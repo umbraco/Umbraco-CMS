@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Globalization;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Tests.Routing
 {
@@ -28,15 +26,15 @@ namespace Umbraco.Tests.Routing
         [TestCase("/test-page", 1172)]
         public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
-            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings, snapshotService: snapshotService);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
 
-            Assert.IsTrue(Current.Configs.Global().HideTopLevelNodeFromPath);
+            Assert.IsTrue(globalSettings.HideTopLevelNodeFromPath);
 
             // FIXME: debugging - going further down, the routes cache is NOT empty?!
             if (urlString == "/home/sub1")
@@ -63,15 +61,14 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1.aspx", 1173)]
         public void Match_Document_By_Url(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
 
-            Assert.IsFalse(Current.Configs.Global().HideTopLevelNodeFromPath);
+            Assert.IsFalse(globalSettings.HideTopLevelNodeFromPath);
 
             var result = lookup.TryFindContent(frequest);
 
@@ -88,13 +85,12 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
 
             var result = lookup.TryFindContent(frequest);
 
@@ -115,14 +111,13 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_Using_Hostname(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
 
             var result = lookup.TryFindContent(frequest);
 
@@ -144,14 +139,13 @@ namespace Umbraco.Tests.Routing
         [TestCase("/æøå/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_In_Hostname(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
 
             var result = lookup.TryFindContent(frequest);
 

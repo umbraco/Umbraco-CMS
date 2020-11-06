@@ -1,16 +1,22 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService, overlayService) {
+
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var id = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
 
         var vm = this;
         var contentPickerOpen = false;
 
         vm.page = {};
         vm.page.rootIcon = "icon-folder";
+        vm.page.submitButtonLabelKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
+
         vm.userGroup = {};
         vm.labels = {};
-        vm.showBackButton = true;
+        vm.showBackButton = !infiniteMode;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -53,7 +59,7 @@
                 vm.labels.noStartNode = name;
             });
 
-            if ($routeParams.create) {
+            if (create) {
                 // get user group scaffold
                 userGroupsResource.getUserGroupScaffold().then(function (userGroup) {
                     vm.userGroup = userGroup;
@@ -63,7 +69,7 @@
                 });
             } else {
                 // get user group
-                userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
+                userGroupsResource.getUserGroup(id).then(function (userGroup) {
                     vm.userGroup = userGroup;
                     formatGranularPermissionSelection();
                     setSectionIcon(vm.userGroup.sections);
@@ -71,7 +77,6 @@
                     vm.loading = false;
                 });
             }
-
         }
 
         function save() {
@@ -85,11 +90,15 @@
             }).then(function (saved) {
 
                 vm.userGroup = saved;
-                formatGranularPermissionSelection();
-                setSectionIcon(vm.userGroup.sections);
-                makeBreadcrumbs();
-                vm.page.saveButtonState = "success";
 
+                if (infiniteMode) {
+                    $scope.model.submit(vm.userGroup);
+                } else {
+                    formatGranularPermissionSelection();
+                    setSectionIcon(vm.userGroup.sections);
+                    makeBreadcrumbs();
+                    vm.page.saveButtonState = "success";
+                }
             }, function (err) {
                 vm.page.saveButtonState = "error";
             });
@@ -274,7 +283,25 @@
 
         function removeSelectedItem(index, selection) {
             if (selection && selection.length > 0) {
-                selection.splice(index, 1);
+
+                const dialog = {
+                    view: "views/users/views/overlays/remove.html",
+                    username: selection[index].username,
+                    userGroupName: vm.userGroup.name.toLowerCase(),
+                    submitButtonLabelKey: "defaultdialogs_yesRemove",
+                    submitButtonStyle: "danger",
+
+                    submit: function () {
+                        selection.splice(index, 1);
+
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(dialog);
             }
         }
 

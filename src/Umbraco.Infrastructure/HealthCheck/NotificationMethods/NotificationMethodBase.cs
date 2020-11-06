@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core.Configuration.HealthChecks;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {
-        protected NotificationMethodBase(IHealthChecksSettings healthCheckSettingsConfig)
+        protected NotificationMethodBase(IOptions<HealthChecksSettings> healthCheckSettings)
         {
             var type = GetType();
             var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
@@ -18,8 +20,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var notificationMethods = healthCheckSettingsConfig.NotificationSettings.NotificationMethods;
-            if(!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
+            var notificationMethods = healthCheckSettings.Value.Notification.NotificationMethods;
+            if (!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;
                 return;
@@ -37,13 +39,13 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
 
-        public IReadOnlyDictionary<string, INotificationMethodSettings> Settings { get; }
+        public IDictionary<string, string> Settings { get; }
 
         protected bool ShouldSend(HealthCheckResults results)
         {
             return Enabled && (!FailureOnly || !results.AllChecksSuccessful);
         }
 
-        public abstract Task SendAsync(HealthCheckResults results, CancellationToken token);
+        public abstract Task SendAsync(HealthCheckResults results);
     }
 }

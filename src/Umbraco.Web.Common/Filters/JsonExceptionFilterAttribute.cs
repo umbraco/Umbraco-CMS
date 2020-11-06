@@ -25,7 +25,7 @@ namespace Umbraco.Web.Common.Filters
 
             public void OnException(ExceptionContext filterContext)
             {
-                if (filterContext.Exception != null)
+                if (filterContext.Exception != null && !filterContext.ExceptionHandled)
                 {
                     filterContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 

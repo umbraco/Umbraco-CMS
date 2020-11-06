@@ -9,7 +9,10 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
+    function DocumentTypesEditController($scope, $routeParams, $q,
+        contentTypeResource, editorState, contentEditingHelper,
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];
@@ -21,6 +24,7 @@
         var isElement = $routeParams.iselement;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var documentTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -354,6 +358,10 @@
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
+                    
+                    if (documentTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
 
                     vm.page.saveButtonState = "success";
 
@@ -403,10 +411,12 @@
             // convert icons for content type
             convertLegacyIcons(contentType);
 
-            vm.contentType = contentType;
-
             //set a shared state
-            editorState.set(vm.contentType);
+            editorState.set(contentType);
+
+            vm.contentType = contentType;
+            
+            documentTypeIcon = contentType.icon;
 
             loadButtons();
         }

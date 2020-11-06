@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using MailKit.Security;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Umbraco.Core
@@ -17,16 +19,16 @@ namespace Umbraco.Core
     {
         // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
 
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly bool _enableEvents;
 
-        public EmailSender(IGlobalSettings globalSettings) : this(globalSettings, false)
+        public EmailSender(IOptions<GlobalSettings> globalSettings) : this(globalSettings, false)
         {
         }
 
-        public EmailSender(IGlobalSettings globalSettings, bool enableEvents)
+        public EmailSender(IOptions<GlobalSettings> globalSettings, bool enableEvents)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _enableEvents = enableEvents;
 
             _smtpConfigured = new Lazy<bool>(() => _globalSettings.IsSmtpServerConfigured);
@@ -38,23 +40,23 @@ namespace Umbraco.Core
         /// Sends the message non-async
         /// </summary>
         /// <param name="message"></param>
-        public void Send(MailMessage message)
+        public void Send(EmailMessage message)
         {
             if (_smtpConfigured.Value == false && _enableEvents)
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
-            else
+            else if (_smtpConfigured.Value == true)
             {
                 using (var client = new SmtpClient())
                 {
+                    client.Connect(_globalSettings.Smtp.Host,
+                        _globalSettings.Smtp.Port,
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
-                    client.Connect(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
-
-                    if (!(_globalSettings.SmtpSettings.Username is null &&
-                          _globalSettings.SmtpSettings.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
-                        client.Authenticate(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                        client.Authenticate(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
 
                     client.Send(ConstructEmailMessage(message));
@@ -68,26 +70,27 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendAsync(MailMessage message)
+        public async Task SendAsync(EmailMessage message)
         {
             if (_smtpConfigured.Value == false && _enableEvents)
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
-            else
+            else if (_smtpConfigured.Value == true)
             {
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+                    await client.ConnectAsync(_globalSettings.Smtp.Host,
+                        _globalSettings.Smtp.Port,
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
-                    if (!(_globalSettings.SmtpSettings.Username is null &&
-                          _globalSettings.SmtpSettings.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
-                        await client.AuthenticateAsync(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                        await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
 
                     var mailMessage = ConstructEmailMessage(message);
-                    if (_globalSettings.SmtpSettings.DeliveryMethod == SmtpDeliveryMethod.Network)
+                    if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
                     {
                         await client.SendAsync(mailMessage);
                     }
@@ -107,7 +110,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
         /// </remarks>
-        public static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
+        public static bool CanSendRequiredEmail(GlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
 
         /// <summary>
         /// returns true if an event handler has been registered
@@ -124,23 +127,22 @@ namespace Umbraco.Core
 
         private static void OnSendEmail(SendEmailEventArgs e)
         {
-            var handler = SendEmail;
-            if (handler != null) handler(null, e);
+            SendEmail?.Invoke(null, e);
         }
 
-        private MimeMessage ConstructEmailMessage(MailMessage mailMessage)
+        private MimeMessage ConstructEmailMessage(EmailMessage mailMessage)
         {
-            var fromEmail = mailMessage.From?.Address;
+            var fromEmail = mailMessage.From;
             if(string.IsNullOrEmpty(fromEmail))
-                fromEmail = _globalSettings.SmtpSettings.From;
+                fromEmail = _globalSettings.Smtp.From;
 
             var messageToSend = new MimeMessage
             {
                 Subject = mailMessage.Subject,
-                From = { new MailboxAddress(fromEmail)},
+                From = { MailboxAddress.Parse(fromEmail) },
                 Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body }
             };
-            messageToSend.To.AddRange(mailMessage.To.Select(x=>new MailboxAddress(x.Address)));
+            messageToSend.To.Add(MailboxAddress.Parse(mailMessage.To));
 
             return messageToSend;
         }

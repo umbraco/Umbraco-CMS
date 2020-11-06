@@ -8,23 +8,20 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
@@ -32,7 +29,10 @@ using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -45,8 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-
-        private readonly IMemberPasswordConfiguration _passwordConfig;
+        private readonly MemberPasswordConfigurationSettings _passwordConfig;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly LegacyPasswordSecurity _passwordSecurity;
         private readonly UmbracoMapper _umbracoMapper;
@@ -54,27 +53,27 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
 
         public MemberController(
             ICultureDictionary cultureDictionary,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
-            IMemberPasswordConfiguration passwordConfig,
+            IOptions<MemberPasswordConfigurationSettings> passwordConfig,
             PropertyEditorCollection propertyEditors,
             LegacyPasswordSecurity passwordSecurity,
             UmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
-            : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
         {
-            _passwordConfig = passwordConfig;
+            _passwordConfig = passwordConfig.Value;
             _propertyEditors = propertyEditors;
             _passwordSecurity = passwordSecurity;
             _umbracoMapper = umbracoMapper;
@@ -82,7 +81,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberTypeService = memberTypeService;
             _dataTypeService = dataTypeService;
             _localizedTextService = localizedTextService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -305,18 +304,22 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private IMember CreateMemberData(MemberSave contentItem)
         {
-            var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
-            if (memberType == null)
-                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
-            var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
-            {
-                CreatorId = _webSecurity.CurrentUser.Id,
-                RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
-                Comments = contentItem.Comments,
-                IsApproved = contentItem.IsApproved
-            };
+            throw new NotImplementedException("Members have not been migrated to netcore");
 
-            return member;
+            // TODO: all member password processing and creation needs to be done with a new aspnet identity MemberUserManager that hasn't been created yet.
+
+            //var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
+            //if (memberType == null)
+            //    throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
+            //var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
+            //{
+            //    CreatorId = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id,
+            //    RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
+            //    Comments = contentItem.Comments,
+            //    IsApproved = contentItem.IsApproved
+            //};
+
+            //return member;
         }
 
         /// <summary>
@@ -328,13 +331,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         private void UpdateMemberData(MemberSave contentItem)
         {
-            contentItem.PersistedContent.WriterId = _webSecurity.CurrentUser.Id;
+            contentItem.PersistedContent.WriterId = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id;
 
             // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
             // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
             // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
             // but we will take care of this in a generic way below so that it works for all props.
-            if (!_webSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData())
             {
                 var memberType = _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
                 var sensitiveProperties = memberType
@@ -372,8 +375,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (contentItem.Password == null)
                 return;
 
+            throw new NotImplementedException("Members have not been migrated to netcore");
+            // TODO: all member password processing and creation needs to be done with a new aspnet identity MemberUserManager that hasn't been created yet.
             // set the password
-            contentItem.PersistedContent.RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
+            //contentItem.PersistedContent.RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
         }
 
         private static void UpdateName(MemberSave memberSave)
@@ -458,7 +463,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult ExportMemberData(Guid key)
         {
-            var currentUser = _webSecurity.CurrentUser;
+            var currentUser = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             if (currentUser.HasAccessToSensitiveData() == false)
             {

@@ -39,15 +39,19 @@
                     check.status.forEach(status => {
                         switch (status.resultType) {
                             case SUCCESS:
+                            case 'Success':
                                 totalSuccess = totalSuccess + 1;
                                 break;
                             case WARNING:
+                            case 'Warning':
                                 totalWarning = totalWarning + 1;
                                 break;
                             case ERROR:
+                            case 'Error':
                                 totalError = totalError + 1;
                                 break;
                             case INFO:
+                            case 'Info':
                                 totalInfo = totalInfo + 1;
                                 break;
                         }

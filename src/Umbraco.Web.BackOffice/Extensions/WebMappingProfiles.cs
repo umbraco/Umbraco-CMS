@@ -1,8 +1,9 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
-using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.BackOffice.Mapping;
 
 namespace Umbraco.Extensions
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Extensions
                 .Add<MediaMapDefinition>()
                 .Add<MemberMapDefinition>();
 
-            composition.Register<CommonTreeNodeMapper>();
+            composition.Services.AddTransient<CommonTreeNodeMapper>();
 
             return composition;
         }

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
@@ -17,19 +16,23 @@ namespace Umbraco.Core.Cache
     /// </remarks>
     public class HttpRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
+        private static object _syncRoot = new object(); // Using this for locking as the SyncRoot property is not available to us
+                                                        // on the provided collection provided from .NET Core's HttpContext.Items dictionary,
+                                                        // as it doesn't implement ICollection where SyncRoot is defined.
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public HttpRequestAppCache(Func<IDictionary> requestItems) : base()
+        public HttpRequestAppCache(Func<IDictionary<object, object>> requestItems) : base()
         {
             ContextItems = requestItems;
         }
 
-        private Func<IDictionary> ContextItems { get; }
+        private Func<IDictionary<object, object>> ContextItems { get; }
 
         public bool IsAvailable => TryGetContextItems(out _);
 
-        private bool TryGetContextItems(out IDictionary items)
+        private bool TryGetContextItems(out IDictionary<object, object> items)
         {
             items = ContextItems?.Invoke();
             return items != null;
@@ -115,13 +118,13 @@ namespace Umbraco.Core.Cache
 
         #region Entries
 
-        protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
+        protected override IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries()
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (!TryGetContextItems(out var items)) return Enumerable.Empty<DictionaryEntry>();
+            if (!TryGetContextItems(out var items)) return Enumerable.Empty<KeyValuePair<object, object>>();
 
-            return items.Cast<DictionaryEntry>()
+            return items.Cast<KeyValuePair<object, object>>()
                 .Where(x => x.Key is string s && s.StartsWith(prefix));
         }
 
@@ -154,7 +157,7 @@ namespace Umbraco.Core.Cache
             // ContextItems - which is locked, so this should be safe
 
             var entered = false;
-            Monitor.Enter(items.SyncRoot, ref entered);
+            Monitor.Enter(_syncRoot, ref entered);
             items[ContextItemsLockKey] = entered;
         }
 
@@ -166,7 +169,7 @@ namespace Umbraco.Core.Cache
 
             var entered = (bool?)items[ContextItemsLockKey] ?? false;
             if (entered)
-                Monitor.Exit(items.SyncRoot);
+                Monitor.Exit(_syncRoot);
             items.Remove(ContextItemsLockKey);
         }
 
@@ -179,7 +182,7 @@ namespace Umbraco.Core.Cache
                 yield break;
             }
 
-            foreach (DictionaryEntry item in items)
+            foreach (var item in items)
             {
                 yield return new KeyValuePair<string, object>(item.Key.ToString(), item.Value);
             }

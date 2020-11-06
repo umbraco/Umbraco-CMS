@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.ActionResults
+namespace Umbraco.Web.BackOffice.ActionResults
 {
     public class JavaScriptResult : ContentResult
     {

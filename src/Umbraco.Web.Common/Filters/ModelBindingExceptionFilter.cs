@@ -4,8 +4,9 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ModelBinders;
 
@@ -18,16 +19,16 @@ namespace Umbraco.Web.Common.Filters
     /// <remarks>
     /// This is only enabled when running PureLive
     /// </remarks>
-    internal class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
+    public class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
     {
         private static readonly Regex _getPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
 
-        private readonly IExceptionFilterSettings _exceptionFilterSettings;
+        private readonly ExceptionFilterSettings _exceptionFilterSettings;
         private readonly IPublishedModelFactory _publishedModelFactory;
 
-        public ModelBindingExceptionFilter(IExceptionFilterSettings exceptionFilterSettings, IPublishedModelFactory publishedModelFactory)
+        public ModelBindingExceptionFilter(IOptions<ExceptionFilterSettings> exceptionFilterSettings, IPublishedModelFactory publishedModelFactory)
         {
-            _exceptionFilterSettings = exceptionFilterSettings;
+            _exceptionFilterSettings = exceptionFilterSettings.Value;
             _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
         }
 

@@ -4,20 +4,20 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)
-                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
+                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger<UmbracoDatabase>>()));
 
             return databaseFactoryMock.Object;
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets a mocked service context built with mocked services.
         /// </summary>
         /// <returns>A ServiceContext.</returns>
-        public ServiceContext GetServiceContextMock(IFactory container = null)
+        public ServiceContext GetServiceContextMock(IServiceProvider container = null)
         {
             // FIXME: else some tests break - figure it out
             container = null;
@@ -83,10 +83,10 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMacroService>(container));
         }
 
-        private T MockService<T>(IFactory container = null)
+        private T MockService<T>(IServiceProvider container = null)
             where T : class
         {
-            return container?.TryGetInstance<T>() ?? new Mock<T>().Object;
+            return container?.GetService<T>() ?? new Mock<T>().Object;
         }
 
         /// <summary>
@@ -136,9 +136,9 @@ namespace Umbraco.Tests.TestHelpers
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
-        public IGlobalSettings GetGlobalSettings()
+        public GlobalSettings GetGlobalSettings()
         {
-            return SettingsForTests.DefaultGlobalSettings;
+            return new GlobalSettings();
         }
         public IFileSystems GetFileSystemsMock()
         {

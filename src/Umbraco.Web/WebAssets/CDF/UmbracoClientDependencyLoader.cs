@@ -2,6 +2,7 @@
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.WebAssets.CDF
@@ -15,7 +16,7 @@ namespace Umbraco.Web.WebAssets.CDF
         /// <summary>
         /// Set the defaults
         /// </summary>
-        public UmbracoClientDependencyLoader(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public UmbracoClientDependencyLoader(GlobalSettings globalSettings, IIOHelper ioHelper)
             : base()
         {
             this.AddPath("UmbracoRoot", ioHelper.ResolveUrl(globalSettings.UmbracoPath));
@@ -23,7 +24,7 @@ namespace Umbraco.Web.WebAssets.CDF
 
         }
 
-        public static ClientDependencyLoader TryCreate(Control parent, out bool isNew, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public static ClientDependencyLoader TryCreate(Control parent, out bool isNew, GlobalSettings globalSettings, IIOHelper ioHelper)
         {
             if (ClientDependencyLoader.Instance == null)
             {

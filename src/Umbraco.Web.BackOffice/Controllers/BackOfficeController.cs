@@ -5,74 +5,77 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
-using Umbraco.Web.Security;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-
+    [DisableBrowserCache] //TODO Reintroduce
+    //[UmbracoRequireHttps] //TODO Reintroduce
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
-    public class BackOfficeController : Controller
+    public class BackOfficeController : UmbracoController
     {
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
-        private readonly IWebSecurity _webSecurity;
-        private readonly ILogger _logger;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly ILogger<BackOfficeController> _logger;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public BackOfficeController(
-            BackOfficeUserManager userManager,
+            IBackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
-            IWebSecurity webSecurity,
-            ILogger logger)
-
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            ILogger<BackOfficeController> logger,
+            IJsonSerializer jsonSerializer)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _backOfficeServerVariables = backOfficeServerVariables;
             _appCaches = appCaches;
             _signInManager = signInManager;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _logger = logger;
+            _jsonSerializer = jsonSerializer;
         }
 
         [HttpGet]
@@ -80,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
-            
+
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () => View(viewPath),
                 () => View(viewPath));
@@ -92,14 +95,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
             //dumped at the default admin view with no detail
-            if (_webSecurity.IsAuthenticated())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated())
             {
                 await _signInManager.SignOutAsync();
             }
 
             if (invite == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: NULL");
                 return RedirectToAction(nameof(Default));
             }
 
@@ -107,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (parts.Length != 2)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -116,7 +119,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -125,7 +128,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var identityUser = await _userManager.FindByIdAsync(id);
             if (identityUser == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                _logger.LogWarning("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -133,7 +136,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.Succeeded == false)
             {
-                _logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
+                _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
                 return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
             }
 
@@ -185,7 +188,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
-            var isAuthenticated = _webSecurity.IsAuthenticated();
+            var isAuthenticated = _backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated();
 
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
@@ -250,11 +253,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user != null)
             {
-                var result = await _userManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
+                var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] =  _jsonSerializer.Serialize(new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }

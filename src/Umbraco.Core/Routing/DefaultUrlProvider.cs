@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
@@ -12,18 +14,18 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class DefaultUrlProvider : IUrlProvider
     {
-        private readonly IRequestHandlerSettings _requestSettings;
-        private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly RequestHandlerSettings _requestSettings;
+        private readonly ILogger<DefaultUrlProvider> _logger;
+        private readonly GlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IRequestHandlerSettings requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
+        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, IOptions<GlobalSettings> globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
-            _requestSettings = requestSettings;
+            _requestSettings = requestSettings.Value;
             _logger = logger;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _siteDomainHelper = siteDomainHelper;
             _uriUtility = uriUtility;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -47,7 +49,7 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
+                _logger.LogDebug("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 
@@ -113,7 +115,7 @@ namespace Umbraco.Web.Routing
                 var path = pos == 0 ? route : route.Substring(pos);
 
                 var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
-                uri = _uriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
+                uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
                 yield return UrlInfo.Url(uri.ToString(), culture);
             }
         }
@@ -172,7 +174,7 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return _uriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
+            return _uriUtility.UriFromUmbraco(uri, _requestSettings);
         }
 
         string CombinePaths(string path1, string path2)

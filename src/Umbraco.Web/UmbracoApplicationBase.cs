@@ -1,24 +1,34 @@
-﻿using Serilog.Context;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Context;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Net;
-using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
+using GlobalSettings = Umbraco.Core.Configuration.Models.GlobalSettings;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
 {
@@ -27,32 +37,37 @@ namespace Umbraco.Web
     /// </summary>
     public abstract class UmbracoApplicationBase : HttpApplication
     {
+        private readonly ILogger<UmbracoApplicationBase> _logger;
+        private readonly SecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ConnectionStrings _connectionStrings;
+        private readonly IIOHelper _ioHelper;
         private IRuntime _runtime;
-        private IFactory _factory;
+        private IServiceProvider _factory;
+        private ILoggerFactory _loggerFactory;
 
         protected UmbracoApplicationBase()
         {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
-                var configFactory = new ConfigsFactory();
+                HostingSettings hostingSettings = null;
+                GlobalSettings globalSettings = null;
+                SecuritySettings securitySettings = null;
+                WebRoutingSettings webRoutingSettings = null;
 
-                var hostingSettings = configFactory.HostingSettings;
-                var globalSettings = configFactory.GlobalSettings;
-
-                var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+                var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
-                var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
-                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"));
+                var ioHelper = new IOHelper(hostingEnvironment);
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, new ConfigurationRoot(new List<IConfigurationProvider>()));
 
-                var configs = configFactory.Create();
-
-                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
-                Logger = logger;
+                Umbraco.Composing.Current.Initialize(NullLogger<object>.Instance,
+                    securitySettings,
+                    globalSettings,
+                    ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Logger = NullLogger<UmbracoApplicationBase>.Instance;
             }
         }
 
@@ -66,22 +81,26 @@ namespace Umbraco.Web
                 return new VoidProfiler();
             }
 
-            var webProfiler = new WebProfiler();
-            webProfiler.Start();
-
-            return webProfiler;
+            return new VoidProfiler();
         }
 
-        protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, ILoggerFactory loggerFactory, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
+            _logger = logger;
+            _securitySettings = securitySettings;
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
+            _ioHelper = ioHelper;
+            _loggerFactory = loggerFactory;
+
             if (!Umbraco.Composing.Current.IsInitialized)
             {
                 Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }
         }
 
-        protected ILogger Logger { get; }
+        protected ILogger<UmbracoApplicationBase> Logger { get; }
 
         /// <summary>
         /// Gets a <see cref="ITypeFinder"/>
@@ -101,8 +120,8 @@ namespace Umbraco.Web
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/App_Code")));
             // global.asax (the app domain also monitors this, if it changes will do a full restart)
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/global.asax")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
-            return new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(_loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+            return new TypeFinder(_loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website
                 // in that case is essentially an exe. However in netframework there is no entry assembly, things don't really work that way since
                 // the process that is running the site is iisexpress, so this returns null. The best we can do is fallback to GetExecutingAssembly()
@@ -120,14 +139,14 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
+        protected abstract IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
+        protected virtual IServiceCollection GetRegister(GlobalSettings globalSettings)
         {
-            return RegisterFactory.Create(globalSettings);
+            return new ServiceCollection();
         }
 
         // events - in the order they trigger
@@ -159,28 +178,30 @@ namespace Umbraco.Web
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
 
-            var globalSettings =  Umbraco.Composing.Current.Configs.Global();
-            var umbracoVersion = new UmbracoVersion(globalSettings);
+            var globalSettings =  _globalSettings;
+            var umbracoVersion = new UmbracoVersion();
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
             _runtime = GetRuntime(
-                Umbraco.Composing.Current.Configs,
+                _globalSettings,
+                _connectionStrings,
                 umbracoVersion,
-                Umbraco.Composing.Current.IOHelper,
-                Umbraco.Composing.Current.Logger,
+                _ioHelper,
+                _logger,
+                _loggerFactory,
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            _factory = Current.Factory = _runtime.Configure(register);
+            //_factory = Current.Factory = _runtime.Configure(register);
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
-            LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));
-            LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
-            LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
+            LogContext.Push(new HttpSessionIdEnricher(_factory.GetRequiredService<ISessionIdResolver>()));
+            LogContext.Push(new HttpRequestNumberEnricher(_factory.GetRequiredService<IRequestCache>()));
+            LogContext.Push(new HttpRequestIdEnricher(_factory.GetRequiredService<IRequestCache>()));
 
-            _runtime.Start();
+            _runtime.Start(null);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
@@ -251,7 +272,7 @@ namespace Umbraco.Web
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                Current.Logger.LogInformation("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
                     HostingEnvironment.ShutdownReason,
                     shutDownMessage,
                     shutDownStack);
@@ -259,12 +280,10 @@ namespace Umbraco.Web
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
+                Current.Logger.LogInformation("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
 
             Current.Logger.DisposeIfDisposable();
-            // dispose the container and everything
-            Current.Reset();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
@@ -291,7 +310,7 @@ namespace Umbraco.Web
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.Error<UmbracoApplicationBase>(exception, "An unhandled exception occurred");
+            Current.Logger.LogError(exception, "An unhandled exception occurred");
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -314,7 +333,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
+                Current.Logger.LogError(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

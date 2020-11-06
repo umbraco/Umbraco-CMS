@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class RelationTypeRepository : NPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-        public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -50,12 +50,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = GetBaseQuery(false);
 
-            // should not happen due to the cache policy
-            if (ids.Any())
-                throw new NotImplementedException();
-
             var dtos = Database.Fetch<RelationTypeDto>(sql);
-            
+
             return dtos.Select(x => DtoToEntity(x));
         }
 
@@ -75,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
-  
+
             return dtos.Select(x => DtoToEntity(x));
         }
 

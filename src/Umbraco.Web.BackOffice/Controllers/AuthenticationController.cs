@@ -1,21 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
@@ -39,54 +38,57 @@ namespace Umbraco.Web.BackOffice.Controllers
     [IsBackOffice] // TODO: This could be applied with our Application Model conventions
     public class AuthenticationController : UmbracoApiControllerBase
     {
-        private readonly IWebSecurity _webSecurity;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySettings _securitySettings;
-        private readonly ILogger _logger;
+        private readonly GlobalSettings _globalSettings;
+        private readonly SecuritySettings _securitySettings;
+        private readonly ILogger<AuthenticationController> _logger;
         private readonly IIpResolver _ipResolver;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly LinkGenerator _linkGenerator;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
-            IWebSecurity webSecurity,
-            BackOfficeUserManager backOfficeUserManager,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings,
-            ISecuritySettings securitySettings,
-            ILogger logger,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
+            ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IRequestAccessor requestAccessor)
+            IRequestAccessor requestAccessor,
+            LinkGenerator linkGenerator)
         {
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
             _signInManager = signInManager;
             _userService = userService;
             _textService = textService;
             _umbracoMapper = umbracoMapper;
-            _globalSettings = globalSettings;
-            _securitySettings = securitySettings;
+            _globalSettings = globalSettings.Value;
+            _securitySettings = securitySettings.Value;
             _logger = logger;
             _ipResolver = ipResolver;
-            _passwordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration.Value;
             _emailSender = emailSender;
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
+            _linkGenerator = linkGenerator;
         }
 
         /// <summary>
@@ -96,7 +98,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _webSecurity.CurrentUser.Id);
+            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
         }
 
         /// <summary>
@@ -148,7 +150,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                 // the timeout process.
 
-                _logger.Info<AuthenticationController>(
+                _logger.LogInformation(
                     "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
                     backOfficeIdentity.Name,
                     _ipResolver.GetCurrentRequestIpAddress());
@@ -164,7 +166,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public bool IsAuthenticated()
         {
-            var attempt = _webSecurity.AuthorizeRequest();
+            var attempt = _backofficeSecurityAccessor.BackofficeSecurity.AuthorizeRequest();
             if (attempt == ValidateRequestAttempt.Success)
             {
                 return true;
@@ -186,7 +188,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
@@ -207,7 +209,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [SetAngularAntiForgeryTokens]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             if (user.IsApproved)
             {
@@ -307,6 +309,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var user = _userService.GetByEmail(model.Email);
                 if (user != null)
                 {
+                    var from = _globalSettings.Smtp.From;
                     var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
@@ -319,13 +322,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings));
 
-                    var mailMessage = new MailMessage()
-                    {
-                        Subject = subject,
-                        Body = message,
-                        IsBodyHtml = true,
-                        To = { user.Email }
-                    };
+                    var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
                     await _emailSender.SendAsync(mailMessage);
 
@@ -351,19 +348,19 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var lockedOut = await _userManager.IsLockedOutAsync(identityUser);
                 if (lockedOut)
                 {
-                    _logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    _logger.LogInformation("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        _logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
 
                     var resetAccessFailedCountResult = await _userManager.ResetAccessFailedCountAsync(identityUser);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        _logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
                 }
 
@@ -409,7 +406,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
 
-            _logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
             _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
 
@@ -438,11 +435,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private string ConstructCallbackUrl(int userId, string code)
         {
             // Get an mvc helper to get the url
-            var urlHelper = new UrlHelper(ControllerContext);
-            var action = urlHelper.Action(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
+            var action = _linkGenerator.GetPathByAction(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
                 new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     u = userId,
                     r = code
                 });

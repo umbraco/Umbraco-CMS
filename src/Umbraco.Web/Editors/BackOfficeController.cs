@@ -4,17 +4,20 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
@@ -26,45 +29,36 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [UmbracoRequireHttps]
     [DisableBrowserCache]
-    public class BackOfficeController : UmbracoController
+    public class BackOfficeController : Controller
     {
-        private readonly UmbracoFeatures _features;
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _runtimeSettings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUserService _userService;
+        private readonly ILogger<BackOfficeController> _logger;
 
         public BackOfficeController(
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger profilingLogger,
-            IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
+            IOptions<GlobalSettings> globalSettings,
+            ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
-
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUserService userService
+           )
         {
-            _features = features;
-            _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = settings;
-            _securitySettings = securitySettings;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _userService = userService;
+            _logger = loggerFactory.CreateLogger<BackOfficeController>();
         }
 
-        protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
+        protected BackOfficeSignInManager SignInManager => null;
 
-        protected BackOfficeOwinUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
+        protected BackOfficeOwinUserManager UserManager => null;
 
-        protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
+        protected IAuthenticationManager AuthenticationManager => null;
 
 
         // TODO: for converting to netcore, some examples:
@@ -139,7 +133,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment));
+            ViewData.SetUmbracoPath(_globalSettings.Value.GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
@@ -147,7 +141,7 @@ namespace Umbraco.Web.Editors
                 return defaultResponse();
 
             //First check if there's external login info, if there's not proceed as normal
-            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
+            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
                 Constants.Security.BackOfficeExternalAuthenticationType);
 
             if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
@@ -172,10 +166,10 @@ namespace Umbraco.Web.Editors
             // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
             // .... not likely!
-            var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
+            var authType = AuthenticationManager.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -198,7 +192,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        _logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 
@@ -230,7 +224,7 @@ namespace Umbraco.Web.Editors
             if (autoLinkOptions == null)
                 return false;
 
-            if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo) == false)
+            if (autoLinkOptions.ShouldAutoLinkExternalAccount(_umbracoContextAccessor.UmbracoContext, loginInfo) == false)
                 return true;
 
             //we are allowing auto-linking/creating of local accounts
@@ -241,7 +235,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
+                var foundByEmail = _userService.GetByEmail(loginInfo.Email);
                 if (foundByEmail != null)
                 {
                     ViewData.SetExternalSignInError(new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider });
@@ -251,13 +245,12 @@ namespace Umbraco.Web.Editors
                     if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
                     if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
-                    var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
+                    var groups = _userService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(_umbracoContextAccessor.UmbracoContext, loginInfo));
 
-                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(
-                        GlobalSettings,
+                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings.Value,
                         loginInfo.Email,
                         loginInfo.Email,
-                        autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
+                        autoLinkOptions.GetDefaultCulture(_umbracoContextAccessor.UmbracoContext, loginInfo));
                     autoLinkUser.Name = loginInfo.ExternalIdentity.Name;
                     foreach (var userGroup in groups)
                     {

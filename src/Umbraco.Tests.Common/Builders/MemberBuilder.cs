@@ -1,6 +1,8 @@
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
+using System.Collections.Generic;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -45,6 +47,7 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sortOrder;
         private bool? _trashed;
         private int? _propertyIdsIncrementingFrom;
+        private IMemberType _memberType;
 
         public MemberBuilder WithPropertyIdsIncrementingFrom(int propertyIdsIncrementingFrom)
         {
@@ -54,9 +57,18 @@ namespace Umbraco.Tests.Common.Builders
 
         public MemberTypeBuilder AddMemberType()
         {
+            _memberType = null;
             var builder = new MemberTypeBuilder(this);
             _memberTypeBuilder = builder;
             return builder;
+        }
+
+        public MemberBuilder WithMemberType(IMemberType memberType)
+        {
+            _memberTypeBuilder = null;
+            _memberType = memberType;
+
+            return this;
         }
 
         public GenericCollectionBuilder<MemberBuilder, string> AddMemberGroups()
@@ -82,12 +94,12 @@ namespace Umbraco.Tests.Common.Builders
 
         public override Member Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
-            var creatorId = _creatorId ?? 1;
+            var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
@@ -102,12 +114,12 @@ namespace Umbraco.Tests.Common.Builders
             var lastLoginDate = _lastLoginDate ?? DateTime.Now;
             var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
 
-            if (_memberTypeBuilder == null)
+            if (_memberTypeBuilder is null && _memberType is null)
             {
-                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMemberType().");
+                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMemberType() or WithMemberType().");
             }
 
-            var memberType = _memberTypeBuilder.Build();
+            var memberType = _memberType ?? _memberTypeBuilder.Build();
 
             var member = new Member(name, email, username, rawPasswordValue, memberType)
             {
@@ -164,6 +176,84 @@ namespace Umbraco.Tests.Common.Builders
             }
 
             return member;
+        }
+
+        public static IEnumerable<IMember> CreateSimpleMembers(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
+        {
+            var list = new List<IMember>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+
+                var builder = new MemberBuilder()
+                    .WithMemberType(memberType)
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i);
+
+
+                builder = builder
+                    .AddPropertyData()
+                    .WithKeyValue("title", name + " member" + i)
+                    .WithKeyValue("bodyText", "This is a subpage" + i)
+                    .WithKeyValue("author", "John Doe" + i)
+                    .Done();
+
+                list.Add(builder.Build());
+            }
+
+            return list;
+        }
+        public static Member CreateSimpleMember(IMemberType memberType, string name, string email, string password, string username, Guid? key = null)
+        {
+            var builder = new MemberBuilder()
+                .WithMemberType(memberType)
+                .WithName(name)
+                .WithEmail(email)
+                .WithIsApproved(true)
+                .WithLogin(username, password);
+
+            if (key.HasValue)
+            {
+                builder = builder.WithKey(key.Value);
+            }
+
+            builder = builder
+                .AddPropertyData()
+                    .WithKeyValue("title", name + " member")
+                    .WithKeyValue("bodyText", "Member profile")
+                    .WithKeyValue("author", "John Doe")
+                    .Done();
+
+            return builder.Build();
+        }
+
+        public static IEnumerable<IMember> CreateMultipleSimpleMembers(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
+        {
+            var list = new List<IMember>();
+
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+                var member = new MemberBuilder()
+                    .WithMemberType(memberType)
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i)
+                    .AddPropertyData()
+                        .WithKeyValue("title", name + " member" + i)
+                        .WithKeyValue("bodyText", "Member profile" + i)
+                        .WithKeyValue("author", "John Doe" + i)
+                        .Done()
+                    .Build();
+
+                onCreating?.Invoke(i, member);
+
+                list.Add(member);
+            }
+
+            return list;
         }
 
         int? IWithIdBuilder.Id

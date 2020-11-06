@@ -127,6 +127,13 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         }
     }
 
+    function showBackdrop() {
+        var backDropOptions = {
+            'element': $('#leftcolumn')[0]
+        };
+        backdropService.open(backDropOptions);
+    }
+
     var service = {
 
         /**
@@ -427,13 +434,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         showMenu: function (args) {
             var self = this;
 
-            var backDropOptions = {
-                'element': $('#leftcolumn')[0]
-            };
-
             return treeService.getMenu({ treeNode: args.node })
                 .then(function (data) {
-                    backdropService.open(backDropOptions);
+                    showBackdrop();
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
@@ -544,6 +547,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 }
             }
             else {
+                showBackdrop();
                 service.showDialog({
                     node: node,
                     action: action,

@@ -17,11 +17,11 @@
             </div>
         </div>
 
-        <div class="controls" ng-if="installer.current.model.dbType == 0">
+        <div class="controls" ng-if="installer.current.model.dbType == 0 || installer.current.model.dbType =='SqlCe' ">
             <p>Great! No need to configure anything, you can simply click the <strong>continue</strong> button below to continue to the next step</p>
         </div>
 
-        <div ng-if="installer.current.model.dbType < 0">
+        <div ng-if="installer.current.model.dbType < 0 || installer.current.model.dbType == 3 || installer.current.model.dbType == 'Custom' ">
             <legend>What is the exact connection string we should use?</legend>
             <div class="control-group">
                 <label class="control-label" for="server">Connection string</label>
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div ng-if="installer.current.model.dbType > 0">
+        <div ng-if="installer.current.model.dbType > 0 || installer.current.model.dbType != 'Custom' ">
             <div class="row">
                 <legend>Where do we find your database?</legend>
                 <div class="span6">
@@ -40,7 +40,7 @@
                         <label class="control-label" for="server">Server</label>
                         <div class="controls">
                             <input type="text" id="server" name="server"
-                                   placeholder="{{ installer.current.model.dbType == 3 ? 'umbraco-database.database.windows.net' : '127.0.0.1\SQLEXPRESS'}}"
+                                   placeholder="{{ (installer.current.model.dbType == 2 || installer.current.model.dbType =='SqlAzure') ? 'umbraco-database.database.windows.net' : '127.0.0.1\\SQLEXPRESS'}}"
                                    required ng-model="installer.current.model.server" />
                             <small class="inline-help">Enter server domain or IP</small>
                         </div>
@@ -86,7 +86,7 @@
                     </div>
                 </div>
 
-                <div class="span12 control-group" ng-if="installer.current.model.dbType == 1">
+                <div class="span12 control-group" ng-if="installer.current.model.dbType == 1 || installer.current.model.dbType =='SqlServer' ">
                     <div class="controls">
                         <label class="checkbox">
                             <input type="checkbox" id="integratedAuth" name="integratedAuth"
@@ -106,7 +106,7 @@
                            ng-class="{disabled:myForm.$invalid}" />
 
                     <button class="btn btn-info" ng-click="restart()">Go back</button>
-                
+
                     <span class="inline-help" ng-if="checking" ng-animate="'fade'">
                         Validating your database connection...
                     </span>

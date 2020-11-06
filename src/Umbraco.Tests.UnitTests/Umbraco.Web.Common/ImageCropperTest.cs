@@ -9,8 +9,9 @@ using Umbraco.Web.Models;
 using System.Text;
 using Umbraco.Core.Media;
 using Umbraco.Extensions;
+using System.Collections.Generic;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 {
 
     [TestFixture]
@@ -311,6 +312,8 @@ namespace Umbraco.Tests.PropertyEditors
 
         internal class TestImageUrlGenerator : IImageUrlGenerator
         {
+            public IEnumerable<string> SupportedImageFileTypes => new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
+
             public string GetImageUrl(ImageUrlGenerationOptions options)
             {
                 var imageProcessorUrl = new StringBuilder(options.ImageUrl ?? string.Empty);

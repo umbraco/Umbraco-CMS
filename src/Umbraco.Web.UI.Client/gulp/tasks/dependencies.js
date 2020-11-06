@@ -212,16 +212,18 @@ function dependencies() {
         },
         {
             "name": "signalr",
-            "src":  ["./node_modules/signalr/jquery.signalR.js"],
-            "base": "./node_modules/signalr"
+            "src":  [
+                "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
+            ],
+            "base": "./node_modules/@microsoft/signalr/dist/browser"
         },
         {
             "name": "spectrum",
             "src":  [
-                "./node_modules/spectrum-colorpicker/spectrum.js",
-                "./node_modules/spectrum-colorpicker/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
             ],
-            "base": "./node_modules/spectrum-colorpicker"
+            "base": "./node_modules/spectrum-colorpicker2/dist"
         },
         {
             "name": "tinymce",
@@ -279,7 +281,7 @@ function dependencies() {
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
     assetsTask = assetsTask.pipe(imagemin([
         imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
+        imagemin.mozjpeg({progressive: true}),
         imagemin.optipng({optimizationLevel: 5}),
         imagemin.svgo({
             plugins: [

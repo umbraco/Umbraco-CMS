@@ -3,6 +3,7 @@ using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Scheduling;
@@ -12,19 +13,24 @@ namespace Umbraco.Web.Search
     /// <summary>
     /// Utility to rebuild all indexes on a background thread
     /// </summary>
-    public sealed class BackgroundIndexRebuilder
+    public class BackgroundIndexRebuilder
     {
         private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _logger;
+        // TODO: Remove unused ProfilingLogger?
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<BackgroundIndexRebuilder> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
-            _logger = logger;
+            _profilingLogger = profilingLogger ;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<BackgroundIndexRebuilder>();
             _hostingEnvironment = hostingEnvironment;
             _indexRebuilder = indexRebuilder;
         }
@@ -34,7 +40,7 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="onlyEmptyIndexes"></param>
         /// <param name="waitMilliseconds"></param>
-        public void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
+        public virtual void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
             // TODO: need a way to disable rebuilding on startup
 
@@ -42,17 +48,17 @@ namespace Umbraco.Web.Search
             {
                 if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
                 {
-                    _logger.Warn<BackgroundIndexRebuilder>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
+                    _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
                     return;
                 }
 
-                _logger.Info<BackgroundIndexRebuilder>("Starting initialize async background thread.");
+                _logger.LogInformation("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger, onlyEmptyIndexes, waitMilliseconds);
+                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _loggerFactory.CreateLogger<RebuildOnStartupTask>(), onlyEmptyIndexes, waitMilliseconds);
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
-                    _logger, _hostingEnvironment);
+                    _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), _hostingEnvironment);
 
                 _rebuildOnStartupRunner.TryAdd(task);
             }
@@ -66,12 +72,12 @@ namespace Umbraco.Web.Search
             private readonly IMainDom _mainDom;
 
             private readonly IndexRebuilder _indexRebuilder;
-            private readonly ILogger _logger;
+            private readonly ILogger<RebuildOnStartupTask> _logger;
             private readonly bool _onlyEmptyIndexes;
             private readonly int _waitMilliseconds;
 
             public RebuildOnStartupTask(IMainDom mainDom,
-                IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+                IndexRebuilder indexRebuilder, ILogger<RebuildOnStartupTask> logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 _mainDom = mainDom;
                 _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
@@ -95,7 +101,7 @@ namespace Umbraco.Web.Search
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<RebuildOnStartupTask>(ex, "Failed to rebuild empty indexes.");
+                    _logger.LogError(ex, "Failed to rebuild empty indexes.");
                 }
             }
 

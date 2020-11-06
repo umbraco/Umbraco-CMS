@@ -1,10 +1,17 @@
 ﻿@model dynamic
 @using Umbraco.Web.Composing
 @using Umbraco.Web.Templates
+
+@*
+    TODO: When this project is asp.net core we can @inject HtmlLocalLinkParser etc (or come up with something even better)
+*@
+
+@using Microsoft.Extensions.DependencyInjection
+
 @{
-    var htmlLocalLinkParser = Current.Factory.GetInstance<HtmlLocalLinkParser>();
-    var htmlUrlParser = Current.Factory.GetInstance<HtmlUrlParser>();
-    var htmlImageSourceParser = Current.Factory.GetInstance<HtmlImageSourceParser>();
+    var htmlLocalLinkParser = Current.Factory.GetRequiredService<HtmlLocalLinkParser>();
+    var htmlUrlParser = Current.Factory.GetRequiredService<HtmlUrlParser>();
+    var htmlImageSourceParser = Current.Factory.GetRequiredService<HtmlImageSourceParser>();
 
     var value = htmlUrlParser.EnsureUrls(Model.value.ToString());
     value = htmlImageSourceParser.EnsureImageSources(value);

@@ -1,32 +1,40 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
     [HealthCheck("61214FF3-FC57-4B31-B5CF-1D095C977D6D", "Debug Compilation Mode",
         Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
         Group = "Live Environment")]
-    public class CompilationDebugCheck : AbstractConfigCheck
+    public class CompilationDebugCheck : AbstractSettingsCheck
     {
-        public CompilationDebugCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
-        { }
+        private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
 
-        public override string FilePath => "~/Web.config";
+        public CompilationDebugCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptionsMonitor<HostingSettings> hostingSettings)
+            : base(textService, loggerFactory)
+        {
+            _hostingSettings = hostingSettings;
+        }
 
-        public override string XPath => "/configuration/system.web/compilation/@debug";
+        public override string ItemPath => Constants.Configuration.ConfigHostingDebug;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
-        public override bool ValidIfConfigMissing => true;
-
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
+            new AcceptableConfiguration
+            {
+                IsRecommended = true,
+                Value = bool.FalseString.ToLower()
+            }
         };
+
+        public override string CurrentValue => _hostingSettings.CurrentValue.Debug.ToString();
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
 

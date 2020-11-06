@@ -1,21 +1,22 @@
-﻿@using Umbraco.Core
+﻿@using Microsoft.Extensions.Options;
+@using Umbraco.Core
 @using Umbraco.Web.WebAssets
 @using Umbraco.Web.Common.Security
 @using Umbraco.Core.WebAssets
 @using Umbraco.Core.Configuration
+@using Umbraco.Core.Configuration.Models
 @using Umbraco.Core.Hosting
 @using Umbraco.Extensions
-@using Umbraco.Core.Logging
 @using Umbraco.Web.BackOffice.Controllers
 @inject BackOfficeSignInManager signInManager
 @inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
-@inject IGlobalSettings globalSettings
+@inject IOptions<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 
 @{
-    var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 }
 
 <!DOCTYPE html>
@@ -59,7 +60,7 @@
     document.angularReady = function (app) {
 
         @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
-        @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+        @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
 
     }
     </script>

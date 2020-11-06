@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Core.HealthCheck
 {
     /// <summary>
-    /// Provides a base class for health checks.
+    /// Provides a base class for health checks, filling in the healthcheck metadata on construction
     /// </summary>
     [DataContract(Name = "healthCheck", Namespace = "")]
     public abstract class HealthCheck : IDiscoverable
     {
         protected HealthCheck()
         {
-            //Fill in the metadata
             var thisType = GetType();
             var meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
             if (meta == null)
-                throw new InvalidOperationException($"The health check {thisType} requires a {typeof (HealthCheckAttribute)}");
+            {
+                throw new InvalidOperationException($"The health check {thisType} requires a {typeof(HealthCheckAttribute)}");
+            }
+
             Name = meta.Name;
             Description = meta.Description;
             Group = meta.Group;
@@ -49,7 +50,5 @@ namespace Umbraco.Web.HealthCheck
         /// <param name="action"></param>
         /// <returns></returns>
         public abstract HealthCheckStatus ExecuteAction(HealthCheckAction action);
-
-        // TODO: What else?
     }
 }

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
@@ -8,6 +9,6 @@ namespace Umbraco.Web.Search
         protected override SearchableTreeCollectionBuilder This => this;
 
         //per request because generally an instance of ISearchableTree is a controller
-        protected override Lifetime CollectionLifetime => Lifetime.Request;
+        protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Scoped;
     }
 }

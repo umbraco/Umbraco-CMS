@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -10,6 +11,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,12 +21,12 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRouter : IPublishedRouter
     {
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly ILogger _logger;
+        private readonly ILogger<PublishedRouter> _logger;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IPublishedValueFallback _publishedValueFallback;
@@ -36,11 +39,12 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IWebRoutingSettings webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             IProfilingLogger proflog,
+            ILogger<PublishedRouter> logger,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IPublishedValueFallback publishedValueFallback,
@@ -49,12 +53,12 @@ namespace Umbraco.Web.Routing
             IContentTypeService contentTypeService,
             IPublicAccessService publicAccessService)
         {
-            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            _logger = proflog;
+            _logger = logger;
             _publishedUrlProvider = publishedUrlProvider;
             _requestAccessor = requestAccessor;
             _publishedValueFallback = publishedValueFallback;
@@ -67,7 +71,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
-            return new PublishedRequest(this, umbracoContext, _webRoutingSettings, uri ?? umbracoContext.CleanedUmbracoUrl);
+            return new PublishedRequest(this, umbracoContext, Options.Create(_webRoutingSettings), uri ?? umbracoContext.CleanedUmbracoUrl);
         }
 
         #region Request
@@ -247,7 +251,7 @@ namespace Umbraco.Web.Routing
 
             // note - we are not handling schemes nor ports here.
 
-            _logger.Debug<PublishedRouter>("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
 
             var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache.GetAll(includeWildcards: false).ToList();
@@ -284,7 +288,7 @@ namespace Umbraco.Web.Routing
             if (domainAndUri != null)
             {
                 // matching an existing domain
-                _logger.Debug<PublishedRouter>("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
+                _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
 
                 request.Domain = domainAndUri;
                 request.Culture = domainAndUri.Culture;
@@ -299,12 +303,12 @@ namespace Umbraco.Web.Routing
             else
             {
                 // not matching any existing domain
-                _logger.Debug<PublishedRouter>("{TracePrefix}Matches no domain", tracePrefix);
+                _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
 
                 request.Culture = defaultCulture == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultCulture);
             }
 
-            _logger.Debug<PublishedRouter>("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture.Name);
+            _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture.Name);
 
             return request.Domain != null;
         }
@@ -320,7 +324,7 @@ namespace Umbraco.Web.Routing
                 return;
 
             var nodePath = request.PublishedContent.Path;
-            _logger.Debug<PublishedRouter>("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
+            _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.HasDomain ? request.Domain.ContentId : (int?)null;
             var domain = DomainUtilities.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
@@ -328,11 +332,11 @@ namespace Umbraco.Web.Routing
             if (domain != null)
             {
                 request.Culture = domain.Culture;
-                _logger.Debug<PublishedRouter>("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture.Name);
+                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture.Name);
             }
             else
             {
-                _logger.Debug<PublishedRouter>("{TracePrefix}No match.", tracePrefix);
+                _logger.LogDebug("{TracePrefix}No match.", tracePrefix);
             }
         }
 
@@ -374,7 +378,7 @@ namespace Umbraco.Web.Routing
         /// <returns>A value indicating whether a document and template were found.</returns>
         private void FindPublishedContentAndTemplate(IPublishedRequest request)
         {
-            _logger.Debug<PublishedRouter>("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", request.Uri.AbsolutePath);
+            _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", request.Uri.AbsolutePath);
 
             // run the document finders
             FindPublishedContent(request);
@@ -417,7 +421,7 @@ namespace Umbraco.Web.Routing
                 //iterate but return on first one that finds it
                 var found = _contentFinders.Any(finder =>
                 {
-                    _logger.Debug<PublishedRouter>("Finder {ContentFinderType}", finder.GetType().FullName);
+                    _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
             }
@@ -441,22 +445,22 @@ namespace Umbraco.Web.Routing
             const int maxLoop = 8;
             do
             {
-                _logger.Debug<PublishedRouter>("HandlePublishedContent: Loop {LoopCounter}", i);
+                _logger.LogDebug("HandlePublishedContent: Loop {LoopCounter}", i);
 
                 // handle not found
                 if (request.HasPublishedContent == false)
                 {
                     request.Is404 = true;
-                    _logger.Debug<PublishedRouter>("HandlePublishedContent: No document, try last chance lookup");
+                    _logger.LogDebug("HandlePublishedContent: No document, try last chance lookup");
 
                     // if it fails then give up, there isn't much more that we can do
                     if (_contentLastChanceFinder.TryFindContent(request) == false)
                     {
-                        _logger.Debug<PublishedRouter>("HandlePublishedContent: Failed to find a document, give up");
+                        _logger.LogDebug("HandlePublishedContent: Failed to find a document, give up");
                         break;
                     }
 
-                    _logger.Debug<PublishedRouter>("HandlePublishedContent: Found a document");
+                    _logger.LogDebug("HandlePublishedContent: Found a document");
                 }
 
                 // follow internal redirects as long as it's not running out of control ie infinite loop of some sort
@@ -478,11 +482,11 @@ namespace Umbraco.Web.Routing
 
             if (i == maxLoop || j == maxLoop)
             {
-                _logger.Debug<PublishedRouter>("HandlePublishedContent: Looks like we are running into an infinite loop, abort");
+                _logger.LogDebug("HandlePublishedContent: Looks like we are running into an infinite loop, abort");
                 request.PublishedContent = null;
             }
 
-            _logger.Debug<PublishedRouter>("HandlePublishedContent: End");
+            _logger.LogDebug("HandlePublishedContent: End");
         }
 
         /// <summary>
@@ -527,25 +531,25 @@ namespace Umbraco.Web.Routing
             if (valid == false)
             {
                 // bad redirect - log and display the current page (legacy behavior)
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
+                _logger.LogDebug("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
             }
 
             if (internalRedirectNode == null)
             {
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
+                _logger.LogDebug("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {
                 // redirect to self
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to self, ignore");
+                _logger.LogDebug("FollowInternalRedirects: Redirecting to self, ignore");
             }
             else
             {
                 request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
                 redirect = true;
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
             }
 
             return redirect;
@@ -566,35 +570,35 @@ namespace Umbraco.Web.Routing
 
             if (publicAccessAttempt)
             {
-                _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Page is protected, check for access");
+                _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
 
                 var status = _publicAccessChecker.HasMemberAccessToContent(request.PublishedContent.Id);
                 switch (status)
                 {
                     case PublicAccessStatus.NotLoggedIn:
-                        _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Not logged in, redirect to login page");
+                        _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
                         SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.LoginNodeId);
                         break;
                     case PublicAccessStatus.AccessDenied:
-                        _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
+                        _logger.LogDebug("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
                         SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
                         break;
                     case PublicAccessStatus.LockedOut:
-                        _logger.Debug<PublishedRouter>("Current member is locked out, redirect to error page");
+                        _logger.LogDebug("Current member is locked out, redirect to error page");
                         SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
                         break;
                     case PublicAccessStatus.NotApproved:
-                        _logger.Debug<PublishedRouter>("Current member is unapproved, redirect to error page");
+                        _logger.LogDebug("Current member is unapproved, redirect to error page");
                         SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
                         break;
                     case PublicAccessStatus.AccessAccepted:
-                        _logger.Debug<PublishedRouter>("Current member has access");
+                        _logger.LogDebug("Current member has access");
                         break;
                 }
             }
             else
             {
-                _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Page is not protected");
+                _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
             }
         }
 
@@ -637,7 +641,7 @@ namespace Umbraco.Web.Routing
 
                 if (request.HasTemplate)
                 {
-                    _logger.Debug<IPublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
+                    _logger.LogDebug("FindTemplate: Has a template already, and no alternate template.");
                     return;
                 }
 
@@ -659,8 +663,8 @@ namespace Umbraco.Web.Routing
                 // ignore if the alias does not match - just trace
 
                 if (request.HasTemplate)
-                    _logger.Debug<PublishedRouter>("FindTemplate: Has a template already, but also an alternative template.");
-                _logger.Debug<PublishedRouter>("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
+                    _logger.LogDebug("FindTemplate: Has a template already, but also an alternative template.");
+                _logger.LogDebug("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
 
                 // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
                 if (request.PublishedContent.IsAllowedTemplate(
@@ -676,16 +680,16 @@ namespace Umbraco.Web.Routing
                     if (template != null)
                     {
                         request.TemplateModel = template;
-                        _logger.Debug<PublishedRouter>("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                        _logger.LogDebug("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
                     }
                     else
                     {
-                        _logger.Debug<PublishedRouter>("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
+                        _logger.LogDebug("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
                     }
                 }
                 else
                 {
-                    _logger.Warn<PublishedRouter>("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
+                    _logger.LogWarning("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
 
                     // no allowed, back to default
                     var templateId = request.PublishedContent.TemplateId;
@@ -695,7 +699,7 @@ namespace Umbraco.Web.Routing
 
             if (request.HasTemplate == false)
             {
-                _logger.Debug<PublishedRouter>("FindTemplate: No template was found.");
+                _logger.LogDebug("FindTemplate: No template was found.");
 
                 // initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
                 // then reset _pcr.Document to null to force a 404.
@@ -708,7 +712,7 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                _logger.Debug<PublishedRouter>("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", request.TemplateModel.Id, request.TemplateModel.Alias);
+                _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", request.TemplateModel.Id, request.TemplateModel.Alias);
             }
         }
 
@@ -716,11 +720,11 @@ namespace Umbraco.Web.Routing
         {
             if (templateId.HasValue == false || templateId.Value == default)
             {
-                _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
+                _logger.LogDebug("GetTemplateModel: No template.");
                 return null;
             }
 
-            _logger.Debug<PublishedRouter>("GetTemplateModel: Get template id={TemplateId}", templateId);
+            _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
 
             if (templateId == null)
                 throw new InvalidOperationException("The template is not set, the page cannot render.");
@@ -728,7 +732,7 @@ namespace Umbraco.Web.Routing
             var template = _fileService.GetTemplate(templateId.Value);
             if (template == null)
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
-            _logger.Debug<PublishedRouter>("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
             return template;
         }
 

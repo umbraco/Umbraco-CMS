@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Core.Scoping;
 using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Runtime;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
@@ -34,7 +36,6 @@ namespace Umbraco.Tests.Runtimes
         public void SetUp()
         {
             TestComponent.Reset();
-            Current.Reset();
         }
 
         public void TearDown()
@@ -42,90 +43,43 @@ namespace Umbraco.Tests.Runtimes
             TestComponent.Reset();
         }
 
-        [Test]
-        public void ComponentLifeCycle()
-        {
-            using (var app = new TestUmbracoApplication())
-            {
-                app.HandleApplicationStart(app, new EventArgs());
-
-                var e = app.Runtime.State.BootFailedException;
-                var m = "";
-                switch (e)
-                {
-                    case null:
-                        m = "";
-                        break;
-                    case BootFailedException bfe when bfe.InnerException != null:
-                        m = "BootFailed: " + bfe.InnerException.GetType() + " " + bfe.InnerException.Message + " " + bfe.InnerException.StackTrace;
-                        break;
-                    default:
-                        m = e.GetType() + " " + e.Message + " " + e.StackTrace;
-                        break;
-                }
-
-                Assert.AreNotEqual(RuntimeLevel.BootFailed, app.Runtime.State.Level, m);
-                Assert.IsTrue(TestComposer.Ctored);
-                Assert.IsTrue(TestComposer.Composed);
-                Assert.IsTrue(TestComponent.Ctored);
-                Assert.IsNotNull(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<DebugDiagnosticsLogger>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
-
-                // note: components are NOT disposed after boot
-
-                Assert.IsFalse(TestComponent.Terminated);
-
-                app.HandleApplicationEnd();
-                Assert.IsTrue(TestComponent.Terminated);
-            }
-        }
 
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
+            public TestUmbracoApplication() : base(new NullLogger<UmbracoApplicationBase>(),
+                NullLoggerFactory.Instance,
+                new SecuritySettings(),
+                new GlobalSettings(),
+                new ConnectionStrings(),
+                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  new NullLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
             {
             }
 
-            private static readonly DebugDiagnosticsLogger _logger = new DebugDiagnosticsLogger(new MessageTemplates());
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
-            private static readonly Configs _configs = GetConfigs();
-            private static readonly IGlobalSettings _globalSettings = SettingsForTests.DefaultGlobalSettings;
-            private static readonly IHostingSettings _hostingSettings = SettingsForTests.DefaultHostingSettings;
-            private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
-            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
-
-            private static Configs GetConfigs()
-            {
-                var configs = new ConfigsFactory().Create();
-                configs.Add(() => _globalSettings);
-                configs.Add(() => _contentSettings);
-                configs.Add(() => _hostingSettings);
-                return configs;
-            }
+            private static readonly GlobalSettings _globalSettings = new GlobalSettings();
 
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,  ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
             {
-                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
+                return Runtime = new TestRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, loggerFactory, profiler, hostingEnvironment, backOfficeInfo);
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
+            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+                :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
 
             }
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            protected internal override IUmbracoDatabaseFactory GetDatabaseFactory()
+            protected internal override IUmbracoDatabaseFactory CreateDatabaseFactory()
             {
                 var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);
@@ -133,13 +87,14 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            public override IFactory Configure(IRegister container)
+            public override void Configure(IServiceCollection services)
             {
-                container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
-                container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
+                services.AddSingleton<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>();
+                services.AddSingleton<ISessionIdResolver, NullSessionIdResolver>();
+                services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
-                var factory = base.Configure(container);
-                return factory;
+
+                base.Configure(services);
             }
 
             // runs with only one single component
@@ -170,8 +125,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
-                composition.RegisterUnique<IExamineManager, TestExamineManager>();
+                composition.Services.AddUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 
                 Composed = true;

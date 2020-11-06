@@ -2,7 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Web.Macros;
 
-namespace Umbraco.Tests.Macros
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Macros
 {
     [TestFixture]
     public class MacroTests

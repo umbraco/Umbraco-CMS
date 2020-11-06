@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Trees;
+using Umbraco.Web.BackOffice.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares how model mappings for content
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedRouter _publishedRouter;
         private readonly ILocalizationService _localizationService;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Models.Mapping
 
 
         public ContentMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
-            IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
+            IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILoggerFactory loggerFactory,
             IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility, IPublishedUrlProvider publishedUrlProvider, IEntityService entityService)
         {
             _commonMapper = commonMapper;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
             _umbracoContextAccessor = umbracoContextAccessor;
             _publishedRouter = publishedRouter;
             _localizationService = localizationService;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _userService = userService;
             _entityService = entityService;
             _variationContextAccessor = variationContextAccessor;
@@ -188,7 +189,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var urls = umbracoContext == null
                 ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
-                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _logger, _uriUtility, _publishedUrlProvider).ToArray();
+                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _loggerFactory.CreateLogger<IContent>(), _uriUtility, _publishedUrlProvider).ToArray();
 
             return urls;
         }

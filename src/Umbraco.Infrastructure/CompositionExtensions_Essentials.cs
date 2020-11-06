@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Cache;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
@@ -24,7 +26,7 @@ namespace Umbraco.Core
             // then we pre-resolve them which means that the instance re-resolved later is different... BUT if we register that
             // pre-resolved instance here again, then it will be the same instance re-resolved later, just like we are doing with
             // IDbProviderFactoryCreator.
-            ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
+            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
             AppCaches appCaches,
             IUmbracoDatabaseFactory databaseFactory,
@@ -36,24 +38,25 @@ namespace Umbraco.Core
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo)
-        {            
-            composition.RegisterUnique(logger);
-            composition.RegisterUnique(profiler);
-            composition.RegisterUnique(profilingLogger);
-            composition.RegisterUnique(mainDom);
-            composition.RegisterUnique(appCaches);
-            composition.RegisterUnique(appCaches.RequestCache);
-            composition.RegisterUnique(databaseFactory);
-            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
-            composition.RegisterUnique(typeLoader);
-            composition.RegisterUnique(state);
-            composition.RegisterUnique(typeFinder);
-            composition.RegisterUnique(ioHelper);
-            composition.RegisterUnique(umbracoVersion);
-            composition.RegisterUnique(dbProviderFactoryCreator);
-            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
-            composition.RegisterUnique(hostingEnvironment);
-            composition.RegisterUnique(backOfficeInfo);
+        {
+            composition.Services.AddUnique(logger);
+            composition.Services.AddUnique(loggerFactory);
+            composition.Services.AddUnique(profiler);
+            composition.Services.AddUnique(profilingLogger);
+            composition.Services.AddUnique(mainDom);
+            composition.Services.AddUnique(appCaches);
+            composition.Services.AddUnique(appCaches.RequestCache);
+            composition.Services.AddUnique(databaseFactory);
+            composition.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            composition.Services.AddUnique(typeLoader);
+            composition.Services.AddUnique(state);
+            composition.Services.AddUnique(typeFinder);
+            composition.Services.AddUnique(ioHelper);
+            composition.Services.AddUnique(umbracoVersion);
+            composition.Services.AddUnique(dbProviderFactoryCreator);
+            composition.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
+            composition.Services.AddUnique(hostingEnvironment);
+            composition.Services.AddUnique(backOfficeInfo);
         }
     }
 }

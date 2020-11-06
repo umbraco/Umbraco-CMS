@@ -1,29 +1,32 @@
+using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
-using Umbraco.Net;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Extensions;
+using Umbraco.Net;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Formatters;
+using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Macros;
-using Umbraco.Web.Composing.CompositionExtensions;
-using Umbraco.Web.Macros;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.Common.Install;
-using Umbraco.Extensions;
-using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.Common.Templates;
+using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 
@@ -37,44 +40,42 @@ namespace Umbraco.Web.Common.Runtime
     [ComposeAfter(typeof(CoreInitialComposer))]
     public class AspNetCoreComposer : ComponentComposer<AspNetCoreComponent>, IComposer
     {
-        public new void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
             base.Compose(composition);
 
             // AspNetCore specific services
-            composition.RegisterUnique<IHttpContextAccessor, HttpContextAccessor>();
-            composition.RegisterUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
+            composition.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
+            composition.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
 
             // Our own netcore implementations
-            composition.RegisterMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            composition.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
 
-            composition.RegisterUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
+            composition.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.RegisterMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+            composition.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
-            //Password hasher
-            composition.RegisterUnique<IPasswordHasher, AspNetCorePasswordHasher>();
+            // Password hasher
+            composition.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
+            composition.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+            composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
+            composition.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
-            composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
-            composition.Register<IIpResolver, AspNetCoreIpResolver>();
-            composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
+            composition.Services.AddMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
 
-            composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+            composition.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
 
-            composition.RegisterUnique<IMarchal, AspNetCoreMarchal>();
+            composition.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
-            composition.RegisterUnique<IProfilerHtml, WebProfilerHtml>();
-
-            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
-            composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
-
-            composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
+            composition.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            composition.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
-            composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IWebSecurity, WebSecurity>();
+            composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            composition.Services.AddUnique<IBackofficeSecurityFactory, BackofficeSecurityFactory>();
+            composition.Services.AddUnique<IBackofficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
@@ -86,19 +87,17 @@ namespace Umbraco.Web.Common.Runtime
                 .Add(umbracoApiControllerTypes);
 
 
-            composition.RegisterUnique<InstallAreaRoutes>();
+            composition.Services.AddUnique<InstallAreaRoutes>();
 
-            composition.RegisterUnique<UmbracoRequestLoggingMiddleware>();
-            composition.RegisterUnique<UmbracoRequestMiddleware>();
-            composition.RegisterUnique<BootFailedMiddleware>();
+            composition.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            composition.Services.AddUnique<UmbracoRequestMiddleware>();
+            composition.Services.AddUnique<BootFailedMiddleware>();
 
-            composition.RegisterUnique<UmbracoJsonModelBinder>();
+            composition.Services.AddUnique<UmbracoJsonModelBinder>();
 
-            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
-            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetInstance<IUserPasswordConfiguration>()));
-
-
+            composition.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+            composition.Services.AddUnique(factory => new LegacyPasswordSecurity());
         }
     }
 }

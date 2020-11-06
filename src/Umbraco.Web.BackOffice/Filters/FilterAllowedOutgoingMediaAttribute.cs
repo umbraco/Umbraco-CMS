@@ -13,7 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes
@@ -34,13 +34,13 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly Type _outgoingType;
         private readonly IEntityService _entityService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly string _propertyName;
 
-        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IWebSecurity webSecurity, Type outgoingType, string propertyName)
+        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IBackofficeSecurityAccessor backofficeSecurityAccessor, Type outgoingType, string propertyName)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
 
             _propertyName = propertyName;
             _outgoingType = outgoingType;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (context.Result == null) return;
 
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             if (user == null) return;
 
             var objectContent = context.Result as ObjectResult;

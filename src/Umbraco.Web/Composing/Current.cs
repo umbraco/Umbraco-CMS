@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
@@ -9,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Templates;
@@ -36,17 +39,18 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
 {
+    // TODO: MSDI - let's kill this class once and for all...
     // see notes in Umbraco.Core.Composing.Current.
     public static class Current
     {
         private static readonly object Locker = new object();
 
-        private static IFactory _factory;
+        private static IServiceProvider _factory;
 
         /// <summary>
         /// Gets or sets the factory.
         /// </summary>
-        public static IFactory Factory
+        public static IServiceProvider Factory
         {
             get
             {
@@ -56,43 +60,11 @@ namespace Umbraco.Web.Composing
             }
             set
             {
-                if (_factory != null)
-                    throw new InvalidOperationException("A factory has already been set.");
                 _factory = value;
             }
         }
 
         private static IUmbracoContextAccessor _umbracoContextAccessor;
-
-        static Current()
-        {
-            Resetted += (sender, args) =>
-            {
-                if (_umbracoContextAccessor != null)
-                {
-                    var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                    umbracoContext?.Dispose();
-                }
-                _umbracoContextAccessor = null;
-            };
-        }
-
-        /// <summary>
-        /// for UNIT TESTS exclusively! Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
-        /// </summary>
-        /// <remarks>
-        /// <para>For UNIT TESTS exclusively.</para>
-        /// <para>Resets everything that is 'current'.</para>
-        /// </remarks>
-        public static void Reset()
-        {
-            _factory.DisposeIfDisposable();
-            _factory = null;
-
-            Resetted?.Invoke(null, EventArgs.Empty);
-        }
-
-        internal static event EventHandler Resetted;
 
 
         #region Temp & Special
@@ -104,7 +76,7 @@ namespace Umbraco.Web.Composing
             get
             {
                 if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
-                return _umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
+                return _umbracoContextAccessor = Factory.GetRequiredService<IUmbracoContextAccessor>();
             }
             set => _umbracoContextAccessor = value; // for tests
         }
@@ -117,65 +89,65 @@ namespace Umbraco.Web.Composing
             => UmbracoContextAccessor.UmbracoContext;
 
         public static UmbracoHelper UmbracoHelper
-            => Factory.GetInstance<UmbracoHelper>();
+            => Factory.GetRequiredService<UmbracoHelper>();
         public static IUmbracoComponentRenderer UmbracoComponentRenderer
-            => Factory.GetInstance<IUmbracoComponentRenderer>();
+            => Factory.GetRequiredService<IUmbracoComponentRenderer>();
         public static ITagQuery TagQuery
-            => Factory.GetInstance<ITagQuery>();
+            => Factory.GetRequiredService<ITagQuery>();
 
         public static IRuntimeMinifier RuntimeMinifier
-            => Factory.GetInstance<IRuntimeMinifier>();
+            => Factory.GetRequiredService<IRuntimeMinifier>();
 
         public static DistributedCache DistributedCache
-            => Factory.GetInstance<DistributedCache>();
+            => Factory.GetRequiredService<DistributedCache>();
 
         public static IPublishedSnapshot PublishedSnapshot
-            => Factory.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
+            => Factory.GetRequiredService<IPublishedSnapshotAccessor>().PublishedSnapshot;
 
         public static EventMessages EventMessages
-            => Factory.GetInstance<IEventMessagesFactory>().GetOrDefault();
+            => Factory.GetRequiredService<IEventMessagesFactory>().GetOrDefault();
 
         public static UrlProviderCollection UrlProviders
-            => Factory.GetInstance<UrlProviderCollection>();
+            => Factory.GetRequiredService<UrlProviderCollection>();
 
         public static MediaUrlProviderCollection MediaUrlProviders
-            => Factory.GetInstance<MediaUrlProviderCollection>();
+            => Factory.GetRequiredService<MediaUrlProviderCollection>();
 
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
-            => Factory.GetInstance<HealthCheckCollectionBuilder>();
+            => Factory.GetRequiredService<HealthCheckCollectionBuilder>();
 
         internal static ActionCollectionBuilder ActionCollectionBuilder
-            => Factory.GetInstance<ActionCollectionBuilder>();
+            => Factory.GetRequiredService<ActionCollectionBuilder>();
 
         public static ActionCollection Actions
-            => Factory.GetInstance<ActionCollection>();
+            => Factory.GetRequiredService<ActionCollection>();
 
         public static ContentFinderCollection ContentFinders
-            => Factory.GetInstance<ContentFinderCollection>();
+            => Factory.GetRequiredService<ContentFinderCollection>();
 
         public static IContentLastChanceFinder LastChanceContentFinder
-            => Factory.GetInstance<IContentLastChanceFinder>();
+            => Factory.GetRequiredService<IContentLastChanceFinder>();
 
         internal static EditorValidatorCollection EditorValidators
-            => Factory.GetInstance<EditorValidatorCollection>();
+            => Factory.GetRequiredService<EditorValidatorCollection>();
 
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
-            => Factory.GetInstance<UmbracoApiControllerTypeCollection>();
+            => Factory.GetRequiredService<UmbracoApiControllerTypeCollection>();
 
         internal static SurfaceControllerTypeCollection SurfaceControllerTypes
-            => Factory.GetInstance<SurfaceControllerTypeCollection>();
-
-        public static FilteredControllerFactoryCollection FilteredControllerFactories
-            => Factory.GetInstance<FilteredControllerFactoryCollection>();
+            => Factory.GetRequiredService<SurfaceControllerTypeCollection>();
 
         internal static IPublishedSnapshotService PublishedSnapshotService
-            => Factory.GetInstance<IPublishedSnapshotService>();
+            => Factory.GetRequiredService<IPublishedSnapshotService>();
 
         public static ITreeService TreeService
-            => Factory.GetInstance<ITreeService>();
+            => Factory.GetRequiredService<ITreeService>();
 
         public static ISectionService SectionService
-            => Factory.GetInstance<ISectionService>();
+            => Factory.GetRequiredService<ISectionService>();
+
+        public static IIconService IconService
+            => Factory.GetRequiredService<IIconService>();
 
         #endregion
 
@@ -205,79 +177,49 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
-        public static IMediaFileSystem MediaFileSystem => Factory.GetInstance<IMediaFileSystem>();
+        public static IMediaFileSystem MediaFileSystem => Factory.GetRequiredService<IMediaFileSystem>();
 
-        public static UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+        public static UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
 
-        public static IRuntimeState RuntimeState => Factory.GetInstance<IRuntimeState>();
+        public static IRuntimeState RuntimeState => Factory.GetRequiredService<IRuntimeState>();
 
-        public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
+        public static CacheRefresherCollection CacheRefreshers => Factory.GetRequiredService<CacheRefresherCollection>();
 
-        public static Configs Configs => Factory.GetInstance<Configs>();
+        internal static IPublishedModelFactory PublishedModelFactory => Factory.GetRequiredService<IPublishedModelFactory>();
 
-        public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
+        public static IServerMessenger ServerMessenger => Factory.GetRequiredService<IServerMessenger>();
 
-        public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();
+        public static ILogger<object> Logger => Factory.GetRequiredService<ILogger<object>>();
 
-        public static DataEditorCollection DataEditors => Factory.GetInstance<DataEditorCollection>();
+        public static ILoggerFactory LoggerFactory => Factory.GetRequiredService<ILoggerFactory>();
 
-        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => Factory.GetInstance<DataValueReferenceFactoryCollection>();
+        public static IProfiler Profiler => Factory.GetRequiredService<IProfiler>();
 
-        public static PropertyEditorCollection PropertyEditors => Factory.GetInstance<PropertyEditorCollection>();
+        public static IProfilerHtml ProfilerHtml => Factory.GetRequiredService<IProfilerHtml>();
 
-        public static ParameterEditorCollection ParameterEditors => Factory.GetInstance<ParameterEditorCollection>();
+        public static IProfilingLogger ProfilingLogger => Factory.GetRequiredService<IProfilingLogger>();
 
-        internal static ManifestValueValidatorCollection ManifestValidators => Factory.GetInstance<ManifestValueValidatorCollection>();
+        public static AppCaches AppCaches => Factory.GetRequiredService<AppCaches>();
 
-        internal static IPackageActionRunner PackageActionRunner => Factory.GetInstance<IPackageActionRunner>();
+        public static ServiceContext Services => Factory.GetRequiredService<ServiceContext>();
 
-        internal static PackageActionCollection PackageActions => Factory.GetInstance<PackageActionCollection>();
+        public static IScopeProvider ScopeProvider => Factory.GetRequiredService<IScopeProvider>();
 
-        internal static PropertyValueConverterCollection PropertyValueConverters => Factory.GetInstance<PropertyValueConverterCollection>();
+        public static IPublishedContentTypeFactory PublishedContentTypeFactory => Factory.GetRequiredService<IPublishedContentTypeFactory>();
 
-        internal static IPublishedModelFactory PublishedModelFactory => Factory.GetInstance<IPublishedModelFactory>();
+        public static IPublishedValueFallback PublishedValueFallback => Factory.GetRequiredService<IPublishedValueFallback>();
 
-        public static IServerMessenger ServerMessenger => Factory.GetInstance<IServerMessenger>();
+        public static IVariationContextAccessor VariationContextAccessor => Factory.GetRequiredService<IVariationContextAccessor>();
 
-        public static IServerRegistrar ServerRegistrar => Factory.GetInstance<IServerRegistrar>();
-
-        public static ICultureDictionaryFactory CultureDictionaryFactory => Factory.GetInstance<ICultureDictionaryFactory>();
-
-        public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
-
-        public static ILogger Logger => Umbraco.Composing.Current.Logger;
-
-        public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
-
-        public static IProfilerHtml ProfilerHtml => Factory.GetInstance<IProfilerHtml>();
-
-        public static IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
-
-        public static AppCaches AppCaches => Factory.GetInstance<AppCaches>();
-
-        public static ServiceContext Services => Factory.GetInstance<ServiceContext>();
-
-        public static IScopeProvider ScopeProvider => Factory.GetInstance<IScopeProvider>();
-
-        public static IFileSystems FileSystems => Factory.GetInstance<IFileSystems>();
-
-        public static ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
-
-        public static IPublishedContentTypeFactory PublishedContentTypeFactory => Factory.GetInstance<IPublishedContentTypeFactory>();
-
-        public static IPublishedValueFallback PublishedValueFallback => Factory.GetInstance<IPublishedValueFallback>();
-
-        public static IVariationContextAccessor VariationContextAccessor => Factory.GetInstance<IVariationContextAccessor>();
-
-        public static IIOHelper IOHelper => Factory.GetInstance<IIOHelper>();
-        public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
-        public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
-        public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
-        public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
-        public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetInstance<IMenuItemCollectionFactory>();
-        public static MembershipHelper MembershipHelper => Factory.GetInstance<MembershipHelper>();
-        public static IUmbracoApplicationLifetime UmbracoApplicationLifetime => Factory.GetInstance<IUmbracoApplicationLifetime>();
-        public static IPublishedContentQuery PublishedContentQuery => Factory.GetInstance<IPublishedContentQuery>();
+        public static IIOHelper IOHelper => Factory.GetRequiredService<IIOHelper>();
+        public static IHostingEnvironment HostingEnvironment => Factory.GetRequiredService<IHostingEnvironment>();
+        public static IIpResolver IpResolver => Factory.GetRequiredService<IIpResolver>();
+        public static IUmbracoVersion UmbracoVersion => Factory.GetRequiredService<IUmbracoVersion>();
+        public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetRequiredService<IPublishedUrlProvider>();
+        public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetRequiredService<IMenuItemCollectionFactory>();
+        public static MembershipHelper MembershipHelper => Factory.GetRequiredService<MembershipHelper>();
+        public static IUmbracoApplicationLifetime UmbracoApplicationLifetime => Factory.GetRequiredService<IUmbracoApplicationLifetime>();
+        public static IPublishedContentQuery PublishedContentQuery => Factory.GetRequiredService<IPublishedContentQuery>();
 
         #endregion
     }

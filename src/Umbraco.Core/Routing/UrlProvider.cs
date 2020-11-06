@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
@@ -24,23 +25,14 @@ namespace Umbraco.Web.Routing
         /// <param name="mediaUrlProviders">The list of media url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="propertyEditorCollection"></param>
-        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IWebRoutingSettings routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
-            if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
-
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            var provider = UrlMode.Auto;
-            Mode = provider;
-
-            if (Enum<UrlMode>.TryParse(routingSettings.UrlProviderMode, out provider))
-            {
-                Mode = provider;
-            }
+            Mode = routingSettings.Value.UrlProviderMode;
         }
-
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEnumerable<IUrlProvider> _urlProviders;

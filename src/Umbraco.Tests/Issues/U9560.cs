@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Issues
             var aliasName = string.Empty;
 
             // read fields, same as what we do with PetaPoco Fetch<dynamic>
-            using (var db = Factory.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
+            using (var db = Factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase())
             {
                 db.OpenSharedConnection();
                 try
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Issues
             Assert.AreEqual("Alias", aliasName);
 
             // try differently
-            using (var db = Factory.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
+            using (var db = Factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase())
             {
                 db.OpenSharedConnection();
                 try

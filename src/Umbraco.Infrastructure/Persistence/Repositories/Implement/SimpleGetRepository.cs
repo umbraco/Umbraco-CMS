@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    // TODO: Obsolete this, change all implementations of this like in Dictionary to just use custom Cache policies like in the member repository.
+
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
@@ -18,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IEntity
         where TDto: class
     {
-        protected SimpleGetRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        protected SimpleGetRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<SimpleGetRepository<TId, TEntity, TDto>> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

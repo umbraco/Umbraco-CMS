@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Extensions
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Extensions
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
+                    Current.Logger.LogError(ex, "Could not parse the json string: {Json}", json);
                 }
             }
 

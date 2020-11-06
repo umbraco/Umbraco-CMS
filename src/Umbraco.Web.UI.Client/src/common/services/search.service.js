@@ -12,7 +12,7 @@
  *
  * <pre>
  *      searchService.searchMembers({term: 'bob'}).then(function(results){
- *          angular.forEach(results, function(result){
+ *          results.forEach(function(result){
  *                  //returns:
  *                  {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
  *           })

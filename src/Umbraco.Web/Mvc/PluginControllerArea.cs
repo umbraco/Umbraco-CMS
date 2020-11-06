@@ -6,6 +6,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebApi;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     internal class PluginControllerArea : AreaRegistration
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEnumerable<PluginControllerMetadata> _surfaceControllers;
         private readonly IEnumerable<PluginControllerMetadata> _apiControllers;
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="globalSettings"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="pluginControllers"></param>
-        public PluginControllerArea(IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IEnumerable<PluginControllerMetadata> pluginControllers)
+        public PluginControllerArea(GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IEnumerable<PluginControllerMetadata> pluginControllers)
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;

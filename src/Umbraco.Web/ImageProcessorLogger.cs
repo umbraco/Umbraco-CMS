@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using ImageProcessor.Common.Exceptions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {
@@ -28,7 +28,7 @@ namespace Umbraco.Web
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
             var message = $"{callerName} {lineNumber} : {text}";
-            Current.Logger.Error<T>(new ImageProcessingException(message));
+            Current.Logger.LogError(new ImageProcessingException(message).Message);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Umbraco.Web
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
             var message = $"{callerName} {lineNumber} : {text}";
-            Current.Logger.Error(type, new ImageProcessingException(message));
+            Current.Logger.LogError(new ImageProcessingException(message).Message);
         }
     }
 }

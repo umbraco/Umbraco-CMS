@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(User))]
     public sealed class UserMapper : BaseMapper
     {
-        public UserMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public UserMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 

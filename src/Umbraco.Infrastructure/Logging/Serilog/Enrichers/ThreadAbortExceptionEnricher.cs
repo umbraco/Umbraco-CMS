@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Serilog.Core;
 using Serilog.Events;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
+using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
 {
@@ -14,13 +15,13 @@ namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
     /// </summary>
     public class ThreadAbortExceptionEnricher : ILogEventEnricher
     {
-        private readonly ICoreDebugSettings _coreDebugSettings;
+        private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMarchal _marchal;
 
-        public ThreadAbortExceptionEnricher(ICoreDebugSettings coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        public ThreadAbortExceptionEnricher(IOptions<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
         {
-            _coreDebugSettings = coreDebugSettings;
+            _coreDebugSettings = coreDebugSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _marchal = marchal;
         }

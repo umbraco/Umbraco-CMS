@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Core.Media;
 using Umbraco.Web.Common.Attributes;
@@ -16,9 +16,9 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
         private readonly EmbedProvidersCollection _embedCollection;
-        private readonly ILogger _logger;
+        private readonly ILogger<RteEmbedController> _logger;
 
-        public RteEmbedController(EmbedProvidersCollection embedCollection, ILogger logger)
+        public RteEmbedController(EmbedProvidersCollection embedCollection, ILogger<RteEmbedController> logger)
         {
             _embedCollection = embedCollection ?? throw new ArgumentNullException(nameof(embedCollection));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -63,7 +63,7 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
             }
             catch(Exception ex)
             {
-                _logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
+                _logger.LogError(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
                 result.OEmbedStatus = OEmbedStatus.Error;
             }
 

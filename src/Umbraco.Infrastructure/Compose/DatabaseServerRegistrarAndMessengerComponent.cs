@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
@@ -35,7 +36,7 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
+        public static DatabaseServerMessengerOptions GetDefaultOptions(IServiceProvider factory)
         {
             return new DatabaseServerMessengerOptions
             {
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Compose
                     //rebuild the xml cache file if the server is not synced
                     () =>
                     {
-                        var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>();
+                        var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>();
 
                         // rebuild the published snapshot caches entirely, if the server is not synced
                         // this is equivalent to DistributedCache RefreshAll... but local only
@@ -62,7 +63,7 @@ namespace Umbraco.Web.Compose
                     // indexes then they can adjust this logic themselves.
                     () =>
                     {
-                        var indexRebuilder = factory.GetInstance<BackgroundIndexRebuilder>();
+                        var indexRebuilder = factory.GetRequiredService<BackgroundIndexRebuilder>();
                         indexRebuilder.RebuildIndexes(false, 5000);
                     }
                 }
@@ -83,7 +84,8 @@ namespace Umbraco.Web.Compose
         private object _locker = new object();
         private readonly DatabaseServerRegistrar _registrar;
         private readonly IBatchedDatabaseServerMessenger _messenger;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseServerRegistrarAndMessengerComponent> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IServerRegistrationService _registrationService;
         private readonly BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
         private readonly BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
@@ -95,11 +97,13 @@ namespace Umbraco.Web.Compose
             IServerRegistrar serverRegistrar,
             IServerMessenger serverMessenger,
             IServerRegistrationService registrationService,
-            ILogger logger,
+            ILogger<DatabaseServerRegistrarAndMessengerComponent> logger,
+            ILoggerFactory loggerFactory,
             IApplicationShutdownRegistry hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _registrationService = registrationService;
             _requestAccessor = requestAccessor;
 
@@ -108,7 +112,7 @@ namespace Umbraco.Web.Compose
             if (_registrar != null)
             {
                 _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), hostingEnvironment);
             }
 
             // create task runner for BatchedDatabaseServerMessenger
@@ -116,7 +120,7 @@ namespace Umbraco.Web.Compose
             if (_messenger != null)
             {
                 _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), hostingEnvironment);
             }
         }
 
@@ -225,7 +229,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<InstructionProcessTask>(e, "Failed (will repeat).");
+                    _logger.LogError(e, "Failed (will repeat).");
                 }
                 return true; // repeat
             }
@@ -268,7 +272,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>(ex, "Failed to update server record in database.");
+                    _logger.LogError(ex, "Failed to update server record in database.");
                     return false; // probably stop if we have an error
                 }
             }

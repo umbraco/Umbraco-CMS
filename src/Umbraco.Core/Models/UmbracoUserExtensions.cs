@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -48,14 +49,14 @@ namespace Umbraco.Core.Models
         /// <param name="textService"></param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService, IGlobalSettings globalSettings)
+        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService, GlobalSettings globalSettings)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             return GetUserCulture(user.Language, textService, globalSettings);
         }
 
-        public static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService, IGlobalSettings globalSettings)
+        public static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService, GlobalSettings globalSettings)
         {
             try
             {

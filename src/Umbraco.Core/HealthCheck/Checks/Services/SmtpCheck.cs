@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Services
+namespace Umbraco.Core.HealthCheck.Checks.Services
 {
     [HealthCheck(
         "1B5D221B-CE99-4193-97CB-5F3261EC73DF",
@@ -16,13 +16,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
     public class SmtpCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRuntimeState _runtime;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
-        public SmtpCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings)
+        public SmtpCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings)
         {
             _textService = textService;
-            _runtime = runtime;
             _globalSettings = globalSettings;
         }
 
@@ -48,11 +46,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
 
         private HealthCheckStatus CheckSmtpSettings()
         {
-            var message = string.Empty;
             var success = false;
 
-            var smtpSettings = _globalSettings.SmtpSettings;
+            var smtpSettings = _globalSettings.CurrentValue.Smtp;
 
+            string message;
             if (smtpSettings == null)
             {
                 message = _textService.Localize("healthcheck/smtpMailSettingsNotFound");

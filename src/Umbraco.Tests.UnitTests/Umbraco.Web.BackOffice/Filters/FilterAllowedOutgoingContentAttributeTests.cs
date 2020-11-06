@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -8,14 +7,15 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.TestHelpers.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
-namespace Umbraco.Tests.Web.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class FilterAllowedOutgoingContentAttributeTests
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(expected));
 
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var actual = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -77,10 +77,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Filter_On_Start_Node()
         {
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { 5 });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9, startContentId: 5);
             var userServiceMock = new Mock<IUserService>();
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -94,7 +91,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var path = "";
             for (var i = 0; i < 10; i++)
@@ -123,10 +120,7 @@ namespace Umbraco.Tests.Web.Controllers
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
 
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
-            var user = userMock.Object;
+            var user = CreateUser(id: 9, startContentId: 0);
 
             var userServiceMock = new Mock<IUserService>();
             //we're only assigning 3 nodes browse permissions so that is what we expect as a result
@@ -145,13 +139,21 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
             att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);
             Assert.AreEqual(1, list.ElementAt(0).Id);
             Assert.AreEqual(2, list.ElementAt(1).Id);
             Assert.AreEqual(3, list.ElementAt(2).Id);
+        }
+
+        private IUser CreateUser(int id = 0, int? startContentId = null)
+        {
+            return new UserBuilder()
+                .WithId(id)
+                .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0])
+                .Build();
         }
 
         private class MyTestClass

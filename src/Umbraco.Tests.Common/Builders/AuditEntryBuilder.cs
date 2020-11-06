@@ -25,14 +25,14 @@ namespace Umbraco.Tests.Common.Builders
         private int? _id;
         private Guid? _key;
         private DateTime? _updateDate;
-        private string _affectedDetails;
-        private int? _affectedUserId;
-        private string _eventDetails;
-        private string _eventType;
-        private string _performingDetails;
-        private string _performingIp;
-        private DateTime? _eventDateUtc;
-        private int? _performingUserId;
+        private string _affectedDetails = null;
+        private int? _affectedUserId = null;
+        private string _eventDetails = null;
+        private string _eventType = null;
+        private string _performingDetails = null;
+        private string _performingIp = null;
+        private DateTime? _eventDateUtc = null;
+        private int? _performingUserId = null;
 
         public AuditEntryBuilder(TParent parentBuilder) : base(parentBuilder)
         {

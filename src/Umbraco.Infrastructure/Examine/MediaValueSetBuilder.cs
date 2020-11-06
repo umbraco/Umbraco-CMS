@@ -2,8 +2,8 @@
 using Examine;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -17,13 +17,13 @@ namespace Umbraco.Examine
     {
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
+        private readonly ILogger<MediaValueSetBuilder> _logger;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer _serializer;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService, ILogger logger, IShortStringHelper shortStringHelper, IJsonSerializer serializer)
+            IUserService userService, ILogger<MediaValueSetBuilder> logger, IShortStringHelper shortStringHelper, IJsonSerializer serializer)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
@@ -55,7 +55,7 @@ namespace Umbraco.Examine
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error<MediaValueSetBuilder>(ex, $"Could not Deserialize ImageCropperValue for item with key {m.Key} ");
+                        _logger.LogError(ex, $"Could not Deserialize ImageCropperValue for item with key {m.Key} ");
                     }
 
                     if (cropper != null)

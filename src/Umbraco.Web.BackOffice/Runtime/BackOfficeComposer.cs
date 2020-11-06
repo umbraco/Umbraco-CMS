@@ -1,13 +1,17 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.BackOffice.Services;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Runtime;
 using Umbraco.Web.Trees;
@@ -20,15 +24,14 @@ namespace Umbraco.Web.BackOffice.Runtime
     {
         public void Compose(Composition composition)
         {
+            composition.Services.AddUnique<BackOfficeAreaRoutes>();
+            composition.Services.AddUnique<PreviewRoutes>();
+            composition.Services.AddUnique<BackOfficeServerVariables>();
+            composition.Services.AddScoped<BackOfficeSessionIdValidator>();
+            composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
-
-            composition.RegisterUnique<BackOfficeAreaRoutes>();
-            composition.RegisterUnique<BackOfficeServerVariables>();
-            composition.Register<BackOfficeSessionIdValidator>(Lifetime.Request);
-            composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
-
-            composition.RegisterUnique<PreviewAuthenticationMiddleware>();
-            composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            composition.Services.AddUnique<PreviewAuthenticationMiddleware>();
+            composition.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
@@ -39,12 +42,17 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.ComposeWebMappingProfiles();
 
-            composition.RegisterUniqueFor<IFileSystem, FilesTreeController>(factory =>
+            composition.Services.AddUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
-                    factory.GetInstance<IIOHelper>(),
-                    factory.GetInstance<IHostingEnvironment>(),
-                    factory.GetInstance<ILogger>(),
+                    factory.GetRequiredService<IIOHelper>(),
+                    factory.GetRequiredService<IHostingEnvironment>(),
+                    factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
                     "~/"));
+
+            composition.Services.AddUnique<IIconService, IconService>();
+            composition.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
+
+            composition.ComposeUmbracoBackOfficeControllers();
         }
     }
 }

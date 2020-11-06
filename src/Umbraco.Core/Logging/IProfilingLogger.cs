@@ -5,7 +5,7 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Defines the profiling logging service.
     /// </summary>
-    public interface IProfilingLogger : ILogger
+    public interface IProfilingLogger
     {
         /// <summary>
         /// Profiles an action and log as information messages.

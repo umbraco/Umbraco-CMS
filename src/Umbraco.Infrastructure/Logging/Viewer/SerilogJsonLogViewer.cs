@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
@@ -11,10 +12,10 @@ namespace Umbraco.Core.Logging.Viewer
     internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
     {
         private readonly string _logsPath;
-        private readonly ILogger _logger;
+        private readonly ILogger<SerilogJsonLogViewer> _logger;
 
         public SerilogJsonLogViewer(
-            ILogger logger,
+            ILogger<SerilogJsonLogViewer> logger,
             ILogViewerConfig logViewerConfig,
             ILoggingConfiguration loggingConfiguration,
             global::Serilog.ILogger serilogLog)
@@ -128,7 +129,7 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 // As we are reading/streaming one line at a time in the JSON file
                 // Thus we can not report the line number, as it will always be 1
-                _logger.Error<SerilogJsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
+                _logger.LogError(ex, "Unable to parse a line in the JSON log file");
 
                 evt = null;
                 return true;

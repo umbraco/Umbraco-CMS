@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -12,16 +13,18 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
+using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
     // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
@@ -33,46 +36,45 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
 
-
         public ContentTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IWebSecurity webSecurity,
-            ILogger logger,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            ILogger<ContentTreeController> logger,
             ActionCollection actionCollection,
             IUserService userService,
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             ActionCollection actions,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IContentService contentService,
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, webSecurity, logger, actionCollection, userService, dataTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _menuItemCollectionFactory = menuItemCollectionFactory;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentService = contentService;
             _entityService = entityService;
             _publicAccessService = publicAccessService;
@@ -87,7 +89,7 @@ namespace Umbraco.Web.Trees
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _webSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
 
 
 
@@ -165,7 +167,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = _userService.GetPermissions(_webSecurity.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
@@ -201,7 +203,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_webSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));

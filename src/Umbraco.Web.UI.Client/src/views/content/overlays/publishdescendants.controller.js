@@ -26,6 +26,11 @@
                     vm.labels.includeUnpublished = value;
                 });
             }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(value => {
+                    vm.labels.includeUnpublished = value;
+                });
+            }
 
             vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);

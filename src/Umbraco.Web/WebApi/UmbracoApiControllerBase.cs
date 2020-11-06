@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Web;
 using System.Web.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
@@ -38,25 +40,24 @@ namespace Umbraco.Web.WebApi
         /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoApiControllerBase()
             : this(
-                Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoContextAccessor>(),
-                Current.Factory.GetInstance<ISqlContext>(),
-                Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<AppCaches>(),
-                Current.Factory.GetInstance<IProfilingLogger>(),
-                Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoMapper>(),
-                Current.Factory.GetInstance<IPublishedUrlProvider>()
+                Current.Factory.GetRequiredService<GlobalSettings>(),
+                Current.Factory.GetRequiredService<IUmbracoContextAccessor>(),
+                Current.Factory.GetRequiredService<ISqlContext>(),
+                Current.Factory.GetRequiredService<ServiceContext>(),
+                Current.Factory.GetRequiredService<AppCaches>(),
+                Current.Factory.GetRequiredService<IProfilingLogger>(),
+                Current.Factory.GetRequiredService<IRuntimeState>(),
+                Current.Factory.GetRequiredService<UmbracoMapper>(),
+                Current.Factory.GetRequiredService<IPublishedUrlProvider>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoApiControllerBase(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
-            GlobalSettings = globalSettings;
             SqlContext = sqlContext;
             Services = services;
             AppCaches = appCaches;
@@ -71,11 +72,6 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         /// <remarks>For debugging purposes.</remarks>
         internal Guid InstanceId { get; } = Guid.NewGuid();
-
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public virtual IGlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -123,7 +119,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IWebSecurity Security => UmbracoContext.Security;
+        public IBackofficeSecurity Security => UmbracoContext.Security;
 
         /// <summary>
         /// Tries to get the current HttpContext.

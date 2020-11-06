@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
@@ -18,6 +22,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Common
 {
@@ -33,30 +38,22 @@ namespace Umbraco.Tests.Common
 
         protected TestHelperBase(Assembly entryAssembly)
         {
-            SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;
 
         public TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
         }
 
-        public Configs GetConfigs() => GetConfigsFactory().Create();
-
-        public IRuntimeState GetRuntimeState()
-        {
-            return new RuntimeState(
-                Mock.Of<IGlobalSettings>(),
-                GetUmbracoVersion());
-        }
+       // public Configs GetConfigs() => GetConfigsFactory().Create();
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
+        //public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.
@@ -82,14 +79,14 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
+        public CoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
         public IIOHelper IOHelper
         {
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
+                    _ioHelper = new IOHelper(GetHostingEnvironment());
                 return _ioHelper;
             }
         }
@@ -104,10 +101,6 @@ namespace Umbraco.Tests.Common
                 return _uriUtility;
             }
         }
-
-        public SettingsForTests SettingsForTests { get; }
-        public IWebRoutingSettings WebRoutingSettings => SettingsForTests.GenerateMockWebRoutingSettings();
-
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
@@ -126,11 +119,11 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", bin + "/");
         }
 
-        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetConfigs().Global());
+        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion();
 
-        public IRegister GetRegister()
+        public IServiceCollection GetRegister()
         {
-            return RegisterFactory.Create(GetConfigs().Global());
+            return new ServiceCollection();
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
@@ -154,9 +147,7 @@ namespace Umbraco.Tests.Common
         {
             hostingEnv = hostingEnv ?? GetHostingEnvironment();
             return new LoggingConfiguration(
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "App_Data","Logs"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.config"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.user.config"));
+                Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco","logs"));
         }
     }
 }

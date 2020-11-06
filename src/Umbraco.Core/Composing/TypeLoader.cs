@@ -11,6 +11,7 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Composing
 {
@@ -28,7 +29,8 @@ namespace Umbraco.Core.Composing
         private const string CacheKey = "umbraco-types.list";
 
         private readonly IAppPolicyCache _runtimeCache;
-        private readonly IProfilingLogger _logger;
+        private readonly ILogger<TypeLoader> _logger;
+        private readonly IProfilingLogger _profilingLogger;
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
         private readonly object _locko = new object();
@@ -51,8 +53,8 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
-            : this(typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IEnumerable<Assembly> assembliesToScan = null)
+            : this(typeFinder, runtimeCache, localTempPath, logger, profilingLogger, true, assembliesToScan)
         { }
 
         /// <summary>
@@ -64,12 +66,13 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _assemblies = assembliesToScan;
 
             if (detectChanges)
@@ -309,7 +312,7 @@ namespace Umbraco.Core.Composing
         // internal for tests
         public void WriteCache()
         {
-            _logger.Debug<TypeLoader>("Writing cache file.");
+            _logger.LogDebug("Writing cache file.");
             var typesListFilePath = GetTypesListFilePath();
             using (var stream = GetFileStream(typesListFilePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
@@ -381,7 +384,7 @@ namespace Umbraco.Core.Composing
                     if (--attempts == 0)
                         throw;
 
-                    _logger.Debug<TypeLoader>("Attempted to get filestream for file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
+                    _logger.LogDebug("Attempted to get filestream for file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
                     Thread.Sleep(pauseMilliseconds);
                 }
             }
@@ -402,7 +405,7 @@ namespace Umbraco.Core.Composing
                     if (--attempts == 0)
                         throw;
 
-                    _logger.Debug<TypeLoader>("Attempted to delete file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
+                    _logger.LogDebug("Attempted to delete file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
                     Thread.Sleep(pauseMilliseconds);
                 }
             }
@@ -475,7 +478,7 @@ namespace Umbraco.Core.Composing
             if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
             {
                 // warn
-                _logger.Debug<TypeLoader>("Running a full, " + (cache ? "" : "non-") + "cached, scan for non-discoverable type {TypeName} (slow).", typeof(T).FullName);
+                _logger.LogDebug("Running a full, " + (cache ? "" : "non-") + "cached, scan for non-discoverable type {TypeName} (slow).", typeof(T).FullName);
 
                 return GetTypesInternal(
                     typeof(T), null,
@@ -493,7 +496,7 @@ namespace Umbraco.Core.Composing
 
             // warn
             if (!cache)
-                _logger.Debug<TypeLoader>("Running a non-cached, filter for discoverable type {TypeName} (slowish).", typeof(T).FullName);
+                _logger.LogDebug("Running a non-cached, filter for discoverable type {TypeName} (slowish).", typeof(T).FullName);
 
             // filter the cached discovered types (and maybe cache the result)
             return GetTypesInternal(
@@ -525,7 +528,7 @@ namespace Umbraco.Core.Composing
             // if not IDiscoverable, directly get types
             if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
             {
-                _logger.Debug<TypeLoader>("Running a full, " + (cache ? "" : "non-") + "cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).", typeof(T).FullName, typeof(TAttribute).FullName);
+                _logger.LogDebug("Running a full, " + (cache ? "" : "non-") + "cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).", typeof(T).FullName, typeof(TAttribute).FullName);
 
                 return GetTypesInternal(
                     typeof(T), typeof(TAttribute),
@@ -543,7 +546,7 @@ namespace Umbraco.Core.Composing
 
             // warn
             if (!cache)
-                _logger.Debug<TypeLoader>("Running a non-cached, filter for discoverable type {TypeName}  / attribute {AttributeName} (slowish).", typeof(T).FullName, typeof(TAttribute).FullName);
+                _logger.LogDebug("Running a non-cached, filter for discoverable type {TypeName}  / attribute {AttributeName} (slowish).", typeof(T).FullName, typeof(TAttribute).FullName);
 
             // filter the cached discovered types (and maybe cache the result)
             return GetTypesInternal(
@@ -573,7 +576,7 @@ namespace Umbraco.Core.Composing
             cache &= specificAssemblies == null;
 
             if (!cache)
-                _logger.Debug<TypeLoader>("Running a full, non-cached, scan for types / attribute {AttributeName} (slow).", typeof(TAttribute).FullName);
+                _logger.LogDebug("Running a full, non-cached, scan for types / attribute {AttributeName} (slow).", typeof(TAttribute).FullName);
 
             return GetTypesInternal(
                 typeof (object), typeof (TAttribute),
@@ -596,7 +599,7 @@ namespace Umbraco.Core.Composing
             var name = GetName(baseType, attributeType);
 
             lock (_locko)
-            using (_logger.DebugDuration<TypeLoader>(
+            using (_profilingLogger.DebugDuration<TypeLoader>(
                 "Getting " + name,
                 "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find
             {
@@ -629,7 +632,7 @@ namespace Umbraco.Core.Composing
             if (typeList != null)
             {
                 // need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
-                _logger.Debug<TypeLoader>("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
+                _logger.LogDebug("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
                 return typeList.Types;
             }
 
@@ -645,7 +648,7 @@ namespace Umbraco.Core.Composing
                 // report (only once) and scan and update the cache file
                 if (_reportedChange == false)
                 {
-                    _logger.Debug<TypeLoader>("Assemblies changes detected, need to rescan everything.");
+                    _logger.LogDebug("Assemblies changes detected, need to rescan everything.");
                     _reportedChange = true;
                 }
             }
@@ -660,7 +663,7 @@ namespace Umbraco.Core.Composing
                 // so in this instance there will never be a result.
                 if (cacheResult.Exception is CachedTypeNotFoundInFileException || cacheResult.Success == false)
                 {
-                    _logger.Debug<TypeLoader>("Getting {TypeName}: failed to load from cache file, must scan assemblies.", GetName(baseType, attributeType));
+                    _logger.LogDebug("Getting {TypeName}: failed to load from cache file, must scan assemblies.", GetName(baseType, attributeType));
                     scan = true;
                 }
                 else
@@ -674,7 +677,7 @@ namespace Umbraco.Core.Composing
                         else
                         {
                             // in case of any exception, we have to exit, and revert to scanning
-                            _logger.Warn<TypeLoader>("Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
+                            _logger.LogWarning("Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
                             scan = true;
                             break;
                         }
@@ -682,7 +685,7 @@ namespace Umbraco.Core.Composing
 
                     if (scan == false)
                     {
-                        _logger.Debug<TypeLoader>("Getting {TypeName}: loaded types from cache file.", GetName(baseType, attributeType));
+                        _logger.LogDebug("Getting {TypeName}: loaded types from cache file.", GetName(baseType, attributeType));
                     }
                 }
             }
@@ -690,7 +693,7 @@ namespace Umbraco.Core.Composing
             if (scan)
             {
                 // either we had to scan, or we could not get the types from the cache file - scan now
-                _logger.Debug<TypeLoader>("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
+                _logger.LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
 
                 foreach (var t in finder())
                     typeList.Add(t);
@@ -708,11 +711,11 @@ namespace Umbraco.Core.Composing
                         UpdateCache();
                 }
 
-                _logger.Debug<TypeLoader>("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
+                _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
             }
             else
             {
-                _logger.Debug<TypeLoader>("Got {TypeName}.", GetName(baseType, attributeType));
+                _logger.LogDebug("Got {TypeName}.", GetName(baseType, attributeType));
             }
 
             return typeList.Types;

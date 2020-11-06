@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Events;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// Automatically checks if any request is a non-GET and if the

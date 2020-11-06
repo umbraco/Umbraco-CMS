@@ -19,7 +19,7 @@ namespace Umbraco.Core.Composing
                 "Umbraco.Core",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
-              //  "Umbraco.ModelsBuilder.Embedded", TODO reintroduce when ModelsBuilder is migrated
+                "Umbraco.ModelsBuilder.Embedded",
                 "Umbraco.Examine.Lucene",
                 "Umbraco.Web.Common",
                 "Umbraco.Web.BackOffice",

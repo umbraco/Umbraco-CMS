@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
@@ -30,15 +31,15 @@ namespace Umbraco.Web
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
             IScopeProvider scopeProvider,
-            ISqlContext sqlContext,
             IProfilingLogger proflog,
+            ILogger<BatchedDatabaseServerMessenger> logger,
             IServerRegistrar serverRegistrar,
             DatabaseServerMessengerOptions options,
             IHostingEnvironment hostingEnvironment,
             CacheRefresherCollection cacheRefreshers,
             IRequestCache requestCache,
             IRequestAccessor requestAccessor)
-            : base(mainDom, scopeProvider, sqlContext, proflog, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
+            : base(mainDom, scopeProvider, databaseFactory, proflog, logger, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
             _requestCache = requestCache;
@@ -52,7 +53,7 @@ namespace Umbraco.Web
 
             if (_databaseFactory.CanConnect == false)
             {
-                Logger.Warn<BatchedDatabaseServerMessenger>("Cannot connect to the database, distributed calls will not be enabled for this server.");
+                Logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
             }
             else
             {

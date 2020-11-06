@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps
-            = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
-
         protected override MapperCollectionBuilder This => this;
 
-        public override void RegisterWith(IRegister register)
+        public override void RegisterWith(IServiceCollection services)
         {
-            base.RegisterWith(register);
+            base.RegisterWith(services);
 
             // default initializer registers
             // - service MapperCollectionBuilder, returns MapperCollectionBuilder
@@ -21,12 +20,8 @@ namespace Umbraco.Core.Persistence.Mappers
             // we want to register extra
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
-            register.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
-        }
-
-        protected override BaseMapper CreateItem(IFactory factory, Type itemType)
-        {
-            return (BaseMapper) factory.CreateInstance(itemType, _maps);
+            services.AddSingleton<MapperConfigurationStore>();
+            services.AddSingleton<IMapperCollection>(factory => factory.GetRequiredService<MapperCollection>());
         }
 
         public MapperCollectionBuilder AddCoreMappers()

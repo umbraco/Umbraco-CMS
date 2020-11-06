@@ -1,16 +1,17 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using System;
+using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.BackOffice.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for media.
@@ -23,17 +24,17 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
         public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IContentSettings contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IOptions<ContentSettings> contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _mediaUrlGenerators = mediaUrlGenerators;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         }

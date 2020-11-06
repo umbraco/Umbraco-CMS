@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Logging
 {
@@ -8,9 +9,9 @@ namespace Umbraco.Core.Logging
     /// </summary>
     public class LogProfiler : IProfiler
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LogProfiler> _logger;
 
-        public LogProfiler(ILogger logger)
+        public LogProfiler(ILogger<LogProfiler> logger)
         {
             _logger = logger;
         }
@@ -18,8 +19,8 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            _logger.Debug<LogProfiler>("Begin: {ProfileName}", name);
-            return new LightDisposableTimer(duration => _logger.Info<LogProfiler>("End {ProfileName} ({ProfileDuration}ms)", name, duration));
+            _logger.LogDebug("Begin: {ProfileName}", name);
+            return new LightDisposableTimer(duration => _logger.LogInformation("End {ProfileName} ({ProfileDuration}ms)", name, duration));
         }
 
         /// <inheritdoc/>

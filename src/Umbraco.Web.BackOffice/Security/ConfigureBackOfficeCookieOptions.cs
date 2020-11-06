@@ -5,20 +5,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Net;
 using Umbraco.Web.Common.Security;
-using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -27,9 +27,10 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ISecuritySettings _securitySettings;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly SecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly IDataProtectionProvider _dataProtection;
@@ -37,13 +38,13 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
-        private readonly BackOfficeSessionIdValidator _sessionIdValidator;
         private readonly LinkGenerator _linkGenerator;
 
         public ConfigureBackOfficeCookieOptions(
+            IServiceProvider serviceProvider,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISecuritySettings securitySettings,
-            IGlobalSettings globalSettings,
+            IOptions<SecuritySettings> securitySettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IDataProtectionProvider dataProtection,
@@ -51,12 +52,12 @@ namespace Umbraco.Web.BackOffice.Security
             IUserService userService,
             IIpResolver ipResolver,
             ISystemClock systemClock,
-            BackOfficeSessionIdValidator sessionIdValidator,
             LinkGenerator linkGenerator)
         {
+            _serviceProvider = serviceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
-            _securitySettings = securitySettings;
-            _globalSettings = globalSettings;
+            _securitySettings = securitySettings.Value;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _runtimeState = runtimeState;
             _dataProtection = dataProtection;
@@ -64,7 +65,6 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _systemClock = systemClock;
-            _sessionIdValidator = sessionIdValidator;
             _linkGenerator = linkGenerator;
         }
 
@@ -226,11 +226,14 @@ namespace Umbraco.Web.BackOffice.Security
         private async Task EnsureValidSessionId(CookieValidatePrincipalContext context)
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
-                await _sessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            {
+                var validator = _serviceProvider.GetRequiredService<BackOfficeSessionIdValidator>();
+                await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            }
         }
 
         /// <summary>
-        /// Ensures the ticket is renewed if the <see cref="ISecuritySettings.KeepUserLoggedIn"/> is set to true
+        /// Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn"/> is set to true
         /// and the current request is for the get user seconds endpoint
         /// </summary>
         /// <param name="context"></param>

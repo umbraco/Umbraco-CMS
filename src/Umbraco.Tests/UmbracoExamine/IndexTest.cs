@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Property_Data_With_Value_Indexer()
         {
-            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Factory.GetInstance<PropertyEditorCollection>(), ScopeProvider, false);
+            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Factory.GetRequiredService<PropertyEditorCollection>(), ScopeProvider, false);
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, HostingEnvironment, RuntimeState, luceneDir,
@@ -122,8 +123,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Rebuild_Index()
         {
-            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
-            var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetRequiredService<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
+            var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetRequiredService<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, HostingEnvironment, RuntimeState, luceneDir,
@@ -150,7 +151,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Protected_Content_Not_Indexed()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetRequiredService<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
 
 
             using (var luceneDir = new RandomIdRamDirectory())
@@ -275,7 +276,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Reindex_Content()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetRequiredService<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, HostingEnvironment, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(false)))
@@ -316,7 +317,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
 
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetRequiredService<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider, false);
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, HostingEnvironment, RuntimeState, luceneDir))

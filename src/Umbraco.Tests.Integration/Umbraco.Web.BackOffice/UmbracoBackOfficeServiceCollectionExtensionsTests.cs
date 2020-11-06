@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 using Umbraco.Core.BackOffice;
 using Umbraco.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
+namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserManagerResolvable()
         {
-            var userManager = Services.GetService<BackOfficeUserManager>();
+            var userManager = Services.GetService<IBackOfficeUserManager>();
 
             Assert.NotNull(userManager);
         }

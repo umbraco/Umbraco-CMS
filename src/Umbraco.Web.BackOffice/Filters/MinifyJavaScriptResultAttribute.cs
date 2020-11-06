@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

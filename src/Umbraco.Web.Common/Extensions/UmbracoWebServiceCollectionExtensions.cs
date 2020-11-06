@@ -1,13 +1,10 @@
-﻿using System.Buffers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
@@ -17,11 +14,8 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Smidge;
 using Smidge.Nuglify;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Common.ApplicationModels;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.ModelBinding;
 
 namespace Umbraco.Extensions
 {
@@ -40,8 +34,7 @@ namespace Umbraco.Extensions
 
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
-            var configs = serviceProvider.GetService<Configs>();
-            var imagingSettings = configs.Imaging();
+            var imagingSettings = serviceProvider.GetService<IOptions<ImagingSettings>>().Value;
             services.AddUmbracoImageSharp(imagingSettings);
 
             return services;
@@ -53,29 +46,31 @@ namespace Umbraco.Extensions
         /// <param name="services"></param>
         /// <param name="imagingSettings"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IImagingSettings imagingSettings)
+        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, ImagingSettings imagingSettings)
         {
-            services.AddImageSharpCore(
-                    options =>
+
+            services.AddImageSharp(options =>
                     {
                         options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-                        options.MaxBrowserCacheDays = imagingSettings.MaxBrowserCacheDays;
-                        options.MaxCacheDays = imagingSettings.MaxCacheDays;
-                        options.CachedNameLength = imagingSettings.CachedNameLength;
-                        options.OnParseCommands = context =>
+                        options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
+                        options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
+                        options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
+                        options.OnParseCommandsAsync = context =>
                         {
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.MaxResizeWidth);
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.MaxResizeHeight);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxWidth);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxHeight);
+
+                            return Task.CompletedTask;
                         };
-                        options.OnBeforeSave = _ => { };
-                        options.OnProcessed = _ => { };
-                        options.OnPrepareResponse = _ => { };
+                         options.OnBeforeSaveAsync = _ =>  Task.CompletedTask;
+                        options.OnProcessedAsync = _ => Task.CompletedTask;
+                        options.OnPrepareResponseAsync = _ => Task.CompletedTask;
                     })
                 .SetRequestParser<QueryCollectionRequestParser>()
                 .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
-                    options.CacheFolder = imagingSettings.CacheFolder;
+                    options.CacheFolder = imagingSettings.Cache.CacheFolder;
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
@@ -128,13 +123,13 @@ namespace Umbraco.Extensions
 
             // TODO: we can inject params with DI here
             public UmbracoMvcConfigureOptions()
-            {                
+            {
             }
 
             // TODO: we can configure global mvc options here if we need to
             public void Configure(MvcOptions options)
-            {                
-                
+            {
+
             }
         }
 

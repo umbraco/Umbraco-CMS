@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Web.BackOffice.PropertyEditors.Validation;
 using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters

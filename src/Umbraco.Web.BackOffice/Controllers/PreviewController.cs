@@ -1,23 +1,28 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
+using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
@@ -28,10 +33,10 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class PreviewController : Controller
     {
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IWebSecurity _webSecurity;
-        private readonly ILocalizationService _localizationService;        
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly ILocalizationService _localizationService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
@@ -39,9 +44,9 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public PreviewController(
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizationService localizationService,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
@@ -49,9 +54,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             ICompositeViewEngine viewEngines)
         {
             _features = features;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _publishedSnapshotService = publishedSnapshotService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizationService = localizationService;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -105,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

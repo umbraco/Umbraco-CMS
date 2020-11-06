@@ -50,5 +50,10 @@ namespace Umbraco.Core
         /// </summary>
         BootFailedException BootFailedException { get; }
 
+        /// <summary>
+        /// Determines the runtime level.
+        /// </summary>
+        void DetermineRuntimeLevel();
+
     }
 }

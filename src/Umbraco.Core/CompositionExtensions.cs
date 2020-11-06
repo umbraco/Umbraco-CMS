@@ -1,10 +1,11 @@
 ﻿using Umbraco.Core.Composing;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Sections;
 using Umbraco.Web.Tour;
@@ -94,7 +95,18 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static DashboardCollectionBuilder Dashboards(this Composition composition)
-            => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
+            => composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+                .Add<ContentDashboard>()
+                .Add<ExamineDashboard>()
+                .Add<FormsDashboard>()
+                .Add<HealthCheckDashboard>()
+                .Add<ManifestDashboard>()
+                .Add<MediaDashboard>()
+                .Add<MembersDashboard>()
+                .Add<ProfilerDashboard>()
+                .Add<PublishedStatusDashboard>()
+                .Add<RedirectUrlDashboard>()
+                .Add<SettingsDashboard>();
 
 
         /// <summary>

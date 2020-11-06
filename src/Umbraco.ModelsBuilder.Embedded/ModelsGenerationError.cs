@@ -1,20 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class ModelsGenerationError
     {
-        private readonly IModelsBuilderConfig _config;
-        private readonly IIOHelper _ioHelper;
+        private readonly ModelsBuilderSettings _config;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerationError(IModelsBuilderConfig config, IIOHelper ioHelper)
+        public ModelsGenerationError(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
-            _config = config;
-            _ioHelper = ioHelper;
+            _config = config.Value;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Clear()
@@ -59,7 +61,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GetErrFile()
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 return null;
 

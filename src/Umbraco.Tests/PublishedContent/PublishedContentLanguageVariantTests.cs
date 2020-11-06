@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -22,7 +24,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterUnique(_ => GetServiceContext());
+            Composition.Services.AddUnique(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()
@@ -34,11 +36,11 @@ namespace Umbraco.Tests.PublishedContent
 
         private static void MockLocalizationService(ServiceContext serviceContext)
         {
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             // Set up languages.
             // Spanish falls back to English and Italian to Spanish (and then to English).
             // French has no fall back.
             // Danish, Swedish and Norweigan create an invalid loop.
+            var globalSettings = new GlobalSettings();
             var languages = new List<Language>
                 {
                     new Language(globalSettings, "en-US") { Id = 1, CultureName = "English", IsDefault = true },

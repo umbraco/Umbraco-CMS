@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Common.Attributes;
+using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Web.BackOffice.HealthCheck
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
@@ -20,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly HealthCheckCollection _checks;
         private readonly IList<Guid> _disabledCheckIds;
-        private readonly ILogger _logger;
+        private readonly ILogger<HealthCheckController> _logger;
 
-        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IHealthChecksSettings healthChecksSettings)
+        public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings)
         {
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var healthCheckConfig = healthChecksSettings ?? throw new ArgumentNullException(nameof(healthChecksSettings));
+            var healthCheckConfig = healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();
@@ -71,7 +73,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}", check.Name);
+                _logger.LogError(ex, "Exception in health check: {HealthCheckName}", check.Name);
                 throw;
             }
         }
@@ -83,7 +85,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return check.ExecuteAction(action);
         }
 
-        private HealthCheck.HealthCheck GetCheckById(Guid id)
+        private Core.HealthCheck.HealthCheck GetCheckById(Guid id)
         {
             var check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)

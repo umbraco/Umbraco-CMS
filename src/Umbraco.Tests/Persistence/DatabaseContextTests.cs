@@ -3,20 +3,21 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -25,7 +26,8 @@ namespace Umbraco.Tests.Persistence
     public class DatabaseContextTests
     {
         private IUmbracoDatabaseFactory _databaseFactory;
-        private ILogger _logger;
+        private ILogger<UmbracoDatabaseFactory> _logger;
+        private ILoggerFactory _loggerFactory;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private IUmbracoVersion _umbracoVersion;
@@ -36,11 +38,12 @@ namespace Umbraco.Tests.Persistence
             // create the database factory and database context
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
-            _logger = Mock.Of<ILogger>();
+            _logger = Mock.Of<ILogger<UmbracoDatabaseFactory>>();
+            _loggerFactory = NullLoggerFactory.Instance;
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, _loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings),  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]
@@ -73,7 +76,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // re-create the database factory and database context with proper connection string
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, connString, Constants.DbProviderNames.SqlCe, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, NullLoggerFactory.Instance, connString, Constants.DbProviderNames.SqlCe, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
 
             // test get database type (requires an actual database)
             using (var database = _databaseFactory.CreateDatabase())
@@ -94,7 +97,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

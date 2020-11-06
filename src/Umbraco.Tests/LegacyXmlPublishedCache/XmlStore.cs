@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             if (SyncToXmlFile == false) return;
 
-            var logger = Current.Logger;
+            var loggerFactory = Current.LoggerFactory;
 
             // there's always be one task keeping a ref to the runner
             // so it's safe to just create it as a local var here
@@ -147,10 +147,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 LongRunning = true,
                 KeepAlive = true,
                 Hosted = false // main domain will take care of stopping the runner (see below)
-            }, logger, _hostingLifetime);
+            }, loggerFactory.CreateLogger<BackgroundTaskRunner<XmlStoreFilePersister>>(), _hostingLifetime);
 
             // create (and add to runner)
-            _persisterTask = new XmlStoreFilePersister(runner, this, logger);
+            _persisterTask = new XmlStoreFilePersister(runner, this, loggerFactory.CreateLogger<XmlStoreFilePersister>());
 
             var registered = mainDom.Register(
                 null,
@@ -286,8 +286,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 throw new Exception("Cannot run with both ContinouslyUpdateXmlDiskCache and XmlContentCheckForDiskChanges being true.");
 
             if (XmlIsImmutable == false)
-                //Current.Logger.Warn<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
-                Current.Logger.Warn<XmlStore>("CloneXmlContent is false - ignored, we always clone.");
+                //Current.Logger.LogWarning<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
+                Current.Logger.LogWarning("CloneXmlContent is false - ignored, we always clone.");
 
             // note: if SyncFromXmlFile then we should also disable / warn that local edits are going to cause issues...
         }
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<ContentTypeService>(ex, "Failed to build a DTD for the Xml cache.");
+                Current.Logger.LogError(ex, "Failed to build a DTD for the Xml cache.");
             }
 
             dtd.AppendLine("]>");
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // assumes xml lock (file is always locked)
         private void LoadXmlLocked(SafeXmlReaderWriter safeXml, out bool registerXmlChange)
         {
-            Current.Logger.Debug<XmlStore>("Loading Xml...");
+            Current.Logger.LogDebug("Loading Xml...");
 
             // try to get it from the file
             if (XmlFileEnabled && (safeXml.Xml = LoadXmlFromFile()) != null)
@@ -674,7 +674,7 @@ AND (umbracoNode.id=@id)";
         // (no need to test _released)
         internal void SaveXmlToFile()
         {
-            Current.Logger.Info<XmlStore>("Save Xml to file...");
+            Current.Logger.LogInformation("Save Xml to file...");
 
             try
             {
@@ -698,14 +698,14 @@ AND (umbracoNode.id=@id)";
                     fs.Write(bytes, 0, bytes.Length);
                 }
 
-                Current.Logger.Info<XmlStore>("Saved Xml to file.");
+                Current.Logger.LogInformation("Saved Xml to file.");
             }
             catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -714,7 +714,7 @@ AND (umbracoNode.id=@id)";
         // (no need to test _released)
         internal async Task SaveXmlToFileAsync()
         {
-            Current.Logger.Info<XmlStore>("Save Xml to file...");
+            Current.Logger.LogInformation("Save Xml to file...");
 
             try
             {
@@ -738,14 +738,14 @@ AND (umbracoNode.id=@id)";
                     await fs.WriteAsync(bytes, 0, bytes.Length);
                 }
 
-                Current.Logger.Info<XmlStore>("Saved Xml to file.");
+                Current.Logger.LogInformation("Saved Xml to file.");
             }
             catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -782,7 +782,7 @@ AND (umbracoNode.id=@id)";
             // do NOT try to load if we are not the main domain anymore
             if (_released) return null;
 
-            Current.Logger.Info<XmlStore>("Load Xml from file...");
+            Current.Logger.LogInformation("Load Xml from file...");
 
             try
             {
@@ -792,17 +792,17 @@ AND (umbracoNode.id=@id)";
                     xml.Load(fs);
                 }
                 _lastFileRead = DateTime.UtcNow;
-                Current.Logger.Info<XmlStore>("Loaded Xml from file.");
+                Current.Logger.LogInformation("Loaded Xml from file.");
                 return xml;
             }
             catch (FileNotFoundException)
             {
-                Current.Logger.Warn<XmlStore>("Failed to load Xml, file does not exist.");
+                Current.Logger.LogWarning("Failed to load Xml, file does not exist.");
                 return null;
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<XmlStore>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
                 try
                 {
                     DeleteXmlFile();
@@ -834,7 +834,7 @@ AND (umbracoNode.id=@id)";
             _nextFileCheck = now.AddSeconds(1); // check every 1s
             if (XmlFileLastWriteTime <= _lastFileRead) return;
 
-            Current.Logger.Debug<XmlStore>("Xml file change detected, reloading.");
+            Current.Logger.LogDebug("Xml file change detected, reloading.");
 
             // time to read
 
@@ -1042,7 +1042,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+                    Current.Logger.LogDebug("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                     {
@@ -1075,7 +1075,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
-                        Current.Logger.Debug<XmlStore>("Notified, content {ContentId} has no published version.", payload.Id);
+                        Current.Logger.LogDebug("Notified, content {ContentId} has no published version.", payload.Id);
 
                         if (current != null)
                         {
@@ -1114,7 +1114,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             if (dtos.MoveNext() == false)
                             {
                                 // gone fishing, remove (possible race condition)
-                                Current.Logger.Debug<XmlStore>("Notified, content {ContentId} gone fishing.", payload.Id);
+                                Current.Logger.LogDebug("Notified, content {ContentId} gone fishing.", payload.Id);
 
                                 if (current != null)
                                 {
@@ -1228,7 +1228,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
+                Current.Logger.LogDebug("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
 
             if (ids.Length > 0) // must have refreshes, not only removes
                 RefreshContentTypes(ids);
@@ -1247,7 +1247,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 _contentTypeCache.ClearDataType(payload.Id);
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {RemovedStatus} for data type {payload.Id}",
+                Current.Logger.LogDebug("Notified {RemovedStatus} for data type {payload.Id}",
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 

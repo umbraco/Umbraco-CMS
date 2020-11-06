@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -113,7 +114,11 @@ namespace Umbraco.Web.Models.Trees
                     return Current.IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
 
                 //legacy icon path
-                var backOfficePath = Current.Configs.Global().GetUmbracoMvcArea(Current.HostingEnvironment);
+
+                // TODO: replace this when we have something other than Current.Configs available
+                var backOfficePath = Current.GlobalSettings.GetUmbracoMvcArea(Current.HostingEnvironment);
+
+
                 return string.Format("{0}images/umbraco/{1}", backOfficePath.EnsureEndsWith("/"), Icon);
             }
         }

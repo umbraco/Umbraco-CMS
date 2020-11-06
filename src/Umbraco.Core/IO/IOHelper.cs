@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Configuration;
+using System.Reflection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 
@@ -14,7 +13,7 @@ namespace Umbraco.Core.IO
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public IOHelper(IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings)
+        public IOHelper(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
@@ -123,7 +122,7 @@ namespace Umbraco.Core.IO
 
             var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
             if (filePath.StartsWith(mappedRoot) == false)
-                filePath = MapPath(filePath);
+                filePath = _hostingEnvironment.MapPathContentRoot(filePath);
 
             // yes we can (see above)
             //// don't trust what we get, it may contain relative segments
@@ -133,7 +132,7 @@ namespace Umbraco.Core.IO
             {
                 var validDir = dir;
                 if (validDir.StartsWith(mappedRoot) == false)
-                    validDir = MapPath(validDir);
+                    validDir = _hostingEnvironment.MapPathContentRoot(validDir);
 
                 if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
                     return true;
@@ -189,5 +188,63 @@ namespace Umbraco.Core.IO
             return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
         }
 
+        /// <summary>
+        /// Retrieves array of temporary folders from the hosting environment.
+        /// </summary>
+        /// <returns>Array of <see cref="DirectoryInfo"/> instances.</returns>
+        public DirectoryInfo[] GetTempFolders()
+        {
+            var tempFolderPaths = new[]
+            {
+                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
+            };
+
+            foreach (var tempFolderPath in tempFolderPaths)
+            {
+                // Ensure it exists
+                Directory.CreateDirectory(tempFolderPath);
+            }
+
+            return tempFolderPaths.Select(x => new DirectoryInfo(x)).ToArray();
+        }
+
+        /// <summary>
+        /// Cleans contents of a folder by deleting all files older that the provided age.
+        /// If deletition of any file errors (e.g. due to a file lock) the process will continue to try to delete all that it can.
+        /// </summary>
+        /// <param name="folder">Folder to clean.</param>
+        /// <param name="age">Age of files within folder to delete.</param>
+        /// <returns>Result of operation.</returns>
+        public CleanFolderResult CleanFolder(DirectoryInfo folder, TimeSpan age)
+        {
+            folder.Refresh(); // In case it's changed during runtime.
+
+            if (!folder.Exists)
+            {
+                return CleanFolderResult.FailedAsDoesNotExist();
+            }
+
+            var files = folder.GetFiles("*.*", SearchOption.AllDirectories);
+            var errors = new List<CleanFolderResult.Error>();
+            foreach (var file in files)
+            {
+                if (DateTime.UtcNow - file.LastWriteTimeUtc > age)
+                {
+                    try
+                    {
+                        file.IsReadOnly = false;
+                        file.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(new CleanFolderResult.Error(ex, file));
+                    }
+                }
+            }
+
+            return errors.Any()
+                ? CleanFolderResult.FailedWithErrors(errors)
+                : CleanFolderResult.Success();
+        }
     }
 }

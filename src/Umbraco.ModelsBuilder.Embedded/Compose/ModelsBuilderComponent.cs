@@ -1,37 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Web;
-using Umbraco.Web.Mvc;
+using Umbraco.Net;
+using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     internal class ModelsBuilderComponent : IComponent
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
+        private readonly LinkGenerator _linkGenerator;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
+        public ModelsBuilderComponent(IOptions<ModelsBuilderSettings> config, IShortStringHelper shortStringHelper,
+            LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
+            IUmbracoRequestLifetime umbracoRequestLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
-            _config = config;
+            _config = config.Value;
             _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
             _shortStringHelper = shortStringHelper;
+            _linkGenerator = linkGenerator;
+            _umbracoRequestLifetime = umbracoRequestLifetime;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         public void Initialize()
@@ -39,6 +48,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
             InstallServerVars();
+            _umbracoApplicationLifetime.ApplicationInit += InitializeApplication;
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
@@ -53,32 +63,40 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            ServerVariablesParser.Parsing -= ServerVariablesParser_Parsing;
+            ContentModelBinder.ModelBindingException -= ContentModelBinder_ModelBindingException;
+            FileService.SavingTemplate -= FileService_SavingTemplate;
+        }
+
+        private void InitializeApplication(object sender, EventArgs args)
+        {
+            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
+        }
 
         private void InstallServerVars()
         {
             // register our url - for the backoffice api
-            ServerVariablesParser.Parsing += (sender, serverVars) =>
-            {
-                if (!serverVars.ContainsKey("umbracoUrls"))
-                    throw new ArgumentException("Missing umbracoUrls.");
-                var umbracoUrlsObject = serverVars["umbracoUrls"];
-                if (umbracoUrlsObject == null)
-                    throw new ArgumentException("Null umbracoUrls");
-                if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
-                    throw new ArgumentException("Invalid umbracoUrls");
+            ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
+        }
 
-                if (!serverVars.ContainsKey("umbracoPlugins"))
-                    throw new ArgumentException("Missing umbracoPlugins.");
-                if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
-                    throw new ArgumentException("Invalid umbracoPlugins");
+        private void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> serverVars)
+        {
+            if (!serverVars.ContainsKey("umbracoUrls"))
+                throw new ArgumentException("Missing umbracoUrls.");
+            var umbracoUrlsObject = serverVars["umbracoUrls"];
+            if (umbracoUrlsObject == null)
+                throw new ArgumentException("Null umbracoUrls");
+            if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
+                throw new ArgumentException("Invalid umbracoUrls");
 
-                if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+            if (!serverVars.ContainsKey("umbracoPlugins"))
+                throw new ArgumentException("Missing umbracoPlugins.");
+            if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
+                throw new ArgumentException("Invalid umbracoPlugins");
 
-                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
+                umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
                 umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
-            };
         }
 
         private Dictionary<string, object> GetModelsBuilderSettings()

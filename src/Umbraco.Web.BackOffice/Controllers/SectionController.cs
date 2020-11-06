@@ -1,19 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     ///     The API controller used for using the list of sections
@@ -22,43 +24,46 @@ namespace Umbraco.Web.Editors
     public class SectionController : UmbracoAuthorizedJsonController
     {
         private readonly IControllerFactory _controllerFactory;
+        private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
         private readonly IDashboardService _dashboardService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public SectionController(
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
-            UmbracoMapper umbracoMapper, IControllerFactory controllerFactory)
+            UmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizedTextService = localizedTextService;
             _dashboardService = dashboardService;
             _sectionService = sectionService;
             _treeService = treeService;
             _umbracoMapper = umbracoMapper;
             _controllerFactory = controllerFactory;
+            _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
         public IEnumerable<Section> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(_webSecurity.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(_umbracoMapper.Map<Section>).ToArray();
 
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
             var appTreeController =
-                new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory)
+                new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory, _actionDescriptorCollectionProvider)
                 {
                     ControllerContext = ControllerContext
                 };
 
-            var dashboards = _dashboardService.GetDashboards(_webSecurity.CurrentUser);
+            var dashboards = _dashboardService.GetDashboards(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser);
 
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)
@@ -104,10 +109,10 @@ namespace Umbraco.Web.Editors
         {
             var sections = _sectionService.GetSections();
             var mapped = sections.Select(_umbracoMapper.Map<Section>);
-            if (_webSecurity.CurrentUser.IsAdmin())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
                 return mapped;
 
-            return mapped.Where(x => _webSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
+            return mapped.Where(x => _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
         }
     }
 }

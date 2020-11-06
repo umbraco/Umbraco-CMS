@@ -8,13 +8,11 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
-using Umbraco.Core.IO;
-using Umbraco.Web.Install;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-
 using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -25,7 +23,7 @@ namespace Umbraco.Web.Runtime
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
 
@@ -33,7 +31,7 @@ namespace Umbraco.Web.Runtime
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper)
         {
@@ -68,7 +66,7 @@ namespace Umbraco.Web.Runtime
 
         private static void ConfigureGlobalFilters()
         {
-            GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
+            //GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
         }
 
         // internal for tests
@@ -80,7 +78,7 @@ namespace Umbraco.Web.Runtime
             viewEngines.Clear();
             foreach (var engine in originalEngines)
             {
-                var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+                var wrappedEngine = engine;// TODO introduce in NETCORE: is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
                 viewEngines.Add(wrappedEngine);
             }
         }
@@ -91,15 +89,12 @@ namespace Umbraco.Web.Runtime
             MvcHandler.DisableMvcResponseHeader = true;
 
             // set master controller factory
-            var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
-            ControllerBuilder.Current.SetControllerFactory(controllerFactory);
+            // var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
+            // ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
             // set the render & plugin view engines
-            ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
-            ViewEngines.Engines.Add(new PluginViewEngine());
-
-            //set model binder
-            ModelBinderProviders.BinderProviders.Add(ContentModelBinder.Instance); // is a provider
+            // ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
+            // ViewEngines.Engines.Add(new PluginViewEngine());
 
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
@@ -111,7 +106,7 @@ namespace Umbraco.Web.Runtime
         // internal for tests
         internal static void CreateRoutes(
             IUmbracoContextAccessor umbracoContextAccessor,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
@@ -127,9 +122,6 @@ namespace Umbraco.Web.Runtime
             );
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
-            // register no content route
-            RouteNoContentController(umbracoPath);
-
             // register install routes
            // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
@@ -140,16 +132,8 @@ namespace Umbraco.Web.Runtime
             RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, hostingEnvironment);
         }
 
-        private static void RouteNoContentController(string umbracoPath)
-        {
-            RouteTable.Routes.MapRoute(
-                Constants.Web.NoContentRouteName,
-                umbracoPath + "/UmbNoContent",
-                new { controller = "RenderNoContent", action = "Index" });
-        }
-
         private static void RoutePluginControllers(
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)

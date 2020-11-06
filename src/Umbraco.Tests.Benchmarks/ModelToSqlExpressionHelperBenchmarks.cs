@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Infrastructure.Persistence.Mappers;
 using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Benchmarks
@@ -24,8 +25,8 @@ namespace Umbraco.Tests.Benchmarks
             return new Lazy<ISqlContext>(() => sqlContext);
         }
 
-        protected ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()
-            => new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+        protected MapperConfigurationStore CreateMaps()
+            => new MapperConfigurationStore();
 
         public ModelToSqlExpressionHelperBenchmarks()
         {

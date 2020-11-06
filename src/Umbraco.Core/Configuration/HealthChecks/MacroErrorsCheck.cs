@@ -1,27 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.HealthCheck.Checks.Configuration
 {
     [HealthCheck("D0F7599E-9B2A-4D9E-9883-81C7EDC5616F", "Macro errors",
-        Description = "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
+        Description =
+            "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
         Group = "Configuration")]
-    public class MacroErrorsCheck : AbstractConfigCheck
+    public class MacroErrorsCheck : AbstractSettingsCheck
     {
-        public MacroErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
-        { }
+        private readonly ILocalizedTextService _textService;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly IOptionsMonitor<ContentSettings> _contentSettings;
 
-        public override string FilePath => "~/Config/umbracoSettings.config";
-
-        public override string XPath => "/settings/content/MacroErrors";
+        public MacroErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,
+            IOptionsMonitor<ContentSettings> contentSettings)
+            : base(textService, loggerFactory)
+        {
+            _textService = textService;
+            _loggerFactory = loggerFactory;
+            _contentSettings = contentSettings;
+        }
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
+        public override string ItemPath => Constants.Configuration.ConfigContentMacroErrors;
+
+
+        /// <summary>
+        /// Gets the values to compare against.
+        /// </summary>
         public override IEnumerable<AcceptableConfiguration> Values
         {
             get
@@ -44,24 +57,35 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
         }
 
+        public override string CurrentValue => _contentSettings.CurrentValue.MacroErrors.ToString();
+
+        /// <summary>
+        /// Gets the message for when the check has succeeded.
+        /// </summary>
         public override string CheckSuccessMessage
         {
             get
             {
-                return TextService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
+                return _textService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
+        /// <summary>
+        /// Gets the message for when the check has failed.
+        /// </summary>
         public override string CheckErrorMessage
         {
             get
             {
-                return TextService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
+                return _textService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
+        /// <summary>
+        /// Gets the rectify success message.
+        /// </summary>
         public override string RectifySuccessMessage
         {
             get

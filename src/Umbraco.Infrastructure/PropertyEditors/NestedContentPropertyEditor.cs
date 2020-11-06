@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         public NestedContentPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             Lazy<PropertyEditorCollection> propertyEditors,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -43,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService)
-            : base (logger, dataTypeService, localizationService, localizedTextService,  shortStringHelper)
+            : base (loggerFactory, dataTypeService, localizationService, localizedTextService,  shortStringHelper)
         {
             _propertyEditors = propertyEditors;
             _contentTypeService = contentTypeService;
@@ -62,14 +62,14 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors, Logger);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors, LoggerFactory.CreateLogger<NestedContentPropertyEditor>());
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IContentTypeService _contentTypeService;
             private readonly IDataTypeService _dataTypeService;
-            private readonly ILogger _logger;
+            private readonly ILogger<NestedContentPropertyEditor> _logger;
             private readonly NestedContentValues _nestedContentValues;
 
             private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
@@ -82,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors
                 IShortStringHelper shortStringHelper,
                 DataEditorAttribute attribute,
                 PropertyEditorCollection propertyEditors,
-                ILogger logger)
+                ILogger<NestedContentPropertyEditor> logger)
                 : base(dataTypeService, localizationService,  localizedTextService, shortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
@@ -95,7 +95,6 @@ namespace Umbraco.Web.PropertyEditors
                 _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
                     _contentTypeService.GetAll().ToDictionary(c => c.Alias)
                 );
-
             }
 
             /// <inheritdoc />
@@ -144,7 +143,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.Warn<NestedContentPropertyValueEditor>(
+                            _logger.LogWarning(
                                 ex,
                                 "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, propertyType.Alias);
@@ -213,7 +212,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.Warn<NestedContentPropertyValueEditor>(
+                            _logger.LogWarning(
                                 ex,
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, property.PropertyType.Alias);

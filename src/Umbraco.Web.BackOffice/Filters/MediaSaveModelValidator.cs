@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -12,11 +12,11 @@ namespace Umbraco.Web.BackOffice.Filters
     internal class MediaSaveModelValidator : ContentModelValidator<IMedia, MediaItemSave, IContentProperties<ContentPropertyBasic>>
     {
         public MediaSaveModelValidator(
-            ILogger logger,
-            IWebSecurity webSecurity,
+            ILogger<MediaSaveModelValidator> logger,
+            IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(logger, webSecurity, textService, propertyValidationService)
+            : base(logger, backofficeSecurity, textService, propertyValidationService)
         {
         }
     }

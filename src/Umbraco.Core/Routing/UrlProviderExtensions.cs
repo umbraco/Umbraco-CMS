@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Routing
             ILocalizedTextService textService,
             IContentService contentService,
             IVariationContextAccessor variationContextAccessor,
-            ILogger logger,
+            ILogger<IContent> logger,
             UriUtility uriUtility,
             IPublishedUrlProvider publishedUrlProvider)
         {
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<UrlProvider>(ex, "GetUrl exception.");
+                    logger.LogError(ex, "GetUrl exception.");
                     url = "#ex";
                 }
 
