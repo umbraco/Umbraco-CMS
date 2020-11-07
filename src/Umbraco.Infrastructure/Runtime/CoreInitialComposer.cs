@@ -139,8 +139,7 @@ namespace Umbraco.Core.Runtime
                 return singleServer
                     ? (IServerRegistrar) new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
                     : new DatabaseServerRegistrar(
-                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>),
-                        new DatabaseServerRegistrarOptions());
+                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
             });
 
             // by default we'll use the database server messenger with default options (no callbacks),

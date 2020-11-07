@@ -46,6 +46,8 @@
 
         public bool DisableElectionForSingleServer { get; set; } = false;
 
+        public DatabaseServerRegistrarSettings DatabaseServerRegistrar { get; set; } = new DatabaseServerRegistrarSettings();
+
         public string RegisterType { get; set; } = string.Empty;
 
         public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
