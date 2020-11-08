@@ -20,7 +20,7 @@
                 <div class="umb-control-group">
                     <umb-search-filter
                         input-id="icon-search"
-                        model="searchTerm"
+                        model="vm.options.filter"
                         label-key="placeholders_filter"
                         text="Type to filter..."
                         css-class="w-100"
@@ -40,9 +40,9 @@
 
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-                <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
-                    <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
-                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm | orderBy:'name') track by $id(icon)">
+                <div class="umb-control-group" ng-show="!vm.loading && vm.icons.length > 0 ">
+                    <ul class="umb-iconpicker" ng-class="vm.color.value">
+                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in vm.icons track by $id(icon)">
                             <button type="button" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color.value)">
                                 <umb-icon class="umb-iconpicker-svg {{icon.name}} large" icon="{{icon.name}}"></umb-icon>
                                 <span class="sr-only"><localize key="buttons_select">Select</localize> {{icon.name}}</span>
@@ -51,11 +51,19 @@
                     </ul>
                 </div>
 
-                <umb-empty-state
-                    ng-if="filtered.length === 0"
-                    position="center">
+                <umb-empty-state ng-if="vm.icons.length === 0"
+                                 position="center">
                     <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
                 </umb-empty-state>
+
+                <!-- Pagination -->
+                <!--<div class="flex justify-center">
+                    <umb-pagination ng-if="model.relations.totalPages"
+                                    page-number="model.relations.pageNumber"
+                                    total-pages="model.relations.totalPages"
+                                    on-change="vm.changePageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>-->
 
             </umb-box-content>
         </umb-box>

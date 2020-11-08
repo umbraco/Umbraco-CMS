@@ -224,8 +224,8 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                  }
             });
         },
-
-        /** Gets all the available icons in the backoffice icon folder and returns them as an array of IconModels */
+        
+         /** Gets all the available icons in the backoffice icon folder and returns them as an array of IconModels */
          getAllIcons: function() {
             return $q((resolve, reject) => {
                 if(allIconsRequested === false) {
@@ -247,6 +247,60 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                 } else {
                     resolve(iconCache);
                 }
+            });
+        },
+
+        getPagedIcons: function (options) {
+
+            var defaults = {
+                pageSize: 100,
+                pageNumber: 1,
+                filter: '',
+                orderDirection: "Ascending",
+                orderBy: "Name"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+
+            // overwrite the defaults if there are any specified
+            Utilities.extend(defaults, options);
+
+            // now copy back to the options we will use
+            options = defaults;
+
+            // change asc/desc
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
+
+            var params = [
+                { pageNumber: options.pageNumber },
+                { pageSize: options.pageSize },
+                { orderBy: options.orderBy },
+                { orderDirection: options.orderDirection },
+                { filter: options.filter }
+            ];
+
+            var qry = umbRequestHelper.dictionaryToQueryString(params);
+
+            return $q((resolve, reject) => {
+                umbRequestHelper.resourcePromise(
+                    $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetPagedIcons', qry)
+                    , 'Failed to retrieve icons')
+                    .then(icons => {
+                        icons.forEach(icon => {
+                            this.defineIcon(icon.Name, icon.SvgString);
+                        });
+
+                        resolve(iconCache);
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                    });
             });
         },
 

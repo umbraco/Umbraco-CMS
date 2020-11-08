@@ -10,6 +10,9 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
+    vm.options = {};
+
+    vm.changePageNumber = changePageNumber;
     vm.selectIcon = selectIcon;
     vm.selectColor = selectColor;
     vm.submit = submit;
@@ -43,7 +46,22 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
         setTitle();
 
-        iconHelper.getAllIcons()
+        loadIcons();
+
+        // set a default color if nothing is passed in
+        vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
+
+        // if an icon is passed in - preselect it
+        vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
+    }
+
+    function changePageNumber(pageNumber) {
+        vm.options.pageNumber = pageNumber;
+        loadIcons();
+    }
+
+    function loadIcons() {
+        iconHelper.getPagedIcons(vm.options)
             .then(icons => {
                 vm.icons = icons;
 
@@ -61,13 +79,6 @@ function IconPickerController($scope, localizationService, iconHelper) {
                         vm.loading = false;
                     });
             });
-
-        // set a default color if nothing is passed in
-        vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
-
-
-        // if an icon is passed in - preselect it
-        vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
     }
 
     function setTitle() {
@@ -96,7 +107,7 @@ function IconPickerController($scope, localizationService, iconHelper) {
     }
 
     function close() {
-        if($scope.model && $scope.model.close) {
+        if ($scope.model && $scope.model.close) {
             $scope.model.close();
         }
     }

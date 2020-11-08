@@ -13,9 +13,15 @@ namespace Umbraco.Core.Services
         IconModel GetIcon(string iconName);
 
         /// <summary>
-        /// Gets a list of all svg icons found at at the global icons path.
+        /// Gets a list of all svg icons found at the global icons path.
         /// </summary>
         /// <returns></returns>
         IList<IconModel> GetAllIcons();
+
+        /// <summary>
+        /// Gets a paged list of svg icons found at the global icons path.
+        /// </summary>
+        /// <returns></returns>
+        IList<IconModel> GetPagedIcons(int pageNumber, int pageSize, string filter = "");
     }
 }
