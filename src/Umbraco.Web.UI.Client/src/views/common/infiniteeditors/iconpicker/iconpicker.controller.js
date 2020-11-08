@@ -10,13 +10,19 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
-    vm.options = {};
-
     vm.changePageNumber = changePageNumber;
     vm.selectIcon = selectIcon;
     vm.selectColor = selectColor;
     vm.submit = submit;
     vm.close = close;
+
+    vm.options = {
+        pageNumber: 1,
+        pageSize: 100,
+        totalItems: 0,
+        totalPages: 0,
+        filter: ''
+    };
 
     vm.colors = [
         { name: "Black", value: "color-black", default: true },
@@ -52,7 +58,7 @@ function IconPickerController($scope, localizationService, iconHelper) {
         vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
 
         // if an icon is passed in - preselect it
-        vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
+        vm.icon = $scope.model.icon ? $scope.model.icon : null;
     }
 
     function changePageNumber(pageNumber) {
@@ -63,7 +69,7 @@ function IconPickerController($scope, localizationService, iconHelper) {
     function loadIcons() {
         iconHelper.getPagedIcons(vm.options)
             .then(icons => {
-                vm.icons = icons;
+                vm.icons = icons.items || [];
 
                 // Get's legacy icons, removes duplicates then maps them to IconModel
                 iconHelper.getIcons()
