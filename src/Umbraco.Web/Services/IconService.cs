@@ -40,7 +40,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
-        public IList<IconModel> GetPagedIcons(int pageNumber, int pageSize, string filter = "")
+        public IList<IconModel> GetPagedIcons(int pageIndex, int pageSize, out long totalRecords, string filter = "")
         {
             var icons = new List<IconModel>();
             var iconNames = GetIconNames();
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Services
                 ? iconNames.Where(x => x.Name.InvariantContains(filter))
                 : iconNames;
 
-            filtered.OrderBy(f => f.Name).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList().ForEach(iconInfo =>
+            filtered.OrderBy(f => f.Name).Skip(pageSize * pageIndex).Take(pageSize).ToList().ForEach(iconInfo =>
             {
                 var icon = GetIcon(iconInfo);
 
@@ -58,6 +58,8 @@ namespace Umbraco.Web.Services
                     icons.Add(icon);
                 }
             });
+
+            totalRecords = icons.Count;
 
             return icons;
         }

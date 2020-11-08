@@ -22,6 +22,6 @@ namespace Umbraco.Core.Services
         /// Gets a paged list of svg icons found at the global icons path.
         /// </summary>
         /// <returns></returns>
-        IList<IconModel> GetPagedIcons(int pageNumber, int pageSize, string filter = "");
+        IList<IconModel> GetPagedIcons(int pageIndex, int pageSize, out long totalRecords, string filter = "");
     }
 }

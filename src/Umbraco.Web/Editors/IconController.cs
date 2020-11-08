@@ -50,7 +50,7 @@ namespace Umbraco.Web.Editors
                 return new PagedResult<IconModel>(0, pageNumber, pageSize);
             }
 
-            var icons = _iconService.GetPagedIcons(pageNumber - 1, pageSize, out long totalRecords, null, filter);
+            var icons = _iconService.GetPagedIcons(pageNumber - 1, pageSize, out long totalRecords, filter);
 
             return new PagedResult<IconModel>(totalRecords, pageNumber, pageSize)
             {

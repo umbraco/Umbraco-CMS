@@ -40,9 +40,9 @@
 
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-                <div class="umb-control-group" ng-show="!vm.loading && vm.icons.length > 0 ">
+                <div class="umb-control-group" ng-show="!vm.loading && vm.icons.items.length > 0 ">
                     <ul class="umb-iconpicker" ng-class="vm.color.value">
-                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in vm.icons track by $id(icon)">
+                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in vm.icons.items track by $id(icon)">
                             <button type="button" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color.value)">
                                 <umb-icon class="umb-iconpicker-svg {{icon.name}} large" icon="{{icon.name}}"></umb-icon>
                                 <span class="sr-only"><localize key="buttons_select">Select</localize> {{icon.name}}</span>
@@ -51,19 +51,19 @@
                     </ul>
                 </div>
 
-                <umb-empty-state ng-if="vm.icons.length === 0"
+                <umb-empty-state ng-if="vm.icons.totalItems === 0"
                                  position="center">
                     <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
                 </umb-empty-state>
 
                 <!-- Pagination -->
-                <!--<div class="flex justify-center">
-                    <umb-pagination ng-if="model.relations.totalPages"
-                                    page-number="model.relations.pageNumber"
-                                    total-pages="model.relations.totalPages"
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="model.icons.totalPages"
+                                    page-number="model.icons.pageNumber"
+                                    total-pages="model.icons.totalPages"
                                     on-change="vm.changePageNumber(pageNumber)">
                     </umb-pagination>
-                </div>-->
+                </div>
 
             </umb-box-content>
         </umb-box>
