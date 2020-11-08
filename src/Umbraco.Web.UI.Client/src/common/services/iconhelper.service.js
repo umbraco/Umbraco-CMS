@@ -292,6 +292,13 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                     $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetPagedIcons', qry)
                     , 'Failed to retrieve icons')
                     .then(icons => {
+
+                        if (icons) {
+                            icons.items.forEach(icon => {
+                                this.defineIcon(icon.Name, icon.SvgString);
+                            });
+                        }
+
                         resolve(icons);
                     })
                     .catch(err => {
@@ -351,7 +358,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         /** Creates a icon object, and caches it in a runtime cache */
         defineIcon: function(name, svg) {
             var icon = iconCache.find(x => x.name === name);
-            if(icon === undefined) {
+            if (icon === undefined) {
                 icon = {
                     name: name,
                     svgString: $sce.trustAsHtml(svg)
