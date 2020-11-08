@@ -69,21 +69,24 @@ function IconPickerController($scope, localizationService, iconHelper) {
     function loadIcons() {
         iconHelper.getPagedIcons(vm.options)
             .then(icons => {
-                vm.icons = icons.items || [];
+                vm.icons = icons;
+                console.log("loadIcons", vm.icons);
 
                 // Get's legacy icons, removes duplicates then maps them to IconModel
-                iconHelper.getIcons()
-                    .then(icons => {
-                        if (icons && icons.length > 0) {
-                            let legacyIcons = icons
-                                .filter(icon => !vm.icons.find(x => x.name == icon))
-                                .map(icon => { return { name: icon, svgString: null }; });
+                //iconHelper.getIcons()
+                //    .then(icons => {
+                //        if (icons && icons.length > 0) {
+                //            let legacyIcons = icons
+                //                .filter(icon => !vm.icons.find(x => x.name == icon))
+                //                .map(icon => { return { name: icon, svgString: null }; });
 
-                            vm.icons = legacyIcons.concat(vm.icons);
-                        }
+                //            vm.icons = legacyIcons.concat(vm.icons);
+                //        }
 
-                        vm.loading = false;
-                    });
+                //        vm.loading = false;
+                //    });
+
+                vm.loading = false;
             });
     }
 
