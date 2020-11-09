@@ -7,7 +7,7 @@
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked mb0">
                     <li ng-repeat="url in currentUrls">
-                        <a href="{{url.text}}" target="_blank" ng-if="url.isUrl">
+                        <a href="{{url.text}}" target="_blank" rel="noopener" ng-if="url.isUrl">
                             <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <i class="icon icon-out" aria-hidden="true"></i>
                             <span>{{url.text}}</span>
@@ -30,7 +30,7 @@
                         <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
                         <ul class="nav nav-stacked" style="margin-bottom: 0;">
                             <li ng-repeat="redirectUrl in redirectUrls">
-                                <a href="{{redirectUrl.originalUrl}}" target="_blank">
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank" rel="noopener">
                                     <i ng-class="value.icon" class="icon-out" aria-hidden="true"></i>
                                     {{redirectUrl.originalUrl}}
                                 </a>
