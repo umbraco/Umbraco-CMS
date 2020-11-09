@@ -526,7 +526,7 @@
     <key alias="yesRemove">Ja, verwijderen</key>
   </area>
   <area alias="dictionary">
-    <key alias="noItems">Er zijn geen wordenboekitems.</key>
+    <key alias="noItems">Er zijn geen woordenboekitems.</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -578,7 +578,7 @@
     <key alias="enterDescription">Voer een omschrijving in...</key>
     <key alias="search">Typ om te zoeken...</key>
     <key alias="filter">Typ om te filteren...</key>
-    <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
+    <key alias="enterTags">Typ om tags toe te voegen (druk op Enter na elke tag)...</key>
     <key alias="email">Voer jouw e-mailadres in</key>
     <key alias="enterMessage">Voer een bericht in ...</key>
     <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw e-mailadres</key>
@@ -663,7 +663,7 @@
     <key alias="areyousure">Weet je het zeker?</key>
     <key alias="back">Terug</key>
     <key alias="backToOverview">Terug naar overzicht</key>
-    <key alias="border">Border</key>
+    <key alias="border">Rand</key>
     <key alias="by">bij</key>
     <key alias="cancel">Annuleren</key>
     <key alias="cellMargin">Cel marge</key>
@@ -695,7 +695,7 @@
     <key alias="edit">Bewerken</key>
     <key alias="edited">Bewerkt</key>
     <key alias="elements">Elementen</key>
-    <key alias="email">Email</key>
+    <key alias="email">E-mail</key>
     <key alias="error">Fout</key>
     <key alias="field">Veld</key>
     <key alias="findDocument">Zoeken</key>
@@ -718,7 +718,7 @@
     <key alias="insert">Invoegen</key>
     <key alias="install">Installeren</key>
     <key alias="invalid">Ongeldig</key>
-    <key alias="justify">Justify</key>
+    <key alias="justify">Uitvullen</key>
     <key alias="label">Label</key>
     <key alias="language">Taal</key>
     <key alias="last">Laatste</key>
@@ -750,7 +750,7 @@
     <key alias="previous">Vorige</key>
     <key alias="properties">Eigenschappen</key>
     <key alias="rebuild">Opnieuw opbouwen</key>
-    <key alias="reciept">Email om formulier resultaten te ontvangen</key>
+    <key alias="reciept">E-mail om formulier resultaten te ontvangen</key>
     <key alias="recycleBin">Prullenbak</key>
     <key alias="recycleBinEmpty">De prullenbak is leeg</key>
     <key alias="reload">Vernieuwen</key>
@@ -930,8 +930,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="timeout">Sessie is verlopen</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
     <key alias="forgottenPassword">Wachtwoord vergeten?</key>
-    <key alias="forgottenPasswordInstruction">Er zal een email worden gestuurd naar het emailadres van jouw account. Hierin staat een link om je wachtwoord te resetten</key>
-    <key alias="requestPasswordResetConfirmation">Een email met daarin de wachtwoord reset uitleg zal worden gestuurd als het emailadres in onze database voorkomt.</key>
+    <key alias="forgottenPasswordInstruction">Er zal een e-mail worden gestuurd naar het e-mailadres van jouw account. Hierin staat een link om je wachtwoord te resetten</key>
+    <key alias="requestPasswordResetConfirmation">Een e-mail met daarin de wachtwoord reset uitleg zal worden gestuurd als het e-mailadres in onze database voorkomt.</key>
     <key alias="showPassword">Wachtwoord tonen</key>
     <key alias="hidePassword">Wacthwoord verbergen</key>
     <key alias="returnToLogin">Terug naar loginformulier</key>
