@@ -17,7 +17,7 @@
         $scope.model.onValueChanged = onValueChanged;
 
 
-        $scope.fileExtensionsString = $scope.model.config.fileExtensions.map(x => "."+x.value).join(",");
+        $scope.fileExtensionsString = $scope.model.config.fileExtensions ? $scope.model.config.fileExtensions.map(x => "."+x.value).join(",") : "";
 
         /**
          * Called when the file selection value changes
