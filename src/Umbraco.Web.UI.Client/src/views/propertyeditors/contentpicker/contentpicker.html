@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-property-editor umb-contentpicker">
 
-    <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem"></localize></p>
-    <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems"></localize></p>
+    <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</localize></p>
+    <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</localize></p>
 
     <ng-form name="contentPickerForm">
 
@@ -19,14 +19,12 @@
             </umb-node-preview>
         </div>
 
-        <button
-            ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
-            type="button"
-            class="umb-node-preview-add"
-            ng-click="openCurrentPicker()"
-            id="{{model.alias}}"
-            aria-label="{{model.label}}: {{labels.general_add}}"
-        >
+        <button type="button"
+                class="umb-node-preview-add"
+                id="{{model.alias}}"
+                ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
+                ng-click="openCurrentPicker()"
+                aria-label="{{model.label}}: {{labels.general_add}}">
             <localize key="general_add">Add</localize>
             <span class="sr-only">...</span>
         </button>

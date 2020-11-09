@@ -26,11 +26,11 @@
             </div>
         </div>
 
-        <button ng-if="vm.loading !== true"
+        <button type="button"
                 id="{{vm.model.alias}}"
-                type="button"
                 class="btn-reset umb-block-list__create-button umb-outline"
                 ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
+                ng-if="vm.loading !== true"
                 ng-click="vm.showCreateDialog(vm.layout.length, $event)">
             <localize key="grid_addElement">Add content</localize>
         </button>
