@@ -10,6 +10,6 @@ namespace Umbraco.Web.PropertyEditors
     {
 
         [ConfigurationField("fileExtensions", "Accepted file extensions", "multivalues")]
-        List<FileExtensionConfigItem> IFileExtensionsConfig.FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
+        public List<FileExtensionConfigItem> FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
     }
 }
