@@ -117,6 +117,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void TearDown()
         {
             base.TearDown();
+            base.TerminateCoreRuntime();
 
             Factory.Dispose();
         }

@@ -91,6 +91,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
         }
+
         [SetUp]
         public virtual void Setup()
         {
@@ -295,7 +296,19 @@ namespace Umbraco.Tests.Integration.Testing
                 Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
                 Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
                 app.UseUmbracoCore(); // Takes 200 ms
+
+                OnTestTearDown(TerminateCoreRuntime);
             }
+        }
+
+        /// <remarks>
+        /// Some IComponents hook onto static events (e.g. Published in ContentService)
+        /// If these fire after the components host has been shutdown, errors can occur.
+        /// If CoreRuntime.Start() is called We also need to de-register the events.
+        /// </remarks>
+        protected void TerminateCoreRuntime()
+        {
+            Services.GetRequiredService<IRuntime>().Terminate();
         }
 
         #endregion
