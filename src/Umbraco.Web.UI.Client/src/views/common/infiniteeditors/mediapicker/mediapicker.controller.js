@@ -330,7 +330,7 @@ angular.module("umbraco")
                             var images = _.rest($scope.images, $scope.images.length - files.length);
                             images.forEach(image => selectMedia(image));
                         } else {
-                            var image = $scope.images[$scope.images.length - 1];
+                            var image = _.sortBy($scope.images, 'id').reverse()[0];
                             clickHandler(image);
                         }
                     });
