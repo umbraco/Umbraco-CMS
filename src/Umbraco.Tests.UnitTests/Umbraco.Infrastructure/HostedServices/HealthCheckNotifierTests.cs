@@ -37,10 +37,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             VerifyNotificationsNotSent();
         }
 
-        [Test]
-        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run()
+        [TestCase(RuntimeLevel.Boot)]
+        [TestCase(RuntimeLevel.Install)]
+        [TestCase(RuntimeLevel.Unknown)]
+        [TestCase(RuntimeLevel.Upgrade)]
+        [TestCase(RuntimeLevel.BootFailed)]
+        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateHealthCheckNotifier(runtimeLevel: RuntimeLevel.Boot);
+            var sut = CreateHealthCheckNotifier(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }

@@ -21,10 +21,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         private const string _serverIdentity = "Test/1";
         private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
 
-        [Test]
-        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run()
+        [TestCase(RuntimeLevel.Boot)]
+        [TestCase(RuntimeLevel.Install)]
+        [TestCase(RuntimeLevel.Unknown)]
+        [TestCase(RuntimeLevel.Upgrade)]
+        [TestCase(RuntimeLevel.BootFailed)]
+        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateTouchServerTask(runtimeLevel: RuntimeLevel.Boot);
+            var sut = CreateTouchServerTask(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyServerNotTouched();
         }
