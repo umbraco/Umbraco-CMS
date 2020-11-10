@@ -154,7 +154,6 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
-    <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
     <Compile Include="AspNet\AspNetCookieManager.cs" />
@@ -199,7 +198,6 @@
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
-    <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />

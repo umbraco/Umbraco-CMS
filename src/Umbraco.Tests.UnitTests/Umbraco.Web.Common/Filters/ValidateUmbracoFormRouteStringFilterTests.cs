@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
-using Umbraco.Composing;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
