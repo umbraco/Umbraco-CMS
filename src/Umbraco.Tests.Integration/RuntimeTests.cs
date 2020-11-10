@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,8 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common;
@@ -43,7 +46,6 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Boot_Core_Runtime()
         {
-            // TODO: MSDI - cleanup after initial merge.
             var services = new ServiceCollection().AddLazySupport();
 
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
@@ -64,6 +66,7 @@ namespace Umbraco.Tests.Integration
             var webRoutingSettings = new WebRoutingSettings();
 
             services.AddTransient(x => Options.Create(globalSettings));
+            services.AddTransient(x => Options.Create(connectionStrings));
             services.AddTransient(x => Options.Create(contentSettings));
             services.AddTransient(x => Options.Create(coreDebugSettings));
             services.AddTransient(x => Options.Create(nuCacheSettings));
@@ -73,26 +76,30 @@ namespace Umbraco.Tests.Integration
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Create the core runtime
-            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
+            var bootstrapper = new CoreRuntimeBootstrapper(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
-            coreRuntime.Configure(services);
+            bootstrapper.Configure(services);
 
-            Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
-            Assert.IsNull(coreRuntime.State.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);
+            Assert.IsTrue(bootstrapper.MainDom.IsMainDom);
+            Assert.IsNull(bootstrapper.State.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, bootstrapper.State.Level);
             Assert.IsTrue(MyComposer.IsComposed);
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-            coreRuntime.Start(services.BuildServiceProvider());
+            var container = services.BuildServiceProvider();
+
+            var runtime = container.GetRequiredService<IRuntime>();
+
+            runtime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-            coreRuntime.Terminate();
+            runtime.Terminate();
 
             Assert.IsTrue(MyComponent.IsTerminated);
         }

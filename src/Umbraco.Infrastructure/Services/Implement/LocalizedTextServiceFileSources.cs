@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Composing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Microsoft.Extensions.Logging;
