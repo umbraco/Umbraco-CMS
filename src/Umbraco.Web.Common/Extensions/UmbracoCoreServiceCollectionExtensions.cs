@@ -25,6 +25,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Infrastructure.HostedServices;
+using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
@@ -297,6 +298,9 @@ namespace Umbraco.Extensions
             services.AddHostedService<LogScrubber>();
             services.AddHostedService<ScheduledPublishing>();
             services.AddHostedService<TempFileCleanup>();
+
+            services.AddHostedService<InstructionProcessTask>();
+            services.AddHostedService<TouchServerTask>();
 
             return services;
         }

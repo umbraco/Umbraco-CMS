@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
-using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Compose
@@ -36,9 +30,9 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public static DatabaseServerMessengerOptions GetDefaultOptions(IServiceProvider factory)
+        public static DatabaseServerMessengerCallbacks GetCallbacks(IServiceProvider factory)
         {
-            return new DatabaseServerMessengerOptions
+            return new DatabaseServerMessengerCallbacks
             {
                 //These callbacks will be executed if the server has not been synced
                 // (i.e. it is a new server or the lastsynced.txt file has been removed)
@@ -74,208 +68,55 @@ namespace Umbraco.Web.Compose
         {
             base.Compose(composition);
 
-            composition.SetDatabaseServerMessengerOptions(GetDefaultOptions);
+            composition.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             composition.SetServerMessenger<BatchedDatabaseServerMessenger>();
         }
     }
 
     public sealed class DatabaseServerRegistrarAndMessengerComponent : IComponent
     {
-        private object _locker = new object();
-        private readonly DatabaseServerRegistrar _registrar;
         private readonly IBatchedDatabaseServerMessenger _messenger;
-        private readonly ILogger<DatabaseServerRegistrarAndMessengerComponent> _logger;
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly IServerRegistrationService _registrationService;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
-        private bool _started;
-        private IBackgroundTask[] _tasks;
         private readonly IRequestAccessor _requestAccessor;
 
         public DatabaseServerRegistrarAndMessengerComponent(
-            IServerRegistrar serverRegistrar,
             IServerMessenger serverMessenger,
-            IServerRegistrationService registrationService,
-            ILogger<DatabaseServerRegistrarAndMessengerComponent> logger,
-            ILoggerFactory loggerFactory,
-            IApplicationShutdownRegistry hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
-            _logger = logger;
-            _loggerFactory = loggerFactory;
-            _registrationService = registrationService;
             _requestAccessor = requestAccessor;
-
-            // create task runner for DatabaseServerRegistrar
-            _registrar = serverRegistrar as DatabaseServerRegistrar;
-            if (_registrar != null)
-            {
-                _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), hostingEnvironment);
-            }
-
-            // create task runner for BatchedDatabaseServerMessenger
             _messenger = serverMessenger as IBatchedDatabaseServerMessenger;
-            if (_messenger != null)
-            {
-                _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), hostingEnvironment);
-            }
         }
 
         public void Initialize()
         {
-            //We will start the whole process when a successful request is made
-            if (_registrar != null || _messenger != null)
-                _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;
+            // The scheduled tasks - TouchServerTask and InstructionProcessTask - run as .NET Core hosted services.
+            // The former (as well as other hosted services that run outside of an HTTP request context) depends on the application URL
+            // being available (via IRequestAccessor), which can only be retrieved within an HTTP request (unless it's explicitly configured).
+            // Hence we hook up a one-off task on an HTTP request to ensure this is retrieved, which caches the value and makes it available
+            // for the hosted services to use when the HTTP request is not available.
+            _requestAccessor.RouteAttempt += EnsureApplicationUrlOnce;
 
-            // must come last, as it references some _variables
+            // Must come last, as it references some _variables
             _messenger?.Startup();
         }
 
         public void Terminate()
         { }
 
-        /// <summary>
-        /// Handle when a request is made
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// We require this because:
-        /// - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest
-        /// - RegisterServer is called on _requestAccessor.RouteAttempt which is triggered in ProcessRequest
-        ///      we are safe, UmbracoApplicationUrl has been initialized
-        /// </remarks>
-        private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)
+        private void EnsureApplicationUrlOnce(object sender, RoutableAttemptEventArgs e)
         {
-            switch (e.Outcome)
+            if (e.Outcome == EnsureRoutableOutcome.IsRoutable || e.Outcome == EnsureRoutableOutcome.NotDocumentRequest)
             {
-                case EnsureRoutableOutcome.IsRoutable:
-                case EnsureRoutableOutcome.NotDocumentRequest:
-                    _requestAccessor.RouteAttempt -= RegisterBackgroundTasksOnce;
-                    RegisterBackgroundTasks();
-                    break;
+                _requestAccessor.RouteAttempt -= EnsureApplicationUrlOnce;
+                EnsureApplicationUrl();
             }
         }
 
-        private void RegisterBackgroundTasks()
+        private void EnsureApplicationUrl()
         {
-            // only perform this one time ever
-            LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
-            {
-                var serverAddress = _requestAccessor.GetApplicationUrl().ToString();
-
-                return new[]
-                {
-                    RegisterInstructionProcess(),
-                    RegisterTouchServer(_registrationService, serverAddress)
-                };
-            });
-        }
-
-        private IBackgroundTask RegisterInstructionProcess()
-        {
-            if (_messenger == null)
-                return null;
-
-            var task = new InstructionProcessTask(_processTaskRunner,
-                60000, //delay before first execution
-                _messenger.Options.ThrottleSeconds*1000, //amount of ms between executions
-                _messenger,
-                _logger);
-            _processTaskRunner.TryAdd(task);
-            return task;
-        }
-
-        private IBackgroundTask RegisterTouchServer(IServerRegistrationService registrationService, string serverAddress)
-        {
-            if (_registrar == null)
-                return null;
-
-            var task = new TouchServerTask(_touchTaskRunner,
-                15000, //delay before first execution
-                _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
-                registrationService, _registrar, serverAddress, _logger);
-            _touchTaskRunner.TryAdd(task);
-            return task;
-        }
-
-        private class InstructionProcessTask : RecurringTaskBase
-        {
-            private readonly IDatabaseServerMessenger _messenger;
-            private readonly ILogger _logger;
-
-            public InstructionProcessTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IDatabaseServerMessenger messenger, ILogger logger)
-                : base(runner, delayMilliseconds, periodMilliseconds)
-            {
-                _messenger = messenger;
-                _logger = logger;
-            }
-
-            public override bool IsAsync => false;
-
-            /// <summary>
-            /// Runs the background task.
-            /// </summary>
-            /// <returns>A value indicating whether to repeat the task.</returns>
-            public override bool PerformRun()
-            {
-                try
-                {
-                    _messenger.Sync();
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Failed (will repeat).");
-                }
-                return true; // repeat
-            }
-        }
-
-        private class TouchServerTask : RecurringTaskBase
-        {
-            private readonly IServerRegistrationService _svc;
-            private readonly DatabaseServerRegistrar _registrar;
-            private readonly string _serverAddress;
-            private readonly ILogger _logger;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TouchServerTask"/> class.
-            /// </summary>
-            public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, ILogger logger)
-                : base(runner, delayMilliseconds, periodMilliseconds)
-            {
-                _svc = svc ?? throw new ArgumentNullException(nameof(svc));
-                _registrar = registrar;
-                _serverAddress = serverAddress;
-                _logger = logger;
-            }
-
-            public override bool IsAsync => false;
-
-            /// <summary>
-            /// Runs the background task.
-            /// </summary>
-            /// <returns>A value indicating whether to repeat the task.</returns>
-            public override bool PerformRun()
-            {
-                try
-                {
-                    // TouchServer uses a proper unit of work etc underneath so even in a
-                    // background task it is safe to call it without dealing with any scope
-                    _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
-                    return true; // repeat
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to update server record in database.");
-                    return false; // probably stop if we have an error
-                }
-            }
+            // By retrieving the application URL within the context of a request (as we are here in responding
+            // to the IRequestAccessor's RouteAttempt event), we'll get it from the HTTP context and save it for
+            // future requests that may not be within an HTTP request (e.g. from hosted services).
+            _requestAccessor.GetApplicationUrl();
         }
     }
 }
