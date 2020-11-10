@@ -271,7 +271,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             services.AddSignalR();
 
-            services.AddUmbracoWebComponents();
+            services.AddUmbracoWebComponents(Configuration);
             services.AddUmbracoRuntimeMinifier(Configuration);
             services.AddUmbracoBackOffice();
             services.AddUmbracoBackOfficeIdentity();
