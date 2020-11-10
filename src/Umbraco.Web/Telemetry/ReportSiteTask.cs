@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Formatting;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
@@ -76,14 +77,26 @@ namespace Umbraco.Web.Telemetry
                 return false;
             }
 
-
             try
             {
-                // Make a HTTP Post to telemetry service
-                // https://telemetry.umbraco.com/installs
-                // Fire & Forget, do not need to know if its a 200, 500 etc
+                // Send data to LIVE telemetry
+                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+
+//#if DEBUG
+//                // Send data to DEBUG telemetry service
+//                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+//#endif
+
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                 var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
-                var result = await _httpClient.PostAsync("https://telemetry.rainbowsrock.net/installs/", postData, new JsonMediaTypeFormatter());
+                var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
+                request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
+
+                // Make a HTTP Post to telemetry service
+                // https://telemetry.umbraco.com/installs/
+                // Fire & Forget, do not need to know if its a 200, 500 etc
+                var result = await _httpClient.SendAsync(request);
+
             }
             catch (Exception ex)
             {
@@ -100,8 +113,10 @@ namespace Umbraco.Web.Telemetry
 
         private class TelemetryReportData
         {
+            [JsonProperty("id")]
             public Guid Id { get; set; }
 
+            [JsonProperty("version")]
             public string Version { get; set; }
         }
     }
