@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
@@ -65,8 +66,9 @@ namespace Umbraco.Tests.Common.Builders
             var creatorId = _creatorId ?? 1;
             var databaseType = _databaseType ?? ValueStorageType.Ntext;
             var sortOrder = _sortOrder ?? 0;
+            var serializer = new JsonNetSerializer();
 
-            return new DataType(editor, parentId)
+            return new DataType(editor, serializer, parentId)
             {
                 Id = id,
                 Key = key,

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Models
 {
-    // TODO: This should exist within Umbraco.Core not infrastructure however there's a dependency on Newtonsoft here, how can we refactor that requirement?
-
     /// <summary>
     /// Implements <see cref="IDataType"/>.
     /// </summary>
@@ -19,6 +16,7 @@ namespace Umbraco.Core.Models
     {
         private IDataEditor _editor;
         private ValueStorageType _databaseType;
+        private readonly IJsonSerializer _serializer;
         private object _configuration;
         private bool _hasConfiguration;
         private string _configurationJson;
@@ -26,9 +24,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
         /// </summary>
-        public DataType(IDataEditor editor, int parentId = -1)
+        public DataType(IDataEditor editor, IJsonSerializer serializer, int parentId = -1)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(editor));
             ParentId = parentId;
 
             // set a default configuration
@@ -49,7 +48,7 @@ namespace Umbraco.Core.Models
                 // try to map the existing configuration to the new configuration
                 // simulate saving to db and reloading (ie go via json)
                 var configuration = Configuration;
-                var json = JsonConvert.SerializeObject(configuration);
+                var json = _serializer.Serialize(configuration);
                 _editor = value;
 
                 try
@@ -148,7 +147,7 @@ namespace Umbraco.Core.Models
         /// type, and they should be the same.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        internal void SetLazyConfiguration(string configurationJson)
+        public void SetLazyConfiguration(string configurationJson)
         {
             _hasConfiguration = false;
             _configuration = null;

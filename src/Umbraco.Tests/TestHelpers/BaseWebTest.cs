@@ -14,6 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
@@ -47,8 +48,9 @@ namespace Umbraco.Tests.TestHelpers
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
 
+            var serializer = new JsonNetSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", new PublishedPropertyType[] { });

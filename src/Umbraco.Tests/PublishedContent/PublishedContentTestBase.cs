@@ -18,6 +18,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -52,6 +53,7 @@ namespace Umbraco.Tests.PublishedContent
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IMediaFileSystem>(), ShortStringHelper, publishedUrlProvider);
             var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
+            var serializer = new JsonNetSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
                     loggerFactory,
@@ -64,7 +66,8 @@ namespace Umbraco.Tests.PublishedContent
                     ShortStringHelper,
                     IOHelper,
                     LocalizedTextService,
-                    Mock.Of<IImageUrlGenerator>())) { Id = 1 });
+                    Mock.Of<IImageUrlGenerator>()),
+                    serializer) { Id = 1 });
 
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);

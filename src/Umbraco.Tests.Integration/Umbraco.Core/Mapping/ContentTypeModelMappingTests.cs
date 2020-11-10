@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
@@ -22,6 +23,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         private IDataTypeService _dataTypeService;
         private UmbracoMapper _sut;
         private IFileService _fileService;
+        private IJsonSerializer _serializer;
 
         [SetUp]
         public void SetupTest()
@@ -29,6 +31,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             _sut = Services.GetRequiredService<UmbracoMapper>();
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _fileService = Services.GetRequiredService<IFileService>();
+            _serializer = Services.GetRequiredService<IJsonSerializer>();
         }
 
         [Test]
@@ -36,7 +39,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             //Arrange
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -94,7 +97,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             //Arrange
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -148,7 +151,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             //Arrange
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -225,7 +228,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             //Arrange
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -250,7 +253,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             //Arrange
 
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -443,7 +446,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -517,7 +520,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void PropertyGroupBasic_To_PropertyGroup()
         {
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -622,7 +625,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         public void PropertyTypeBasic_To_PropertyType()
         {
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
@@ -867,7 +870,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
             //TODO use builder
-            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>())
+            var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };

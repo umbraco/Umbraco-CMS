@@ -14,6 +14,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
@@ -49,15 +50,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
 
             var complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
             var testEditor = Services.GetRequiredService<TestEditor>();
-            var dataTypeService = Services.GetRequiredService<IDataTypeService>();
+            var dataTypeService = Services.GetRequiredService<IDataTypeService>(); 
+            var serializer = new JsonNetSerializer();
 
-            var complexDataType = new DataType(complexTestEditor)
+            var complexDataType = new DataType(complexTestEditor, serializer)
             {
                 Name = "ComplexTest",
                 Configuration = complexEditorConfig
             };
 
-            var testDataType = new DataType(testEditor)
+            var testDataType = new DataType(testEditor, serializer)
             {
                 Name = "Test",
             };

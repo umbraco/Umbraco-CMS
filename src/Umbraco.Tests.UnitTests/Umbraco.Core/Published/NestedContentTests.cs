@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.PublishedContent;
@@ -36,7 +37,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             var editor = new NestedContentPropertyEditor(loggerFactory, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
-            var dataType1 = new DataType(editor)
+            var serializer = new JsonNetSerializer();
+
+            var dataType1 = new DataType(editor, serializer)
             {
                 Id = 1,
                 Configuration = new NestedContentConfiguration
@@ -50,7 +53,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 }
             };
 
-            var dataType2 = new DataType(editor)
+            var dataType2 = new DataType(editor, serializer)
             {
                 Id = 2,
                 Configuration = new NestedContentConfiguration
@@ -64,7 +67,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 }
             };
 
-            var dataType3 = new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>()))
+            var dataType3 = new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
             {
                 Id = 3
             };

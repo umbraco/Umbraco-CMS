@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Provides a default implementation for <see cref="IPublishedContentTypeFactory"/>.
     /// </summary>
-    internal class PublishedContentTypeFactory : IPublishedContentTypeFactory
+    public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     {
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;

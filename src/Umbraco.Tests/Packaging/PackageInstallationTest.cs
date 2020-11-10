@@ -14,6 +14,7 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -60,7 +61,8 @@ namespace Umbraco.Tests.Packaging
             Factory.GetRequiredService<IScopeProvider>(),
             Factory.GetRequiredService<IShortStringHelper>(),
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
-            Factory.GetRequiredService<ILocalizedTextService>());
+            Factory.GetRequiredService<ILocalizedTextService>(),
+            Factory.GetRequiredService<IJsonSerializer>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

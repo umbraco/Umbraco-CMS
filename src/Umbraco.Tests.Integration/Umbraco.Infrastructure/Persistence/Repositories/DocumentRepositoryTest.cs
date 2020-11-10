@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -35,6 +36,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IFileService FileService => GetRequiredService<IFileService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         [SetUp]
         public void SetUpData()
@@ -90,7 +92,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
             var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory);
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, JsonSerializer);
             return ctRepository;
         }
 

@@ -13,6 +13,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -23,8 +24,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
     {
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
-        {
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+        { 
+            var serializer = new JsonNetSerializer();
+            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
             {
                 Id = 12345
             };

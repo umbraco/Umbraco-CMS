@@ -15,6 +15,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 using static Umbraco.Core.Models.Property;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
@@ -46,8 +47,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var property = new Property(new PropertyType(ShortStringHelper, new DataType(labelEditor))
+            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString(); 
+            var serializer = new JsonNetSerializer();
+            var property = new Property(new PropertyType(ShortStringHelper, new DataType(labelEditor, serializer))
             {
                 Variations = ContentVariation.CultureAndSegment
             })
@@ -114,8 +116,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var property = new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker))
+            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString(); 
+            var serializer = new JsonNetSerializer();
+            var property = new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
                 Variations = ContentVariation.CultureAndSegment
             })
@@ -182,8 +185,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-            var property = new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker))
+            var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString(); 
+            var serializer = new JsonNetSerializer();
+            var property = new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
                 Variations = ContentVariation.Nothing | ContentVariation.Segment
             })

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
@@ -593,10 +594,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 shortStringHelper,
                 localizedTextService
             );
+             
+            var serializer = new JsonNetSerializer();
 
             var mockDataTypeService = new Mock<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))
-                .Returns(new DataType(textBoxEditor));
+                .Returns(new DataType(textBoxEditor, serializer));
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { textBoxEditor }));
             return new PropertyValidationService(

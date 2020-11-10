@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
@@ -30,10 +31,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-
+             
+            var serializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -115,10 +117,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-
+             
+            var serializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -195,10 +198,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-
+             
+            var serializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

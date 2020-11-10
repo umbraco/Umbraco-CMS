@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -17,12 +18,14 @@ namespace Umbraco.Web.Models.Mapping
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger<DataTypeMapDefinition> _logger;
         private readonly ContentSettings _contentSettings;
+        private readonly IJsonSerializer _serializer;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings, IJsonSerializer serializer)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _serializer = serializer;
         }
 
         private static readonly int[] SystemIds =
@@ -40,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IDataType, DataTypeBasic>((source, context) => new DataTypeBasic(), Map);
             mapper.Define<IDataType, DataTypeDisplay>((source, context) => new DataTypeDisplay(), Map);
             mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
-            mapper.Define<DataTypeSave, IDataType>((source, context) => new DataType(_propertyEditors[source.EditorAlias]) { CreateDate = DateTime.Now },Map);
+            mapper.Define<DataTypeSave, IDataType>((source, context) => new DataType(_propertyEditors[source.EditorAlias], _serializer) { CreateDate = DateTime.Now }, Map);
             mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
         }
 
@@ -145,7 +148,7 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configurationEditor = editor.GetConfigurationEditor();
-            var fields = context.MapEnumerable<ConfigurationField,DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
+            var fields = context.MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields);
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
             MapConfigurationFields(dataType, fields, configurationDictionary);
