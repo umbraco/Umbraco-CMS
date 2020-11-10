@@ -48,6 +48,8 @@
 
         public DatabaseServerRegistrarSettings DatabaseServerRegistrar { get; set; } = new DatabaseServerRegistrarSettings();
 
+        public DatabaseServerMessengerSettings DatabaseServerMessenger { get; set; } = new DatabaseServerMessengerSettings();
+
         public string RegisterType { get; set; } = string.Empty;
 
         public string DatabaseFactoryServerVersion { get; set; } = string.Empty;

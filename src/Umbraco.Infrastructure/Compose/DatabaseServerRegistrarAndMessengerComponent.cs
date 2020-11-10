@@ -30,9 +30,9 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public static DatabaseServerMessengerOptions GetDefaultOptions(IServiceProvider factory)
+        public static DatabaseServerMessengerCallbacks GetCallbacks(IServiceProvider factory)
         {
-            return new DatabaseServerMessengerOptions
+            return new DatabaseServerMessengerCallbacks
             {
                 //These callbacks will be executed if the server has not been synced
                 // (i.e. it is a new server or the lastsynced.txt file has been removed)
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Compose
         {
             base.Compose(composition);
 
-            composition.SetDatabaseServerMessengerOptions(GetDefaultOptions);
+            composition.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             composition.SetServerMessenger<BatchedDatabaseServerMessenger>();
         }
     }

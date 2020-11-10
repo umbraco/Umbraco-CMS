@@ -5,16 +5,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
-using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Sync
@@ -46,11 +47,13 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
 
-        public DatabaseServerMessengerOptions Options { get; }
+        public DatabaseServerMessengerCallbacks Callbacks { get; }
+
+        public GlobalSettings GlobalSettings { get; }
 
         public DatabaseServerMessenger(
             IMainDom mainDom, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
-            bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
+            bool distributedEnabled, DatabaseServerMessengerCallbacks callbacks, IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers, IOptions<GlobalSettings> globalSettings)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
@@ -61,7 +64,8 @@ namespace Umbraco.Core.Sync
             _hostingEnvironment = hostingEnvironment;
             _cacheRefreshers = cacheRefreshers;
             Logger = logger;
-            Options = options ?? throw new ArgumentNullException(nameof(options));
+            Callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
+            GlobalSettings = globalSettings.Value;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(hostingEnvironment));
@@ -200,14 +204,14 @@ namespace Umbraco.Core.Sync
                     //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                     //row so we will sum these numbers to get the actual count.
                     var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
-                    if (count > Options.MaxProcessingInstructionCount)
+                    if (count > GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
                         Logger.LogWarning(
                             "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
                             + " to the latest found in the database and maintain cache updates based on that Id.",
-                            count, Options.MaxProcessingInstructionCount);
+                            count, GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount);
 
                         coldboot = true;
                     }
@@ -225,8 +229,8 @@ namespace Umbraco.Core.Sync
                         SaveLastSynced(maxId);
 
                     // execute initializing callbacks
-                    if (Options.InitializingCallbacks != null)
-                        foreach (var callback in Options.InitializingCallbacks)
+                    if (Callbacks.InitializingCallbacks != null)
+                        foreach (var callback in Callbacks.InitializingCallbacks)
                             callback();
                 }
 
@@ -248,7 +252,7 @@ namespace Umbraco.Core.Sync
                 if (_released)
                     return;
 
-                if ((DateTime.UtcNow - _lastSync).TotalSeconds <= Options.ThrottleSeconds)
+                if ((DateTime.UtcNow - _lastSync) <= GlobalSettings.DatabaseServerMessenger.TimeBetweenSyncOperations)
                     return;
 
                 //Set our flag and the lock to be in it's original state (i.e. it can be awaited)
@@ -265,7 +269,7 @@ namespace Umbraco.Core.Sync
                     ProcessDatabaseInstructions(scope.Database);
 
                     //Check for pruning throttling
-                    if (_released || (DateTime.UtcNow - _lastPruned).TotalSeconds <= Options.PruneThrottleSeconds)
+                    if (_released || (DateTime.UtcNow - _lastPruned) <= GlobalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                     {
                         scope.Complete();
                         return;
@@ -447,7 +451,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void PruneOldInstructions(IUmbracoDatabase database)
         {
-            var pruneDate = DateTime.UtcNow.AddDays(-Options.DaysToRetainInstructions);
+            var pruneDate = DateTime.UtcNow - GlobalSettings.DatabaseServerMessenger.TimeToRetainInstructions;
 
             // using 2 queries is faster than convoluted joins
 

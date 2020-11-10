@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 
@@ -42,7 +44,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
 
             _mockDatabaseServerMessenger = new Mock<IDatabaseServerMessenger>();
 
-            return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object, mockLogger.Object);
+            var settings = new GlobalSettings();
+
+            return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object, mockLogger.Object, Options.Create(settings));
         }
 
         private void VerifyMessengerNotSynced()

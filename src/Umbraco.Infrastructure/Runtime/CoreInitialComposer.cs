@@ -153,9 +153,11 @@ namespace Umbraco.Core.Runtime
                     factory.GetRequiredService<IProfilingLogger>(),
                     factory.GetRequiredService<ILogger<DatabaseServerMessenger>>(),
                     factory.GetRequiredService<IServerRegistrar>(),
-                    true, new DatabaseServerMessengerOptions(),
+                    true,
+                    new DatabaseServerMessengerCallbacks(),
                     factory.GetRequiredService<IHostingEnvironment>(),
-                    factory.GetRequiredService<CacheRefresherCollection>()
+                    factory.GetRequiredService<CacheRefresherCollection>(),
+                    factory.GetRequiredService<IOptions<GlobalSettings>>()
                 ));
 
             composition.CacheRefreshers()

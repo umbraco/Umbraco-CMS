@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Routing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Hosting;
+using Umbraco.Core.Sync;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -34,12 +36,13 @@ namespace Umbraco.Web
             IProfilingLogger proflog,
             ILogger<BatchedDatabaseServerMessenger> logger,
             IServerRegistrar serverRegistrar,
-            DatabaseServerMessengerOptions options,
+            DatabaseServerMessengerCallbacks callbacks,
             IHostingEnvironment hostingEnvironment,
             CacheRefresherCollection cacheRefreshers,
             IRequestCache requestCache,
-            IRequestAccessor requestAccessor)
-            : base(mainDom, scopeProvider, databaseFactory, proflog, logger, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
+            IRequestAccessor requestAccessor,
+            IOptions<GlobalSettings> globalSettings)
+            : base(mainDom, scopeProvider, databaseFactory, proflog, logger, serverRegistrar, true, callbacks, hostingEnvironment, cacheRefreshers, globalSettings)
         {
             _databaseFactory = databaseFactory;
             _requestCache = requestCache;
@@ -89,7 +92,7 @@ namespace Umbraco.Web
             //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
             using (var scope = ScopeProvider.CreateScope())
             {
-                foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                foreach (var instructionsBatch in instructions.InGroupsOf(GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                 {
                     WriteInstructions(scope, instructionsBatch);
                 }
@@ -143,7 +146,7 @@ namespace Umbraco.Web
                 //only write the json blob with a maximum count of the MaxProcessingInstructionCount
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                    foreach (var maxBatch in instructions.InGroupsOf(GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                     {
                         WriteInstructions(scope, maxBatch);
                     }

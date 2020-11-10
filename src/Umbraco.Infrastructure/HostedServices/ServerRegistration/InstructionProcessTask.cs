@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
@@ -18,8 +20,8 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
         /// <summary>
         /// Initializes a new instance of the <see cref="InstructionProcessTask"/> class.
         /// </summary>
-        public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger)
-            : base(TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(1))
+        public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
+            : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
         {
             _runtimeState = runtimeState;
             _messenger = messenger as IDatabaseServerMessenger ?? throw new ArgumentNullException(nameof(messenger));
