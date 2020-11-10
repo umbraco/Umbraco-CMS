@@ -95,7 +95,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
         /// <returns></returns>
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
             return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
@@ -183,7 +183,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
         /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
         /// </remarks>
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         [SetAngularAntiForgeryTokens]
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
@@ -205,7 +205,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
         /// </remarks>
-        [UmbracoAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
+        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
         [SetAngularAntiForgeryTokens]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {

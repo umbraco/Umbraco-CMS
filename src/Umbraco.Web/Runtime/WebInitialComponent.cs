@@ -86,7 +86,7 @@ namespace Umbraco.Web.Runtime
         private void SetupMvcAndWebApi()
         {
             //don't output the MVC version header (security)
-            MvcHandler.DisableMvcResponseHeader = true;
+            //MvcHandler.DisableMvcResponseHeader = true;
 
             // set master controller factory
             // var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
@@ -126,7 +126,7 @@ namespace Umbraco.Web.Runtime
            // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
+          //  RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
 
             // plugin controllers must come first because the next route will catch many things
             RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, hostingEnvironment);

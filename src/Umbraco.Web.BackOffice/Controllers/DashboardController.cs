@@ -29,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [ValidationFilter]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
-    [UmbracoAuthorize]
+    [UmbracoBackOfficeAuthorize]
     public class DashboardController : UmbracoApiController
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

@@ -5,12 +5,12 @@ namespace Umbraco.Web.Common.Filters
     /// <summary>
     /// Ensures authorization is successful for a back office user.
     /// </summary>
-    public class UmbracoAuthorizeAttribute : TypeFilterAttribute
+    public class UmbracoBackOfficeAuthorizeAttribute : TypeFilterAttribute
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public UmbracoAuthorizeAttribute() : this(false, false)
+        public UmbracoBackOfficeAuthorizeAttribute() : this(false, false)
         {
         }
 
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Filters
         /// <param name="redirectToUmbracoLogin"></param>
         /// <param name="requireApproval"></param>
 
-        public UmbracoAuthorizeAttribute(bool redirectToUmbracoLogin, bool requireApproval) : base(typeof(UmbracoAuthorizeFilter))
+        public UmbracoBackOfficeAuthorizeAttribute(bool redirectToUmbracoLogin, bool requireApproval) : base(typeof(UmbracoBackOfficeAuthorizeFilter))
         {
             Arguments = new object[] { redirectToUmbracoLogin, requireApproval };
         }
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Common.Filters
         /// Constructor with redirect url behavior
         /// </summary>
         /// <param name="redirectUrl"></param>
-        public UmbracoAuthorizeAttribute(string redirectUrl) : base(typeof(UmbracoAuthorizeFilter))
+        public UmbracoBackOfficeAuthorizeAttribute(string redirectUrl) : base(typeof(UmbracoBackOfficeAuthorizeFilter))
         {
             Arguments = new object[] { redirectUrl };
         }

@@ -128,7 +128,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AppBuilderExtensions.cs" />
-    <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
     <Compile Include="AspNet\AspNetRequestAccessor.cs" />
@@ -136,7 +135,6 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
-    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
@@ -213,7 +211,6 @@
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
-    <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
@@ -233,8 +230,6 @@
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
-    <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
-    <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
@@ -268,7 +263,6 @@
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
-    <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
@@ -308,7 +302,6 @@
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
@@ -328,7 +321,6 @@
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebViewPageExtensions.cs" />
     <Compile Include="Runtime\WebFinalComponent.cs" />
     <Compile Include="Runtime\WebFinalComposer.cs" />
   </ItemGroup>
