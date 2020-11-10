@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {

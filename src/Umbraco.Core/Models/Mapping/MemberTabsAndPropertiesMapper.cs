@@ -8,13 +8,9 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -83,11 +79,11 @@ namespace Umbraco.Web.Models.Mapping
             if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser != null
                 && _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
-                var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", source.ContentTypeId);
+                var memberTypeLink = $"#/member/memberTypes/edit/{source.ContentTypeId}";
 
                 // Replace the doctype property
                 var docTypeProperty = resolved.SelectMany(x => x.Properties)
-                    .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    .First(x => x.Alias == $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype");
                 docTypeProperty.Value = new List<object>
                 {
                     new
