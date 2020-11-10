@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models.PublishedContent
                     throw new InvalidOperationException($"Both types '{type.AssemblyQualifiedName}' and '{modelInfo.ModelType.AssemblyQualifiedName}' want to be a model type for content type with alias \"{typeName}\".");
 
                 // have to use an unsafe ctor because we don't know the types, really
-                var modelCtor = ReflectionUtilities.EmitConstructorUnsafe<Func<object,IPublishedValueFallback, object>>(constructor);
+                var modelCtor = ReflectionUtilities.EmitConstructorUnsafe<Func<object, IPublishedValueFallback, object>>(constructor);
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = modelCtor };
                 modelTypeMap[typeName] = type;
             }
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {element.GetType().FullName}.");
 
             // can cast, because we checked when creating the ctor
-            return (IPublishedElement) modelInfo.Ctor(element, _publishedValueFallback);
+            return (IPublishedElement)modelInfo.Ctor(element, _publishedValueFallback);
         }
 
         /// <inheritdoc />

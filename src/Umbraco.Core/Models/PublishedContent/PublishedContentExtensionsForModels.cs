@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.PublishedContent
 {

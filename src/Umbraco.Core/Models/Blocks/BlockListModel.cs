@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Blocks
     /// <summary>
     /// The strongly typed model for the Block List editor.
     /// </summary>
-    /// <seealso cref="System.Collections.ObjectModel.ReadOnlyCollection{Umbraco.Core.Models.Blocks.BlockListItem}" />
+    /// <seealso cref="ReadOnlyCollection{BlockListItem}" />
     [DataContract(Name = "blockList", Namespace = "")]
     public class BlockListModel : ReadOnlyCollection<BlockListItem>
     {
