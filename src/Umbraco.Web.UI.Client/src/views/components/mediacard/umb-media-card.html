@@ -1,0 +1,34 @@
+
+    <div class="__showcase">
+
+        <!-- IMAGE -->
+        <img ng-if="vm.media.thumbnail && vm.media.extension !== 'svg'"
+            ng-class="{'trashed': media.trashed}"
+            ng-src="{{vm.media.thumbnail}}"
+            ng-attr-title="{{vm.media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + vm.media.name : vm.media.name}}"
+            alt="{{vm.media.name}}" />
+
+        <!-- SVG -->
+        <img ng-if="vm.media.thumbnail && vm.media.extension === 'svg'"
+            ng-class="{'trashed': vm.media.trashed}"
+            ng-src="{{vm.media.thumbnail}}"
+            ng-attr-title="{{vm.media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + vm.media.name : vm.media.name}}"
+            alt="{{vm.media.name}}" />
+
+        <!-- FILE -->
+        <umb-file-icon ng-hide="vm.media.thumbnail"
+            ng-class="{'trashed': vm.media.trashed}"
+            extension="{{vm.media.extension}}"
+            icon="{{vm.media.icon}}"
+            size="s"
+            text="{{vm.media.name}}">
+        </umb-file-icon>
+
+    </div>
+    <button type="button" ng-click="vm.clickButton($event)" class="__info" ng-if="vm.media !== null">
+        <div class="__name" ng-bind="vm.media.name"></div>
+        <div class="__subname" ng-if="vm.media.description" ng-bind="vm.media.description"></div>
+    </button>
+
+    <ng-transclude></ng-transclude>
+

@@ -93,6 +93,11 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
         currentItemType = args.value;
         init();
     });
+
+    if ($scope.model.config.itemType) {
+        currentItemType = $scope.model.config.itemType;
+        init();
+    }
 }
 
 angular.module('umbraco').controller("Umbraco.PrevalueEditors.TreeSourceTypePickerController", TreeSourceTypePickerController);

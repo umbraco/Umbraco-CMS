@@ -264,6 +264,9 @@
     <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
     <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3Configuration.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
