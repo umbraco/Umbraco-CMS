@@ -31,6 +31,11 @@ namespace Umbraco.Web.Telemetry
                 _logger.Warn<TelemetryMarkerComponent>("When upgrading the anonymous telemetry file already existsed on disk at {filePath}", telemetricsFilePath);
                 return;
             }
+            else if (_runtime.Level == RuntimeLevel.Install && File.Exists(telemetricsFilePath))
+            {
+                // No need to log for when level is install if file exists (As this component hit several times during install process)
+                return;
+            }
 
             // We are a clean install or an upgrade without the marker file
             // Generate GUID
