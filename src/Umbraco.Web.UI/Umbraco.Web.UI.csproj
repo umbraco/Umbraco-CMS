@@ -286,6 +286,7 @@
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
     <Content Include="Umbraco\Views\web.config" />
     <Content Include="Views\Partials\BlockList\Default.cshtml" />
+    <Content Include="Config\unversion.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>

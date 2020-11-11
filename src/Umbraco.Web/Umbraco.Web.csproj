@@ -302,6 +302,11 @@
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
+    <Compile Include="Unversion\IUnversionService.cs" />
+    <Compile Include="Unversion\UnversionComponent.cs" />
+    <Compile Include="Unversion\UnversionComposer.cs" />
+    <Compile Include="Unversion\UnversionConfig.cs" />
+    <Compile Include="Unversion\UnversionService.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />

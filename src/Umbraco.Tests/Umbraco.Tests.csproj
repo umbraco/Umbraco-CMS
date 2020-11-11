@@ -171,6 +171,7 @@
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
+    <Compile Include="Services\UnversionServiceTests.cs" />
     <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
