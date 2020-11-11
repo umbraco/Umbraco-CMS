@@ -848,69 +848,6 @@ namespace Umbraco.Extensions
 
         #endregion
 
-        // #region Wrap
-        //
-        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
-        // {
-        //     var item = html.Wrap(tag, innerText, (object)null);
-        //     foreach (var child in children)
-        //     {
-        //         item.AddChild(child);
-        //     }
-        //     return item;
-        // }
-        //
-        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        // {
-        //     string innerText = null;
-        //     if (inner != null)
-        //     {
-        //         innerText = string.Format("{0}", inner);
-        //     }
-        //     var item = html.Wrap(tag, innerText, anonymousAttributes);
-        //     foreach (var child in children)
-        //     {
-        //         item.AddChild(child);
-        //     }
-        //     return item;
-        // }
-        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner)
-        // {
-        //     string innerText = null;
-        //     if (inner != null)
-        //     {
-        //         innerText = string.Format("{0}", inner);
-        //     }
-        //     return html.Wrap(tag, innerText, (object)null);
-        // }
-        //
-        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        // {
-        //     var wrap = new HtmlTagWrapper(tag);
-        //     if (anonymousAttributes != null)
-        //     {
-        //         wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
-        //     }
-        //     if (!string.IsNullOrWhiteSpace(innerText))
-        //     {
-        //         wrap.AddChild(new HtmlTagWrapperTextNode(innerText));
-        //     }
-        //     foreach (var child in children)
-        //     {
-        //         wrap.AddChild(child);
-        //     }
-        //     return wrap;
-        // }
-        //
-        // public static HtmlTagWrapper Wrap(this HtmlHelper html, bool visible, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        // {
-        //     var item = html.Wrap(tag, innerText, anonymousAttributes, children);
-        //     item.Visible = visible;
-        //     return item;
-        // }
-        //
-        // #endregion
-
         #region If
 
         /// <summary>
@@ -981,14 +918,7 @@ namespace Umbraco.Extensions
             return helper.StripHtml(html.ToHtmlString(), tags);
         }
 
-        public static string ToHtmlString(this IHtmlContent content)
-        {
-            using (var writer = new System.IO.StringWriter())
-            {
-                content.WriteTo(writer, HtmlEncoder.Default);
-                return writer.ToString();
-            }
-        }
+
 
         /// <summary>
         /// Strips all HTML tags from a given string, all contents of the tags will remain.

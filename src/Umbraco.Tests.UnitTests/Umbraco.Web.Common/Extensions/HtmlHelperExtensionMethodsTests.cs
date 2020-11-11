@@ -1,6 +1,5 @@
 ﻿using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Buffers;
@@ -31,20 +30,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
         }
 
         private HtmlHelper _htmlHelper;
-
-        // [Test]
-        // public void Wrap_Simple()
-        // {
-        //     var output = _htmlHelper.Wrap("div", "hello world");
-        //     Assert.AreEqual("<div>hello world</div>", output.ToHtmlString());
-        // }
-        //
-        // [Test]
-        // public void Wrap_Object_Attributes()
-        // {
-        //     var output = _htmlHelper.Wrap("div", "hello world", new {style = "color:red;", onclick = "void();"});
-        //     Assert.AreEqual("<div style=\"color:red;\" onclick=\"void();\">hello world</div>", output.ToHtmlString());
-        // }
 
         [Test]
         public void Truncate_Simple()
