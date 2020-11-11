@@ -1767,7 +1767,7 @@ namespace Umbraco.Core.Services.Implement
         #region Delete
 
         /// <inheritdoc />
-        public OperationResult Delete(IContent content, int userId)
+        public OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1897,7 +1897,7 @@ namespace Umbraco.Core.Services.Implement
         #region Move, RecycleBin
 
         /// <inheritdoc />
-        public OperationResult MoveToRecycleBin(IContent content, int userId)
+        public OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<(IContent, string)>();

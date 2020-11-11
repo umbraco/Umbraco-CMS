@@ -46,13 +46,17 @@
 
         public bool DisableElectionForSingleServer { get; set; } = false;
 
+        public DatabaseServerRegistrarSettings DatabaseServerRegistrar { get; set; } = new DatabaseServerRegistrarSettings();
+
+        public DatabaseServerMessengerSettings DatabaseServerMessenger { get; set; } = new DatabaseServerMessengerSettings();
+
         public string RegisterType { get; set; } = string.Empty;
 
         public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
 
         public string MainDomLock { get; set; } = string.Empty;
 
-        public string NoNodesViewPath { get; set; } = "~/config/splashes/NoNodes.cshtml";
+        public string NoNodesViewPath { get; set; } = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
 
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 

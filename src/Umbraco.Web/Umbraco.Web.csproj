@@ -151,8 +151,6 @@
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
-    <Compile Include="Models\NoNodesViewModel.cs" />
-    <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
@@ -230,7 +228,6 @@
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
-    <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
@@ -295,7 +292,6 @@
     <Compile Include="Mvc\IHtmlTagWrapper.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
-    <Compile Include="Mvc\PluginViewEngine.cs" />
     <Compile Include="Mvc\PostedDataProxyInfo.cs" />
     <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
@@ -316,7 +312,6 @@
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
-    <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />

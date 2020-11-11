@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -106,20 +105,8 @@ namespace Umbraco.Web.Models.Trees
         {
             get
             {
-                if (IconIsClass)
-                    return string.Empty;
-
-                //absolute path with or without tilde
-                if (Icon.StartsWith("~") || Icon.StartsWith("/"))
-                    return Current.IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
-
-                //legacy icon path
-
-                // TODO: replace this when we have something other than Current.Configs available
-                var backOfficePath = Current.GlobalSettings.GetUmbracoMvcArea(Current.HostingEnvironment);
-
-
-                return string.Format("{0}images/umbraco/{1}", backOfficePath.EnsureEndsWith("/"), Icon);
+                // TODO: Is this ever actually used? If not remove, if so, add setter.
+                return string.Empty;
             }
         }
 

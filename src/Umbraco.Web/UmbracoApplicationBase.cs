@@ -22,6 +22,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Core.Runtime;
 using Umbraco.Net;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -48,8 +49,7 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase()
         {
-            if (!Umbraco.Composing.Current.IsInitialized)
-            {
+       
                 HostingSettings hostingSettings = null;
                 GlobalSettings globalSettings = null;
                 SecuritySettings securitySettings = null;
@@ -63,12 +63,8 @@ namespace Umbraco.Web
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                Umbraco.Composing.Current.Initialize(NullLogger<object>.Instance,
-                    securitySettings,
-                    globalSettings,
-                    ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                StaticApplicationLogging.Initialize(_loggerFactory);
                 Logger = NullLogger<UmbracoApplicationBase>.Instance;
-            }
         }
 
         private IProfiler GetWebProfiler(IHostingEnvironment hostingEnvironment)
@@ -93,11 +89,8 @@ namespace Umbraco.Web
             _ioHelper = ioHelper;
             _loggerFactory = loggerFactory;
 
-            if (!Umbraco.Composing.Current.IsInitialized)
-            {
-                Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
-            }
+            Logger = logger;
+            StaticApplicationLogging.Initialize(_loggerFactory);
         }
 
         protected ILogger<UmbracoApplicationBase> Logger { get; }
@@ -139,7 +132,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
+        protected abstract CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
@@ -184,24 +177,27 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            _runtime = GetRuntime(
+            var boostrapper = GetRuntime(
                 _globalSettings,
                 _connectionStrings,
                 umbracoVersion,
                 _ioHelper,
                 _logger,
                 _loggerFactory,
-                Umbraco.Composing.Current.Profiler,
-                Umbraco.Composing.Current.HostingEnvironment,
-                Umbraco.Composing.Current.BackOfficeInfo);
+                null, // TODO get from somewhere that isn't Current.
+                null, // TODO get from somewhere that isn't Current.
+                null // TODO get from somewhere that isn't Current.
+                );
             //_factory = Current.Factory = _runtime.Configure(register);
+
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
             LogContext.Push(new HttpSessionIdEnricher(_factory.GetRequiredService<ISessionIdResolver>()));
             LogContext.Push(new HttpRequestNumberEnricher(_factory.GetRequiredService<IRequestCache>()));
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetRequiredService<IRequestCache>()));
 
-            _runtime.Start(null);
+            _runtime = _factory.GetRequiredService<IRuntime>();
+            _runtime.Start();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
@@ -456,7 +455,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
             {
-                Current.Logger.LogWarning("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                StaticApplicationLogging.Logger.LogWarning("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 parts = null;
                 return false;
             }

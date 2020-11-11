@@ -60,18 +60,18 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly GlobalSettings _globalSettings = new GlobalSettings();
 
-            public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,  ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            
+            protected override CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,  ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
             {
-                return Runtime = new TestRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, loggerFactory, profiler, hostingEnvironment, backOfficeInfo);
+                return new TestRuntimeBootstrapper(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, loggerFactory, profiler, hostingEnvironment, backOfficeInfo);
             }
         }
 
         // test runtime
-        public class TestRuntime : CoreRuntime
+        public class TestRuntimeBootstrapper : CoreRuntimeBootstrapper
         {
-            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            public TestRuntimeBootstrapper(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
                 :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
 
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Runtimes
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            protected internal override IUmbracoDatabaseFactory CreateDatabaseFactory()
+            protected internal override IUmbracoDatabaseFactory CreateBootstrapDatabaseFactory()
             {
                 var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);

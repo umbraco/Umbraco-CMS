@@ -20,7 +20,7 @@
 
             public const string AppCode = "~/App_Code";
 
-            public const string AppPlugins = "~/App_Plugins";
+            public const string AppPlugins = "/App_Plugins";
 
             public const string MvcViews = "~/Views";
 

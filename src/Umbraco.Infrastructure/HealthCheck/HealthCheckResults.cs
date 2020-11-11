@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using HeyRed.MarkdownSharp;
 using Microsoft.Extensions.Logging;
-using Umbraco.Composing;
+using Umbraco.Core;
 using Umbraco.Core.HealthCheck;
 
 namespace Umbraco.Infrastructure.HealthCheck
@@ -14,7 +14,7 @@ namespace Umbraco.Infrastructure.HealthCheck
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
         public readonly bool AllChecksSuccessful;
 
-        private ILogger Logger => Current.Logger; // TODO: inject
+        private ILogger Logger => StaticApplicationLogging.Logger; // TODO: inject
 
         public HealthCheckResults(IEnumerable<Core.HealthCheck.HealthCheck> checks)
         {

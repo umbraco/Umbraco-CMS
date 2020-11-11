@@ -69,7 +69,7 @@ namespace Umbraco.Web.Common.Builder
             => builder.AddWith(nameof(WithRuntimeMinifier), () => builder.Services.AddUmbracoRuntimeMinifier(builder.Config));
 
         public static IUmbracoBuilder WithWebComponents(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithWebComponents), () => builder.Services.AddUmbracoWebComponents());
+            => builder.AddWith(nameof(WithWebComponents), () => builder.Services.AddUmbracoWebComponents(builder.Config));
 
         public static IUmbracoBuilder WithWebServer(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithWebServer), () =>

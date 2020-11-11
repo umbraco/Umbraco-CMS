@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;

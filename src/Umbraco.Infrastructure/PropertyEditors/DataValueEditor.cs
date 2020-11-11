@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -217,7 +216,7 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                Current.Logger.LogWarning("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
+                StaticApplicationLogging.Logger.LogWarning("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
                 return null;
             }
             return result.Result;
