@@ -141,7 +141,6 @@
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
-    <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
@@ -203,7 +202,6 @@
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
-    <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
@@ -213,7 +211,6 @@
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
-    <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
@@ -240,7 +237,6 @@
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />

@@ -3,35 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Web;
-using System.Web.Helpers;
-using System.Web.Mvc;
-using System.Web.Mvc.Html;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Security;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.Logging;
+using Umbraco.Web;
+using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.Mvc;
+using Umbraco.Web.Common.Security;
+using Umbraco.Web.Website.Collections;
+using Umbraco.Web.Website.Controllers;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// HtmlHelper extensions for use in templates
     /// </summary>
     public static class HtmlHelperRenderExtensions
     {
+       private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
+       {
+           return GetRequiredService<T>(htmlHelper.ViewContext);
+       }
+
+        private static T GetRequiredService<T>(ViewContext viewContext)
+       {
+           return viewContext.HttpContext.RequestServices.GetRequiredService<T>();
+       }
+
         /// <summary>
         /// Renders the markup for the profiler
         /// </summary>
         /// <param name="helper"></param>
         /// <returns></returns>
-        public static IHtmlString RenderProfiler(this HtmlHelper helper)
+        public static IHtmlContent RenderProfiler(this IHtmlHelper helper)
         {
-            return new HtmlString(Current.ProfilerHtml.Render());
+            return new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
         }
 
         /// <summary>
@@ -43,7 +62,7 @@ namespace Umbraco.Web
         /// <param name="model"></param>
         /// <param name="viewData"></param>
         /// <returns></returns>
-        public static MvcHtmlString AreaPartial(this HtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
+        public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
         {
             var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
             helper.ViewContext.RouteData.DataTokens["area"] = area;
@@ -61,23 +80,24 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
+        public static IHtmlContent PreviewBadge(this IHtmlHelper helper, IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
-            if (Current.UmbracoContext.InPreviewMode)
+            var umbrcoContext = umbracoContextAccessor.UmbracoContext;
+            if (umbrcoContext.InPreviewMode)
             {
                 var htmlBadge =
                     String.Format(contentSettings.PreviewBadge,
                                 ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                                   WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                                  Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
-                return new MvcHtmlString(htmlBadge);
+                                umbrcoContext.PublishedRequest.PublishedContent.Id);
+                return new HtmlString(htmlBadge);
             }
-            return new MvcHtmlString("");
+            return new HtmlString("");
 
         }
 
-        public static IHtmlString CachedPartial(
-            this HtmlHelper htmlHelper,
+        public static IHtmlContent CachedPartial(
+            this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
             int cachedSeconds,
@@ -95,36 +115,50 @@ namespace Umbraco.Web
             }
             if (cacheByPage)
             {
-                if (Current.UmbracoContext == null)
+                var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
+                var umbracoContext = umbracoContextAccessor.UmbracoContext;
+                if (umbracoContext == null)
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
-                cacheKey.AppendFormat("{0}-", Current.UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
+                cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
             if (cacheByMember)
             {
-                var helper = Current.MembershipHelper;
-                var currentMember = helper.GetCurrentMember();
-                cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
+                //TODO reintroduce when members are migrated
+                throw new NotImplementedException("Reintroduce when members are migrated");
+                    // var helper = Current.MembershipHelper;
+                // var currentMember = helper.GetCurrentMember();
+                // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);
                 cacheKey.AppendFormat("c{0}-", contextualKey);
             }
-            return Current.AppCaches.CachedPartialView(Current.HostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+
+            var appCaches = GetRequiredService<AppCaches>(htmlHelper);
+            var hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
+
+            return appCaches.CachedPartialView(hostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
         }
 
-        public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
-            where T : new()
-        {
-            var model = new T();
-            var typedHelper = new HtmlHelper<T>(
-                htmlHelper.ViewContext.CopyWithModel(model),
-                htmlHelper.ViewDataContainer.CopyWithModel(model));
-
-            return typedHelper.EditorFor(x => model, templateName, htmlFieldName, additionalViewData);
-        }
+        // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
+        //     where T : new()
+        // {
+        //     var model = new T();
+        //     htmlHelper.Contextualize(htmlHelper.ViewContext.CopyWithModel(model));
+        //
+        //     //
+        //     // var typedHelper = new HtmlHelper<T>(htmlHelper.
+        //     // htmlHelper.
+        //     //     ,
+        //     //     htmlHelper.ViewDataContainer.CopyWithModel(model));
+        //
+        //
+        //
+        //     return htmlHelper.EditorForModel(x => model, templateName, htmlFieldName, additionalViewData);
+        // }
 
         /// <summary>
         /// A validation summary that lets you pass in a prefix so that the summary only displays for elements
@@ -136,71 +170,94 @@ namespace Umbraco.Web
         /// <param name="message"></param>
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
-        public static MvcHtmlString ValidationSummary(this HtmlHelper htmlHelper,
-                                                      string prefix = "",
-                                                      bool excludePropertyErrors = false,
-                                                      string message = "",
-                                                      IDictionary<string, object> htmlAttributes = null)
+        public static IHtmlContent ValidationSummary(this IHtmlHelper htmlHelper,
+                                                     string prefix = "",
+                                                     bool excludePropertyErrors = false,
+                                                     string message = "",
+                                                     object htmlAttributes = null)
         {
             if (prefix.IsNullOrWhiteSpace())
             {
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-            //if there's a prefix applied, we need to create a new HTML helper with a filtered ModelState collection so that it only looks for
-            //specific model state with the prefix.
-            var filteredHtmlHelper = new HtmlHelper(htmlHelper.ViewContext, htmlHelper.ViewDataContainer.FilterContainer(prefix));
-            return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
-        }
 
-        /// <summary>
-        /// Returns the result of a child action of a strongly typed SurfaceController
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="htmlHelper"></param>
-        /// <param name="actionName"></param>
-        /// <returns></returns>
-        public static IHtmlString Action<T>(this HtmlHelper htmlHelper, string actionName)
-            where T : SurfaceController
-        {
-            return htmlHelper.Action(actionName, typeof(T));
-        }
 
-        /// <summary>
-        /// Returns the result of a child action of a SurfaceController
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="htmlHelper"></param>
-        /// <param name="actionName"></param>
-        /// <param name="surfaceType"></param>
-        /// <returns></returns>
-        public static IHtmlString Action(this HtmlHelper htmlHelper, string actionName, Type surfaceType)
-        {
-            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
-            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
-            var routeVals = new RouteValueDictionary(new {area = ""});
+            var htmlGenerator = GetRequiredService<IHtmlGenerator>(htmlHelper);
 
-            var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
-            if (surfaceController == null)
-                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-            var metaData = PluginController.GetMetadata(surfaceController);
-            if (!metaData.AreaName.IsNullOrWhiteSpace())
+            var viewContext = htmlHelper.ViewContext.Clone();
+            foreach (var key in viewContext.ViewData.Keys.ToArray()){
+                 if(!key.StartsWith(prefix)){
+                    viewContext.ViewData.Remove(key);
+                 }
+             }
+            var tagBuilder = htmlGenerator.GenerateValidationSummary(
+                viewContext,
+                excludePropertyErrors,
+                message,
+                headerTag: null,
+                htmlAttributes: htmlAttributes);
+            if (tagBuilder == null)
             {
-                //set the area to the plugin area
-                if (routeVals.ContainsKey("area"))
-                {
-                    routeVals["area"] = metaData.AreaName;
-                }
-                else
-                {
-                    routeVals.Add("area", metaData.AreaName);
-                }
+                return HtmlString.Empty;
             }
 
-            return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
+            return tagBuilder;
         }
+
+// TODO what to do here? This will be view components right?
+        // /// <summary>
+        // /// Returns the result of a child action of a strongly typed SurfaceController
+        // /// </summary>
+        // /// <typeparam name="T"></typeparam>
+        // /// <param name="htmlHelper"></param>
+        // /// <param name="actionName"></param>
+        // /// <returns></returns>
+        // public static IHtmlContent Action<T>(this HtmlHelper htmlHelper, string actionName)
+        //     where T : SurfaceController
+        // {
+        //     return htmlHelper.Action(actionName, typeof(T));
+        // }
+        //
+
+// TODO what to do here? This will be view components right?
+        // /// <summary>
+        // /// Returns the result of a child action of a SurfaceController
+        // /// </summary>
+        // /// <typeparam name="T"></typeparam>
+        // /// <param name="htmlHelper"></param>
+        // /// <param name="actionName"></param>
+        // /// <param name="surfaceType"></param>
+        // /// <returns></returns>
+        // public static IHtmlContent Action(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
+        // {
+        //     if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+        //     if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
+        //     if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+        //
+        //     var routeVals = new RouteValueDictionary(new {area = ""});
+        //
+        //     var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
+        //     var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
+        //     if (surfaceController == null)
+        //         throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+        //     var metaData = PluginController.GetMetadata(surfaceController);
+        //     if (!metaData.AreaName.IsNullOrWhiteSpace())
+        //     {
+        //         //set the area to the plugin area
+        //         if (routeVals.ContainsKey("area"))
+        //         {
+        //             routeVals["area"] = metaData.AreaName;
+        //         }
+        //         else
+        //         {
+        //             routeVals.Add("area", metaData.AreaName);
+        //         }
+        //     }
+        //
+        //     return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
+        // }
 
         #region BeginUmbracoForm
 
@@ -213,6 +270,7 @@ namespace Umbraco.Web
             /// Creates an UmbracoForm
             /// </summary>
             /// <param name="viewContext"></param>
+            /// <param name="htmlEncoder"></param>
             /// <param name="controllerName"></param>
             /// <param name="controllerAction"></param>
             /// <param name="area"></param>
@@ -220,17 +278,18 @@ namespace Umbraco.Web
             /// <param name="additionalRouteVals"></param>
             public UmbracoForm(
                 ViewContext viewContext,
+                HtmlEncoder htmlEncoder,
                 string controllerName,
                 string controllerAction,
                 string area,
                 FormMethod method,
                 object additionalRouteVals = null)
-                : base(viewContext)
+                : base(viewContext, htmlEncoder)
             {
                 _viewContext = viewContext;
                 _method = method;
                 _controllerName = controllerName;
-                _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
+                _encryptedString = EncryptionHelper.CreateEncryptedRouteString(GetRequiredService<IDataProtectionProvider>(viewContext), controllerName, controllerAction, area, additionalRouteVals);
             }
 
 
@@ -240,7 +299,7 @@ namespace Umbraco.Web
             private readonly string _encryptedString;
             private readonly string _controllerName;
 
-            protected override void Dispose(bool disposing)
+            protected new void Dispose()
             {
                 if (this._disposed)
                     return;
@@ -252,13 +311,14 @@ namespace Umbraco.Web
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
                 {
-                    _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+                     var antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+                    _viewContext.Writer.Write(antiforgery.GetHtml(_viewContext.HttpContext).ToString());
                 }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
 
-                base.Dispose(disposing);
+                base.Dispose();
             }
         }
 
@@ -594,7 +654,8 @@ namespace Umbraco.Web
 
             var area = "";
 
-            var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
+            var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(html);
+            var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
                 throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
             var metaData = PluginController.GetMetadata(surfaceController);
@@ -706,7 +767,8 @@ namespace Umbraco.Web
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
             if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
-            var formAction = Current.UmbracoContext.OriginalRequestUrl.PathAndQuery;
+            var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
+            var formAction = umbracoContextAccessor.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
 
@@ -764,88 +826,90 @@ namespace Umbraco.Web
             tagBuilder.MergeAttribute("action", formAction);
             // method is an explicit parameter, so it takes precedence over the htmlAttributes.
             tagBuilder.MergeAttribute("method", HtmlHelper.GetFormMethodString(method), true);
-            var traditionalJavascriptEnabled = htmlHelper.ViewContext.ClientValidationEnabled && htmlHelper.ViewContext.UnobtrusiveJavaScriptEnabled == false;
+            var traditionalJavascriptEnabled = htmlHelper.ViewContext.ClientValidationEnabled;
             if (traditionalJavascriptEnabled)
             {
                 // forms must have an ID for client validation
-                tagBuilder.GenerateId("form" + Guid.NewGuid().ToString("N"));
+                tagBuilder.GenerateId("form" + Guid.NewGuid().ToString("N"),  string.Empty);
             }
-            htmlHelper.ViewContext.Writer.Write(tagBuilder.ToString(TagRenderMode.StartTag));
 
+            htmlHelper.ViewContext.Writer.Write(tagBuilder.RenderStartTag());
+
+            var htmlEncoder = GetRequiredService<HtmlEncoder>(htmlHelper);
             //new UmbracoForm:
-            var theForm = new UmbracoForm(htmlHelper.ViewContext, surfaceController, surfaceAction, area, method, additionalRouteVals);
+            var theForm = new UmbracoForm(htmlHelper.ViewContext,  htmlEncoder, surfaceController, surfaceAction, area, method, additionalRouteVals);
 
             if (traditionalJavascriptEnabled)
             {
-                htmlHelper.ViewContext.FormContext.FormId = tagBuilder.Attributes["id"];
+                htmlHelper.ViewContext.FormContext.FormData["FormId"] = tagBuilder.Attributes["id"];
             }
             return theForm;
         }
 
         #endregion
 
-        #region Wrap
-
-        public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
-        {
-            var item = html.Wrap(tag, innerText, (object)null);
-            foreach (var child in children)
-            {
-                item.AddChild(child);
-            }
-            return item;
-        }
-
-        public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        {
-            string innerText = null;
-            if (inner != null)
-            {
-                innerText = string.Format("{0}", inner);
-            }
-            var item = html.Wrap(tag, innerText, anonymousAttributes);
-            foreach (var child in children)
-            {
-                item.AddChild(child);
-            }
-            return item;
-        }
-        public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner)
-        {
-            string innerText = null;
-            if (inner != null)
-            {
-                innerText = string.Format("{0}", inner);
-            }
-            return html.Wrap(tag, innerText, (object)null);
-        }
-
-        public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        {
-            var wrap = new HtmlTagWrapper(tag);
-            if (anonymousAttributes != null)
-            {
-                wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
-            }
-            if (!string.IsNullOrWhiteSpace(innerText))
-            {
-                wrap.AddChild(new HtmlTagWrapperTextNode(innerText));
-            }
-            foreach (var child in children)
-            {
-                wrap.AddChild(child);
-            }
-            return wrap;
-        }
-
-        public static HtmlTagWrapper Wrap(this HtmlHelper html, bool visible, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-        {
-            var item = html.Wrap(tag, innerText, anonymousAttributes, children);
-            item.Visible = visible;
-            return item;
-        }
-
-        #endregion
+        // #region Wrap
+        //
+        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
+        // {
+        //     var item = html.Wrap(tag, innerText, (object)null);
+        //     foreach (var child in children)
+        //     {
+        //         item.AddChild(child);
+        //     }
+        //     return item;
+        // }
+        //
+        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
+        // {
+        //     string innerText = null;
+        //     if (inner != null)
+        //     {
+        //         innerText = string.Format("{0}", inner);
+        //     }
+        //     var item = html.Wrap(tag, innerText, anonymousAttributes);
+        //     foreach (var child in children)
+        //     {
+        //         item.AddChild(child);
+        //     }
+        //     return item;
+        // }
+        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner)
+        // {
+        //     string innerText = null;
+        //     if (inner != null)
+        //     {
+        //         innerText = string.Format("{0}", inner);
+        //     }
+        //     return html.Wrap(tag, innerText, (object)null);
+        // }
+        //
+        // public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
+        // {
+        //     var wrap = new HtmlTagWrapper(tag);
+        //     if (anonymousAttributes != null)
+        //     {
+        //         wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
+        //     }
+        //     if (!string.IsNullOrWhiteSpace(innerText))
+        //     {
+        //         wrap.AddChild(new HtmlTagWrapperTextNode(innerText));
+        //     }
+        //     foreach (var child in children)
+        //     {
+        //         wrap.AddChild(child);
+        //     }
+        //     return wrap;
+        // }
+        //
+        // public static HtmlTagWrapper Wrap(this HtmlHelper html, bool visible, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
+        // {
+        //     var item = html.Wrap(tag, innerText, anonymousAttributes, children);
+        //     item.Visible = visible;
+        //     return item;
+        // }
+        //
+        // #endregion
 
         #region If
 
@@ -858,7 +922,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue)
+        public static IHtmlContent If(this HtmlHelper html, bool test, string valueIfTrue)
         {
             return If(html, test, valueIfTrue, string.Empty);
         }
@@ -873,7 +937,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded value.
         /// </returns>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
+        public static IHtmlContent If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(HttpUtility.HtmlEncode(test ? valueIfTrue : valueIfFalse));
         }
@@ -892,7 +956,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
         /// </returns>
-        public static IHtmlString ReplaceLineBreaks(this HtmlHelper helper, string text)
+        public static IHtmlContent ReplaceLineBreaks(this HtmlHelper helper, string text)
         {
             return StringUtilities.ReplaceLineBreaks(text);
         }
@@ -912,15 +976,24 @@ namespace Umbraco.Web
         /// <summary>
         /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
-        public static IHtmlString StripHtml(this HtmlHelper helper, IHtmlString html, params string[] tags)
+        public static IHtmlContent StripHtml(this HtmlHelper helper, IHtmlContent html, params string[] tags)
         {
             return helper.StripHtml(html.ToHtmlString(), tags);
+        }
+
+        public static string ToHtmlString(this IHtmlContent content)
+        {
+            using (var writer = new System.IO.StringWriter())
+            {
+                content.WriteTo(writer, HtmlEncoder.Default);
+                return writer.ToString();
+            }
         }
 
         /// <summary>
         /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
-        public static IHtmlString StripHtml(this HtmlHelper helper, string html, params string[] tags)
+        public static IHtmlContent StripHtml(this HtmlHelper helper, string html, params string[] tags)
         {
             return StringUtilities.StripHtmlTags(html, tags);
         }
@@ -952,7 +1025,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, IHtmlString html, int length)
+        public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length)
         {
             return helper.Truncate(html.ToHtmlString(), length, true, false);
         }
@@ -960,7 +1033,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, IHtmlString html, int length, bool addElipsis)
+        public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length, bool addElipsis)
         {
             return helper.Truncate(html.ToHtmlString(), length, addElipsis, false);
         }
@@ -968,7 +1041,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
+        public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length, bool addElipsis, bool treatTagsAsContent)
         {
             return helper.Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
         }
@@ -976,7 +1049,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, string html, int length)
+        public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length)
         {
             return helper.Truncate(html, length, true, false);
         }
@@ -984,7 +1057,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, string html, int length, bool addElipsis)
+        public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length, bool addElipsis)
         {
             return helper.Truncate(html, length, addElipsis, false);
         }
@@ -992,7 +1065,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString Truncate(this HtmlHelper helper, string html, int length, bool addElipsis, bool treatTagsAsContent)
+        public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
             return StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
         }
@@ -1002,7 +1075,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString TruncateByWords(this HtmlHelper helper, string html, int words)
+        public static IHtmlContent TruncateByWords(this HtmlHelper helper, string html, int words)
         {
             int length = StringUtilities.WordsToLength(html, words);
 
@@ -1012,7 +1085,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString TruncateByWords(this HtmlHelper helper, string html, int words, bool addElipsis)
+        public static IHtmlContent TruncateByWords(this HtmlHelper helper, string html, int words, bool addElipsis)
         {
             int length = StringUtilities.WordsToLength(html, words);
 
@@ -1022,7 +1095,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString TruncateByWords(this HtmlHelper helper, IHtmlString html, int words)
+        public static IHtmlContent TruncateByWords(this HtmlHelper helper, IHtmlContent html, int words)
         {
             int length = StringUtilities.WordsToLength(html.ToHtmlString(), words);
 
@@ -1032,7 +1105,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
-        public static IHtmlString TruncateByWords(this HtmlHelper helper, IHtmlString html, int words, bool addElipsis)
+        public static IHtmlContent TruncateByWords(this HtmlHelper helper, IHtmlContent html, int words, bool addElipsis)
         {
             int length = StringUtilities.WordsToLength(html.ToHtmlString(), words);
 

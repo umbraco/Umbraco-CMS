@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
                 ShortStringHelper,
-                new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
+              //  new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()),
                 HostingEnvironment);
         }
@@ -69,8 +69,8 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
-            Composition.Services.AddUnique(surfaceControllerTypes);
+            // var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
+            // Composition.Services.AddUnique(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.Services.AddUnique(umbracoApiControllerTypes);

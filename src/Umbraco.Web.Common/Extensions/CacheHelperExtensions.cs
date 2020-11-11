@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Mvc.Html;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Hosting;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
 
     /// <summary>
@@ -25,10 +25,10 @@ namespace Umbraco.Web
         /// <param name="cacheKey">used to cache the partial view, this key could change if it is cached by page or by member</param>
         /// <param name="viewData"></param>
         /// <returns></returns>
-        public static IHtmlString CachedPartialView(
+        public static IHtmlContent CachedPartialView(
             this AppCaches appCaches,
             IHostingEnvironment hostingEnvironment,
-            HtmlHelper htmlHelper,
+            IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
             int cachedSeconds,
@@ -42,7 +42,7 @@ namespace Umbraco.Web
                 return htmlHelper.Partial(partialViewName, model, viewData);
             }
 
-            return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
+            return appCaches.RuntimeCache.GetCacheItem<IHtmlContent>(
                 Core.CacheHelperExtensions.PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));

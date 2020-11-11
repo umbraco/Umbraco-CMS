@@ -21,7 +21,6 @@ namespace Umbraco.Web.Runtime
     public sealed class WebInitialComponent : IComponent
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -29,14 +28,12 @@ namespace Umbraco.Web.Runtime
 
         public WebInitialComponent(
             IUmbracoContextAccessor umbracoContextAccessor,
-            SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
@@ -58,7 +55,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes, _hostingEnvironment);
+            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _apiControllerTypes, _hostingEnvironment);
         }
 
         public void Terminate()
@@ -108,7 +105,6 @@ namespace Umbraco.Web.Runtime
             IUmbracoContextAccessor umbracoContextAccessor,
             GlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
-            SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
@@ -129,19 +125,18 @@ namespace Umbraco.Web.Runtime
           //  RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
 
             // plugin controllers must come first because the next route will catch many things
-            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, hostingEnvironment);
+            RoutePluginControllers(globalSettings, apiControllerTypes, hostingEnvironment);
         }
 
         private static void RoutePluginControllers(
             GlobalSettings globalSettings,
-            SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
             var umbracoPath = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
 
             // need to find the plugin controllers and route them
-            var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
+            var pluginControllers = apiControllerTypes; //TODO was: surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
 
             // local controllers do not contain the attribute
             var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());

@@ -221,9 +221,7 @@
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
-    <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
-    <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
@@ -277,11 +275,7 @@
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
-    <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="ModelStateExtensions.cs" />
-    <Compile Include="Mvc\HtmlTagWrapper.cs" />
-    <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
-    <Compile Include="Mvc\IHtmlTagWrapper.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
     <Compile Include="Mvc\PostedDataProxyInfo.cs" />
@@ -297,7 +291,6 @@
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="UmbracoHelper.cs" />
-    <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />

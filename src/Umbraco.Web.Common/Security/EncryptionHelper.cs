@@ -10,19 +10,19 @@ using Umbraco.Web.Common.Constants;
 
 namespace Umbraco.Web.Common.Security
 {
-    internal class EncryptionHelper
+    public class EncryptionHelper
     {
         private static IDataProtector CreateDataProtector(IDataProtectionProvider dataProtectionProvider)
         {
             return dataProtectionProvider.CreateProtector(nameof(EncryptionHelper));
         }
 
-        internal static string Decrypt(string encryptedString, IDataProtectionProvider dataProtectionProvider)
+        public static string Decrypt(string encryptedString, IDataProtectionProvider dataProtectionProvider)
         {
             return CreateDataProtector(dataProtectionProvider).Unprotect(encryptedString);
         }
 
-        internal static string Encrypt(string plainString, IDataProtectionProvider dataProtectionProvider)
+        public static string Encrypt(string plainString, IDataProtectionProvider dataProtectionProvider)
         {
             return CreateDataProtector(dataProtectionProvider).Protect(plainString);
         }
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Common.Security
         /// <param name="area"></param>
         /// <param name="additionalRouteVals"></param>
         /// <returns></returns>
-        internal static string CreateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string controllerName, string controllerAction, string area, object additionalRouteVals = null)
+        public static string CreateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string controllerName, string controllerAction, string area, object additionalRouteVals = null)
         {
             if (dataProtectionProvider == null) throw new ArgumentNullException(nameof(dataProtectionProvider));
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Common.Security
             return Encrypt(surfaceRouteParams, dataProtectionProvider);
         }
 
-        internal static bool DecryptAndValidateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string encryptedString, out IDictionary<string, string> parts)
+        public static bool DecryptAndValidateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string encryptedString, out IDictionary<string, string> parts)
         {
             if (dataProtectionProvider == null) throw new ArgumentNullException(nameof(dataProtectionProvider));
             string decryptedString;
