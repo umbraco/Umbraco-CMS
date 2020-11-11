@@ -14,11 +14,6 @@ namespace Umbraco.Web.Website.Runtime
         public void Compose(Composition composition)
         {
             composition.Services.AddUnique<NoContentRoutes>();
-
-            composition
-                .ComposeWebsiteUmbracoControllers()
-                //.SetDefaultRenderMvcController<RenderMvcController>()// default controller for template views
-                ;
         }
     }
 }

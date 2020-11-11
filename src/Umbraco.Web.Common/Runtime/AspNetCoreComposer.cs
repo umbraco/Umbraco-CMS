@@ -80,6 +80,7 @@ namespace Umbraco.Web.Common.Runtime
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that
+            // TODO: MSDI we can fix that
             composition.ComposeInstaller();
 
             var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();

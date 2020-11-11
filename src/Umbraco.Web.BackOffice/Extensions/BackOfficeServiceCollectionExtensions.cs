@@ -52,6 +52,9 @@ namespace Umbraco.Extensions
 
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
+            // TODO: MSDI - This needs some work, e.g. additional registrations / not registering as UserManager<BackOfficeIdentityUser>
+            // if we want container validation back on.
+
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
