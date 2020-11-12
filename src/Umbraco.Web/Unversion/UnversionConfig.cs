@@ -63,6 +63,9 @@ namespace Umbraco.Web.Unversion
                     if (xmlConfigEntry.Attributes["maxCount"] != null)
                         configEntry.MaxCount = Convert.ToInt32(xmlConfigEntry.Attributes["maxCount"].Value);
 
+                    if (xmlConfigEntry.Attributes["minCount"] != null)
+                        configEntry.MinCount = Convert.ToInt32(xmlConfigEntry.Attributes["minCount"].Value);
+
                     if (!ConfigEntries.ContainsKey(configEntry.DocTypeAlias))
                         ConfigEntries.Add(configEntry.DocTypeAlias, new List<UnversionConfigEntry>());
 
@@ -75,13 +78,14 @@ namespace Umbraco.Web.Unversion
     {
         public UnversionConfigEntry()
         {
-            MaxDays = MaxCount = int.MaxValue;
+            MaxDays = MaxCount = MinCount = int.MaxValue;
         }
 
         public string DocTypeAlias { get; set; }
         public string RootXPath { get; set; }
         public int MaxDays { get; set; }
         public int MaxCount { get; set; }
+        public int MinCount { get; set; }
     }
 
     public interface IUnversionConfig
