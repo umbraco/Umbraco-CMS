@@ -1,0 +1,10 @@
+name: "CodeQL config"
+paths-ignore: 
+  - node_modules
+  - Umbraco.TestData
+  - Umbraco.Tests
+  - Umbraco.Tests.AcceptanceTest
+  - Umbraco.Tests.Benchmarks
+  - bin
+paths:
+  - src   
