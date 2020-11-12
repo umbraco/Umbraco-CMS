@@ -25,7 +25,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Media;
@@ -57,10 +56,10 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider);
+            var serializer = new JsonNetSerializer();
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
-            var serializer = new JsonNetSerializer();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper), serializer) { Id = 1 },
