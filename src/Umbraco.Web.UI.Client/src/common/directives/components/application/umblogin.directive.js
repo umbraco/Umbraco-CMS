@@ -164,7 +164,7 @@
 
         function inviteSavePassword() {
 
-            if (formHelper.submitForm({ scope: $scope })) {
+            if (formHelper.submitForm({ scope: $scope, formCtrl: vm.inviteUserPasswordForm })) {
 
                 vm.invitedUserPasswordModel.buttonState = "busy";
 
@@ -172,7 +172,7 @@
                     .then(function (data) {
 
                         //success
-                        formHelper.resetForm({ scope: $scope });
+                        formHelper.resetForm({ scope: $scope, formCtrl: vm.inviteUserPasswordForm });
                         vm.invitedUserPasswordModel.buttonState = "success";
                         //set the user and set them as logged in
                         vm.invitedUser = data;
@@ -181,7 +181,7 @@
                         vm.inviteStep = 2;
 
                     }, function (err) {
-                        formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        formHelper.resetForm({ scope: $scope, hasErrors: true, formCtrl: vm.inviteUserPasswordForm });
                         formHelper.handleError(err);
                         vm.invitedUserPasswordModel.buttonState = "error";
                     });

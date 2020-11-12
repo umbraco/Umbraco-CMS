@@ -252,6 +252,14 @@ namespace Umbraco.Web.Search
                         DeleteIndexForEntity(c4.Id, false);
                     }
                     break;
+                case MessageType.RefreshByPayload:
+                    var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
+                    var members = payload.Select(x => _services.MemberService.GetById(x.Id));
+                    foreach(var m in members)
+                    {
+                        ReIndexForMember(m);
+                    }
+                    break;
                 case MessageType.RefreshAll:
                 case MessageType.RefreshByJson:
                 default:

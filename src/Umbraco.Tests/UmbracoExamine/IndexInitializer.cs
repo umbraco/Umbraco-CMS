@@ -49,7 +49,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, bool publishedValuesOnly)
         {
             var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, scopeProvider, publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(true, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
+            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
             return contentIndexDataSource;
         }
 
