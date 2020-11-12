@@ -1,13 +1,5 @@
 name: "Code scanning - action"
-paths-ignore: 
-  - node_modules
-  - Umbraco.TestData
-  - Umbraco.Tests
-  - Umbraco.Tests.AcceptanceTest
-  - Umbraco.Tests.Benchmarks
-  - bin
-paths:
-  - src 
+
 on:
   push:
     branches: [v8/contrib]
@@ -59,3 +51,13 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+      paths-ignore: 
+        - node_modules
+        - Umbraco.TestData
+        - Umbraco.Tests
+        - Umbraco.Tests.AcceptanceTest
+        - Umbraco.Tests.Benchmarks
+        - bin
+      paths:
+        - src 
+
