@@ -55,12 +55,14 @@
     visibility: visible !important;
 }
 
-.umb-nested-content__item--single > .umb-nested-content__content {
+.umb-nested-content__item--single {
     border: 0;
-}
 
-.umb-nested-content__item--single > .umb-nested-content__content > .umb-pane {
-    margin: 0;
+    > .umb-nested-content__content {
+        > .umb-pane {
+            margin: 0;
+        }
+    }
 }
 
 .umb-nested-content__header-bar {
