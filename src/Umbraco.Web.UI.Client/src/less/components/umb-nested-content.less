@@ -4,6 +4,7 @@
 
 .umb-nested-content-property-container {
     position: relative;
+
     &:not(:last-child){
         margin-bottom: 12px;
     }
@@ -19,7 +20,7 @@
         yeah so this is a pain, but we must be super specific in targeting the mandatory property labels,
         otherwise all properties within a reqired, nested, nested content property will all appear mandatory
     */
-    > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
+    .umb-property > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
         content: '*';
         color: @red;
     }
@@ -63,10 +64,8 @@
 }
 
 .umb-nested-content__header-bar {
-    
     cursor: pointer;
     background-color: @white;
-
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
@@ -78,22 +77,20 @@
             padding-right: 60px;
         }
     }
-
 }
 
 .umb-nested-content__heading {
+    display: flex;
+    padding: 15px;
     line-height: 20px;
-    position: relative;
-    padding: 15px 5px;
-    color:@ui-option-type;
+    color: @ui-option-type;
 
     &:hover {
-        color:@ui-option-type-hover;
+        color: @ui-option-type-hover;
     }
 
     i {
-        position: absolute;
-        margin-top: -1px;
+        margin-top: 3px;
     }
 
     .umb-nested-content__item-name {
@@ -105,32 +102,34 @@
         padding-left: 5px;
 
         &.--has-icon {
-            padding-left: 30px;
+            padding-left: 10px;
         }
     }
-
 }
 
 .umb-nested-content__icons {
-    opacity: 0;
-    transition: opacity 120ms ease-in-out;
+    background-color: @white;
     position: absolute;
     right: 0;
     top: 3px;
     padding: 5px;
-    background-color: @white;
+    opacity: 0;
+    transition: opacity 120ms ease-in-out;
 }
 
 .umb-nested-content__item--active > .umb-nested-content__header-bar {
     .umb-nested-content__heading {
         background-color: @ui-active;
+
         &:hover {
-            color:@ui-option-type;
+            color: @ui-option-type;
         }
+
         .umb-nested-content__item-name {
             padding-right: 60px;
         }
     }
+
     .umb-nested-content__icons {
         background-color: @ui-active;
         &:before {
@@ -139,16 +138,12 @@
     }
 }
 
-
-
 .umb-nested-content__header-bar:hover .umb-nested-content__icons,
 .umb-nested-content__header-bar:focus .umb-nested-content__icons,
 .umb-nested-content__header-bar:focus-within .umb-nested-content__icons,
 .umb-nested-content__item--active > .umb-nested-content__header-bar .umb-nested-content__icons {
     opacity: 1;
 }
-
-
 
 .umb-nested-content__icon {
     background: transparent;
@@ -179,9 +174,6 @@
     }
 }
 
-
-
-
 .umb-nested-content__footer-bar {
     margin-top: 20px;
 }
@@ -210,7 +202,6 @@
     border-color: @gray-7;
     cursor: not-allowed;
 }
-
 
 .umb-nested-content__content {
     border-top: 1px solid transparent;
