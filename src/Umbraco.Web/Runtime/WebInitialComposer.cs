@@ -66,8 +66,8 @@ namespace Umbraco.Web.Runtime
             //.SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
-            composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
-                .Add(composition.TypeLoader.GetSurfaceControllers());
+            // composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+            //     .Add(composition.TypeLoader.GetSurfaceControllers());
 
 
             // auto-register views

@@ -3,6 +3,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Extensions;
 using Umbraco.Web.Website.Routing;
 using Umbraco.Web.Common.Runtime;
+using Umbraco.Web.Website.Collections;
 
 namespace Umbraco.Web.Website.Runtime
 {
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Website.Runtime
                 .ComposeWebsiteUmbracoControllers()
                 //.SetDefaultRenderMvcController<RenderMvcController>()// default controller for template views
                 ;
+
+
+            composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+                 .Add(composition.TypeLoader.GetSurfaceControllers());
         }
     }
 }

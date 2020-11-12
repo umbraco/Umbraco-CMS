@@ -1,7 +1,8 @@
 ﻿using NUnit.Framework;
 using Umbraco.Web;
+using Umbraco.Web.Common.Mvc;
 
-namespace Umbraco.Tests.Web.Mvc
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Mvc
 {
     [TestFixture]
     public class HtmlStringUtilitiesTests

@@ -1,15 +1,20 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Tests.Web
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
 {
     [TestFixture]
-    public class UrlHelperExtensionTests
+    public class EncryptionHelperTests
     {
+
+        private IDataProtectionProvider DataProtectionProvider { get; } = new EphemeralDataProtectionProvider();
+
         [Test]
-        public static void Create_Encrypted_RouteString_From_Anonymous_Object()
+        public void Create_Encrypted_RouteString_From_Anonymous_Object()
         {
             var additionalRouteValues = new
             {
@@ -19,14 +24,15 @@ namespace Umbraco.Tests.Web
                 keY4 = "valuE4"
             };
 
-            var encryptedRouteString = UrlHelperRenderExtensions.CreateEncryptedRouteString(
+            var encryptedRouteString = EncryptionHelper.CreateEncryptedRouteString(
+                DataProtectionProvider,
                 "FormController",
                 "FormAction",
                 "",
                 additionalRouteValues
             );
 
-            var result = encryptedRouteString.DecryptWithMachineKey();
+            var result = EncryptionHelper.Decrypt(encryptedRouteString, DataProtectionProvider);
 
             const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
@@ -34,7 +40,7 @@ namespace Umbraco.Tests.Web
         }
 
         [Test]
-        public static void Create_Encrypted_RouteString_From_Dictionary()
+        public void Create_Encrypted_RouteString_From_Dictionary()
         {
             var additionalRouteValues = new Dictionary<string, object>()
             {
@@ -44,14 +50,15 @@ namespace Umbraco.Tests.Web
                 {"keY4", "valuE4"}
             };
 
-            var encryptedRouteString = UrlHelperRenderExtensions.CreateEncryptedRouteString(
+            var encryptedRouteString = EncryptionHelper.CreateEncryptedRouteString(
+                DataProtectionProvider,
                 "FormController",
                 "FormAction",
                 "",
                 additionalRouteValues
             );
 
-            var result = encryptedRouteString.DecryptWithMachineKey();
+            var result = EncryptionHelper.Decrypt(encryptedRouteString, DataProtectionProvider);
 
             const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 

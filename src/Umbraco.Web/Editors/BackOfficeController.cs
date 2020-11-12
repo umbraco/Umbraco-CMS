@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
     /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
-    [DisableBrowserCache]
+  //  [DisableBrowserCache]
     public class BackOfficeController : Controller
     {
         private BackOfficeOwinUserManager _userManager;
