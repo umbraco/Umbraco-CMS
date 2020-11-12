@@ -1,35 +1,41 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Unversion
 {
     public class UnversionComponent : IComponent
     {
-        private readonly IUnversionService unVersionService;
+        private readonly IRuntimeState _runtime;
+        private readonly IProfilingLogger _logger;
+        private readonly IContentService _contentService;
+        private readonly IUnversionService _unversionService;
+        private readonly BackgroundTaskRunner<IBackgroundTask> _unversionRunner;
 
-        public UnversionComponent(IUnversionService _unVersionService)
+        public UnversionComponent(IRuntimeState runtime, IProfilingLogger logger, IContentService contentService, IUnversionService unversionService)
         {
-            unVersionService = _unVersionService;
+            _runtime = runtime;
+            _logger = logger;            
+            _contentService = contentService;
+            _unversionService = unversionService;
+            _unversionRunner = new BackgroundTaskRunner<IBackgroundTask>("Unversion", _logger);
         }
 
         public void Initialize()
         {
-            ContentService.Published += ContentService_Published;
-        }
+            int delayBeforeWeStart = 60000; // 60000ms = 1min
+            int howOftenWeRepeat = 6000 * 60; // 60000 * 60 = 1hr
 
-        private void ContentService_Published(IContentService sender, ContentPublishedEventArgs e)
-        {
-            foreach (var content in e.PublishedEntities)
-            {
-                unVersionService.Unversion(content);
-            }
+            var task = new UnversionTask(_unversionRunner, delayBeforeWeStart, howOftenWeRepeat, _runtime, _logger, _contentService, _unversionService);
+
+            //As soon as we add our task to the runner it will start to run (after its delay period)
+            _unversionRunner.TryAdd(task);
         }
 
         public void Terminate()
         {
-            ContentService.Published -= ContentService_Published;
         }
     }
 }

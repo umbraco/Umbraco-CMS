@@ -307,6 +307,7 @@
     <Compile Include="Unversion\UnversionComposer.cs" />
     <Compile Include="Unversion\UnversionConfig.cs" />
     <Compile Include="Unversion\UnversionService.cs" />
+    <Compile Include="Unversion\UnversionTask.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
