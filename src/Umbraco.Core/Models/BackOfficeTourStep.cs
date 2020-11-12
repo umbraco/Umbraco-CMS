@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.Models
 {
@@ -28,7 +27,7 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "eventElement")]
         public string EventElement { get; set; }
         [DataMember(Name = "customProperties")]
-        public JObject CustomProperties { get; set; }
+        public object CustomProperties { get; set; }
         [DataMember(Name = "skipStepIfVisible")]
         public string SkipStepIfVisible { get; set; }
     }

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)
                 {
-                     var groupProperties = source.GetPropertiesForGroup(group)
+                    var groupProperties = source.GetPropertiesForGroup(group)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
 
                     properties.AddRange(groupProperties);

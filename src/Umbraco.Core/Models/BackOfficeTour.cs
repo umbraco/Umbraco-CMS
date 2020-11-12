@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models
     {
         public BackOfficeTour()
         {
-            RequiredSections = new List<string>();            
+            RequiredSections = new List<string>();
         }
 
         [DataMember(Name = "name")]

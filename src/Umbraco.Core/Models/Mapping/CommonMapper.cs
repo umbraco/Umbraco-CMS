@@ -10,7 +10,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
@@ -21,16 +20,14 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly ContentAppFactoryCollection _contentAppDefinitions;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor,
+        public CommonMapper(IUserService userService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             ContentAppFactoryCollection contentAppDefinitions, ILocalizedTextService localizedTextService)
         {
             _userService = userService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _contentAppDefinitions = contentAppDefinitions;
             _localizedTextService = localizedTextService;
-            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public UserProfile GetOwner(IContentBase source, MapperContext context)
