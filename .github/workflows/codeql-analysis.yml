@@ -1,8 +1,16 @@
 name: "Code scanning - action"
-
+paths-ignore: 
+  - node_modules
+  - Umbraco.TestData
+  - Umbraco.Tests
+  - Umbraco.Tests.AcceptanceTest
+  - Umbraco.Tests.Benchmarks
+  - bin
+paths:
+  - src 
 on:
   push:
-    branches: [v8/none]
+    branches: [v8/contrib]
   pull_request:
     # The branches below must be a subset of the branches above
     # SJ: Don't run on PR branches for now
