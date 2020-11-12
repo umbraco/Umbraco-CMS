@@ -6,7 +6,7 @@ namespace Umbraco.Core.Sync
     public interface IBatchedDatabaseServerMessenger : IDatabaseServerMessenger
     {
         void FlushBatch();
-        DatabaseServerMessengerOptions Options { get; }
+        DatabaseServerMessengerCallbacks Callbacks { get; }
         void Startup();
     }
 }

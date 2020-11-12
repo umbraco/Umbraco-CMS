@@ -1,7 +1,9 @@
-﻿namespace Umbraco.Core.Configuration.Models
+﻿using System;
+
+namespace Umbraco.Core.Configuration.Models
 {
     public class LoggingSettings
     {
-        public int MaxLogAge { get; set; } = -1;
+        public TimeSpan MaxLogAge { get; set; } = TimeSpan.FromHours(24);
     }
 }

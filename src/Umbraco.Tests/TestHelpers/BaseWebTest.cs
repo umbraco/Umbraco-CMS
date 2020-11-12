@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -35,8 +36,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
-            Composition.RegisterUnique<IProfilingLogger, ProfilingLogger>();
+            Composition.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
+            Composition.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
         }
 
         protected override void Initialize()
@@ -93,13 +94,13 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal PublishedRouter CreatePublishedRouter(IServiceProvider container = null, ContentFinderCollection contentFinders = null)
         {
             var webRoutingSettings = new WebRoutingSettings();
             return CreatePublishedRouter(webRoutingSettings, container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(WebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(WebRoutingSettings webRoutingSettings, IServiceProvider container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
@@ -110,11 +111,11 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
-                container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),
-                container?.GetInstance<IPublicAccessChecker>()?? Current.Factory.GetInstance<IPublicAccessChecker>(),
-                container?.GetInstance<IFileService>()?? Current.Factory.GetInstance<IFileService>(),
-                container?.GetInstance<IContentTypeService>() ?? Current.Factory.GetInstance<IContentTypeService>(),
-                container?.GetInstance<IPublicAccessService>() ?? Current.Factory.GetInstance<IPublicAccessService>()
+                container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
+                container?.GetRequiredService<IPublicAccessChecker>()?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
+                container?.GetRequiredService<IFileService>()?? Current.Factory.GetRequiredService<IFileService>(),
+                container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
+                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>()
             );
         }
     }

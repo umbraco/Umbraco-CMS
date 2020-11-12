@@ -25,17 +25,14 @@ namespace Umbraco.Extensions
         /// Registers the web components needed for Umbraco
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services, IConfiguration configuration)
         {
             services.ConfigureOptions<UmbracoMvcConfigureOptions>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
-
-            // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
-            var serviceProvider = services.BuildServiceProvider();
-            var imagingSettings = serviceProvider.GetService<IOptions<ImagingSettings>>().Value;
-            services.AddUmbracoImageSharp(imagingSettings);
+            services.AddUmbracoImageSharp(configuration);
 
             return services;
         }
@@ -44,10 +41,12 @@ namespace Umbraco.Extensions
         /// Adds Image Sharp with Umbraco settings
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="imagingSettings"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, ImagingSettings imagingSettings)
+        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IConfiguration configuration)
         {
+            var imagingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigImaging)
+                .Get<ImagingSettings>() ?? new ImagingSettings();
 
             services.AddImageSharp(options =>
                     {
@@ -62,7 +61,7 @@ namespace Umbraco.Extensions
 
                             return Task.CompletedTask;
                         };
-                         options.OnBeforeSaveAsync = _ =>  Task.CompletedTask;
+                        options.OnBeforeSaveAsync = _ =>  Task.CompletedTask;
                         options.OnProcessedAsync = _ => Task.CompletedTask;
                         options.OnPrepareResponseAsync = _ => Task.CompletedTask;
                     })

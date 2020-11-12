@@ -252,11 +252,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Get_Paged_Child_Entities_By_Parent_Id()
         {
-            CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
+            CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out _);
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider, out var relationTypeRepository);
+                var repository = CreateRepository(ScopeProvider, out _);
 
                 // Get parent entities for child id
                 var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out var totalRecords).ToList();
@@ -408,12 +408,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.That(shouldntExist, Is.False);
                 Assert.That(shouldExist, Is.True);
             }
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
         }
 
         public void CreateTestData()

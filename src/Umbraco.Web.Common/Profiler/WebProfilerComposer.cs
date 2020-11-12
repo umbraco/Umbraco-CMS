@@ -9,7 +9,7 @@ namespace Umbraco.Web.Common.Profiler
         {
             base.Compose(composition);
 
-            composition.RegisterUnique<WebProfilerHtml>();
+            composition.Services.AddUnique<WebProfilerHtml>();
         }
     }
 }

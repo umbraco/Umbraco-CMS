@@ -312,76 +312,81 @@ namespace Umbraco.Web
             return result;
         }
 
-        /// <summary>
-        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType"></param>
-        /// <returns></returns>
-        public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType)
-        {
-            return url.SurfaceAction(action, surfaceType, null);
-        }
+        //TODO Move to LinkGenerator
+        // /// <summary>
+        // /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        // /// </summary>
+        // /// <param name="url"></param>
+        // /// <param name="action"></param>
+        // /// <param name="surfaceType"></param>
+        // /// <returns></returns>
+        // public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType)
+        // {
+        //     return url.SurfaceAction(action, surfaceType, null);
+        // }
 
-        /// <summary>
-        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
-        public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
-            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+        //TODO Move to LinkGenerator
+        // /// <summary>
+        // /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        // /// </summary>
+        // /// <param name="url"></param>
+        // /// <param name="action"></param>
+        // /// <param name="surfaceType"></param>
+        // /// <param name="additionalRouteVals"></param>
+        // /// <returns></returns>
+        // public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
+        // {
+        //     if (action == null) throw new ArgumentNullException(nameof(action));
+        //     if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+        //     if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+        //
+        //     var area = "";
+        //
+        //
+        //     var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
+        //     if (surfaceController == null)
+        //         throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+        //     var metaData = PluginController.GetMetadata(surfaceController);
+        //     if (metaData.AreaName.IsNullOrWhiteSpace() == false)
+        //     {
+        //         //set the area to the plugin area
+        //         area = metaData.AreaName;
+        //     }
+        //
+        //     var encryptedRoute = CreateEncryptedRouteString(metaData.ControllerName, action, area, additionalRouteVals);
+        //
+        //     var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+        //     return result;
+        // }
 
-            var area = "";
+        // /// <summary>
+        // /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        // /// </summary>
+        // /// <typeparam name="T"></typeparam>
+        // /// <param name="url"></param>
+        // /// <param name="action"></param>
+        // /// <returns></returns>
+        // //TODO Move to LinkGenerator
+        // public static string SurfaceAction<T>(this UrlHelper url, string action)
+        //     where T : SurfaceController
+        // {
+        //     return url.SurfaceAction(action, typeof (T));
+        // }
 
-            var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
-            if (surfaceController == null)
-                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-            var metaData = PluginController.GetMetadata(surfaceController);
-            if (metaData.AreaName.IsNullOrWhiteSpace() == false)
-            {
-                //set the area to the plugin area
-                area = metaData.AreaName;
-            }
-
-            var encryptedRoute = CreateEncryptedRouteString(metaData.ControllerName, action, area, additionalRouteVals);
-
-            var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
-            return result;
-        }
-
-        /// <summary>
-        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static string SurfaceAction<T>(this UrlHelper url, string action)
-            where T : SurfaceController
-        {
-            return url.SurfaceAction(action, typeof (T));
-        }
-
-        /// <summary>
-        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
-        public static string SurfaceAction<T>(this UrlHelper url, string action, object additionalRouteVals)
-            where T : SurfaceController
-        {
-            return url.SurfaceAction(action, typeof (T), additionalRouteVals);
-        }
+        // /// <summary>
+        // /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        // /// </summary>
+        // /// <typeparam name="T"></typeparam>
+        // /// <param name="url"></param>
+        // /// <param name="action"></param>
+        // /// <param name="additionalRouteVals"></param>
+        // /// <returns></returns>
+        // //TODO Move to LinkGenerator
+        // public static string SurfaceAction<T>(this UrlHelper url, string action, object additionalRouteVals)
+        //     where T : SurfaceController
+        // {
+        //     return url.SurfaceAction(action, typeof (T), additionalRouteVals);
+        // }
 
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which

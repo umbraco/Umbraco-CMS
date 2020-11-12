@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Mapping
 {
@@ -6,6 +7,6 @@ namespace Umbraco.Core.Mapping
     {
         protected override MapDefinitionCollectionBuilder This => this;
 
-        protected override Lifetime CollectionLifetime => Lifetime.Transient;
+        protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Transient;
     }
 }

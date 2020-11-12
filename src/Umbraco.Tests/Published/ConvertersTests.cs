@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -17,6 +18,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
@@ -32,7 +34,14 @@ namespace Umbraco.Tests.Published
            // Current.Reset();
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), Mock.Of<IIOHelper>(), AppCaches.NoCache);
+            var composition = new Composition(
+                register,
+                TestHelper.GetMockedTypeLoader(),
+                Mock.Of<IProfilingLogger>(),
+                Mock.Of<IRuntimeState>(),
+                Mock.Of<IIOHelper>(),
+                AppCaches.NoCache
+            );
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()
@@ -43,9 +52,9 @@ namespace Umbraco.Tests.Published
                 typeof (PublishedSnapshotTestObjects.TestElementModel1), typeof (PublishedSnapshotTestObjects.TestElementModel2),
                 typeof (PublishedSnapshotTestObjects.TestContentModel1), typeof (PublishedSnapshotTestObjects.TestContentModel2),
             }, Mock.Of<IPublishedValueFallback>());
-            register.Register(f => factory);
+            register.AddTransient(f => factory);
 
-            var registerFactory = composition.CreateFactory();
+       
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -54,9 +63,10 @@ namespace Umbraco.Tests.Published
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
-            register.Register(f => publishedSnapshotAccessorMock.Object);
+            register.AddTransient(f => publishedSnapshotAccessorMock.Object);
 
-            var converters = registerFactory.GetInstance<PropertyValueConverterCollection>();
+            var registerFactory = composition.CreateServiceProvider();
+            var converters = registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
@@ -93,7 +103,7 @@ namespace Umbraco.Tests.Published
                 Properties = new[] { new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" } }
             };
 
-            var publishedModelFactory = registerFactory.GetInstance<IPublishedModelFactory>();
+            var publishedModelFactory = registerFactory.GetRequiredService<IPublishedModelFactory>();
             cacheContent[cnt1.Id] = cnt1.CreateModel(publishedModelFactory);
             cacheContent[cnt2.Id] = cnt2.CreateModel(publishedModelFactory);
 

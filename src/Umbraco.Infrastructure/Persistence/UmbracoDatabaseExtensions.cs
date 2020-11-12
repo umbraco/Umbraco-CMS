@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Core.Persistence
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets a key/value directly from the database, no scope, nothing.
         /// </summary>
-        /// <remarks>Used by <see cref="Runtime.CoreRuntime"/> to determine the runtime state.</remarks>
+        /// <remarks>Used by <see cref="CoreRuntimeBootstrapper"/> to determine the runtime state.</remarks>
         public static string GetFromKeyValueTable(this IUmbracoDatabase database, string key)
         {
             if (database is null) return null;

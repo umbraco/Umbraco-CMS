@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using Smidge;
 using Smidge.Nuglify;
@@ -42,10 +43,6 @@ namespace Umbraco.Extensions
             if (!app.UmbracoCanBoot()) return app;
 
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            if (runtime is CoreRuntime coreRuntime)
-            {
-                coreRuntime.ReplaceFactory(app.ApplicationServices);
-            }
 
             // Register a listener for application shutdown in order to terminate the runtime
             var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
@@ -55,7 +52,9 @@ namespace Umbraco.Extensions
             // Register our global threadabort enricher for logging
             var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
             LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
-            
+
+            StaticApplicationLogging.Initialize(app.ApplicationServices.GetRequiredService<ILoggerFactory>());
+
             // Start the runtime!
             runtime.Start();
 

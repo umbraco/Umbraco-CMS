@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
@@ -14,10 +15,13 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          * HOW TO REPLACE THE MEDIA UNDERLYING FILESYSTEM
          * ----------------------------------------------
          *
-         *   composition.RegisterUnique<IMediaFileSystem>(factoryMethod);
+         * Create an implementation of IFileSystem and register it as the underlying filesystem for
+         * MediaFileSystem with the following extension on composition.
          *
-         *   composition.RegisterUnique<IMediaFileSystem, TImplementation>();
+         * composition.SetMediaFileSystem(factory => FactoryMethodToReturnYourImplementation())
          *
+         * Alternatively you can just register an Implementation of IMediaFileSystem, however the
+         * extension above ensures that your IFileSystem implementation is wrapped by the "ShadowWrapper".
          *
          * WHAT IS SHADOWING
          * -----------------
@@ -27,7 +31,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          * compared to creating your own physical filesystem, ensures that your filesystem
          * would participate into such transactions.
          *
-         *
          */
 
         public static Composition ComposeFileSystems(this Composition composition)
@@ -36,28 +39,24 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            composition.RegisterUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
+            composition.Services.AddUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());
+            composition.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<Core.IO.FileSystems>());
 
             // register the scheme for media paths
-            composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
-            // register the default IMediaFileSystem implementation
-            composition.RegisterUnique<IMediaFileSystem>(factory =>
+            composition.SetMediaFileSystem(factory =>
             {
-                var ioHelper = factory.GetInstance<IIOHelper>();
-                var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
-                var logger = factory.GetInstance<ILogger<PhysicalFileSystem>>();
-                var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>().Value;
+                var ioHelper = factory.GetRequiredService<IIOHelper>();
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                var logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
-                var inner = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
-
-                var fileSystems = factory.GetInstance<IO.FileSystems>();
-                return fileSystems.GetFileSystem<MediaFileSystem>(inner);
+                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });
 
             return composition;

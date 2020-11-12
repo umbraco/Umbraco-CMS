@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -62,11 +63,11 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Helper()
         {
             // unless we can inject them in MembershipHelper, we need need this
-            Composition.Register(_ => Mock.Of<IMemberService>());
-            Composition.Register(_ => Mock.Of<IMemberTypeService>());
-            Composition.Register(_ => Mock.Of<IUserService>());
-            Composition.Register(_ => AppCaches.Disabled);
-            Composition.Register<ServiceContext>();
+            Composition.Services.AddTransient(_ => Mock.Of<IMemberService>());
+            Composition.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
+            Composition.Services.AddTransient(_ => Mock.Of<IUserService>());
+            Composition.Services.AddTransient(_ => AppCaches.Disabled);
+            Composition.Services.AddTransient<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),

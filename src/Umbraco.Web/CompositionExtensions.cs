@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Actions;
@@ -28,7 +29,12 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-
+        [Obsolete("This extension method exists only to ease migration, please refactor")]
+        public static IServiceProvider CreateServiceProvider(this Composition composition)
+        {
+            composition.RegisterBuilders();
+            return composition.Services.BuildServiceProvider();
+        }
 
         #region Uniques
 
@@ -38,9 +44,9 @@ namespace Umbraco.Web
         /// <typeparam name="T">The type of the content last chance finder.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetContentLastChanceFinder<T>(this Composition composition)
-            where T : IContentLastChanceFinder
+            where T : class, IContentLastChanceFinder
         {
-            composition.RegisterUnique<IContentLastChanceFinder, T>();
+            composition.Services.AddUnique<IContentLastChanceFinder, T>();
         }
 
         /// <summary>
@@ -48,9 +54,9 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceProvider, IContentLastChanceFinder> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -60,7 +66,7 @@ namespace Umbraco.Web
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
-            composition.RegisterUnique(_ => finder);
+            composition.Services.AddUnique(_ => finder);
         }
 
         /// <summary>
@@ -69,9 +75,9 @@ namespace Umbraco.Web
         /// <typeparam name="T">The type of the site domain helper.</typeparam>
         /// <param name="composition"></param>
         public static void SetSiteDomainHelper<T>(this Composition composition)
-            where T : ISiteDomainHelper
+            where T : class, ISiteDomainHelper
         {
-            composition.RegisterUnique<ISiteDomainHelper, T>();
+            composition.Services.AddUnique<ISiteDomainHelper, T>();
         }
 
         /// <summary>
@@ -79,9 +85,9 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceProvider, ISiteDomainHelper> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -91,32 +97,7 @@ namespace Umbraco.Web
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
-            composition.RegisterUnique(_ => helper);
-        }
-
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <typeparam name="TController">The type of the controller.</typeparam>
-        /// <param name="composition">The composition.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController<TController>(this Composition composition)
-            => composition.SetDefaultRenderMvcController(typeof(TController));
-
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="controllerType">The type of the controller.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController(this Composition composition, Type controllerType)
-        {
-            composition.OnCreatingFactory["Umbraco.Core.DefaultRenderMvcController"] = () =>
-            {
-                // no need to register: all IRenderMvcController are registered
-                //composition.Register(controllerType, Lifetime.Request);
-                Current.DefaultRenderMvcControllerType = controllerType;
-            };
+            composition.Services.AddUnique(_ => helper);
         }
 
         #endregion

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
@@ -20,6 +21,8 @@ namespace Umbraco.Web.Common.Builder
             if (webHostEnvironment is null) throw new ArgumentNullException(nameof(webHostEnvironment));
             if (config is null) throw new ArgumentNullException(nameof(config));
 
+            services.AddLazySupport();
+
             var builder = new UmbracoBuilder(services, webHostEnvironment, config);
             return builder;
         }
@@ -28,7 +31,13 @@ namespace Umbraco.Web.Common.Builder
             => builder.AddWith(nameof(WithConfiguration), () => builder.Services.AddUmbracoConfiguration(builder.Config));
 
         public static IUmbracoBuilder WithCore(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config, out _));
+            => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config));
+
+        public static IUmbracoBuilder WithHostedServices(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithHostedServices), () => builder.Services.AddUmbracoHostedServices());
+
+        public static IUmbracoBuilder WithHttpClients(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithHttpClients), () => builder.Services.AddUmbracoHttpClients());
 
         public static IUmbracoBuilder WithMiniProfiler(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithMiniProfiler), () =>
@@ -60,7 +69,7 @@ namespace Umbraco.Web.Common.Builder
             => builder.AddWith(nameof(WithRuntimeMinifier), () => builder.Services.AddUmbracoRuntimeMinifier(builder.Config));
 
         public static IUmbracoBuilder WithWebComponents(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithWebComponents), () => builder.Services.AddUmbracoWebComponents());
+            => builder.AddWith(nameof(WithWebComponents), () => builder.Services.AddUmbracoWebComponents(builder.Config));
 
         public static IUmbracoBuilder WithWebServer(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithWebServer), () =>

@@ -14,15 +14,7 @@
       <Compile Remove="Views\**" />
       <EmbeddedResource Remove="Views\**" />
       <None Remove="Views\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Logging\logviewer.searches.config.js">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+      <None Remove="create_slicing_filter_condition.sh" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,12 +27,10 @@
 
     <ItemGroup>
         <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
-        <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.3" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
         <PackageReference Include="Moq" Version="4.14.6" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
         <PackageReference Include="nunit" Version="3.12.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
             <PrivateAssets>all</PrivateAssets>
@@ -58,18 +48,6 @@
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Umbraco.Configuration\Configurations\umbracoSettings.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Umbraco.Configuration\Configurations\umbracoSettings.minimal.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Umbraco.Configuration\Configurations\web.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
     <ItemGroup>

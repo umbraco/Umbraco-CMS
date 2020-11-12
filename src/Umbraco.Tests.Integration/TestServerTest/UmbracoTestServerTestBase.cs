@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
@@ -21,14 +20,13 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Editors;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
@@ -119,13 +117,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void TearDown()
         {
             base.TearDown();
+            base.TerminateCoreRuntime();
 
             Factory.Dispose();
-
-            if (Current.IsInitialized)
-            {
-                Current.IsInitialized = false;
-            }
         }
 
         #region IStartup

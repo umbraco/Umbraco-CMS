@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
-using Umbraco.Composing;
 
 
 namespace Umbraco.Core.Models
@@ -473,7 +472,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.LogWarning("Trying to access the '{PropertyName}' property on '{MemberType}' " +
+                StaticApplicationLogging.Logger.LogWarning("Trying to access the '{PropertyName}' property on '{MemberType}' " +
                                             "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
                                             "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
                                                 logPropertyName,
@@ -498,7 +497,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.LogWarning("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
+                StaticApplicationLogging.Logger.LogWarning("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
                                             "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
                                                 logPropertyName,
                                                 typeof(Member),

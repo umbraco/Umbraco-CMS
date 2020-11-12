@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
@@ -12,22 +13,22 @@ namespace Umbraco.Web.Composing.CompositionExtensions
         {
             // register the installer steps
 
-            composition.Register<InstallSetupStep,NewInstallStep>(Lifetime.Scope);
-            composition.Register<InstallSetupStep,UpgradeStep>(Lifetime.Scope);
-            composition.Register<InstallSetupStep,FilePermissionsStep>(Lifetime.Scope);
-            composition.Register<InstallSetupStep,DatabaseConfigureStep>(Lifetime.Scope);
-            composition.Register<InstallSetupStep,DatabaseInstallStep>(Lifetime.Scope);
-            composition.Register<InstallSetupStep,DatabaseUpgradeStep>(Lifetime.Scope);
+            composition.Services.AddScoped<InstallSetupStep,NewInstallStep>();
+            composition.Services.AddScoped<InstallSetupStep,UpgradeStep>();
+            composition.Services.AddScoped<InstallSetupStep,FilePermissionsStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseConfigureStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseInstallStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseUpgradeStep>();
 
             // TODO: Add these back once we have a compatible Starter kit
-            // composition.Register<InstallSetupStep,StarterKitDownloadStep>(Lifetime.Scope);
-            // composition.Register<InstallSetupStep,StarterKitInstallStep>(Lifetime.Scope);
-            // composition.Register<InstallSetupStep,StarterKitCleanupStep>(Lifetime.Scope);
+            // composition.Services.AddScoped<InstallSetupStep,StarterKitDownloadStep>();
+            // composition.Services.AddScoped<InstallSetupStep,StarterKitInstallStep>();
+            // composition.Services.AddScoped<InstallSetupStep,StarterKitCleanupStep>();
 
-            composition.Register<InstallSetupStep,CompleteInstallStep>(Lifetime.Scope);
+            composition.Services.AddScoped<InstallSetupStep,CompleteInstallStep>();
 
-            composition.Register<InstallStepCollection>();
-            composition.RegisterUnique<InstallHelper>();
+            composition.Services.AddTransient<InstallStepCollection>();
+            composition.Services.AddUnique<InstallHelper>();
 
             return composition;
         }

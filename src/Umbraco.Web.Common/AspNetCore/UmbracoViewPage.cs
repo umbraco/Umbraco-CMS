@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -8,12 +9,12 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.AspNetCore
@@ -110,6 +111,8 @@ namespace Umbraco.Web.Common.AspNetCore
             ViewData = (ViewDataDictionary<TModel>) viewData;
         }
 
+
+
         // viewData is the ViewDataDictionary (maybe <TModel>) that we have
         // modelType is the type of the model that we need to bind to
         //
@@ -143,5 +146,16 @@ namespace Umbraco.Web.Common.AspNetCore
             var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
             return nViewData;
         }
+
+        public HtmlString RenderSection(string name, HtmlString defaultContents)
+        {
+            return RazorPageExtensions.RenderSection(this, name, defaultContents);
+        }
+
+        public HtmlString RenderSection(string name, string defaultContents)
+        {
+            return RazorPageExtensions.RenderSection(this, name, defaultContents);
+        }
+
     }
 }

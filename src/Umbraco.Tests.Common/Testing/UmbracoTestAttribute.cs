@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Testing
                 throw new ArgumentException(nameof(other));
 
             base.Merge(other);
-
+            _boot.Set(attr.Boot);
             _mapper.Set(attr._mapper);
             _publishedRepositoryEvents.Set(attr._publishedRepositoryEvents);
             _logger.Set(attr._logger);

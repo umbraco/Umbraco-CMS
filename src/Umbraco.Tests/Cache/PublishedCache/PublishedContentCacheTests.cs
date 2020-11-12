@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 
             var globalSettings = new GlobalSettings();
-            var umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
+            var umbracoContextAccessor = Factory.GetRequiredService<IUmbracoContextAccessor>();
 
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var domainCache = new DomainCache(Mock.Of<IDomainService>(), DefaultCultureAccessor);
             var publishedShapshot = new PublishedSnapshot(
                 new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, ContentTypesCache, null, VariationContextAccessor, null),
-                new PublishedMediaCache(xmlStore, Mock.Of<IMediaService>(), Mock.Of<IUserService>(), appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor, VariationContextAccessor),
+                new PublishedMediaCache(xmlStore, Mock.Of<IMediaService>(), Mock.Of<IUserService>(), appCache, ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), umbracoContextAccessor, VariationContextAccessor),
                 new PublishedMemberCache(null, appCache, Mock.Of<IMemberService>(), ContentTypesCache, Mock.Of<IUserService>(), VariationContextAccessor),
                 domainCache);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();

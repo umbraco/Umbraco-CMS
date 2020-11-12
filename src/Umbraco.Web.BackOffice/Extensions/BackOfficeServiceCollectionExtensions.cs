@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Infrastructure.BackOffice;
@@ -23,7 +16,6 @@ using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
-
     public static class BackOfficeServiceCollectionExtensions
     {
         /// <summary>

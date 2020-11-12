@@ -28,16 +28,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private IFileService FileService => GetRequiredService<IFileService>();
         public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
-        public override void Setup()
+        [SetUp]
+        public void Setup()
         {
-            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void Teardown()
         {
             ContentRepositoryBase.ThrowOnWarning = false;
-            base.TearDown();
         }
 
         [Test]

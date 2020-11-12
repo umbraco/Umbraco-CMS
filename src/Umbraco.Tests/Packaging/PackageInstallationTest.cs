@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -55,11 +56,11 @@ namespace Umbraco.Tests.Packaging
             NullLoggerFactory.Instance.CreateLogger<PackageDataInstallation>(), NullLoggerFactory.Instance, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
-            Factory.GetInstance<PropertyEditorCollection>(),
-            Factory.GetInstance<IScopeProvider>(),
-            Factory.GetInstance<IShortStringHelper>(),
+            Factory.GetRequiredService<PropertyEditorCollection>(),
+            Factory.GetRequiredService<IScopeProvider>(),
+            Factory.GetRequiredService<IShortStringHelper>(),
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
-            Factory.GetInstance<ILocalizedTextService>());
+            Factory.GetRequiredService<ILocalizedTextService>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

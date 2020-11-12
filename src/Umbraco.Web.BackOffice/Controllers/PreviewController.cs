@@ -64,7 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _viewEngines = viewEngines;
         }
 
-        [UmbracoAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
+        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
         [DisableBrowserCache]
         public ActionResult Index()
         {
@@ -107,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The endpoint that is loaded within the preview iframe
         /// </summary>
         /// <returns></returns>
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         public ActionResult Frame(int id, string culture)
         {
             EnterPreview(id);

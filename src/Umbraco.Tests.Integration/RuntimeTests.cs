@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,9 +11,10 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -44,11 +46,10 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Boot_Core_Runtime()
         {
-            // TODO: MSDI - cleanup after initial merge.
-            var umbracoContainer = new ServiceCollectionRegistryAdapter(new ServiceCollection());
+            var services = new ServiceCollection().AddLazySupport();
 
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
-            umbracoContainer.Register(x => Mock.Of<IHostApplicationLifetime>());
+            services.AddTransient(x => Mock.Of<IHostApplicationLifetime>());
 
             var testHelper = new TestHelper();
 
@@ -64,37 +65,41 @@ namespace Umbraco.Tests.Integration
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
             var webRoutingSettings = new WebRoutingSettings();
 
-            umbracoContainer.Register(x => Options.Create(globalSettings));
-            umbracoContainer.Register(x => Options.Create(contentSettings));
-            umbracoContainer.Register(x => Options.Create(coreDebugSettings));
-            umbracoContainer.Register(x => Options.Create(nuCacheSettings));
-            umbracoContainer.Register(x => Options.Create(requestHandlerSettings));
-            umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
-            umbracoContainer.Register(x => Options.Create(webRoutingSettings));
-            umbracoContainer.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
+            services.AddTransient(x => Options.Create(globalSettings));
+            services.AddTransient(x => Options.Create(connectionStrings));
+            services.AddTransient(x => Options.Create(contentSettings));
+            services.AddTransient(x => Options.Create(coreDebugSettings));
+            services.AddTransient(x => Options.Create(nuCacheSettings));
+            services.AddTransient(x => Options.Create(requestHandlerSettings));
+            services.AddTransient(x => Options.Create(userPasswordConfigurationSettings));
+            services.AddTransient(x => Options.Create(webRoutingSettings));
+            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Create the core runtime
-            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
+            var bootstrapper = new CoreRuntimeBootstrapper(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
-            coreRuntime.Configure(umbracoContainer);
+            bootstrapper.Configure(services);
 
-            Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
-            Assert.IsNull(coreRuntime.State.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);
+            Assert.IsTrue(bootstrapper.MainDom.IsMainDom);
+            Assert.IsNull(bootstrapper.State.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, bootstrapper.State.Level);
             Assert.IsTrue(MyComposer.IsComposed);
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
+            var container = services.BuildServiceProvider();
 
-            coreRuntime.Start();
+            var runtime = container.GetRequiredService<IRuntime>();
+
+            runtime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-            coreRuntime.Terminate();
+            runtime.Terminate();
 
             Assert.IsTrue(MyComponent.IsTerminated);
         }
@@ -117,10 +122,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-
-                    // TODO: MSDI - cleanup after initial merge.
-                    var register = new ServiceCollectionRegistryAdapter(services);
-                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration,out _);
+                    services.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -159,9 +161,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    // TODO: MSDI - cleanup after initial merge.
-                    var register = new ServiceCollectionRegistryAdapter(services);
-                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration, out _);
+                    services.AddUmbracoCore(webHostEnvironment,  GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();

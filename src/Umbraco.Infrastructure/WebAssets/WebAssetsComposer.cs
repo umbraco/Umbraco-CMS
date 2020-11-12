@@ -8,7 +8,7 @@ namespace Umbraco.Web.WebAssets
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.RegisterUnique<BackOfficeWebAssets>();
+            composition.Services.AddUnique<BackOfficeWebAssets>();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Web.Http.Controllers;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Web.WebApi.Filters
         public FeatureAuthorizeAttribute()
         {
             // attributes have to use Current.Container
-            _features = Current.Factory?.TryGetInstance<UmbracoFeatures>();
+            _features = Current.Factory?.GetService<UmbracoFeatures>();
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)

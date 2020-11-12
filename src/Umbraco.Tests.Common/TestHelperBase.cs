@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -120,9 +121,9 @@ namespace Umbraco.Tests.Common
 
         public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion();
 
-        public IRegister GetRegister()
+        public IServiceCollection GetRegister()
         {
-            return RegisterFactory.Create(new GlobalSettings());
+            return new ServiceCollection();
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();

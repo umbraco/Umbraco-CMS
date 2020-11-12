@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -306,7 +307,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IRegister GetRegister() => _testHelperInternal.GetRegister();
+        public static IServiceCollection GetRegister() => _testHelperInternal.GetRegister().AddLazySupport();
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 
