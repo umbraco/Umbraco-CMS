@@ -2,7 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Web.WebApi.Filters;using Umbraco.Core.Models.Identity;
+using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Identity;
