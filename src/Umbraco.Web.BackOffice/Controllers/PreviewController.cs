@@ -110,18 +110,23 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-
-            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
-
-            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, previewToken);
+            EnterPreview(id);
 
             // use a numeric url because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
 
             return RedirectPermanent($"../../{id}.aspx{query}");
         }
+        public ActionResult EnterPreview(int id)
+        {
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
+            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
+
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, previewToken);
+
+            return null;
+        }
         public ActionResult End(string redir = null)
         {
             var previewToken = _cookieManager.GetPreviewCookieValue();
@@ -129,6 +134,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             _publishedSnapshotService.ExitPreview(previewToken);
 
             _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
+            _cookieManager.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false

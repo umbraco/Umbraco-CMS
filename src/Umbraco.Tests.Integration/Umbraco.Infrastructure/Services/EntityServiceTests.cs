@@ -12,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -39,6 +40,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [SetUp]
         public void SetupTestData()
         {
+
+            //This is super nasty, but this lets us initialize the cache while it is empty.
+            _ = GetRequiredService<IPublishedSnapshotService>();
+
             if (_langFr == null && _langEs == null)
             {
                 var globalSettings = new GlobalSettings();
@@ -663,7 +668,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
         {
-            var result = EntityService.GetKey(1052, UmbracoObjectTypes.Unknown);
+            var result = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -672,7 +677,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id()
         {
-            var result = EntityService.GetKey(1052, UmbracoObjectTypes.DocumentType);
+            var result = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -681,8 +686,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
-            var result1 = EntityService.GetKey(1052, UmbracoObjectTypes.DocumentType);
-            var result2 = EntityService.GetKey(1052, UmbracoObjectTypes.MediaType);
+            var result1 = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.DocumentType);
+            var result2 = EntityService.GetKey(_contentType.Id, UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
@@ -694,7 +699,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(1052, result.Result);
+            Assert.AreEqual(_contentType.Id, result.Result);
         }
 
         [Test]
@@ -703,7 +708,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(1052, result.Result);
+            Assert.AreEqual(_contentType.Id, result.Result);
         }
 
         [Test]
@@ -742,6 +747,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private static bool _isSetup = false;
 
         private int folderId;
+        private ContentType _contentType;
+        private Content _textpage;
+        private Content _subpage;
+        private Content _subpage2;
+        private Content _trashed;
+        private IMediaType _folderMediaType;
+        private Media _folder;
+        private IMediaType _imageMediaType;
+        private Media _image;
+        private Media _subfolder;
+        private Media _subfolder2;
 
         public void CreateTestData()
         {
@@ -752,52 +768,52 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 var template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template); // else, FK violation on contentType!
 
-                //Create and Save ContentType "umbTextpage" -> 1052
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-                contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-                ContentTypeService.Save(contentType);
+                //Create and Save ContentType "umbTextpage" -> _contentType.Id
+                _contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+                _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+                ContentTypeService.Save(_contentType);
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> 1053
-                var textpage = ContentBuilder.CreateSimpleContent(contentType);
-                textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-                ContentService.Save(textpage, 0);
+                _textpage = ContentBuilder.CreateSimpleContent(_contentType);
+                _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
+                ContentService.Save(_textpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
-                var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-                subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
-                ContentService.Save(subpage, 0);
+                _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
+                _subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
+                ContentService.Save(_subpage, 0);
 
                 //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
-                var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-                ContentService.Save(subpage2, 0);
+                _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
+                ContentService.Save(_subpage2, 0);
 
                 //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
-                var trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
-                trashed.Trashed = true;
-                ContentService.Save(trashed, 0);
+                _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
+                _trashed.Trashed = true;
+                ContentService.Save(_trashed, 0);
 
                 //Create and Save folder-Media -> 1057
-                var folderMediaType = MediaTypeService.Get(1031);
-                var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
-                MediaService.Save(folder, 0);
-                folderId = folder.Id;
+                _folderMediaType = MediaTypeService.Get(1031);
+                _folder = MediaBuilder.CreateMediaFolder(_folderMediaType, -1);
+                MediaService.Save(_folder, 0);
+                folderId = _folder.Id;
 
                 //Create and Save image-Media -> 1058
-                var imageMediaType = MediaTypeService.Get(1032);
-                var image = MediaBuilder.CreateMediaImage(imageMediaType, folder.Id);
-                MediaService.Save(image, 0);
+                _imageMediaType = MediaTypeService.Get(1032);
+                _image = MediaBuilder.CreateMediaImage(_imageMediaType, _folder.Id);
+                MediaService.Save(_image, 0);
 
                 //Create and Save file-Media -> 1059
                 var fileMediaType = MediaTypeService.Get(1033);
-                var file = MediaBuilder.CreateMediaFile(fileMediaType, folder.Id);
+                var file = MediaBuilder.CreateMediaFile(fileMediaType, _folder.Id);
                 MediaService.Save(file, 0);
 
                 // Create and save sub folder -> 1060
-                var subfolder = MediaBuilder.CreateMediaFolder(folderMediaType, folder.Id);
-                MediaService.Save(subfolder, 0);
+                _subfolder = MediaBuilder.CreateMediaFolder(_folderMediaType, _folder.Id);
+                MediaService.Save(_subfolder, 0);
                 // Create and save sub folder -> 1061
-                var subfolder2 = MediaBuilder.CreateMediaFolder(folderMediaType, subfolder.Id);
-                MediaService.Save(subfolder2, 0);
+                _subfolder2 = MediaBuilder.CreateMediaFolder(_folderMediaType, _subfolder.Id);
+                MediaService.Save(_subfolder2, 0);
             }
         }
     }

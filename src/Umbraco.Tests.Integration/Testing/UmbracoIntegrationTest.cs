@@ -35,6 +35,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Infrastructure.Composing;
+using Umbraco.Web.PublishedCache;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -86,7 +87,6 @@ namespace Umbraco.Tests.Integration.Testing
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app); //Takes around 200 ms
-
 
             OnFixtureTearDown(() => host.Dispose());
         }
@@ -428,7 +428,7 @@ namespace Umbraco.Tests.Integration.Testing
         #endregion
 
         #region Common services
-        
+
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
 
         public Dictionary<string, string> InMemoryConfiguration { get; } = new Dictionary<string, string>();
