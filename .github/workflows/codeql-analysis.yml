@@ -2,11 +2,9 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [v8/none]
+    branches: [v8/contrib,v8/dev]
   pull_request:
     # The branches below must be a subset of the branches above
-    # SJ: Don't run on PR branches for now
-    # branches: [v8/contrib]
   schedule:
     - cron: '0 7 * * 2'
 
@@ -44,10 +42,20 @@ jobs:
     # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
-
+    
+    - name: configure Pagefile
+      uses: al-cheb/configure-pagefile-action@v1.2
+      with:
+          minimum-size: 8GB
+          maximum-size: 32GB
+          
     - run: |
         echo "Run Umbraco-CMS build"
         pwsh -command .\build\build.ps1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+      with:
+        config-file: ./.github/codeql-config.yml
+
+
