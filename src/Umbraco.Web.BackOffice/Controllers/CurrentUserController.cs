@@ -170,7 +170,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This only works when the user is logged in (partially)
         /// </remarks>
-        [UmbracoAuthorize(redirectToUmbracoLogin: false, requireApproval : true)]
+        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval : true)]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0).ToString());
@@ -235,7 +235,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             throw HttpResponseException.CreateValidationErrorResponse(ModelState);
         }
 
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {

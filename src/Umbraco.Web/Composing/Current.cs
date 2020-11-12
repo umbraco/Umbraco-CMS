@@ -133,9 +133,6 @@ namespace Umbraco.Web.Composing
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
             => Factory.GetRequiredService<UmbracoApiControllerTypeCollection>();
 
-        internal static SurfaceControllerTypeCollection SurfaceControllerTypes
-            => Factory.GetRequiredService<SurfaceControllerTypeCollection>();
-
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Factory.GetRequiredService<IPublishedSnapshotService>();
 

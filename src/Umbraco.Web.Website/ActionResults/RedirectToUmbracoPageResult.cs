@@ -18,7 +18,7 @@ namespace Umbraco.Web.Website.ActionResults
     public class RedirectToUmbracoPageResult : IActionResult
     {
         private IPublishedContent _publishedContent;
-        private readonly int _pageId;
+        private readonly Guid _key;
         private readonly QueryString _queryString;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -31,22 +31,20 @@ namespace Umbraco.Web.Website.ActionResults
                 if (!string.IsNullOrWhiteSpace(_url)) return _url;
 
                 if (PublishedContent is null)
-                    throw new InvalidOperationException($"Cannot redirect, no entity was found for id {PageId}");
+                    throw new InvalidOperationException($"Cannot redirect, no entity was found for key {Key}");
 
                 var result = _publishedUrlProvider.GetUrl(PublishedContent.Id);
 
                 if (result == "#")
                     throw new InvalidOperationException(
-                        $"Could not route to entity with id {PageId}, the NiceUrlProvider could not generate a URL");
+                        $"Could not route to entity with key {Key}, the NiceUrlProvider could not generate a URL");
 
                 _url = result;
 
                 return _url;
             }
         }
-
-        private int PageId => _pageId;
-
+        public Guid Key => _key;
         private IPublishedContent PublishedContent
         {
             get
@@ -54,7 +52,7 @@ namespace Umbraco.Web.Website.ActionResults
                 if (!(_publishedContent is null)) return _publishedContent;
 
                 //need to get the URL for the page
-                _publishedContent = _umbracoContextAccessor.GetRequiredUmbracoContext().Content.GetById(_pageId);
+                _publishedContent = _umbracoContextAccessor.GetRequiredUmbracoContext().Content.GetById(_key);
 
                return _publishedContent;
             }
@@ -65,9 +63,9 @@ namespace Umbraco.Web.Website.ActionResults
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(Guid key, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _pageId = pageId;
+            _key = key;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -78,9 +76,9 @@ namespace Umbraco.Web.Website.ActionResults
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(Guid key, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _pageId = pageId;
+            _key = key;
             _queryString = queryString;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -95,7 +93,7 @@ namespace Umbraco.Web.Website.ActionResults
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
-            _pageId = publishedContent.Id;
+            _key = publishedContent.Key;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -110,7 +108,7 @@ namespace Umbraco.Web.Website.ActionResults
         public RedirectToUmbracoPageResult(IPublishedContent publishedContent, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
-            _pageId = publishedContent.Id;
+            _key = publishedContent.Key;
             _queryString = queryString;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;

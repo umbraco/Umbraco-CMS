@@ -13,7 +13,7 @@ namespace Umbraco.Web.Common.Filters
     /// <summary>
     /// Ensures authorization is successful for a back office user.
     /// </summary>
-    public class UmbracoAuthorizeFilter : IAuthorizationFilter
+    public class UmbracoBackOfficeAuthorizeFilter : IAuthorizationFilter
     {
         private readonly bool _requireApproval;
 
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Common.Filters
         private readonly bool _redirectToUmbracoLogin;
         private string _redirectUrl;
 
-        private UmbracoAuthorizeFilter(
+        private UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContext,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Common.Filters
         /// <param name="runtimeState"></param>
         /// <param name="linkGenerator"></param>
         /// <param name="redirectUrl"></param>
-        public UmbracoAuthorizeFilter(
+        public UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContext,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Common.Filters
         {
         }
 
-        public UmbracoAuthorizeFilter(
+        public UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContext,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
