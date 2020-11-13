@@ -12,6 +12,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -42,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
@@ -54,7 +55,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
             ILocalizedTextService localizedTextService,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
          {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
@@ -65,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _mediaTypeService = mediaTypeService ?? throw new ArgumentNullException(nameof(mediaTypeService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
          }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             _dataTypeService.Delete(foundType, currentUser.Id);
 
             return Ok();
@@ -245,7 +246,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult DeleteContainer(int id)
         {
 
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             _dataTypeService.DeleteContainer(id, currentUser.Id);
 
             return Ok();
@@ -253,7 +254,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var result = _dataTypeService.CreateContainer(parentId, name, currentUser.Id);
 
             return result
@@ -283,7 +284,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             dataType.PersistedDataType.Configuration = configuration;
 
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             // save the data type
             try
             {
@@ -340,7 +341,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var result = _dataTypeService.RenameContainer(id, name, currentUser.Id);
 
             return result

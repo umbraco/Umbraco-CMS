@@ -313,6 +313,7 @@ namespace Umbraco.Tests.Testing
 
             // web
             Composition.Services.AddUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            Composition.Services.AddUnique<IBackOfficeSecurityAccessor>(_ => new HybridBackofficeSecurityAccessor(AppCaches.NoCache.RequestCache));
             Composition.Services.AddUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 

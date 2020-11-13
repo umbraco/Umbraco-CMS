@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Strings.Css;
@@ -34,7 +35,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IIOHelper _ioHelper;
         private readonly IFileSystems _fileSystems;
         private readonly IFileService _fileService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
@@ -44,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IIOHelper ioHelper,
             IFileSystems fileSystems,
             IFileService fileService,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
@@ -53,7 +55,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _ioHelper = ioHelper;
             _fileSystems = fileSystems;
             _fileService = fileService;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _localizedTextService = localizedTextService;
             _umbracoMapper = umbracoMapper;
             _shortStringHelper = shortStringHelper;
@@ -72,7 +74,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (display == null) throw new ArgumentNullException("display");
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
 
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
@@ -322,7 +324,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             switch (type)
             {
                 case Constants.Trees.PartialViews:
@@ -555,7 +557,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     ? relPath + display.Name
                     : relPath.EnsureEndsWith('/') + display.Name;
             }
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var file = getFileByName(relPath);
             if (file != null)
             {
@@ -608,7 +610,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             display.Name = EnsureCorrectFileExtension(display.Name, ".cshtml");
 
             Attempt<IPartialView> partialViewResult;
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
             var virtualPath = NormalizeVirtualPath(display.VirtualPath, systemDirectory);
             var view = getView(virtualPath);

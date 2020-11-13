@@ -222,7 +222,6 @@
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
-    <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
