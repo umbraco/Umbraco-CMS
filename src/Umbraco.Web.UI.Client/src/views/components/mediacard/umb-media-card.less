@@ -2,11 +2,11 @@
 umb-media-card {
     position: relative;
     display: inline-block;
-    width: 100%;
-    height: auto;
-    background-color: white;
-    border-radius: @doubleBorderRadius;
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    width: 200px;
+    //background-color: white;
+    border-radius: @baseBorderRadius;
+    //box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    overflow: hidden;
 
     transition: box-shadow 120ms;
 
@@ -23,7 +23,7 @@ umb-media-card {
             content: "";
             position: absolute;
             border: 2px solid @ui-active-border;
-            border-radius: @doubleBorderRadius;
+            border-radius: @baseBorderRadius;
             top:0;
             bottom: 0;
             left: 0;
@@ -37,7 +37,7 @@ umb-media-card {
             position: absolute;
             background-color:rgba(@ui-drop-area-color, .05);
             border: 2px solid rgba(@ui-drop-area-color, .1);
-            border-radius: @doubleBorderRadius;
+            border-radius: @baseBorderRadius;
             box-shadow: 0 0 4px rgba(@ui-drop-area-color, 0.05);
             top:0;
             bottom: 0;
@@ -54,16 +54,12 @@ umb-media-card {
 
     .__showcase {
         position: relative;
-        width: 100%;
-        padding-bottom: 10/16*100%;
-        background-color: @gray-12;
-        
-        background-size: contain;
-        background-position: 50% 50%;
-        background-repeat: no-repeat;
-        
-        border-top-left-radius: @doubleBorderRadius;
-        border-top-right-radius: @doubleBorderRadius;
+        max-width: 100%;
+        min-height: 120px;
+        max-height: 240px;
+        text-align: center;
+        //padding-bottom: 10/16*100%;
+        //background-color: @gray-12;
 
         &.--error {
             border: 2px solid @errorBackground;
@@ -72,27 +68,43 @@ umb-media-card {
             border-top-right-radius: 6px;
             box-sizing: border-box;
         }
+
+        img {
+            object-fit: contain;
+            max-height: 240px;
+        }
         
-        .__icon {
-            position: absolute;
+        umb-file-icon {
             width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size:42px;
+            padding-bottom: 100%;
+            display: block;
+            .umb-file-icon {
+                position: absolute;
+                top: 0;
+                bottom: 30px;
+                left: 10px;
+                right: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
     }
     
     .__info {
+        position: absolute;
+        text-align: left;
+        bottom: 0;
         width: 100%;
         background-color: #fff;
         padding-top: 10px;
         padding-bottom: 11px;// 10 + 1 to compentiate for the -1 substraction in margin-bottom.
-        border-bottom-left-radius: @doubleBorderRadius;
-        border-bottom-right-radius: @doubleBorderRadius;
+        
+        opacity: 0;
+        transition: opacity 120ms;
 
         &.--error {
+            opacity: 1;
             background-color: @errorBackground;
             .__name, .__subname {
                 color: @errorText;
@@ -117,6 +129,9 @@ umb-media-card {
     }
 
     &:hover {
+        .__info {
+            opacity: 1;
+        }
         .__info:not(.--error) {
             .__name {
                 color: @ui-action-type-hover;

@@ -1,22 +1,23 @@
 
-    <div class="__showcase">
+    <div class="__showcase" ng-class="{'--error':vm.media.trashed}">
 
-        <!-- IMAGE -->
-        <img ng-if="vm.media.thumbnail && vm.media.extension !== 'svg'"
-            ng-class="{'trashed': media.trashed}"
-            ng-src="{{vm.media.thumbnail}}"
-            ng-attr-title="{{vm.media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + vm.media.name : vm.media.name}}"
-            alt="{{vm.media.name}}" />
+        <div ng-if="vm.loading" class="umb-button__progress"></div>
 
-        <!-- SVG -->
-        <img ng-if="vm.media.thumbnail && vm.media.extension === 'svg'"
+        <!-- IMAGE and SVG-->
+        <img ng-if="vm.loading === false && vm.thumbnail"
             ng-class="{'trashed': vm.media.trashed}"
-            ng-src="{{vm.media.thumbnail}}"
+            ng-src="{{vm.thumbnail}}"
             ng-attr-title="{{vm.media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + vm.media.name : vm.media.name}}"
             alt="{{vm.media.name}}" />
+
+        <!--
+        <div class="__thumbnail" ng-if="vm.loading === false && vm.thumbnail"
+            ng-style="{'background-image':'url('+vm.thumbnail+')'}"
+            ng-class="{'trashed': vm.media.trashed}">
+        </div>-->
 
         <!-- FILE -->
-        <umb-file-icon ng-hide="vm.media.thumbnail"
+        <umb-file-icon ng-if="vm.loading === false && !vm.thumbnail"
             ng-class="{'trashed': vm.media.trashed}"
             extension="{{vm.media.extension}}"
             icon="{{vm.media.icon}}"
@@ -25,7 +26,7 @@
         </umb-file-icon>
 
     </div>
-    <button type="button" ng-click="vm.clickButton($event)" class="__info" ng-if="vm.media !== null">
+    <button type="button" ng-click="vm.onNameClicked(); $event.stopPropagation();" class="btn-reset __info" ng-class="{'--error':vm.media.trashed}" ng-if="vm.media !== null">
         <div class="__name" ng-bind="vm.media.name"></div>
         <div class="__subname" ng-if="vm.media.description" ng-bind="vm.media.description"></div>
     </button>

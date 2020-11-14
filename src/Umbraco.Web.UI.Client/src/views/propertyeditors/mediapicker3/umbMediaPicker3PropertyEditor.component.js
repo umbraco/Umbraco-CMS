@@ -60,12 +60,10 @@
 
         vm.$onInit = function() {
 
+            console.log("property model: ", vm.model)
+
             vm.singleMode = vm.model.config.singleMode || false;
             vm.validationLimit = vm.model.config.validationLimit;
-
-            if(typeof vm.model.value !== 'array' || vm.model.value === null) {
-                vm.model.value = [];
-            }
 
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -92,6 +90,12 @@
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
 
+            if(vm.model.value === null || !Array.isArray(vm.model.value)) {
+                vm.model.value = [];
+            }
+
+            vm.model.value.forEach(mediaEntry => updateMediaEntryData(mediaEntry));
+
             userService.getCurrentUser().then(function (userData) {
 
                 if (!vm.model.config.startNodeId) {
@@ -110,6 +114,8 @@
                 vm.allowAdd = hasAccessToMedia;
 
                 vm.loading = false;
+
+                //editMedia(vm.model.value[0]);
             });
 
         };
@@ -120,8 +126,8 @@
             }
         }
 
-        vm.add = add;
-        function add() {
+        vm.addMediaAt = addMediaAt;
+        function addMediaAt(createIndex, $event) {
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
@@ -129,15 +135,47 @@
                 multiPicker: vm.isSingleMode !== true,
                 submit: function (model) {
                     editorService.close();
+
+                    var indexIncrementor = 0;
+                    model.selection.forEach((entry) => {
+                        var mediaEntry = {};
+                        mediaEntry.key = String.CreateGuid();
+                        mediaEntry.mediaKey = entry.key;
+                        updateMediaEntryData(mediaEntry);
+                        vm.model.value.splice(createIndex + indexIncrementor, 0, mediaEntry);
+                        indexIncrementor++;
+                    });
+
                     setDirty();
                 },
-                close: function (model) {
+                close: function () {
                     editorService.close();
-                    reloadUpdatedMediaItems(model.updatedMediaNodes);
                 }
             }
 
             editorService.mediaPicker(mediaPicker);
+        }
+
+        function updateMediaEntryData(mediaEntry) {
+
+            mediaEntry.crops = mediaEntry.crops || [];
+            mediaEntry.focalPoint = mediaEntry.focalPoint || {
+                left: 0.5,
+                top: 0.5
+            };;
+
+            // Copy config and only transfer coordinates.
+            var newCrops = Utilities.copy(vm.model.config.crops);
+            newCrops.forEach(crop => {
+                console.log("mediaEntry.crops", mediaEntry.crops);
+                var oldCrop = mediaEntry.crops.filter(x => x.alias === crop.alias).shift();
+                console.log("oldCrop", oldCrop);
+                if (oldCrop && oldCrop.height === crop.height && oldCrop.width === crop.width) {
+                    crop.coordinates = oldCrop.coordinates;
+                }
+            });
+            mediaEntry.crops = newCrops;
+
         }
 
 
@@ -145,55 +183,49 @@
             vm.model.value = [];
         }
 
-        function activateBlock(mediaObject) {
-            mediaObject.active = true;
+        vm.activeMediaEntry = null;
+        function setActiveMedia(mediaEntryOrNull) {
+            vm.activeMediaEntry = mediaEntryOrNull;
         }
 
-        function editBlock(mediaObject, mediaIndex, parentForm) {
+        vm.editMedia = editMedia;
+        function editMedia(mediaEntry, options) {
 
             options = options || {};
 
-            // this must be set
-            if (mediaIndex === undefined) {
-                throw "mediaIndex was not specified on call to editBlock";
-            }
-
-            var wasNotActiveBefore = mediaObject.active !== true;
-            activateMedia(mediaObject);
+            setActiveMedia(mediaEntry);
 
             // make a clone to avoid editing model directly.
-            var mediaObjectClone = Utilities.copy(mediaObject);
+            var mediaEntryClone = Utilities.copy(mediaEntry);
 
-            var blockEditorModel = {
+            var mediaEditorModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
-                $parentForm: parentForm || vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
+                $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 createFlow: options.createFlow === true,
-                title: mediaObjectClone.label,
-                view: "views/common/infiniteeditors/MediaPicker3/mediapicker.html",
-                submit: function(blockEditorModel) {
-                    mediaObject.active = false;
+                title: "TODO media editor label",
+                mediaEntry: mediaEntryClone,
+                //cropsConfig: config.crops,
+                //api: vm,
+                view: "views/common/infiniteeditors/mediapicker3/mediaEntryEditor.html",
+                size: "large",
+                submit: function(model) {
+                    vm.model.value[vm.model.value.indexOf(mediaEntry)] = mediaEntryClone;
+                    setActiveMedia(null)
                     editorService.close();
                 },
                 close: function(model) {
-                    if (model.createFlow) {
-                        deleteBlock(mediaObject);
-                    } else {
-                        if (wasNotActiveBefore === true) {
-                            mediaObject.active = false;
-                        }
+                    if(model.createFlow === true) {
+                        // This means that the user cancelled the creation and we should remove the media item.
+                        // TODO: remove new media item.
                     }
+                    setActiveMedia(null)
                     editorService.close();
                 }
             };
 
             // open property settings editor
-            editorService.open(blockEditorModel);
+            editorService.open(mediaEditorModel);
         }
-
-        vm.showAddDialog = showAddDialog;
-        function showAddDialog(createIndex, $event) {
-            console.log("shoa add dialog")
-        };
 
         var requestCopyAllMedias = function() {
             // TODO..
@@ -213,7 +245,7 @@
 
         }
 
-        function requestDeleteBlock(block) {
+        function requestDeleteMedia(media) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -223,7 +255,7 @@
                         overlayService.close();
                     },
                     submit: function () {
-                        deleteBlock(block);
+                        deleteMedia(media);
                         overlayService.close();
                     }
                 };
@@ -240,7 +272,7 @@
                         overlayService.close();
                     },
                     submit: function () {
-                        deleteAllBlocks();
+                        deleteAllMedias();
                         overlayService.close();
                     }
                 });
@@ -249,8 +281,7 @@
 
 
         vm.sortableOptions = {
-            axis: "y",
-            containment: "parent",
+            //containment: "parent",
             cursor: "grabbing",
             handle: "umb-media-card",
             cancel: "input,textarea,select,option",

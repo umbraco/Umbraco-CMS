@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -11,14 +9,15 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker3,
-        EditorType.PropertyValue | EditorType.MacroParameter,
+        EditorType.PropertyValue,
         "Media Picker v3",
         "mediapicker3",
-        ValueType = ValueTypes.Text,
+        ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = Constants.Icons.MediaImage)]
     public class MediaPicker3PropertyEditor : DataEditor
     {
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPicker3PropertyEditor"/> class.
@@ -33,12 +32,13 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new MediaPicker3PropertyValueEditor(Attribute);
 
-        internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
+        internal class MediaPicker3PropertyValueEditor : DataValueEditor
         {
             public MediaPicker3PropertyValueEditor(DataEditorAttribute attribute) : base(attribute)
             {
             }
 
+            /*
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
                 var asString = value is string str ? str : value?.ToString();
@@ -51,8 +51,12 @@ namespace Umbraco.Web.PropertyEditors
                         yield return new UmbracoEntityReference(udi);
                 }
             }
-        }
-    }
+            */
 
+        }
+
+
+
+    }
 
 }
