@@ -15,7 +15,7 @@
 
             <div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
 
-                <div ng-show="vm.model.mediaEntry.media.trashed" class="umb-editor--trashed-message">
+                <div ng-show="vm.media.trashed" class="umb-editor--trashed-message">
                     <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
                 </div>
 
@@ -43,11 +43,24 @@
                         </div>
 
                         <div ng-if="!vm.currentCrop" class="umb-cropper-imageholder clearfix">
-                            <umb-image-gravity src="vm.imageSrc"
-                                            center="vm.mediaEntry.focalPoint"
-                                            on-value-changed="vm.focalPointChanged(left, top)"
-                                            on-image-loaded="vm.onImageLoaded(isCroppable, hasDimensions)">
+
+                            <umb-image-gravity
+                                ng-if="vm.imageSrc"
+                                src="vm.imageSrc"
+                                center="vm.mediaEntry.focalPoint"
+                                on-value-changed="vm.focalPointChanged(left, top)"
+                                on-image-loaded="vm.onImageLoaded(isCroppable, hasDimensions)">
                             </umb-image-gravity>
+
+                            <umb-file-icon
+                                ng-if="vm.loading === false && !vm.imageSrc"
+                                ng-class="{'trashed': vm.media.trashed}"
+                                extension="{{vm.media.extension}}"
+                                icon="{{vm.media.icon}}"
+                                size="s"
+                                text="{{vm.media.name}}">
+                            </umb-file-icon>
+
                             <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="content_uploadClear">Replace media</localize></button>
                             <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="content_uploadClear">Open media</localize></button>
                         </div>

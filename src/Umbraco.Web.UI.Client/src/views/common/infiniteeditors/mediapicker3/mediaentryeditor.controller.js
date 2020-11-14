@@ -43,7 +43,6 @@ angular.module("umbraco")
                     vm.loading = false;
                     vm.hasDimensions = false;
                     vm.isCroppable = false;
-                    console.log(vm.media);
                 }, function () {
                     localizationService.localize("mediaPicker_deletedItem").then(function (localized) {
                         vm.media = {
@@ -54,14 +53,12 @@ angular.module("umbraco")
                         vm.loading = false;
                         vm.hasDimensions = false;
                         vm.isCroppable = false;
-                        console.log(vm.media);
                     });
                 });
             }
 
             vm.onImageLoaded = onImageLoaded;
             function onImageLoaded(isCroppable, hasDimensions) {
-                console.log("onImageLoaded")
                 vm.isCroppable = isCroppable;
                 vm.hasDimensions = hasDimensions;
             };
@@ -112,7 +109,7 @@ angular.module("umbraco")
             vm.close = function () {
                 if (vm.model && vm.model.close) {
                     if (vm.model.createFlow === true || vm.imageCropperForm.$dirty === true) {
-                        var labels = vm.model.createFlow === true ? ["blockEditor_confirmCancelBlockCreationHeadline", "blockEditor_confirmCancelBlockCreationMessage"] : ["prompt_discardChanges", "blockEditor_blockHasChanges"];
+                        var labels = vm.model.createFlow === true ? ["media_confirmCancelMediaEntryCreationHeadline", "media_confirmCancelMediaEntryCreationMessage"] : ["prompt_discardChanges", "media_confirmCancelMediaEntryHasChanges"];
                         localizationService.localizeMany(labels).then(function (localizations) {
                             const confirm = {
                                 title: localizations[0],

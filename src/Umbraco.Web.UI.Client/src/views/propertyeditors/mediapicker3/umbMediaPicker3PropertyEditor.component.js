@@ -246,7 +246,7 @@
         }
 
         function requestDeleteMedia(media) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
+            localizationService.localizeMany(["general_delete", "media_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
                 const overlay = {
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [block.label]),
@@ -264,7 +264,7 @@
             });
         }
         function requestDeleteAllMedia() {
-            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+            localizationService.localizeMany(["media_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],
