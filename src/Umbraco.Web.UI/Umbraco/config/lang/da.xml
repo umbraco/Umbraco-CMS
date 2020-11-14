@@ -1084,7 +1084,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="openMedia">Åben medie</key>
     <key alias="replaceMedia">Udskift mediet</key>
     <key alias="resetMediaCrop">Nulstil medie beskæring</key>
-    <key alias="editMediaEntryLabel">Rediger brugen af%0%</key>
+    <key alias="editMediaEntryLabel">Rediger medie tilretninger</key>
     <key alias="confirmCancelMediaEntryCreationHeadline">Annuller indsættelse?</key>
     <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Er du sikker på at du vil annullere indsættelsen?]]></key>
     <key alias="confirmCancelMediaEntryHasChanges">Du har foretaget ændringer til bruge af dette media. Er du sikker på at du vil annullere?</key>

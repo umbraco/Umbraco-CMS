@@ -53,9 +53,10 @@
 
         vm.labels = {};
 
-        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty", "mediaPicker_editMediaEntryLabel"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
             vm.labels.content_createEmpty = data[1];
+            vm.labels.mediaPicker_editMediaEntryLabel = data[2];
         });
 
         vm.$onInit = function() {
@@ -202,7 +203,7 @@
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 createFlow: options.createFlow === true,
-                title: "TODO media editor label",
+                title: vm.label.mediaPicker_editMediaEntryLabel,
                 mediaEntry: mediaEntryClone,
                 //cropsConfig: config.crops,
                 //api: vm,
