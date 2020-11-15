@@ -857,8 +857,8 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
-              done.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              More information on editing web.config here.</a></p>]]></key>
+              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              More information on editing web.config here</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
         If you're installing on a local machine or server you might need information from your system administrator.]]></key>
@@ -905,7 +905,7 @@
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
@@ -973,7 +973,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
     <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
     <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
@@ -2444,7 +2444,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="trainingHeadline">Hours of Umbraco training videos are only a click away</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
+        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
     ]]>
     </key>
     <key alias="getStarted">To get you started</key>

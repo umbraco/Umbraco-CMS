@@ -359,7 +359,7 @@
     <key alias="databaseInstall"><![CDATA[Premi il tasto <strong>installa</strong> per installare il database Umbraco %0% ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% è stato copiato nel tuo database. Premi <strong>Avanti</strong> per proseguire.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database non trovato! Perfavore, controlla che le informazioni della stringa di connessione nel file "web.config" siano corrette.</p>
-<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]></key>
+<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener"> Maggiori dettagli per la modifica del file web.config qui</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Per completare questo passaggio, devi conoscere alcune informazioni riguardanti il tuo database server ("connection string"). Se è necessario contatta il tuo ISP per reperire le informazioni necessarie. Se stai effettuando l'installazione in locale o su un server, puoi richiederle al tuo amministratore di sistema]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Premi il tasto <strong>aggiorna</strong> per aggiornare il database ad Umbraco %0%</p><p>Non preoccuparti, il contenuto non verrà perso e tutto continuerà a funzionare dopo l'aggiornamento!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Il tuo database è stato aggiornato all'ultima versione %0%.<br />Premi il tasto <strong>Avanti</strong> per continuare.]]></key>
@@ -386,7 +386,7 @@
     <key alias="permissionsSettingUpPermissions"><![CDATA[Impostazione dei permessi delle cartelle]]></key>
     <key alias="permissionsText"><![CDATA[per poter archiviare file come immagini e PDF, Umbraco deve avere accesso in scrittura/modifica ad alcune directory. Inoltre per incrementare le prestazioni del tuo sito, deve essere possibile memorizzare informazioni temporanee (es: cache).]]></key>
     <key alias="runwayFromScratch"><![CDATA[Voglio partire da zero]]></key>
-    <key alias="runwayFromScratchText"><![CDATA[Il tuo sito al momento è completamente vuoto, e questo è il punto di partenza ideale per creare da zero i tuoi tipi documento e i tuoi templates. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Guarda come</a>) Puoi anche installare eventuali Runway in un secondo momento. Vai nella sezione Developer e scegli Pacchetti.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Il tuo sito al momento è completamente vuoto, e questo è il punto di partenza ideale per creare da zero i tuoi tipi documento e i tuoi templates. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Guarda come</a>) Puoi anche installare eventuali Runway in un secondo momento. Vai nella sezione Developer e scegli Pacchetti.]]></key>
     <key alias="runwayHeader"><![CDATA[Hai configurato una versione pulita della piattaforma Umbraco. Cosa vuoi fare adesso?]]></key>
     <key alias="runwayInstalled">Runway è installato</key>
     <key alias="runwayInstalledText"><![CDATA[
@@ -440,7 +440,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>

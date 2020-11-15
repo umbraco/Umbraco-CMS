@@ -403,8 +403,8 @@
               <p>
               <strong>Tekrar dene</strong>.
               <br />
-              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]></key>
+              <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Bu adımı tamamlamak için, veritabanı sunucusu ("bağlantı dizesi") ile ilgili bazı bilgileri bilmeniz gerekir.<br />
         Gerekirse ISS'nize irtibata geçiniz.
         Eğer yerel makine veya sunucu üzerinde yükleme ediyorsanız, sistem yöneticinizden bilgi gerekebilir.]]></key>
@@ -451,7 +451,7 @@
     <key alias="runwayFromScratch">Baştan başlamak istiyorum</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
@@ -518,7 +518,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="greeting6">İçerik Yönetim Sistemi</key>
     <key alias="instruction">Giriş Yapın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2015 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2015 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Gösterge Paneli</key>

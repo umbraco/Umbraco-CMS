@@ -812,7 +812,7 @@
               <p>Pour poursuivre, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scroller jusqu'en bas, ajouter le "connection string" pour votre base de données dans la ligne avec la clé "umbracoDbDSN" et sauvegarder le fichier.</p>
               <p>
               Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour réaliser cette étape, vous devez d'abord connaître des informations concernant votre serveur de base de données ("connection string").<br />
         Veuillez contacter votre fournisseur de services internet si nécessaire.
@@ -860,7 +860,7 @@
     <key alias="runwayFromScratch">Je veux démarrer "from scratch"</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Votre site est vide pour le moment, ce qui est parfait si vous voulez commencer "from scratch" et créer vos propres types de documents et modèles d'affichage.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
         Vous pouvez toujours choisir d'installer Runway plus tard. Pour cela, allez dans la section "Développeur" et sélectionnez "Packages".
       ]]></key>
     <key alias="runwayHeader">Vous venez de mettre en place une plateforme Umbraco toute nette. Que voulez-vous faire ensuite ?</key>
@@ -928,7 +928,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="signInWith">Identifiez-vous avec</key>
     <key alias="timeout">La session a expiré</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Mot de passe oublié?</key>
     <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
     <key alias="requestPasswordResetConfirmation">Un email contenant les instructions de ré-initialisation de votre mot de passe sera envoyée à l'adresse spécifiée si elle correspond à nos informations.</key>

@@ -504,7 +504,7 @@
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mer information om att redigera web.config hittar du här</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
@@ -532,7 +532,7 @@
     <key alias="permissionsSettingUpPermissions">Konfigurerar mapprättigheter</key>
     <key alias="permissionsText">Umbraco behöver skriv/ändra rättigheter till vissa mappar för att spara filer som bilder och PDFer. Umbraco sparar också temporär data (så kallad cache) för att öka prestandan på din webbplats.</key>
     <key alias="runwayFromScratch">Jag vill börja från början</key>
-    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
     <key alias="runwayHeader">Du har just installerat en ren Umbraco platform. Vad vill du göra härnäst?</key>
     <key alias="runwayInstalled">Runway är installerat</key>
     <key alias="runwayInstalledText"><![CDATA[Du har nu grunden på plats. Välj vilka moduler du vill installera ovanpå den.<br /> Det här är vår lista över rekommenderade moduler, markera de moduler du vill installera, eller visa den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fullständiga listan</a>]]></key>
@@ -567,7 +567,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>

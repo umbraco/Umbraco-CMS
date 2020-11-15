@@ -938,8 +938,8 @@
               <p>Er mwyn parhau, newidiwch y ffeil "web.config" (gan ddefnyddio Visual Studio neu eich hoff olygydd testun), rholiwch at y gwaelod, ychwanegwch y llinyn gyswllt ar gyfer eich cronfa ddata yn yr allwedd o'r enw "UmbracoDbDSN" ac achub y ffeil. </p>
               <p>
               Cliciwch y botwm <strong>ceisio eto</strong> pan rydych wedi
-              gorffen.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              Mwy o wybodaeth am newid y ffeil web.config yma.</a></p>]]>
+              gorffen.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Mwy o wybodaeth am newid y ffeil web.config yma</a>.</p>]]>
         </key>
         <key alias="databaseText">
             <![CDATA[Er mwyn cwblhau'r cam yma, rhaid i chi berchen gwybodaeth am eich gweinydd gronfa ddata ("llinyn gyswllt").<br />
@@ -1004,7 +1004,7 @@
         <key alias="runwayFromScratchText">
             <![CDATA[
         Mae eich gwefan yn hollol wag ar hyn o bryd, felly mae hynny'n berffaith os rydych chi eisiau cychwyn eto a chreu eich mathau o ddogfennau a thempledi eich hunain.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dysgwch sut</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dysgwch sut</a>)
         Gallwch ddewis i osod Runway yn hwyrach os hoffwch chi. Ewch at yr adran Datblygwr a dewiswch Pecynnau.
       ]]>
         </key>
@@ -1089,7 +1089,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="instruction">Mewngofnodwch isod</key>
         <key alias="signInWith">Mewngofnodwch gyda</key>
         <key alias="timeout">Sesiwn wedi cyrraedd terfyn amser</key>
-        <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+        <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
         <key alias="forgottenPassword">Wedi anghofio eich cyfrinair?</key>
         <key alias="forgottenPasswordInstruction">Bydd ebost yn cael ei anfon i'r cyfeiriad darparwyd gyda dolen i ailosod eich cyfrinair</key>
         <key alias="requestPasswordResetConfirmation">Bydd ebost gyda chyfarwyddiadau ailosod cyfrinair yn cael ei anfon at y cyfeiriad darparwyd os yw'n cyfateb â'n cofnodion</key>
