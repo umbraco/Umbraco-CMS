@@ -2438,7 +2438,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="helpText">
             <![CDATA[
             <p>Mae'r gwiriwr iechyd yn gwerthuso gwahanol rannau o'ch gwefan ar gyfer gosodiadau arfer gorau, cyfluniad, problemau posibl, ac ati. Gallwch chi drwsio problemau yn hawdd trwy wasgu botwm.
-            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
+            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
             ]]>
         </key>
         <key alias="tls12HealthCheckSuccess">Eich wefan gallu defnyddio y protocol gwarchodaeth TLS 1.2 wrth wneud cysylltiadau allanol i endpoints HTTPS</key>
@@ -2682,7 +2682,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="trainingHeadline">Oriau o fideos hyfforddiant Umbraco ddim ond un clic i fwrdd</key>
         <key alias="trainingDescription">
             <![CDATA[
-                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> am fwy o fideos am Umbraco</p>
+                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> am fwy o fideos am Umbraco</p>
             ]]>
         </key>
         <key alias="getStarted">I roi cychwyn i chi</key>
@@ -2693,27 +2693,27 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="more">Ddarganfod fwy</key>
         <key alias="bulletPointOne">
             <![CDATA[
-            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">fewn yr adran Dogfennaeth</a> o Our Umbraco
+            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco
         ]]>
         </key>
         <key alias="bulletPointTwo">
             <![CDATA[
-            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Fforwm Cymunedol</a>
+            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Fforwm Cymunedol</a>
         ]]>
         </key>
         <key alias="bulletPointThree">
             <![CDATA[
-            Gwyliwch ein <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">fideos tiwtorial</a> (mae rhai am ddim, ond bydd angen tanysgrifiad am rhai eraill)
+            Gwyliwch ein <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">fideos tiwtorial</a> (mae rhai am ddim, ond bydd angen tanysgrifiad am rhai eraill)
         ]]>
         </key>
         <key alias="bulletPointFour">
             <![CDATA[
-            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>
+            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>
         ]]>
         </key>
         <key alias="bulletPointFive">
             <![CDATA[
-            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">hyfforddi ac ardystio</a>
+            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">hyfforddi ac ardystio</a>
         ]]>
         </key>
     </area>

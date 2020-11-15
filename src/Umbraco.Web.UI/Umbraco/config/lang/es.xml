@@ -504,11 +504,11 @@
     <key alias="innerMargin">Margen interno</key>
     <key alias="insert">Insertar</key>
     <key alias="install">Instalar</key>
-        <key alias="invalid">Inválido</key>
+    <key alias="invalid">Inválido</key>
     <key alias="justify">Justificar</key>
     <key alias="label">Etiqueta</key>
     <key alias="language">Idioma</key>
-        <key alias="last">Último</key>
+    <key alias="last">Último</key>
     <key alias="layout">Diseño</key>
     <key alias="loading">Cargando</key>
     <key alias="locked">Bloqueado</key>
@@ -520,7 +520,7 @@
     <key alias="message">Mensaje</key>
     <key alias="move">Mover</key>
     <key alias="name">Nombre</key>
-        <key alias="new">Nuevo</key>
+    <key alias="new">Nuevo</key>
     <key alias="next">Próximo</key>
     <key alias="no">No</key>
     <key alias="of">de</key>

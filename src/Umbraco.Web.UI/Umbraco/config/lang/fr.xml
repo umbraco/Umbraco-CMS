@@ -2320,7 +2320,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="trainingHeadline">Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
+        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
     ]]>
     </key>
     <key alias="getStarted">Pour démarrer</key>
@@ -2331,27 +2331,27 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="more">En savoir plus</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
+            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">outils d'amélioration de productivité et notre support commercial</a>
+            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">outils d'amélioration de productivité et notre support commercial</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">formations et certifications</a>
+            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>
         ]]>
     </key>
   </area>
