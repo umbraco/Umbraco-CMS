@@ -20,7 +20,7 @@
         vm.toggleDefault = toggleDefault;
 
         var currCulture = null;
-        var editLanguage = "";
+        
         function init() {
 
             // localize labels
@@ -47,6 +47,7 @@
                 vm.labels.addLanguage = values[5];
                 vm.labels.noFallbackLanguageOption = values[6];
                 vm.labels.areYouSure = values[9];
+                vm.labels.editLanguage = values[10];
 
                 $scope.properties = {
                     fallbackLanguage: {
@@ -61,7 +62,6 @@
                     $scope.$emit("$changeTitle", vm.labels.addLanguage);
                 }
                 addLanguage = vm.labels.addLanguage;
-                editLanguage = values[10];
             });
 
             vm.loading = true;
@@ -94,7 +94,7 @@
                     vm.language = lang;
 
                     vm.page.name = vm.language.name;
-                    $scope.$emit("$changeTitle", editLanguage + ": " + vm.page.name);
+                    $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.page.name);
                     /* we need to store the initial default state so we can disable the toggle if it is the default.
                     we need to prevent from not having a default language. */
                     vm.initIsDefault = Utilities.copy(vm.language.isDefault);
