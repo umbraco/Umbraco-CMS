@@ -3,7 +3,7 @@
   <creator>
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
-  </creator> 
+  </creator>
   <area alias="actions">
     <key alias="assignDomain">Kültür ve Ana Bilgisayar Adları</key>
     <key alias="auditTrail">Denetim Yolu</key>
@@ -102,14 +102,15 @@
     <key alias="domainUpdated">'%0%' etki alanı güncellendi</key>
     <key alias="orEdit">Mevcut Etki Alanlarını Düzenle</key>
     <key alias="domainHelpWithVariants">
-    <![CDATA[Geçerli alan adları: "example.com", "www.example.com", "example.com:8080" veya "https://www.example.com/".
-     Ayrıca, alanlardaki tek seviyeli yollar da desteklenir, örn. "example.com/tr" veya "/en".]]></key>
+      <![CDATA[Geçerli alan adları: "example.com", "www.example.com", "example.com:8080" veya "https://www.example.com/".
+     Ayrıca, alanlardaki tek seviyeli yollar da desteklenir, örn. "example.com/tr" veya "/en".]]>
+    </key>
     <key alias="inherit">Devral</key>
     <key alias="setLanguage">Kültür</key>
-        <key alias="setLanguageHelp">
-        <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br /> 
+    <key alias="setLanguageHelp">
+      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br /> 
         aşağıdaki alan da geçerli değilse geçerli düğüme.]]>
-       </key>
+    </key>
     <key alias="setDomains">Alanlar</key>
   </area>
   <area alias="buttons">
@@ -316,7 +317,7 @@
     <key alias="variantsToSendForApproval">Onaya gönderilecek çeşitleri seçin.</key>
     <key alias="variantsToSchedule">Planlanmış yayınlamayı ayarlayın...</key>
     <key alias="variantsToUnpublish">Yayından kaldırılacak varyantları seçin. Zorunlu bir dilin yayından kaldırılması tüm değişkenleri yayından kaldıracaktır.</key>
-    <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key> 
+    <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key>
 
     <key alias="notReadyToPublish">Yayınlamaya hazır değiliz</key>
     <key alias="readyToPublish">Yayınlamaya hazır mısınız?</key>
@@ -514,21 +515,25 @@
     <key alias="selectEditor">Düzenleyici seçin</key>
     <key alias="selectSnippet">Snippet seçin</key>
     <key alias="variantdeletewarning">Bu, düğümü ve tüm dillerini silecektir. Yalnızca bir dili silmek istiyorsanız, bunun yerine düğümü o dilde yayından kaldırmalısınız.</key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <b>%0%</b> kullanıcısını kaldıracaktır.]]></key> 
-    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1%</b> grubundan kaldıracak]]></key>   
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <b>%0%</b> kullanıcısını kaldıracaktır.]]></key>
+    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1%</b> grubundan kaldıracak]]></key>
     <key alias="yesRemove">Evet, kaldır</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">Sözlük öğesi yok.</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[
+    <key alias="description">
+      <![CDATA[
       Aşağıdaki sözlük öğesi '<em>%0%</em>' için farklı dil sürümlerini düzenleyin
-   ]]></key>
+   ]]>
+    </key>
     <key alias="displayName">Kültür Adı</key>
-    <key alias="changeKeyError"><![CDATA[
+    <key alias="changeKeyError">
+      <![CDATA[
       '%0%' anahtarı zaten var.
-   ]]></key>
+   ]]>
+    </key>
     <key alias="overviewTitle">Sözlüğe genel bakış</key>
   </area>
   <area alias="examineManagement">
@@ -543,12 +548,13 @@
     <key alias="manageIndexes">İnceleme dizinlerini yönetin</key>
     <key alias="manageIndexesDescription">Her dizinin ayrıntılarını görüntülemenizi sağlar ve dizinleri yönetmek için bazı araçlar sağlar</key>
     <key alias="rebuildIndex">Dizini yeniden oluştur</key>
-    <key alias="rebuildIndexWarning"><![CDATA[
+    <key alias="rebuildIndexWarning">
+      <![CDATA[
       Bu, dizinin yeniden oluşturulmasına neden olacaktır. <br />
       Sitenizde ne kadar içerik olduğuna bağlı olarak bu biraz zaman alabilir. <br />
       Yüksek web sitesi trafiğinin olduğu zamanlarda veya editörler içeriği düzenlerken bir dizinin yeniden oluşturulması önerilmez.
      ]]>
-   </key>
+    </key>
     <key alias="searchers">Arayanlar</key>
     <key alias="searchDescription">Dizini arayın ve sonuçları görüntüleyin</key>
     <key alias="tools">Araçlar</key>
@@ -841,30 +847,38 @@
     <key alias="databaseErrorWebConfig">web.config dosyası kaydedilemedi. Lütfen bağlantı dizesini manuel olarak değiştirin.</key>
     <key alias="databaseFound">​​Veritabanınız bulundu ve</key> olarak tanımlandı
     <key alias="databaseHeader">Veritabanı yapılandırması</key>
-        <key alias="databaseInstall">
-            <![CDATA[
+    <key alias="databaseInstall">
+      <![CDATA[
       Umbraco %0% veritabanını yüklemek için <strong>kur</strong> düğmesine basın
     ]]>
-       </key>
+    </key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% artık veritabanınıza kopyalandı. Devam etmek için <strong>İleri</strong>'ye basın.]]></key>
-    <key alias="databaseNotFound">​​<![CDATA[<p> Veritabanı bulunamadı! Lütfen "web.config" dosyasının "bağlantı dizesindeki" bilgilerin doğru olup olmadığını kontrol edin. </p>
+    <key alias="databaseNotFound">
+      ​​<![CDATA[<p> Veritabanı bulunamadı! Lütfen "web.config" dosyasının "bağlantı dizesindeki" bilgilerin doğru olup olmadığını kontrol edin. </p>
               <p> Devam etmek için lütfen "web.config" dosyasını düzenleyin (Visual Studio veya favori metin düzenleyicinizi kullanarak), en alta kaydırın, veritabanınız için "UmbracoDbDSN" adlı anahtara bağlantı dizesini ekleyin ve dosyayı kaydedin. </p>
               <p>
               <strong> Yeniden dene </strong> düğmesini tıklayın.
               bitti. <br /> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-                                                        Web.config'i düzenleme hakkında daha fazla bilgi burada. </a> </p>]]></key>
-    <key alias="databaseText"><![CDATA[Bu adımı tamamlamak için, veritabanı sunucunuzla ilgili bazı bilgileri bilmeniz gerekir ("bağlantı dizesi"). <br />
+                                                        Web.config'i düzenleme hakkında daha fazla bilgi burada. </a> </p>]]>
+    </key>
+    <key alias="databaseText">
+      <![CDATA[Bu adımı tamamlamak için, veritabanı sunucunuzla ilgili bazı bilgileri bilmeniz gerekir ("bağlantı dizesi"). <br />
         Lütfen gerekirse ISS'niz ile iletişime geçin.
-        Yerel bir makineye veya sunucuya kurulum yapıyorsanız, sistem yöneticinizden bilgi almanız gerekebilir.]]></key>
-    <key alias="databaseUpgrade"><![CDATA[
+        Yerel bir makineye veya sunucuya kurulum yapıyorsanız, sistem yöneticinizden bilgi almanız gerekebilir.]]>
+    </key>
+    <key alias="databaseUpgrade">
+      <![CDATA[
       <p>
       Veritabanınızı Umbraco %0% sürümüne yükseltmek için <strong> yükselt </strong> düğmesine basın </p>
       <p>
       Endişelenmeyin - hiçbir içerik silinmeyecek ve daha sonra her şey çalışmaya devam edecek!
       </p>
-      ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Veritabanınız son sürüme %0% yükseltildi. <br /> için <strong> İleri </strong> 'ye basın
-      ilerlemek. ]]></key>
+      ]]>
+    </key>
+    <key alias="databaseUpgradeDone">
+      <![CDATA[Veritabanınız son sürüme %0% yükseltildi. <br /> için <strong> İleri </strong> 'ye basın
+      ilerlemek. ]]>
+    </key>
     <key alias="databaseUpToDate"><![CDATA[Mevcut veritabanınız güncel !. Yapılandırma sihirbazına devam etmek için <strong> ileri </strong> 'yi tıklayın]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong> Varsayılan kullanıcıların şifresinin değiştirilmesi gerekiyor! </strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong> Varsayılan kullanıcı devre dışı bırakıldı veya Umbraco'ya erişimi yok! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <b> İleri </b> 'yi tıklayın.]]></key>
@@ -876,41 +890,56 @@
     <key alias="permissionsAffectedFolders">Etkilenen dosyalar ve klasörler</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbraco için izinlerin ayarlanmasıyla ilgili daha fazla bilgiyi burada bulabilirsiniz</key>
     <key alias="permissionsAffectedFoldersText">Aşağıdaki dosyalara / klasörlere ASP.NET değiştirme izinleri vermeniz gerekiyor</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong> İzin ayarlarınız neredeyse mükemmel! </strong> <br /> <br />
-        Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen paketleri kuramazsınız.]]></key>
+    <key alias="permissionsAlmostPerfect">
+      <![CDATA[<strong> İzin ayarlarınız neredeyse mükemmel! </strong> <br /> <br />
+        Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen paketleri kuramazsınız.]]>
+    </key>
     <key alias="permissionsHowtoResolve">Nasıl Çözümlenir</key>
     <key alias="permissionsHowtoResolveLink">Metin sürümünü okumak için burayı tıklayın</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Umbraco için klasör izinlerinin ayarlanmasıyla ilgili <strong> eğitim videosunu </strong> izleyin veya metin sürümünü okuyun.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong> İzin ayarlarınız bir sorun olabilir! </strong>
+    <key alias="permissionsMaybeAnIssue">
+      <![CDATA[<strong> İzin ayarlarınız bir sorun olabilir! </strong>
       <br/> <br />
-      Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen klasörler oluşturamaz veya paketleri yükleyemezsiniz.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong> İzin ayarlarınız Umbraco için hazır değil! </strong>
+      Umbraco'yu sorunsuz bir şekilde çalıştırabilirsiniz, ancak Umbraco'dan tam olarak yararlanmanız için önerilen klasörler oluşturamaz veya paketleri yükleyemezsiniz.]]>
+    </key>
+    <key alias="permissionsNotReady">
+      <![CDATA[<strong> İzin ayarlarınız Umbraco için hazır değil! </strong>
           <br /> <br />
-          Umbraco'yu çalıştırmak için izin ayarlarınızı güncellemeniz gerekir.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong> İzin ayarlarınız mükemmel! </strong> <br /> <br />
-              Umbraco'yu çalıştırmaya ve paketleri kurmaya hazırsınız!]]></key>
+          Umbraco'yu çalıştırmak için izin ayarlarınızı güncellemeniz gerekir.]]>
+    </key>
+    <key alias="permissionsPerfect">
+      <![CDATA[<strong> İzin ayarlarınız mükemmel! </strong> <br /> <br />
+              Umbraco'yu çalıştırmaya ve paketleri kurmaya hazırsınız!]]>
+    </key>
     <key alias="permissionsResolveFolderIssues">Klasör sorununu çözme</key>
     <key alias="permissionsResolveFolderIssuesLink">ASP.NET ile ilgili sorunlar ve klasör oluşturma hakkında daha fazla bilgi için bu bağlantıyı izleyin</key>
     <key alias="permissionsSettingUpPermissions">Klasör izinlerini ayarlama</key>
-    <key alias="permissionsText"><![CDATA[
+    <key alias="permissionsText">
+      <![CDATA[
       Resimler ve PDF'ler gibi dosyaları depolamak için Umbraco'nun belirli dizinlere yazma / değiştirme erişimine ihtiyacı vardır.
       Ayrıca, web sitenizin performansını artırmak için geçici verileri (aka: önbellek) depolar.
-    ]]></key>
+    ]]>
+    </key>
     <key alias="runwayFromScratch">Sıfırdan başlamak istiyorum</key>
-    <key alias="runwayFromScratchText"><![CDATA[
+    <key alias="runwayFromScratchText">
+      <![CDATA[
         Web siteniz şu anda tamamen boş, bu nedenle sıfırdan başlamak ve kendi belge türlerinizi ve şablonlarınızı oluşturmak istiyorsanız bu mükemmel.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">nasıl yapılacağını öğrenin </a>)
         Yine de Runway'i daha sonra kurmayı seçebilirsiniz. Lütfen Geliştirici bölümüne gidin ve Paketleri seçin.
-      ]]></key>
+      ]]>
+    </key>
     <key alias="runwayHeader">Temiz bir Umbraco platformu kurdunuz. Bundan sonra ne yapmak istiyorsunuz?</key>
     <key alias="runwayInstalled">Runway yüklendi</key>
-    <key alias="runwayInstalledText"><![CDATA[
+    <key alias="runwayInstalledText">
+      <![CDATA[
       Temeliniz yerinde. Üzerine yüklemek istediğiniz modülleri seçin. <br />
       Bu, önerilen modüller listemizdir, yüklemek istediklerinizi işaretleyin veya <a href="#" onclick="toggleModules (); return false;" id="toggleModuleList">modüllerin tam listesi </a>
-      ]]></key>
+      ]]>
+    </key>
     <key alias="runwayOnlyProUsers">Yalnızca deneyimli kullanıcılar için önerilir</key>
     <key alias="runwaySimpleSite">Basit bir web sitesiyle başlamak istiyorum</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[
+    <key alias="runwaySimpleSiteText">
+      <![CDATA[
       <p>
       "Runway", bazı temel belge türlerini ve şablonlarını sunan basit bir web sitesidir. Yükleyici sizin için otomatik olarak Runway kurabilir,
         ancak kolayca düzenleyebilir, genişletebilir veya kaldırabilirsiniz. Bu gerekli değildir ve Umbraco'yu onsuz mükemmel bir şekilde kullanabilirsiniz. Ancak,
@@ -921,7 +950,8 @@
         <em> Runway'e Dahildir: </em> Ana sayfa, Başlarken sayfası, Modülleri Takma sayfası. <br />
         <em> İsteğe Bağlı Modüller: </em> Üst Gezinme, Site Haritası, İletişim, Galeri.
         </small>
-      ]]></key>
+      ]]>
+    </key>
     <key alias="runwayWhatIsRunway">Runway Nedir</key>
     <key alias="step1">Adım 1/5 Lisansı kabul edin</key>
     <key alias="step2">Adım 2/5: Veritabanı yapılandırması</key>
@@ -929,24 +959,36 @@
     <key alias="step4">4. Adım: Umbraco güvenliğini kontrol edin</key>
     <key alias="step5">Adım 5/5: Umbraco başlamanıza hazır</key>
     <key alias="thankYou">Umbraco'yu seçtiğiniz için teşekkür ederiz</key>
-    <key alias="theEndBrowseSite"><![CDATA[<h3> Yeni sitenize göz atın </h3>
-Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bakmıyorsunuz.]]></key>
-    <key alias="theEndFowseHelp"><![CDATA[<h3> Daha fazla yardım ve bilgi </h3>
-Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]></key>
+    <key alias="theEndBrowseSite">
+      <![CDATA[<h3> Yeni sitenize göz atın </h3>
+Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bakmıyorsunuz.]]>
+    </key>
+    <key alias="theEndFowseHelp">
+      <![CDATA[<h3> Daha fazla yardım ve bilgi </h3>
+Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]>
+    </key>
     <key alias="theEndHeader">Umbraco %0% yüklendi ve kullanıma hazır</key>
-    <key alias="theEndInstallFailed"><![CDATA[Kurulumu bitirmek için yapmanız gerekenler
-        <strong> /web.config dosyasını </strong> manuel olarak düzenleyin ve alttaki AppSetting anahtarını <strong> UmbracoConfigurationStatus </strong> <strong> '%0%' </strong> değerine güncelleyin.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Aşağıdaki "Umbraco'yu Başlat" düğmesini tıklayarak <strong> anında başlayabilirsiniz </strong>. <br /> <strong> Umbraco'da yeniyseniz </strong>,
-başlangıç ​​sayfalarımızda birçok kaynak bulabilirsiniz.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3> Umbraco’yu Başlat </h3>
-Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemeye başlayın, şablonları ve stil sayfalarını güncelleyin veya yeni işlevler ekleyin]]></key>
+    <key alias="theEndInstallFailed">
+      <![CDATA[Kurulumu bitirmek için yapmanız gerekenler
+        <strong> /web.config dosyasını </strong> manuel olarak düzenleyin ve alttaki AppSetting anahtarını <strong> UmbracoConfigurationStatus </strong> <strong> '%0%' </strong> değerine güncelleyin.]]>
+    </key>
+    <key alias="theEndInstallSuccess">
+      <![CDATA[Aşağıdaki "Umbraco'yu Başlat" düğmesini tıklayarak <strong> anında başlayabilirsiniz </strong>. <br /> <strong> Umbraco'da yeniyseniz </strong>,
+başlangıç ​​sayfalarımızda birçok kaynak bulabilirsiniz.]]>
+    </key>
+    <key alias="theEndOpenUmbraco">
+      <![CDATA[<h3> Umbraco’yu Başlat </h3>
+Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemeye başlayın, şablonları ve stil sayfalarını güncelleyin veya yeni işlevler ekleyin]]>
+    </key>
     <key alias="Unavailable">Veritabanına bağlantı başarısız oldu.</key>
     <key alias="Version3">Umbraco Sürüm 3</key>
     <key alias="Version4">Umbraco Sürüm 4</key>
     <key alias="watch">İzle</key>
-    <key alias="welcomeIntro"><![CDATA[Bu sihirbaz, yeni bir yükleme veya sürüm 3.0'dan yükseltme için <strong> Umbraco %0% </strong> 'u yapılandırma sürecinde size yol gösterecektir.
+    <key alias="welcomeIntro">
+      <![CDATA[Bu sihirbaz, yeni bir yükleme veya sürüm 3.0'dan yükseltme için <strong> Umbraco %0% </strong> 'u yapılandırma sürecinde size yol gösterecektir.
                                 <br /> <br />
-                                Sihirbazı başlatmak için <strong> "ileri" </strong> seçeneğine basın.]]></key>
+                                Sihirbazı başlatmak için <strong> "ileri" </strong> seçeneğine basın.]]>
+    </key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Kültür Kodu</key>
@@ -978,7 +1020,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="setPasswordConfirmation">Şifreniz güncellendi</key>
     <key alias="resetCodeExpired">Tıkladığınız bağlantı geçersiz veya süresi dolmuş</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Şifreyi Sıfırla</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+    <key alias="resetPasswordEmailCopyFormat">
+      <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -1058,7 +1101,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 				</table>
 			</body>
 		</html>              
-  ]]></key>
+  ]]>
+    </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -1082,7 +1126,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   <area alias="notifications">
     <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]></key> için bildiriminizi seçin
     <key alias="notificationSavedFor">için bildirim ayarları kaydedildi</key>
-    <key alias="mailBody"><![CDATA[
+    <key alias="mailBody">
+      <![CDATA[
       Merhaba %0%
  
       Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
@@ -1096,9 +1141,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       İyi günler!
  
       Umbraco robotunun alkışları
-    ]]></key>
+    ]]>
+    </key>
     <key alias="mailBodyVariantSummary">Aşağıdaki diller %0% değiştirildi</key>
-    <key alias="mailBodyHtml"><![CDATA[
+    <key alias="mailBodyHtml">
+      <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -1173,10 +1220,13 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 				</table>
 			</body>
 		</html>  
-	]]></key> 
-    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p> Aşağıdaki diller değiştirildi: </p>
+	]]>
+    </key>
+    <key alias="mailBodyVariantHtmlSummary">
+      <![CDATA[<p> Aşağıdaki diller değiştirildi: </p>
        %0%
-    ]]></key>
+    ]]>
+    </key>
     <key alias="mailSubject">[ %0%]%1% ile ilgili bildirim%2% üzerinde gerçekleştirildi</key>
     <key alias="notifications">Bildirimler</key>
   </area>
@@ -1184,10 +1234,12 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="actions">İşlemler</key>
     <key alias="created">Oluşturuldu</key>
     <key alias="createPackage">Paket oluştur</key>
-    <key alias="chooseLocalPackageText"><![CDATA[
+    <key alias="chooseLocalPackageText">
+      <![CDATA[
       Gözat düğmesine tıklayarak ve paketi bularak makinenizden Paketi seçin. <br/>
       Umbraco paketleri genellikle ".umb" veya ".zip" uzantısına sahiptir.
-      ]]></key>
+      ]]>
+    </key>
     <key alias="deletewarning">Bu, paketi silecek</key>
     <key alias="dropHere">Yüklemek için bırakın</key>
     <key alias="includeAllChildNodes">Tüm alt düğümleri dahil et</key>
@@ -1198,7 +1250,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="cancelAndUploadAnother">İptal edin ve başka bir paketi yükleyin</key>
     <key alias="accept">Kabul ediyorum</key>
     <key alias="termsOfUse">kullanım şartları</key>
- 
+
     <key alias="pathToFile">Dosyaya giden yol</key>
     <key alias="pathToFileDescription">Dosyaya giden mutlak yol (yani: /bin/umbraco.bin)</key>
     <key alias="installed">Yüklendi</key>
@@ -1242,8 +1294,10 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="packageMetaData">Meta verilerini paketle</key>
     <key alias="packageName">Paket adı</key>
     <key alias="packageNoItemsHeader">Paket herhangi bir öğe içermiyor</key>
-    <key alias="packageNoItemsText"><![CDATA[Bu paket dosyası kaldırılacak hiçbir öğe içermiyor.<br /><br/>
-      Aşağıdaki "Paketi kaldır"'ı tıklayarak bunu sistemden güvenle kaldırabilirsiniz.]]></key>
+    <key alias="packageNoItemsText">
+      <![CDATA[Bu paket dosyası kaldırılacak hiçbir öğe içermiyor.<br /><br/>
+      Aşağıdaki "Paketi kaldır"'ı tıklayarak bunu sistemden güvenle kaldırabilirsiniz.]]>
+    </key>
     <key alias="packageOptions">Paket seçenekleri</key>
     <key alias="packageReadme">Paketi beni oku</key>
     <key alias="packageRepository">Paket deposu</key>
@@ -1251,9 +1305,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="packageUninstalledHeader">Paket kaldırıldı</key>
     <key alias="packageUninstalledText">Paket başarıyla kaldırıldı</key>
     <key alias="packageUninstallHeader">Paketi kaldır</key>
-    <key alias="packageUninstallText"><![CDATA[Şu anda aşağıda, kaldırmak istemediğiniz öğelerin seçimini kaldırabilirsiniz. "Kaldırmayı onayla" yı tıkladığınızda işaretlenen tüm öğeler kaldırılacaktır. <br />
+    <key alias="packageUninstallText">
+      <![CDATA[Şu anda aşağıda, kaldırmak istemediğiniz öğelerin seçimini kaldırabilirsiniz. "Kaldırmayı onayla" yı tıkladığınızda işaretlenen tüm öğeler kaldırılacaktır. <br />
       <span style="color: Red; font-weight: bold;">Uyarı:</span> kaldırdığınız öğelere bağlı olarak herhangi bir belge, ortam vb. çalışmayı durdurur ve sistem kararsızlığına neden olabilir,
-      bu yüzden dikkatli bir şekilde kaldırın. Şüpheniz varsa, paket yazarıyla iletişime geçin.]]></key>
+      bu yüzden dikkatli bir şekilde kaldırın. Şüpheniz varsa, paket yazarıyla iletişime geçin.]]>
+    </key>
     <key alias="packageVersion">Paket versiyonu</key>
     <key alias="packageAlreadyInstalled">Paket zaten yüklü</key>
     <key alias="targetVersionMismatch">Bu paket kurulamaz, minimum Umbraco sürümü gerektirir</key>
@@ -1292,21 +1348,31 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="paMembersHelp">Belirli üyelere erişim vermek istiyorsanız</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease">
+      <![CDATA[
      %0%, öğenin yayınlanması planlandığından yayınlanamadı.
-    ]]></key>
-    <key alias="contentPublishedFailedExpired"><![CDATA[
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedExpired">
+      <![CDATA[
       Öğenin süresi dolduğu için %0% yayınlanamadı.
-    ]]></key>
-    <key alias="contentPublishedFailedInvalid"><![CDATA[
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
      %0%, şu özellikler nedeniyle yayınlanamadı:%1% doğrulama kurallarını geçemedi.
-    ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent">
+      <![CDATA[
      %0% yayınlanamadı, 3. taraf eklenti işlemi iptal etti.
-    ]]></key>
-    <key alias="contentPublishedFailedByParent"><![CDATA[
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
       Bir üst sayfa yayınlanmadığı için %0% yayınlanamaz.
-    ]]></key>
+    ]]>
+    </key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[ %0%, adı eksik olduğu için yayınlanamaz.]]></key>
     <key alias="includeUnpublished">Yayınlanmamış alt sayfaları dahil et</key>
     <key alias="inProgress">Yayınlanıyor - lütfen bekleyin ...</key>
@@ -1314,9 +1380,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="nodePublish">%0% yayınlandı</key>
     <key alias="nodePublishAll">%0% ve alt sayfalar yayınlandı</key>
     <key alias="publishAll">%0% ve tüm alt sayfalarını yayınlayın</key>
-    <key alias="publishHelp"><![CDATA[<strong>%0%</strong> yayınlamak ve böylece içeriğini herkese açık hale getirmek için <em>Yayınla</em>'yı tıklayın. <br/><br />
+    <key alias="publishHelp">
+      <![CDATA[<strong>%0%</strong> yayınlamak ve böylece içeriğini herkese açık hale getirmek için <em>Yayınla</em>'yı tıklayın. <br/><br />
       Aşağıdaki <em>Yayınlanmamış alt sayfaları ekle</em> 'yi işaretleyerek bu sayfayı ve tüm alt sayfalarını yayınlayabilirsiniz.
-      ]]></key>
+      ]]>
+    </key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Onaylanmış herhangi bir renk yapılandırmadınız</key>
@@ -1389,22 +1457,23 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Varsayılan şablon</key>
-    <key alias="importDocumentTypeHelp">Bir belge türünü içe aktarmak için, "Gözat" düğmesini tıklayarak bilgisayarınızda ".udt" dosyasını bulun ve "İçe Aktar" ı tıklayın (sonraki ekranda onay vermeniz istenir) < / anahtar>
+    <key alias="importDocumentTypeHelp">
+      Bir belge türünü içe aktarmak için, "Gözat" düğmesini tıklayarak bilgisayarınızda ".udt" dosyasını bulun ve "İçe Aktar" ı tıklayın (sonraki ekranda onay vermeniz istenir) </key>
     <key alias="newtabname">Yeni Sekme Başlığı</key>
-    <key alias="nodetype">Düğüm türü</key>
-    <key alias="objecttype">Tür</key>
-    <key alias="stylesheet">Stil Sayfası</key>
-    <key alias="script">Komut Dosyası</key>
-    <key alias="tab">Sekme</key>
-    <key alias="tabname">Sekme Başlığı</key>
-    <key alias="tabs">Sekmeler</key>
-    <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
-    <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
-    Ana İçerik Türü olarak <key alias="asAContentMasterType">. Ana İçerik Türlerinden sekmeler gösterilmez ve yalnızca Ana İçerik Türünün kendisinde düzenlenebilir</key>
-    <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
-    <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
-    <key alias="addIcon">Simge ekle</key>
-  </area>
+      <key alias="nodetype">Düğüm türü</key>
+      <key alias="objecttype">Tür</key>
+      <key alias="stylesheet">Stil Sayfası</key>
+      <key alias="script">Komut Dosyası</key>
+      <key alias="tab">Sekme</key>
+      <key alias="tabname">Sekme Başlığı</key>
+      <key alias="tabs">Sekmeler</key>
+      <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
+      <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
+      Ana İçerik Türü olarak <key alias="asAContentMasterType">. Ana İçerik Türlerinden sekmeler gösterilmez ve yalnızca Ana İçerik Türünün kendisinde düzenlenebilir</key>
+      <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
+      <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
+      <key alias="addIcon">Simge ekle</key>
+    </area>
   <area alias="sort">
     <key alias="sortOrder">Sıralama düzeni</key>
     <key alias="sortCreationDate">Oluşturma tarihi</key>
@@ -1518,40 +1587,46 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="insertDictionaryItemDesc">Sözlük öğesi, çevrilebilir bir metin parçası için yer tutucudur ve çok dilli web siteleri için tasarımlar oluşturmayı kolaylaştırır.</key>
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
-            Makro, yapılandırılabilir bir bileşendir ve aşağıdakiler için idealdir:
-            parametreler sağlama seçeneğine ihtiyaç duyduğunuz tasarımınızın yeniden kullanılabilir parçaları,
-            galeriler, formlar ve listeler gibi.
-       </key>
+      Makro, yapılandırılabilir bir bileşendir ve aşağıdakiler için idealdir:
+      parametreler sağlama seçeneğine ihtiyaç duyduğunuz tasarımınızın yeniden kullanılabilir parçaları,
+      galeriler, formlar ve listeler gibi.
+    </key>
     <key alias="insertPageField">Değer</key>
     <key alias="insertPageFieldDesc">Geçerli sayfadaki adlandırılmış bir alanın değerini, değeri değiştirme veya alternatif değerlere geri dönüş seçenekleri ile birlikte görüntüler.</key>
     <key alias="insertPartialView">Kısmi görünüm</key>
     <key alias="insertPartialViewDesc">
-            Kısmi görünüm, başka bir şablonun içinde oluşturulabilen ayrı bir şablon dosyasıdır.
-            şablonu, işaretlemeyi yeniden kullanmak veya karmaşık şablonları ayrı dosyalara ayırmak için harikadır.
-       </key>
+      Kısmi görünüm, başka bir şablonun içinde oluşturulabilen ayrı bir şablon dosyasıdır.
+      şablonu, işaretlemeyi yeniden kullanmak veya karmaşık şablonları ayrı dosyalara ayırmak için harikadır.
+    </key>
     <key alias="mastertemplate">Ana şablon</key>
     <key alias="noMaster">Ana yok</key>
     <key alias="renderBody">Alt şablonu oluştur</key>
-    <key alias="renderBodyDesc"><![CDATA[
+    <key alias="renderBodyDesc">
+      <![CDATA[
      Ekleyerek bir alt şablonun içeriğini işler
      <code>@RenderBody()</code> yer tutucusu.
-      ]]></key>
+      ]]>
+    </key>
     <key alias="defineSection">Adlandırılmış bir bölüm tanımlayın</key>
-    <key alias="defineSectionDesc"><![CDATA[
+    <key alias="defineSectionDesc">
+      <![CDATA[
          Şablonunuzun bir bölümünü, içine sararak adlandırılmış bir bölüm olarak tanımlar
           <code>@section { ... }</code>. Bu bir
           <code>@RenderSection</code> kullanarak bu şablonun üst öğesinin belirli bir alanı.
-      ]]></key>
+      ]]>
+    </key>
     <key alias="renderSection">Adlandırılmış bir bölüm oluşturun</key>
-    <key alias="renderSectionDesc"><![CDATA[
+    <key alias="renderSectionDesc">
+      <![CDATA[
       Bir <code>@RenderSection(ad)</code> yer tutucusu ekleyerek bir alt şablonun adlandırılmış alanını oluşturur.
       Bu, karşılık gelen bir <code>@section [ad] {...}</code> tanımına sarılmış bir alt şablon alanını oluşturur.
-      ]]></key>
+      ]]>
+    </key>
     <key alias="sectionName">Bölüm Adı</key>
     <key alias="sectionMandatory">Bölüm zorunludur</key>
     <key alias="sectionMandatoryDesc">
-            Zorunlu ise, alt şablon bir <code>@section</code> tanımı içermelidir, aksi takdirde bir hata gösterilir.
-       </key>
+      Zorunlu ise, alt şablon bir <code>@section</code> tanımı içermelidir, aksi takdirde bir hata gösterilir.
+    </key>
     <key alias="queryBuilder">Sorgu oluşturucu</key>
     <key alias="itemsReturned">öğe iade edildi,</key>
     <key alias="copyToClipboard">panoya kopyala</key>
@@ -1624,11 +1699,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="chooseExtra">Fazladan birini seçin</key>
     <key alias="chooseDefault">Varsayılanı seçin</key>
     <key alias="areAdded">eklendi</key>
-        <key alias="warning">Uyarı</key>
-        <key alias="youAreDeleting">Satır yapılandırmasını siliyorsunuz</key>
-        <key alias="deletingARow">
-            Bir satır yapılandırma adının silinmesi, bu yapılandırmaya dayalı mevcut herhangi bir içerik için veri kaybına neden olur.
-       </key>
+    <key alias="warning">Uyarı</key>
+    <key alias="youAreDeleting">Satır yapılandırmasını siliyorsunuz</key>
+    <key alias="deletingARow">
+      Bir satır yapılandırma adının silinmesi, bu yapılandırmaya dayalı mevcut herhangi bir içerik için veri kaybına neden olur.
+    </key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompozisyonlar</key>
@@ -1709,7 +1784,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="fallbackLanguage">Geri dönüş dili</key>
     <key alias="none">yok</key>
   </area>
- 
+
   <area alias="macro">
     <key alias="addParameter">Parametre ekle</key>
     <key alias="editParameter">Parametreyi düzenle</key>
@@ -1769,7 +1844,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="DownloadXmlDTD">XML DTD'yi İndir</key>
     <key alias="fields">Alanlar</key>
     <key alias="includeSubpages">Alt sayfaları dahil et</key>
-    <key alias="mailBody"><![CDATA[
+    <key alias="mailBody">
+      <![CDATA[
       Merhaba %0%
  
       Bu, '%1%' belgesinin size bildirilmesi için otomatik bir postadır.
@@ -1783,7 +1859,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       İyi günler!       
       
       Umbraco robotunun alkışları     
-      ]]></key>
+      ]]>
+    </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
     <key alias="pageHasBeenSendToTranslation">'%0%' sayfası çeviriye gönderildi</key>
     <key alias="sendToTranslate">'%0%' sayfasını çeviriye gönder</key>
@@ -1921,7 +1998,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="userInvitedSuccessHelp">Yeni kullanıcıya, Umbraco'da nasıl oturum açılacağına ilişkin ayrıntıları içeren bir davetiye gönderildi.</key>
     <key alias="userinviteWelcomeMessage">Merhabalar, Umbraco'ya hoş geldiniz! Sadece 1 dakika içinde hazır olacaksınız, sadece bir şifre belirlemeniz ve avatarınız için bir resim eklemeniz gerekiyor.</key>
     <key alias="userinviteExpiredMessage">Umbraco'ya hoş geldiniz! Maalesef davetinizin süresi doldu. Lütfen yöneticinizle iletişime geçin ve yeniden göndermesini isteyin.</key>
-        <key alias="userinviteAvatarMessage">Kendi fotoğrafınızı yüklemek, diğer kullanıcıların sizi tanımasını kolaylaştıracaktır. Fotoğrafınızı yüklemek için yukarıdaki daireyi tıklayın.</key>
+    <key alias="userinviteAvatarMessage">Kendi fotoğrafınızı yüklemek, diğer kullanıcıların sizi tanımasını kolaylaştıracaktır. Fotoğrafınızı yüklemek için yukarıdaki daireyi tıklayın.</key>
     <key alias="writer">Yazar</key>
     <key alias="change">Değiştir</key>
     <key alias="yourProfile" version="7.0">Profiliniz</key>
@@ -1932,7 +2009,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="sendInvite">Davet gönder</key>
     <key alias="backToUsers">Kullanıcılara dön</key>
     <key alias="inviteEmailCopySubject">Umbraco: Davet</key>
-    <key alias="inviteEmailCopyFormat"><![CDATA[
+    <key alias="inviteEmailCopyFormat">
+      <![CDATA[
     <html>
     <head>
         <meta name='viewport' content='width=device-width'>
@@ -2022,7 +2100,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
             </tr>
         </table>
     </body>                           
-</html>]]></key>
+</html>]]>
+    </key>
     <key alias="invite">Davet Et</key>
     <key alias="defaultInvitationMessage">Davetiye yeniden gönderiliyor ...</key>
     <key alias="deleteUser">Kullanıcıyı Sil</key>
@@ -2077,7 +2156,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="rectifySuccessMessage">Değer, '%3%' yapılandırma dosyasındaki XPath '%2%' için '%1%' olarak ayarlandı.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">'%3%' yapılandırma dosyasında '%2%' için '%1%' değeri bekleniyordu, ancak '%0%' bulundu.</key>
     <key alias="checkErrorMessageUnexpectedValue">'%3%' yapılandırma dosyasında '%2%' için beklenmeyen '%0%' değeri bulundu.</key>
-        <!-- The following keys get these tokens passed in:
+    <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 	  -->
@@ -2111,7 +2190,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.Https' web.config dosyanızda 'false' olarak ayarlandı. Bu siteye HTTPS şemasını kullanarak eriştiğinizde, bu 'doğru' olarak ayarlanmalıdır.</key>
     <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda '%0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
     <key alias="httpsCheckEnableHttpsError">Web.config dosyanızdaki 'Umbraco.Core.Https' ayarı güncellenemedi. Hata: %0%</key>
-    
+
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">HTTPS'yi etkinleştir</key>
     <key alias="httpsCheckEnableHttpsDescription">web.config dosyasının appSettings öğesinde umbracoSSL ayarını true olarak ayarlar.</key>
@@ -2135,50 +2214,52 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="filePermissionsCheckMessage">Tüm dosyalar doğru izinlere sahip.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
-  	-->    
+  	-->
     <key alias="requiredFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar, belirli Umbraco işlemlerinin çalışması için yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
-    <key alias="clickJackingCheckHeaderFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]> </ anahtar>
-    <key alias="clickJackingCheckHeaderNotFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]> < / anahtar>
+    <key alias="clickJackingCheckHeaderFound">
+      ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]> </key>
+      <key alias="clickJackingCheckHeaderNotFound">
+        ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]> </key>
     <key alias="setHeaderInConfig">Yapılandırmada Üstbilgiyi Ayarla</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">Sitenin diğer web siteleri tarafından IFRAMEd olmasını önlemek için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
-    <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
-    <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
-    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </key>
-    
-    <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-    <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
-    <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
-    <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Web.config'in httpProtocol / customHeaders bölümüne 'max-age=10886400' değerine sahip 'Strict-Transport-Security' başlığını ekler. Bu düzeltmeyi yalnızca alanlarınız önümüzdeki 18 hafta boyunca (minimum) https ile çalışacaksa kullanın.</key>
-    <key alias="hSTSSetHeaderInConfigSuccess">HSTS başlığı web.config dosyanıza eklendi.</key>
-    <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
-    <key alias="xssProtectionSetHeaderInConfigDescription">'X-XSS-Protection' başlığını '1; mode=block 'web.config'in httpProtocol / customHeaders bölümüne.</key>
-    <key alias="xssProtectionSetHeaderInConfigSuccess">X-XSS-Protection başlığı web.config dosyanıza eklendi.</key>
-    <!-- The following key get these tokens passed in:
+        <key alias="clickJackingSetHeaderInConfigDescription">Sitenin diğer web siteleri tarafından IFRAMEd olmasını önlemek için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
+        <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
+        <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
+        <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
+        <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </key>
+
+        <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
+        <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
+        <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
+        <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
+        <key alias="hSTSSetHeaderInConfigDescription">Web.config'in httpProtocol / customHeaders bölümüne 'max-age=10886400' değerine sahip 'Strict-Transport-Security' başlığını ekler. Bu düzeltmeyi yalnızca alanlarınız önümüzdeki 18 hafta boyunca (minimum) https ile çalışacaksa kullanın.</key>
+        <key alias="hSTSSetHeaderInConfigSuccess">HSTS başlığı web.config dosyanıza eklendi.</key>
+        <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
+        <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
+        <key alias="xssProtectionSetHeaderInConfigDescription">'X-XSS-Protection' başlığını '1; mode=block 'web.config'in httpProtocol / customHeaders bölümüne.</key>
+        <key alias="xssProtectionSetHeaderInConfigSuccess">X-XSS-Protection başlığı web.config dosyanıza eklendi.</key>
+        <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
-    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
-    <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
-    <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
-    <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
-    <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
-    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> edip.]]></key> olarak ayarlandı
-    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
-    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
-    <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
-    <key alias="checkGroup">Grubu kontrol et</key>
-    <key alias="helpText">
-        <![CDATA[
+        <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
+        <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
+        <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
+        <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
+        <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
+        <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
+        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> edip.]]></key> olarak ayarlandı
+        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
+        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
+        <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
+        <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
+        <key alias="checkGroup">Grubu kontrol et</key>
+        <key alias="helpText">
+          <![CDATA[
         <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
         Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
         ]]>
-   </key>
-  </area>
+        </key>
+      </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">URL izleyiciyi devre dışı bırakın</key>
     <key alias="enableUrlTracker">URL izleyiciyi etkinleştir</key>
@@ -2210,7 +2291,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mediaTrashed">Şu kimliğe sahip çöp kutusuna gönderilen medya: {0} Şu kimliğe sahip orijinal ana medya öğesiyle ilgili: {1}</key>
     <key alias="itemCannotBeRestored">Bu öğe otomatik olarak geri yüklenemez</key>
     <key alias="itemCannotBeRestoredHelpText">Bu öğenin otomatik olarak geri yüklenebileceği bir yer yok. Aşağıdaki ağacı kullanarak öğeyi manuel olarak taşıyabilirsiniz.</key>
-    <key alias="wasRestored">,</key> altında geri yüklendi
+    <key alias="wasRestored">altında geri yüklendi ,</key>
   </area>
   <area alias="relationType">
     <key alias="direction">Yön</key>
@@ -2277,9 +2358,9 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="name">Reklam</key>
     <key alias="addNewRow">Yeni satır ekle</key>
     <key alias="tabExpand">Diğer seçenekleri görüntüleyin</key>
-      <key alias="hasTranslation">Çeviri var</key>
-      <key alias="noTranslation">Eksik çeviri</key>
-      <key alias="dictionaryListCaption">Sözlük öğeleri</key>
+    <key alias="hasTranslation">Çeviri var</key>
+    <key alias="noTranslation">Eksik çeviri</key>
+    <key alias="dictionaryListCaption">Sözlük öğeleri</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referanslar</key>
@@ -2296,36 +2377,36 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="labelUsedByMedia">Medyada Kullanıldı</key>
   </area>
   <area alias="logViewer">
-      <key alias="deleteSavedSearch">Kaydedilmiş Aramayı Sil</key>
-      <key alias="logLevels">Günlük Düzeyleri</key>
-      <key alias="savedSearches">Kaydedilmiş Aramalar</key>
-      <key alias="saveSearch">Aramayı Kaydet</key>
-      <key alias="saveSearchDescription">Arama sorgunuz için kolay bir ad girin</key>
-      <key alias="filterSearch">Aramayı Filtrele</key>
-      <key alias="totalItems">Toplam Öğeler</key>
-      <key alias="timestamp">Zaman damgası</key>
-      <key alias="level">Seviye</key>
-      <key alias="machine">Makine</key>
-      <key alias="message">Mesaj</key>
-      <key alias="exception">İstisna</key>
-      <key alias="properties">Özellikler</key>
-      <key alias="searchWithGoogle">Google ile Ara</key>
-      <key alias="searchThisMessageWithGoogle">Bu mesajı Google ile ara</key>
-      <key alias="searchWithBing">Bing ile Ara</key>
-      <key alias="searchThisMessageWithBing">Bu iletiyi Bing ile ara</key>
-      <key alias="searchOurUmbraco">Umbraco'yu Arayın</key>
-      <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Bu iletiyi Umbraco forumlarımızda ve belgelerimizde arayın</key>
-      <key alias="searchOurUmbracoWithGoogle">Google ile Umbraco'muzda arama yapın</key>
-      <key alias="searchOurUmbracoForumsUsingGoogle">Umbraco forumlarımızda Google'ı kullanarak arama yapın</key>
-      <key alias="searchUmbracoSource">Umbraco Kaynağını Ara</key>
-      <key alias="searchWithinUmbracoSourceCodeOnGithub">Github'da Umbraco kaynak kodu içinde arama</key>
-      <key alias="searchUmbracoIssues">Umbraco Sorunlarını Ara</key>
-      <key alias="searchUmbracoIssuesOnGithub">Github'da Umbraco Sorunlarını Ara</key>
-      <key alias="deleteThisSearch">Bu aramayı sil</key>
-      <key alias="findLogsWithRequestId">İstek Kimliği Olan Günlükleri Bul</key>
-      <key alias="findLogsWithNamespace">Ad Alanına Sahip Günlükleri Bul</key>
-      <key alias="findLogsWithMachineName">Makine Adına Sahip Günlükleri Bul</key>
-      <key alias="open">Aç</key>
+    <key alias="deleteSavedSearch">Kaydedilmiş Aramayı Sil</key>
+    <key alias="logLevels">Günlük Düzeyleri</key>
+    <key alias="savedSearches">Kaydedilmiş Aramalar</key>
+    <key alias="saveSearch">Aramayı Kaydet</key>
+    <key alias="saveSearchDescription">Arama sorgunuz için kolay bir ad girin</key>
+    <key alias="filterSearch">Aramayı Filtrele</key>
+    <key alias="totalItems">Toplam Öğeler</key>
+    <key alias="timestamp">Zaman damgası</key>
+    <key alias="level">Seviye</key>
+    <key alias="machine">Makine</key>
+    <key alias="message">Mesaj</key>
+    <key alias="exception">İstisna</key>
+    <key alias="properties">Özellikler</key>
+    <key alias="searchWithGoogle">Google ile Ara</key>
+    <key alias="searchThisMessageWithGoogle">Bu mesajı Google ile ara</key>
+    <key alias="searchWithBing">Bing ile Ara</key>
+    <key alias="searchThisMessageWithBing">Bu iletiyi Bing ile ara</key>
+    <key alias="searchOurUmbraco">Umbraco'yu Arayın</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Bu iletiyi Umbraco forumlarımızda ve belgelerimizde arayın</key>
+    <key alias="searchOurUmbracoWithGoogle">Google ile Umbraco'muzda arama yapın</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Umbraco forumlarımızda Google'ı kullanarak arama yapın</key>
+    <key alias="searchUmbracoSource">Umbraco Kaynağını Ara</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Github'da Umbraco kaynak kodu içinde arama</key>
+    <key alias="searchUmbracoIssues">Umbraco Sorunlarını Ara</key>
+    <key alias="searchUmbracoIssuesOnGithub">Github'da Umbraco Sorunlarını Ara</key>
+    <key alias="deleteThisSearch">Bu aramayı sil</key>
+    <key alias="findLogsWithRequestId">İstek Kimliği Olan Günlükleri Bul</key>
+    <key alias="findLogsWithNamespace">Ad Alanına Sahip Günlükleri Bul</key>
+    <key alias="findLogsWithMachineName">Makine Adına Sahip Günlükleri Bul</key>
+    <key alias="open">Aç</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">%0% Kopyala</key>
@@ -2342,32 +2423,32 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="refreshStatus">Durumu yenile</key>
     <key alias="memoryCache">Bellek Önbelleği</key>
     <key alias="memoryCacheDescription">
-        <![CDATA[
+      <![CDATA[
             Bu düğme, bellek içi önbelleği veritabanından tamamen yeniden yükleyerek yeniden yüklemenizi sağlar.
     önbellek (ancak bu veritabanı önbelleğini yeniden oluşturmaz). Bu nispeten hızlıdır.
     Bazı olaylardan sonra önbelleğin düzgün şekilde yenilenmediğini düşündüğünüzde kullanın.
     küçük bir Umbraco sorununu gösterecek olan & mdash;
     (not: bir LB ortamındaki tüm sunucularda yeniden yüklemeyi tetikler).
     ]]>
-   </key>
+    </key>
     <key alias="reload">Yeniden yükle</key>
     <key alias="databaseCache">Veritabanı Önbelleği</key>
     <key alias="databaseCacheDescription">
-        <![CDATA[
+      <![CDATA[
     Bu düğme, veritabanı önbelleğini, yani cmsContentNu tablosunun içeriğini yeniden oluşturmanıza olanak sağlar.
     <strong> Yeniden oluşturmak pahalı olabilir. </strong>
     Yeniden yükleme yeterli olmadığında ve veritabanı önbelleğinin yüklenmediğini düşündüğünüzde kullanın.
     uygun şekilde oluşturulmuş&mdash; bu bazı kritik Umbraco sorunlarına işaret eder.
     ]]>
-   </key>
+    </key>
     <key alias="rebuild">Yeniden Oluştur</key>
     <key alias="internals">Dahili</key>
     <key alias="internalsDescription">
-        <![CDATA[
+      <![CDATA[
     Bu düğme, bir NuCache anlık görüntü koleksiyonunu tetiklemenizi sağlar (bir fullCLR GC çalıştırdıktan sonra).
     Bunun ne anlama geldiğini bilmiyorsanız, muhtemelen kullanmanız <em>gerekmez</em>.
     ]]>
-   </key>
+    </key>
     <key alias="collect">Topla</key>
     <key alias="publishedCacheStatus">Yayınlanmış Önbellek Durumu</key>
     <key alias="caches">Önbellekler</key>
@@ -2375,7 +2456,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   <area alias="profiling">
     <key alias="performanceProfiling">Performans profili oluşturma</key>
     <key alias="performanceProfilingDescription">
-        <![CDATA[
+      <![CDATA[
             <p>
                 Umbraco şu anda hata ayıklama modunda çalışıyor. Bu, sayfaları işlerken performansı değerlendirmek için yerleşik performans profilleyicisini kullanabileceğiniz anlamına gelir.
             </p>
@@ -2388,18 +2469,18 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                 Başka bir deyişle, profil oluşturucu yalnızca <i>tarayıcınızda</i> varsayılan olarak etkin olacaktır - diğer herkesin değil.
             </p>
     ]]>
-   </key>
+    </key>
     <key alias="activateByDefault">Profil oluşturucuyu varsayılan olarak etkinleştirin</key>
     <key alias="reminder">Kolay hatırlatma</key>
     <key alias="reminderDescription">
-        <![CDATA[
+      <![CDATA[
         <p>
             Bir üretim sitesinin hata ayıklama modunda çalışmasına asla izin vermemelisiniz. Web.config içindeki <b>&lt;compilation /&gt;</b> öğesinde <b> debug="false" </b> ayarlanarak hata ayıklama modu kapatılır.
         </p>
     ]]>
-   </key>
+    </key>
     <key alias="profilerEnabledDescription">
-        <![CDATA[
+      <![CDATA[
         <p>
             Umbraco şu anda hata ayıklama modunda çalışmadığından yerleşik profil oluşturucuyu kullanamazsınız. Bir üretim sahası için böyle olması gerekir.
         </p>
@@ -2407,15 +2488,15 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
             Hata ayıklama modu, web.config'deki <b>&lt;compilation /&gt;</b> öğesinde <b>debug="true"</b> ayarlanarak etkinleştirilir.
         </p>
     ]]>
-   </key>
+    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta</key>
     <key alias="trainingDescription">
-        <![CDATA[
+      <![CDATA[
             <p> Umbraco'da ustalaşmak mı istiyorsunuz? Umbraco'nun kullanımıyla ilgili bu videolardan birini izleyerek en iyi uygulamaları öğrenmek için birkaç dakikanızı ayırın. Daha da fazla Umbraco videosu için <a href="http://umbraco.tv" target="_blank">umbraco.tv </a> adresini ziyaret edin </p>
         ]]>
-   </key>
+    </key>
     <key alias="getStarted">Başlamak için</key>
   </area>
   <area alias="settingsDashboard">
@@ -2423,30 +2504,30 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="startDescription">Bu bölüm, Umbraco siteniz için yapı taşlarını içerir. Ayarlar bölümündeki öğelerle çalışma hakkında daha fazla bilgi edinmek için aşağıdaki bağlantıları izleyin</key>
     <key alias="more">Daha fazla bilgi edinin</key>
     <key alias="bulletPointOne">
-        <![CDATA[
+      <![CDATA[
         Ayarlar <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
     ]]>
-   </key>
+    </key>
     <key alias="bulletPointTwo">
-        <![CDATA[
+      <![CDATA[
         <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Topluluk Forumu</a>'nda bir soru sorun
     ]]>
-   </key>
+    </key>
     <key alias="bulletPointThree">
-        <![CDATA[
+      <![CDATA[
         <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">Eğitici videolarımızı</a> izleyin (bazıları ücretsiz, bazıları abonelik gerektirir)
     ]]>
-   </key>
+    </key>
     <key alias="bulletPointFour">
-        <![CDATA[
+      <![CDATA[
         <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">Üretkenliği artıran araçlarımız ve ticari desteğimiz </a> hakkında bilgi edinin
     ]]>
-   </key>
+    </key>
     <key alias="bulletPointFive">
-        <![CDATA[
+      <![CDATA[
         Gerçek hayattaki <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">eğitim ve sertifika </a> fırsatları hakkında bilgi edinin
     ]]>
-   </key>
+    </key>
   </area>
   <area alias="startupDashboard">
     <key alias="fallbackHeadline">Dost Canlısı CMS'e Hoş Geldiniz</key>
@@ -2500,7 +2581,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="whatDescription">İçerik Şablonları, yeni bir içerik düğümü oluştururken seçilebilen önceden tanımlanmış içeriklerdir.</key>
     <key alias="createHeadline">Nasıl İçerik Şablonu oluşturabilirim?</key>
     <key alias="createDescription">
-        <![CDATA[
+      <![CDATA[
             <p> İçerik Şablonu oluşturmanın iki yolu vardır: </p>
             <ul>
                 <li> Bir içerik düğümünü sağ tıklayın ve yeni bir İçerik Şablonu oluşturmak için "İçerik Şablonu Oluştur" u seçin. </li>
@@ -2508,7 +2589,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
             </ul>
             <p> Bir ad verildiğinde, editörler İçerik Şablonunu yeni sayfalarının temeli olarak kullanmaya başlayabilir. </p>
         ]]>
-   </key>
+    </key>
     <key alias="manageHeadline">İçerik Şablonlarını nasıl yönetirim?</key>
     <key alias="manageDescription">Ayarlar bölümündeki "İçerik Şablonları" ağacından İçerik Şablonlarını düzenleyebilir ve silebilirsiniz. İçerik Şablonunun dayandığı Belge Türünü genişletin ve düzenlemek veya silmek için tıklayın.</key>
   </area>
