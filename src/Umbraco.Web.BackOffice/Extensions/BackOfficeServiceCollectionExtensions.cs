@@ -85,11 +85,18 @@ namespace Umbraco.Extensions
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
-            services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
-
+        
             // CUSTOM:
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
+
+            /*
+             * IdentityBuilderExtensions.AddUserManager adds UserManager<BackOfficeIdentityUser> to service collection
+             * To validate the container the following registrations are required (dependencies of UserManager<T>)
+             * Perhaps we shouldn't be registering UserManager<T> at all and only registering/depending the UmbracoBackOffice prefixed types.
+             */
+            services.TryAddScoped<ILookupNormalizer, BackOfficeLookupNormalizer>();
+            services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);
         }
