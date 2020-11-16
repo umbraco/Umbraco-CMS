@@ -203,7 +203,7 @@
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 createFlow: options.createFlow === true,
-                title: vm.label.mediaPicker_editMediaEntryLabel,
+                title: vm.labels.mediaPicker_editMediaEntryLabel,
                 mediaEntry: mediaEntryClone,
                 //cropsConfig: config.crops,
                 //api: vm,
