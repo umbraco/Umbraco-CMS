@@ -36,29 +36,34 @@ namespace Umbraco.Web.Unversion
 
             var allContent = new List<IContent>();
 
-            // Get all content nodes
-            // Worried this could be crap for performance...
-            var rootContent = _contentService.GetRootContent();
-            allContent.AddRange(rootContent);
+            // Add TraceDuration - so users can see if this is taking a long time to calculate
+            using (_logger.TraceDuration<UnversionTask>("Calculating number of content nodes in site for Unversion", "Calculated number of nodes in site for Unversion"))
+            {               
+                // Get all content nodes
+                // Worried this could be bad for performance...
+                var rootContent = _contentService.GetRootContent();
+                allContent.AddRange(rootContent);
 
-            // For each top level root node get its descendants
-            foreach (var rootNode in rootContent)
-            {
-                var pageIndex = 0;
-                var itemCount = 0;
-                long totalRecords;
-
-                // Keep paging through all descendants until we have no more to fetch
-                do
+                // For each top level root node get its descendants
+                foreach (var rootNode in rootContent)
                 {
-                    var descendants = _contentService.GetPagedDescendants(rootNode.Id, pageIndex, 1, out totalRecords);
+                    var pageIndex = 0;
+                    var itemCount = 0;
+                    long totalRecords;
 
-                    pageIndex++;
-                    itemCount += descendants.Count();
+                    // Keep paging through all descendants in groups of 100 until we have no more to fetch
+                    do
+                    {
+                        var descendants = _contentService.GetPagedDescendants(rootNode.Id, pageIndex, 100, out totalRecords);
 
-                    allContent.AddRange(descendants);
-                } while (itemCount < totalRecords);
+                        pageIndex++;
+                        itemCount += descendants.Count();
 
+                        allContent.AddRange(descendants);
+                    } while (itemCount < totalRecords);
+                }
+
+                _logger.Info<UnversionTask>("The website contains a total number of content nodes {TotalContentNodes} to parse for unversion", allContent.Count);
             }
 
             // For each piece of content check if we need to unversion
