@@ -40,9 +40,9 @@
     <key alias="toInTheTreeStructureBelow">aşağıdaki ağaç yapısına</key>
     <key alias="infiniteEditorChooseWhereToCopy">Seçili öğelerin nereye kopyalanacağını seçin</key>
     <key alias="infiniteEditorChooseWhereToMove">Seçili öğelerin nereye taşınacağını seçin</key>
-    <key alias="wasMovedTo">,</key> konumuna taşındı
-    <key alias="wasCopiedTo">kopyalandı</key>
-    <key alias="wasDeleted">silindi</key>
+    <key alias="wasMovedTo">konumuna taşındı,</key>
+    <key alias="wasCopiedTo">kopyalandı,</key>
+    <key alias="wasDeleted">silindi,</key>
     <key alias="rights">İzinler</key>
     <key alias="rollback">Geri al</key>
     <key alias="sendtopublish">Yayınlamak İçin Gönder</key>
@@ -96,14 +96,14 @@
     <key alias="duplicateDomain">Etki alanı zaten atanmış.</key>
     <key alias="language">Dil</key>
     <key alias="domain">Alan</key>
-    <key alias="domainCreated">Yeni ' %0%' etki alanı oluşturuldu</key>
-    <key alias="domainDeleted">' %0%' alan adı silindi</key>
-    <key alias="domainExists">' %0%' etki alanı zaten atanmış</key>
-    <key alias="domainUpdated">' %0%' etki alanı güncellendi</key>
+    <key alias="domainCreated">Yeni '%0%' etki alanı oluşturuldu</key>
+    <key alias="domainDeleted">'%0%' alan adı silindi</key>
+    <key alias="domainExists">'%0%' etki alanı zaten atanmış</key>
+    <key alias="domainUpdated">'%0%' etki alanı güncellendi</key>
     <key alias="orEdit">Mevcut Etki Alanlarını Düzenle</key>
     <key alias="domainHelpWithVariants">
     <![CDATA[Geçerli alan adları: "example.com", "www.example.com", "example.com:8080" veya "https://www.example.com/".
-     Ayrıca, alanlardaki tek seviyeli yollar da desteklenir, örn. "example.com/tr" veya "/ en".]]></key>
+     Ayrıca, alanlardaki tek seviyeli yollar da desteklenir, örn. "example.com/tr" veya "/en".]]></key>
     <key alias="inherit">Devral</key>
     <key alias="setLanguage">Kültür</key>
         <key alias="setLanguageHelp">
@@ -247,10 +247,10 @@
     <key alias="nodeName">Sayfa başlığı</key>
     <key alias="noMediaLink">Bu medya öğesinin bağlantısı yok</key>
     <key alias="otherElements">Özellikler</key>
-    <key alias="parentNotPublished">Bu belge yayınlandı, ancak ' %0%' üst öğesi yayından kaldırıldığı için görünmüyor</key>
-    <key alias="parentCultureNotPublished">Bu kültür yayınlandı, ancak ' %0%' üst öğe üzerinde yayınlanmadığı için görünmüyor</key>
+    <key alias="parentNotPublished">Bu belge yayınlandı, ancak '%0%' üst öğesi yayından kaldırıldığı için görünmüyor</key>
+    <key alias="parentCultureNotPublished">Bu kültür yayınlandı, ancak '%0%' üst öğe üzerinde yayınlanmadığı için görünmüyor</key>
     <key alias="parentNotPublishedAnomaly">Bu belge yayınlandı, ancak önbellekte yok</key>
-    <key alias="getUrlException">url alınamadı</key>
+    <key alias="getUrlException">URL alınamadı</key>
     <key alias="routeError">Bu belge yayınlandı, ancak url'si %0% içeriğiyle çakışacak</key>
     <key alias="routeErrorCannotRoute">Bu belge yayınlandı, ancak url'si yönlendirilemez</key>
     <key alias="publish">Yayınla</key>
@@ -314,7 +314,7 @@
     <key alias="variantsToPublish">Hangi çeşitleri yayınlamak istersiniz?</key>
     <key alias="variantsToSave">Hangi değişkenlerin kaydedileceğini seçin.</key>
     <key alias="variantsToSendForApproval">Onaya gönderilecek çeşitleri seçin.</key>
-    <key alias="variantsToSchedule">Planlanmış yayınlamayı ayarlayın ...</key>
+    <key alias="variantsToSchedule">Planlanmış yayınlamayı ayarlayın...</key>
     <key alias="variantsToUnpublish">Yayından kaldırılacak varyantları seçin. Zorunlu bir dilin yayından kaldırılması tüm değişkenleri yayından kaldıracaktır.</key>
     <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key> 
 
@@ -328,11 +328,11 @@
     <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">' %0%' den yeni bir İçerik Şablonu oluşturun</key>
+    <key alias="createBlueprintFrom">'%0%' den yeni bir İçerik Şablonu oluşturun</key>
     <key alias="blankBlueprint">Boş</key>
     <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
     <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>
-    <key alias="createdBlueprintMessage">' %0%' üzerinden bir İçerik Şablonu oluşturuldu</key>
+    <key alias="createdBlueprintMessage">'%0%' üzerinden bir İçerik Şablonu oluşturuldu</key>
     <key alias="duplicateBlueprintMessage">Aynı ada sahip başka bir İçerik Şablonu zaten var</key>
     <key alias="blueprintDescription">İçerik Şablonu, bir düzenleyicinin yeni içerik oluşturmak için temel olarak kullanmak üzere seçebileceği önceden tanımlanmış içeriktir</key>
   </area>
@@ -360,13 +360,13 @@
     <key alias="createContentBlueprint">İçerik şablonu yapmak istediğiniz belge türünü seçin</key>
     <key alias="enterFolderName">Bir klasör adı girin</key>
     <key alias="updateData">Bir tür ve başlık seçin</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong> İzinler </strong> altında <strong> İzin verilen alt düğüm türlerini </strong> düzenleyerek <strong> Ayarlar </strong> bölümündeki <strong> Belge Türleri </strong> 'nde etkinleştirmelisiniz. ]]></key>
-    <key alias="noDocumentTypesAtRoot"><![CDATA[Burada içerik oluşturmak için uygun belge türü yok. Bunları <strong> Ayarlar </strong> bölümündeki <strong> Belge Türleri </strong> 'nde oluşturmanız gerekir.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[Burada içerik oluşturmak için uygun belge türü yok. Bunları <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekir.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">İçerik ağacında seçilen sayfa, altında herhangi bir sayfanın oluşturulmasına izin vermiyor.</key>
     <key alias="noDocumentTypesEditPermissions">Bu belge türü için izinleri düzenleyin</key>
     <key alias="noDocumentTypesCreateNew">Yeni bir belge türü oluşturun</key>
-    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong> İzinler </strong> altında <strong> Kök olarak izin ver </strong> seçeneğini değiştirerek, <strong> Ayarlar </strong> bölümündeki <strong> Belge Türleri </strong> 'nde etkinleştirmeniz gerekir. ]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong> İzinler </strong> altında <strong> İzin verilen alt düğüm türlerini </strong> düzenleyerek <strong> Ayarlar </strong> bölümündeki <strong> Medya Türleri </strong> 'nde etkinleştirmelisiniz. .]]></key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>İzinler</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Ağaçtaki seçili ortam, altında başka bir ortamın oluşturulmasına izin vermiyor.</key>
     <key alias="noMediaTypesEditPermissions">Bu medya türü için izinleri düzenleyin</key>
     <key alias="documentTypeWithoutTemplate">Şablonsuz Belge Türü</key>
@@ -467,7 +467,7 @@
     <key alias="recycleBinIsEmpty">Geri dönüşüm kutusu artık boş</key>
     <key alias="recycleBinWarning">Öğeler geri dönüşüm kutusundan silindiğinde sonsuza kadar kaybolacaklar</key>
     <key alias="regexSearchError"><![CDATA[<a target='_ blank' href='http: //regexlib.com'> regexlib.com </a> 'un web hizmeti şu anda bazı sorunlar yaşıyor ve biz üzerinde kontrol yok. Bu rahatsızlıktan dolayı çok üzgünüz.]]></key>
-    <key alias="regexSearchHelp">Bir form alanına doğrulama eklemek için normal ifade arayın. Örnek: 'e-posta,' posta kodu '' url '</key>
+    <key alias="regexSearchHelp">Bir form alanına doğrulama eklemek için normal ifade arayın. Örnek: 'e-posta,'posta kodu','URL'</key>
     <key alias="removeMacro">Makroyu Kaldır</key>
     <key alias="requiredField">Gerekli Alan</key>
     <key alias="sitereindexed">Site yeniden dizine eklendi</key>
@@ -501,7 +501,7 @@
     <key alias="selectSections">Bölümleri seçin</key>
     <key alias="selectUser">Kullanıcı seçin</key>
     <key alias="selectUsers">Kullanıcıları seçin</key>
-    <key alias="noIconsFound">Simge bulunamadı</key>
+    <key alias="noIconsFound">​​Simge bulunamadı</key>
     <key alias="noMacroParams">Bu makro için parametre yok</key>
     <key alias="noMacros">Eklenecek makro yok</key>
     <key alias="externalLoginProviders">Harici giriş sağlayıcıları</key>
@@ -515,7 +515,7 @@
     <key alias="selectSnippet">Snippet seçin</key>
     <key alias="variantdeletewarning">Bu, düğümü ve tüm dillerini silecektir. Yalnızca bir dili silmek istiyorsanız, bunun yerine düğümü o dilde yayından kaldırmalısınız.</key>
     <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <b>%0%</b> kullanıcısını kaldıracaktır.]]></key> 
-    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1% </b> grubundan kaldıracak]]></key>   
+    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1%</b> grubundan kaldıracak]]></key>   
     <key alias="yesRemove">Evet, kaldır</key>
   </area>
   <area alias="dictionary">
@@ -523,11 +523,11 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      Aşağıdaki sözlük öğesi '<em>%0% </em>' için farklı dil sürümlerini düzenleyin
+      Aşağıdaki sözlük öğesi '<em>%0%</em>' için farklı dil sürümlerini düzenleyin
    ]]></key>
     <key alias="displayName">Kültür Adı</key>
     <key alias="changeKeyError"><![CDATA[
-      ' %0%' anahtarı zaten var.
+      '%0%' anahtarı zaten var.
    ]]></key>
     <key alias="overviewTitle">Sözlüğe genel bakış</key>
   </area>
@@ -605,10 +605,10 @@
     <key alias="rteRelatedStylesheets">İlgili stil sayfaları</key>
     <key alias="rteShowLabel">Etiketi göster</key>
     <key alias="rteWidthAndHeight">Genişlik ve yükseklik</key>
-    <key alias="allPropTypes">Tüm mülk türleri & amp; emlak verileri</key>
+    <key alias="allPropTypes">Tüm mülk türleri &amp; emlak verileri</key>
     Bu veri türünü kullanan <key alias="willBeDeleted">kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın</key>
     <key alias="yesDelete">Evet, sil</key>
-    <key alias="andAllRelated">ve tüm mülk türleri & amp; bu veri türünü kullanan mülk verileri</key>
+    <key alias="andAllRelated">ve tüm mülk türleri &amp; bu veri türünü kullanan mülk verileri</key>
     <key alias="selectFolder">Taşınacak klasörü seçin</key>
     <key alias="inTheTree">aşağıdaki ağaç yapısına</key>
     <key alias="wasMoved">altına taşındı</key>
@@ -625,14 +625,14 @@
     <key alias="errorMandatoryWithoutTab">%0% zorunlu bir alandır</key>
     <key alias="errorRegExp">%1% konumunda %0% doğru biçimde değil</key>
     <key alias="errorRegExpWithoutTab">%0% doğru biçimde değil</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">' %0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Sunucudan bir hata aldı</key>
     <key alias="dissallowedMediaType">Belirtilen dosya türüne yönetici tarafından izin verilmedi</key>
     <key alias="codemirroriewarning">NOT! CodeMirror yapılandırma ile etkinleştirilmiş olsa da, yeterince kararlı olmadığı için Internet Explorer'da devre dışı bırakılmıştır.</key>
     <key alias="contentTypeAliasAndNameNotNull">Lütfen yeni özellik türünde hem takma adı hem de adı girin!</key>
-    <key alias="filePermissionsError">Belirli bir dosya veya klasöre okuma / yazma erişiminde sorun var</key>
+    <key alias="filePermissionsError">Belirli bir dosya veya klasöre okuma/yazma erişiminde sorun var</key>
     <key alias="macroErrorLoadingPartialView">Kısmi Görünüm komut dosyası yüklenirken hata oluştu (dosya: %0%)</key>
     <key alias="missingTitle">Lütfen bir başlık girin</key>
     <key alias="missingType">Lütfen bir tür seçin</key>
@@ -727,7 +727,7 @@
     <key alias="new">Yeni</key>
     <key alias="next">Sonraki</key>
     <key alias="no">Hayır</key>
-    <key alias="of">of</key>
+    <key alias="of">arasında</key>
     <key alias="off">Kapalı</key>
     <key alias="ok">Tamam</key>
     <key alias="open">Aç</key>
@@ -773,7 +773,7 @@
     <key alias="update">Güncelle</key>
     <key alias="upgrade">Yükselt</key>
     <key alias="upload">Yükle</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Kullanıcı</key>
     <key alias="username">Kullanıcı adı</key>
     <key alias="value">Değer</key>
@@ -787,7 +787,7 @@
     <key alias="reorderDone">Yeniden sıralamayı tamamladım</key>
     <key alias="preview">Önizleme</key>
     <key alias="changePassword">Şifreyi değiştir</key>
-    <key alias="to">to</key>
+    <key alias="to">için</key>
     <key alias="listView">Liste görünümü</key>
     <key alias="saving">Kaydediliyor ...</key>
     <key alias="current">mevcut</key>
@@ -823,8 +823,8 @@
     <key alias="moveLineDown">Satırları Aşağı Taşı</key>
     <key alias="generalHeader">Genel</key>
     <key alias="editorHeader">Düzenleyici</key>
-    <key alias="toggleAllowCultureVariants">Kültür varyantlarına izin ver / key>
-    <key alias="toggleAllowSegmentVariants">Bölümlemeye izin vermeyi aç / kapat</key>
+    <key alias="toggleAllowCultureVariants">Kültür varyantlarına izin ver </key>
+    <key alias="toggleAllowSegmentVariants">Bölümlemeye izin vermeyi aç/kapat</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Arka plan rengi</key>
@@ -843,10 +843,10 @@
     <key alias="databaseHeader">Veritabanı yapılandırması</key>
         <key alias="databaseInstall">
             <![CDATA[
-      Umbraco %0% veritabanını yüklemek için <strong> kur </strong> düğmesine basın
+      Umbraco %0% veritabanını yüklemek için <strong>kur</strong> düğmesine basın
     ]]>
        </key>
-    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% artık veritabanınıza kopyalandı. Devam etmek için <strong> İleri </strong> 'ye basın.]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% artık veritabanınıza kopyalandı. Devam etmek için <strong>İleri</strong>'ye basın.]]></key>
     <key alias="databaseNotFound">​​<![CDATA[<p> Veritabanı bulunamadı! Lütfen "web.config" dosyasının "bağlantı dizesindeki" bilgilerin doğru olup olmadığını kontrol edin. </p>
               <p> Devam etmek için lütfen "web.config" dosyasını düzenleyin (Visual Studio veya favori metin düzenleyicinizi kullanarak), en alta kaydırın, veritabanınız için "UmbracoDbDSN" adlı anahtara bağlantı dizesini ekleyin ve dosyayı kaydedin. </p>
               <p>
@@ -935,7 +935,7 @@ Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bak
 Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]></key>
     <key alias="theEndHeader">Umbraco %0% yüklendi ve kullanıma hazır</key>
     <key alias="theEndInstallFailed"><![CDATA[Kurulumu bitirmek için yapmanız gerekenler
-        <strong> /web.config dosyasını </strong> manuel olarak düzenleyin ve alttaki AppSetting anahtarını <strong> UmbracoConfigurationStatus </strong> <strong> ' %0%' </strong> değerine güncelleyin.]]></key>
+        <strong> /web.config dosyasını </strong> manuel olarak düzenleyin ve alttaki AppSetting anahtarını <strong> UmbracoConfigurationStatus </strong> <strong> '%0%' </strong> değerine güncelleyin.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Aşağıdaki "Umbraco'yu Başlat" düğmesini tıklayarak <strong> anında başlayabilirsiniz </strong>. <br /> <strong> Umbraco'da yeniyseniz </strong>,
 başlangıç ​​sayfalarımızda birçok kaynak bulabilirsiniz.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3> Umbraco’yu Başlat </h3>
@@ -1015,10 +1015,10 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 												<tr>
 													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
 														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
-															Password reset requested
+															Şifre sıfırlama istendi
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Your username to login to the Umbraco back-office is: <strong>%0%</strong>
+															Umbraco arka ofisinde oturum açmak için kullanıcı adınız: <strong>%0%</strong>
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
@@ -1026,14 +1026,14 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
 																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
-																				Click this link to reset your password
+																				Şifrenizi sıfırlamak için bu bağlantıyı tıklayın
 																			</a>
 																		</td>
 																	</tr>
 																</tbody>
 															</table>
 														</p>
-														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Bağlantıya tıklayamazsanız, bu URL'yi kopyalayıp tarayıcı pencerenize yapıştırın:</p>
 															<table border='0' cellpadding='0' cellspacing='0'>
 																<tr>
 																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
@@ -1080,7 +1080,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="relateToOriginal">Kopyalanan öğeleri orijinalle ilişkilendir</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications"><![CDATA[<strong>%0%</]]]></key> için bildiriminizi seçin
+    <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]></key> için bildiriminizi seçin
     <key alias="notificationSavedFor">için bildirim ayarları kaydedildi</key>
     <key alias="mailBody"><![CDATA[
       Merhaba %0%
@@ -1135,10 +1135,10 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 												<tr>
 													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
 														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
-															Hi %0%,
+															Merhaba %0%,
 														</h1>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															This is an automated mail to inform you that the task <strong>'%1%'</strong> has been performed on the page <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> by the user <strong>'%3%'</strong>
+                                                        <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                            Bu, <strong>'%1%'</strong> görevinin <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> sayfasında <strong>'%3%'</strong> kullanıcısı tarafından gerçekleştirildiğini size bildirmek için otomatik bir postadır.
 														</p>
 														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
 															<tbody>
@@ -1146,18 +1146,18 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>DÜZENLE</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
 														</table>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															<h3>Update summary:</h3>
+															<h3>Güncelleme Özeti:</h3>
 															%6%
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Have a nice day!<br /><br />
-															Cheers from the Umbraco robot
+															İyi günler dilerim!<br /><br />
+															Umbraco robottan Alkış
 														</p>
 													</td>
 												</tr>
@@ -1280,7 +1280,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="paErrorPageHelp">Kişiler oturum açtığında ancak erişimi olmadığında kullanılır</key>
     <key alias="paHowWould"><![CDATA[Sayfaya erişimi nasıl kısıtlayacağınızı seçin <strong>%0%</strong>]]></key>
     <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> artık korumalı]]></key>
-    <key alias="paIsRemoved"><![CDATA[Koruma, <strong>%0%</strong>]]]></key> sayfasından kaldırılmıştır.
+    <key alias="paIsRemoved"><![CDATA[Koruma, <strong>%0%</strong>]]></key> sayfasından kaldırılmıştır.
     <key alias="paLoginPage">Giriş Sayfası</key>
     <key alias="paLoginPageHelp">Giriş formunu içeren sayfayı seçin</key>
     <key alias="paRemoveProtection">Korumayı kaldır ...</key>
@@ -1635,7 +1635,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="grup">Grup</key>
     <key alias="noGroups">Hiçbir grup eklemediniz</key>
     <key alias="addGroup">Grup ekle</key>
-    <key alias="inheritedFrom">devralındı </key>
+    <key alias="inheritedFrom">devralındı ​​</key>
     <key alias="addProperty">Mülk ekle</key>
     <key alias="requiredLabel">Gerekli etiket</key>
     <key alias="enableListViewHeading">Liste görünümünü etkinleştir</key>
@@ -1785,8 +1785,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       Umbraco robotunun alkışları     
       ]]></key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
-    <key alias="pageHasBeenSendToTranslation">' %0%' sayfası çeviriye gönderildi</key>
-    <key alias="sendToTranslate">' %0%' sayfasını çeviriye gönder</key>
+    <key alias="pageHasBeenSendToTranslation">'%0%' sayfası çeviriye gönderildi</key>
+    <key alias="sendToTranslate">'%0%' sayfasını çeviriye gönder</key>
     <key alias="totalWords">Toplam kelime</key>
     <key alias="translateTo">Şu dile çevir</key>
     <key alias="translationDone">Çeviri tamamlandı.</key>
@@ -1874,10 +1874,10 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="lastLogin">Son giriş</key>
     <key alias="lastPasswordChangeDate">Parola son değiştirildi</key>
     <key alias="loginname">Kullanıcı Adı</key>
-    <key alias="mediastartnode">Medya başlangıç düğümü</key>
-    <key alias="mediastartnodehelp">Medya kitaplığını belirli bir başlangıç düğümüyle sınırlayın</key>
-    <key alias="mediastartnodes">Medya başlangıç düğümleri</key>
-    <key alias="mediastartnodeshelp">Medya kitaplığını belirli başlangıç düğümleriyle sınırlayın</key>
+    <key alias="mediastartnode">Medya başlangıç ​​düğümü</key>
+    <key alias="mediastartnodehelp">Medya kitaplığını belirli bir başlangıç ​​düğümüyle sınırlayın</key>
+    <key alias="mediastartnodes">Medya başlangıç ​​düğümleri</key>
+    <key alias="mediastartnodeshelp">Medya kitaplığını belirli başlangıç ​​düğümleriyle sınırlayın</key>
     <key alias="modules">Bölümler</key>
     <key alias="noConsole">Umbraco Erişimini Devre Dışı Bırak</key>
     <key alias="noLogin">henüz giriş yapmadı</key>
@@ -1933,96 +1933,96 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="backToUsers">Kullanıcılara dön</key>
     <key alias="inviteEmailCopySubject">Umbraco: Davet</key>
     <key alias="inviteEmailCopyFormat"><![CDATA[
-        <html>
-			<head>
-				<meta name='viewport' content='width=device-width'>
-				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
-			</head>
-			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
-				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
-				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
-					<tr>
-						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
-							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-								<tr>
-									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
-										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
-										<div> </div>
-										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
-									</td>
-									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
-					<tr>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
-							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
-								<br>
-								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
-									<tr>
-										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
-											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
-												<tr>
-													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
-														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
-															Hi %0%,
-														</h1>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
-														</p>
-														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
-															<br/>
-															<em>%2%</em>
-														</p>
-														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
-															<tbody>
-																<tr>
-																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
-																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
-																			<tbody>
-																				<tr>
-																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
-																							Click this link to accept the invite
-																						</a>
-																					</td>
-																				</tr>
-																			</tbody>
-																		</table>
-																	</td>
-																</tr>
-															</tbody>
-														</table>
-														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>
-															<table border='0' cellpadding='0' cellspacing='0'>
-																<tr>
-																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
-																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
-																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
-																		</font>
-																	</td>
-																</tr>
-															</table>
-														</p>
-													</td>
-												</tr>
-											</table>
-										</td>
-									</tr>
-								</table>
-								<br><br><br>
-							</div>
-						</td>
-						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
-					</tr>
-				</table>
-			</body>                           
-    </html>]]></key>
+    <html>
+    <head>
+        <meta name='viewport' content='width=device-width'>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    </head>
+    <body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+        <style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+        <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+            <tr>
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+                    <table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+                        <tr>
+                            <td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+                                <!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+                                <div> </div>
+                                <!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+                            </td>
+                            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+            <tr>
+                <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+                <td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+                    <div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+                        <br>
+                        <table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+                            <tr>
+                                <td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+                                    <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+                                        <tr>
+                                            <td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+                                                <h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+                                                    Merhaba %0%,
+                                                </h1>
+                                                <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                    <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> tarafından Umbraco Arka Ofisine davet edildiniz.
+                                                </p>
+                                                <p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+                                                    <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> tarafından gönderilen mesaj:
+                                                    <br/>
+                                                    <em>%2%</em>
+                                                </p>
+                                                <table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+                                                                <table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+                                                                                <a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+                                                                                    Daveti Kabul Etmek İçin Bu Bağlantıyı Tıklayın
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Bağlantıya tıklayamazsanız, bu URL'yi kopyalayıp tarayıcı pencerenize yapıştırın:</p>
+                                                    <table border='0' cellpadding='0' cellspacing='0'>
+                                                        <tr>
+                                                            <td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+                                                                <font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+                                                                    <a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+                                                                </font>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <br><br><br>
+                    </div>
+                </td>
+                <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+            </tr>
+        </table>
+    </body>                           
+</html>]]></key>
     <key alias="invite">Davet Et</key>
     <key alias="defaultInvitationMessage">Davetiye yeniden gönderiliyor ...</key>
     <key alias="deleteUser">Kullanıcıyı Sil</key>
@@ -2073,7 +2073,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 		   2: XPath
 		   3: Configuration file path
 	  -->
-    <key alias="checkSuccessMessage">Değer, önerilen değere ayarlandı: ' %0%'.</key>
+    <key alias="checkSuccessMessage">Değer, önerilen değere ayarlandı: '%0%'.</key>
     <key alias="rectifySuccessMessage">Değer, '%3%' yapılandırma dosyasındaki XPath '%2%' için '%1%' olarak ayarlandı.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">'%3%' yapılandırma dosyasında '%2%' için '%1%' değeri bekleniyordu, ancak '%0%' bulundu.</key>
     <key alias="checkErrorMessageUnexpectedValue">'%3%' yapılandırma dosyasında '%2%' için beklenmeyen '%0%' değeri bulundu.</key>
@@ -2081,35 +2081,35 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 	     0: Current value
 		   1: Recommended value
 	  -->
-    <key alias="customErrorsCheckSuccessMessage">Özel hatalar ' %0%' olarak ayarlandı.</key>
-    <key alias="customErrorsCheckErrorMessage">Özel hatalar şu anda ' %0%' olarak ayarlı. Yayınlanmadan önce bunun '%1%' olarak ayarlanması önerilir.</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">Özel hatalar başarıyla ' %0%' olarak ayarlandı.</key>
-    <key alias="macroErrorModeCheckSuccessMessage">Makro Hatalar ' %0%' olarak ayarlandı.</key>
-    <key alias="macroErrorModeCheckErrorMessage">MacroErrors, makrolarda herhangi bir hata olması durumunda sitenizdeki bazı veya tüm sayfaların tamamen yüklenmesini önleyecek olan ' %0%' olarak ayarlanmıştır. Bunu düzeltmek, değeri "%1%" olarak ayarlayacaktır.</key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">Makro Hatalar artık ' %0%' olarak ayarlandı.</key>
+    <key alias="customErrorsCheckSuccessMessage">Özel hatalar '%0%' olarak ayarlandı.</key>
+    <key alias="customErrorsCheckErrorMessage">Özel hatalar şu anda '%0%' olarak ayarlı. Yayınlanmadan önce bunun '%1%' olarak ayarlanması önerilir.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Özel hatalar başarıyla '%0%' olarak ayarlandı.</key>
+    <key alias="macroErrorModeCheckSuccessMessage">Makro Hatalar '%0%' olarak ayarlandı.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors, makrolarda herhangi bir hata olması durumunda sitenizdeki bazı veya tüm sayfaların tamamen yüklenmesini önleyecek olan '%0%' olarak ayarlanmıştır. Bunu düzeltmek, değeri "%1%" olarak ayarlayacaktır.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">Makro Hatalar artık '%0%' olarak ayarlandı.</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Deneyin IIS Özel Hatalarını Atla ' %0%' olarak ayarlandı ve '%1%' IIS sürümünü kullanıyorsunuz.</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">IIS'yi Atlamayı Deneyin Özel Hataları şu anda ' %0%'. IIS sürümünüz (%2%) için bunu '%1%' olarak ayarlamanız önerilir.</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">IIS Özel Hatalarını Atlamayı deneyin başarıyla ' %0%' olarak ayarlandı.</key>
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Deneyin IIS Özel Hatalarını Atla '%0%' olarak ayarlandı ve '%1%' IIS sürümünü kullanıyorsunuz.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">IIS'yi Atlamayı Deneyin Özel Hataları şu anda '%0%'. IIS sürümünüz (%2%) için bunu '%1%' olarak ayarlamanız önerilir.</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">IIS Özel Hatalarını Atlamayı deneyin başarıyla '%0%' olarak ayarlandı.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">​​Dosya mevcut değil: ' %0%'.</key>
-    <key alias="configurationServiceNodeNotFound">​​<![CDATA[<strong> '%1%' </strong> yapılandırma dosyasında <strong> ' %0%' </strong> bulunamadı.]]> </ key >
+    <key alias="configurationServiceFileNotFound">​​Dosya mevcut değil: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound">​​<![CDATA[<strong> '%1%' </strong> yapılandırma dosyasında <strong> '%0%' </strong> bulunamadı.]]> </key>
     <key alias="configurationServiceError">Bir hata oluştu, tam hata için günlüğü kontrol edin: %0%.</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Veritabanı - Veritabanı şeması, Umbraco'nun bu sürümü için doğru</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">Veritabanı şemanızda %0% sorun algılandı (Ayrıntılar için günlüğe bakın)</key>
     <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Umbraco'nun mevcut sürümüne göre veritabanı şeması doğrulanırken bazı hatalar tespit edildi.</key>
     <key alias="httpsCheckValidCertificate">Web sitenizin sertifikası geçerlidir.</key>
-    <key alias="httpsCheckInvalidCertificate">Sertifika doğrulama hatası: ' %0%'</key>
+    <key alias="httpsCheckInvalidCertificate">Sertifika doğrulama hatası: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Web sitenizin SSL sertifikasının süresi doldu.</key>
     <key alias="httpsCheckExpiringCertificate">Web sitenizin SSL sertifikasının süresi %0% gün içinde doluyor.</key>
     <key alias="healthCheckInvalidUrl">URL %0% - '%1%' pinglenirken hata oluştu</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Şu anda HTTPS şemasını kullanarak siteyi %0% görüntülüyorsunuz.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.Https' web.config dosyanızda 'false' olarak ayarlandı. Bu siteye HTTPS şemasını kullanarak eriştiğinizde, bu 'doğru' olarak ayarlanmalıdır.</key>
-    <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda ' %0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
+    <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda '%0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
     <key alias="httpsCheckEnableHttpsError">Web.config dosyanızdaki 'Umbraco.Core.Https' ayarı güncellenemedi. Hata: %0%</key>
     
     <!-- The following keys don't get tokens passed in -->
@@ -2130,13 +2130,13 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFolderPermissionFailed"><![CDATA[Aşağıdaki klasörler, değiştirme izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</].]]></key>
+    <key alias="requiredFolderPermissionFailed"><![CDATA[Aşağıdaki klasörler, değiştirme izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[Aşağıdaki klasörler, belirli Umbraco işlemlerinin çalışması için değiştirme izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
     <key alias="filePermissionsCheckMessage">Tüm dosyalar doğru izinlere sahip.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->    
-    <key alias="requiredFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</”.]]></key>
+    <key alias="requiredFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar, belirli Umbraco işlemlerinin çalışması için yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
     <key alias="clickJackingCheckHeaderFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]> </ anahtar>
     <key alias="clickJackingCheckHeaderNotFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]> < / anahtar>
@@ -2145,7 +2145,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
     <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
     <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
-    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </ key >
+    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </key>
     
     <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
     <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
@@ -2160,15 +2160,15 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
-    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</💖.]]></key>
+    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
     <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
     <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
-    <key alias="smtpMailSettingsConnectionFail">' %0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
-    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</ edip.]]></key> olarak ayarlandı
-    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</💖.]]></key>
-    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html> <body> <p>%0% tarihinde%1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2% ​​< / body> </html>]]></key>
+    <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> edip.]]></key> olarak ayarlandı
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
     <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
     <key alias="checkGroup">Grubu kontrol et</key>
@@ -2188,7 +2188,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="panelInformation">Aşağıdaki URL'ler bu içerik öğesine yönlendiriyor:</key>
     <key alias="noRedirects">Yönlendirme yapılmadı</key>
     <key alias="noRedirectsDescription">Yayınlanan bir sayfa yeniden adlandırıldığında veya taşındığında, yeni sayfaya otomatik olarak bir yönlendirme yapılır.</key>
-    <key alias="confirmRemove">' %0%' dan '%1%' e yönlendirmeyi kaldırmak istediğinizden emin misiniz?</key>
+    <key alias="confirmRemove">'%0%' dan '%1%' e yönlendirmeyi kaldırmak istediğinizden emin misiniz?</key>
     <key alias="redirectRemoved">Yönlendirme URL'si kaldırıldı.</key>
     <key alias="redirectRemoveError">Yönlendirme URL'sini kaldırma hatası.</key>
     <key alias="redirectRemoveWarning">Bu, yönlendirmeyi kaldırır</key>
@@ -2357,7 +2357,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     Bu düğme, veritabanı önbelleğini, yani cmsContentNu tablosunun içeriğini yeniden oluşturmanıza olanak sağlar.
     <strong> Yeniden oluşturmak pahalı olabilir. </strong>
     Yeniden yükleme yeterli olmadığında ve veritabanı önbelleğinin yüklenmediğini düşündüğünüzde kullanın.
-    uygun şekilde oluşturulmuş & mdash; bu bazı kritik Umbraco sorunlarına işaret eder.
+    uygun şekilde oluşturulmuş&mdash; bu bazı kritik Umbraco sorunlarına işaret eder.
     ]]>
    </key>
     <key alias="rebuild">Yeniden Oluştur</key>
@@ -2365,7 +2365,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="internalsDescription">
         <![CDATA[
     Bu düğme, bir NuCache anlık görüntü koleksiyonunu tetiklemenizi sağlar (bir fullCLR GC çalıştırdıktan sonra).
-    Bunun ne anlama geldiğini bilmiyorsanız, muhtemelen kullanmanız <em> gerekmez </em>.
+    Bunun ne anlama geldiğini bilmiyorsanız, muhtemelen kullanmanız <em>gerekmez</em>.
     ]]>
    </key>
     <key alias="collect">Topla</key>
@@ -2385,7 +2385,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
             <p>
                 Profilcinin tüm sayfa görüntülemeleri için varsayılan olarak etkinleştirilmesini istiyorsanız, aşağıdaki geçişi kullanabilirsiniz.
                 Tarayıcınızda, profil oluşturucuyu otomatik olarak etkinleştiren bir çerez ayarlayacaktır.
-                Başka bir deyişle, profil oluşturucu yalnızca <i> tarayıcınızda </i> varsayılan olarak etkin olacaktır - diğer herkesin değil.
+                Başka bir deyişle, profil oluşturucu yalnızca <i>tarayıcınızda</i> varsayılan olarak etkin olacaktır - diğer herkesin değil.
             </p>
     ]]>
    </key>
@@ -2394,7 +2394,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="reminderDescription">
         <![CDATA[
         <p>
-            Bir üretim sitesinin hata ayıklama modunda çalışmasına asla izin vermemelisiniz. Web.config içindeki <b> & lt; compilation / & gt; </b> öğesinde <b> debug="false" </b> ayarlanarak hata ayıklama modu kapatılır.
+            Bir üretim sitesinin hata ayıklama modunda çalışmasına asla izin vermemelisiniz. Web.config içindeki <b>&lt;compilation /&gt;</b> öğesinde <b> debug="false" </b> ayarlanarak hata ayıklama modu kapatılır.
         </p>
     ]]>
    </key>
@@ -2449,7 +2449,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
    </key>
   </area>
   <area alias="startupDashboard">
-    <key alias="fallbackHeadline">Dostu CMS'ye Hoş Geldiniz</key>
+    <key alias="fallbackHeadline">Dost Canlısı CMS'e Hoş Geldiniz</key>
     <key alias="fallbackDescription">Umbraco'yu seçtiğiniz için teşekkür ederiz - bunun güzel bir şeyin başlangıcı olabileceğini düşünüyoruz. İlk başta bunaltıcı gibi görünse de, öğrenme eğrisini olabildiğince sorunsuz ve hızlı hale getirmek için çok şey yaptık.</key>
   </area>
   <area alias="formsDashboard">
@@ -2478,8 +2478,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="addCustomView">Özel görünüm ekle</key>
     <key alias="addSettingsElementType">Ayarları ekle</key>
     <key alias="labelTemplatePlaceholder">Etiket şablonunun üzerine yaz</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[<strong>%0%</strong>].]]></key> içeriğini silmek istediğinizden emin misiniz?
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[<strong>%0%</strong>].]]></key> blok yapılandırmasını silmek istediğinizden emin misiniz?
+    <key alias="confirmDeleteBlockMessage"><![CDATA[<strong>%0%</strong> içeriğini silmek istediğinizden emin misiniz?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[<strong>%0%</strong> blok yapılandırmasını silmek istediğinizden emin misiniz?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">Bu bloğun içeriği hala mevcut olacak, bu içeriğin düzenlenmesi artık kullanılamayacak ve desteklenmeyen içerik olarak gösterilecek.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA['%0%' Konfigürasyonu]]></key>
     <key alias="thumbnail">Küçük Resim</key>
