@@ -79,11 +79,53 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(res.Contains(90));            
         }
 
+        [Test]
+        public void GetVersions_Returns_Right_Based_Min_Count()
+        {
+            var config = new UnversionConfigEntry() { MinCount = 3 };
+
+            List<IContent> versions = new List<IContent>()
+            {
+                GetVersionMock(10, new DateTime(2019, 12, 10)).Object, // should be kept
+                GetVersionMock(20, new DateTime(2019, 12, 19)).Object, // should be kept
+                GetVersionMock(30, new DateTime(2019, 12, 20)).Object, // should be kept
+                GetVersionMock(40, new DateTime(2019, 12, 10)).Object, // should be deleted
+                GetVersionMock(50, new DateTime(2019, 12, 19)).Object, // should be deleted
+                GetVersionMock(60, new DateTime(2019, 12, 20)).Object, // should be deleted
+                GetVersionMock(70, new DateTime(2019, 12, 10)).Object, // should be deleted
+                GetVersionMock(80, new DateTime(2019, 12, 19)).Object, // should be deleted
+                GetVersionMock(90, new DateTime(2019, 12, 20)).Object, // should be deleted
+            };
+
+            var logger = Mock.Of<ILogger>();
+            var service = new UnversionService(null, logger, null, null);
+
+            var res = service.GetVersionsToDelete(versions, config, new DateTime(2019, 12, 30));
+
+            // Has 6 extra versions to remove (leaving the 3 min items we want)
+            Assert.IsTrue(res.Count == 6);
+
+            // Ensure the list of IDs does not contain the versions we want to keep
+            Assert.IsFalse(res.Contains(10));
+            Assert.IsFalse(res.Contains(20));
+            Assert.IsFalse(res.Contains(30));
+
+            // These ones should be deleted
+            Assert.IsFalse(res.Contains(40));
+            Assert.IsFalse(res.Contains(50));
+            Assert.IsTrue(res.Contains(60));
+            Assert.IsTrue(res.Contains(70));
+            Assert.IsTrue(res.Contains(80));
+            Assert.IsTrue(res.Contains(90));
+        }
+
         private Mock<IContent> GetVersionMock(int versionId, DateTime updateDate)
         {
             var mock = new Mock<IContent>();
+            mock.Setup(x => x.Key).Returns(Guid.NewGuid());
             mock.Setup(x => x.VersionId).Returns(versionId);
             mock.Setup(x => x.UpdateDate).Returns(updateDate);
+
             return mock;
         }
     }
