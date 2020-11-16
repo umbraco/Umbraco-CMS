@@ -1,7 +1,4 @@
 ﻿using Umbraco.Core.Composing;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Install;
 using Umbraco.Web.BackOffice.Trees;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
@@ -27,26 +24,5 @@ namespace Umbraco.Extensions
             => composition.WithCollectionBuilder<TreeCollectionBuilder>();
 
         #endregion
-
-
-        /// <summary>
-        /// Registers Umbraco backoffice controllers.
-        /// </summary>
-        public static Composition ComposeUmbracoBackOfficeControllers(this Composition composition)
-        {
-            composition.RegisterControllers(new []
-            {
-                typeof(BackOfficeController),
-                typeof(PreviewController),
-                typeof(AuthenticationController),
-                typeof(InstallController),
-                typeof(InstallApiController),
-            });
-
-            var umbracoAuthorizedApiControllers = composition.TypeLoader.GetTypes<UmbracoApiController>();
-            composition.RegisterControllers(umbracoAuthorizedApiControllers);
-
-            return composition;
-        }
     }
 }
