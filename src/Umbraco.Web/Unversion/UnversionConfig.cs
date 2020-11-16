@@ -79,7 +79,8 @@ namespace Umbraco.Web.Unversion
     {
         public UnversionConfigEntry()
         {
-            MaxDays = MaxCount = MinCount = int.MaxValue;
+            MaxDays = MaxCount = int.MaxValue;
+            MinCount = int.MinValue;
         }
 
         public string DocTypeAlias { get; set; }

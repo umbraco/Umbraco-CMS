@@ -104,7 +104,7 @@ namespace Umbraco.Web.Unversion
                 _logger.Debug<UnversionService>("Version:{VersionId} ContentUdi:{ContentUdi} IterationCount:{IterationCount}", version.VersionId, version.GetUdi(), iterationCount);
 
                 // If we have a minCount set and current iteration is LESS than min count
-                if(configEntry.MinCount > 0 && iterationCount < configEntry.MinCount)
+                if(configEntry.MinCount > 0 && iterationCount <= configEntry.MinCount)
                 {
                     // Do nothing apart from log it as we want to keep this version
                     _logger.Debug<UnversionService>("Keeping version {VersionId} for {ContentUdi} because item was required by MinCount. IterationCount: {IterationCount} MinValue: {MinCount}", version.VersionId, version.GetUdi(), iterationCount, configEntry.MinCount);
@@ -131,7 +131,19 @@ namespace Umbraco.Web.Unversion
                     {
                         _logger.Debug<UnversionService>("Mark this version to be removed {VersionId} for {ContentUdi} because version update date {UpdateDate} is less than the cuttoff date {DateRemoveBefore}", version.VersionId, version.GetUdi(), version.UpdateDate, dateRemoveBefore);
                         versionIdsToDelete.Add(version.VersionId);
+
+                        // Added to list stop carrying on
+                        continue;
                     }
+                }
+
+                // We have a mincount set and the iteration count is higher than the versions we want to keep
+                // AND we do NOT have MaxCount or MaxDays sets
+                // Thus we need to remove all other versions as we explicity only wanted to keep x min versions only
+                if(configEntry.MinCount > 0 && configEntry.MaxCount !> 0 && configEntry.MaxDays !> 0)
+                {
+                    _logger.Debug<UnversionService>("Mark this version to be removed {VersionId} for {ContentUdi} because we have all the versions we required for mincount and MaxDays nor MaxCount has been set in conjuction.", version.VersionId, version.GetUdi(), iterationCount, configEntry.MaxCount);
+                    versionIdsToDelete.Add(version.VersionId);
                 }
             }
 

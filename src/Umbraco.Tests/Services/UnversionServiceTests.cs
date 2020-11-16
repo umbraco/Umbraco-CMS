@@ -111,9 +111,91 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(res.Contains(30));
 
             // These ones should be deleted
+            Assert.IsTrue(res.Contains(40));
+            Assert.IsTrue(res.Contains(50));
+            Assert.IsTrue(res.Contains(60));
+            Assert.IsTrue(res.Contains(70));
+            Assert.IsTrue(res.Contains(80));
+            Assert.IsTrue(res.Contains(90));
+        }
+
+        [Test]
+        public void GetVersions_Returns_Right_Based_Min_Count_Greater_Than_Max_Count()
+        {
+            // We should always take biggest number & keep 5
+            var config = new UnversionConfigEntry() { MinCount = 5, MaxCount = 2 };
+
+            List<IContent> versions = new List<IContent>()
+            {
+                GetVersionMock(10, new DateTime(2019, 12, 10)).Object, // should be kept
+                GetVersionMock(20, new DateTime(2019, 12, 19)).Object, // should be kept
+                GetVersionMock(30, new DateTime(2019, 12, 20)).Object, // should be kept
+                GetVersionMock(40, new DateTime(2019, 12, 10)).Object, // should be kept
+                GetVersionMock(50, new DateTime(2019, 12, 19)).Object, // should be kept
+                GetVersionMock(60, new DateTime(2019, 12, 20)).Object, // should be deleted
+                GetVersionMock(70, new DateTime(2019, 12, 10)).Object, // should be deleted
+                GetVersionMock(80, new DateTime(2019, 12, 19)).Object, // should be deleted
+                GetVersionMock(90, new DateTime(2019, 12, 20)).Object, // should be deleted
+            };
+
+            var logger = Mock.Of<ILogger>();
+            var service = new UnversionService(null, logger, null, null);
+
+            var res = service.GetVersionsToDelete(versions, config, new DateTime(2019, 12, 30));
+
+            // Has 4 extra versions to remove (leaving the 5 min items we want)
+            Assert.IsTrue(res.Count == 4);
+
+            // Ensure the list of IDs does not contain the versions we want to keep
+            Assert.IsFalse(res.Contains(10));
+            Assert.IsFalse(res.Contains(20));
+            Assert.IsFalse(res.Contains(30));
             Assert.IsFalse(res.Contains(40));
             Assert.IsFalse(res.Contains(50));
+
+            // These ones should be deleted
             Assert.IsTrue(res.Contains(60));
+            Assert.IsTrue(res.Contains(70));
+            Assert.IsTrue(res.Contains(80));
+            Assert.IsTrue(res.Contains(90));
+        }
+
+        [Test]
+        public void GetVersions_Returns_Right_Based_Min_Count_Less_Than_Max_Count()
+        {
+            // We should always take biggest number & keep 6
+            var config = new UnversionConfigEntry() { MinCount = 2, MaxCount = 6 };
+
+            List<IContent> versions = new List<IContent>()
+            {
+                GetVersionMock(10, new DateTime(2019, 12, 10)).Object, // should be kept
+                GetVersionMock(20, new DateTime(2019, 12, 19)).Object, // should be kept
+                GetVersionMock(30, new DateTime(2019, 12, 20)).Object, // should be kept
+                GetVersionMock(40, new DateTime(2019, 12, 10)).Object, // should be kept
+                GetVersionMock(50, new DateTime(2019, 12, 19)).Object, // should be kept
+                GetVersionMock(60, new DateTime(2019, 12, 20)).Object, // should be kept
+                GetVersionMock(70, new DateTime(2019, 12, 10)).Object, // should be deleted
+                GetVersionMock(80, new DateTime(2019, 12, 19)).Object, // should be deleted
+                GetVersionMock(90, new DateTime(2019, 12, 20)).Object, // should be deleted
+            };
+
+            var logger = Mock.Of<ILogger>();
+            var service = new UnversionService(null, logger, null, null);
+
+            var res = service.GetVersionsToDelete(versions, config, new DateTime(2019, 12, 30));
+
+            // Has 3 extra versions to remove (leaving the 6 min items we want)
+            Assert.IsTrue(res.Count == 3);
+
+            // Ensure the list of IDs does not contain the versions we want to keep
+            Assert.IsFalse(res.Contains(10));
+            Assert.IsFalse(res.Contains(20));
+            Assert.IsFalse(res.Contains(30));
+            Assert.IsFalse(res.Contains(40));
+            Assert.IsFalse(res.Contains(50));
+            Assert.IsFalse(res.Contains(60));
+
+            // These ones should be deleted
             Assert.IsTrue(res.Contains(70));
             Assert.IsTrue(res.Contains(80));
             Assert.IsTrue(res.Contains(90));
