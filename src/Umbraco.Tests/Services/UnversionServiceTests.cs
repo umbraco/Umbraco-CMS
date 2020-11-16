@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Unversion;
-using Moq;
 
 namespace Umbraco.Tests.Services
 {
