@@ -61,7 +61,6 @@
                     vm.page.name = vm.labels.addLanguage;
                     $scope.$emit("$changeTitle", vm.labels.addLanguage);
                 }
-                addLanguage = vm.labels.addLanguage;
             });
 
             vm.loading = true;
