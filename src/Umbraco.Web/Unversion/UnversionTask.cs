@@ -28,6 +28,12 @@ namespace Umbraco.Web.Unversion
 
         public override bool PerformRun()
         {
+            if (_runtime.ServerRole != Core.Sync.ServerRole.Master)
+            {
+                _logger.Debug<UnversionTask>("Unversion background task does not run when server role '{ServerRole}' is not Master", _runtime.ServerRole);
+                return true; // We return true to try again as the server role may change!
+            }
+
             var allContent = new List<IContent>();
 
             // Get all content nodes
