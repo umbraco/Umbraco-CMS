@@ -291,7 +291,7 @@
     <key alias="nestedContentAddElementType">Öğe türü ekle</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Öğe türünü seçin</key>
     <key alias="nestedContentGroupHelpText">Özelliklerinin görüntülenmesi gereken grubu seçin. Boş bırakılırsa, eleman türündeki ilk grup kullanılacaktır.</key>
-    <key alias="nestedContentTemplateHelpTextPart1">Adını her bir öğeyle karşılaştırmak için açısal bir ifade girin.</key> kullanın
+    <key alias="nestedContentTemplateHelpTextPart1">Adını her bir öğeyle karşılaştırmak için açısal bir ifade girin. kullanın </key>
     <key alias="nestedContentTemplateHelpTextPart2">öğe dizinini görüntülemek için</key>
     <key alias="addTextBox">Başka bir metin kutusu ekle</key>
     <key alias="removeTextBox">Bu metin kutusunu kaldırın</key>
@@ -774,7 +774,7 @@
     <key alias="success">Başarılı</key>
     <key alias="type">Tür</key>
     <key alias="typeToSearch">Aramak için yazın ...</key>
-    <key alias="under"></key> altında
+    <key alias="under">altında</key>
     <key alias="up">Yukarı</key>
     <key alias="update">Güncelle</key>
     <key alias="upgrade">Yükselt</key>
@@ -845,7 +845,7 @@
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Yükleyici veritabanına bağlanamıyor.</key>
     <key alias="databaseErrorWebConfig">web.config dosyası kaydedilemedi. Lütfen bağlantı dizesini manuel olarak değiştirin.</key>
-    <key alias="databaseFound">​​Veritabanınız bulundu ve</key> olarak tanımlandı
+    <key alias="databaseFound">​​Veritabanınız bulundu ve tanımlandı</key>
     <key alias="databaseHeader">Veritabanı yapılandırması</key>
     <key alias="databaseInstall">
       <![CDATA[
@@ -1124,7 +1124,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="relateToOriginal">Kopyalanan öğeleri orijinalle ilişkilendir</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]></key> için bildiriminizi seçin
+    <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]> için bildiriminizi seçin</key>
     <key alias="notificationSavedFor">için bildirim ayarları kaydedildi</key>
     <key alias="mailBody">
       <![CDATA[
@@ -1336,7 +1336,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="paErrorPageHelp">Kişiler oturum açtığında ancak erişimi olmadığında kullanılır</key>
     <key alias="paHowWould"><![CDATA[Sayfaya erişimi nasıl kısıtlayacağınızı seçin <strong>%0%</strong>]]></key>
     <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> artık korumalı]]></key>
-    <key alias="paIsRemoved"><![CDATA[Koruma, <strong>%0%</strong>]]></key> sayfasından kaldırılmıştır.
+    <key alias="paIsRemoved"><![CDATA[Koruma, <strong>%0%</strong>]]> sayfasından kaldırılmıştır.</key>
     <key alias="paLoginPage">Giriş Sayfası</key>
     <key alias="paLoginPageHelp">Giriş formunu içeren sayfayı seçin</key>
     <key alias="paRemoveProtection">Korumayı kaldır ...</key>
@@ -2247,7 +2247,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
         <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
         <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
         <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
-        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> edip.]]></key> olarak ayarlandı
+        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
         <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
