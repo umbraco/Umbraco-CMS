@@ -50,7 +50,6 @@ namespace Umbraco.Web.Unversion
 
                 // Check if RootXPath is configured
                 if (!string.IsNullOrEmpty(configEntry.RootXPath))
-                    // TODO: Fix in some otherway (Check with Soren on what he meant by this)
                     if (content.Level > 1 && content.ParentId > 0)
                     {
                         var ids = GetNodeIdsFromXpath(configEntry.RootXPath);
