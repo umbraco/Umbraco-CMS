@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -220,7 +221,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return nestedDictionary;
         }
 
-        [UmbracoAuthorize(Order = 0)]
+        [UmbracoBackOfficeAuthorize(Order = 0)]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
@@ -231,7 +232,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
+        [UmbracoBackOfficeAuthorize(Order = 0)]
         [MinifyJavaScriptResult(Order = 1)]
         public async Task<JavaScriptResult> ServerVariables()
         {

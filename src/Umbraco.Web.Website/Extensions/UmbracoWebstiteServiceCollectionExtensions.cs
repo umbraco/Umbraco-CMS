@@ -18,6 +18,9 @@ namespace Umbraco.Extensions
 
             // Wraps all existing view engines in a ProfilerViewEngine
             services.AddTransient<IConfigureOptions<MvcViewOptions>, ProfilingViewEngineWrapperMvcViewOptionsSetup>();
+
+            //TODO figure out if we need more to work on load balanced setups
+            services.AddDataProtection();
         }
     }
 }

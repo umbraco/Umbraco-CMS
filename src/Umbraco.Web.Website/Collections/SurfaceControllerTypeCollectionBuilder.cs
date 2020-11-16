@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core.Composing;
-using Umbraco.Web.WebApi;
+using Umbraco.Web.Website.Controllers;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Website.Collections
 {
     public class SurfaceControllerTypeCollectionBuilder : TypeCollectionBuilderBase<SurfaceControllerTypeCollectionBuilder, SurfaceControllerTypeCollection, SurfaceController>
     {

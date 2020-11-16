@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
@@ -9,10 +7,8 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Website
 {
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates
@@ -445,40 +441,5 @@ namespace Umbraco.Web
         }
 
         #endregion
-
-
-        //Migrated to EncryptionHelper
-        internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
-        {
-            string decryptedString;
-            try
-            {
-                decryptedString = ufprt.DecryptWithMachineKey();
-            }
-            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
-            {
-                StaticApplicationLogging.Logger.LogWarning("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
-                parts = null;
-                return false;
-            }
-            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
-            parts = new Dictionary<string, string>();
-            foreach (var key in parsedQueryString.AllKeys)
-            {
-                parts[key] = parsedQueryString[key];
-            }
-            //validate all required keys exist
-            //the controller
-            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
-                return false;
-            //the action
-            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Action))
-                return false;
-            //the area
-            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Area))
-                return false;
-
-            return true;
-        }
     }
 }

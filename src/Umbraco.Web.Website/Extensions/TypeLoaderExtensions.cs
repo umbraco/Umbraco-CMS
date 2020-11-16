@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using Umbraco.Core.Composing;
+using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Website.Controllers;
 
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="TypeLoader"/> class.

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Html;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Common.Mvc
 {
     /// <summary>
     /// Provides utility methods for UmbracoHelper for working with strings and HTML in views.
@@ -20,7 +21,7 @@ namespace Umbraco.Web
         /// <returns>
         /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
         /// </returns>
-        public IHtmlString ReplaceLineBreaks(string text)
+        public IHtmlContent ReplaceLineBreaks(string text)
         {
             var value = HttpUtility.HtmlEncode(text)?
                 .Replace("\r\n", "<br />")
@@ -63,7 +64,7 @@ namespace Umbraco.Web
             return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml.Replace("  ", " "));
         }
 
-        internal string Join(string separator, params object[] args)
+        public string Join(string separator, params object[] args)
         {
             var results = args
                 .Where(x => x != null)
@@ -72,7 +73,7 @@ namespace Umbraco.Web
             return string.Join(separator, results);
         }
 
-        internal string Concatenate(params object[] args)
+        public string Concatenate(params object[] args)
         {
             var sb = new StringBuilder();
             foreach (var arg in args
@@ -85,7 +86,7 @@ namespace Umbraco.Web
             return sb.ToString();
         }
 
-        internal string Coalesce(params object[] args)
+        public string Coalesce(params object[] args)
         {
             var arg = args
                 .Where(x => x != null)
@@ -95,7 +96,7 @@ namespace Umbraco.Web
             return arg ?? string.Empty;
         }
 
-        public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
+        public IHtmlContent Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
             const string hellip = "&hellip;";
 

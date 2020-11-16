@@ -131,7 +131,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [UmbracoAuthorize, OverrideAuthorization]
+        [UmbracoBackOfficeAuthorize, OverrideAuthorization]
         public bool AllowsCultureVariation()
         {
             var contentTypes = _contentTypeService.GetAll();
