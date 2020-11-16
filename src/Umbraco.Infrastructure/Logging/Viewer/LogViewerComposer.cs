@@ -1,13 +1,10 @@
-﻿using System.IO;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     // ReSharper disable once UnusedMember.Global
     public class LogViewerComposer : ICoreComposer
     {
