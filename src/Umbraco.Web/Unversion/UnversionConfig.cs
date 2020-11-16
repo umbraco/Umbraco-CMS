@@ -49,6 +49,7 @@ namespace Umbraco.Web.Unversion
                 {
                     var configEntry = new UnversionConfigEntry
                     {
+                        // If no doctype alias set on XML entry then its assume it's for all doctypes
                         DocTypeAlias = xmlConfigEntry.Attributes["docTypeAlias"] != null
                             ? xmlConfigEntry.Attributes["docTypeAlias"].Value
                             : AllDocumentTypesKey
