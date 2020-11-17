@@ -71,7 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly IConfigurationEditorJsonSerializer _jsonSerializer;
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
@@ -98,7 +98,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEntityService entityService,
             IHostingEnvironment hostingEnvironment,
             EditorValidatorCollection editorValidatorCollection,
-            IJsonSerializer jsonSerializer)
+            IConfigurationEditorJsonSerializer jsonSerializer)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,

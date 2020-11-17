@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();

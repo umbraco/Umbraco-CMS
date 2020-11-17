@@ -50,8 +50,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
 
             var complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
             var testEditor = Services.GetRequiredService<TestEditor>();
-            var dataTypeService = Services.GetRequiredService<IDataTypeService>(); 
-            var serializer = new JsonNetSerializer();
+            var dataTypeService = Services.GetRequiredService<IDataTypeService>();
+            var serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
 
             var complexDataType = new DataType(complexTestEditor, serializer)
             {

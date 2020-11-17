@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     {
         private IDataEditor _editor;
         private ValueStorageType _databaseType;
-        private readonly IJsonSerializer _serializer;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
         private object _configuration;
         private bool _hasConfiguration;
         private string _configurationJson;
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
         /// </summary>
-        public DataType(IDataEditor editor, IJsonSerializer serializer, int parentId = -1)
+        public DataType(IDataEditor editor, IConfigurationEditorJsonSerializer serializer, int parentId = -1)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(editor));
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
 
                 try
                 {
-                    Configuration = _editor.GetConfigurationEditor().FromDatabase(json);
+                    Configuration = _editor.GetConfigurationEditor().FromDatabase(json, _serializer);
                 }
                 catch (Exception e)
                 {
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Models
 
                 try
                 {
-                    _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson);
+                    _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson, _serializer);
                 }
                 catch (Exception e)
                 {
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Models
                 {
                     try
                     {
-                        return capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration);
+                        return capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration, _serializer);
                     }
                     catch (Exception e)
                     {

@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Published
             }, Mock.Of<IPublishedValueFallback>());
             register.AddTransient(f => factory);
 
-       
+
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -68,8 +68,8 @@ namespace Umbraco.Tests.Published
 
             var registerFactory = composition.CreateServiceProvider();
             var converters = registerFactory.GetRequiredService<PropertyValueConverterCollection>();
-            
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)

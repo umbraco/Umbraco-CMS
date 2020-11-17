@@ -48,7 +48,7 @@ namespace Umbraco.Tests.TestHelpers
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
 
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 1 });
 

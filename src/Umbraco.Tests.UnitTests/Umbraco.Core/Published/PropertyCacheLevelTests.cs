@@ -31,8 +31,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-             
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
@@ -117,8 +117,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-             
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
@@ -198,8 +198,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 converter,
             });
-             
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)

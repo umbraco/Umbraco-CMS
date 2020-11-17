@@ -28,8 +28,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
     {
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
-        { 
-            var serializer = new JsonNetSerializer();
+        {
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
             {
                 Configuration = new ValueListConfiguration
@@ -61,8 +61,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
-        { 
-            var serializer = new JsonNetSerializer();
+        {
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
             {
                 Configuration = new ValueListConfiguration

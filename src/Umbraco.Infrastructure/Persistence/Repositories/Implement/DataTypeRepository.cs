@@ -27,10 +27,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
-        private readonly IJsonSerializer _serializer;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly ILogger<IDataType> _dataTypeLogger;
 
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger<DataTypeRepository> logger, ILoggerFactory loggerFactory, IJsonSerializer serializer)
+        public DataTypeRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            Lazy<PropertyEditorCollection> editors,
+            ILogger<DataTypeRepository> logger,
+            ILoggerFactory loggerFactory,
+            IConfigurationEditorJsonSerializer serializer)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
@@ -129,7 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            var dto = DataTypeFactory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity, _serializer);
 
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
@@ -194,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var dto = DataTypeFactory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity, _serializer);
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;

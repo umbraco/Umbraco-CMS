@@ -65,8 +65,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
-             
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
 
             // create data types, property types and content types
             var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 3 };

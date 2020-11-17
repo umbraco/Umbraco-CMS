@@ -594,8 +594,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 shortStringHelper,
                 localizedTextService
             );
-             
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
 
             var mockDataTypeService = new Mock<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))

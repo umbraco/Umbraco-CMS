@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
@@ -26,6 +27,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
         public EntityXmlSerializer(
             IContentService contentService,
@@ -36,7 +38,8 @@ namespace Umbraco.Core.Services.Implement
             IContentTypeService contentTypeService,
             UrlSegmentProviderCollection urlSegmentProviders,
             IShortStringHelper shortStringHelper,
-            PropertyEditorCollection propertyEditors)
+            PropertyEditorCollection propertyEditors,
+            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         {
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
@@ -47,6 +50,7 @@ namespace Umbraco.Core.Services.Implement
             _urlSegmentProviders = urlSegmentProviders;
             _shortStringHelper = shortStringHelper;
             _propertyEditors = propertyEditors;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
         /// <summary>
@@ -179,7 +183,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
             xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration, PropertyEditors.ConfigurationEditor.ConfigurationJsonSettings)));
+            xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.Configuration)));
 
             var folderNames = string.Empty;
             if (dataType.Level != 1)

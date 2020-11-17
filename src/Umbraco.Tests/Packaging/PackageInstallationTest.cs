@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Packaging
             Factory.GetRequiredService<IShortStringHelper>(),
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             Factory.GetRequiredService<ILocalizedTextService>(),
-            Factory.GetRequiredService<IJsonSerializer>());
+            Factory.GetRequiredService<IConfigurationEditorJsonSerializer>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

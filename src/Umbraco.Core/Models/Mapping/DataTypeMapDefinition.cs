@@ -18,9 +18,9 @@ namespace Umbraco.Web.Models.Mapping
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger<DataTypeMapDefinition> _logger;
         private readonly ContentSettings _contentSettings;
-        private readonly IJsonSerializer _serializer;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings, IJsonSerializer serializer)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings, IConfigurationEditorJsonSerializer serializer)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;

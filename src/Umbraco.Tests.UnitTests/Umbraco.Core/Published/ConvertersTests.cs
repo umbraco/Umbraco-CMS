@@ -29,8 +29,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 new SimpleConverter1(),
             });
-            
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
@@ -113,8 +113,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             {
                 new SimpleConverter2(publishedSnapshotAccessor),
             });
-            
-            var serializer = new JsonNetSerializer();
+
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)

@@ -127,8 +127,8 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         private IPublishedContent GetContent(bool createChildren, int indexVals)
-        { 
-            var serializer = new JsonNetSerializer();
+        {
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 1 });
 

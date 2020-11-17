@@ -279,7 +279,7 @@ namespace Umbraco.TestData
             if (editor == null)
                 throw new InvalidOperationException($"No {editorAlias} editor found");
 
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
 
             dt = new DataType(editor, serializer)
             {

@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IJsonSerializer _serializer;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
 
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
@@ -57,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMemberTypeService memberTypeService,
             ILocalizedTextService localizedTextService,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IJsonSerializer serializer)
+            IConfigurationEditorJsonSerializer serializer)
          {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));

@@ -412,7 +412,7 @@ namespace Umbraco.Tests.Common.PublishedContent
 
         static AutoPublishedContentType()
         {
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
 
             var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,

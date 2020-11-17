@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         private IDataTypeService _dataTypeService;
         private UmbracoMapper _sut;
         private IFileService _fileService;
-        private IJsonSerializer _serializer;
+        private IConfigurationEditorJsonSerializer _serializer;
 
         [SetUp]
         public void SetupTest()
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             _sut = Services.GetRequiredService<UmbracoMapper>();
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _fileService = Services.GetRequiredService<IFileService>();
-            _serializer = Services.GetRequiredService<IJsonSerializer>();
+            _serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
         }
 
         [Test]

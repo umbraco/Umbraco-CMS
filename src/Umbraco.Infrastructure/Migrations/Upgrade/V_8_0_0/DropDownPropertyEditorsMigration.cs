@@ -8,17 +8,20 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
-        public DropDownPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper)
+        public DropDownPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             : base(context)
         {
             _ioHelper = ioHelper;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
         public override void Migrate()
@@ -34,7 +37,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private bool Migrate(IEnumerable<DataTypeDto> dataTypes)
         {
             var refreshCache = false;
-            PropertyEditors.ConfigurationEditor configurationEditor = null;
+            ConfigurationEditor configurationEditor = null;
 
             foreach (var dataType in dataTypes)
             {
@@ -47,7 +50,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         configurationEditor = new ValueListConfigurationEditor(_ioHelper);
                     try
                     {
-                        config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration);
+                        config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration, _configurationEditorJsonSerializer);
                     }
                     catch (Exception ex)
                     {
@@ -112,7 +115,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Items = config.Items,
                 Multiple = isMultiple
             };
-            dataType.Configuration = PropertyEditors.ConfigurationEditor.ToDatabase(flexConfig);
+            dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig, _configurationEditorJsonSerializer);
 
             Database.Update(dataType);
         }

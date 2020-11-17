@@ -24,8 +24,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
     {
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
-        { 
-            var serializer = new JsonNetSerializer();
+        {
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
             {
                 Id = 12345

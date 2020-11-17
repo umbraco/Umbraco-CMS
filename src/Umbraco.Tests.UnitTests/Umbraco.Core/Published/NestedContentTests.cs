@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             var editor = new NestedContentPropertyEditor(loggerFactory, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
 
             var dataType1 = new DataType(editor, serializer)
             {

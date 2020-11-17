@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Common.Builders
             var creatorId = _creatorId ?? 1;
             var databaseType = _databaseType ?? ValueStorageType.Ntext;
             var sortOrder = _sortOrder ?? 0;
-            var serializer = new JsonNetSerializer();
+            var serializer = new ConfigurationEditorJsonSerializer();
 
             return new DataType(editor, serializer, parentId)
             {

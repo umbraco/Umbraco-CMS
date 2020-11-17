@@ -35,7 +35,7 @@ namespace Umbraco.Core.Packaging
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IJsonSerializer _serializer;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Packaging
         public PackageDataInstallation(ILogger<PackageDataInstallation> logger, ILoggerFactory loggerFactory, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
             IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            ILocalizedTextService localizedTextService, IJsonSerializer serializer)
+            ILocalizedTextService localizedTextService, IConfigurationEditorJsonSerializer serializer)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
@@ -921,7 +921,7 @@ namespace Umbraco.Core.Packaging
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
-                        dataType.Configuration = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue);
+                        dataType.Configuration = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue, _serializer);
 
                     dataTypes.Add(dataType);
                 }

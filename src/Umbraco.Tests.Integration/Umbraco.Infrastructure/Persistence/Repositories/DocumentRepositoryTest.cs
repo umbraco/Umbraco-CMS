@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IFileService FileService => GetRequiredService<IFileService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
-        private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
+        private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
         [SetUp]
         public void SetUpData()
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
             var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, JsonSerializer);
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
             return ctRepository;
         }
 
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
             var repository = new DocumentRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository,
-                relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
+                relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService, ConfigurationEditorJsonSerializer);
             return repository;
         }
 

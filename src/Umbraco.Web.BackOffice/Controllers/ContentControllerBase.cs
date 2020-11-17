@@ -20,7 +20,6 @@ using Umbraco.Extensions;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.ContentEditing;
-using ConfigurationEditor = Umbraco.Core.PropertyEditors.ConfigurationEditor;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
