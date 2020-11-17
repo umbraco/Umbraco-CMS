@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -58,21 +59,19 @@ namespace Umbraco.Tests.Integration
 
             // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
-            var contentSettings = new ContentSettings();
-            var coreDebugSettings = new CoreDebugSettings();
-            var nuCacheSettings = new NuCacheSettings();
-            var requestHandlerSettings = new RequestHandlerSettings();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
-            var webRoutingSettings = new WebRoutingSettings();
 
             services.AddTransient(x => Options.Create(globalSettings));
             services.AddTransient(x => Options.Create(connectionStrings));
-            services.AddTransient(x => Options.Create(contentSettings));
-            services.AddTransient(x => Options.Create(coreDebugSettings));
-            services.AddTransient(x => Options.Create(nuCacheSettings));
-            services.AddTransient(x => Options.Create(requestHandlerSettings));
-            services.AddTransient(x => Options.Create(userPasswordConfigurationSettings));
-            services.AddTransient(x => Options.Create(webRoutingSettings));
+            services.AddTransient(x => Options.Create(new ContentSettings()));
+            services.AddTransient(x => Options.Create(new CoreDebugSettings()));
+            services.AddTransient(x => Options.Create(new NuCacheSettings()));
+            services.AddTransient(x => Options.Create(new RequestHandlerSettings()));
+            services.AddTransient(x => Options.Create(new UserPasswordConfigurationSettings()));
+            services.AddTransient(x => Options.Create(new WebRoutingSettings()));
+            services.AddTransient(x => Options.Create(new ModelsBuilderSettings()));
+            services.AddTransient(x => Options.Create(new RouteOptions()));
+            services.AddTransient(x => Options.Create(new IndexCreatorSettings()));
+            services.AddRouting(); // LinkGenerator
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Create the core runtime
@@ -162,6 +161,8 @@ namespace Umbraco.Tests.Integration
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
                     services.AddUmbracoCore(webHostEnvironment,  GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration);
+
+                    services.AddRouting(); // LinkGenerator
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -184,8 +185,6 @@ namespace Umbraco.Tests.Integration
             Assert.IsTrue(MyComponent.IsTerminated);
         }
 
-
-        [RuntimeLevel(MinLevel = RuntimeLevel.Install)]
         public class MyComposer : IUserComposer
         {
             public void Compose(Composition composition)

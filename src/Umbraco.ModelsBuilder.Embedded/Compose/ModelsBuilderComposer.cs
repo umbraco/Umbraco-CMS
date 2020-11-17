@@ -1,9 +1,7 @@
 ﻿using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
@@ -13,7 +11,6 @@ using Microsoft.Extensions.Options;
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     [ComposeBefore(typeof(IPublishedCacheComposer))]
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
         public void Compose(Composition composition)

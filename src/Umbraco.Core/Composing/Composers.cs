@@ -103,18 +103,7 @@ namespace Umbraco.Core.Composing
         internal Dictionary<Type, List<Type>> GetRequirements(bool throwOnMissing = true)
         {
             // create a list, remove those that cannot be enabled due to runtime level
-            var composerTypeList = _composerTypes
-                .Where(x =>
-                {
-                    // use the min/max levels specified by the attribute if any
-                    // otherwise, min: user composers are Run, anything else is Unknown (always run)
-                    //            max: everything is Run (always run)
-                    var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
-                    var minLevel = attr?.MinLevel ?? (x.Implements<IUserComposer>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
-                    var maxLevel = attr?.MaxLevel ?? RuntimeLevel.Run;
-                    return _composition.RuntimeState.Level >= minLevel && _composition.RuntimeState.Level <= maxLevel;
-                })
-                .ToList();
+            var composerTypeList = _composerTypes.ToList();
 
             // enable or disable composers
             EnableDisableComposers(_enableDisableAttributes, composerTypeList);

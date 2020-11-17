@@ -1,5 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -11,7 +10,6 @@ namespace Umbraco.Web.Routing
     /// <para>not managing domains because we don't know how to do it - changing domains => must create a higher level strategy using rewriting rules probably</para>
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class RedirectTrackingComposer : ComponentComposer<RedirectTrackingComponent>, ICoreComposer
     { }
 }
