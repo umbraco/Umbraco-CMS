@@ -48,14 +48,14 @@ namespace Umbraco.Tests.Routing
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
                 ShortStringHelper,
-                new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
+              //  new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()),
                 HostingEnvironment);
         }
 
-        public class TestRuntime : CoreRuntime
+        public class TestRuntimeBootstrapper : CoreRuntimeBootstrapper
         {
-            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            public TestRuntimeBootstrapper(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
                 : base(globalSettings, connectionStrings,umbracoVersion, ioHelper,  NullLoggerFactory.Instance, Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
@@ -69,8 +69,8 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
-            Composition.Services.AddUnique(surfaceControllerTypes);
+            // var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
+            // Composition.Services.AddUnique(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.Services.AddUnique(umbracoApiControllerTypes);

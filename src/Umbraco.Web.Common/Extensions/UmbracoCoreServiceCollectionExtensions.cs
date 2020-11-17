@@ -25,6 +25,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Infrastructure.HostedServices;
+using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
@@ -142,7 +143,7 @@ namespace Umbraco.Extensions
         /// <param name="requestCache"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
-        /// <param name="getRuntime">Delegate to create an <see cref="IRuntime"/></param>
+        /// <param name="getRuntimeBootstrapper">Delegate to create an <see cref="CoreRuntimeBootstrapper"/></param>
         /// <param name="factory"></param>
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(
@@ -153,7 +154,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime)
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, CoreRuntimeBootstrapper> getRuntimeBootstrapper)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
@@ -208,7 +209,7 @@ namespace Umbraco.Extensions
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
-            var coreRuntime = getRuntime(
+            var bootstrapper = getRuntimeBootstrapper(
                 globalSettings.CurrentValue,
                 connectionStrings.Value,
                 umbracoVersion,
@@ -221,7 +222,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            coreRuntime.Configure(services);
+            bootstrapper.Configure(services);
 
             return services;
         }
@@ -298,6 +299,9 @@ namespace Umbraco.Extensions
             services.AddHostedService<ScheduledPublishing>();
             services.AddHostedService<TempFileCleanup>();
 
+            services.AddHostedService<InstructionProcessTask>();
+            services.AddHostedService<TouchServerTask>();
+
             return services;
         }
 
@@ -320,7 +324,7 @@ namespace Umbraco.Extensions
             return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
-        private static IRuntime GetCoreRuntime(
+        private static CoreRuntimeBootstrapper GetCoreRuntime(
            GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILoggerFactory loggerFactory,
             IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
@@ -335,7 +339,7 @@ namespace Umbraco.Extensions
 
             var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
-            var coreRuntime = new CoreRuntime(
+            var coreRuntime = new CoreRuntimeBootstrapper(
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,

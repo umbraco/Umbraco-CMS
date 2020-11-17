@@ -2,8 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Composing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -33,8 +35,9 @@ namespace Umbraco.Web.Models.ContentEditing
             if (UserGroups.Any() == false)
                 yield return new ValidationResult("A user must be assigned to at least one group", new[] { nameof(UserGroups) });
 
-            // TODO: this will need another way of retrieving this setting if and when Configs are removed from Current.
-            if (Current.SecuritySettings.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
+            var securitySettings = validationContext.GetRequiredService<IOptions<SecuritySettings>>();
+
+            if (securitySettings.Value.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
                 yield return new ValidationResult("A username cannot be empty", new[] { nameof(Username) });
         }
     }

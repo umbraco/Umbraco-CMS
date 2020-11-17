@@ -10,6 +10,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Provides extension methods for the <see cref="TypeLoader"/> class.
     /// </summary>
+    // Migrated to .NET Core
     public static class TypeLoaderExtensions
     {
         /// <summary>

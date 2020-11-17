@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -108,7 +107,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.LogError(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
+                    StaticApplicationLogging.Logger.LogError(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
                     return null;
                 }
             }

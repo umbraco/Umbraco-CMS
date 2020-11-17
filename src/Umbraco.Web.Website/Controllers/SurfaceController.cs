@@ -48,22 +48,22 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
-        /// <param name="pageId"></param>
+        /// <param name="contentKey"></param>
         /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId)
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey)
         {
-            return new RedirectToUmbracoPageResult(pageId, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(contentKey, _publishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
         /// Redirects to the Umbraco page with the given id and passes provided querystring
         /// </summary>
-        /// <param name="pageId"></param>
+        /// <param name="contentKey"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, QueryString queryString)
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey, QueryString queryString)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryString, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(contentKey, queryString, _publishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
