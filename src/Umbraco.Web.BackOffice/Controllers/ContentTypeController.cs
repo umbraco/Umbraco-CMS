@@ -35,6 +35,7 @@ using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -70,6 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfigurationEditorJsonSerializer _jsonSerializer;
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
@@ -95,7 +97,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMacroService macroService,
             IEntityService entityService,
             IHostingEnvironment hostingEnvironment,
-            EditorValidatorCollection editorValidatorCollection)
+            EditorValidatorCollection editorValidatorCollection,
+            IConfigurationEditorJsonSerializer jsonSerializer)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -124,6 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _macroService = macroService;
             _entityService = entityService;
             _hostingEnvironment = hostingEnvironment;
+            _jsonSerializer = jsonSerializer;
         }
 
         public int GetCount()
@@ -621,7 +625,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dataInstaller = new PackageDataInstallation(_loggerFactory.CreateLogger<PackageDataInstallation>(), _loggerFactory, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService);
+                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService, _jsonSerializer);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

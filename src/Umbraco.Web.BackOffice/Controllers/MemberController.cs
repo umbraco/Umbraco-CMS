@@ -71,7 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
-            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
             _passwordConfig = passwordConfig.Value;
             _propertyEditors = propertyEditors;

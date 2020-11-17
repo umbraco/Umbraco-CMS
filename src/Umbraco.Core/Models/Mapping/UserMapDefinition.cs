@@ -2,24 +2,22 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Services;
-using Umbraco.Core.Media;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -296,7 +294,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLockoutDate = source.LastLockoutDate;
-            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?) source.LastLoginDate;
+            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangeDate;
             target.Name = source.Name;
             target.Navigation = CreateUserEditorNavigation();
@@ -322,7 +320,7 @@ namespace Umbraco.Web.Models.Mapping
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.Id = source.Id;
             target.Key = source.Key;
-            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?) source.LastLoginDate;
+            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
@@ -447,6 +445,6 @@ namespace Umbraco.Web.Models.Mapping
                 Trashed = false,
                 ParentId = -1
             };
-        }       
+        }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Stylesheet = Umbraco.Core.Models.Stylesheet;
 
 namespace Umbraco.Web.Models.Mapping
 {

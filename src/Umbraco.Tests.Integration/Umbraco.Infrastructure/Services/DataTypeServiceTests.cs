@@ -4,6 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -24,12 +25,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private IFileService FileService => GetRequiredService<IFileService>();
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {
             // Act
-            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper), ConfigurationEditorJsonSerializer) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             DataTypeService.Save(dataType);
 
             // Assert
@@ -72,7 +74,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_DataType_With_Empty_Name()
         {
             // Act
-            var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
+            var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper), ConfigurationEditorJsonSerializer) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));

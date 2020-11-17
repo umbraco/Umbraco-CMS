@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -116,5 +115,4 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "cssClasses")]
         public IList<string> CssClasses { get; private set; }
     }
-
 }

@@ -1,28 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
     public class JsonNetSerializer : IJsonSerializer
     {
-        private static readonly JsonConverter[] _defaultConverters = new JsonConverter[]
+        protected static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
         {
-            new StringEnumConverter()
+            Converters = new List<JsonConverter>()
+            {
+                new StringEnumConverter()
+            }
         };
-
         public string Serialize(object input)
         {
-            return JsonConvert.SerializeObject(input, _defaultConverters);
+            return JsonConvert.SerializeObject(input, JsonSerializerSettings);
         }
 
         public T Deserialize<T>(string input)
         {
-            return JsonConvert.DeserializeObject<T>(input, _defaultConverters);
+            return JsonConvert.DeserializeObject<T>(input, JsonSerializerSettings);
+        }
+
+        public T DeserializeSubset<T>(string input, string key)
+        {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
+            var root = JsonConvert.DeserializeObject<JObject>(input);
+
+            var jToken = root.SelectToken(key);
+
+            return jToken switch
+            {
+                JArray jArray => jArray.ToObject<T>(),
+                JObject jObject => jObject.ToObject<T>(),
+                _ => jToken is null ? default : jToken.Value<T>()
+            };
         }
     }
 }

@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -29,6 +30,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
         private ITemplateRepository TemplateRepository => GetRequiredService<ITemplateRepository>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+        private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         // Makes handing IDs easier, these are set by CreateTestData
         private Media _testFolder;
@@ -56,7 +58,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaRepository>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaRepository>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService, JsonSerializer);
             return repository;
         }
 

@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IJsonSerializer _serializer;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
 
@@ -33,12 +35,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IPasswordHasher passwordHasher,
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IJsonSerializer serializer)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _passwordHasher = passwordHasher;
+            _serializer = serializer;
             _memberGroupRepository = memberGroupRepository;
 
             _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
@@ -326,7 +330,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            SetEntityTags(entity, _tagRepository);
+            SetEntityTags(entity, _tagRepository, _serializer);
 
             PersistRelations(entity);
 
@@ -408,7 +412,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
             }   
 
-            SetEntityTags(entity, _tagRepository);
+            SetEntityTags(entity, _tagRepository, _serializer);
 
             PersistRelations(entity);
 

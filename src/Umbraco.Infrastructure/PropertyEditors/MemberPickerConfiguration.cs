@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors
 {

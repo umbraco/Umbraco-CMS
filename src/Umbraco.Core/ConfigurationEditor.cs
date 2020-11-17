@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Runtime.Serialization;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Core
 {
     /// <summary>
     /// Represents a data type configuration editor.
@@ -35,7 +34,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the fields.
         /// </summary>
-        [JsonProperty("fields")]
+        [DataMember(Name = "fields")]
         public List<ConfigurationField> Fields { get; }
 
         /// <summary>
@@ -53,18 +52,20 @@ namespace Umbraco.Core.PropertyEditors
         {
             if (obj == null) return default;
             if (obj is TConfiguration configuration) return configuration;
-            throw new InvalidCastException($"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
+            throw new InvalidCastException(
+                $"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
         }
 
         /// <summary>
         /// Converts a configuration object into a serialized database value.
         /// </summary>
-        public static string ToDatabase(object configuration)
-            => configuration == null ? null : JsonConvert.SerializeObject(configuration, ConfigurationJsonSettings);
+        public static string ToDatabase(object configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+            => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
 
         /// <inheritdoc />
-        [JsonProperty("defaultConfig")]
-        public virtual IDictionary<string, object> DefaultConfiguration {
+        [DataMember(Name = "defaultConfig")]
+        public virtual IDictionary<string, object> DefaultConfiguration
+        {
             get => _defaultConfiguration;
             set => _defaultConfiguration = value;
         }
@@ -75,11 +76,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <inheritdoc />
         public virtual bool IsConfiguration(object obj) => obj is IDictionary<string, object>;
 
+
         /// <inheritdoc />
-        public virtual object FromDatabase(string configurationJson)
+        public virtual object FromDatabase(string configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => string.IsNullOrWhiteSpace(configurationJson)
                 ? new Dictionary<string, object>()
-                : JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
+                : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson);
 
         /// <inheritdoc />
         public virtual object FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
@@ -108,7 +110,9 @@ namespace Umbraco.Core.PropertyEditors
                 configuration = new Dictionary<string, object>();
 
             if (!(configuration is IDictionary<string, object> c))
-                throw new ArgumentException($"Expecting a {typeof(Dictionary<string,object>).Name} instance but got {configuration.GetType().Name}.", nameof(configuration));
+                throw new ArgumentException(
+                    $"Expecting a {typeof(Dictionary<string, object>).Name} instance but got {configuration.GetType().Name}.",
+                    nameof(configuration));
 
             // clone the default configuration, and apply the current configuration values
             var d = new Dictionary<string, object>(DefaultConfiguration);
@@ -121,34 +125,5 @@ namespace Umbraco.Core.PropertyEditors
         public virtual IDictionary<string, object> ToValueEditor(object configuration)
             => ToConfigurationEditor(configuration);
 
-        /// <summary>
-        /// Gets the custom json serializer settings for configurations.
-        /// </summary>
-        public static JsonSerializerSettings ConfigurationJsonSettings { get; } = new JsonSerializerSettings
-        {
-            ContractResolver = new ConfigurationCustomContractResolver(),
-            Converters = new List<JsonConverter>(new[]{new FuzzyBooleanConverter()})
-        };
-
-        private class ConfigurationCustomContractResolver : DefaultContractResolver
-        {
-            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-            {
-                // base.CreateProperty deals with [JsonProperty("name")]
-                var property = base.CreateProperty(member, memberSerialization);
-
-                // override with our custom attribute, if any
-                var attribute = member.GetCustomAttribute<ConfigurationFieldAttribute>();
-                if (attribute != null) property.PropertyName = attribute.Key;
-
-                // for value types,
-                //  don't try to deserialize nulls (in legacy json)
-                //  no impact on serialization (value cannot be null)
-                if (member is PropertyInfo propertyInfo && propertyInfo.PropertyType.IsValueType)
-                    property.NullValueHandling = NullValueHandling.Ignore;
-
-                return property;
-            }
-        }
     }
 }

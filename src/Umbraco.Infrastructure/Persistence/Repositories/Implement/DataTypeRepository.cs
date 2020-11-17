@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
@@ -26,12 +27,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly ILogger<IDataType> _dataTypeLogger;
 
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger<DataTypeRepository> logger, ILoggerFactory loggerFactory)
+        public DataTypeRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            Lazy<PropertyEditorCollection> editors,
+            ILogger<DataTypeRepository> logger,
+            ILoggerFactory loggerFactory,
+            IConfigurationEditorJsonSerializer serializer)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
+            _serializer = serializer;
             _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
         }
 
@@ -56,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger, _serializer)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -67,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger, _serializer)).ToArray();
         }
 
         #endregion
@@ -126,7 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            var dto = DataTypeFactory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity, _serializer);
 
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
@@ -191,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var dto = DataTypeFactory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity, _serializer);
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;

@@ -28,6 +28,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
@@ -63,6 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IRelationService _relationService;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly IJsonSerializer _serializer;
         private readonly ILogger<MediaController> _logger;
 
         public MediaController(
@@ -84,8 +86,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             PropertyEditorCollection propertyEditors,
             IMediaFileSystem mediaFileSystem,
             IHostingEnvironment hostingEnvironment,
-            IImageUrlGenerator imageUrlGenerator)
-            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
+            IImageUrlGenerator imageUrlGenerator,
+            IJsonSerializer serializer)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
             _contentSettings = contentSettings.Value;
@@ -104,6 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
+            _serializer = serializer;
         }
 
         /// <summary>
@@ -764,7 +768,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File,fileName, stream);
+                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
                     }
 
 
@@ -774,7 +778,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                         AddCancelMessage(tempFiles,
                             message: _localizedTextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName);
                     }
-
                 }
                 else
                 {
