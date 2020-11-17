@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
             var repository = new DocumentRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository,
-                relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+                relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
             return repository;
         }
 

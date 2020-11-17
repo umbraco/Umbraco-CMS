@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
@@ -26,6 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+        private readonly IJsonSerializer _serializer;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
         public MediaRepository(
@@ -41,12 +43,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection,
             MediaUrlGeneratorCollection mediaUrlGenerators,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IJsonSerializer serializer)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaUrlGenerators = mediaUrlGenerators;
+            _serializer = serializer;
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, loggerFactory.CreateLogger<MediaByGuidReadRepository>());
         }
 
@@ -299,7 +303,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Insert(propertyDataDto);
 
             // set tags
-            SetEntityTags(entity, _tagRepository);
+            SetEntityTags(entity, _tagRepository, _serializer);
 
             PersistRelations(entity);
 
@@ -365,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var propertyDataDto in propertyDataDtos)
                     Database.Insert(propertyDataDto);
 
-                SetEntityTags(entity, _tagRepository);
+                SetEntityTags(entity, _tagRepository, _serializer);
 
                 PersistRelations(entity);
             }

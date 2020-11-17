@@ -4,6 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -32,8 +33,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IRelationTypeRepository relationTypeRepository,
             Lazy<PropertyEditorCollection> propertyEditorCollection,
             IDataTypeService dataTypeService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactories)
-            : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IJsonSerializer serializer)
+            : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository,
+                tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection,
+                dataValueReferenceFactories, dataTypeService, serializer)
         {
         }
 

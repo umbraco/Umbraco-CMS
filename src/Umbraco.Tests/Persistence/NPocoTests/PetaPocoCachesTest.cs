@@ -6,6 +6,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Services;
@@ -145,6 +146,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         private void CreateStuff(out int id1, out int id2, out int id3, out string alias)
         {
             var contentService = ServiceContext.ContentService;
+            var serializer = new JsonNetSerializer();
 
             var ctAlias = "umbTextpage" + Guid.NewGuid().ToString("N");
             alias = ctAlias;
@@ -180,13 +182,13 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 });
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.AssignTags(PropertyEditorCollection.Value, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
+            content1.AssignTags(PropertyEditorCollection.Value, DataTypeService, serializer, "tags", new[] { "hello", "world", "some", "tags" });
             content1.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content1);
             id2 = content1.Id;
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.AssignTags(PropertyEditorCollection.Value, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
+            content2.AssignTags(PropertyEditorCollection.Value, DataTypeService, serializer, "tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content2);
             id3 = content2.Id;

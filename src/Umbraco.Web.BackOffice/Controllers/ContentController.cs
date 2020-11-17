@@ -21,6 +21,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Actions;
@@ -98,8 +99,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             INotificationService notificationService,
             ActionCollection actionCollection,
             IMemberGroupService memberGroupService,
-            ISqlContext sqlContext)
-            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
+            ISqlContext sqlContext,
+            IJsonSerializer serializer)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
             _contentService = contentService;

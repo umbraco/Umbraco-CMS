@@ -88,7 +88,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer)
-            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
             _contentSettings = contentSettings.Value;

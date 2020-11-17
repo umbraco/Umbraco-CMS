@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
@@ -243,7 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Updates tags for an item.
         /// </summary>
-        protected void SetEntityTags(IContentBase entity, ITagRepository tagRepo)
+        protected void SetEntityTags(IContentBase entity, ITagRepository tagRepo, IJsonSerializer serializer)
         {
             foreach (var property in entity.Properties)
             {
@@ -255,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (var pvalue in property.Values)
                     {
-                        var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, pvalue.Culture);
+                        var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                         var cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                         tags.AddRange(cultureTags);
@@ -264,7 +265,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
                 else
                 {
-                    var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService); // strings
+                    var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
                     var tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
