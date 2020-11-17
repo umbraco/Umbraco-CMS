@@ -6,6 +6,6 @@
 
         T Deserialize<T>(string input);
 
-        T DeserializeSubset<T>(string input, string value);
+        T DeserializeSubset<T>(string input, string key);
     }
 }

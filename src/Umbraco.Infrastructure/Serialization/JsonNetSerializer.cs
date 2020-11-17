@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
@@ -25,10 +24,20 @@ namespace Umbraco.Core.Serialization
             return JsonConvert.DeserializeObject<T>(input, _defaultConverters);
         }
 
-        public T DeserializeSubset<T>(string input, string value)
+        public T DeserializeSubset<T>(string input, string key)
         {
-            var jObject = JsonConvert.DeserializeObject<dynamic>(input);
-            return jObject != null ? jObject.GetValueAsString(value) : input;
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
+            var root = JsonConvert.DeserializeObject<JObject>(input);
+
+            var jToken = root.SelectToken(key);
+
+            return jToken switch
+            {
+                JArray jArray => jArray.ToObject<T>(),
+                JObject jObject => jObject.ToObject<T>(),
+                _ => jToken is null ? default : jToken.Value<T>()
+            };
         }
     }
 }
