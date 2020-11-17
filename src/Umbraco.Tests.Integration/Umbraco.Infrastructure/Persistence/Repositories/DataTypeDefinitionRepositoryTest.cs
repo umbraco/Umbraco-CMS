@@ -9,6 +9,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.PropertyEditors;
+using ConfigurationEditor = Umbraco.Core.PropertyEditors.ConfigurationEditor;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {

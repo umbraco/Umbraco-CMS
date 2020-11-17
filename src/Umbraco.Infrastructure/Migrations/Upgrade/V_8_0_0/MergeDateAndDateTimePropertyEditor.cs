@@ -51,7 +51,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 config.OffsetTime = false;
 
                 dataType.EditorAlias = Constants.PropertyEditors.Aliases.DateTime;
-                dataType.Configuration = ConfigurationEditor.ToDatabase(config);
+                dataType.Configuration = PropertyEditors.ConfigurationEditor.ToDatabase(config);
 
                 Database.Update(dataType);
             }

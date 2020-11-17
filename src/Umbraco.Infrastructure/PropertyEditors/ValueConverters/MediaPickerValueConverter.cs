@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache;
+using ConfigurationEditor = Umbraco.Core.PropertyEditors.ConfigurationEditor;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {

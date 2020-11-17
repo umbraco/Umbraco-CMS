@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Factories
                 EditorAlias = entity.EditorAlias,
                 NodeId = entity.Id,
                 DbType = entity.DatabaseType.ToString(),
-                Configuration = ConfigurationEditor.ToDatabase(entity.Configuration),
+                Configuration = PropertyEditors.ConfigurationEditor.ToDatabase(entity.Configuration),
                 NodeDto = BuildNodeDto(entity)
             };
 

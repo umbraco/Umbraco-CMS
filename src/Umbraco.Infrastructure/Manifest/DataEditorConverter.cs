@@ -108,7 +108,7 @@ namespace Umbraco.Core.Manifest
                 // explicitly assign a configuration editor of type ConfigurationEditor
                 // (else the deserializer will try to read it before setting it)
                 // (and besides it's an interface)
-                target.ExplicitConfigurationEditor = new ConfigurationEditor();
+                target.ExplicitConfigurationEditor = new PropertyEditors.ConfigurationEditor();
 
                 // see note about validators, above - same applies to field validators
                 if (config["fields"] is JArray jarray)

@@ -34,7 +34,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private bool Migrate(IEnumerable<DataTypeDto> dataTypes)
         {
             var refreshCache = false;
-            ConfigurationEditor configurationEditor = null;
+            PropertyEditors.ConfigurationEditor configurationEditor = null;
 
             foreach (var dataType in dataTypes)
             {
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Items = config.Items,
                 Multiple = isMultiple
             };
-            dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig);
+            dataType.Configuration = PropertyEditors.ConfigurationEditor.ToDatabase(flexConfig);
 
             Database.Update(dataType);
         }
