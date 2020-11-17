@@ -24,5 +24,11 @@ namespace Umbraco.Core.Serialization
         {
             return JsonConvert.DeserializeObject<T>(input, _defaultConverters);
         }
+
+        public T DeserializeSubset<T>(string input, string value)
+        {
+            var jObject = JsonConvert.DeserializeObject<dynamic>(input);
+            return jObject != null ? jObject.GetValueAsString(value) : input;
+        }
     }
 }

@@ -224,8 +224,7 @@ namespace Umbraco.Core
                 if (svalue.DetectIsJson())
                 {
                     // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
-                    var jObject = serializer.Deserialize<dynamic>(svalue);
-                    //svalue = jObject != null ? jObject.GetValueAsString("src") : svalue; // TODO: come back to this use case
+                    svalue = serializer.DeserializeSubset<string>(svalue, "src");
                 }
                 oldpath = mediaFileSystem.GetRelativePath(svalue);
             }
