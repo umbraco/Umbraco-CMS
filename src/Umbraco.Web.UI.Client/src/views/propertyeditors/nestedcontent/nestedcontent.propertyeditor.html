@@ -18,7 +18,7 @@
                              ng-hide="vm.singleMode"
                              umb-auto-focus="{{vm.currentNode.key === node.key ? 'true' : 'false'}}">
 
-                            <div class="umb-nested-content__heading"><i ng-if="vm.showIcons" class="icon" ng-class="vm.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span></div>
+                            <div class="umb-nested-content__heading"><i ng-if="vm.showIcons" class="icon umb-nested-content__item-icon" ng-class="vm.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span></div>
 
                             <div class="umb-nested-content__icons">
                                 <button type="button" class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{vm.labels.copy_icon_title}}" ng-click="vm.clickCopy($event, node);" ng-if="vm.showCopy">
