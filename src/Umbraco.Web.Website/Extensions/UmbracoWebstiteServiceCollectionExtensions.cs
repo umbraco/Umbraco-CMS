@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Security;
+using Umbraco.Web.Website.Security;
 using Umbraco.Web.Website.ViewEngines;
 
 namespace Umbraco.Extensions
@@ -21,6 +23,9 @@ namespace Umbraco.Extensions
 
             //TODO figure out if we need more to work on load balanced setups
             services.AddDataProtection();
+
+            // Website security
+            services.AddSingleton<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
         }
     }
 }

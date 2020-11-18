@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Core.Models.Security
 {
     public class LoginModel : PostRedirectModel
     {
@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models
 
         [Required]
         [DataMember(Name = "password", IsRequired = true)]
-        [StringLength(maximumLength:256)]
+        [StringLength(maximumLength: 256)]
         public string Password { get; set; }
 
     }

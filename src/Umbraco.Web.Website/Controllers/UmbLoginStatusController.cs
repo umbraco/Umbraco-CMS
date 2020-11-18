@@ -1,58 +1,53 @@
-﻿using System.Web.Mvc;
-using System.Web.Security;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Security;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Security;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Controllers
+namespace Umbraco.Web.Website.Controllers
 {
-    [MemberAuthorize]
+    // TOOO: reinstate [MemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
-        private readonly MembershipHelper _membershipHelper;
-
-        public UmbLoginStatusController()
-        {
-        }
+        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
 
         public UmbLoginStatusController(IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger profilingLogger, MembershipHelper membershipHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
+            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurity websiteSecurity)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _membershipHelper = membershipHelper;
+            _websiteSecurity = websiteSecurity;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public ActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
+        public IActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
         {
             if (ModelState.IsValid == false)
             {
                 return CurrentUmbracoPage();
             }
 
-            if (_membershipHelper.IsLoggedIn())
+            if (_websiteSecurity.IsLoggedIn())
             {
-                FormsAuthentication.SignOut();
+                _websiteSecurity.LogOut();
             }
 
             TempData["LogoutSuccess"] = true;
 
-            //if there is a specified path to redirect to then use it
+            // If there is a specified path to redirect to then use it.
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
                 return Redirect(model.RedirectUrl);
             }
 
-            //redirect to current page by default
-
+            // Redirect to current page by default.
             return RedirectToCurrentUmbracoPage();
         }
     }

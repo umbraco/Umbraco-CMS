@@ -2,36 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Core.Models.Security
 {
     /// <summary>
     /// A readonly member profile model
     /// </summary>
-    [ModelBinder(typeof(ProfileModelBinder))]
     public class ProfileModel : PostRedirectModel
     {
-
-        public static ProfileModel CreateModel()
-        {
-            var model = new ProfileModel(false);
-            return model;
-        }
-
-        private ProfileModel(bool doLookup)
-        {
-            MemberProperties = new List<UmbracoProperty>();
-            if (doLookup && Current.UmbracoContext != null)
-            {
-                var helper = Current.MembershipHelper;
-                var model = helper.GetCurrentMemberProfileModel();
-                MemberProperties = model.MemberProperties;
-            }
-        }
-
-
         [Required]
         [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
             ErrorMessage = "Please enter a valid e-mail address")]
@@ -81,18 +60,6 @@ namespace Umbraco.Web.Models
         /// <remarks>
         /// Adding items to this list on the front-end will not add properties to the member in the database.
         /// </remarks>
-        public List<UmbracoProperty> MemberProperties { get; set; }
-
-        /// <summary>
-        /// A custom model binder for MVC because the default ctor performs a lookup!
-        /// </summary>
-        internal class ProfileModelBinder : DefaultModelBinder
-        {
-            protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
-            {
-                return ProfileModel.CreateModel();
-            }
-
-        }
+        public List<UmbracoProperty> MemberProperties { get; set; } = new List<UmbracoProperty>();
     }
 }
