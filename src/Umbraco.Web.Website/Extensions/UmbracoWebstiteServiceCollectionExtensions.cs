@@ -23,9 +23,6 @@ namespace Umbraco.Extensions
 
             //TODO figure out if we need more to work on load balanced setups
             services.AddDataProtection();
-
-            // Website security
-            services.AddSingleton<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
         }
     }
 }

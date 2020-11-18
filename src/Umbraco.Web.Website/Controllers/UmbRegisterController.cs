@@ -15,14 +15,14 @@ namespace Umbraco.Web.Website.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
-        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
+        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
         public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurity websiteSecurity)
+            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _websiteSecurity = websiteSecurity;
+            _websiteSecurityAccessor = websiteSecurityAccessor;
         }
 
         [HttpPost]
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Website.Controllers
                 model.Name = model.Email;
             }
 
-            var result = await _websiteSecurity.RegisterMemberAsync(model, model.LoginOnSuccess);
+            var result = await _websiteSecurityAccessor.WebsiteSecurity.RegisterMemberAsync(model, model.LoginOnSuccess);
 
             switch (result)
             {

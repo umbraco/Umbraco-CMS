@@ -15,14 +15,14 @@ namespace Umbraco.Web.Website.Controllers
     [UmbracoMemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
-        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
+        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
         public UmbLoginStatusController(IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurity websiteSecurity)
+            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _websiteSecurity = websiteSecurity;
+            _websiteSecurityAccessor = websiteSecurityAccessor;
         }
 
         [HttpPost]
@@ -35,9 +35,9 @@ namespace Umbraco.Web.Website.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (_websiteSecurity.IsLoggedIn())
+            if (_websiteSecurityAccessor.WebsiteSecurity.IsLoggedIn())
             {
-                await _websiteSecurity.LogOutAsync();
+                await _websiteSecurityAccessor.WebsiteSecurity.LogOutAsync();
             }
 
             TempData["LogoutSuccess"] = true;

@@ -14,14 +14,14 @@ namespace Umbraco.Web.Website.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
-        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
+        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
         public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
             ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider,
-            IUmbracoWebsiteSecurity websiteSecurity)
+            IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _websiteSecurity = websiteSecurity;
+            _websiteSecurityAccessor = websiteSecurityAccessor;
         }
 
         [HttpPost]
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Website.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (await _websiteSecurity.LoginAsync(model.Username, model.Password) == false)
+            if (await _websiteSecurityAccessor.WebsiteSecurity.LoginAsync(model.Username, model.Password) == false)
             {
                 // Don't add a field level error, just model level.
                 ModelState.AddModelError("loginModel", "Invalid username or password");

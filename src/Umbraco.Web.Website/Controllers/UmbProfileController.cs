@@ -16,14 +16,14 @@ namespace Umbraco.Web.Website.Controllers
     [UmbracoMemberAuthorize]
     public class UmbProfileController : SurfaceController
     {
-        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
+        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
         public UmbProfileController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
             ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger,
-            IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurity websiteSecurity)
+            IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _websiteSecurity = websiteSecurity;
+            _websiteSecurityAccessor = websiteSecurityAccessor;
         }
 
         [HttpPost]
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Website.Controllers
                 return CurrentUmbracoPage();
             }
 
-            var result = await _websiteSecurity.UpdateMemberProfileAsync(model);
+            var result = await _websiteSecurityAccessor.WebsiteSecurity.UpdateMemberProfileAsync(model);
             switch (result.Status)
             {
                 case UpdateMemberProfileStatus.Success:

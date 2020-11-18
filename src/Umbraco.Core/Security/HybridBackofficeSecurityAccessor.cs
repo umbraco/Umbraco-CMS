@@ -1,15 +1,12 @@
 ﻿using Umbraco.Core.Cache;
-using Umbraco.Core.Security;
 using Umbraco.Web;
-using Umbraco.Web.Security;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Security
 {
-
     public class HybridBackofficeSecurityAccessor : HybridAccessorBase<IBackOfficeSecurity>, IBackOfficeSecurityAccessor
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.
+        /// Initializes a new instance of the <see cref="HybridBackofficeSecurityAccessor"/> class.
         /// </summary>
         public HybridBackofficeSecurityAccessor(IRequestCache requestCache)
             : base(requestCache)
@@ -19,7 +16,7 @@ namespace Umbraco.Core
         protected override string ItemKey => "Umbraco.Web.HybridBackofficeSecurityAccessor";
 
         /// <summary>
-        /// Gets or sets the <see cref="BackOfficeSecurity"/> object.
+        /// Gets or sets the <see cref="IBackOfficeSecurity"/> object.
         /// </summary>
         public IBackOfficeSecurity BackOfficeSecurity
         {
