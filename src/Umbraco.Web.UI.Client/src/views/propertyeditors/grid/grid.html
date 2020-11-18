@@ -19,34 +19,25 @@
 
         <!-- Template picker -->
 
-        <div class="templates-preview"
+        <div class="umb-grid-preview--templates"
              ng-show="!model.value || model.value == ''">
 
              <p><strong><localize key="grid_chooseLayout">Choose a layout</localize></strong></p>
 
-            <div class="preview-rows layout"
+            <button type="button" class="umb-grid-preview--rows btn-reset m3"
                  ng-repeat="template in model.config.items.templates"
                  ng-click="addTemplate(template)">
 
-                <div class="preview-row">
-
-                    <div class="preview-col"
+                <div class="umb-grid-preview--row">
+                    <div class="umb-grid-preview--col"
                          ng-repeat="section in template.sections"
                          ng-style="{width: percentage(section.grid) + '%'}">
-
-                        <div class="preview-cell">
-                        </div>
-
                     </div>
-
-                </div>
-
-                <div class="preview-overlay">
                 </div>
 
                 <small>{{template.name}}</small>
 
-            </div> <!-- .templates-preview-rows -->
+            </button> <!-- .templates-preview-rows -->
 
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
@@ -92,7 +83,7 @@
 
                                    <div class="cell-tools-edit row-tool" ng-if="hasSettings">
                                        <button type="button" class="btn-icon" ng-click="editGridItemSettings(row, 'row')" localize="title" title="@grid_settings">
-                                           <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                           <umb-icon icon="icon-settings"></umb-icon>
                                            <span class="sr-only">
                                                <localize key="grid_settings">Settings</localize>
                                            </span>
@@ -100,7 +91,12 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
+                                        <button class="btn-icon" ng-click="togglePrompt(row)" type="button" localize="title" title="@general_remove">
+                                            <umb-icon icon="icon-trash"></umb-icon>
+                                            <span class="sr-only">
+                                                <localize key="general_remove">Remove</localize>
+                                            </span>
+                                        </button>
                                         <umb-confirm-action
                                             ng-if="row.deletePrompt"
                                             direction="left"
@@ -161,7 +157,7 @@
 
                                                       <div class="cell-tools" ng-if="(area === active || area === currentCellWithActiveChild) && !sortMode">
                                                           <button type="button" aria-haspopup="true" class="btn-icon cell-tool" ng-click="editGridItemSettings(area, 'cell')">
-                                                              <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                                              <umb-icon icon="icon-settings"></umb-icon>
                                                               <span class="sr-only">Open column settings</span>
                                                           </button>
                                                       </div>
@@ -207,7 +203,7 @@
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
                                                                               <button type="button" class="umb-control-tool-icon btn-icon" ng-click="editGridItemSettings(control, 'control')">
-                                                                                  <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                                                                  <umb-icon icon="icon-settings"></umb-icon>
                                                                                   <span class="sr-only">
                                                                                       <localize key="general_edit">Edit</localize>
                                                                                   </span>
@@ -262,14 +258,13 @@
                     <!-- row sortable end -->
                     <!-- column tools -->
 
-                    <div class="umb-add-row" ng-if="!sortMode">
+                    <div class="umb-add-row" ng-if="!sortMode && !showRowConfigurations">
 
                        <button type="button"
                                class="iconBox btn-reset"
                                title="{{section.$allowedLayouts.length == 1 ? section.$allowedLayouts[0].label || section.$allowedLayouts[0].name : ''}}"
-                               ng-click="section.$allowedLayouts.length == 1 ? addRow(section, section.$allowedLayouts[0]) : toggleAddRow()"
-                               ng-if="!showRowConfigurations">
-                            <i class="icon icon-add" aria-hidden="true"></i>
+                               ng-click="section.$allowedLayouts.length == 1 ? addRow(section, section.$allowedLayouts[0]) : toggleAddRow()">
+                            <umb-icon icon="icon-add"></umb-icon>
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_addNewRow">Add new row</localize>
                             </span>
@@ -277,28 +272,19 @@
 
                     </div>
 
-                    <div class="templates-preview" ng-if="showRowConfigurations">
+                    <div class="umb-grid-preview--templates" ng-if="showRowConfigurations">
 
                         <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows">Add row</localize></strong></p>
 
-                        <button class="preview-rows columns btn-reset"
-                             ng-repeat="layout in  section.$allowedLayouts"
+                        <button class="umb-grid-preview--rows btn-reset m3"
+                             ng-repeat="layout in section.$allowedLayouts"
                              ng-show="layout.areas.length > 0"
                              ng-click="addRow(section, layout)"
                              type="button">
 
-                            <div class="preview-row">
-
-                                <div class="preview-col" ng-style="{width: percentage(area.grid) + '%'}" ng-repeat="area in layout.areas">
-
-                                    <div class="preview-cell">
-                                    </div>
-
+                            <div class="umb-grid-preview--row">
+                                <div class="umb-grid-preview--col" ng-style="{width: percentage(area.grid) + '%'}" ng-repeat="area in layout.areas">
                                 </div>
-
-                            </div>
-
-                            <div class="preview-overlay">
                             </div>
 
                             <small>{{layout.label || layout.name}}</small>
