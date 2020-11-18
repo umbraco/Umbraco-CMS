@@ -54,6 +54,8 @@ function valServerMatch(serverValidationManager) {
 
             function bindCallback(validationKey, matchVal, matchType) {
 
+                if (!matchVal) return;
+
                 if (Utilities.isString(matchVal)) {
                     matchVal = [matchVal]; // normalize to an array since the value can also natively be an array
                 }

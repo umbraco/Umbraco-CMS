@@ -12,7 +12,7 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Routing
 {
     // purpose: test the values returned by PublishedContentCache.GetRouteById
-    // and .GetByRoute (no caching at all, just routing nice urls) including all
+    // and .GetByRoute (no caching at all, just routing nice URLs) including all
     // the quirks due to hideTopLevelFromPath and backward compatibility.
 
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
@@ -146,7 +146,7 @@ DetermineRouteById(id):
 
     node = node(id)
 
-    walk up from node to domain or root, assemble parts = url segments
+    walk up from node to domain or root, assemble parts = URL segments
 
     if !domain and global.hide:
         if id.parent:

@@ -8,21 +8,23 @@
 
                <i class="icon-navigation list-view-layout__sort-handle" aria-hidden="true" aria-label="Sort"></i>
 
-               <div>
+               <div class="list-view-layout__icon-wrapper">
 
-                   <button ng-if="layout.isSystem !== 1" type="button" ng-click="vm.openIconPicker(layout)" class="list-view-layout__icon" umb-auto-focus>
-                       <i class="{{ layout.icon }}" aria-hidden="true"></i>
+                   <button ng-if="layout.isSystem !== 1" type="button" class="btn-reset" ng-click="vm.openIconPicker(layout)" umb-auto-focus>
+                       <span class="list-view-layout__icon">
+                           <i class="{{layout.icon}}" aria-hidden="true"></i>
+                       </span>
                    </button>
 
                    <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
-                       <i class="{{ layout.icon }}" aria-hidden="true"></i>
+                       <i class="{{layout.icon}}" aria-hidden="true"></i>
                    </div>
 
                </div>
 
                <div class="list-view-layout__name">
                    <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
-                   <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
+                   <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{layout.name}}</span>
                    <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
                </div>
 
@@ -34,9 +36,11 @@
                    <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
 
                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                       <umb-confirm-action show="layout.deletePrompt"
+                       <button type="button" class="btn-icon" ng-click="vm.showPrompt(layout)" aria-label="Remove">
+                           <i class="icon-trash" aria-hidden="true"></i>
+                       </button>
+                       <umb-confirm-action ng-if="layout.deletePrompt"
                                            direction="left"
-                                           on-delete="vm.showPrompt(layout)"
                                            on-confirm="vm.removeLayout($index, layout)"
                                            on-cancel="vm.hidePrompt(layout)">
                        </umb-confirm-action>
@@ -47,7 +51,7 @@
 
        </div>
 
-      <button type="button" class="list-view-add-layout" ng-click="vm.addLayout()">Add layout</button>
+      <button type="button" class="list-view-add-layout mt2" ng-click="vm.addLayout()">Add layout</button>
 
    </div>
 

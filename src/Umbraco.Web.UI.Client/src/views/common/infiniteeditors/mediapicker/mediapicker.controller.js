@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService) {
 
             var vm = this;
 
@@ -17,6 +17,7 @@ angular.module("umbraco")
             vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
+            vm.focalPointChanged = focalPointChanged;
             vm.changePagination = changePagination;
 
             vm.clickHandler = clickHandler;
@@ -52,11 +53,11 @@ angular.module("umbraco")
             if ($scope.onlyImages) {
                 vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             } else {
-                // Use whitelist of allowed file types if provided
+                // Use list of allowed file types if provided
                 if (allowedUploadFiles !== '') {
                     vm.acceptedFileTypes = allowedUploadFiles;
                 } else {
-                    // If no whitelist, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+                    // If no allowed list, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
                     vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
                 }
             }
@@ -166,8 +167,14 @@ angular.module("umbraco")
                 }
             }
 
-            function upload() {
-                $(".umb-file-dropzone .file-select").trigger("click");
+            function upload(v) {
+                var fileSelect = $(".umb-file-dropzone .file-select");
+                if (fileSelect.length === 0){
+                    localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
+                }
+                else{
+                    fileSelect.trigger("click");
+                }
             }
 
             function dragLeave() {
@@ -223,15 +230,11 @@ angular.module("umbraco")
                                     return f.path.indexOf($scope.startNodeId) !== -1;
                                 });
                         });
-
-                    mediaTypeHelper.getAllowedImagetypes(folder.id)
-                        .then(function (types) {
-                            vm.acceptedMediatypes = types;
-                        });
                 } else {
                     $scope.path = [];
                 }
 
+                mediaTypeHelper.getAllowedImagetypes(folder.id).then(function (types) { vm.acceptedMediatypes = types; });
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
                 $scope.currentFolder = folder;
 
@@ -239,7 +242,7 @@ angular.module("umbraco")
 
                 return getChildren(folder.id);
             }
-            
+
             function toggleListView() {
                 vm.showMediaList = !vm.showMediaList;
             }
@@ -286,7 +289,7 @@ angular.module("umbraco")
                     gotoFolder(item);
                 }
                 else {
-                    $scope.clickHandler(item, event, index);
+                    clickHandler(item, event, index);
                 }
             };
 
@@ -368,7 +371,7 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
-                
+
                 const dialog = {
                     view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
                     size: "small",
@@ -376,7 +379,7 @@ angular.module("umbraco")
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
                     submit: function (model) {
-                        
+
                         $scope.model.selection.push($scope.target);
                         $scope.model.submit($scope.model);
 
@@ -542,6 +545,19 @@ angular.module("umbraco")
                         folderImage.selected = true;
                     }
                 }
+            }
+
+            /**
+             * Called when the umbImageGravity component updates the focal point value
+             * @param {any} left
+             * @param {any} top
+             */
+            function focalPointChanged(left, top) {
+                // update the model focalpoint value
+                $scope.target.focalPoint = {
+                    left: left,
+                    top: top
+                };
             }
 
             function submit() {

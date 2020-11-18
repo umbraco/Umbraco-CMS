@@ -105,7 +105,7 @@
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
                             </span>
                             <span class="umb-variant-selector-entry__description"
-                                ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                  ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                             </span>
@@ -181,12 +181,9 @@
 
                         </div>
                     </div>
-
                 </ng-form>
             </div>
             <br />
         </div>
-
     </div>
-
 </div>

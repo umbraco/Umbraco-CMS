@@ -159,9 +159,6 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 element.removeClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = false;
                 notifySubView();
-                //clear form state as at this point we retrieve new data from the server
-                //and all validation will have cleared at this point
-                formCtrl.$setPristine();
             }));
 
             var confirmed = false;
@@ -238,6 +235,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 }
             });
 
+            // TODO: I'm unsure why this exists, i believe this may be a hack for something like tinymce which might automatically
+            // change a form value on load but we need it to be $pristine?
             $timeout(function () {
                 formCtrl.$setPristine();
             }, 1000);

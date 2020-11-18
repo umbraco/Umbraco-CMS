@@ -2,14 +2,14 @@
 
     <umb-editor-view footer="false">
 
-        <umb-editor-header
-            name="'Log Search'"
-            name-locked="true"
-            on-back="vm.back()"
-            show-back-button="vm.showBackButton"
-            hide-icon="true"
-            hide-description="true"
-            hide-alias="true">
+        <umb-editor-header name="'Log Search'"
+                           name-locked="true"
+                           on-back="vm.back()"
+                           show-back-button="vm.showBackButton"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true"
+                           setPageTitle="true">
         </umb-editor-header>
 
         <umb-editor-container>
@@ -21,36 +21,46 @@
                 <umb-editor-sub-header>
                     <umb-editor-sub-header-content-left class="flex-auto flex-wrap">
 
-                        <!-- Log Level filter -->
-                        <div class="flex log-viewer-filter" style="position: relative;">
-                            <button type="button"
-                                    class="btn-link dropdown-toggle flex mb2 filter-toggle"
-                                    ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
-                                    aria-haspopup="true"
-                                    aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}">
-                                <span>
-                                    <localize key="logViewer_logLevels">Log Levels</localize>:
-                                </span>
-                                <span class="filter-toggle__level truncate">{{ vm.getFilterName(vm.logLevels) }}</span>
-                                <span class="filter-toggle__icon caret" aria-hidden="true"></span>
-                            </button>
-                            <umb-dropdown class="pull-left" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
-                                <umb-dropdown-item ng-repeat="level in vm.logLevels" class="dropdown-item">
-                                    <div class="flex items-center">
-                                        <umb-checkbox input-id="loglevel-{{$index}}"
-                                                      name="loglevel"
-                                                      model="level.selected"
-                                                      on-change="vm.setLogLevelFilter(level)">
-                                        </umb-checkbox>
+                        <div class="flex mr-auto mb2">
 
-                                        <label for="loglevel-{{$index}}">
-                                            <umb-badge size="s" color="{{level.logTypeColor}}">{{level.name}}</umb-badge>
-                                        </label>
-                                    </div>
-                                </umb-dropdown-item>
-                            </umb-dropdown>
+                            <!-- Log Level filter -->
+                            <div class="umb-filter">
+                                <button type="button"
+                                        class="btn btn-link dropdown-toggle umb-filter__toggle"
+                                        ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
+                                        aria-haspopup="true"
+                                        aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}">
+
+                                    <span><localize key="logViewer_logLevels">Log Levels</localize>:</span>
+                                    <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.logLevels) }}</span>
+                                    <span class="caret" aria-hidden="true"></span>
+                                </button>
+                                <umb-dropdown class="pull-left" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
+                                    <umb-dropdown-item ng-repeat="level in vm.logLevels" class="dropdown-item">
+                                        <div class="flex items-center">
+                                            <umb-checkbox input-id="loglevel-{{$index}}"
+                                                          name="loglevel"
+                                                          model="level.selected"
+                                                          on-change="vm.setLogLevelFilter(level)">
+                                            </umb-checkbox>
+                                            <label for="loglevel-{{$index}}">
+                                                <umb-badge size="s" color="{{level.logTypeColor}}">{{level.name}}</umb-badge>
+                                            </label>
+                                        </div>
+                                    </umb-dropdown-item>
+                                </umb-dropdown>
+                            </div>
+
                         </div>
-
+                        <div class="flex">
+                            <!-- Polling Button -->
+                            <umb-button-group default-button="vm.polling.defaultButton"
+                                              sub-buttons="vm.polling.subButtons"
+                                              icon="{{ vm.polling.defaultButton.icon }}"
+                                              direction="down"
+                                              float="right">
+                            </umb-button-group>
+                        </div>
                         <div class="flex search-box">
                             <div class="flex-auto">
                                 <!-- Search/expression filter -->
@@ -101,143 +111,144 @@
 
             <div ng-if="!vm.loading" class="log-items">
 
-                    <!-- Loader for the main logs content when paging -->
-                    <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
+                <!-- Loader for the main logs content when paging -->
+                <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
 
-                    <!-- Empty states -->
-                    <umb-empty-state ng-if="vm.logItems.totalItems === 0 && !vm.logsLoading" position="center">
-                        <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
-                    </umb-empty-state>
+                <!-- Empty states -->
+                <umb-empty-state ng-if="vm.logItems.totalItems === 0 && !vm.logsLoading" position="center">
+                    <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
+                </umb-empty-state>
 
-                    <!-- Main Log Table -->
-                    <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">
-                        <umb-box-content class="block-form">
+                <!-- Main Log Table -->
+                <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">
+                    <umb-box-content class="block-form">
 
-                            <div ng-if="vm.logItems.totalItems > 0">
-                                <localize key="logViewer_totalItems">Total Items</localize>: {{ vm.logItems.totalItems }}
-                            </div>
+                        <div ng-if="vm.logItems.totalItems > 0">
+                            <p> <localize key="logViewer_totalItems">Total Items</localize>: {{ vm.logItems.totalItems }}</p>
+                        </div>
 
-                            <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
-                                <thead>
-                                    <tr>
-                                        <th ng-click="vm.toggleOrderBy()">
-                                            <localize key="logViewer_timestamp">Timestamp</localize>
-                                            <umb-icon icon="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
-                                        </th>
-                                        <th><localize key="logViewer_level">Level</localize></th>
-                                        <th><localize key="logViewer_machine">Machine</localize></th>
-                                        <th><localize key="logViewer_message">Message</localize></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
-                                        <td>{{ log.Timestamp | date:'medium' }}</td>
-                                        <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
-                                        <td><small>{{ log.Properties.MachineName.Value }}</small></td>
-                                        <td>{{ log.RenderedMessage }}</td>
-                                    </tr>
+                        <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
+                            <caption class="sr-only">Logs <localize key="logViewer_totalItems">Total Items</localize>: {{ vm.logItems.totalItems }}</caption>
+                            <thead>
+                            <tr>
+                                <th ng-click="vm.toggleOrderBy()">
+                                    <localize key="logViewer_timestamp">Timestamp</localize>
+                                    <umb-icon icon="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
+                                </th>
+                                <th><localize key="logViewer_level">Level</localize></th>
+                                <th><localize key="logViewer_machine">Machine</localize></th>
+                                <th><localize key="logViewer_message">Message</localize></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
+                                <td>{{ log.Timestamp | date:'medium' }}</td>
+                                <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
+                                <td><small>{{ log.Properties.MachineName.Value }}</small></td>
+                                <td>{{ log.RenderedMessage }}</td>
+                            </tr>
 
-                                    <!-- Log Details (Exception & Properties) -->
-                                    <tr ng-repeat-end ng-if="log.open">
-                                        <td colspan="4">
-                                            <div ng-if="log.Exception"class="exception">
-                                                <h3 class="text-error"><localize key="logViewer_exception">Exception</localize></h3>
-                                                <p class="exception-message">{{ log.Exception }}</p>
-                                            </div>
+                                <!-- Log Details (Exception & Properties) -->
+                                <tr ng-repeat-end ng-if="log.open">
+                                    <td colspan="4">
+                                        <div ng-if="log.Exception" class="exception">
+                                            <h3 class="text-error"><localize key="logViewer_exception">Exception</localize></h3>
+                                            <p class="exception-message">{{log.Exception}}</p>
+                                        </div>
 
-                                            <h3><localize key="logViewer_properties">Properties</localize></h3>
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th><localize key="logViewer_timestamp">Timestamp</localize></th>
-                                                        <td>{{log.Timestamp}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>@MessageTemplate</th>
-                                                        <td>{{log.MessageTemplateText}}</td>
-                                                    </tr>
-                                                    <tr ng-repeat="(key, val) in log.Properties">
-                                                        <th>{{key}}</th>
-                                                        <td ng-switch on="key">
-                                                            <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithRequestId">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithNamespace">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithMachineName">{{val.Value}} <i class="icon-search"></i></a>
-                                                            <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noreferrer" localize="title" title="@logViewer_Open">{{val.Value}} <i class="icon-link"></i></a>
-                                                            <span ng-switch-default>{{val.Value}}</span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                        <h3><localize key="logViewer_properties">Properties</localize></h3>
+                                        <table class="table">
+                                            <caption class="sr-only">{{log.RenderedMessage}} Properties for {{log.Timestamp | date:'medium'}}</caption>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row"><localize key="logViewer_timestamp">Timestamp</localize></th>
+                                                    <td>{{log.Timestamp}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">@MessageTemplate</th>
+                                                    <td>{{log.MessageTemplateText}}</td>
+                                                </tr>
+                                                <tr ng-repeat="(key, val) in log.Properties">
+                                                    <th scope="row">{{key}}</th>
+                                                    <td ng-switch on="key">
+                                                        <button type="button" class="btn-reset" ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithRequestId" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i> </button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithNamespace" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i></button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithMachineName" aria-describedby="{{key}}">{{val.Value}} <i class="icon-search" aria-hidden="true"></i></button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" localize="title" title="@logViewer_Open" aria-describedby="{{key}}">{{val.Value}} <i class="icon-link" aria-hidden="true"></i></button>
+                                                        <span ng-switch-default>{{val.Value}}</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                                            <div class="btn-group" deep-blur="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                <button
-                                                    type="button"
+                                        <div class="btn-group" deep-blur="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                            <button type="button"
                                                     class="btn btn-info dropdown-toggle"
                                                     aria-haspopup="true"
                                                     aria-expanded="{{log.searchDropdownOpen === undefined ? false : log.searchDropdownOpen}}"
                                                     ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                        <umb-icon icon="icon-search" class="icon-search"></umb-icon>
-                                                        <localize key="general_search">Search</localize>
-                                                        <span class="caret" aria-hidden="true"></span>
-                                                </button>
+                                                <umb-icon icon="icon-search" class="icon-search"></umb-icon>
+                                                <localize key="general_search">Search</localize>
+                                                <span class="caret" aria-hidden="true"></span>
+                                            </button>
 
-                                                <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithGoogle">
-                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithGoogle">Search With Google</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                            <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchThisMessageWithGoogle">
+                                                        <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithGoogle">Search With Google</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithBing">
-                                                            <img src="https://www.bing.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithBing">Search With Bing</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchThisMessageWithBing">
+                                                        <img src="https://www.bing.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithBing">Search With Bing</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageOnOurUmbracoForumsAndDocs">
-                                                            <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbraco">Search Our Umbraco</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchThisMessageOnOurUmbracoForumsAndDocs">
+                                                        <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbraco">Search Our Umbraco</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchOurUmbracoForumsUsingGoogle">
-                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbracoWithGoogle">Search Our Umbraco with Google</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://www.google.co.uk/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchOurUmbracoForumsUsingGoogle">
+                                                        <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbracoWithGoogle">Search Our Umbraco with Google</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchWithinUmbracoSourceCodeOnGithub">
-                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoSource">Search Umbraco Source</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchWithinUmbracoSourceCodeOnGithub">
+                                                        <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoSource">Search Umbraco Source</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchUmbracoIssuesOnGithub">
-                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoIssues">Search Umbraco Issues</localize>
-                                                        </a>
-                                                    </umb-dropdown-item>
-                                                </umb-dropdown>
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchUmbracoIssuesOnGithub">
+                                                        <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoIssues">Search Umbraco Issues</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
+                                            </umb-dropdown>
 
-                                            </div>
+                                        </div>
 
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                            <!-- Pagination -->
-                            <div ng-if="!vm.loading" class="flex justify-center">
-                                <umb-pagination
-                                    ng-if="vm.logItems.totalPages"
-                                    page-number="vm.logItems.pageNumber"
-                                    total-pages="vm.logItems.totalPages"
-                                    on-change="vm.changePageNumber(pageNumber)">
-                                </umb-pagination>
-                            </div>
+                        <!-- Pagination -->
+                        <div ng-if="!vm.loading" class="flex justify-center">
+                            <umb-pagination
+                                ng-if="vm.logItems.totalPages"
+                                            page-number="vm.logItems.pageNumber"
+                                            total-pages="vm.logItems.totalPages"
+                                            on-change="vm.changePageNumber(pageNumber)">
+                            </umb-pagination>
+                        </div>
 
-                        </umb-box-content>
-                    </umb-box>
+                    </umb-box-content>
+                </umb-box>
 
             </div>
 

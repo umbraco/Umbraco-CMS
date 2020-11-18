@@ -208,6 +208,13 @@ umb-property:last-of-type .umb-control-group {
     .control-description {
         display: block;
         clear: both;
+        overflow-wrap: break-word;
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
 
@@ -272,6 +279,7 @@ label:not([for]) {
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
+    font-weight: 900;
 }
 
 .controls-row {

@@ -22,14 +22,14 @@
             $location.path("/settings/stylesheets/edit/" + node.id).search("create", "true").search("rtestyle", "true");
             navigationService.hideMenu();
         }
-        
+
         function showCreateFolder() {
             vm.creatingFolder = true;
         }
 
         function createFolder(form) {
 
-            if (formHelper.submitForm({scope: $scope, formCtrl: form })) {
+            if (formHelper.submitForm({ scope: $scope, formCtrl: form })) {
 
                 codefileResource.createContainer("stylesheets", node.id, vm.folderName).then(function (saved) {
 
@@ -42,12 +42,13 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, formCtrl: form });
 
-                }, function(err) {
+                }, function (err) {
 
-                  vm.createFolderError = err;
-                    
+                    formHelper.resetForm({ scope: $scope, formCtrl: form, hasErrors: true });
+                    vm.createFolderError = err;
+
                 });
             }
 
@@ -57,7 +58,7 @@
             const showMenu = true;
             navigationService.hideDialog(showMenu);
         }
-        
+
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.CreateController", StyleSheetsCreateController);
