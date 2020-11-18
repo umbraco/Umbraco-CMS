@@ -24,7 +24,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly ILogger<RedirectUrlManagementController> _logger;
         private readonly WebRoutingSettings _webRoutingSettings;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public RedirectUrlManagementController(
             ILogger<RedirectUrlManagementController> logger,
             IOptions<WebRoutingSettings> webRoutingSettings,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
             IHostingEnvironment hostingEnvironment,
@@ -56,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult GetEnableState()
         {
             var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
-            var userIsAdmin = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult ToggleUrlTracker(bool disable)
         {
-            var userIsAdmin = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";

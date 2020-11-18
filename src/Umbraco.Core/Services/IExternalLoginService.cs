@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Services
@@ -19,16 +20,28 @@ namespace Umbraco.Core.Services
         /// Returns all logins matching the login info - generally there should only be one but in some cases
         /// there might be more than one depending on if an administrator has been editing/removing members
         /// </summary>
-        /// <param name="login"></param>
+        /// <param name="loginProvider"></param>
+        /// <param name="providerKey"></param>
         /// <returns></returns>
-        IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login);
+        IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey);
 
         /// <summary>
-        /// Save user logins
+        /// Saves the external logins associated with the user
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userId">
+        /// The user associated with the logins
+        /// </param>
         /// <param name="logins"></param>
-        void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins);
+        /// <remarks>
+        /// This will replace all external login provider information for the user
+        /// </remarks>
+        void Save(int userId, IEnumerable<IExternalLogin> logins);
+
+        /// <summary>
+        /// Save a single external login record
+        /// </summary>
+        /// <param name="login"></param>
+        void Save(IIdentityUserLogin login);
 
         /// <summary>
         /// Deletes all user logins - normally used when a member is deleted

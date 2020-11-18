@@ -9,6 +9,7 @@ namespace Umbraco.Web
 {
     public static class OwinExtensions
     {
+
         /// <summary>
         /// Gets the <see cref="ISecureDataFormat{AuthenticationTicket}"/> for the Umbraco back office cookie
         /// </summary>
@@ -50,17 +51,7 @@ namespace Umbraco.Web
             var ctx = owinContext.Get<HttpContextBase>(typeof(HttpContextBase).FullName);
             return ctx == null ? Attempt<HttpContextBase>.Fail() : Attempt.Succeed(ctx);
         }
-        
-        /// <summary>
-        /// Gets the back office sign in manager out of OWIN
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        public static BackOfficeSignInManager GetBackOfficeSignInManager(this IOwinContext owinContext)
-        {
-            return owinContext.Get<BackOfficeSignInManager>()
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeSignInManager)} from the {typeof(IOwinContext)}.");
-        }
+
 
         /// <summary>
         /// Gets the back office user manager out of OWIN

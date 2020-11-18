@@ -35,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly string[] _treeAliases;
 
             private readonly ITreeService _treeService;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
             /// <summary>
             ///     Constructor to set authorization to be based on a tree alias for which application security will be applied
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Filters
             ///     If the user has access to the application that the treeAlias is specified in, they will be authorized.
             ///     Multiple trees may be specified.
             /// </param>
-            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 params string[] treeAliases)
             {
                 _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
@@ -76,9 +76,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     .Distinct()
                     .ToArray();
 
-                return _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser != null
-                       && apps.Any(app => _backofficeSecurityAccessor.BackofficeSecurity.UserHasSectionAccess(
-                           app, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser));
+                return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
+                       && apps.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
+                           app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
             }
         }
     }

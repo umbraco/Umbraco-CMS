@@ -3,6 +3,7 @@
 
 namespace Umbraco.Core.BackOffice
 {
+
     /// <summary>
     /// This class is used by events raised from the BackofficeUserManager
     /// </summary>
@@ -82,6 +83,7 @@ namespace Umbraco.Core.BackOffice
         LogoutSuccess,
         PasswordChanged,
         PasswordReset,
-        ResetAccessFailedCount
+        ResetAccessFailedCount,
+        SendingUserInvite
     }
 }

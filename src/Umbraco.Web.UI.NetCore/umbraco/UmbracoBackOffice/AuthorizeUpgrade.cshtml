@@ -8,11 +8,11 @@
 @using Umbraco.Core.Hosting
 @using Umbraco.Extensions
 @using Umbraco.Web.BackOffice.Controllers
-@inject BackOfficeSignInManager signInManager
 @inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
+@inject IBackOfficeExternalLoginProviders externalLogins
 @inject IRuntimeMinifier runtimeMinifier
 
 @{
@@ -59,7 +59,7 @@
     <script type="text/javascript">
     document.angularReady = function (app) {
 
-        @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
+        @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors())
         @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
 
     }

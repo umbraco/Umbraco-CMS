@@ -14,10 +14,10 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-            var backofficeSecurity = new Mock<IBackofficeSecurity>();
+            var backofficeSecurity = new Mock<IBackOfficeSecurity>();
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();

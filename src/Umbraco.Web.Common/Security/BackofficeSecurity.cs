@@ -7,21 +7,21 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Common.Security
 {
 
-    public class BackofficeSecurity : IBackofficeSecurity
+    public class BackOfficeSecurity : IBackOfficeSecurity
     {
         private readonly IUserService _userService;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BackofficeSecurity(
+        public BackOfficeSecurity(
             IUserService userService,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,

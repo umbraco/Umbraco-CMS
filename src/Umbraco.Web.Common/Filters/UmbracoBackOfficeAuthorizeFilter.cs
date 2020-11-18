@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using System;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;

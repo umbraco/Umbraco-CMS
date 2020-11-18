@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -106,12 +107,12 @@ namespace Umbraco.Core.PropertyEditors
             => obj is TConfiguration;
 
         /// <inheritdoc />
-        public override object FromDatabase(string configuration)
+        public override object FromDatabase(string configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(configuration)) return new TConfiguration();
-                return JsonConvert.DeserializeObject<TConfiguration>(configuration, ConfigurationJsonSettings);
+                return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration);
             }
             catch (Exception e)
             {

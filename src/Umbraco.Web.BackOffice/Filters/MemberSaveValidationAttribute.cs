@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private sealed class MemberSaveValidationFilter : IActionFilter
         {
             private readonly ILoggerFactory _loggerFactory;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly ILocalizedTextService _textService;
             private readonly IMemberTypeService _memberTypeService;
             private readonly IMemberService _memberService;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             public MemberSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IMemberTypeService memberTypeService,
                 IMemberService memberService,
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MemberSave)context.ActionArguments["contentItem"];
-                var contentItemValidator = new MemberSaveModelValidator(_loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackofficeSecurity, _textService, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
+                var contentItemValidator = new MemberSaveModelValidator(_loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, context))
                     if (contentItemValidator.ValidateProperties(model, model, context))

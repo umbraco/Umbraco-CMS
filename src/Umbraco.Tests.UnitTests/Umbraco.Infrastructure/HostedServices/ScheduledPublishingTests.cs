@@ -104,7 +104,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
-            var mockBackOfficeSecurityFactory = new Mock<IBackofficeSecurityFactory>();
+            var mockBackOfficeSecurityFactory = new Mock<IBackOfficeSecurityFactory>();
 
             return new ScheduledPublishing(mockRunTimeState.Object, mockMainDom.Object, mockServerRegistrar.Object, _mockContentService.Object,
                 mockUmbracoContextFactory.Object, _mockLogger.Object, mockServerMessenger.Object, mockBackOfficeSecurityFactory.Object);

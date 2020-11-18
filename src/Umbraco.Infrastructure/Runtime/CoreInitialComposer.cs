@@ -91,6 +91,7 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
 
             composition.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
+            composition.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
             composition.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
             composition.Services.AddUnique<InstallStatusTracker>();
 
@@ -330,6 +331,7 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<ITreeService, TreeService>();
             composition.Services.AddUnique<ISectionService, SectionService>();
             composition.Services.AddUnique<IEmailSender, EmailSender>();
+            composition.Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
 
             composition.Services.AddUnique<IExamineManager, ExamineManager>();
 

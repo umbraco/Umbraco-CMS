@@ -2,8 +2,7 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
-[RuntimeLevel(MinLevel = RuntimeLevel.Upgrade, MaxLevel = RuntimeLevel.Upgrade)] // only on upgrades
-public class PreValueMigratorComposer : ICoreComposer
+    public class PreValueMigratorComposer : ICoreComposer
 {
     public void Compose(Composition composition)
     {

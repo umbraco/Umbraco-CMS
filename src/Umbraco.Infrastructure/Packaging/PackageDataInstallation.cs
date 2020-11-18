@@ -15,6 +15,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
@@ -34,6 +35,7 @@ namespace Umbraco.Core.Packaging
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -41,7 +43,7 @@ namespace Umbraco.Core.Packaging
         public PackageDataInstallation(ILogger<PackageDataInstallation> logger, ILoggerFactory loggerFactory, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
             IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService, IConfigurationEditorJsonSerializer serializer)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
@@ -54,6 +56,7 @@ namespace Umbraco.Core.Packaging
             _shortStringHelper = shortStringHelper;
             _globalSettings = globalSettings.Value;
             _localizedTextService = localizedTextService;
+            _serializer = serializer;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -615,6 +618,8 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
+            if (infoElement.Element("Key") != null)
+                contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -811,6 +816,8 @@ namespace Umbraco.Core.Packaging
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
                         : ContentVariation.Nothing
                 };
+                if (property.Element("Key") != null)
+                    propertyType.Key = new Guid(property.Element("Key").Value);
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
@@ -908,7 +915,7 @@ namespace Umbraco.Core.Packaging
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
                         editor = new VoidEditor(_loggerFactory, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper) { Alias = editorAlias };
 
-                    var dataType = new DataType(editor)
+                    var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
@@ -918,7 +925,7 @@ namespace Umbraco.Core.Packaging
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
-                        dataType.Configuration = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue);
+                        dataType.Configuration = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue, _serializer);
 
                     dataTypes.Add(dataType);
                 }

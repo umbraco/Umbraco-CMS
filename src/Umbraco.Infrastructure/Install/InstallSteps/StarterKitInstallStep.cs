@@ -16,10 +16,10 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IPackagingService _packagingService;
 
-        public StarterKitInstallStep(IUmbracoApplicationLifetime umbracoApplicationLifetime, IBackofficeSecurityAccessor backofficeSecurityAccessor, IPackagingService packagingService)
+        public StarterKitInstallStep(IUmbracoApplicationLifetime umbracoApplicationLifetime, IBackOfficeSecurityAccessor backofficeSecurityAccessor, IPackagingService packagingService)
         {
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var packageFile = new FileInfo(definition.PackagePath);
 
-            _packagingService.InstallCompiledPackageData(definition, packageFile, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(-1));
+            _packagingService.InstallCompiledPackageData(definition, packageFile, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(-1));
         }
 
         public override bool RequiresExecution(object model)

@@ -14,6 +14,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
@@ -50,14 +51,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             var complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
             var testEditor = Services.GetRequiredService<TestEditor>();
             var dataTypeService = Services.GetRequiredService<IDataTypeService>();
+            var serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
 
-            var complexDataType = new DataType(complexTestEditor)
+            var complexDataType = new DataType(complexTestEditor, serializer)
             {
                 Name = "ComplexTest",
                 Configuration = complexEditorConfig
             };
 
-            var testDataType = new DataType(testEditor)
+            var testDataType = new DataType(testEditor, serializer)
             {
                 Name = "Test",
             };
@@ -135,14 +137,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
         public void Validating_ContentItemSave()
         {
             var logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
-            var backofficeSecurityFactory = Services.GetRequiredService<IBackofficeSecurityFactory>();
-            backofficeSecurityFactory.EnsureBackofficeSecurity();
-            var backofficeSecurityAccessor = Services.GetRequiredService<IBackofficeSecurityAccessor>();
+            var backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
+            backofficeSecurityFactory.EnsureBackOfficeSecurity();
+            var backofficeSecurityAccessor = Services.GetRequiredService<IBackOfficeSecurityAccessor>();
             var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
             var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
             var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
-            var validator = new ContentSaveModelValidator(logger, backofficeSecurityAccessor.BackofficeSecurity, localizedTextService, propertyValidationService);
+            var validator = new ContentSaveModelValidator(logger, backofficeSecurityAccessor.BackOfficeSecurity, localizedTextService, propertyValidationService);
 
             var content = ContentBuilder.CreateTextpageContent(_contentType, "test", -1);
 

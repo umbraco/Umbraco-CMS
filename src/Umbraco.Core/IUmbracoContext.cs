@@ -1,8 +1,8 @@
 using System;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -18,7 +18,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the BackofficeSecurity class
         /// </summary>
-        IBackofficeSecurity Security { get; }
+        IBackOfficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

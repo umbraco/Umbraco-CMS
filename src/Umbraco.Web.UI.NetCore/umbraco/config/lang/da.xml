@@ -1861,6 +1861,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
-
+  <area alias="preview">
+    <key alias="endLabel">Afslut</key>
+    <key alias="endTitle">Afslut forhåndsvisning</key>
+    <key alias="openWebsiteLabel">Vis i nyt vindue</key>
+    <key alias="openWebsiteTitle">Åben forhåndsvisning i nyt vindue</key>
+    <key alias="returnToPreviewHeadline">Forhåndsvisning af indholdet?</key>
+    <key alias="returnToPreviewDescription">Du har afslutet forhåndsvisning, vil du se dette indhold i forhåndsvisning?</key>
+    <key alias="returnToPreviewButton">Fortsæt</key>
+    <key alias="viewPublishedContentHeadline">Se udgivet indhold?</key>
+    <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
+    <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
+    <key alias="viewPublishedContentDeclineButton">Forbliv i forhåndsvisning</key>
+  </area>
 </language>

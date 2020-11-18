@@ -5,17 +5,20 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class MergeDateAndDateTimePropertyEditor : MigrationBase
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
-        public MergeDateAndDateTimePropertyEditor(IMigrationContext context, IIOHelper ioHelper)
+        public MergeDateAndDateTimePropertyEditor(IMigrationContext context, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             : base(context)
         {
             _ioHelper = ioHelper;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
         public override void Migrate()
@@ -28,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 try
                 {
                     config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor(_ioHelper).FromDatabase(
-                        dataType.Configuration);
+                        dataType.Configuration, _configurationEditorJsonSerializer);
 
                     // If the Umbraco.Date type is the default from V7 and it has never been updated, then the
                     // configuration is empty, and the format stuff is handled by in JS by moment.js. - We can't do that
@@ -51,7 +54,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 config.OffsetTime = false;
 
                 dataType.EditorAlias = Constants.PropertyEditors.Aliases.DateTime;
-                dataType.Configuration = ConfigurationEditor.ToDatabase(config);
+                dataType.Configuration = ConfigurationEditor.ToDatabase(config, _configurationEditorJsonSerializer);
 
                 Database.Update(dataType);
             }

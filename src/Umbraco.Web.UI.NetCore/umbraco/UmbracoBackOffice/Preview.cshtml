@@ -8,18 +8,27 @@
 @using Umbraco.Extensions
 @using Umbraco.Core.Logging
 @using Umbraco.Web.BackOffice.Controllers
-@inject BackOfficeSignInManager signInManager
-@inject BackOfficeServerVariables backOfficeServerVariables
-@inject IUmbracoVersion umbracoVersion
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
-@inject IRuntimeMinifier runtimeMinifier
-@inject IProfilerHtml profilerHtml
-
+@inject BackOfficeSignInManager SignInManager
+@inject BackOfficeServerVariables BackOfficeServerVariables
+@inject IUmbracoVersion UmbracoVersion
+@inject IHostingEnvironment HostingEnvironment
+@inject IOptions<GlobalSettings> GlobalSettings
+@inject IRuntimeMinifier RuntimeMinifier
+@inject IProfilerHtml ProfilerHtml
+@inject ILocalizedTextService LocalizedTextService
+@using Umbraco.Core.Services
 
 @model Umbraco.Web.Editors.BackOfficePreviewModel
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
+
+    var EndLabel = LocalizedTextService.Localize("preview", "endLabel");
+    var EndTitle = LocalizedTextService.Localize("preview", "endTitle");
+    var OpenWebsiteLabel = LocalizedTextService.Localize("preview", "openWebsiteLabel");
+    var OpenWebsiteTitle = LocalizedTextService.Localize("preview", "openWebsiteTitle");
+    var returnToPreviewHeadline = LocalizedTextService.Localize("preview", "returnToPreviewHeadline");
+    var returnToPreviewDescription = LocalizedTextService.Localize("preview", "returnToPreviewDescription");
+    var returnToPreviewButton = LocalizedTextService.Localize("preview", "returnToPreviewButton");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,8 +38,15 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="pinterest" content="nopin" />
 
-    @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
+    @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
 
+    <script type="text/javascript">
+        window.umbLocalizedVars = {
+            'returnToPreviewHeadline': '@returnToPreviewHeadline',
+            'returnToPreviewDescription':'@returnToPreviewDescription',
+            'returnToPreviewButton':'@returnToPreviewButton'
+        };
+    </script>
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
     <div class="wait" ng-show="!frameLoaded"></div>
@@ -74,8 +90,12 @@
                     </div>
                 }
 
-                <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline">
-                    <i class="icon icon-power"></i><span>Exit</span>
+                <button ng-click="openInBrowser()" title="@OpenWebsiteTitle" class="menu-bar__button umb-outline">
+                    <i class="icon icon-out"></i><span>@OpenWebsiteLabel</span>
+                </button>
+
+                <button ng-click="exitPreview()" title="@EndTitle" class="menu-bar__button umb-outline">
+                    <i class="icon icon-power"></i><span>@EndLabel</span>
                 </button>
 
             </div>
@@ -83,10 +103,10 @@
 
     </div>
 
-    @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
+    @await Html.BareMinimumServerVariablesScriptAsync(BackOfficeServerVariables)
 
     <script src="../lib/lazyload-js/LazyLoad.min.js"></script>
-    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null, HostingEnvironment, UmbracoVersion, RuntimeMinifier)"></script>
 
 </body>
 </html>

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
@@ -18,6 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private readonly PreValueMigratorCollection _preValueMigrators;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger<DataTypeMigration> _logger;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
         private static readonly ISet<string> LegacyAliases = new HashSet<string>()
         {
@@ -31,12 +30,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
         };
 
-        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger<DataTypeMigration> logger)
+        public DataTypeMigration(IMigrationContext context,
+            PreValueMigratorCollection preValueMigrators,
+            PropertyEditorCollection propertyEditors,
+            ILogger<DataTypeMigration> logger,
+            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             : base(context)
         {
             _preValueMigrators = preValueMigrators;
             _propertyEditors = propertyEditors;
             _logger = logger;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
         public override void Migrate()
@@ -86,7 +90,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 // migrate the preValues to configuration
                 var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
                 var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, dictionary);
-                var json = JsonConvert.SerializeObject(config);
+                var json = _configurationEditorJsonSerializer.Serialize(config);
 
                 // validate - and kill the migration if it fails
                 var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
@@ -115,7 +119,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     var configEditor = propertyEditor.GetConfigurationEditor();
                     try
                     {
-                        var _ = configEditor.FromDatabase(json);
+                        var _ = configEditor.FromDatabase(json, _configurationEditorJsonSerializer);
                     }
                     catch (Exception e)
                     {
@@ -126,7 +130,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
 
                 // update
-                dataType.Configuration = JsonConvert.SerializeObject(config);
+                dataType.Configuration = _configurationEditorJsonSerializer.Serialize(config);
                 Database.Update(dataType);
             }
         }

@@ -30,10 +30,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public SectionController(
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
             UmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IEnumerable<Section> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(_umbracoMapper.Map<Section>).ToArray();
 
@@ -63,7 +63,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     ControllerContext = ControllerContext
                 };
 
-            var dashboards = _dashboardService.GetDashboards(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser);
+            var dashboards = _dashboardService.GetDashboards(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
 
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)
@@ -109,10 +109,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var sections = _sectionService.GetSections();
             var mapped = sections.Select(_umbracoMapper.Map<Section>);
-            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin())
                 return mapped;
 
-            return mapped.Where(x => _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
+            return mapped.Where(x => _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
         }
     }
 }

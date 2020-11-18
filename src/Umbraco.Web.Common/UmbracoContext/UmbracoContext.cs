@@ -1,13 +1,11 @@
 ﻿using System;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -30,7 +28,7 @@ namespace Umbraco.Web
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
-            IBackofficeSecurity backofficeSecurity,
+            IBackOfficeSecurity backofficeSecurity,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
@@ -79,7 +77,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the BackofficeSecurity class
         /// </summary>
-        public IBackofficeSecurity Security { get; }
+        public IBackOfficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

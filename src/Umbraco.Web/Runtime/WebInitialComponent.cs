@@ -122,7 +122,7 @@ namespace Umbraco.Web.Runtime
            // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-          //  RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
+           // RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
 
             // plugin controllers must come first because the next route will catch many things
             RoutePluginControllers(globalSettings, apiControllerTypes, hostingEnvironment);
