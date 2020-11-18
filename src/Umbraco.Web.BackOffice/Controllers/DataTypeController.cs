@@ -13,6 +13,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -44,6 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly IConfigurationEditorJsonSerializer _serializer;
 
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
@@ -55,7 +57,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
             ILocalizedTextService localizedTextService,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IConfigurationEditorJsonSerializer serializer)
          {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
@@ -67,6 +70,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
          }
 
         /// <summary>
@@ -156,7 +160,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             // cannot create an "empty" data type, so use something by default.
             var editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
-            var dt = new DataType(editor, parentId);
+            var dt = new DataType(editor, _serializer, parentId);
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
@@ -189,7 +193,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (dt == null)
             {
                 var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
-                dt = new DataType(editor) { Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias };
+                dt = new DataType(editor, _serializer) { Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias };
                 _dataTypeService.Save(dt);
             }
 

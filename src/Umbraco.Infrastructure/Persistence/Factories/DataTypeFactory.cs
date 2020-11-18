@@ -3,12 +3,13 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger, IConfigurationEditorJsonSerializer serializer)
         {
             // Check we have an editor for the data type.
             if (!editors.TryGet(dto.EditorAlias, out var editor))
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Persistence.Factories
                 editor = new MissingPropertyEditor();
             }
 
-            var dataType = new DataType(editor);
+            var dataType = new DataType(editor, serializer);
 
             try
             {
@@ -52,14 +53,14 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static DataTypeDto BuildDto(IDataType entity)
+        public static DataTypeDto BuildDto(IDataType entity, IConfigurationEditorJsonSerializer serializer)
         {
             var dataTypeDto = new DataTypeDto
             {
                 EditorAlias = entity.EditorAlias,
                 NodeId = entity.Id,
                 DbType = entity.DatabaseType.ToString(),
-                Configuration = ConfigurationEditor.ToDatabase(entity.Configuration),
+                Configuration = ConfigurationEditor.ToDatabase(entity.Configuration, serializer),
                 NodeDto = BuildNodeDto(entity)
             };
 

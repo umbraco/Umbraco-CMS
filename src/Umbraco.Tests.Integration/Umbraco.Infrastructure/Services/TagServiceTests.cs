@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -27,6 +28,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private IFileService FileService => GetRequiredService<IFileService>();
         private ITagService TagService => GetRequiredService<ITagService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+        private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
         private IContentType _contentType;
 
@@ -49,18 +51,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void TagApiConsistencyTest()
         {
             IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
-            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig", "goat" });
             ContentService.SaveAndPublish(content1);
 
             // change
-            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "elephant" }, true);
-            content1.RemoveTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "elephant" }, true);
+            content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer,"tags", new[] { "cow" });
             ContentService.SaveAndPublish(content1);
 
             // more changes
-            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "mouse" }, true);
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" }, true);
             ContentService.SaveAndPublish(content1);
-            content1.RemoveTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "mouse" });
+            content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" });
             ContentService.SaveAndPublish(content1);
 
             // get it back
@@ -86,15 +88,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void TagList_Contains_NodeCount()
         {
             var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
-            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig", "goat" });
             ContentService.SaveAndPublish(content1);
 
             var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2", -1);
-            content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig" });
+            content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig" });
             ContentService.SaveAndPublish(content2);
 
             var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3", -1);
-            content3.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow" });
+            content3.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
             ContentService.SaveAndPublish(content3);
 
             // Act

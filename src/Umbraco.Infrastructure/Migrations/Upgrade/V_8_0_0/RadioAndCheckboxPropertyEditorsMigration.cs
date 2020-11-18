@@ -8,17 +8,23 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
-        public RadioAndCheckboxPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper)
+        public RadioAndCheckboxPropertyEditorsMigration(
+            IMigrationContext context,
+            IIOHelper ioHelper,
+            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             : base(context)
         {
             _ioHelper = ioHelper;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
         public override void Migrate()
@@ -51,7 +57,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     configurationEditor = new ValueListConfigurationEditor(_ioHelper);
                 try
                 {
-                    config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration);
+                    config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration, _configurationEditorJsonSerializer);
                 }
                 catch (Exception ex)
                 {

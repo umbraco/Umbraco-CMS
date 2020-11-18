@@ -14,7 +14,6 @@ namespace Umbraco.Web.Search
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ExamineComposer : ComponentComposer<ExamineComponent>, ICoreComposer
     {
         public override void Compose(Composition composition)

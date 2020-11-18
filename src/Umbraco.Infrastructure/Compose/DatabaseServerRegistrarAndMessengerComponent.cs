@@ -22,8 +22,6 @@ namespace Umbraco.Web.Compose
     /// out the "server address" ie the address to which server-to-server requests should be sent - because it
     /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-
     // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
     // TODO: should not be a strong dependency on "examine" but on an "indexing component"
     [ComposeAfter(typeof(ExamineComposer))]

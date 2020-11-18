@@ -16,6 +16,7 @@ using Umbraco.Web.Mvc;
 using System.Configuration;
 using Bogus;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.TestData
@@ -278,7 +279,9 @@ namespace Umbraco.TestData
             if (editor == null)
                 throw new InvalidOperationException($"No {editorAlias} editor found");
 
-            dt = new DataType(editor)
+            var serializer = new ConfigurationEditorJsonSerializer();
+
+            dt = new DataType(editor, serializer)
             {
                 Name = name,
                 Configuration = editor.GetConfigurationEditor().DefaultConfigurationObject,

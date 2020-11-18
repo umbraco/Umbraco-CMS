@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common.Builders;
@@ -47,6 +48,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private INotificationService NotificationService => GetRequiredService<INotificationService>();
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+        private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
         [SetUp]
         public void Setup()
@@ -2004,7 +2006,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType, "Simple Tags Page", Constants.System.Root);
-            content.AssignTags(PropertyEditorCollection, DataTypeService, propAlias, new[] {"hello", "world"});
+            content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, propAlias, new[] {"hello", "world"});
             ContentService.Save(content);
 
             // value has been set but no tags have been created (not published)

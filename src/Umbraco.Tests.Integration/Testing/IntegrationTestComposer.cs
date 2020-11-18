@@ -35,7 +35,6 @@ namespace Umbraco.Tests.Integration.Testing
     /// <remarks>
     /// This is a IUserComposer so that it runs after all core composers
     /// </remarks>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Boot)]
     public class IntegrationTestComposer : ComponentComposer<IntegrationTestComponent>
     {
         public override void Compose(Composition composition)
