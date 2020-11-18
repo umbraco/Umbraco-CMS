@@ -23,6 +23,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Tests.Common.Builders;
+using System.Runtime.InteropServices;
 
 namespace Umbraco.Tests.Common
 {
@@ -86,7 +87,11 @@ namespace Umbraco.Tests.Common
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment());
+                {
+                    var hostingEnvironment = GetHostingEnvironment();
+                    _ioHelper = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? new IOHelperLinux(hostingEnvironment)
+                        : (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? (IIOHelper)new IOHelperOSX(hostingEnvironment) : new IOHelperWindows(hostingEnvironment));
+                }
                 return _ioHelper;
             }
         }

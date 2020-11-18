@@ -373,7 +373,8 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException($"Could not resolve type {typeof(GlobalSettings)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
-            ioHelper = new IOHelper(hostingEnvironment);
+            ioHelper = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? new IOHelperLinux(hostingEnvironment)
+                : (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? (IIOHelper)new IOHelperOSX(hostingEnvironment) : new IOHelperWindows(hostingEnvironment));
             AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment);

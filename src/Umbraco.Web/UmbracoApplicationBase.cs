@@ -58,7 +58,7 @@ namespace Umbraco.Web
                 var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"));
-                var ioHelper = new IOHelper(hostingEnvironment);
+                var ioHelper = new IOHelperWindows(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, new ConfigurationRoot(new List<IConfigurationProvider>()));
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
