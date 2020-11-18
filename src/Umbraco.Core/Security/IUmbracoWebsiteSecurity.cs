@@ -29,6 +29,10 @@ namespace Umbraco.Core.Security
         /// <returns>Result of login operation.</returns>
         Task<bool> LoginAsync(string username, string password);
 
+        /// <summary>
+        /// Check if a member is logged in
+        /// </summary>
+        /// <returns>True if logged in, false if not.</returns>
         bool IsLoggedIn();
 
         /// <summary>
