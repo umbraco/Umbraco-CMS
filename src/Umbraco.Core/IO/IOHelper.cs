@@ -66,10 +66,7 @@ namespace Umbraco.Core.IO
             if (path == null) throw new ArgumentNullException(nameof(path));
 
             // Check if the path is already mapped - TODO: This should be switched to Path.IsPathFullyQualified once we are on Net Standard 2.1
-            if (Path.IsPathRooted(path) &&
-                (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || // Linux paths are fully qualified as long as they are rooted, Windows paths can be rooted but not fully qualified
-                    ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar) || path.StartsWith(@"\\") //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"
-                )))
+            if (IsPathFullyQualified(path))
             {
                 return path;
             }

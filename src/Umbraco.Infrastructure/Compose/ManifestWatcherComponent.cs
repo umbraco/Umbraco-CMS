@@ -12,18 +12,18 @@ namespace Umbraco.Core.Compose
     {
         private readonly IHostingEnvironment _hosting;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public ManifestWatcherComponent(IHostingEnvironment hosting, ILoggerFactory loggerFactory, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public ManifestWatcherComponent(IHostingEnvironment hosting, ILoggerFactory loggerFactory, IHostingEnvironment hostingEnvironment, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _hosting = hosting;
             _loggerFactory = loggerFactory;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Compose
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;
 
-            var appPlugins = _ioHelper.MapPath("~/App_Plugins/");
+            var appPlugins = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins) == false) return;
 
             _mw = new ManifestWatcher(_loggerFactory.CreateLogger<ManifestWatcher>(), _umbracoApplicationLifetime);

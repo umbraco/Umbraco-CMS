@@ -5,25 +5,25 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Configuration
 {
     public class XmlConfigManipulator : IConfigManipulator
     {
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<XmlConfigManipulator> _logger;
 
-        public XmlConfigManipulator(IIOHelper ioHelper, ILogger<XmlConfigManipulator> logger)
+        public XmlConfigManipulator(IHostingEnvironment hostingEnvironment, ILogger<XmlConfigManipulator> logger)
         {
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _logger = logger;
         }
 
         public void RemoveConnectionString()
         {
             var key = Constants.System.UmbracoConnectionName;
-            var fileName = _ioHelper.MapPath("~/web.config");
+            var fileName = _hostingEnvironment.MapPathContentRoot("~/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Configuration
 
 
             var fileSource = "web.config";
-            var fileName = _ioHelper.MapPath("~/" + fileSource);
+            var fileName = _hostingEnvironment.MapPathContentRoot("~/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Configuration
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = _ioHelper.MapPath("~/" + fileSource);
+                fileName = _hostingEnvironment.MapPathContentRoot("~/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Configuration
 
         public void SaveDisableRedirectUrlTracking(bool disable)
         {
-            var fileName = _ioHelper.MapPath("~/config/umbracoSettings.config");
+            var fileName = _hostingEnvironment.MapPathContentRoot("~/config/umbracoSettings.config");
 
             var umbracoConfig = new XmlDocument { PreserveWhitespace = true };
             umbracoConfig.Load(fileName);

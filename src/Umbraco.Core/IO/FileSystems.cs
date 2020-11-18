@@ -222,7 +222,7 @@ namespace Umbraco.Core.IO
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
-            var id = ShadowWrapper.CreateShadowId(_ioHelper);
+            var id = ShadowWrapper.CreateShadowId(_hostingEnvironment);
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
         }
 

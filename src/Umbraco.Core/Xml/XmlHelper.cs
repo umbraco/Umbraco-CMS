@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Xml
 {
@@ -208,9 +208,9 @@ namespace Umbraco.Core.Xml
         /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
         /// <param name="ioHelper"></param>
         /// <returns>Returns a XmlDocument class</returns>
-        public static XmlDocument OpenAsXmlDocument(string filePath, IIOHelper ioHelper)
+        public static XmlDocument OpenAsXmlDocument(string filePath, IHostingEnvironment hostingEnvironment)
         {
-            using (var reader = new XmlTextReader(ioHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
+            using (var reader = new XmlTextReader(hostingEnvironment.MapPathContentRoot(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
             {
                 var xmlDoc = new XmlDocument();
                 //Load the file into the XmlDocument

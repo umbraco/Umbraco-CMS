@@ -19,6 +19,7 @@ namespace Umbraco.Core.IO
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        [Obsolete("Use IHostingEnvironment.MapPathContentRoot or IHostingEnvironment.MapPathWebRoot instead")]
         string MapPath(string path);
 
         /// <summary>
