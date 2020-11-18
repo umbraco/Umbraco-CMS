@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using Umbraco.Web.Macros;
@@ -26,16 +26,16 @@ namespace Umbraco.Web.Common.Macros
     public class PartialViewMacroEngine
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly Func<IUmbracoContext> _getUmbracoContext;
 
         public PartialViewMacroEngine(
             IUmbracoContextAccessor umbracoContextAccessor,
             IHttpContextAccessor httpContextAccessor,
-            IIOHelper ioHelper)
+            IHostingEnvironment hostingEnvironment)
         {
             _httpContextAccessor = httpContextAccessor;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
 
             _getUmbracoContext = () =>
             {
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Common.Macros
         }
         private string GetVirtualPathFromPhysicalPath(string physicalPath)
         {
-            var rootpath = _ioHelper.MapPath("~/");
+            var rootpath = _hostingEnvironment.MapPathContentRoot("~/");
             physicalPath = physicalPath.Replace(rootpath, "");
             physicalPath = physicalPath.Replace("\\", "/");
             return "~/" + physicalPath;

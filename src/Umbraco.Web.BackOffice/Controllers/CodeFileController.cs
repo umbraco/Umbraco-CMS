@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -31,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoApplicationAuthorize(Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IFileSystems _fileSystems;
         private readonly IFileService _fileService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -41,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly GlobalSettings _globalSettings;
 
         public CodeFileController(
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             IFileSystems fileSystems,
             IFileService fileService,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IOptions<GlobalSettings> globalSettings)
         {
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;
             _fileService = fileService;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -655,7 +656,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private bool IsDirectory(string virtualPath, string systemDirectory)
         {
-            var path = _ioHelper.MapPath(systemDirectory + "/" + virtualPath);
+            var path = _hostingEnvironment.MapPathContentRoot(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
         }

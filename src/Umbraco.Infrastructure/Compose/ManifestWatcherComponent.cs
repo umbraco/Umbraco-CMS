@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Net;
 
