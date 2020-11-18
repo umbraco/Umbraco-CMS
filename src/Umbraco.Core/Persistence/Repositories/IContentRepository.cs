@@ -8,28 +8,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-
-    public interface IContentRepository2<in TId,TEntity>: IContentRepository<TId,TEntity> where TEntity : IUmbracoEntity
-    {
-
-        /// <summary>
-        /// Gets Count for the given query
-        /// </summary>
-        /// <remarks>Here, <paramref name="filter"/> can be null</remarks>
-        long Count(IQuery<TEntity> query, IQuery<TEntity> filter = null);
-
-        /// <summary>
-        /// Gets paged content items.
-        /// </summary>
-        /// <param name="query">Query</param>
-        /// <param name="filter">Filter</param>
-        /// <param name="ordering">Ordering</param>
-        /// <param name="pageIndex">Page Index. Indexing starts at zero</param>
-        /// <param name="pageSize">Page size</param>
-        /// <remarks>Here, <paramref name="filter"/> can be null but <paramref name="ordering"/> cannot.</remarks>
-        IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, Ordering ordering,
-            IQuery<TEntity> filter = null);
-    }
     /// <summary>
     /// Defines the base implementation of a repository for content items.
     /// </summary>
@@ -102,5 +80,23 @@ namespace Umbraco.Core.Persistence.Repositories
             IQuery<TEntity> filter, Ordering ordering);
 
         ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
+
+        /// <summary>
+        /// Gets Count for the given query
+        /// </summary>
+        /// <remarks>Here, <paramref name="filter"/> can be null</remarks>
+        int Count(IQuery<TEntity> query, IQuery<TEntity> filter = null);
+
+        /// <summary>
+        /// Gets paged content items.
+        /// </summary>
+        /// <param name="query">Query</param>
+        /// <param name="filter">Filter</param>
+        /// <param name="ordering">Ordering</param>
+        /// <param name="pageIndex">Page Index. Indexing starts at zero</param>
+        /// <param name="pageSize">Page size</param>
+        /// <remarks>Here, <paramref name="filter"/> can be null but <paramref name="ordering"/> cannot.</remarks>
+        IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, Ordering ordering,
+            IQuery<TEntity> filter = null);
     }
 }

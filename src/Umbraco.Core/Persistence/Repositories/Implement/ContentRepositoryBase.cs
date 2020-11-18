@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public static bool ThrowOnWarning = false;
     }
 
-    internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>, IContentRepository2<TId, TEntity>
+    internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
@@ -980,7 +980,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         }
 
-        public abstract long Count(IQuery<TEntity> query, IQuery<TEntity> filter = null);
+        public abstract int Count(IQuery<TEntity> query, IQuery<TEntity> filter = null);
         protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
            long pageIndex, int pageSize,
            Func<List<TDto>, IEnumerable<TEntity>> mapDtos,
@@ -1002,7 +1002,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // map the DTOs and return
             return mapDtos(pagedResult);
         }
-        protected long Count(IQuery<TEntity> query, Sql<ISqlContext> filter = null)
+        protected int Count(IQuery<TEntity> query, Sql<ISqlContext> filter = null)
         {
             
             // start with base query, and apply the supplied IQuery
@@ -1024,7 +1024,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
            
 
             // get a page of DTOs and the total count
-            return Database.ExecuteScalar<long>(sql);
+            return Database.ExecuteScalar<int>(sql);
         }
 
         public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, Ordering ordering, IQuery<TEntity> filter = null);

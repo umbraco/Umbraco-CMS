@@ -506,7 +506,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 filterSql,
                 ordering);
         }
-        public override long Count(IQuery<IMedia> query, IQuery<IMedia> filter = null)
+        public override int Count(IQuery<IMedia> query, IQuery<IMedia> filter = null)
         {
             Sql<ISqlContext> filterSql = null;
 

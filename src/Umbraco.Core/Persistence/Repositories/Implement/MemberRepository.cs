@@ -612,7 +612,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ordering);
         }
 
-        public override long Count(IQuery<IMember> query, IQuery<IMember> filter = null)
+        public override int Count(IQuery<IMember> query, IQuery<IMember> filter = null)
         {
             Sql<ISqlContext> filterSql = null;
 
