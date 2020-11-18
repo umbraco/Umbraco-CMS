@@ -198,7 +198,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = scope.SqlContext.Sql()
 
-                .Select<NodeDto>(x => Alias(x.NodeId, "Id"))
+                 .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                    x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
+                    x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                 .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"), x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
