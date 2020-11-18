@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -12,7 +13,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Website.Controllers
 {
-    // TOOO: reinstate [MemberAuthorize]
+    [UmbracoMemberAuthorize]
     public class UmbProfileController : SurfaceController
     {
         private readonly IUmbracoWebsiteSecurity _websiteSecurity;
@@ -28,21 +29,21 @@ namespace Umbraco.Web.Website.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public IActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
+        public async Task<IActionResult> HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
             if (ModelState.IsValid == false)
             {
                 return CurrentUmbracoPage();
             }
 
-            _websiteSecurity.UpdateMemberProfile(model, out var status, out var errorMessage);
-            switch(status)
+            var result = await _websiteSecurity.UpdateMemberProfileAsync(model);
+            switch (result.Status)
             {
                 case UpdateMemberProfileStatus.Success:
                     break;
                 case UpdateMemberProfileStatus.Error:
                     // Don't add a field level error, just model level.
-                    ModelState.AddModelError("profileModel", errorMessage);
+                    ModelState.AddModelError("profileModel", result.ErrorMessage);
                     return CurrentUmbracoPage();
                 default:
                     throw new ArgumentOutOfRangeException();

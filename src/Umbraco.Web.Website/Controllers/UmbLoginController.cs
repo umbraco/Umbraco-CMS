@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -26,14 +27,14 @@ namespace Umbraco.Web.Website.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public IActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
+        public async Task<IActionResult> HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
             {
                 return CurrentUmbracoPage();
             }
 
-            if (_websiteSecurity.Login(model.Username, model.Password) == false)
+            if (await _websiteSecurity.LoginAsync(model.Username, model.Password) == false)
             {
                 // Don't add a field level error, just model level.
                 ModelState.AddModelError("loginModel", "Invalid username or password");

@@ -1,31 +1,55 @@
-﻿using Umbraco.Core.Models.Security;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Umbraco.Core.Models.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Website.Security
 {
     public class UmbracoWebsiteSecurity : IUmbracoWebsiteSecurity
     {
-        public void RegisterMember(RegisterModel model, out RegisterMemberStatus status, bool logMemberIn = true)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public UmbracoWebsiteSecurity(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        /// <inheritdoc/>
+        public Task<RegisterMemberStatus> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
         {
             throw new System.NotImplementedException();
         }
 
-        public void UpdateMemberProfile(ProfileModel model, out UpdateMemberProfileStatus status, out string errorMessage)
+        /// <inheritdoc/>
+        public Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(ProfileModel model)
         {
             throw new System.NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public bool IsLoggedIn()
         {
-            throw new System.NotImplementedException();
+            var httpContext = _httpContextAccessor.HttpContext;
+            return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated;
         }
 
-        public bool Login(string username, string password)
+        /// <inheritdoc/>
+        public Task<bool> LoginAsync(string username, string password)
         {
             throw new System.NotImplementedException();
         }
 
-        public void LogOut()
+        /// <inheritdoc/>
+        public async Task LogOutAsync()
+        {
+            await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        /// <inheritdoc/>
+        public bool IsMemberAuthorized(IEnumerable<string> allowTypes = null, IEnumerable<string> allowGroups = null, IEnumerable<int> allowMembers = null)
         {
             throw new System.NotImplementedException();
         }

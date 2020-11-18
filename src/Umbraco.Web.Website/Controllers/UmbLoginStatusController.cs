@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -11,7 +12,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Website.Controllers
 {
-    // TOOO: reinstate [MemberAuthorize]
+    [UmbracoMemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
         private readonly IUmbracoWebsiteSecurity _websiteSecurity;
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Website.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public IActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
+        public async Task<IActionResult> HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
         {
             if (ModelState.IsValid == false)
             {
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Website.Controllers
 
             if (_websiteSecurity.IsLoggedIn())
             {
-                _websiteSecurity.LogOut();
+                await _websiteSecurity.LogOutAsync();
             }
 
             TempData["LogoutSuccess"] = true;

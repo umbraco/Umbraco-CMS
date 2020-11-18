@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Website.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public IActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
+        public async Task<IActionResult> HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
         {
             if (ModelState.IsValid == false)
             {
@@ -41,9 +42,9 @@ namespace Umbraco.Web.Website.Controllers
                 model.Name = model.Email;
             }
 
-            _websiteSecurity.RegisterMember(model, out var status, model.LoginOnSuccess);
+            var result = await _websiteSecurity.RegisterMemberAsync(model, model.LoginOnSuccess);
 
-            switch (status)
+            switch (result)
             {
                 case RegisterMemberStatus.Success:
 
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Website.Controllers
                     break;
                 case RegisterMemberStatus.Error:
                     // Don't add a field level error, just model level.
-                    ModelState.AddModelError("registerModel", "An error occurred creating the member: " + status);
+                    ModelState.AddModelError("registerModel", $"An error occurred creating the member: {result}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

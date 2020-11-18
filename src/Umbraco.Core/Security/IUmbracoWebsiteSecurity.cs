@@ -1,20 +1,51 @@
-﻿using Umbraco.Core.Models.Security;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Umbraco.Core.Models.Security;
 
 namespace Umbraco.Core.Security
 {
     public interface IUmbracoWebsiteSecurity
     {
-        // TODO: this should return the member, but in what form?  MembershipUser is in place on MembershipHelper, but
-        // isn't appropriate for when we're using ASP.NET Identity.
-        void RegisterMember(RegisterModel model, out RegisterMemberStatus status, bool logMemberIn = true);
+        /// <summary>
+        /// Registers a new member.
+        /// </summary>
+        /// <param name="model">Register member model.</param>
+        /// <param name="logMemberIn">Flag for whether to log the member in upon successful registration.</param>
+        /// <returns>Result of registration operation.</returns>
+        Task<RegisterMemberStatus> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true);
 
-        // TODO: again, should this return the member?
-        void UpdateMemberProfile(ProfileModel model, out UpdateMemberProfileStatus status, out string errorMessage);
+        /// <summary>
+        /// Updates the currently logged in member's profile.
+        /// </summary>
+        /// <param name="model">Update member profile model.</param>
+        /// <returns>Result of update profile operation.</returns>
+        Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(ProfileModel model);
 
-        bool Login(string username, string password);
+        /// <summary>
+        /// A helper method to perform the validation and logging in of a member.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>Result of login operation.</returns>
+        Task<bool> LoginAsync(string username, string password);
 
         bool IsLoggedIn();
 
-        void LogOut();
+        /// <summary>
+        /// Logs out the current member.
+        /// </summary>
+        Task LogOutAsync();
+
+        /// <summary>
+        /// Checks if the current member is authorized based on the parameters provided.
+        /// </summary>
+        /// <param name="allowTypes">Allowed types.</param>
+        /// <param name="allowGroups">Allowed groups.</param>
+        /// <param name="allowMembers">Allowed individual members.</param>
+        /// <returns>True or false if the currently logged in member is authorized</returns>
+        bool IsMemberAuthorized(
+            IEnumerable<string> allowTypes = null,
+            IEnumerable<string> allowGroups = null,
+            IEnumerable<int> allowMembers = null);
     }
 }
