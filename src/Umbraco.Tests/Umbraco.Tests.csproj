@@ -219,7 +219,6 @@
     <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
-    <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
