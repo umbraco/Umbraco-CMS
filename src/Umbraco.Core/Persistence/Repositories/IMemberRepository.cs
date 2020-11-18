@@ -5,11 +5,6 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-
-    public interface IMemberRepository2 : IMemberRepository, IContentRepository2<int, IMember>
-    {
-
-    }
     public interface IMemberRepository : IContentRepository<int, IMember>
     {
         IMember GetByUsername(string username);

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;

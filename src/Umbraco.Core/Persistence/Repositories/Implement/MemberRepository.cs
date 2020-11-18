@@ -245,8 +245,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             entity.AddingEntity();
 
-            var member = (Member) entity;
-
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
@@ -304,7 +302,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            member.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the member dto
             dto.NodeId = nodeDto.NodeId;
@@ -321,9 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -335,11 +331,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         protected override void PersistUpdatedItem(IMember entity)
-        {
-            var member = (Member) entity;
-
+        {   
             // update
-            member.UpdatingEntity();
+            entity.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -385,27 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // Replace the property data
-            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we have another method that doesn't take an explicit WriteLock
-            // in SetLastLogin which is called very often and we want to avoid the lock timeout for the explicit lock table but we still need to ensure atomic
-            // operations between that method and this one. 
-
-            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
-            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-            {
-                // Check if this already exists and update, else insert a new one
-                if (existingPropData.TryGetValue(propertyDataDto.PropertyTypeId, out var propData))
-                {
-                    propertyDataDto.Id = propData.Id;
-                    Database.Update(propertyDataDto);
-                }
-                else
-                {
-                    Database.Insert(propertyDataDto);
-                }
-            }   
+            ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -612,7 +586,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ordering);
         }
 
-        public override long Count(IQuery<IMember> query, IQuery<IMember> filter = null)
+        public override int Count(IQuery<IMember> query, IQuery<IMember> filter = null)
         {
             Sql<ISqlContext> filterSql = null;
 
