@@ -14,6 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Published
             }, Mock.Of<IPublishedValueFallback>());
             register.AddTransient(f => factory);
 
-       
+
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -68,12 +69,13 @@ namespace Umbraco.Tests.Published
             var registerFactory = composition.CreateServiceProvider();
             var converters = registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 1 };
             var dataType2 = new DataType(new VoidEditor("2", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 2 };
 
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new []{dataType1, dataType2 });

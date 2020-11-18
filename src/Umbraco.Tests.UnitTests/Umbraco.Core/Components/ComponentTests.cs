@@ -77,11 +77,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var typeLoader = MockTypeLoader();
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), IOHelper, AppCaches.NoCache);
 
-            var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
+            var types = TypeArray<Composer1, Composer2, Composer4>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<Composers>>(), Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
-            // 3 is User - goes away with RuntimeLevel.Unknown
+            // 3 is User 
             // => reorder components accordingly
             composers.Compose();
             AssertTypeArray(TypeArray<Composer1, Composer4, Composer2>(), Composed);
@@ -270,10 +270,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<ILogger<Composers>>(), Mock.Of<IProfilingLogger>());
             Composed.Clear();
             composers.Compose();
-            Assert.AreEqual(2, Composed.Count);
+            Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Composer4), Composed[0]);
             Assert.AreEqual(typeof(Composer2), Composed[1]);
-            //Assert.AreEqual(typeof(Component9), Composed[2]); -- goes away with RuntimeLevel.Unknown
         }
 
         [Test]

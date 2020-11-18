@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>Converting the configuration object to the serialized database value is
         /// achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase"/>.</remarks>
-        object FromDatabase(string configurationJson);
+        object FromDatabase(string configurationJson, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
         /// <summary>
         /// Converts the values posted by the configuration editor into the actual configuration object.

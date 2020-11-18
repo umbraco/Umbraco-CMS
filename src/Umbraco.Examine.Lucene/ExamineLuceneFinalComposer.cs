@@ -1,5 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Examine
 {
@@ -7,7 +6,6 @@ namespace Umbraco.Examine
     // and *also* after ICoreComposer (in case IUserComposer is disabled)
     [ComposeAfter(typeof(IUserComposer))]
     [ComposeAfter(typeof(ICoreComposer))]
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class ExamineLuceneFinalComposer : ComponentComposer<ExamineLuceneFinalComponent>
     { }
 }

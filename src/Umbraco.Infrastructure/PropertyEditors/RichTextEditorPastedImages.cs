@@ -8,11 +8,11 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -26,10 +26,11 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly IJsonSerializer _serializer;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider)
+        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider,  IJsonSerializer serializer)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -39,6 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
             _publishedUrlProvider = publishedUrlProvider;
+            _serializer = serializer;
         }
 
         /// <summary>
@@ -92,7 +94,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fileStream)
                     {
-                        mediaFile.SetValue(_mediaFileSystem, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                        mediaFile.SetValue(_mediaFileSystem, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
                     }
 
                     _mediaService.Save(mediaFile, userId);

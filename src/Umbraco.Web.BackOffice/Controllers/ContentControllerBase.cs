@@ -13,6 +13,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
@@ -34,13 +35,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         protected IEventMessagesFactory EventMessages { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
         private readonly ILogger<ContentControllerBase> _logger;
+        private readonly IJsonSerializer _serializer;
 
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
             ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IJsonSerializer serializer)
         {
             CultureDictionary = cultureDictionary;
             LoggerFactory = loggerFactory;
@@ -48,6 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ShortStringHelper = shortStringHelper;
             EventMessages = eventMessages;
             LocalizedTextService = localizedTextService;
+            _serializer = serializer;
         }
 
         protected NotFoundObjectResult HandleContentNotFound(object id, bool throwException = true)
@@ -117,7 +121,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
                     if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
                     var tagCulture = property.PropertyType.VariesByCulture() ? culture : null;
-                    property.SetTagsValue(value, tagConfiguration, tagCulture);
+                    property.SetTagsValue(_serializer, value, tagConfiguration, tagCulture);
                 }
                 else
                     savePropertyValue(contentItem, property, value);

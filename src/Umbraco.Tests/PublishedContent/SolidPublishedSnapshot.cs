@@ -9,6 +9,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
@@ -411,9 +412,10 @@ namespace Umbraco.Tests.PublishedContent
 
         static AutoPublishedContentType()
         {
+            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
                 { Id = 666 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

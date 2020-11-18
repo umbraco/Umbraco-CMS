@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly IJsonSerializer _serializer;
         private readonly AppCaches _appCaches;
         private readonly ILoggerFactory _loggerFactory;
         private PermissionRepository<IContent> _permissionRepository;
@@ -58,12 +60,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IRelationTypeRepository relationTypeRepository,
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IJsonSerializer serializer)
             : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _serializer = serializer;
             _appCaches = appCaches;
             _loggerFactory = loggerFactory;
             _scopeAccessor = scopeAccessor;
@@ -502,7 +506,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.PublishName = entity.Name;
                 entity.PublishDate = entity.UpdateDate;
 
-                SetEntityTags(entity, _tagRepository);
+                SetEntityTags(entity, _tagRepository, _serializer);
             }
             else if (entity.PublishedState == PublishedState.Unpublishing)
             {
@@ -699,7 +703,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // if entity is publishing, update tags, else leave tags there
                 // means that implicitly unpublished, or trashed, entities *still* have tags in db
                 if (entity.PublishedState == PublishedState.Publishing)
-                    SetEntityTags(entity, _tagRepository);
+                    SetEntityTags(entity, _tagRepository, _serializer);
             }
 
             // trigger here, before we reset Published etc
@@ -717,7 +721,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     entity.PublishName = entity.Name;
                     entity.PublishDate = entity.UpdateDate;
 
-                    SetEntityTags(entity, _tagRepository);
+                    SetEntityTags(entity, _tagRepository, _serializer);
                 }
                 else if (entity.PublishedState == PublishedState.Unpublishing)
                 {

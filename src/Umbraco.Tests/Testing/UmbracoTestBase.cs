@@ -463,6 +463,7 @@ namespace Umbraco.Tests.Testing
             Composition.Services.AddUnique<IExamineManager, ExamineManager>();
 
             Composition.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
+            Composition.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
             Composition.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
             Composition.Services.AddUnique<InstallStatusTracker>();
 

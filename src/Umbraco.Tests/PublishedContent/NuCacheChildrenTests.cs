@@ -31,6 +31,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -65,8 +66,10 @@ namespace Umbraco.Tests.PublishedContent
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
+            var serializer = new ConfigurationEditorJsonSerializer();
+
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 3 };
 
             var dataTypes = new[]
             {
