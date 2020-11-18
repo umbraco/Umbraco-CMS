@@ -35,7 +35,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Builder.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }
 }

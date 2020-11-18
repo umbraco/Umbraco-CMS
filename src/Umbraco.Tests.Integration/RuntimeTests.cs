@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
@@ -20,6 +22,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.Integration
 {
@@ -80,7 +83,9 @@ namespace Umbraco.Tests.Integration
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
-            bootstrapper.Configure(services);
+            var builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>());
+            bootstrapper.Configure(builder);
+            builder.Build();
 
             Assert.IsTrue(bootstrapper.MainDom.IsMainDom);
             Assert.IsNull(bootstrapper.State.BootFailedException);
@@ -121,7 +126,8 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration);
+                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -160,8 +166,9 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment,  GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration);
-
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration);
+                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
+                    builder.Build();
                     services.AddRouting(); // LinkGenerator
                 });
 
@@ -187,9 +194,9 @@ namespace Umbraco.Tests.Integration
 
         public class MyComposer : IUserComposer
         {
-            public void Compose(Composition composition)
+            public void Compose(IUmbracoBuilder builder)
             {
-                composition.Components().Append<MyComponent>();
+                builder.Components().Append<MyComponent>();
                 IsComposed = true;
             }
 

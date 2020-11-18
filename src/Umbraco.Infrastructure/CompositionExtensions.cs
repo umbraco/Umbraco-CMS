@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
@@ -27,80 +28,80 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the cache refreshers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static CacheRefresherCollectionBuilder CacheRefreshers(this Composition composition)
-            => composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static CacheRefresherCollectionBuilder CacheRefreshers(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
 
         /// <summary>
         /// Gets the mappers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static MapperCollectionBuilder Mappers(this Composition composition)
-            => composition.WithCollectionBuilder<MapperCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static MapperCollectionBuilder Mappers(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<MapperCollectionBuilder>();
 
         /// <summary>
         /// Gets the package actions collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        internal static PackageActionCollectionBuilder PackageActions(this Composition composition)
-            => composition.WithCollectionBuilder<PackageActionCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        internal static PackageActionCollectionBuilder PackageActions(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<PackageActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the data editor collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static DataEditorCollectionBuilder DataEditors(this Composition composition)
-            => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static DataEditorCollectionBuilder DataEditors(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
         /// Gets the data value reference factory collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static DataValueReferenceFactoryCollectionBuilder DataValueReferenceFactories(this Composition composition)
-            => composition.WithCollectionBuilder<DataValueReferenceFactoryCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static DataValueReferenceFactoryCollectionBuilder DataValueReferenceFactories(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<DataValueReferenceFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static PropertyValueConverterCollectionBuilder PropertyValueConverters(this Composition composition)
-            => composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static PropertyValueConverterCollectionBuilder PropertyValueConverters(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url segment providers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)
-            => composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the validators collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        internal static ManifestValueValidatorCollectionBuilder ManifestValueValidators(this Composition composition)
-            => composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        internal static ManifestValueValidatorCollectionBuilder ManifestValueValidators(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the manifest filter collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static ManifestFilterCollectionBuilder ManifestFilters(this Composition composition)
-            => composition.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static ManifestFilterCollectionBuilder ManifestFilters(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the backoffice OEmbed Providers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
-            => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static EmbedProvidersCollectionBuilder OEmbedProviders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
 
         /// <summary>
         /// Gets the back office searchable tree collection builder
         /// </summary>
-        /// <param name="composition"></param>
+        /// <param name="builder"></param>
         /// <returns></returns>
-        public static SearchableTreeCollectionBuilder SearchableTrees(this Composition composition)
-            => composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
+        public static SearchableTreeCollectionBuilder SearchableTrees(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
         #endregion
 
@@ -110,189 +111,189 @@ namespace Umbraco.Core
         /// Sets the culture dictionary factory.
         /// </summary>
         /// <typeparam name="T">The type of the factory.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetCultureDictionaryFactory<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetCultureDictionaryFactory<T>(this IUmbracoBuilder builder)
             where T : class, ICultureDictionaryFactory
         {
-            composition.Services.AddUnique<ICultureDictionaryFactory, T>();
+            builder.Services.AddUnique<ICultureDictionaryFactory, T>();
         }
 
         /// <summary>
         /// Sets the culture dictionary factory.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a culture dictionary factory.</param>
-        public static void SetCultureDictionaryFactory(this Composition composition, Func<IServiceProvider, ICultureDictionaryFactory> factory)
+        public static void SetCultureDictionaryFactory(this IUmbracoBuilder builder, Func<IServiceProvider, ICultureDictionaryFactory> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the culture dictionary factory.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A factory.</param>
-        public static void SetCultureDictionaryFactory(this Composition composition, ICultureDictionaryFactory factory)
+        public static void SetCultureDictionaryFactory(this IUmbracoBuilder builder, ICultureDictionaryFactory factory)
         {
-            composition.Services.AddUnique(_ => factory);
+            builder.Services.AddUnique(_ => factory);
         }
 
         /// <summary>
         /// Sets the published content model factory.
         /// </summary>
         /// <typeparam name="T">The type of the factory.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetPublishedContentModelFactory<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetPublishedContentModelFactory<T>(this IUmbracoBuilder builder)
             where T : class, IPublishedModelFactory
         {
-            composition.Services.AddUnique<IPublishedModelFactory, T>();
+            builder.Services.AddUnique<IPublishedModelFactory, T>();
         }
 
         /// <summary>
         /// Sets the published content model factory.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceProvider, IPublishedModelFactory> factory)
+        public static void SetPublishedContentModelFactory(this IUmbracoBuilder builder, Func<IServiceProvider, IPublishedModelFactory> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the published content model factory.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, IPublishedModelFactory factory)
+        public static void SetPublishedContentModelFactory(this IUmbracoBuilder builder, IPublishedModelFactory factory)
         {
-            composition.Services.AddUnique(_ => factory);
+            builder.Services.AddUnique(_ => factory);
         }
 
         /// <summary>
         /// Sets the server registrar.
         /// </summary>
         /// <typeparam name="T">The type of the server registrar.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetServerRegistrar<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetServerRegistrar<T>(this IUmbracoBuilder builder)
             where T : class, IServerRegistrar
         {
-            composition.Services.AddUnique<IServerRegistrar, T>();
+            builder.Services.AddUnique<IServerRegistrar, T>();
         }
 
         /// <summary>
         /// Sets the server registrar.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a server registrar.</param>
-        public static void SetServerRegistrar(this Composition composition, Func<IServiceProvider, IServerRegistrar> factory)
+        public static void SetServerRegistrar(this IUmbracoBuilder builder, Func<IServiceProvider, IServerRegistrar> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the server registrar.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="registrar">A server registrar.</param>
-        public static void SetServerRegistrar(this Composition composition, IServerRegistrar registrar)
+        public static void SetServerRegistrar(this IUmbracoBuilder builder, IServerRegistrar registrar)
         {
-            composition.Services.AddUnique(_ => registrar);
+            builder.Services.AddUnique(_ => registrar);
         }
 
         /// <summary>
         /// Sets the server messenger.
         /// </summary>
         /// <typeparam name="T">The type of the server registrar.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetServerMessenger<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetServerMessenger<T>(this IUmbracoBuilder builder)
             where T : class, IServerMessenger
         {
-            composition.Services.AddUnique<IServerMessenger, T>();
+            builder.Services.AddUnique<IServerMessenger, T>();
         }
 
         /// <summary>
         /// Sets the server messenger.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a server messenger.</param>
-        public static void SetServerMessenger(this Composition composition, Func<IServiceProvider, IServerMessenger> factory)
+        public static void SetServerMessenger(this IUmbracoBuilder builder, Func<IServiceProvider, IServerMessenger> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the server messenger.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="registrar">A server messenger.</param>
-        public static void SetServerMessenger(this Composition composition, IServerMessenger registrar)
+        public static void SetServerMessenger(this IUmbracoBuilder builder, IServerMessenger registrar)
         {
-            composition.Services.AddUnique(_ => registrar);
+            builder.Services.AddUnique(_ => registrar);
         }
 
         /// <summary>
         /// Sets the database server messenger options.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating the options.</param>
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
-        public static void SetDatabaseServerMessengerCallbacks(this Composition composition, Func<IServiceProvider, DatabaseServerMessengerCallbacks> factory)
+        public static void SetDatabaseServerMessengerCallbacks(this IUmbracoBuilder builder, Func<IServiceProvider, DatabaseServerMessengerCallbacks> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the database server messenger options.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="options">Options.</param>
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
-        public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerCallbacks options)
+        public static void SetDatabaseServerMessengerOptions(this IUmbracoBuilder builder, DatabaseServerMessengerCallbacks options)
         {
-            composition.Services.AddUnique(_ => options);
+            builder.Services.AddUnique(_ => options);
         }
 
         /// <summary>
         /// Sets the short string helper.
         /// </summary>
         /// <typeparam name="T">The type of the short string helper.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetShortStringHelper<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetShortStringHelper<T>(this IUmbracoBuilder builder)
             where T : class, IShortStringHelper
         {
-            composition.Services.AddUnique<IShortStringHelper, T>();
+            builder.Services.AddUnique<IShortStringHelper, T>();
         }
 
         /// <summary>
         /// Sets the short string helper.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a short string helper.</param>
-        public static void SetShortStringHelper(this Composition composition, Func<IServiceProvider, IShortStringHelper> factory)
+        public static void SetShortStringHelper(this IUmbracoBuilder builder, Func<IServiceProvider, IShortStringHelper> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the short string helper.
         /// </summary>
-        /// <param name="composition">A composition.</param>
+        /// <param name="builder">A builder.</param>
         /// <param name="helper">A short string helper.</param>
-        public static void SetShortStringHelper(this Composition composition, IShortStringHelper helper)
+        public static void SetShortStringHelper(this IUmbracoBuilder builder, IShortStringHelper helper)
         {
-            composition.Services.AddUnique(_ => helper);
+            builder.Services.AddUnique(_ => helper);
         }
 
         /// <summary>
         /// Sets the underlying media filesystem.
         /// </summary>
-        /// <param name="composition">A composition.</param>
+        /// <param name="builder">A builder.</param>
         /// <param name="filesystemFactory">A filesystem factory.</param>
         /// <remarks>
         /// Using this helper will ensure that your IFileSystem implementation is wrapped by the ShadowWrapper
         /// </remarks>
-        public static void SetMediaFileSystem(this Composition composition, Func<IServiceProvider, IFileSystem> filesystemFactory)
-            => composition.Services.AddUnique<IMediaFileSystem>(factory =>
+        public static void SetMediaFileSystem(this IUmbracoBuilder builder, Func<IServiceProvider, IFileSystem> filesystemFactory)
+            => builder.Services.AddUnique<IMediaFileSystem>(factory =>
             {
                 var fileSystems = factory.GetRequiredService<IO.FileSystems>();
                 return fileSystems.GetFileSystem<MediaFileSystem>(filesystemFactory(factory));
@@ -302,31 +303,31 @@ namespace Umbraco.Core
         /// Sets the log viewer.
         /// </summary>
         /// <typeparam name="T">The type of the log viewer.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetLogViewer<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetLogViewer<T>(this IUmbracoBuilder builder)
             where T : class, ILogViewer
         {
-            composition.Services.AddUnique<ILogViewer, T>();
+            builder.Services.AddUnique<ILogViewer, T>();
         }
 
         /// <summary>
         /// Sets the log viewer.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a log viewer.</param>
-        public static void SetLogViewer(this Composition composition, Func<IServiceProvider, ILogViewer> factory)
+        public static void SetLogViewer(this IUmbracoBuilder builder, Func<IServiceProvider, ILogViewer> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the log viewer.
         /// </summary>
-        /// <param name="composition">A composition.</param>
+        /// <param name="builder">A builder.</param>
         /// <param name="helper">A log viewer.</param>
-        public static void SetLogViewer(this Composition composition, ILogViewer viewer)
+        public static void SetLogViewer(this IUmbracoBuilder builder, ILogViewer viewer)
         {
-            composition.Services.AddUnique(_ => viewer);
+            builder.Services.AddUnique(_ => viewer);
         }
 
         #endregion

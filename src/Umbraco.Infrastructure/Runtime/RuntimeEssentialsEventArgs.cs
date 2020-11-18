@@ -1,23 +1,19 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Runtime
 {
     public class RuntimeEssentialsEventArgs : EventArgs
     {
-        public RuntimeEssentialsEventArgs(Composition composition, AppCaches appCaches, TypeLoader typeLoader, IUmbracoDatabaseFactory databaseFactory)
+        public RuntimeEssentialsEventArgs(IUmbracoBuilder builder, IUmbracoDatabaseFactory databaseFactory)
         {
-            Composition = composition;
-            AppCaches = appCaches;
-            TypeLoader = typeLoader;
+            Builder = builder;
             DatabaseFactory = databaseFactory;
         }
 
-        public Composition Composition { get; }
-        public AppCaches AppCaches { get; }
-        public TypeLoader TypeLoader { get; }
+        public IUmbracoBuilder Builder { get; }
+
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
     }
 }

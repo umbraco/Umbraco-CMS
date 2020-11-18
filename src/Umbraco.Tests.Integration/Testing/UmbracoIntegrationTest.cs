@@ -32,6 +32,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
+using Umbraco.Web.Common.Builder;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Integration.Testing
@@ -257,14 +258,15 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
             services.AddUmbracoConfiguration(Configuration);
-
-            services.AddUmbracoCore(
+            var builder = new UmbracoBuilder(services, Configuration);
+            builder.AddUmbracoCore(
                 webHostEnvironment,
                 GetType().Assembly,
                 GetAppCaches(),
                 TestHelper.GetLoggingConfiguration(),
                 Configuration,
                 CreateTestRuntime);
+            builder.Build();
 
             services.AddSignalR();
 
@@ -329,7 +331,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Re-configure IOptions<ConnectionStrings> now that we have a test db
             // This is what will be resolved first time IUmbracoDatabaseFactory is resolved from container (e.g. post CoreRuntime bootstrap)
-            args.Composition.Services.Configure<ConnectionStrings>((x) =>
+            args.Builder.Services.Configure<ConnectionStrings>((x) =>
             {
                 x.UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, TestDBConnectionString);
             });

@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
@@ -15,23 +17,27 @@ namespace Umbraco.Web.Common.Builder
     // TODO: We could add parameters to configure each of these for flexibility
     public static class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder AddUmbraco(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration config)
+        public static IUmbracoBuilder AddUmbraco(
+            this IServiceCollection services,
+            IConfiguration config)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-            if (webHostEnvironment is null) throw new ArgumentNullException(nameof(webHostEnvironment));
             if (config is null) throw new ArgumentNullException(nameof(config));
 
             services.AddLazySupport();
 
-            var builder = new UmbracoBuilder(services, webHostEnvironment, config);
+            var builder = new UmbracoBuilder(services, config);
             return builder;
         }
 
         public static IUmbracoBuilder WithConfiguration(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithConfiguration), () => builder.Services.AddUmbracoConfiguration(builder.Config));
 
-        public static IUmbracoBuilder WithCore(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config));
+        public static IUmbracoBuilder WithCore(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment)
+            => builder.AddWith(nameof(WithCore), () =>
+            {
+                builder.AddUmbracoCore(webHostEnvironment, builder.Config);
+            });
 
         public static IUmbracoBuilder WithHostedServices(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithHostedServices), () => builder.Services.AddUmbracoHostedServices());

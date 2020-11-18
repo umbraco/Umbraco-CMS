@@ -72,11 +72,11 @@ namespace Umbraco.Tests.Routing
             // var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
             // Composition.Services.AddUnique(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
-            Composition.Services.AddUnique(umbracoApiControllerTypes);
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Builder.TypeLoader.GetUmbracoApiControllers());
+            Builder.Services.AddUnique(umbracoApiControllerTypes);
 
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Builder.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 
         public override void TearDown()

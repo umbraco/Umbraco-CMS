@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
@@ -21,8 +22,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
                     () =>
                     {
-                        builder.Services.AddUmbracoCore(
-                            builder.WebHostEnvironment,
+                        builder.AddUmbracoCore(
+                            testHelper.GetWebHostEnvironment(),
                             typeof(UmbracoBuilderExtensions).Assembly,
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),

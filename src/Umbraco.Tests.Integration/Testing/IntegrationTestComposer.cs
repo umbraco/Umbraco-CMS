@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -37,25 +38,25 @@ namespace Umbraco.Tests.Integration.Testing
     /// </remarks>
     public class IntegrationTestComposer : ComponentComposer<IntegrationTestComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
-            composition.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
-            composition.Services.AddUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
+            builder.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
+            builder.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
+            builder.Services.AddUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
 
             // we don't want persisted nucache files in tests
-            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
+            builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
             // ensure all lucene indexes are using RAM directory (no file system)
-            composition.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
+            builder.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
 
             // replace this service so that it can lookup the correct file locations
-            composition.Services.AddUnique<ILocalizedTextService>(GetLocalizedTextService);
+            builder.Services.AddUnique<ILocalizedTextService>(GetLocalizedTextService);
 
-            composition.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
-            composition.Services.AddUnique<IProfiler, TestProfiler>();
+            builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
+            builder.Services.AddUnique<IProfiler, TestProfiler>();
 
 
         }

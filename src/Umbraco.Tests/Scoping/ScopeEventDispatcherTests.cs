@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,6 +21,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -38,7 +40,8 @@ namespace Umbraco.Tests.Scoping
 
             var services =  TestHelper.GetRegister();
 
-            var composition = new Composition(services, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>());
+            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
 
             _testObjects = new TestObjects(services);
 

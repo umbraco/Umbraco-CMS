@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
+            var umbracoBuilder = services.AddUmbraco(Configuration);
             umbracoBuilder
                 .WithConfiguration()
                 .WithTestCore(TestHelper, UseTestLocalDb) // This is the important one!

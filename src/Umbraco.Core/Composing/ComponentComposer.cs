@@ -1,4 +1,6 @@
 ﻿
+using Umbraco.Core.Builder;
+
 namespace Umbraco.Core.Composing
 {
     /// <summary>
@@ -9,7 +11,7 @@ namespace Umbraco.Core.Composing
         where TComponent : IComponent
     {
         /// <inheritdoc />
-        public virtual void Compose(Composition composition)
+        public virtual void Compose(IUmbracoBuilder composition)
         {
             composition.Components().Append<TComponent>();
         }

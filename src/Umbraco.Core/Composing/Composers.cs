@@ -6,6 +6,7 @@ using System.Text;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.Builder;
 
 namespace Umbraco.Core.Composing
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public class Composers
     {
-        private readonly Composition _composition;
+        private readonly IUmbracoBuilder _builder;
         private readonly ILogger<Composers> _logger;
         private readonly IProfilingLogger _profileLogger;
         private readonly IEnumerable<Type> _composerTypes;
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the <see cref="Composers" /> class.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The composition.</param>
         /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
         /// <param name="enableDisableAttributes">The <see cref="EnableComposerAttribute" /> and/or <see cref="DisableComposerAttribute" /> attributes.</param>
         /// <param name="logger">The logger.</param>
@@ -39,9 +40,9 @@ namespace Umbraco.Core.Composing
         /// enableDisableAttributes
         /// or
         /// logger</exception>
-        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger, IProfilingLogger profileLogger)
+        public Composers(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger, IProfilingLogger profileLogger)
         {
-            _composition = composition ?? throw new ArgumentNullException(nameof(composition));
+            _builder = builder ?? throw new ArgumentNullException(nameof(builder));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
             _enableDisableAttributes = enableDisableAttributes ?? throw new ArgumentNullException(nameof(enableDisableAttributes));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Composing
         public void Compose()
         {
             // make sure it is there
-            _composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            _builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
             IEnumerable<Type> orderedComposerTypes;
 
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Composing
                     var componentType = composer.GetType();
                     using (_profileLogger.DebugDuration<Composers>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        composer.Compose(_composition);
+                        composer.Compose(_builder);
                     }
                 }
             }

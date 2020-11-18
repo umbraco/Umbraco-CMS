@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Builder;
+using Umbraco.Core.Composing;
 using Umbraco.Web.BackOffice.Trees;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
@@ -18,10 +19,10 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the back office tree collection builder
         /// </summary>
-        /// <param name="composition"></param>
+        /// <param name="builder"></param>
         /// <returns></returns>
-        public static TreeCollectionBuilder Trees(this Composition composition)
-            => composition.WithCollectionBuilder<TreeCollectionBuilder>();
+        public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<TreeCollectionBuilder>();
 
         #endregion
     }

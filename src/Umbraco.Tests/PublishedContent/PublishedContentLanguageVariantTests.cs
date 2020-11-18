@@ -24,7 +24,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.Services.AddUnique(_ => GetServiceContext());
+            Builder.Services.AddUnique(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()

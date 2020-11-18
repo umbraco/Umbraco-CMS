@@ -1,4 +1,5 @@
-﻿using Umbraco.Web.Common.Builder;
+﻿using Umbraco.Core.Builder;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Extensions
 {

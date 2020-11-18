@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Common.Builder
@@ -12,16 +12,22 @@ namespace Umbraco.Web.Common.Builder
         private readonly Dictionary<string, Action> _registrations = new Dictionary<string, Action>();
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
-        public UmbracoBuilder(IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration config)
+        public UmbracoBuilder(IServiceCollection services, IConfiguration config)
         {
             Services = services;
-            WebHostEnvironment = webHostEnvironment;
             Config = config;
         }
 
         public IServiceCollection Services { get; }
-        public IWebHostEnvironment WebHostEnvironment { get; }
-        public IConfiguration Config { get; }        
+        public IConfiguration Config { get; }
+
+        /// <remarks>
+        /// TODO: Remove setter
+        /// This should be a constructor parameter
+        /// Attempting to fix it now opens a huge can of worms around logging setup
+        /// &amp; use of IOptionsMoniker&lt;HostingSettings&gt; for AspNetCoreHostingEnvironment
+        /// </remarks>
+        public TypeLoader TypeLoader { get; set; }
 
         public IUmbracoBuilder AddWith(string key, Action add)
         {
@@ -54,6 +60,8 @@ namespace Umbraco.Web.Common.Builder
                 a.Value();
 
             _registrations.Clear();
+
+            // TODO: We can compose composers here, we have a typeloader, no need to do it in CoreRuntimeBootstrapper.
 
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(Services);

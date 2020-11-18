@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,6 +18,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Common.Builder;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -32,14 +34,8 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(
-                _register,
-                TestHelper.GetMockedTypeLoader(),
-                Mock.Of<IProfilingLogger>(),
-                Mock.Of<IRuntimeState>(),
-                TestHelper.IOHelper,
-                AppCaches.NoCache
-            );
+            var composition = new UmbracoBuilder(_register, Mock.Of<IConfiguration>());
+            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
 
             composition.Services.AddTransient(_ => Mock.Of<IDataTypeService>());
             composition.Services.AddTransient<ILoggerFactory, NullLoggerFactory>();

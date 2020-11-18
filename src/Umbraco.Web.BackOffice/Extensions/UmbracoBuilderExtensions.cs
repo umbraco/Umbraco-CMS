@@ -1,14 +1,16 @@
-﻿using Umbraco.Web.Common.Builder;
+﻿using Microsoft.AspNetCore.Hosting;
+using Umbraco.Core.Builder;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder WithAllBackOfficeComponents(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder WithAllBackOfficeComponents(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment)
         {
             return builder
                 .WithConfiguration()
-                .WithCore()
+                .WithCore(webHostEnvironment)
                 .WithWebComponents()
                 .WithRuntimeMinifier()
                 .WithBackOffice()

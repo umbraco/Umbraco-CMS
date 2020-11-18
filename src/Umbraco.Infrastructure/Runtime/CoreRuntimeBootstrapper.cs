@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -108,9 +109,9 @@ namespace Umbraco.Core.Runtime
         public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual void Configure(IServiceCollection services)
+        public virtual void Configure(IUmbracoBuilder builder)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
+            if (builder is null) throw new ArgumentNullException(nameof(builder));
 
 
             // create and register the essential services
@@ -144,65 +145,59 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                Configure(services, timer);
+                Configure(builder, timer);
             }
         }
 
         /// <summary>
         /// Configure the runtime within a timer.
         /// </summary>
-        private void Configure(IServiceCollection services, DisposableTimer timer)
+        private void Configure(IUmbracoBuilder builder, DisposableTimer timer)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
+            if (builder is null) throw new ArgumentNullException(nameof(builder));
             if (timer is null) throw new ArgumentNullException(nameof(timer));
-
-            Composition composition = null;
 
             try
             {
                 // run handlers
                 OnRuntimeBoot();
 
-                // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache,
+                // TODO: Don't do this, UmbracoBuilder ctor should handle it...
+                builder.TypeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache,
                     new DirectoryInfo(HostingEnvironment.LocalTempPath),
                     RuntimeLoggerFactory.CreateLogger<TypeLoader>(), ProfilingLogger);
 
-                services.AddUnique<ILogger>(Logger);
-                services.AddUnique<ILoggerFactory>(RuntimeLoggerFactory);
-                services.AddUnique<IUmbracoBootPermissionChecker>(_umbracoBootPermissionChecker);
-                services.AddUnique<IProfiler>(Profiler);
-                services.AddUnique<IProfilingLogger>(ProfilingLogger);
-                services.AddUnique<IMainDom>(MainDom);
-                services.AddUnique<AppCaches>(AppCaches);
-                services.AddUnique<IRequestCache>(AppCaches.RequestCache);
-                services.AddUnique<TypeLoader>(typeLoader);
-                services.AddUnique<ITypeFinder>(TypeFinder);
-                services.AddUnique<IIOHelper>(IOHelper);
-                services.AddUnique<IUmbracoVersion>(UmbracoVersion);
-                services.AddUnique<IDbProviderFactoryCreator>(DbProviderFactoryCreator);
-                services.AddUnique<IHostingEnvironment>(HostingEnvironment);
-                services.AddUnique<IBackOfficeInfo>(BackOfficeInfo);
-                services.AddUnique<IRuntime, CoreRuntime>();
+                builder.Services.AddUnique<ILogger>(Logger);
+                builder.Services.AddUnique<ILoggerFactory>(RuntimeLoggerFactory);
+                builder.Services.AddUnique<IUmbracoBootPermissionChecker>(_umbracoBootPermissionChecker);
+                builder.Services.AddUnique<IProfiler>(Profiler);
+                builder.Services.AddUnique<IProfilingLogger>(ProfilingLogger);
+                builder.Services.AddUnique<IMainDom>(MainDom);
+                builder.Services.AddUnique<AppCaches>(AppCaches);
+                builder.Services.AddUnique<IRequestCache>(AppCaches.RequestCache);
+                builder.Services.AddUnique<TypeLoader>(builder.TypeLoader);
+                builder.Services.AddUnique<ITypeFinder>(TypeFinder);
+                builder.Services.AddUnique<IIOHelper>(IOHelper);
+                builder.Services.AddUnique<IUmbracoVersion>(UmbracoVersion);
+                builder.Services.AddUnique<IDbProviderFactoryCreator>(DbProviderFactoryCreator);
+                builder.Services.AddUnique<IHostingEnvironment>(HostingEnvironment);
+                builder.Services.AddUnique<IBackOfficeInfo>(BackOfficeInfo);
+                builder.Services.AddUnique<IRuntime, CoreRuntime>();
 
                 // NOTE: This instance of IUmbracoDatabaseFactory is only used to determine runtime state.
                 var bootstrapDatabaseFactory = CreateBootstrapDatabaseFactory();
 
                 // after bootstrapping we let the container wire up for us.
-                services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-                services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-                services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
+                builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+                builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+                builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
 
                 // re-create the state object with the essential services
                 _state = new RuntimeState(_globalSettings, UmbracoVersion, bootstrapDatabaseFactory, RuntimeLoggerFactory.CreateLogger<RuntimeState>());
-                services.AddUnique<IRuntimeState>(_state);
-
-
-                // create the composition
-                composition = new Composition(services, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
+                builder.Services.AddUnique<IRuntimeState>(_state);
 
                 // run handlers
-                OnRuntimeEssentials(composition, AppCaches, typeLoader, bootstrapDatabaseFactory);
+                OnRuntimeEssentials(builder, AppCaches, builder.TypeLoader, bootstrapDatabaseFactory);
 
                 try
                 {
@@ -211,8 +206,9 @@ namespace Umbraco.Core.Runtime
                 }
                 finally
                 {
+                    // TODO: This can move to UmbracoBuilder
                     // always run composers
-                    RunComposers(typeLoader, composition);
+                    RunComposers(builder.TypeLoader, builder);
                 }
 
             }
@@ -236,10 +232,6 @@ namespace Umbraco.Core.Runtime
                 // understand this and will nullify themselves, while UmbracoModule will
                 // throw a BootFailedException for every requests.
             }
-            finally
-            {
-                composition?.RegisterBuilders();
-            }
         }
         
         protected virtual void ConfigureUnhandledException()
@@ -259,7 +251,7 @@ namespace Umbraco.Core.Runtime
             };
         }
 
-        private void RunComposers(TypeLoader typeLoader, Composition composition)
+        private void RunComposers(TypeLoader typeLoader, IUmbracoBuilder builder)
         {
             // get composers, and compose
             var composerTypes = ResolveComposerTypes(typeLoader);
@@ -270,7 +262,7 @@ namespace Umbraco.Core.Runtime
                 enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             }
 
-            var composers = new Composers(composition, composerTypes, enableDisableAttributes, RuntimeLoggerFactory.CreateLogger<Composers>(), ProfilingLogger);
+            var composers = new Composers(builder, composerTypes, enableDisableAttributes, RuntimeLoggerFactory.CreateLogger<Composers>(), ProfilingLogger);
             composers.Compose();
         }
 
@@ -357,14 +349,12 @@ namespace Umbraco.Core.Runtime
 
         protected void OnRuntimeBoot()
         {
-            RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
             RuntimeBooting?.Invoke(this, ProfilingLogger);
         }
 
-        protected void OnRuntimeEssentials(Composition composition, AppCaches appCaches, TypeLoader typeLoader, IUmbracoDatabaseFactory databaseFactory)
+        protected void OnRuntimeEssentials(IUmbracoBuilder builder, AppCaches appCaches, TypeLoader typeLoader, IUmbracoDatabaseFactory databaseFactory)
         {
-            RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
-            RuntimeEssentials?.Invoke(this, new RuntimeEssentialsEventArgs(composition, appCaches, typeLoader, databaseFactory));
+            RuntimeEssentials?.Invoke(this, new RuntimeEssentialsEventArgs(builder,  databaseFactory));
         }
 
         public event TypedEventHandler<CoreRuntimeBootstrapper, IProfilingLogger> RuntimeBooting;

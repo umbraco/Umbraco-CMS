@@ -27,8 +27,8 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Composition.Services.AddUnique(_ => Mock.Of<IDomainService>());
-            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddUnique(_ => Mock.Of<IDomainService>());
+            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         [Test]
