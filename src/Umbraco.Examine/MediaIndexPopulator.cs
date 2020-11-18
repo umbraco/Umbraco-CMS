@@ -14,7 +14,6 @@ namespace Umbraco.Examine
     {
         private readonly int? _parentId;
         private readonly IMediaService _mediaService;
-        private readonly IMediaService2 _mediaService2;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
 
         /// <summary>
@@ -38,7 +37,6 @@ namespace Umbraco.Examine
             _parentId = parentId;
             _mediaService = mediaService;
             _mediaValueSetBuilder = mediaValueSetBuilder;
-            _mediaService2 = mediaService as IMediaService2;
         }
 
         protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
@@ -59,14 +57,8 @@ namespace Umbraco.Examine
 
             do
             {
-                if(_mediaService2 != null)
-                {
-                    media = _mediaService2.GetPagedDescendants(mediaParentId, pageIndex, pageSize).ToArray();
-                }
-                else
-                {
-                    media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out var _).ToArray();
-                }
+                media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize).ToArray();
+                
 
                 if (media.Length > 0)
                 {
