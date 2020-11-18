@@ -75,7 +75,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private sealed class EnsureUserPermissionForContentFilter : IActionFilter
         {
             private readonly int? _nodeId;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly IEntityService _entityService;
             private readonly IUserService _userService;
             private readonly IContentService _contentService;
@@ -83,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly char? _permissionToCheck;
 
             public EnsureUserPermissionForContentFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
@@ -94,7 +94,7 @@ namespace Umbraco.Web.BackOffice.Filters
             }
 
             public EnsureUserPermissionForContentFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
@@ -106,7 +106,7 @@ namespace Umbraco.Web.BackOffice.Filters
             }
 
             public EnsureUserPermissionForContentFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
@@ -116,7 +116,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             }
             public EnsureUserPermissionForContentFilter(
-                    IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                    IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                     IEntityService entityService,
                     IUserService userService,
                     IContentService contentService,
@@ -128,7 +128,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
 
             private EnsureUserPermissionForContentFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
@@ -156,7 +156,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser == null)
+                if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser == null)
                 {
                     //not logged in
                     throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -213,7 +213,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
 
                 var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
-                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                     _userService,
                     _contentService,
                     _entityService,

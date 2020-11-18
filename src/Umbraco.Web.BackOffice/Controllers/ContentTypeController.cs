@@ -58,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IIOHelper _ioHelper;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ILocalizedTextService _localizedTextService;
@@ -85,7 +85,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IIOHelper ioHelper,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
             IFileService fileService,
@@ -215,7 +215,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -314,14 +314,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteContainer(int id)
         {
-            _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -330,7 +330,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -630,7 +630,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
-            var userId = _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
             dataInstaller.ImportDocumentType(element, userId);
 

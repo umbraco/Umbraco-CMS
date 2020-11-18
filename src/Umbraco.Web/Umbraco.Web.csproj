@@ -145,7 +145,7 @@
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
-    <Compile Include="Security\BackofficeSecurity.cs" />
+    <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
@@ -177,7 +177,6 @@
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
-    <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
@@ -212,7 +211,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
@@ -222,7 +220,6 @@
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
-    <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
@@ -233,7 +230,6 @@
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="Security\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="WebAssets\CDF\DependencyPathRenderer.cs" />
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
@@ -249,7 +245,6 @@
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
-    <Compile Include="Editors\BackOfficeController.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />

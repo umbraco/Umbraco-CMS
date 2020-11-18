@@ -6,7 +6,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Core
 {
 
-    public class HybridBackofficeSecurityAccessor : HybridAccessorBase<IBackofficeSecurity>, IBackofficeSecurityAccessor
+    public class HybridBackofficeSecurityAccessor : HybridAccessorBase<IBackOfficeSecurity>, IBackOfficeSecurityAccessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.
@@ -19,9 +19,9 @@ namespace Umbraco.Core
         protected override string ItemKey => "Umbraco.Web.HybridBackofficeSecurityAccessor";
 
         /// <summary>
-        /// Gets or sets the <see cref="BackofficeSecurity"/> object.
+        /// Gets or sets the <see cref="BackOfficeSecurity"/> object.
         /// </summary>
-        public IBackofficeSecurity BackofficeSecurity
+        public IBackOfficeSecurity BackOfficeSecurity
         {
             get => Value;
             set => Value = value;

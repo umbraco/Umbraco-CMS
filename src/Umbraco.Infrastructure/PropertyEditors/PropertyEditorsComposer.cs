@@ -2,6 +2,6 @@
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class PropertyEditorsComposer : ComponentComposer<PropertyEditorsComponent>, ICoreComposer
+    public sealed class PropertyEditorsComposer : ComponentComposer<PropertyEditorsComponent>, ICoreComposer
     { }
 }

@@ -335,7 +335,7 @@ namespace Umbraco.Tests.Testing
             Composition.Services.AddUnique<ISectionService, SectionService>();
 
             Composition.Services.AddUnique<HtmlLocalLinkParser>();
-            Composition.Services.AddUnique<IBackofficeSecurity, BackofficeSecurity>();
+            Composition.Services.AddUnique<IBackOfficeSecurity, BackOfficeSecurity>();
             Composition.Services.AddUnique<IEmailSender, EmailSender>();
             Composition.Services.AddUnique<HtmlUrlParser>();
             Composition.Services.AddUnique<HtmlImageSourceParser>();

@@ -54,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IContentService _contentService;
         private readonly UmbracoMapper _umbracoMapper;
@@ -75,7 +75,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IPublishedContentQuery publishedContentQuery,
             IShortStringHelper shortStringHelper,
             IEntityService entityService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IPublishedUrlProvider publishedUrlProvider,
             IContentService contentService,
             UmbracoMapper umbracoMapper,
@@ -176,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (string.IsNullOrEmpty(query))
                 return result;
 
-            var allowedSections = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.ToArray();
+            var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.ToArray();
 
             foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
@@ -722,9 +722,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
                 case UmbracoEntityTypes.Media:
-                    return _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                 default:
                     return Array.Empty<int>();
             }
@@ -863,10 +863,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                             break;
                     }
 

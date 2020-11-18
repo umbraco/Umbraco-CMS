@@ -35,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly ILogger<DictionaryController> _logger;
         private readonly ILocalizationService _localizationService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public DictionaryController(
             ILogger<DictionaryController> logger,
             ILocalizationService localizationService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper
@@ -75,10 +75,10 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             foreach (var dictionaryItem in foundDictionaryDescendants)
             {
-                _localizationService.Delete(dictionaryItem, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+                _localizationService.Delete(dictionaryItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
             }
 
-            _localizationService.Delete(foundDictionary, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _localizationService.Delete(foundDictionary, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return Ok();
         }
@@ -105,7 +105,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var message = _localizedTextService.Localize(
                      "dictionaryItem/changeKeyError",
-                     _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
+                     _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(message);
             }
@@ -219,7 +219,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (dictionaryItem == null)
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Dictionary item does not exist");
 
-            var userCulture = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
+            var userCulture = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
 
             if (dictionary.NameIsDirty)
             {

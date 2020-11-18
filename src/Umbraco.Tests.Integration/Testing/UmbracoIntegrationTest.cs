@@ -26,16 +26,13 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
-using System.Diagnostics;
 using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
-using Umbraco.Core.Logging.Serilog;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -293,7 +290,7 @@ namespace Umbraco.Tests.Integration.Testing
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
             {
-                Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
+                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
                 Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
                 app.UseUmbracoCore(); // Takes 200 ms
 
@@ -332,7 +329,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Re-configure IOptions<ConnectionStrings> now that we have a test db
             // This is what will be resolved first time IUmbracoDatabaseFactory is resolved from container (e.g. post CoreRuntime bootstrap)
-            args.Composition.Services.Configure<ConnectionStrings>((x) => 
+            args.Composition.Services.Configure<ConnectionStrings>((x) =>
             {
                 x.UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, TestDBConnectionString);
             });

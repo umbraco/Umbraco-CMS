@@ -331,6 +331,7 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<ITreeService, TreeService>();
             composition.Services.AddUnique<ISectionService, SectionService>();
             composition.Services.AddUnique<IEmailSender, EmailSender>();
+            composition.Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
 
             composition.Services.AddUnique<IExamineManager, ExamineManager>();
 

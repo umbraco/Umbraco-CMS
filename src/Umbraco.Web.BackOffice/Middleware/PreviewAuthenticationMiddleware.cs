@@ -10,7 +10,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Web.BackOffice.Middleware
 {
     /// <summary>
     /// Ensures that preview pages (front-end routed) are authenticated with the back office identity appended to the principal alongside any default authentication that takes place
@@ -55,13 +55,11 @@ namespace Umbraco.Web.BackOffice.Security
                         {
                             var backOfficeIdentity = unprotected.Principal.GetUmbracoIdentity();
                             if (backOfficeIdentity != null)
-                            {
                                 //Ok, we've got a real ticket, now we can add this ticket's identity to the current
                                 // Principal, this means we'll have 2 identities assigned to the principal which we can
                                 // use to authorize the preview and allow for a back office User.
 
                                 context.User.AddIdentity(backOfficeIdentity);
-                            }
                         }
                     }
 

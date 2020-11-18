@@ -40,8 +40,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
         {
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
-            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var globalSettings = new GlobalSettings();
 
             var umbracoContextFactory = new UmbracoContextFactory(
@@ -76,8 +76,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
-            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
@@ -109,8 +109,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var content = new Mock<IPublishedContent>();
             content.Setup(x => x.Id).Returns(2);
-            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
-            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
@@ -152,8 +152,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
-            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),

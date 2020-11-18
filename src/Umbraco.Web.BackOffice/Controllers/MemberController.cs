@@ -53,7 +53,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
 
         public MemberController(
@@ -69,7 +69,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
@@ -331,13 +331,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         private void UpdateMemberData(MemberSave contentItem)
         {
-            contentItem.PersistedContent.WriterId = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id;
+            contentItem.PersistedContent.WriterId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
 
             // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
             // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
             // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
             // but we will take care of this in a generic way below so that it works for all props.
-            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
             {
                 var memberType = _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
                 var sensitiveProperties = memberType
@@ -463,7 +463,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult ExportMemberData(Guid key)
         {
-            var currentUser = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
             if (currentUser.HasAccessToSensitiveData() == false)
             {

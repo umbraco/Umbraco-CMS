@@ -74,8 +74,8 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.Services.AddUnique<IBackofficeSecurityFactory, BackofficeSecurityFactory>();
-            composition.Services.AddUnique<IBackofficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            composition.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
+            composition.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
 
             //register the install components
             composition.ComposeInstaller();

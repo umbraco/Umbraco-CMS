@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MediaTypeController(ICultureDictionary cultureDictionary,
             EditorValidatorCollection editorValidatorCollection,
@@ -49,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEntityService entityService,
             IMediaService mediaService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
             : base(
             cultureDictionary,
             editorValidatorCollection,
@@ -148,7 +148,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -242,14 +242,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteContainer(int id)
         {
-            _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -258,7 +258,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id

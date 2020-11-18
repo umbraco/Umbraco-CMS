@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -31,7 +32,13 @@ namespace Umbraco.Extensions
             services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
+                 {
+                     o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
+                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                 });
+
             // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
 
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
@@ -49,8 +56,6 @@ namespace Umbraco.Extensions
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();
-
-            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
@@ -86,6 +91,8 @@ namespace Umbraco.Extensions
             // CUSTOM:
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
+            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
+            services.TryAddSingleton<IBackOfficeExternalLoginProviders, NopBackOfficeExternalLoginProviders>();
 
             /*
              * IdentityBuilderExtensions.AddUserManager adds UserManager<BackOfficeIdentityUser> to service collection

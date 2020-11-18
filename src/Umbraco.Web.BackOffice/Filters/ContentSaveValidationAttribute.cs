@@ -35,12 +35,12 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly ILoggerFactory _loggerFactory;
             private readonly ILocalizedTextService _textService;
             private readonly IUserService _userService;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IContentService contentService,
                 IUserService userService,
@@ -59,11 +59,11 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!ValidateUserAccess(model, context, _backofficeSecurityAccessor.BackofficeSecurity)) return;
+                if (!ValidateUserAccess(model, context, _backofficeSecurityAccessor.BackOfficeSecurity)) return;
 
                 //validate for each variant that is being updated
                 foreach (var variant in model.Variants.Where(x => x.Save))
@@ -103,7 +103,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="contentItem"></param>
             /// <param name="backofficeSecurity"></param>
             private bool ValidateUserAccess(ContentItemSave contentItem, ActionExecutingContext actionContext,
-                IBackofficeSecurity backofficeSecurity)
+                IBackOfficeSecurity backofficeSecurity)
             {
                 // We now need to validate that the user is allowed to be doing what they are doing.
                 // Based on the action we need to check different permissions.

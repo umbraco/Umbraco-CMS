@@ -1,9 +1,7 @@
-﻿using Umbraco.Web.Security;
-
-namespace Umbraco.Core.Security
+﻿namespace Umbraco.Core.Security
 {
-    public interface IBackofficeSecurityAccessor
+    public interface IBackOfficeSecurityAccessor
     {
-        IBackofficeSecurity BackofficeSecurity { get; set; }
+        IBackOfficeSecurity BackOfficeSecurity { get; set; }
     }
 }

@@ -39,7 +39,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IPackagingService _packagingService;
         private readonly ILogger<PackageInstallController> _logger;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILocalizedTextService _localizedTextService;
 
         public PackageInstallController(
@@ -49,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IPackagingService packagingService,
             ILogger<PackageInstallController> logger,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService)
         {
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
@@ -88,14 +88,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var package = _packagingService.GetInstalledPackageById(packageId);
                 if (package == null) return NotFound();
 
-                var summary = _packagingService.UninstallPackage(package.Name, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+                var summary = _packagingService.UninstallPackage(package.Name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
                 //now get all other packages by this name since we'll uninstall all versions
                 foreach (var installed in _packagingService.GetAllInstalledPackages()
                     .Where(x => x.Name == package.Name && x.Id != package.Id))
                 {
                     //remove from the xml
-                    _packagingService.DeleteInstalledPackage(installed.Id, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+                    _packagingService.DeleteInstalledPackage(installed.Id, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception ex)
@@ -224,7 +224,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var packageFile = await _packagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
                     _umbracoVersion.Current,
-                    _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+                    _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
             }
@@ -311,7 +311,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-            var installedFiles = _packagingService.InstallCompiledPackageFiles(definition, zipFile, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+            var installedFiles = _packagingService.InstallCompiledPackageFiles(definition, zipFile, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
             _umbracoApplicationLifetime.Restart();
@@ -343,7 +343,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
             var zipFile = new FileInfo(definition.PackagePath);
-            var installSummary = _packagingService.InstallCompiledPackageData(definition, zipFile, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
+            var installSummary = _packagingService.InstallCompiledPackageData(definition, zipFile, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return model;
         }

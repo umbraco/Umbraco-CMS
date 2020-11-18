@@ -9,12 +9,12 @@ using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Services;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Runtime;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.BackOffice.Runtime
 {
@@ -31,6 +31,7 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
             composition.Services.AddUnique<PreviewAuthenticationMiddleware>();
+            composition.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             composition.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees

@@ -1,16 +1,44 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Common.ActionsResults
 {
     /// <summary>
-    /// Custom result to return a validation error message with a 400 http response and required headers
+    /// Custom result to return a validation error message with required headers
     /// </summary>
+    /// <remarks>
+    /// The default status code is a 400 http response
+    /// </remarks>
     public class ValidationErrorResult : ObjectResult
     {
-        public ValidationErrorResult(string errorMessage) : base(new { Message = errorMessage })
+        public static ValidationErrorResult CreateNotificationValidationErrorResult(string errorMessage)
         {
-            StatusCode = (int)HttpStatusCode.BadRequest;           
+            var notificationModel = new SimpleNotificationModel
+            {
+                Message = errorMessage
+            };
+            notificationModel.AddErrorNotification(errorMessage, string.Empty);
+            return new ValidationErrorResult(notificationModel);
+        }
+
+        public ValidationErrorResult(object value, int statusCode) : base(value)
+        {
+            StatusCode = statusCode;
+        }
+
+        public ValidationErrorResult(object value) : this(value, StatusCodes.Status400BadRequest)
+        {
+        }
+
+        public ValidationErrorResult(string errorMessage, int statusCode) : base(new { Message = errorMessage })
+        {
+            StatusCode = statusCode;
+        }
+
+        public ValidationErrorResult(string errorMessage) : this(errorMessage, StatusCodes.Status400BadRequest)
+        {
         }
 
         public override void OnFormatting(ActionContext context)

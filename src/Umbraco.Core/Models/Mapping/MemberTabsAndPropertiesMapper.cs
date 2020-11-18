@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     {
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
@@ -76,8 +76,8 @@ namespace Umbraco.Web.Models.Mapping
                 isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
             }
 
-            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser != null
-                && _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
+                && _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
                 var memberTypeLink = $"#/member/memberTypes/edit/{source.ContentTypeId}";
 
@@ -191,7 +191,7 @@ namespace Umbraco.Web.Models.Mapping
                 // check if this property is flagged as sensitive
                 var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
                 // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
+                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
                 {
                     // mark this property as sensitive
                     prop.IsSensitive = true;

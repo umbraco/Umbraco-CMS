@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly AppCaches _appCaches;
         private readonly ISqlContext _sqlContext;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
             UmbracoMapper umbracoMapper,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             AppCaches appCaches,
             ISqlContext sqlContext)
@@ -90,7 +90,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
             var result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)

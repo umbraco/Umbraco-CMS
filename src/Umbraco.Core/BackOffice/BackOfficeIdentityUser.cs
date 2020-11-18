@@ -40,7 +40,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture)
+        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
@@ -54,6 +54,7 @@ namespace Umbraco.Core.BackOffice
             user._id = int.MinValue;
             user._hasIdentity = false;
             user._culture = culture;
+            user._name = name;
             user.EnableChangeTracking();
             return user;
         }
@@ -286,16 +287,23 @@ namespace Umbraco.Core.BackOffice
         {
             get
             {
-                if (_getLogins != null && _getLogins.IsValueCreated == false)
+                // return if it exists
+                if (_logins != null) return _logins;
+
+                _logins = new ObservableCollection<IIdentityUserLogin>();
+
+                // if the callback is there and hasn't been created yet then execute it and populate the logins
+                if (_getLogins != null && !_getLogins.IsValueCreated)
                 {
-                    _logins = new ObservableCollection<IIdentityUserLogin>();
                     foreach (var l in _getLogins.Value)
                     {
                         _logins.Add(l);
                     }
-                    //now assign events
-                    _logins.CollectionChanged += Logins_CollectionChanged;
                 }
+
+                //now assign events
+                _logins.CollectionChanged += Logins_CollectionChanged;
+
                 return _logins;
             }
         }

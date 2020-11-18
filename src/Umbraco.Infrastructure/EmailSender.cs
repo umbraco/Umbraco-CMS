@@ -12,6 +12,7 @@ using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Umbraco.Core
 {
+
     /// <summary>
     /// A utility class for sending emails
     /// </summary>
