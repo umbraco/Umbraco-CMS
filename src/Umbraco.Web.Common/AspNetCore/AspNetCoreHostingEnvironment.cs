@@ -100,7 +100,7 @@ namespace Umbraco.Web.Common.AspNetCore
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
 
-            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart("~/").TrimStart("/");
+            var fullPath = Path.Combine(ApplicationVirtualPath, virtualPath.TrimStart('~', '/'));
 
             return fullPath;
         }
