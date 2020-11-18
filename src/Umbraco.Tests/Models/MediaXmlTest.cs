@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Models
             var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act
-            XElement element = media.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
+            XElement element = media.ToXml(Factory.GetRequiredService<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

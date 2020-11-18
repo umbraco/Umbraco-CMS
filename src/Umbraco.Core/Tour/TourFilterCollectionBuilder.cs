@@ -15,7 +15,7 @@ namespace Umbraco.Web.Tour
         private readonly HashSet<BackOfficeTourFilter> _instances = new HashSet<BackOfficeTourFilter>();
 
         /// <inheritdoc />
-        protected override IEnumerable<BackOfficeTourFilter> CreateItems(IFactory factory)
+        protected override IEnumerable<BackOfficeTourFilter> CreateItems(IServiceProvider factory)
         {
             return base.CreateItems(factory).Concat(_instances);
         }

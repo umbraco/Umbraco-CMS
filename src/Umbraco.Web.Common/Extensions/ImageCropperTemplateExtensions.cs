@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Newtonsoft.Json;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Microsoft.Extensions.Logging;
@@ -28,7 +27,7 @@ namespace Umbraco.Extensions
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.LogError(ex, "Could not parse the json string: {Json}", json);
+                    StaticApplicationLogging.Logger.LogError(ex, "Could not parse the json string: {Json}", json);
                 }
             }
 

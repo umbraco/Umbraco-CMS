@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Security
+﻿namespace Umbraco.Core.Security
 {
     public enum ValidateRequestAttempt
     {

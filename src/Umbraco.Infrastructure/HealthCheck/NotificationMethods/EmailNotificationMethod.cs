@@ -28,7 +28,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             IOptions<ContentSettings> contentSettings)
             : base(healthChecksSettings)
         {
-            var recipientEmail = Settings?["recipientEmail"]?.Value;
+            var recipientEmail = Settings?["RecipientEmail"];
             if (string.IsNullOrWhiteSpace(recipientEmail))
             {
                 Enabled = false;
@@ -45,7 +45,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public string RecipientEmail { get; }
 
-        public override async Task SendAsync(HealthCheckResults results, CancellationToken token)
+        public override async Task SendAsync(HealthCheckResults results)
         {
             if (ShouldSend(results) == false)
             {

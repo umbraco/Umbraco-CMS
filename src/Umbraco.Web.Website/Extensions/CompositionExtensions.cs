@@ -20,6 +20,7 @@ namespace Umbraco.Extensions
                 // typeof(UmbRegisterController),//TODO introduce when migrated
                 // typeof(UmbLoginController),//TODO introduce when migrated
                 typeof(RenderMvcController),
+                typeof(RenderNoContentController),
 
             });
 

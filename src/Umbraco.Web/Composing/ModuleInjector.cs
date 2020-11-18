@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Composing
             try
             {
                 // using the service locator here - no other way, really
-                Module = Current.Factory.GetInstance<TModule>();
+                Module = Current.Factory.GetRequiredService<TModule>();
             }
             catch
             {
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Composing
 
                 try
                 {
-                    runtimeState = Current.Factory.GetInstance<IRuntimeState>();
+                    runtimeState = Current.Factory.GetRequiredService<IRuntimeState>();
                 }
                 catch { /* don't make it worse */ }
 

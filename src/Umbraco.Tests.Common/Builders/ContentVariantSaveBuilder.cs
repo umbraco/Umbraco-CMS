@@ -15,8 +15,8 @@ namespace Umbraco.Tests.Common.Builders
 
         private string _name;
         private CultureInfo _cultureInfo;
-        private bool? _save;
-        private bool? _publish;
+        private bool? _save = null;
+        private bool? _publish = null;
 
         public ContentVariantSaveBuilder(TParent parentBuilder) : base(parentBuilder)
         {

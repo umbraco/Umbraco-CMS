@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
@@ -18,9 +19,9 @@ namespace Umbraco.Core.Composing
 
         protected override ComponentCollectionBuilder This => this;
 
-        protected override IEnumerable<IComponent> CreateItems(IFactory factory)
+        protected override IEnumerable<IComponent> CreateItems(IServiceProvider factory)
         {
-            _logger = factory.GetInstance<IProfilingLogger>();
+            _logger = factory.GetRequiredService<IProfilingLogger>();
 
             using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
             {
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Composing
             }
         }
 
-        protected override IComponent CreateItem(IFactory factory, Type itemType)
+        protected override IComponent CreateItem(IServiceProvider factory, Type itemType)
         {
             using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
             {

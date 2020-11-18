@@ -1,4 +1,5 @@
 ﻿using System;
+using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -12,9 +13,8 @@ namespace Umbraco.Tests.Integration.Testing
         protected IFileService FileService => GetRequiredService<IFileService>();
         protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
-        public override void Setup()
-        {
-            base.Setup();
+        [SetUp]
+        public void Setup(){
             CreateTestData();
         }
 

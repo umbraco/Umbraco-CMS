@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Owin;
@@ -8,7 +9,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Net;
 using Umbraco.Core.Services;
@@ -30,9 +30,9 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected GlobalSettings GlobalSettings => Current.Factory.GetInstance<GlobalSettings>();
-        protected SecuritySettings SecuritySettings => Current.Factory.GetInstance<IOptions<SecuritySettings>>().Value;
-        protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
+        protected GlobalSettings GlobalSettings => Current.Factory.GetRequiredService<GlobalSettings>();
+        protected SecuritySettings SecuritySettings => Current.Factory.GetRequiredService<IOptions<SecuritySettings>>().Value;
+        protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetRequiredService<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
@@ -91,6 +91,7 @@ namespace Umbraco.Web
             // Front-end OWIN cookie configuration must be declared after this code.
             app
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate);
+                // TODO: this would be considered a breaking change but this must come after all authentication so should be moved within ConfigureMiddleware
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

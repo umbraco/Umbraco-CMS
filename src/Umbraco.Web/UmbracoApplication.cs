@@ -19,7 +19,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected override CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
@@ -44,7 +44,7 @@ namespace Umbraco.Web
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntime(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+            return new CoreRuntimeBootstrapper(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
                 GetTypeFinder(hostingEnvironment, logger, profiler), appCaches);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -29,11 +30,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
         private static readonly List<Type> Initialized = new List<Type>();
         private static readonly List<Type> Terminated = new List<Type>();
 
-        private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
+        private static IServiceProvider MockFactory(Action<Mock<IServiceProvider>> setup = null)
         {
             // FIXME: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
-            var mock = new Mock<IFactory>();
+            var mock = new Mock<IServiceProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             var logger = loggerFactory.CreateLogger("GenericLogger");
             var typeFinder = TestHelper.GetTypeFinder();
@@ -45,19 +46,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
-            mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof(ILoggerFactory))).Returns(loggerFactory);
-            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
-            mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
-            mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+            mock.Setup(x => x.GetService(typeof (ILogger))).Returns(logger);
+            mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
+            mock.Setup(x => x.GetService(typeof(ILoggerFactory))).Returns(loggerFactory);
+            mock.Setup(x => x.GetService(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetService(typeof (IUmbracoDatabaseFactory))).Returns(f);
+            mock.Setup(x => x.GetService(typeof (IScopeProvider))).Returns(p);
 
             setup?.Invoke(mock);
             return mock.Object;
         }
 
-        private static IRegister MockRegister()
+        private static IServiceCollection MockRegister()
         {
-            return Mock.Of<IRegister>();
+            return Mock.Of<IServiceCollection>();
         }
 
         private static TypeLoader MockTypeLoader()
@@ -86,8 +88,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
 
             var factory = MockFactory(m =>
             {
-                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
-                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                m.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>((type) =>
                 {
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();
@@ -208,8 +210,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var typeLoader = MockTypeLoader();
             var factory = MockFactory(m =>
             {
-                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
-                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                m.Setup(x => x.GetService(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>((type) =>
                 {
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();

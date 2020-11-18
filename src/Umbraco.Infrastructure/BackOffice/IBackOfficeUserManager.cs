@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Core.BackOffice
 {
@@ -14,6 +15,8 @@ namespace Umbraco.Core.BackOffice
     public interface  IBackOfficeUserManager<TUser>: IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
+
         Task<IdentityResult> DeleteAsync(TUser user);
 
         Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
@@ -303,8 +306,11 @@ namespace Umbraco.Core.BackOffice
 
         void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
         void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
-        void RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
 
         void RaiseLoginSuccessEvent(TUser currentUser, int userId);
+
+        bool HasSendingUserInviteEventHandler { get; }
     }
 }

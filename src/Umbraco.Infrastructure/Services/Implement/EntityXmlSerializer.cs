@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using Newtonsoft.Json;
-using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -441,6 +440,7 @@ namespace Umbraco.Core.Services.Implement
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
                                     new XElement("Alias", contentType.Alias),
+                                    new XElement("Key", contentType.Key),
                                     new XElement("Icon", contentType.Icon),
                                     new XElement("Thumbnail", contentType.Thumbnail),
                                     new XElement("Description", contentType.Description),
@@ -491,8 +491,9 @@ namespace Umbraco.Core.Services.Implement
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Key", propertyType.Key),
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),
+                                                   new XElement("Definition", definition.Key),                                                   
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),

@@ -79,8 +79,6 @@ namespace Umbraco.Extensions
                 request.Body.Seek(0, SeekOrigin.Begin);
                 return result;
             }
-
-
         }
 
         public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding encoding = null)

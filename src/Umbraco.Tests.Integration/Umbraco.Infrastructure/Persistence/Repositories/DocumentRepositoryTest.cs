@@ -47,11 +47,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             ContentRepositoryBase.ThrowOnWarning = true;
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void Teardown()
         {
             ContentRepositoryBase.ThrowOnWarning = false;
-
-            base.TearDown();
         }
 
         public void CreateTestData()

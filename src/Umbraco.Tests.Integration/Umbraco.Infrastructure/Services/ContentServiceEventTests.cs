@@ -47,10 +47,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(_contentType);
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void Teardown()
         {
             ContentRepositoryBase.ThrowOnWarning = false;
-            base.TearDown();
         }
 
         [Test]

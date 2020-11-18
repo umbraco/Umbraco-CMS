@@ -121,10 +121,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
         //     textService.Setup(x => x.Localize("validation/invalidNull", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidNull");
         //     textService.Setup(x => x.Localize("validation/invalidEmpty", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidEmpty");
         //
-        //     Composition.RegisterUnique(x => Mock.Of<IDataTypeService>(x => x.GetDataType(It.IsAny<int>()) == Mock.Of<IDataType>()));
-        //     Composition.RegisterUnique(x => dataTypeService.Object);
-        //     Composition.RegisterUnique(x => contentTypeService.Object);
-        //     Composition.RegisterUnique(x => textService.Object);
+        //     composition.Services.AddUnique(x => Mock.Of<IDataTypeService>(x => x.GetDataType(It.IsAny<int>()) == Mock.Of<IDataType>()));
+        //     composition.Services.AddUnique(x => dataTypeService.Object);
+        //     composition.Services.AddUnique(x => contentTypeService.Object);
+        //     composition.Services.AddUnique(x => textService.Object);
         //
         //     Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
         //         .Add<TestEditor>()

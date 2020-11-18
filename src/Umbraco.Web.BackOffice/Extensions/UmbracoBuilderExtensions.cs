@@ -16,7 +16,9 @@ namespace Umbraco.Extensions
                 .WithMiniProfiler()
                 .WithMvcAndRazor()
                 .WithWebServer()
-                .WithPreview();
+                .WithPreview()
+                .WithHostedServices()
+                .WithHttpClients();
         }
 
         public static IUmbracoBuilder WithBackOffice(this IUmbracoBuilder builder)

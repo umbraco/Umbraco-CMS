@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Composing;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -92,7 +91,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    StaticApplicationLogging.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
                 }
             }
 

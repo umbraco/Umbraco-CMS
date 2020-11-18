@@ -314,6 +314,8 @@ namespace Umbraco.Web.Security
             FormsAuthentication.SetAuthCookie(member.UserName, true);
             return true;
         }
+        #region Querying for front-end
+
 
         /// <summary>
         /// Logs out the current member
@@ -323,7 +325,6 @@ namespace Umbraco.Web.Security
             FormsAuthentication.SignOut();
         }
 
-        #region Querying for front-end
 
         public virtual IPublishedContent GetByProviderKey(object key)
         {

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -47,14 +48,14 @@ namespace Umbraco.Tests.Routing
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
                 ShortStringHelper,
-                new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
+              //  new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()),
                 HostingEnvironment);
         }
 
-        public class TestRuntime : CoreRuntime
+        public class TestRuntimeBootstrapper : CoreRuntimeBootstrapper
         {
-            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            public TestRuntimeBootstrapper(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
                 : base(globalSettings, connectionStrings,umbracoVersion, ioHelper,  NullLoggerFactory.Instance, Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
@@ -68,14 +69,14 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
-            Composition.RegisterUnique(surfaceControllerTypes);
+            // var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
+            // Composition.Services.AddUnique(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
-            Composition.RegisterUnique(umbracoApiControllerTypes);
+            Composition.Services.AddUnique(umbracoApiControllerTypes);
 
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 
         public override void TearDown()
@@ -155,12 +156,12 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>(), context =>
                 {
 
-                  return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),
+                  return new CustomDocumentController(Factory.GetRequiredService<IOptions<GlobalSettings>>(),
                         umbracoContextAccessor,
-                        Factory.GetInstance<ServiceContext>(),
-                        Factory.GetInstance<AppCaches>(),
-                        Factory.GetInstance<IProfilingLogger>(),
-                        Factory.GetInstance<ILoggerFactory>());
+                        Factory.GetRequiredService<ServiceContext>(),
+                        Factory.GetRequiredService<AppCaches>(),
+                        Factory.GetRequiredService<IProfilingLogger>(),
+                        Factory.GetRequiredService<ILoggerFactory>());
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);

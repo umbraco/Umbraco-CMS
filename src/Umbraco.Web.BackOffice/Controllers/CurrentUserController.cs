@@ -170,7 +170,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This only works when the user is logged in (partially)
         /// </remarks>
-        [UmbracoAuthorize(redirectToUmbracoLogin: false, requireApproval : true)]
+        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval : true)]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
@@ -201,10 +201,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [AppendUserModifiedHeader]
-        public async Task<IActionResult> PostSetAvatar(IList<IFormFile> files)
+        public IActionResult PostSetAvatar(IList<IFormFile> files)
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
         }
 
         /// <summary>
@@ -216,6 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
+            // TODO: Why don't we inject this? Then we can just inject a logger
             var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
             var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, data, _backOfficeUserManager);
 
@@ -235,12 +236,20 @@ namespace Umbraco.Web.BackOffice.Controllers
             throw HttpResponseException.CreateValidationErrorResponse(ModelState);
         }
 
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
-            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+
+            // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
+            // but there didn't used to be)
+            var result = new Dictionary<string, string>();
+            foreach (var l in identityUser.Logins)
+            {
+                result[l.LoginProvider] = l.ProviderKey;
+            }
+            return result;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -42,11 +43,11 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
             _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-            Composition.RegisterUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
+            Composition.Services.AddUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
-            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
-            Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
+            Composition.Services.AddUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
+            Composition.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Composition.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             var loggerFactory = NullLoggerFactory.Instance;
             var mediaService = Mock.Of<IMediaService>();
@@ -66,14 +67,14 @@ namespace Umbraco.Tests.PublishedContent
                 new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1005 });
-            Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
+            Composition.Services.AddUnique<IDataTypeService>(f => dataTypeService);
         }
 
         protected override void Initialize()
         {
             base.Initialize();
 
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -904,7 +905,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void FragmentProperty()
         {
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
@@ -928,7 +929,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Fragment2()
         {
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {

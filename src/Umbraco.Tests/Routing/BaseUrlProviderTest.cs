@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         protected override void ComposeSettings()
@@ -27,8 +28,8 @@ namespace Umbraco.Tests.Routing
             var contentSettings = new ContentSettings();
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
         }
 
         protected IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)

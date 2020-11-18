@@ -7,7 +7,6 @@ using Umbraco.Core.Cache;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -24,8 +23,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
         private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
         private ILogger<ContentEventsTests> Logger => GetRequiredService<ILogger<ContentEventsTests>>();
-        private IContentService ContentService => GetRequiredService<IContentService>();
-        private IFileService FileService => GetRequiredService<IFileService>();
 
         #region Setup
 
@@ -60,7 +57,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //     base.Compose();
         //
         //     Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-        //     Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+        //     composition.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
         //
         //     Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
         //         .Add<ContentTypeCacheRefresher>()

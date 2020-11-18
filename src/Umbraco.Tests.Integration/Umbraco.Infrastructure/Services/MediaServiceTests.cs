@@ -23,6 +23,31 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private IMediaService MediaService => GetRequiredService<IMediaService>();
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+
+        [Test]
+        public void Can_Update_Media_Property_Values()
+        {
+            IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test");
+            MediaTypeService.Save(mediaType);
+            IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
+            media.SetValue("title", "title of mine");
+            media.SetValue("bodyText", "hello world");
+            MediaService.Save(media);
+
+            // re-get
+            media = MediaService.GetById(media.Id);
+            media.SetValue("title", "another title of mine");          // Change a value
+            media.SetValue("bodyText", null);                          // Clear a value
+            media.SetValue("author", "new author");                    // Add a value
+            MediaService.Save(media);
+
+            // re-get
+            media = MediaService.GetById(media.Id);
+            Assert.AreEqual("another title of mine", media.GetValue("title"));
+            Assert.IsNull(media.GetValue("bodyText"));
+            Assert.AreEqual("new author", media.GetValue("author"));
+        }
+
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>

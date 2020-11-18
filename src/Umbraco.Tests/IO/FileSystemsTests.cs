@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -15,6 +16,7 @@ using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -22,32 +24,39 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class FileSystemsTests
     {
-        private IRegister _register;
-        private IFactory _factory;
+        private IServiceCollection _register;
+        private IServiceProvider _factory;
 
         [SetUp]
         public void Setup()
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(
+                _register,
+                TestHelper.GetMockedTypeLoader(),
+                Mock.Of<IProfilingLogger>(),
+                Mock.Of<IRuntimeState>(),
+                TestHelper.IOHelper,
+                AppCaches.NoCache
+            );
 
-            composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);
-            composition.Register(typeof(ILogger<>), typeof(Logger<>));
-            composition.Register(_ => TestHelper.ShortStringHelper);
-            composition.Register(_ => TestHelper.IOHelper);
-            composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
-            composition.RegisterUnique(TestHelper.IOHelper);
-            composition.RegisterUnique(TestHelper.GetHostingEnvironment());
+            composition.Services.AddTransient(_ => Mock.Of<IDataTypeService>());
+            composition.Services.AddTransient<ILoggerFactory, NullLoggerFactory>();
+            composition.Services.AddTransient(typeof(ILogger<>), typeof(Logger<>));
+            composition.Services.AddTransient(_ => TestHelper.ShortStringHelper);
+            composition.Services.AddTransient(_ => TestHelper.IOHelper);
+            composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            composition.Services.AddUnique(TestHelper.IOHelper);
+            composition.Services.AddUnique(TestHelper.GetHostingEnvironment());
 
             var globalSettings = new GlobalSettings();
-            composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+            composition.Services.AddScoped(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
 
             composition.ComposeFileSystems();
 
-            _factory = composition.CreateFactory();
+            _factory = composition.CreateServiceProvider();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
@@ -63,34 +72,34 @@ namespace Umbraco.Tests.IO
             _register.DisposeIfDisposable();
         }
 
-        private FileSystems FileSystems => _factory.GetInstance<FileSystems>();
+        private FileSystems FileSystems => _factory.GetRequiredService<FileSystems>();
 
         [Test]
         public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void Can_Get_IMediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void IMediaFileSystem_Is_Singleton()
         {
-            var fileSystem1 = _factory.GetInstance<IMediaFileSystem>();
-            var fileSystem2 = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem1 = _factory.GetRequiredService<IMediaFileSystem>();
+            var fileSystem2 = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.AreSame(fileSystem1, fileSystem2);
         }
 
         [Test]
         public void Can_Unwrap_MediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             var unwrapped = fileSystem.Unwrap();
             Assert.IsNotNull(unwrapped);
             var physical = unwrapped as PhysicalFileSystem;
@@ -100,13 +109,13 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            var fs = _factory.GetInstance<IMediaFileSystem>();
+            var fs = _factory.GetRequiredService<IMediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
             var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);
 
             // ~/media/1234/file.txt exists
-            var ioHelper = _factory.GetInstance<IIOHelper>();
+            var ioHelper = _factory.GetRequiredService<IIOHelper>();
             var physPath = ioHelper.MapPath(Path.Combine("media", virtPath));
             Assert.IsTrue(File.Exists(physPath));
 
@@ -114,7 +123,7 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            var scheme = _factory.GetInstance<IMediaPathScheme>();
+            var scheme = _factory.GetRequiredService<IMediaPathScheme>();
             if (scheme is UniqueMediaPathScheme)
             {
                 // ~/media/1234 is *not* gone

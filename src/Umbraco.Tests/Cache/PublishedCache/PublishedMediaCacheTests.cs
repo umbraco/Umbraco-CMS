@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var mChild2 = MakeNewMedia("Child2", mType, user, mRoot2.Id);
 
             var ctx = GetUmbracoContext("/test");
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument) null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument) null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), Factory.GetRequiredService<IUmbracoContextAccessor>(), VariationContextAccessor);
             var roots = cache.GetAtRoot();
             Assert.AreEqual(2, roots.Count());
             Assert.IsTrue(roots.Select(x => x.Id).ContainsAll(new[] {mRoot1.Id, mRoot2.Id}));
@@ -99,7 +100,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             //var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
             var umbracoContext = GetUmbracoContext("/test");
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), Factory.GetRequiredService<IUmbracoContextAccessor>(), VariationContextAccessor);
             var publishedMedia = cache.GetById(mRoot.Id);
             Assert.IsNotNull(publishedMedia);
 
@@ -210,7 +211,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             var result = new SearchResult("1234", 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
 
-            var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
+            var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), Factory.GetRequiredService<IUmbracoContextAccessor>(), VariationContextAccessor);
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
             DoAssert(doc, 1234, key, null, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
@@ -226,7 +227,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var xmlDoc = GetMediaXml();
             ((XmlElement)xmlDoc.DocumentElement.FirstChild).SetAttribute("key", key.ToString());
             var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(),VariationContextAccessor);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), Factory.GetRequiredService<IUmbracoContextAccessor>(),VariationContextAccessor);
             var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
             DoAssert(doc, 2000, key, null, 2, "image1", "Image", 23, "Shannon", "Shannon", "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);

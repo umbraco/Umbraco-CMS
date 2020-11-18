@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Web;
 using System.Web.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -13,8 +13,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -39,15 +39,15 @@ namespace Umbraco.Web.WebApi
         /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoApiControllerBase()
             : this(
-                Current.Factory.GetInstance<GlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoContextAccessor>(),
-                Current.Factory.GetInstance<ISqlContext>(),
-                Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<AppCaches>(),
-                Current.Factory.GetInstance<IProfilingLogger>(),
-                Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoMapper>(),
-                Current.Factory.GetInstance<IPublishedUrlProvider>()
+                Current.Factory.GetRequiredService<GlobalSettings>(),
+                Current.Factory.GetRequiredService<IUmbracoContextAccessor>(),
+                Current.Factory.GetRequiredService<ISqlContext>(),
+                Current.Factory.GetRequiredService<ServiceContext>(),
+                Current.Factory.GetRequiredService<AppCaches>(),
+                Current.Factory.GetRequiredService<IProfilingLogger>(),
+                Current.Factory.GetRequiredService<IRuntimeState>(),
+                Current.Factory.GetRequiredService<UmbracoMapper>(),
+                Current.Factory.GetRequiredService<IPublishedUrlProvider>()
             )
         { }
 

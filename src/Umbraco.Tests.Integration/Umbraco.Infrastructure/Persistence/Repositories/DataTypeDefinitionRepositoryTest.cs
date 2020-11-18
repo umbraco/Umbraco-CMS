@@ -392,11 +392,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.That(doesntExist, Is.False);
             }
         }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
     }
 }

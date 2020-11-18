@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Infrastructure.BackOffice;
@@ -23,7 +16,6 @@ using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
-
     public static class BackOfficeServiceCollectionExtensions
     {
         /// <summary>
@@ -40,7 +32,13 @@ namespace Umbraco.Extensions
             services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
             services
                 .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeAuthenticationType);
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
+                 {
+                     o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
+                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                 });
+
             // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
 
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
@@ -58,8 +56,6 @@ namespace Umbraco.Extensions
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();
-
-            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
 
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
@@ -96,6 +92,8 @@ namespace Umbraco.Extensions
             // CUSTOM:
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
+            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
+            services.TryAddSingleton<IBackOfficeExternalLoginProviders, NopBackOfficeExternalLoginProviders>();
 
             return new BackOfficeIdentityBuilder(services);
         }

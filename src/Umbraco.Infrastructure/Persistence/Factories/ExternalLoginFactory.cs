@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.Identity;
+﻿using System;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -7,7 +8,10 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate);
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate)
+            {
+                UserData = dto.UserData
+            };
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -22,7 +26,23 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = entity.UserId
+                UserId = entity.UserId,
+                UserData = entity.UserData
+            };
+
+            return dto;
+        }
+
+        public static ExternalLoginDto BuildDto(int userId, IExternalLogin entity, int? id = null)
+        {
+            var dto = new ExternalLoginDto
+            {
+                Id = id ?? default,
+                UserId = userId,
+                LoginProvider = entity.LoginProvider,
+                ProviderKey = entity.ProviderKey,
+                UserData = entity.UserData,
+                CreateDate = DateTime.Now
             };
 
             return dto;

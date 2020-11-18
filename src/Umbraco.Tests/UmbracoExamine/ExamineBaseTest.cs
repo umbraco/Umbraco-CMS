@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
@@ -27,9 +28,9 @@ namespace Umbraco.Web
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
         private static IUmbracoContext UmbracoContext => Current.UmbracoContext;
-        private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
+        private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetRequiredService<ISiteDomainHelper>();
         private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
-        private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
+        private static IExamineManager ExamineManager => Current.Factory.GetRequiredService<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
 
 

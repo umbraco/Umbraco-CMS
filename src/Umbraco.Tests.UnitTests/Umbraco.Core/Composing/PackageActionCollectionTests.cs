@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -10,6 +11,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PackageActions;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
@@ -19,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = TestHelper.GetRegister();
+            var container = TestHelper.GetServiceCollection();
 
             var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
@@ -27,9 +29,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => expectedPackageActions);
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
-            var actions = factory.GetInstance<PackageActionCollection>();
+            var actions = factory.GetRequiredService<PackageActionCollection>();
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there

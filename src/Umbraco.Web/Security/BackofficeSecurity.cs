@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

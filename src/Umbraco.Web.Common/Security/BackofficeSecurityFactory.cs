@@ -35,7 +35,7 @@ namespace Umbraco.Web.Common.Security
         {
             if (_backOfficeSecurityAccessor.BackOfficeSecurity is null)
             {
-                _backOfficeSecurityAccessor.BackOfficeSecurity = new BackofficeSecurity(_userService, _globalSettings, _hostingEnvironment, _httpContextAccessor);
+                _backOfficeSecurityAccessor.BackOfficeSecurity = new BackOfficeSecurity(_userService, _globalSettings, _hostingEnvironment, _httpContextAccessor);
             }
 
         }

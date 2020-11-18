@@ -1850,7 +1850,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="createDate">User created</key>
-    <key alias="changePassword">Change Your Password</key>
+    <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="noLockouts">hasn't been locked out</key>
@@ -2496,6 +2496,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
@@ -2513,5 +2515,18 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
     <key alias="manageHeadline">How do I manage Content Templates?</key>
     <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">End</key>
+    <key alias="endTitle">End preview mode</key>
+    <key alias="openWebsiteLabel">Preview website</key>
+    <key alias="openWebsiteTitle">Open website in preview mode</key>
+    <key alias="returnToPreviewHeadline">Preview content?</key>
+    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to continue previewing this content?</key>
+    <key alias="returnToPreviewButton">Preview</key>
+    <key alias="viewPublishedContentHeadline">View published version?</key>
+    <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
+    <key alias="viewPublishedContentAcceptButton">View published version</key>
+    <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
   </area>
 </language>

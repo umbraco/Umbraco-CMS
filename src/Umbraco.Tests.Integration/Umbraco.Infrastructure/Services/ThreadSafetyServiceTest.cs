@@ -44,8 +44,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             CreateTestData();
         }
 
-        protected override string TestDBConnectionString => base.TestDBConnectionString +  "default lock timeout=60000;";
-
 
         private const int MaxThreadCount = 20;
 

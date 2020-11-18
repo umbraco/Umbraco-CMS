@@ -14,7 +14,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Tests.Integration.Testing;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
-namespace Umbraco.Tests.Scoping
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Scoping
             TestHelper.DeleteDirectory(ioHelper.MapPath("FileSysTests"));
             TestHelper.DeleteDirectory(ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
-        
+
         [Test]
         public void test_MediaFileSystem_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
         {
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Scoping
                     mediaFileSystem.AddFile("f1.txt", ms);
                 Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
-     
+
                 Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }

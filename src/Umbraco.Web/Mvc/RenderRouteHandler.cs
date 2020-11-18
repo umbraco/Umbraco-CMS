@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Mvc
 
         private IUmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // TODO: inject
+        private UmbracoFeatures Features => Current.Factory.GetRequiredService<UmbracoFeatures>(); // TODO: inject
 
         #region IRouteHandler Members
 

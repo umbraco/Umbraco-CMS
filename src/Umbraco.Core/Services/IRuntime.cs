@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+﻿using System;
 
 namespace Umbraco.Core
 {
@@ -8,13 +7,6 @@ namespace Umbraco.Core
     /// </summary>
     public interface IRuntime
     {
-        /// <summary>
-        /// Boots the runtime.
-        /// </summary>
-        /// <param name="register">The application register.</param>
-        /// <returns>The application factory.</returns>
-        IFactory Configure(IRegister register);
-
         /// <summary>
         /// Gets the runtime state.
         /// </summary>

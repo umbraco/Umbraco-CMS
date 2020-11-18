@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Composing;
 using Umbraco.Core.Cache;
 using Microsoft.Extensions.Logging;
 
@@ -157,7 +156,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type RefreshByPayload", refresher.GetType());
+            StaticApplicationLogging.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type RefreshByPayload", refresher.GetType());
 
             var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
             if (payloadRefresher == null)
@@ -179,7 +178,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+            StaticApplicationLogging.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
             switch (messageType)
             {
@@ -240,7 +239,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+            StaticApplicationLogging.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
             var typedRefresher = refresher as ICacheRefresher<T>;
 

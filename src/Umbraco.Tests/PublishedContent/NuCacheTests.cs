@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -47,13 +48,12 @@ namespace Umbraco.Tests.PublishedContent
 
         private void Init()
         {
-            Current.Reset();
-
-            var factory = Mock.Of<IFactory>();
+            var factory = Mock.Of<IServiceProvider>();
             Current.Factory = factory;
 
             var publishedModelFactory = new NoopPublishedModelFactory();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IPublishedValueFallback))).Returns(new NoopPublishedValueFallback());
 
             // create a content node kit
             var kit = new ContentNodeKit
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.PublishedContent
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         [Test]

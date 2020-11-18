@@ -17,6 +17,7 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
 
-            var converters = Factory.GetInstance<PropertyValueConverterCollection>();
+            var converters = Factory.GetRequiredService<PropertyValueConverterCollection>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var loggerFactory = NullLoggerFactory.Instance;

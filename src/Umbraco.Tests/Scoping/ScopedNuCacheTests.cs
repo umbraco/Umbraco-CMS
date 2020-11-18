@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -11,6 +12,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
@@ -23,7 +25,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
@@ -42,8 +43,8 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Composition.RegisterUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
+            Composition.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
             Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Scoping
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
-            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();
+            var contentTypeFactory = Factory.GetRequiredService<IPublishedContentTypeFactory>();
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Scoping
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
-                Factory.GetInstance<IEntityXmlSerializer>(),
+                Factory.GetRequiredService<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,

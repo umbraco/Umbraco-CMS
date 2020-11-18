@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -15,21 +17,21 @@ namespace Umbraco.Web.ContentApps
         protected override ContentAppFactoryCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation
-        public override ContentAppFactoryCollection CreateCollection(IFactory factory)
+        public override ContentAppFactoryCollection CreateCollection(IServiceProvider factory)
         {
             // get the logger factory just-in-time - see note below for manifest parser
-            var loggerFactory = factory.GetInstance<ILoggerFactory>();
-            var umbracoContextAccessor = factory.GetInstance<IUmbracoContextAccessor>();
+            var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+            var umbracoContextAccessor = factory.GetRequiredService<IUmbracoContextAccessor>();
             return new ContentAppFactoryCollection(CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), umbracoContextAccessor);
         }
 
-        protected override IEnumerable<IContentAppFactory> CreateItems(IFactory factory)
+        protected override IEnumerable<IContentAppFactory> CreateItems(IServiceProvider factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = factory.GetInstance<IManifestParser>();
-            var ioHelper = factory.GetInstance<IIOHelper>();
+            var manifestParser = factory.GetRequiredService<IManifestParser>();
+            var ioHelper = factory.GetRequiredService<IIOHelper>();
             return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, ioHelper)));
         }
     }

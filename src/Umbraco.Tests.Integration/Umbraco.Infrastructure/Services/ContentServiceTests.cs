@@ -48,16 +48,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
-        public override void Setup()
+        [SetUp]
+        public void Setup()
         {
-            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void Teardown()
         {
             ContentRepositoryBase.ThrowOnWarning = false;
-            base.TearDown();
         }
 
         [Test]
@@ -443,6 +443,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+            PublishedRepositoryEvents = true,
+            WithApplication = true,
+            Boot = true)]
         public void Automatically_Track_Relations()
         {
             var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
@@ -1502,6 +1506,56 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
+        }
+
+        [Test]
+        public void Can_Update_Content_Property_Values()
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
+            IContent content = ContentBuilder.CreateSimpleContent(contentType, "hello");
+            content.SetValue("title", "title of mine");
+            content.SetValue("bodyText", "hello world");
+            ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            content.SetValue("title", "another title of mine");          // Change a value
+            content.SetValue("bodyText", null);                          // Clear a value
+            content.SetValue("author", "new author");                    // Add a value
+            ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            Assert.AreEqual("another title of mine", content.GetValue("title"));
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author", content.GetValue("author"));
+
+            content.SetValue("title", "new title");
+            content.SetValue("bodyText", "new body text");
+            content.SetValue("author", "new author text");
+            ContentService.Save(content);                // new non-published version
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            content.SetValue("title", null);                            // Clear a value
+            content.SetValue("bodyText", null);                         // Clear a value
+            ContentService.Save(content);                // saving non-published version
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            Assert.IsNull(content.GetValue("title"));                   // Test clearing the value worked with the non-published version
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author text", content.GetValue("author"));
+
+            // make sure that the published version remained the same
+            var publishedContent = ContentService.GetVersion(content.PublishedVersionId);
+            Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
+            Assert.IsNull(publishedContent.GetValue("bodyText"));
+            Assert.AreEqual("new author", publishedContent.GetValue("author"));
         }
 
         [Test]

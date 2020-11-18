@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -24,8 +25,8 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Composition.RegisterUnique(_ => Mock.Of<IDomainService>());
-            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Services.AddUnique(_ => Mock.Of<IDomainService>());
+            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         void SetDomains1()

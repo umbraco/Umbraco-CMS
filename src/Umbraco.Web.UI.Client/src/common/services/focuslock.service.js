@@ -5,11 +5,15 @@
         var elementToInert = document.querySelector('#mainwrapper');
 
         function addInertAttribute() {
-            elementToInert.setAttribute('inert', true);
+            if (elementToInert) {
+                elementToInert.setAttribute('inert', true);
+            }
         }
 
         function removeInertAttribute() {
-            elementToInert.removeAttribute('inert');
+            if (elementToInert) {
+                elementToInert.removeAttribute('inert');
+            }
         }
 
         var service = {

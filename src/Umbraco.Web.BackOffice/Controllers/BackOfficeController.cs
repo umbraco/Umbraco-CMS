@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,8 @@ using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -51,7 +54,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger<BackOfficeController> _logger;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IExternalAuthenticationOptions _externalAuthenticationOptions;
+        private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
@@ -66,7 +70,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<BackOfficeController> logger,
             IJsonSerializer jsonSerializer,
-            IExternalAuthenticationOptions externalAuthenticationOptions)
+            IBackOfficeExternalLoginProviders externalLogins,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -80,7 +85,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _logger = logger;
             _jsonSerializer = jsonSerializer;
-            _externalAuthenticationOptions = externalAuthenticationOptions;
+            _externalLogins = externalLogins;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -225,7 +231,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return nestedDictionary;
         }
 
-        [UmbracoAuthorize(Order = 0)]
+        [UmbracoBackOfficeAuthorize(Order = 0)]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
@@ -236,7 +242,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
+        [UmbracoBackOfficeAuthorize(Order = 0)]
         [MinifyJavaScriptResult(Order = 1)]
         public async Task<JavaScriptResult> ServerVariables()
         {
@@ -261,6 +267,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            // TODO: I believe we will have to fill in our own XsrfKey like we use to do since I think
+            // we validate against that key?
+            // see https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/src/Umbraco.Web/Editors/ChallengeResult.cs#L48
             return Challenge(properties, provider);
         }
 
@@ -269,13 +278,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         [HttpPost]
         public ActionResult LinkLogin(string provider)
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, User.Identity.GetUserId());
+            // TODO: I believe we will have to fill in our own XsrfKey like we use to do since I think
+            // we validate against that key?
+            // see https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/src/Umbraco.Web/Editors/ChallengeResult.cs#L48
             return Challenge(properties, provider);
         }
 
@@ -302,10 +314,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Callback path when the user initiates a link login request from the back office to the external provider from the <see cref="LinkLogin(string)"/> action
         /// </summary>
-        [UmbracoAuthorize]
+        [UmbracoBackOfficeAuthorize]
         [HttpGet]
         public async Task<IActionResult> ExternalLinkLoginCallback()
         {
+            // TODO: Do we need/want to tell it an expected xsrf.
+            // In v8 the xsrf used to be set to the user id which was verified manually, in this case I think we don't specify
+            // the key and that is up to the underlying sign in manager to set so we'd just tell it to expect the user id,
+            // the XSRF value used to be set in our ChallengeResult but now we don't have that so this needs to be set in the
+            // BackOfficeController when we issue a Challenge, see TODO notes there.
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
             if (loginInfo == null)
@@ -323,8 +340,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
-            var result2 = await _userManager.AddLoginAsync(user, loginInfo);
-            if (result2.Succeeded)
+            var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+            if (addLoginResult.Succeeded)
             {
                 // Update any authentication tokens if login succeeded
                 // TODO: This is a new thing that we need to implement and because we can store data with the external login now, this is exactly
@@ -335,7 +352,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //Add errors and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenExternalSignInError] = result2.Errors;
+            TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
             return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
@@ -353,15 +370,27 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
-            //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
-            if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
+            //check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
+            if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(_httpContextAccessor.HttpContext, ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
+                ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
                 return defaultResponse();
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
+
             if (loginInfo == null || loginInfo.Principal == null)
             {
+                // if the user is not logged in, check if there's any auto login redirects specified
+                if (!_backofficeSecurityAccessor.BackOfficeSecurity.ValidateCurrentUser())
+                {
+                    var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
+                    if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())
+                    {
+                        return ExternalLogin(oauthRedirectAuthProvider);
+                    }
+                }
+
                 return defaultResponse();
             }
 
@@ -384,7 +413,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                autoLinkOptions = _externalAuthenticationOptions.Get(authType.Name);
+                autoLinkOptions = _externalLogins.Get(authType.Name);
             }
 
             // Sign in the user with this external login provider if the user already has a login
@@ -392,12 +421,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
             if (user != null)
             {
-                // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
-                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
-                // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
-                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
-                // that the ticket is created and stored and that the user is logged in.
-
                 var shouldSignIn = true;
                 if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
                 {
@@ -418,7 +441,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account" });
+                    ViewData.SetExternalSignInProviderErrors(
+                        new BackOfficeExternalLoginProviderErrors(
+                            loginInfo.LoginProvider,
+                            new[] { "The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account" }));
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -441,7 +467,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             //we are allowing auto-linking/creating of local accounts
             if (email.IsNullOrWhiteSpace())
             {
-                ViewData.SetExternalSignInError(new[] { $"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked." });
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.LoginProvider,
+                        new[] { $"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked." }));
             }
             else
             {
@@ -449,13 +478,26 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var autoLinkUser = await _userManager.FindByEmailAsync(email);
                 if (autoLinkUser != null)
                 {
-                    // TODO This will be filled out with 8.9 changes
-                    throw new NotImplementedException("Merge 8.9 changes in!");
+                    try
+                    {
+                        //call the callback if one is assigned
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.LoginProvider,
+                                new[] { "Could not link login provider " + loginInfo.LoginProvider + ". " + ex.Message }));
+                        return true;
+                    }
+
+                    await LinkUser(autoLinkUser, loginInfo);
                 }
                 else
                 {
                     var name = loginInfo.Principal?.Identity?.Name;
-
                     if (name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
                     autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
@@ -466,38 +508,74 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
 
                     //call the callback if one is assigned
-                    autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    try
+                    {
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.LoginProvider,
+                                new[] { "Could not link login provider " + loginInfo.LoginProvider + ". " + ex.Message }));
+                        return true;
+                    }
 
                     var userCreationResult = await _userManager.CreateAsync(autoLinkUser);
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        ViewData.SetExternalSignInError(userCreationResult.Errors.Select(x => x.Description).ToList());
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.LoginProvider,
+                                userCreationResult.Errors.Select(x => x.Description).ToList()));
                     }
                     else
                     {
-                        var linkResult = await _userManager.AddLoginAsync(autoLinkUser, loginInfo);
-                        if (linkResult.Succeeded == false)
-                        {
-                            ViewData.SetExternalSignInError(linkResult.Errors.Select(x => x.Description).ToList());
-
-                            //If this fails, we should really delete the user since it will be in an inconsistent state!
-                            var deleteResult = await _userManager.DeleteAsync(autoLinkUser);
-                            if (deleteResult.Succeeded == false)
-                            {
-                                //DOH! ... this isn't good, combine all errors to be shown
-                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList());
-                            }
-                        }
-                        else
-                        {
-                            //sign in
-                            await _signInManager.SignInAsync(autoLinkUser, isPersistent: false);
-                        }
+                        await LinkUser(autoLinkUser, loginInfo);
                     }
                 }
             }
             return true;
+        }
+
+        private async Task LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
+        {
+            var existingLogins = await _userManager.GetLoginsAsync(autoLinkUser);
+            var exists = existingLogins.FirstOrDefault(x => x.LoginProvider == loginInfo.LoginProvider && x.ProviderKey == loginInfo.ProviderKey);
+
+            // if it already exists (perhaps it was added in the AutoLink callbak) then we just continue
+            if (exists != null)
+            {
+                //sign in
+                await _signInManager.SignInAsync(autoLinkUser, isPersistent: false);
+                return;
+            }
+
+            var linkResult = await _userManager.AddLoginAsync(autoLinkUser, loginInfo);
+            if (linkResult.Succeeded)
+            {
+                //we're good! sign in
+                await _signInManager.SignInAsync(autoLinkUser, isPersistent: false);
+                return;
+            }
+
+            ViewData.SetExternalSignInProviderErrors(
+                   new BackOfficeExternalLoginProviderErrors(
+                       loginInfo.LoginProvider,
+                       linkResult.Errors.Select(x => x.Description).ToList()));
+
+            //If this fails, we should really delete the user since it will be in an inconsistent state!
+            var deleteResult = await _userManager.DeleteAsync(autoLinkUser);
+            if (!deleteResult.Succeeded)
+            {
+                //DOH! ... this isn't good, combine all errors to be shown
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.LoginProvider,
+                        linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList()));
+            }
         }
 
         // Used for XSRF protection when adding external logins

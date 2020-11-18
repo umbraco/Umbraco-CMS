@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
         // TODO: try lazy property injection?
-        private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
+        private IPublishedRouter PublishedRouter => Current.Factory.GetRequiredService<IPublishedRouter>();
 
         /// <summary>
         /// Returns the UmbracoContext for this route handler

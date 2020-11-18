@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -65,9 +66,13 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
             {
+                var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
                 return new AspNetCoreHostingEnvironment(
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x=>x.CurrentValue == new HostingSettings()),
-                    Mock.Of<IWebHostEnvironment>(x=>x.WebRootPath == "/"));
+                    Mock.Of<IWebHostEnvironment>(
+                        x=>
+                            x.WebRootPath == "/" &&
+                            x.ContentRootPath == testPath));
             }
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
@@ -274,7 +279,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IRegister GetRegister() => _testHelperInternal.GetRegister();
+        public static IServiceCollection GetServiceCollection() => new ServiceCollection().AddLazySupport();
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 

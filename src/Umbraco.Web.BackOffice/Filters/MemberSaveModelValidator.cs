@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

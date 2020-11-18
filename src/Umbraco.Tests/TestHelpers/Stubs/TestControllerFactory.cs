@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
                 foreach (var parameter in allParams)
                 {
                     var found = possibleParams.SingleOrDefault(x => x.GetType() == parameter.ParameterType)
-                             ?? Current.Factory.GetInstance(parameter.ParameterType);
+                             ?? Current.Factory.GetRequiredService(parameter.ParameterType);
                     if (found != null) args.Add(found);
                 }
                 if (args.Count == allParams.Length)

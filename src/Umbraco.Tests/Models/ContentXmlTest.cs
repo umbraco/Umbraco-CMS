@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Models
             var urlName = content.GetUrlSegment(ShortStringHelper, new[]{new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act
-            XElement element = content.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
+            XElement element = content.ToXml(Factory.GetRequiredService<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

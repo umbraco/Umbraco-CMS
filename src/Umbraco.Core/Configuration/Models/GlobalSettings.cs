@@ -32,6 +32,9 @@
 
         public string UmbracoPath { get; set; } = "~/umbraco";
 
+        // TODO: Umbraco cannot be hard coded here that is what UmbracoPath is for
+        // so this should not be a normal get set it has to have dynamic ability to return the correct
+        // path given UmbracoPath if this hasn't been explicitly set.
         public string IconsPath { get; set; } = $"~/umbraco/assets/icons";
 
         public string UmbracoCssPath { get; set; } = "~/css";
@@ -46,13 +49,17 @@
 
         public bool DisableElectionForSingleServer { get; set; } = false;
 
+        public DatabaseServerRegistrarSettings DatabaseServerRegistrar { get; set; } = new DatabaseServerRegistrarSettings();
+
+        public DatabaseServerMessengerSettings DatabaseServerMessenger { get; set; } = new DatabaseServerMessengerSettings();
+
         public string RegisterType { get; set; } = string.Empty;
 
         public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
 
         public string MainDomLock { get; set; } = string.Empty;
 
-        public string NoNodesViewPath { get; set; } = "~/config/splashes/NoNodes.cshtml";
+        public string NoNodesViewPath { get; set; } = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
 
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 

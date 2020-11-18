@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Moq;
 using Umbraco.Core;
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
-            var propertyEditors = Factory.GetInstance<PropertyEditorCollection>();
+            var propertyEditors = Factory.GetRequiredService<PropertyEditorCollection>();
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider, true);
 
             using (var luceneDir = new RandomIdRamDirectory())

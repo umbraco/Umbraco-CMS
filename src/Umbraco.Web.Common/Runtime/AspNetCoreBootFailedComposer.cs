@@ -12,7 +12,7 @@ namespace Umbraco.Web.Common.Runtime
     {
         public void Compose(Composition composition)
         {
-            composition.RegisterUnique<BootFailedMiddleware>();
+            composition.Services.AddUnique<BootFailedMiddleware>();
         }
     }
 }
