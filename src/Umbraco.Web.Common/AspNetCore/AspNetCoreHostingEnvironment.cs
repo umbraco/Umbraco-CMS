@@ -81,13 +81,13 @@ namespace Umbraco.Web.Common.AspNetCore
 
         public string MapPathWebRoot(string path)
         {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
+            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
             return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
         }
 
         public string MapPathContentRoot(string path)
         {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
+            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
             return Path.Combine(_webHostEnvironment.ContentRootPath, newPath);
         }
 
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Common.AspNetCore
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
 
-            var fullPath = Path.Combine(ApplicationVirtualPath, virtualPath.TrimStart('~', '/'));
+            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart('~', '/');
 
             return fullPath;
         }
