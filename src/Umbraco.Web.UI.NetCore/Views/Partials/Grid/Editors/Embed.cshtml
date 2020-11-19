@@ -1,5 +1,6 @@
-﻿@model dynamic
-@using Umbraco.Web.Templates
+﻿@using Umbraco.Core
+@model dynamic
+
 @{
     string embedValue = Convert.ToString(Model.value);
     embedValue = embedValue.DetectIsJson() ? Model.value.preview : Model.value;
