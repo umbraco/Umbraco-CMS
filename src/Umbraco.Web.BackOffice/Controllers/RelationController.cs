@@ -58,20 +58,5 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _umbracoMapper.MapEnumerable<IRelation, RelationDisplay>(relations);
         }
 
-        [HttpDelete]
-        [HttpPost]
-        public IActionResult DeleteById(int id)
-        {
-            var foundRelation = _relationService.GetById(id);
-
-            if (foundRelation == null)
-            {
-                return new UmbracoProblemResult("No relation found with the specified id", HttpStatusCode.NotFound);
-            }
-
-            _relationService.Delete(foundRelation);
-
-            return Ok();
-        }
     }
 }
