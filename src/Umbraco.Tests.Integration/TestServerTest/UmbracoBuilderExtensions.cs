@@ -16,9 +16,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoBuilder AddTestCore(this IUmbracoBuilder builder, TestHelper testHelper,
-            Action<CoreRuntimeBootstrapper, RuntimeEssentialsEventArgs> dbInstallEventHandler)
+        public static IUmbracoBuilder AddTestCore(this IUmbracoBuilder builder, TestHelper testHelper)
         {
+
             return builder.AddUmbracoCore(
                 testHelper.GetWebHostEnvironment(),
                 typeof(UmbracoBuilderExtensions).Assembly,
@@ -26,9 +26,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 testHelper.GetLoggingConfiguration(),
                 builder.Config,
                 // TODO: Yep that's extremely ugly
-                (globalSettings, connectionStrings, umbVersion, ioHelper, loggerFactory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                (lambdaBuilder, globalSettings, connectionStrings, umbVersion, ioHelper, loggerFactory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                 {
-                    var runtime = UmbracoIntegrationTest.CreateTestRuntime(
+                   UmbracoIntegrationTest.ConfigureSomeMorebitsForTests(
+                        lambdaBuilder,
                         globalSettings,
                         connectionStrings,
                         umbVersion,
@@ -40,10 +41,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                         typeFinder,
                         appCaches,
                         dbProviderFactoryCreator,
-                        testHelper.MainDom,         // SimpleMainDom
-                        dbInstallEventHandler);     // DB Installation event handler
-
-                    return runtime;
+                        testHelper.MainDom);       // SimpleMainDom
+                      
                 });
         }
     }

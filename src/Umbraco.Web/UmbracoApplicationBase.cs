@@ -130,11 +130,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets a runtime.
-        /// </summary>
-        protected abstract CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
-
-        /// <summary>
         /// Gets the application register.
         /// </summary>
         protected virtual IServiceCollection GetRegister(GlobalSettings globalSettings)
@@ -177,17 +172,17 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            var boostrapper = GetRuntime(
-                _globalSettings,
-                _connectionStrings,
-                umbracoVersion,
-                _ioHelper,
-                _logger,
-                _loggerFactory,
-                null, // TODO get from somewhere that isn't Current.
-                null, // TODO get from somewhere that isn't Current.
-                null // TODO get from somewhere that isn't Current.
-                );
+            //var boostrapper = GetRuntime(
+            //    _globalSettings,
+            //    _connectionStrings,
+            //    umbracoVersion,
+            //    _ioHelper,
+            //    _logger,
+            //    _loggerFactory,
+            //    null, // TODO get from somewhere that isn't Current.
+            //    null, // TODO get from somewhere that isn't Current.
+            //    null // TODO get from somewhere that isn't Current.
+            //    );
             //_factory = Current.Factory = _runtime.Configure(register);
 
 

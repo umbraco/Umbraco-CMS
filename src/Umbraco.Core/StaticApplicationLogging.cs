@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -16,7 +18,16 @@ namespace Umbraco.Core
 
         public static ILogger<T> CreateLogger<T>()
         {
-            return _loggerFactory?.CreateLogger<T>() ?? new NullLogger<T>();
+            try
+            {
+                return _loggerFactory?.CreateLogger<T>() ?? NullLoggerFactory.Instance.CreateLogger<T>();
+            }
+            catch (ObjectDisposedException)
+            {
+                // TODO: Weird, investigate, ScopedRepositoryTests.FullDataSetRepositoryCachePolicy etc
+                Debugger.Break();
+                return NullLoggerFactory.Instance.CreateLogger<T>();
+            }
         }
     }
 }

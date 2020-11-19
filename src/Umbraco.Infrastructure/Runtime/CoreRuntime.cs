@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Runtime
 {
@@ -9,31 +11,39 @@ namespace Umbraco.Core.Runtime
     {
         public IRuntimeState State { get; }
 
+        private readonly ILogger<CoreRuntime> _logger;
         private readonly ComponentCollection _components;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IMainDom _mainDom;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public CoreRuntime(
+            ILogger<CoreRuntime> logger,
             IRuntimeState state,
             ComponentCollection components,
             IUmbracoBootPermissionChecker umbracoBootPermissionChecker,
             IApplicationShutdownRegistry applicationShutdownRegistry,
             IProfilingLogger profilingLogger,
-            IMainDom mainDom)
+            IMainDom mainDom,
+            IUmbracoDatabaseFactory databaseFactory)
         {
             State = state;
+            _logger = logger;
             _components = components;
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
             _applicationShutdownRegistry = applicationShutdownRegistry;
             _profilingLogger = profilingLogger;
             _mainDom = mainDom;
+            _databaseFactory = databaseFactory;
         }
         
 
         public void Start()
         {
+            DetermineRuntimeLevel();
+
             if (State.Level <= RuntimeLevel.BootFailed)
                 throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
 
@@ -69,6 +79,33 @@ namespace Umbraco.Core.Runtime
                     timer?.Fail();
                     throw;
                 }
+            }
+        }
+
+        private void DetermineRuntimeLevel()
+        {
+            using var timer = _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
+
+            try
+            {
+                State.DetermineRuntimeLevel();
+
+                _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
+
+                if (State.Level == RuntimeLevel.Upgrade)
+                {
+                    _logger.LogDebug("Configure database factory for upgrades.");
+                    _databaseFactory.ConfigureForUpgrade();
+                }
+            }
+            catch
+            {
+
+                // BOO a cast, yay no CoreRuntimeBootstrapper
+                ((RuntimeState)State).Level = RuntimeLevel.BootFailed;
+                ((RuntimeState)State).Reason = RuntimeLevelReason.BootFailedOnException;
+                timer?.Fail();
+                throw;
             }
         }
     }

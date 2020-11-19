@@ -21,6 +21,8 @@ using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -70,6 +72,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
+                     UseTestLocalDb(app.ApplicationServices);
                      Services = app.ApplicationServices;
                      Configure(app);
                  });
@@ -129,7 +132,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
             var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
             umbracoBuilder
                 .AddConfiguration()
-                .AddTestCore(TestHelper, UseTestLocalDb) // This is the important one!
+                .AddTestCore(TestHelper) // This is the important one!
                 .AddWebComponents()
                 .AddRuntimeMinifier()
                 .AddBackOffice()

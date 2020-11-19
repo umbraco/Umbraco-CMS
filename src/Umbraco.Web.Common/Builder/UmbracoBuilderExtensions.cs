@@ -104,7 +104,7 @@ namespace Umbraco.Web.Common.Builder
                 appCaches,
                 loggingConfig,
                 builder.Config,
-                UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
+                UmbracoCoreServiceCollectionExtensions.ConfigureSomeMorebits);
 
             return builder;
         }

@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
-    
+
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -48,18 +48,18 @@ namespace Umbraco.Extensions
         /// <param name="requestCache"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
-        /// <param name="getRuntimeBootstrapper">Delegate to create an <see cref="CoreRuntimeBootstrapper"/></param>
+        /// <param name="configureSomeMoreBits">Delegate to create an <see cref="CoreRuntimeBootstrapper"/></param>
         /// <param name="factory"></param>
         /// <returns></returns>
         public static IUmbracoBuilder AddUmbracoCore(
             this IUmbracoBuilder builder,
             IWebHostEnvironment webHostEnvironment,
             Assembly entryAssembly,
-            AppCaches  appCaches,
+            AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, CoreRuntimeBootstrapper> getRuntimeBootstrapper)
+            Action<IUmbracoBuilder, GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator> configureSomeMoreBits)
         {
             if (builder is null) throw new ArgumentNullException(nameof(builder));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
@@ -108,12 +108,13 @@ namespace Umbraco.Extensions
             var profiler = GetWebProfiler(hostingEnvironment);
 
             builder.Services.AddLogger(loggingConfiguration, configuration);
-            var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            var loggerFactory = builder.BuilderLoggerFactory;
 
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
-            var bootstrapper = getRuntimeBootstrapper(
+            configureSomeMoreBits(
+                builder,
                 globalSettings.CurrentValue,
                 connectionStrings.Value,
                 umbracoVersion,
@@ -125,8 +126,6 @@ namespace Umbraco.Extensions
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator);
-
-            bootstrapper.Configure(builder);
 
             builder.AddComposers();
 
@@ -239,10 +238,19 @@ namespace Umbraco.Extensions
             return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
-        internal static CoreRuntimeBootstrapper GetCoreRuntime(
-           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILoggerFactory loggerFactory,
-            IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        internal static void ConfigureSomeMorebits(
+            IUmbracoBuilder builder,
+            GlobalSettings globalSettings,
+            ConnectionStrings connectionStrings,
+            IUmbracoVersion umbracoVersion,
+            IIOHelper ioHelper,
+            ILoggerFactory loggerFactory,
+            IProfiler profiler,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo,
+            ITypeFinder typeFinder,
+            AppCaches appCaches,
+            IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;
@@ -254,21 +262,51 @@ namespace Umbraco.Extensions
 
             var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
-            var coreRuntime = new CoreRuntimeBootstrapper(
-                globalSettings,
-                connectionStrings,
-                umbracoVersion,
-                ioHelper,
-                profiler,
-                new AspNetCoreBootPermissionsChecker(),
-                hostingEnvironment,
-                backOfficeInfo,
-                dbProviderFactoryCreator,
-                mainDom,
-                typeFinder,
-                appCaches);
 
-            return coreRuntime;
+            var logger = builder.BuilderLoggerFactory.CreateLogger<object>();
+            var profilingLogger = new ProfilingLogger(logger, profiler);
+
+            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+
+            // application environment
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                msg += ".";
+                logger.LogError(exception, msg);
+            };
+
+            // TODO: Don't do this, UmbracoBuilder ctor should handle it...
+            builder.TypeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache,
+                new DirectoryInfo(hostingEnvironment.LocalTempPath),
+                builder.BuilderLoggerFactory.CreateLogger<TypeLoader>(), profilingLogger);
+
+            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(new AspNetCoreBootPermissionsChecker());
+            builder.Services.AddUnique<IProfiler>(profiler);
+            builder.Services.AddUnique<IProfilingLogger>(profilingLogger);
+            builder.Services.AddUnique<IMainDom>(mainDom);
+            builder.Services.AddUnique<AppCaches>(appCaches);
+            builder.Services.AddUnique<IRequestCache>(appCaches.RequestCache);
+            builder.Services.AddUnique<TypeLoader>(builder.TypeLoader);
+            builder.Services.AddUnique<ITypeFinder>(typeFinder);
+            builder.Services.AddUnique<IIOHelper>(ioHelper);
+            builder.Services.AddUnique<IUmbracoVersion>(umbracoVersion);
+            builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
+            builder.Services.AddUnique<IHostingEnvironment>(hostingEnvironment);
+            builder.Services.AddUnique<IBackOfficeInfo>(backOfficeInfo);
+            builder.Services.AddUnique<IRuntime, CoreRuntime>();
+
+            // after bootstrapping we let the container wire up for us.
+            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
+
+            // re-create the state object with the essential services
+            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
         }
 
 
