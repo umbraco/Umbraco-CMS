@@ -452,7 +452,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 try
                 {
                     var assemblyPath = GetOutputAssemblyPath(currentHash);
-                    RoslynCompiler.CompileToFile(_hostingEnvironment.MapPathContentRoot(projFile), assemblyPath);
+                    RoslynCompiler.CompileToFile(projFile, assemblyPath);
                     assembly = ReloadAssembly(assemblyPath);
                     File.WriteAllText(dllPathFile, assembly.Location);
                     File.WriteAllText(modelsHashFile, currentHash);
@@ -494,7 +494,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             try
             {
                 var assemblyPath = GetOutputAssemblyPath(currentHash);
-                RoslynCompiler.CompileToFile(_hostingEnvironment.MapPathContentRoot(projFile), assemblyPath);
+                RoslynCompiler.CompileToFile(projFile, assemblyPath);
                 assembly = ReloadAssembly(assemblyPath);
                 File.WriteAllText(dllPathFile, assemblyPath);
                 File.WriteAllText(modelsHashFile, currentHash);

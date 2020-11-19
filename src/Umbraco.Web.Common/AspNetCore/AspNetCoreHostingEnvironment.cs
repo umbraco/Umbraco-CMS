@@ -79,16 +79,13 @@ namespace Umbraco.Web.Common.AspNetCore
             }
         }
 
-        public string MapPathWebRoot(string path)
-        {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-            return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
-        }
+        public string MapPathWebRoot(string path) => MapPath(_webHostEnvironment.WebRootPath, path);
+        public string MapPathContentRoot(string path) => MapPath(_webHostEnvironment.ContentRootPath, path);
 
-        public string MapPathContentRoot(string path)
+        private string MapPath(string root, string path)
         {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-            return Path.Combine(_webHostEnvironment.ContentRootPath, newPath);
+            var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            return newPath.StartsWith(root) ? newPath : Path.Combine(root, newPath.TrimStart('~', '/'));
         }
 
         public string ToAbsolute(string virtualPath)
