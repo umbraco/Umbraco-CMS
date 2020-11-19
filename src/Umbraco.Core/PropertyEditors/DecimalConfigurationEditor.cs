@@ -1,5 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
@@ -7,31 +6,31 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// A custom pre-value editor class to deal with the legacy way that the pre-value data is stored.
     /// </summary>
-    internal class IntegerConfigurationEditor : ConfigurationEditor
+    public class DecimalConfigurationEditor : ConfigurationEditor
     {
-        public IntegerConfigurationEditor()
+        public DecimalConfigurationEditor()
         {
-            Fields.Add(new ConfigurationField(new IntegerValidator())
+            Fields.Add(new ConfigurationField(new DecimalValidator())
             {
                 Description = "Enter the minimum amount of number to be entered",
                 Key = "min",
-                View = "number",
+                View = "decimal",
                 Name = "Minimum"
             });
 
-            Fields.Add(new ConfigurationField(new IntegerValidator())
+            Fields.Add(new ConfigurationField(new DecimalValidator())
             {
                 Description = "Enter the intervals amount between each step of number to be entered",
                 Key = "step",
-                View = "number",
+                View = "decimal",
                 Name = "Step Size"
             });
 
-            Fields.Add(new ConfigurationField(new IntegerValidator())
+            Fields.Add(new ConfigurationField(new DecimalValidator())
             {
                 Description = "Enter the maximum amount of number to be entered",
                 Key = "max",
-                View = "number",
+                View = "decimal",
                 Name = "Maximum"
             });
         }

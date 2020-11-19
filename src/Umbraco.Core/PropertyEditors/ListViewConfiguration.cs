@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -31,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors
                 new Layout { Name = "grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
             };
 
-            IncludeProperties = new []
+            IncludeProperties = new[]
             {
                 new Property { Alias = "sortOrder", Header = "Sort order", IsSystem = 1 },
                 new Property { Alias = "updateDate", Header = "Last edited", IsSystem = 1 },
@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
         public int PageSize { get; set; }
-        
+
         [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
             Description = "The default sort order for the list")]
         public string OrderBy { get; set; }
@@ -69,54 +69,57 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
         public bool ShowContentFirst { get; set; }
 
+        [DataContract]
         public class Property
         {
-            [JsonProperty("alias")]
+            [DataMember(Name = "alias")]
             public string Alias { get; set; }
 
-            [JsonProperty("header")]
+            [DataMember(Name = "header")]
             public string Header { get; set; }
 
-            [JsonProperty("nameTemplate")]
+            [DataMember(Name = "nameTemplate")]
             public string Template { get; set; }
 
-            [JsonProperty("isSystem")]
+            [DataMember(Name = "isSystem")]
             public int IsSystem { get; set; } // TODO: bool
         }
 
+        [DataContract]
         public class Layout
         {
-            [JsonProperty("name")]
+            [DataMember(Name = "name")]
             public string Name { get; set; }
 
-            [JsonProperty("path")]
+            [DataMember(Name = "path")]
             public string Path { get; set; }
 
-            [JsonProperty("icon")]
+            [DataMember(Name = "icon")]
             public string Icon { get; set; }
 
-            [JsonProperty("isSystem")]
+            [DataMember(Name = "isSystem")]
             public int IsSystem { get; set; } // TODO: bool
 
-            [JsonProperty("selected")]
+            [DataMember(Name = "selected")]
             public bool Selected { get; set; }
         }
 
+        [DataContract]
         public class BulkActionPermissionSettings
         {
-            [JsonProperty("allowBulkPublish")]
+            [DataMember(Name = "allowBulkPublish")]
             public bool AllowBulkPublish { get; set; } = true;
 
-            [JsonProperty("allowBulkUnpublish")]
+            [DataMember(Name = "allowBulkUnpublish")]
             public bool AllowBulkUnpublish { get; set; } = true;
 
-            [JsonProperty("allowBulkCopy")]
+            [DataMember(Name = "allowBulkCopy")]
             public bool AllowBulkCopy { get; set; } = true;
 
-            [JsonProperty("allowBulkMove")]
+            [DataMember(Name = "allowBulkMove")]
             public bool AllowBulkMove { get; set; } = true;
 
-            [JsonProperty("allowBulkDelete")]
+            [DataMember(Name = "allowBulkDelete")]
             public bool AllowBulkDelete { get; set; } = true;
         }
     }

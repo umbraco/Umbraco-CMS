@@ -13,6 +13,6 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        IEnumerable<UmbracoEntityReference> GetReferences(object value);        
+        IEnumerable<UmbracoEntityReference> GetReferences(object value);
     }
 }
