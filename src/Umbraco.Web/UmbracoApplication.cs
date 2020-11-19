@@ -44,8 +44,21 @@ namespace Umbraco.Web
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntimeBootstrapper(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
-                GetTypeFinder(hostingEnvironment, logger, profiler), appCaches);
+
+            return new CoreRuntimeBootstrapper(
+                globalSettings,
+                connectionStrings,
+                umbracoVersion,
+                ioHelper,
+                profiler,
+                umbracoBootPermissionChecker,
+                hostingEnvironment,
+                backOfficeInfo,
+                dbProviderFactoryCreator,
+                mainDom,
+                GetTypeFinder(hostingEnvironment, logger, profiler),
+                appCaches
+            );
         }
 
 

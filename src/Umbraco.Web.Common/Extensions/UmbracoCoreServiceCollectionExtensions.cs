@@ -107,7 +107,7 @@ namespace Umbraco.Extensions
             var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = GetWebProfiler(hostingEnvironment);
 
-            builder.Services.AddLogger(hostingEnvironment, loggingConfiguration, configuration);
+            builder.Services.AddLogger(loggingConfiguration, configuration);
             var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
 
             var umbracoVersion = new UmbracoVersion();
@@ -127,6 +127,17 @@ namespace Umbraco.Extensions
                 dbProviderFactoryCreator);
 
             bootstrapper.Configure(builder);
+
+            builder.AddComposers();
+
+            return builder;
+        }
+
+        public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
+        {
+            var composerTypes = builder.TypeLoader.GetTypes<IComposer>();
+            var enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+            new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();
 
             return builder;
         }
@@ -248,7 +259,6 @@ namespace Umbraco.Extensions
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                loggerFactory,
                 profiler,
                 new AspNetCoreBootPermissionsChecker(),
                 hostingEnvironment,
@@ -268,12 +278,11 @@ namespace Umbraco.Extensions
         /// <param name="hostingEnvironment"></param>
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
-            IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(loggingConfiguration, configuration);
 
             // This is nessasary to pick up all the loggins to MS ILogger.
             Log.Logger = logger.SerilogLog;

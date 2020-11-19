@@ -231,7 +231,6 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                loggerFactory,
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
@@ -328,7 +327,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected void UseTestLocalDb(CoreRuntimeBootstrapper runtimeBootstrapper, RuntimeEssentialsEventArgs args)
         {
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtimeBootstrapper.RuntimeLoggerFactory, runtimeBootstrapper.State, TestHelper.WorkingDirectory);
+            InstallTestLocalDb(args.DatabaseFactory, TestHelper.ConsoleLoggerFactory, runtimeBootstrapper.State, TestHelper.WorkingDirectory);
             TestDBConnectionString = args.DatabaseFactory.ConnectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
 

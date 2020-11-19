@@ -19,7 +19,6 @@ namespace Umbraco.Core.Composing
     {
         private readonly IUmbracoBuilder _builder;
         private readonly ILogger<Composers> _logger;
-        private readonly IProfilingLogger _profileLogger;
         private readonly IEnumerable<Type> _composerTypes;
         private readonly IEnumerable<Attribute> _enableDisableAttributes;
 
@@ -40,13 +39,12 @@ namespace Umbraco.Core.Composing
         /// enableDisableAttributes
         /// or
         /// logger</exception>
-        public Composers(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger, IProfilingLogger profileLogger)
+        public Composers(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger)
         {
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
             _enableDisableAttributes = enableDisableAttributes ?? throw new ArgumentNullException(nameof(enableDisableAttributes));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _profileLogger = profileLogger;
         }
 
         private class EnableInfo
@@ -65,23 +63,15 @@ namespace Umbraco.Core.Composing
 
             IEnumerable<Type> orderedComposerTypes;
 
-            using (_profileLogger.DebugDuration<Composers>("Preparing composer types.", "Prepared composer types."))
-            {
-                orderedComposerTypes = PrepareComposerTypes();
-            }
+            orderedComposerTypes = PrepareComposerTypes();
 
             var composers = InstantiateComposers(orderedComposerTypes);
 
-            using (_profileLogger.DebugDuration<Composers>($"Composing composers. (log when >{LogThresholdMilliseconds}ms)", "Composed composers."))
+
+            foreach (var composer in composers)
             {
-                foreach (var composer in composers)
-                {
-                    var componentType = composer.GetType();
-                    using (_profileLogger.DebugDuration<Composers>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
-                    {
-                        composer.Compose(_builder);
-                    }
-                }
+                var componentType = composer.GetType();
+                composer.Compose(_builder);
             }
         }
 
@@ -360,13 +350,10 @@ namespace Umbraco.Core.Composing
                 var ctor = type.GetConstructor(Array.Empty<Type>());
                 if (ctor == null)
                     throw new InvalidOperationException($"Composer {type.FullName} does not have a parameter-less constructor.");
-                return (IComposer) ctor.Invoke(Array.Empty<object>());
+                return (IComposer)ctor.Invoke(Array.Empty<object>());
             }
 
-            using (_profileLogger.DebugDuration<Composers>("Instantiating composers.", "Instantiated composers."))
-            {
-                return types.Select(InstantiateComposer).ToArray();
-            }
+            return types.Select(InstantiateComposer).ToArray();
         }
     }
 }

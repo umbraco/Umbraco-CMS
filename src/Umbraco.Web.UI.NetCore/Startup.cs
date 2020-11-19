@@ -32,7 +32,7 @@ namespace Umbraco.Web.UI.NetCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var umbracoBuilder = services.AddUmbraco(_config);
+            var umbracoBuilder = services.AddUmbraco(_env, _config);
             umbracoBuilder
                 .AddAllBackOfficeComponents(_env)
                 .AddUmbracoWebsite()

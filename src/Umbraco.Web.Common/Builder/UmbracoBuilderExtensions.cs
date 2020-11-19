@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
@@ -32,15 +33,21 @@ namespace Umbraco.Web.Common.Builder
     {
         public static IUmbracoBuilder AddUmbraco(
             this IServiceCollection services,
-            IConfiguration config)
+            IWebHostEnvironment webHostEnvironment,
+            IConfiguration config,
+            ILoggingConfiguration loggingConfig = null,
+            ILoggerFactory loggerFactory = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (config is null) throw new ArgumentNullException(nameof(config));
 
             services.AddLazySupport();
 
-            var builder = new UmbracoBuilder(services, config);
-            return builder;
+            loggingConfig ??= new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
+            services.AddLogger(loggingConfig, config);
+            loggerFactory ??= LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+
+            return new UmbracoBuilder(services, config, loggerFactory);
         }
 
         public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)

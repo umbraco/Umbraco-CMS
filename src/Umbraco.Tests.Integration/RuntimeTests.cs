@@ -78,13 +78,24 @@ namespace Umbraco.Tests.Integration
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Create the core runtime
-            var bootstrapper = new CoreRuntimeBootstrapper(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
-                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
-                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
+            var bootstrapper = new CoreRuntimeBootstrapper(
+                globalSettings,
+                connectionStrings,
+                testHelper.GetUmbracoVersion(),
+                testHelper.IOHelper,
+                testHelper.Profiler,
+                testHelper.UmbracoBootPermissionChecker,
+                testHelper.GetHostingEnvironment(),
+                testHelper.GetBackOfficeInfo(),
+                testHelper.DbProviderFactoryCreator,
+                testHelper.MainDom,
+                testHelper.GetTypeFinder(),
+                AppCaches.NoCache
+            );
 
-            var builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>());
+            var builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), testHelper.ConsoleLoggerFactory);
             bootstrapper.Configure(builder);
+            builder.AddComposers();
             builder.Build();
 
             Assert.IsTrue(bootstrapper.MainDom.IsMainDom);
@@ -126,7 +137,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                   
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration);
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
                     builder.AddConfiguration();
                     builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
                 });
@@ -166,7 +177,7 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration);
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
 
                     builder.AddConfiguration()
                           .AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime)

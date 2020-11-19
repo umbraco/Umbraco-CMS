@@ -39,12 +39,11 @@ namespace Umbraco.Core.Logging.Serilog
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
         public static SerilogLogger CreateWithDefaultConfiguration(
-            IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
             var loggerConfig = new LoggerConfiguration()
-                .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
+                .MinimalConfiguration(loggingConfiguration)
                 .ReadFrom.Configuration(configuration);
 
             return new SerilogLogger(loggerConfig);
