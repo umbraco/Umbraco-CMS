@@ -12,14 +12,12 @@ namespace Umbraco.Web.Editors
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
-        private readonly IUserService _userService;
         private readonly IEntityService _entityService;
 
-        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IUserService userService, IEntityService entityService)
+        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService)
         {
             _contentService = contentService;
             _mediaService = mediaService;
-            _userService = userService;
             _entityService = entityService;
         }
 

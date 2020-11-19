@@ -375,6 +375,8 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<UploadAutoFillProperties>();
 
             composition.Services.AddUnique<ICronTabParser, NCronTabParser>();
+
+            composition.Services.AddUnique<UserEditorAuthorizationHelper>();
         }
     }
 }

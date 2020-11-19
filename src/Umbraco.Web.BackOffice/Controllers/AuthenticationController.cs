@@ -30,7 +30,8 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Web.Editors.Filters;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -126,7 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<ActionResult<UserDisplay>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -265,7 +266,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
@@ -289,7 +290,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<UserDetail> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
@@ -356,7 +357,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<IActionResult> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.

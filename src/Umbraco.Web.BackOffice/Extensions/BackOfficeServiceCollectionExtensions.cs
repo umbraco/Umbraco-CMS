@@ -115,11 +115,27 @@ namespace Umbraco.Extensions
         /// <param name="services"></param>
         private static void AddBackOfficeAuthorizationPolicies(this IServiceCollection services)
         {
+            // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
+            // any auth defining a matching requirement. We don't want to get in the way of end-users own aspnet logic
+            // and although these will trigger for any of their requests that need authorization, the logic won't actually execute.
+            // Basically all registered IAuthorizationHandler will execute for all requests requiring authorization but their logic
+            // won't trigger unless the requirement/policy matches.
+
             services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
             services.AddSingleton<IAuthorizationHandler, UmbracoSectionAuthorizeHandler>();
+            services.AddSingleton<IAuthorizationHandler, AdminUsersAuthorizeHandler>();
+            services.AddSingleton<IAuthorizationHandler, DenyLocalLoginAuthorizeHandler>();
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, policy =>
+                {
+                    policy.Requirements.Add(new AdminUsersAuthorizeRequirement());
+                    policy.Requirements.Add(new AdminUsersAuthorizeRequirement("userIds"));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, policy =>
+                    policy.Requirements.Add(new DenyLocalLoginRequirement()));
 
                 options.AddPolicy(AuthorizationPolicies.SectionAccessContent, policy =>
                     policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Content)));

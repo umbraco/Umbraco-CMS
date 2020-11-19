@@ -1,21 +1,32 @@
 ﻿namespace Umbraco.Web.BackOffice.Authorization
 {
+    /// <summary>
+    /// A list of authorization policy names for use in the back office
+    /// </summary>
     public static class AuthorizationPolicies
     {
-        // TODO: Rethink these names! Describe what they are doing probably
+        public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
+        public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
 
-        public const string SectionAccessContentOrMedia = nameof(SectionAccessContentOrMedia);
+        // Single section access
+
         public const string SectionAccessContent = nameof(SectionAccessContent);
         public const string SectionAccessPackages = nameof(SectionAccessPackages);
         public const string SectionAccessUsers = nameof(SectionAccessUsers);
         public const string SectionAccessMedia = nameof(SectionAccessMedia);
         public const string SectionAccessSettings = nameof(SectionAccessSettings);
+        public const string SectionAccessMembers = nameof(SectionAccessMembers);
+
+        // Custom access based on multiple sections
+
+        public const string SectionAccessContentOrMedia = nameof(SectionAccessContentOrMedia);
         public const string SectionAccessForTinyMce = nameof(SectionAccessForTinyMce);
         public const string SectionAccessForMemberTree = nameof(SectionAccessForMemberTree);
         public const string SectionAccessForMediaTree = nameof(SectionAccessForMediaTree);
         public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
-        public const string SectionAccessForDataTypeReading = nameof(SectionAccessForDataTypeReading);
-        public const string SectionAccessMembers = nameof(SectionAccessMembers);
+        public const string SectionAccessForDataTypeReading = nameof(SectionAccessForDataTypeReading);       
+
+        // Single tree access
 
         public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
         public const string TreeAccessUsers = nameof(TreeAccessUsers);
@@ -33,6 +44,9 @@
         public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
         public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);
         public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
+
+        // Custom access based on multiple trees
+
         public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);
         public const string TreeAccessMediaOrMediaTypes = nameof(TreeAccessMediaOrMediaTypes);
         public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
