@@ -42,11 +42,13 @@ using Task = System.Threading.Tasks.Task;
 using Umbraco.Net;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.BackOffice.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController

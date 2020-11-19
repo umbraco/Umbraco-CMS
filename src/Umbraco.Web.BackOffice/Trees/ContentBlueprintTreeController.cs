@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
@@ -21,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Trees
     /// <remarks>
     /// This authorizes based on access to the content section even though it exists in the settings
     /// </remarks>
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, SortOrder = 12, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

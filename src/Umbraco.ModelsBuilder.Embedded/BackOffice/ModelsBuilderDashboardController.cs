@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
@@ -7,6 +8,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
 
@@ -20,7 +22,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
     public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
         private readonly ModelsBuilderSettings _config;

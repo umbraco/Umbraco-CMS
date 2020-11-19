@@ -4,6 +4,8 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Web.BackOffice.Profiling
 {
@@ -11,7 +13,7 @@ namespace Umbraco.Web.BackOffice.Profiling
     /// The API controller used to display the state of the web profiler
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Settings)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
     public class WebProfilingController : UmbracoAuthorizedJsonController
     {
         private readonly IHostingEnvironment _hosting;

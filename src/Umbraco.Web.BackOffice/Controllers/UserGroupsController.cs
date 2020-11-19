@@ -16,11 +16,13 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Web.BackOffice.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
     public class UserGroupsController : UmbracoAuthorizedJsonController
     {

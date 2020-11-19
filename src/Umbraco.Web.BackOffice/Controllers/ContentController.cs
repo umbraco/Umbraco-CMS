@@ -37,19 +37,16 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.Mapping;
-
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    /// <remarks>
-    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
-    /// access to ALL of the methods on this controller will need access to the content application.
-    /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
     public class ContentController : ContentControllerBase
     {
         private readonly PropertyEditorCollection _propertyEditors;

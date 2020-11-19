@@ -109,10 +109,66 @@ namespace Umbraco.Extensions
             return new BackOfficeIdentityBuilder(services);
         }
 
+        /// <summary>
+        /// Add authorization handlers and policies
+        /// </summary>
+        /// <param name="services"></param>
         private static void AddBackOfficeAuthorizationPolicies(this IServiceCollection services)
         {
+            services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
+            services.AddSingleton<IAuthorizationHandler, UmbracoSectionAuthorizeHandler>();
+
             services.AddAuthorization(options =>
             {
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessContent, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Content)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Content, Constants.Applications.Media)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessUsers, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Users)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessForTinyMce, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(
+                        Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessMedia, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Media)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessMembers, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Members)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessPackages, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Packages)));
+
+                options.AddPolicy(AuthorizationPolicies.SectionAccessSettings, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(Constants.Applications.Settings)));
+
+                //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
+                // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
+                options.AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(
+                        Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
+                        Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members)));
+                options.AddPolicy(AuthorizationPolicies.SectionAccessForMediaTree, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(
+                        Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
+                        Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members)));
+                options.AddPolicy(AuthorizationPolicies.SectionAccessForMemberTree, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(
+                        Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members)));
+
+                // Permission is granted to this policy if the user has access to any of these sections: Content, media, settings, developer, members
+                options.AddPolicy(AuthorizationPolicies.SectionAccessForDataTypeReading, policy =>
+                    policy.Requirements.Add(new SectionAliasesRequirement(
+                        Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+                        Constants.Applications.Settings, Constants.Applications.Packages)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDocuments, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Content)));
+
                 options.AddPolicy(AuthorizationPolicies.TreeAccessUsers, policy =>
                     policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Users)));
 
@@ -182,8 +238,6 @@ namespace Umbraco.Extensions
                             Constants.Trees.MediaTypes, Constants.Trees.Media,
                             Constants.Trees.MemberTypes, Constants.Trees.Members)));
             });
-
-            services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
         }
     }
 }

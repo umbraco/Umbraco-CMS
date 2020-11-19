@@ -40,6 +40,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Web.BackOffice.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -48,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// access to ALL of the methods on this controller will need access to the media application.
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Media)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
     public class MediaController : ContentControllerBase
     {
         private readonly IShortStringHelper _shortStringHelper;

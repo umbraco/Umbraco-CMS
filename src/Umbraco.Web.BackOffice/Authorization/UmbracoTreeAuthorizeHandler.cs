@@ -8,8 +8,9 @@ using Umbraco.Web.Services;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
+
     /// <summary>
-    /// Ensures that the current user has access to the application for which the specified tree(s) belongs
+    /// Ensures that the current user has access to the section for which the specified tree(s) belongs
     /// </summary>
     /// <remarks>
     /// This would allow a tree to be moved between sections.
@@ -17,10 +18,6 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </remarks>
     public class UmbracoTreeAuthorizeHandler : AuthorizationHandler<TreeAliasesRequirement>
     {
-        /// <summary>
-        /// Can be used by unit tests to enable/disable this filter
-        /// </summary>
-        internal static readonly bool Enable = true;
 
         private readonly ITreeService _treeService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -40,25 +37,6 @@ namespace Umbraco.Web.BackOffice.Authorization
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
-        private bool IsAuthorized(TreeAliasesRequirement requirement)
-        {
-            if (Enable == false)
-            {
-                return true;
-            }
-
-            var apps = requirement.TreeAliases.Select(x => _treeService
-                    .GetByAlias(x))
-                .WhereNotNull()
-                .Select(x => x.SectionAlias)
-                .Distinct()
-                .ToArray();
-
-            return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
-                   && apps.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
-                       app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
-        }
-
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TreeAliasesRequirement requirement)
         {
             if (IsAuthorized(requirement))
@@ -71,6 +49,20 @@ namespace Umbraco.Web.BackOffice.Authorization
             }
 
             return Task.CompletedTask;
+        }
+
+        private bool IsAuthorized(TreeAliasesRequirement requirement)
+        {
+            var apps = requirement.TreeAliases.Select(x => _treeService
+                    .GetByAlias(x))
+                .WhereNotNull()
+                .Select(x => x.SectionAlias)
+                .Distinct()
+                .ToArray();
+
+            return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
+                   && apps.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
+                       app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
         }
     }
 }
