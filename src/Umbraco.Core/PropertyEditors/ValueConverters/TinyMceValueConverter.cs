@@ -14,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce;
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IHtmlEncodedString);
+            => typeof(IHtmlEncodedString);
 
         // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
