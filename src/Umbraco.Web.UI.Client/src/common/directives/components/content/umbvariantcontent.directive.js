@@ -23,7 +23,7 @@
         controllerAs: 'vm',
         controller: umbVariantContentController
     };
-    
+
     function umbVariantContentController($scope) {
 
         var unsubscribe = [];
@@ -41,7 +41,7 @@
         vm.showBackButton = showBackButton;
 
         function onInit() {
-            
+
             // Make copy of apps, so we can have a variant specific model for the App. (needed for validation etc.)
             vm.editor.variantApps = Utilities.copy(vm.content.apps);
 
@@ -49,11 +49,11 @@
 
             onAppChanged(activeApp);
         }
-        
+
         function showBackButton() {
             return vm.page.listViewPath !== null && vm.showBack;
         }
-        
+
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
             //set the content to dirty if the header changes
@@ -64,7 +64,7 @@
                     }
                 }));
         }
-        
+
         function onDestroy() {
             for (var i = 0; i < unsubscribe.length; i++) {
                 unsubscribe[i]();
@@ -87,12 +87,12 @@
          */
         function selectApp(item) {
             // call the callback if any is registered
-            if(vm.onSelectApp) {
-                vm.onSelectApp({"app": item});
+            if (vm.onSelectApp) {
+                vm.onSelectApp({ "app": item });
             }
         }
-        
-        $scope.$on("editors.apps.appChanged", function($event, $args) {
+
+        $scope.$on("editors.apps.appChanged", function ($event, $args) {
             var activeApp = $args.app;
 
             // sync varaintApps active with new active.
@@ -103,11 +103,14 @@
             onAppChanged(activeApp);
         });
 
+        $scope.$on("listView.itemsChanged", function ($event, $args) {
+            vm.disableActionsMenu = $args.items.length > 0;
+        });
+
         function onAppChanged(activeApp) {
 
             // disable the name field if the active content app is not "Content" or "Info"
             vm.nameDisabled = (activeApp && activeApp.alias !== "umbContent" && activeApp.alias !== "umbInfo" && activeApp.alias !== "umbListView");
-            vm.disableActionsMenu = activeApp && activeApp.alias === "umbListView";
         }
 
         /**
@@ -116,8 +119,8 @@
          */
         function selectAppAnchor(item, anchor) {
             // call the callback if any is registered
-            if(vm.onSelectAppAnchor) {
-                vm.onSelectAppAnchor({"app": item, "anchor": anchor});
+            if (vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({ "app": item, "anchor": anchor });
             }
         }
 
