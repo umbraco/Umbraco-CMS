@@ -22,7 +22,6 @@ namespace Umbraco.Core.Services.Implement
     public class MediaService : ScopeRepositoryService, IMediaService
     {
         private readonly IMediaRepository _mediaRepository;
-        private readonly IMediaRepository2 _mediaRepository2;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
@@ -41,7 +40,6 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
-            _mediaRepository2 = mediaRepository as IMediaRepository2;
         }
 
         #endregion
@@ -582,15 +580,12 @@ namespace Umbraco.Core.Services.Implement
         private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, 
             IQuery<IMedia> filter, Ordering ordering)
         {
-            if(_mediaRepository2 == null)
-            {
-                return GetPagedLocked(query, pageIndex, pageSize, out _, filter, ordering);
-            }
+           
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-            return _mediaRepository2.GetPage(query, pageIndex, pageSize,  ordering, filter);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize,  ordering, filter);
         }
 
         /// <summary>

@@ -653,11 +653,8 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
-            if(_documentRepository is IDocumentRepository2 documentRepository2)
-            {
-                return documentRepository2.GetPage(query, pageIndex, pageSize, ordering, filter);
-            }
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out _, filter, ordering);
+
+            return _documentRepository.GetPage(query, pageIndex, pageSize, ordering, filter);
         }
 
         /// <summary>
