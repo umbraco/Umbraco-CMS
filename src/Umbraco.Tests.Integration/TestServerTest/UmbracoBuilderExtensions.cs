@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 testHelper.GetLoggingConfiguration(),
                 builder.Config,
                 // TODO: Yep that's extremely ugly
-                (lambdaBuilder, globalSettings, connectionStrings, umbVersion, ioHelper, loggerFactory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                (lambdaBuilder, globalSettings, connectionStrings, umbVersion, ioHelper,  profiler, hostingEnv,  typeFinder, appCaches, dbProviderFactoryCreator) =>
                 {
                    UmbracoIntegrationTest.ConfigureSomeMorebitsForTests(
                         lambdaBuilder,
@@ -34,10 +34,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                         connectionStrings,
                         umbVersion,
                         ioHelper,
-                        loggerFactory,
                         profiler,
                         hostingEnv,
-                        backOfficeInfo,
                         typeFinder,
                         appCaches,
                         dbProviderFactoryCreator,

@@ -185,10 +185,8 @@ namespace Umbraco.Tests.Integration.Testing
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
-            ILoggerFactory loggerFactory,
             IProfiler profiler,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder,
             AppCaches appCaches,
             IDbProviderFactoryCreator dbProviderFactoryCreator)
@@ -199,10 +197,8 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                loggerFactory,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator,
@@ -234,10 +230,8 @@ namespace Umbraco.Tests.Integration.Testing
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
-            ILoggerFactory loggerFactory,
             IProfiler profiler,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder,
             AppCaches appCaches,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
@@ -262,7 +256,6 @@ namespace Umbraco.Tests.Integration.Testing
             builder.Services.AddUnique<IUmbracoVersion>(umbracoVersion);
             builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
             builder.Services.AddUnique<Core.Hosting.IHostingEnvironment>(hostingEnvironment);
-            builder.Services.AddUnique<IBackOfficeInfo>(backOfficeInfo);
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
 
             // after bootstrapping we let the container wire up for us.
@@ -341,6 +334,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected void TerminateCoreRuntime()
         {
             Services.GetRequiredService<IRuntime>().Terminate();
+            StaticApplicationLogging.Initialize(null);
         }
 
         #endregion
@@ -352,7 +346,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         protected void UseTestLocalDb(IServiceProvider serviceProvider)
         {
-            var state = serviceProvider.GetRequiredService<IRuntimeState>() as RuntimeState;
+            var state = serviceProvider.GetRequiredService<IRuntimeState>();
             var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
 
             // This will create a db, install the schema and ensure the app is configured to run

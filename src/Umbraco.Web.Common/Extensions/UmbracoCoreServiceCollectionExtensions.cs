@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
@@ -36,21 +37,18 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
-
-
         /// <summary>
         /// Adds the Umbraco Back Core requirements
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="builder"></param>
         /// <param name="webHostEnvironment"></param>
-        /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
-        /// <param name="requestCache"></param>
-        /// <param name="httpContextAccessor"></param>
+        /// <param name="appCaches"></param>
         /// <param name="loggingConfiguration"></param>
-        /// <param name="configureSomeMoreBits">Delegate to create an <see cref="CoreRuntimeBootstrapper"/></param>
-        /// <param name="factory"></param>
+        /// <param name="configuration"></param>
+        /// <param name="configureSomeMoreBits">Weird hack for tests, won't exist much longer</param>
         /// <returns></returns>
+        /// <remarks>Shouldn't exist</remarks>
         public static IUmbracoBuilder AddUmbracoCore(
             this IUmbracoBuilder builder,
             IWebHostEnvironment webHostEnvironment,
@@ -59,7 +57,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Action<IUmbracoBuilder, GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator> configureSomeMoreBits)
+            Action<IUmbracoBuilder, GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper,  IProfiler, IHostingEnvironment, ITypeFinder, AppCaches, IDbProviderFactoryCreator> configureSomeMoreBits)
         {
             if (builder is null) throw new ArgumentNullException(nameof(builder));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
@@ -74,55 +72,49 @@ namespace Umbraco.Extensions
                 options.Cookie.Name = "UMB_SESSION";
                 options.Cookie.HttpOnly = true;
             });
+            var syntaxProviders = new List<ISqlSyntaxProvider>();
+            var insertProviders = new List<IBulkSqlInsertProvider>();
+            var databaseCreators = new List<IEmbeddedDatabaseCreator>();
 
             // Add supported databases
-            builder.Services.AddUmbracoSqlCeSupport();
-            builder.Services.AddUmbracoSqlServerSupport();
+            builder.Services.AddUmbracoSqlCeSupport(syntaxProviders, insertProviders, databaseCreators);
+            builder.Services.AddUmbracoSqlServerSupport(syntaxProviders, insertProviders, databaseCreators);
 
-            builder.Services.AddSingleton<IDbProviderFactoryCreator>(x => new DbProviderFactoryCreator(
+            var dbProviderFactoryCreator = new DbProviderFactoryCreator(
                 DbProviderFactories.GetFactory,
-                x.GetServices<ISqlSyntaxProvider>(),
-                x.GetServices<IBulkSqlInsertProvider>(),
-                x.GetServices<IEmbeddedDatabaseCreator>()
-            ));
+                syntaxProviders,
+                insertProviders,
+                databaseCreators);
 
-            // TODO: We want to avoid pre-resolving a container as much as possible we should not
-            // be doing this any more than we are now. The ugly part about this is that the service
-            // instances resolved here won't be the same instances resolved from the container
-            // later once the true container is built. However! ... in the case of IDbProviderFactoryCreator
-            // it will be the same instance resolved later because we are re-registering this instance back
-            // into the container. This is not true for `Configs` but we should do that too, see comments in
-            // `RegisterEssentials`.
+            builder.Services.AddSingleton<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
+
+            // TODO: We should not be doing this at all.
             var serviceProvider = builder.Services.BuildServiceProvider();
 
-            var globalSettings = serviceProvider.GetService<IOptionsMonitor<GlobalSettings>>();
-            var connectionStrings = serviceProvider.GetService<IOptions<ConnectionStrings>>();
-            var hostingSettings = serviceProvider.GetService<IOptionsMonitor<HostingSettings>>();
-            var typeFinderSettings = serviceProvider.GetService<IOptionsMonitor<TypeFinderSettings>>();
-
-            var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
-
+            // Switching to IOptions vs IOptionsMonitor was rejected previously as it prevents setting IsDebug true without a restart
+            var hostingSettings = serviceProvider.GetService<IOptionsMonitor<HostingSettings>>();  // <--- We are now building ServiceProvider just for this line
             var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             var ioHelper = new IOHelper(hostingEnvironment);
-            var backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             var profiler = GetWebProfiler(hostingEnvironment);
+
+            builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
 
             builder.Services.AddLogger(loggingConfiguration, configuration);
             var loggerFactory = builder.BuilderLoggerFactory;
 
-            var umbracoVersion = new UmbracoVersion();
-            var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
+            var typeFinderSettings = builder.Config.GetSection(Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
+            var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, Options.Create(typeFinderSettings));
+            var globalSettings = builder.Config.GetSection(Core.Constants.Configuration.ConfigGlobal).Get<GlobalSettings>() ?? new GlobalSettings();
+            var connectionStrings = builder.Config.GetSection("ConnectionStrings").Get<ConnectionStrings>(opt => opt.BindNonPublicProperties = true) ?? new ConnectionStrings();
 
             configureSomeMoreBits(
                 builder,
-                globalSettings.CurrentValue,
-                connectionStrings.Value,
-                umbracoVersion,
+                globalSettings,
+                connectionStrings,
+                new UmbracoVersion(),
                 ioHelper,
-                loggerFactory,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator);
@@ -144,9 +136,11 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds SqlCe support for Umbraco
         /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddUmbracoSqlCeSupport(this IServiceCollection services)
+        private static IServiceCollection AddUmbracoSqlCeSupport(
+            this IServiceCollection services,
+            ICollection<ISqlSyntaxProvider> syntaxProviders,
+            ICollection<IBulkSqlInsertProvider> insertProviders,
+            ICollection<IEmbeddedDatabaseCreator> databaseCreators)
         {
             try
             {
@@ -165,6 +159,10 @@ namespace Umbraco.Extensions
                         services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
                         services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
                         services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+
+                        syntaxProviders.Add((ISqlSyntaxProvider)Activator.CreateInstance(sqlCeSyntaxProviderType));
+                        insertProviders.Add((IBulkSqlInsertProvider)Activator.CreateInstance(sqlCeBulkSqlInsertProviderType));
+                        databaseCreators.Add((IEmbeddedDatabaseCreator)Activator.CreateInstance(sqlCeEmbeddedDatabaseCreatorType));
                     }
 
                     var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
@@ -187,15 +185,25 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds Sql Server support for Umbraco
         /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoSqlServerSupport(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoSqlServerSupport(
+            this IServiceCollection services,
+            ICollection<ISqlSyntaxProvider> syntaxProviders,
+            ICollection<IBulkSqlInsertProvider> insertProviders,
+            ICollection<IEmbeddedDatabaseCreator> databaseCreators)
         {
             DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
-            services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
-            services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            var syntaxProvider = new SqlServerSyntaxProvider();
+            var insertProvider = new SqlServerBulkSqlInsertProvider();
+            var databaseCreator = new NoopEmbeddedDatabaseCreator();
+
+            services.AddSingleton<ISqlSyntaxProvider>(syntaxProvider);
+            services.AddSingleton<IBulkSqlInsertProvider>(insertProvider);
+            services.AddSingleton<IEmbeddedDatabaseCreator>(databaseCreator);
+
+            syntaxProviders.Add(syntaxProvider);
+            insertProviders.Add(insertProvider);
+            databaseCreators.Add(databaseCreator);
 
             return services;
         }
@@ -230,7 +238,7 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptionsMonitor<TypeFinderSettings> typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptions<TypeFinderSettings> typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
@@ -244,10 +252,8 @@ namespace Umbraco.Extensions
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
-            ILoggerFactory loggerFactory,
             IProfiler profiler,
             IHostingEnvironment hostingEnvironment,
-            IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder,
             AppCaches appCaches,
             IDbProviderFactoryCreator dbProviderFactoryCreator)
@@ -257,10 +263,10 @@ namespace Umbraco.Extensions
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+                ? (IMainDomLock)new SqlMainDomLock(builder.BuilderLoggerFactory.CreateLogger<SqlMainDomLock>(), builder.BuilderLoggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
+                : new MainDomSemaphoreLock(builder.BuilderLoggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
 
-            var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
+            var mainDom = new MainDom(builder.BuilderLoggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
 
             var logger = builder.BuilderLoggerFactory.CreateLogger<object>();
@@ -297,7 +303,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IUmbracoVersion>(umbracoVersion);
             builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
             builder.Services.AddUnique<IHostingEnvironment>(hostingEnvironment);
-            builder.Services.AddUnique<IBackOfficeInfo>(backOfficeInfo);
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
 
             // after bootstrapping we let the container wire up for us.
