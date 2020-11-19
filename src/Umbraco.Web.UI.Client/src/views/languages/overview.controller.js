@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($location, $timeout, navigationService, localizationService, languageResource, eventsService, overlayService) {
+    function LanguagesOverviewController($location, $timeout, navigationService, localizationService, languageResource, eventsService, overlayService,$scope) {
 
         var vm = this;
 
@@ -42,6 +42,7 @@
                 vm.labels.fallsbackTo = values[3];
                 // set page name
                 vm.page.name = vm.labels.languages;
+                $scope.$emit("$changeTitle", vm.labels.languages);
             });
 
             languageResource.getAll().then(function (languages) {

@@ -443,9 +443,9 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<UsersController>(ex, "An error occured in a custom event handler while inviting the user");
+                Logger.Error<UsersController>(ex, "An error occurred in a custom event handler while inviting the user");
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse($"An error occured inviting the user (check logs for more info): {ex.Message}"));
+                    Request.CreateNotificationValidationErrorResponse($"An error occurred inviting the user (check logs for more info): {ex.Message}"));
             }
 
             // If the event is handled then no need to send the email
