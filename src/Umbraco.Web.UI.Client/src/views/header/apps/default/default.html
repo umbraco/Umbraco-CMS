@@ -1,5 +1,5 @@
 ﻿<div ng-controller="Umbraco.Editors.Headers.Apps.DefaultController" data-header-action-alias="{{app.alias}}">
-    <button type="button" class="umb-app-header__button btn-reset" hotkey="app.hotkey" ng-click="executeAction(app.action)" ng-mousedown="rememberFocus()">
+    <button type="button" class="umb-app-header__button btn-reset" hotkey="{{app.hotkey}}" ng-click="executeAction(app.action)" ng-mousedown="rememberFocus()">
         <span class="sr-only">
             <localize key="visuallyHiddenTexts_{{app.alias}}">{{app.name}}</localize>...
         </span>
