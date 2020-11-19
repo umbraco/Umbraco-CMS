@@ -125,8 +125,9 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration(hostContext.Configuration);
+                  
                     var builder = new UmbracoBuilder(services, hostContext.Configuration);
+                    builder.AddConfiguration();
                     builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
                 });
 
@@ -165,10 +166,12 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration(hostContext.Configuration);
                     var builder = new UmbracoBuilder(services, hostContext.Configuration);
-                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime);
-                    builder.Build();
+
+                    builder.AddConfiguration()
+                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.GetCoreRuntime)
+                          .Build();
+
                     services.AddRouting(); // LinkGenerator
                 });
 

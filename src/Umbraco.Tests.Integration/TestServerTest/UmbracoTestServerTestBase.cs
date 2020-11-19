@@ -128,19 +128,19 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var umbracoBuilder = services.AddUmbraco(Configuration);
             umbracoBuilder
-                .WithConfiguration()
-                .WithTestCore(TestHelper, UseTestLocalDb) // This is the important one!
-                .WithWebComponents()
-                .WithRuntimeMinifier()
-                .WithBackOffice()
-                .WithBackOfficeIdentity()
-                .WithPreview()
+                .AddConfiguration()
+                .AddTestCore(TestHelper, UseTestLocalDb) // This is the important one!
+                .AddWebComponents()
+                .AddRuntimeMinifier()
+                .AddBackOffice()
+                .AddBackOfficeIdentity()
+                .AddPreviewSupport()
                 //.WithMiniProfiler() // we don't want this running in tests
-                .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
+                .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
                     mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
                 })
-                .WithWebServer()
+                .AddWebServer()
                 .Build();
         }
 

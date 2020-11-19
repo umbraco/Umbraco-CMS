@@ -1,20 +1,31 @@
-﻿using Umbraco.Core.Builder;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Builder;
 using Umbraco.Web.Common.Builder;
+using Umbraco.Web.Website.ViewEngines;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder WithAllWebsiteComponents(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddUmbracoWebsite(this IUmbracoBuilder builder)
         {
-            builder
-                .WithUmbracoWebsite();
+            // Set the render & plugin view engines (Super complicated, but this allows us to use the IServiceCollection
+            // to inject dependencies into the viewEngines)
+            builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, RenderMvcViewOptionsSetup>();
+            builder.Services.AddSingleton<IRenderViewEngine, RenderViewEngine>();
+            builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, PluginMvcViewOptionsSetup>();
+            builder.Services.AddSingleton<IPluginViewEngine, PluginViewEngine>();
+
+            // Wraps all existing view engines in a ProfilerViewEngine
+            builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, ProfilingViewEngineWrapperMvcViewOptionsSetup>();
+
+            //TODO figure out if we need more to work on load balanced setups
+            builder.Services.AddDataProtection();
 
             return builder;
         }
-
-        public static IUmbracoBuilder WithUmbracoWebsite(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithUmbracoWebsite), () => builder.Services.AddUmbracoWebsite());
 
 
     }

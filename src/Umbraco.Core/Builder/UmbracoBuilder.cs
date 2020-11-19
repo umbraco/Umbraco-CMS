@@ -9,7 +9,6 @@ namespace Umbraco.Web.Common.Builder
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
-        private readonly Dictionary<string, Action> _registrations = new Dictionary<string, Action>();
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
         public UmbracoBuilder(IServiceCollection services, IConfiguration config)
@@ -28,13 +27,6 @@ namespace Umbraco.Web.Common.Builder
         /// &amp; use of IOptionsMoniker&lt;HostingSettings&gt; for AspNetCoreHostingEnvironment
         /// </remarks>
         public TypeLoader TypeLoader { get; set; }
-
-        public IUmbracoBuilder AddWith(string key, Action add)
-        {
-            if (_registrations.ContainsKey(key)) return this;
-            _registrations[key] = add;
-            return this;
-        }
 
         /// <summary>
         /// Gets a collection builder (and registers the collection).
@@ -56,13 +48,6 @@ namespace Umbraco.Web.Common.Builder
 
         public void Build()
         {
-            foreach (var a in _registrations)
-                a.Value();
-
-            _registrations.Clear();
-
-            // TODO: We can compose composers here, we have a typeloader, no need to do it in CoreRuntimeBootstrapper.
-
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(Services);
 

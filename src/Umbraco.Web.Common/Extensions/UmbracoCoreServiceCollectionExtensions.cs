@@ -30,87 +30,13 @@ using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
-        /// <summary>
-        /// Adds the Umbraco Configuration requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services, IConfiguration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            // Register configuration validators.
-            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
-            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
-            services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator >();
-            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
-
-            // Register configuration sections.
-            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));
-            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent));
-            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigCoreDebug));
-            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigExceptionFilter));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal));
-            services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigHealthChecks));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting));
-            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigImaging));
-            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigExamine));
-            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigKeepAlive));
-            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigLogging));
-            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigMemberPassword));
-            services.Configure<ModelsBuilderSettings>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
-            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigNuCache));
-            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigRequestHandler));
-            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigRuntime));
-            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurity));
-            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigTours));
-            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigTypeFinder));
-            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigUserPassword));
-            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigWebRouting));
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds the Umbraco Back Core requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="webHostEnvironment"></param>
-        /// <param name="configuration"></param>
-        /// <param name="factory"></param>
-        /// <returns></returns>
-        public static IUmbracoBuilder AddUmbracoCore(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
-        {
-            var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
-
-            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
-            builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
-            builder.Services.AddSingleton<ILoggingConfiguration>(loggingConfig);
-
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
-            var appCaches = new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache()),
-                requestCache,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
-
-            builder.AddUmbracoCore(webHostEnvironment,
-                Assembly.GetEntryAssembly(),
-                appCaches,
-                loggingConfig,
-                configuration,
-                GetCoreRuntime);
-
-            return builder;
-        }
+    
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements

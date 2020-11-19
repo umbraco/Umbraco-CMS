@@ -206,7 +206,8 @@ namespace Umbraco.Core.Runtime
                 }
                 finally
                 {
-                    // TODO: This can move to UmbracoBuilder
+                    // TODO: This can move to an UmbracoBuilder extension e.g. WithComposers
+                    // TODO: Also we're approaching the point CoreRuntimeBootstrapper can be removed entirely.
                     // always run composers
                     RunComposers(builder.TypeLoader, builder);
                 }

@@ -257,25 +257,28 @@ namespace Umbraco.Tests.Integration.Testing
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
-            services.AddUmbracoConfiguration(Configuration);
+
             var builder = new UmbracoBuilder(services, Configuration);
-            builder.AddUmbracoCore(
-                webHostEnvironment,
-                GetType().Assembly,
-                GetAppCaches(),
-                TestHelper.GetLoggingConfiguration(),
-                Configuration,
-                CreateTestRuntime);
-            builder.Build();
+            builder.AddConfiguration()
+                .AddUmbracoCore(
+                    webHostEnvironment,
+                    GetType().Assembly,
+                    GetAppCaches(),
+                    TestHelper.GetLoggingConfiguration(),
+                    Configuration,
+                    CreateTestRuntime
+                );
 
             services.AddSignalR();
 
-            services.AddUmbracoWebComponents(Configuration);
-            services.AddUmbracoRuntimeMinifier(Configuration);
-            services.AddUmbracoBackOffice();
+            builder.AddWebComponents();
+            builder.AddRuntimeMinifier();
+            builder.AddBackOffice();
             services.AddUmbracoBackOfficeIdentity();
 
             services.AddMvc();
+
+            builder.Build();
 
             CustomTestSetup(services);
         }
