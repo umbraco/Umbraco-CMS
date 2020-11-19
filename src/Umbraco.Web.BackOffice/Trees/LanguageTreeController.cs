@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
@@ -9,7 +11,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Languages)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Languages, SortOrder = 11, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

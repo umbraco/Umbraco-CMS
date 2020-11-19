@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -9,6 +10,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
@@ -18,7 +20,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
     public class TemplateController : BackOfficeNotificationsController
     {
         private readonly IFileService _fileService;

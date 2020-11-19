@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Infrastructure.BackOffice;
 using Umbraco.Net;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
@@ -42,6 +44,8 @@ namespace Umbraco.Extensions
             // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
 
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+
+            services.AddBackOfficeAuthorizationPolicies();
         }
 
         public static void AddUmbracoPreview(this IServiceCollection services)
@@ -87,7 +91,7 @@ namespace Umbraco.Extensions
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
-        
+
             // CUSTOM:
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
@@ -103,6 +107,83 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);
+        }
+
+        private static void AddBackOfficeAuthorizationPolicies(this IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AuthorizationPolicies.TreeAccessUsers, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Users)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessPartialViews, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.PartialViews)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessPartialViewMacros, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.PartialViewMacros)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessPackages, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Packages)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessLogs, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.LogViewer)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.DataTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessTemplates, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Templates)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMemberTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.MemberTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessRelationTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.RelationTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.DocumentTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMemberGroups, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.MemberGroups)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMediaTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.MediaTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMacros, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Macros)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessLanguages, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Languages)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Dictionary)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDictionary, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Dictionary, Constants.Trees.Dictionary)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.Dictionary, Constants.Trees.Templates)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.DocumentTypes, Constants.Trees.Content)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMediaOrMediaTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.MediaTypes, Constants.Trees.Media)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessMembersOrMemberTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.MemberTypes, Constants.Trees.Members)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessAnySchemaTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)));
+
+                options.AddPolicy(AuthorizationPolicies.TreeAccessAnyContentOrTypes, policy =>
+                    policy.Requirements.Add(new TreeAliasesRequirement(
+                            Constants.Trees.DocumentTypes, Constants.Trees.Content,
+                            Constants.Trees.MediaTypes, Constants.Trees.Media,
+                            Constants.Trees.MemberTypes, Constants.Trees.Members)));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
         }
     }
 }

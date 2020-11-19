@@ -14,10 +14,12 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.BackOffice.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, SortOrder = 3, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

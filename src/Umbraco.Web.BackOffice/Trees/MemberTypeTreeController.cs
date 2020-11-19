@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
@@ -16,7 +18,7 @@ using Umbraco.Web.WebApi;
 namespace Umbraco.Web.BackOffice.Trees
 {
     [CoreTree]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MemberTypes, SortOrder = 2, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, ISearchableTree

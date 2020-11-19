@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
@@ -14,12 +16,9 @@ using Umbraco.Web.WebApi;
 namespace Umbraco.Web.BackOffice.Trees
 {
 
-    [UmbracoTreeAuthorize(
-        Constants.Trees.Dictionary,
-        Constants.Trees.Templates
-        // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
-        // dictionary items in templates, even when we dont have authorization to manage the dictionary items
-        )]
+    // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
+    // dictionary items in templates, even when we dont have authorization to manage the dictionary items
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
