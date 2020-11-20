@@ -13,27 +13,23 @@ namespace Umbraco.Web.Common.Builder
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
-        public UmbracoBuilder(IServiceCollection services, IConfiguration config)
-            : this(services, config, NullLoggerFactory.Instance)
+        public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
+            : this(services, config, typeLoader, NullLoggerFactory.Instance)
         { }
 
-        public UmbracoBuilder(IServiceCollection services, IConfiguration config, ILoggerFactory loggerFactory)
+        public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader, ILoggerFactory loggerFactory)
         {
             Services = services;
             Config = config;
             BuilderLoggerFactory = loggerFactory;
+            TypeLoader = typeLoader;
         }
 
         public IServiceCollection Services { get; }
         public IConfiguration Config { get; }
 
-        /// <remarks>
-        /// TODO: Remove setter
-        /// This should be a constructor parameter
-        /// Attempting to fix it now opens a huge can of worms around logging setup
-        /// &amp; use of IOptionsMoniker&lt;HostingSettings&gt; for AspNetCoreHostingEnvironment
-        /// </remarks>
-        public TypeLoader TypeLoader { get; set; }
+
+        public TypeLoader TypeLoader { get; }
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <summary>

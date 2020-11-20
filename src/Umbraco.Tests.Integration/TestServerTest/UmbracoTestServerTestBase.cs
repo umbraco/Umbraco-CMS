@@ -21,6 +21,7 @@ using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.BackOffice.Controllers;
@@ -129,7 +130,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
+            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration, assembly: GetType().Assembly);
+    
             umbracoBuilder
                 .AddConfiguration()
                 .AddTestCore(TestHelper) // This is the important one!

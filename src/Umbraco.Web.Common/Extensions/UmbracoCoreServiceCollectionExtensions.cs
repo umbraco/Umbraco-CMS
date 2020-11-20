@@ -53,7 +53,6 @@ namespace Umbraco.Extensions
             this IUmbracoBuilder builder,
             IWebHostEnvironment webHostEnvironment,
             Assembly entryAssembly,
-            AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
@@ -78,6 +77,9 @@ namespace Umbraco.Extensions
             builder.Services.AddUmbracoSqlCeSupport(syntaxProviders, insertProviders, databaseCreators);
             builder.Services.AddUmbracoSqlServerSupport(syntaxProviders, insertProviders, databaseCreators);
 
+            builder.Services.AddUnique<IAppPolicyCache>(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
+            builder.Services.AddUnique<IRequestCache>(factory => factory.GetRequiredService<AppCaches>().RequestCache);
+
             var dbProviderFactoryCreator = new DbProviderFactoryCreator(
                 DbProviderFactories.GetFactory,
                 syntaxProviders,
@@ -93,16 +95,12 @@ namespace Umbraco.Extensions
             var profiler = GetWebProfiler(configuration);
             builder.Services.AddUnique<IProfiler>(profiler);
            
-            var profilingLogger = new ProfilingLogger(builder.BuilderLoggerFactory.CreateLogger<ProfilingLogger>(), profiler);
-            builder.Services.AddUnique<IProfilingLogger>(profilingLogger);
-
+       
             var typeFinder = CreateTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, builder.Config);
+
+            builder.Services.AddUnique<IProfilingLogger,ProfilingLogger>();
             builder.Services.AddUnique<ITypeFinder>(typeFinder);
-
-            var typeLoader = CreateTypeLoader(typeFinder, webHostEnvironment, loggerFactory, profilingLogger, appCaches.RuntimeCache, configuration);
-            builder.TypeLoader = typeLoader;
-            builder.Services.AddUnique<TypeLoader>(typeLoader);
-
+            builder.Services.AddUnique<TypeLoader>(builder.TypeLoader);
             builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
 
             // after bootstrapping we let the container wire up for us.
@@ -110,8 +108,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
 
-            builder.Services.AddUnique<AppCaches>(appCaches);
-            builder.Services.AddUnique<IRequestCache>(appCaches.RequestCache);
             builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
             builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
@@ -125,8 +121,8 @@ namespace Umbraco.Extensions
                 var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
-                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>()
-                    ; var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
                 return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(builder.BuilderLoggerFactory.CreateLogger<SqlMainDomLock>(), builder.BuilderLoggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
@@ -328,14 +324,14 @@ namespace Umbraco.Extensions
             return webProfiler;
         }
 
-        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IConfiguration config)
+        internal static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IConfiguration config)
         {
             var profiler = GetWebProfiler(config);
 
             var typeFinderSettings = config.GetSection(Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
 
             var runtimeHashPaths = new RuntimeHashPaths().AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler), runtimeHashPaths);
 
             return new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
@@ -345,20 +341,22 @@ namespace Umbraco.Extensions
             );
         }
 
-        private static TypeLoader CreateTypeLoader(
-            ITypeFinder typeFinder,
+        internal static TypeLoader CreateTypeLoader(
+            Assembly entryAssembly,
             IWebHostEnvironment webHostEnvironment,
             ILoggerFactory loggerFactory,
-            IProfilingLogger profilingLogger,
-            IAppPolicyCache runtimeCache,
+            AppCaches appCaches,
             IConfiguration configuration)
         {
+            var typeFinder = CreateTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, configuration);
             var hostingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
             var hostingEnvironment = new AspNetCoreHostingEnvironmentWithoutOptionsMonitor(hostingSettings, webHostEnvironment);
 
+            var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), GetWebProfiler(configuration));
+
             return new TypeLoader(
                 typeFinder,
-                runtimeCache,
+                appCaches.RuntimeCache,
                 new DirectoryInfo(hostingEnvironment.LocalTempPath),
                 loggerFactory.CreateLogger<TypeLoader>(),
                 profilingLogger

@@ -48,8 +48,8 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+
 
             services.AddUnique<ILogger>(_ => Mock.Of<ILogger>());
             services.AddUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);

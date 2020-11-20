@@ -37,8 +37,7 @@ namespace Umbraco.Tests.Published
            // Current.Reset();
             var register = TestHelper.GetRegister();
 
-            var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()

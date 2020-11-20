@@ -25,8 +25,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         {
             var container = TestHelper.GetServiceCollection();
 
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+ 
 
             var expectedPackageActions = TypeLoader.GetPackageActions();
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()

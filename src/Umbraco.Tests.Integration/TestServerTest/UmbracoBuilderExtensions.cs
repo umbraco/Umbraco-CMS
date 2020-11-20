@@ -20,9 +20,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
             builder.AddUmbracoCore(
                 testHelper.GetWebHostEnvironment(),
                 typeof(UmbracoBuilderExtensions).Assembly,
-                AppCaches.NoCache, // Disable caches in integration tests
                 testHelper.GetLoggingConfiguration(),
                 builder.Config);
+
+            builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
 
             builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique<IMainDom>(testHelper.MainDom);

@@ -128,7 +128,6 @@ namespace Umbraco.Tests.Integration.Testing
             catch
             {
                 // ignored
-                Debugger.Break();
             }
 
             return NullLoggerFactory.Instance;
@@ -175,15 +174,20 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
 
-            var builder = new UmbracoBuilder(services, Configuration);
+            var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly, webHostEnvironment, TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration);
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
+
+          
             builder.AddConfiguration()
                 .AddUmbracoCore(
                     webHostEnvironment,
                     GetType().Assembly,
-                    GetAppCaches(),
                     TestHelper.GetLoggingConfiguration(),
                     Configuration
                 );
+
+            builder.Services.AddUnique<AppCaches>(GetAppCaches());
+
 
             builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);

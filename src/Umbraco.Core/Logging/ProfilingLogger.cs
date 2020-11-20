@@ -23,6 +23,9 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfilingLogger"/> class.
         /// </summary>
+        public ProfilingLogger(ILogger<ProfilingLogger> logger, IProfiler profiler) : this(logger as ILogger, profiler)
+        { }
+
         public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));

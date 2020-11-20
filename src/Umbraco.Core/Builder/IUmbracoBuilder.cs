@@ -9,7 +9,7 @@ namespace Umbraco.Core.Builder
     {
         IServiceCollection Services { get; }
         IConfiguration Config { get; }
-        TypeLoader TypeLoader { get; set; } // TODO: Remove setter, see note on concrete
+        TypeLoader TypeLoader { get; }
         ILoggerFactory BuilderLoggerFactory { get; }
         TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder, new();
         void Build();

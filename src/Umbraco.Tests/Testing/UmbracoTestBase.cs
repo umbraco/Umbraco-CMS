@@ -207,11 +207,7 @@ namespace Umbraco.Tests.Testing
 
             var services = TestHelper.GetRegister();
 
-
-            Builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>())
-            {
-                TypeLoader = typeLoader
-            };
+            Builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             //TestHelper.GetConfigs().RegisterWith(register);
             services.AddUnique(typeof(ILoggerFactory), loggerFactory);

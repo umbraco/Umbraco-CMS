@@ -34,9 +34,8 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new UmbracoBuilder(_register, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
-
+            var composition = new UmbracoBuilder(_register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+  
             composition.Services.AddTransient(_ => Mock.Of<IDataTypeService>());
             composition.Services.AddTransient<ILoggerFactory, NullLoggerFactory>();
             composition.Services.AddTransient(typeof(ILogger<>), typeof(Logger<>));

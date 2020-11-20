@@ -25,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void Setup()
         {
             var register = TestHelper.GetServiceCollection();
-            _composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>());
+            _composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
         }
 
         [TearDown]

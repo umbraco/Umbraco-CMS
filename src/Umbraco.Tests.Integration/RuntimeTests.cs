@@ -61,10 +61,13 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                  
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
+                    var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly, webHostEnvironment,
+                        testHelper.ConsoleLoggerFactory, AppCaches.NoCache, hostContext.Configuration);
+
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,  testHelper.ConsoleLoggerFactory);
+                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration();
-                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
+                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -99,12 +102,17 @@ namespace Umbraco.Tests.Integration
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
-
+                    
                     // Add it!
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
 
+                    var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly,
+                        webHostEnvironment, testHelper.ConsoleLoggerFactory, AppCaches.NoCache,
+                        hostContext.Configuration);
+
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
+                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration()
-                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration)
+                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly,  testHelper.GetLoggingConfiguration(), hostContext.Configuration)
                           .Build();
 
                     services.AddRouting(); // LinkGenerator

@@ -31,8 +31,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void LazyCollectionBuilderHandlesTypes()
         {
             var container = CreateRegister();
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -58,8 +58,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void LazyCollectionBuilderHandlesProducers()
         {
             var container = CreateRegister();
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
@@ -84,8 +84,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
             var container = CreateRegister();
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -111,8 +111,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
             var container = CreateRegister();
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -134,8 +133,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void LazyCollectionBuilderCanExcludeTypes()
         {
             var container = CreateRegister();
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()

@@ -34,8 +34,8 @@ namespace Umbraco.Tests.TestHelpers
             var container = TestHelper.GetServiceCollection();
             var typeLoader = TestHelper.GetMockedTypeLoader();
 
-            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+    
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();

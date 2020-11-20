@@ -37,7 +37,8 @@ namespace Umbraco.Web.Common.Builder
             IWebHostEnvironment webHostEnvironment,
             IConfiguration config,
             ILoggingConfiguration loggingConfig = null,
-            ILoggerFactory loggerFactory = null)
+            ILoggerFactory loggerFactory = null,
+            Assembly assembly = null)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (config is null) throw new ArgumentNullException(nameof(config));
@@ -47,10 +48,22 @@ namespace Umbraco.Web.Common.Builder
             loggingConfig ??= new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
             services.AddLogger(loggingConfig, config);
             loggerFactory ??= LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+            assembly ??= Assembly.GetEntryAssembly();
 
-        
+            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
 
-            return new UmbracoBuilder(services, config, loggerFactory);
+            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var appCaches = new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                requestCache,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+
+            services.AddUnique<AppCaches>(appCaches);
+
+            var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(assembly, webHostEnvironment, loggerFactory, appCaches, config);
+
+            return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
 
         public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
@@ -92,19 +105,11 @@ namespace Umbraco.Web.Common.Builder
         {
             var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
-            IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
-            builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
-            builder.Services.AddSingleton<ILoggingConfiguration>(loggingConfig);
 
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
-            var appCaches = new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache()),
-                requestCache,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+            builder.Services.AddSingleton<ILoggingConfiguration>(loggingConfig);
 
             builder.AddUmbracoCore(webHostEnvironment,
                 Assembly.GetEntryAssembly(),
-                appCaches,
                 loggingConfig,
                 builder.Config);
 

@@ -40,8 +40,7 @@ namespace Umbraco.Tests.Scoping
 
             var services =  TestHelper.GetRegister();
 
-            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>());
-            composition.TypeLoader = TestHelper.GetMockedTypeLoader();
+            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             _testObjects = new TestObjects(services);
 
