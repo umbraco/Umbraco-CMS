@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="CodeAnalysis.Tests" ToolsVersion="15.0">
+  <!--Inherit basic rules-->
+  <Include Path="codeanalysis.ruleset" Action="Default" />
+
+  <!--Additional rules-->
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+
+    <!--XML comment analysis is disabled due to project configuration-->
+    <Rule Id="SA0001" Action="None" />
+
+    <!--Parameter must follow comma.-->
+    <Rule Id="SA1115" Action="None" />
+
+    <!--A field should not follow a method-->
+    <Rule Id="SA1201" Action="None" />
+
+    <!--Elements must be ordered by access-->
+    <Rule Id="SA1202" Action="None" />
+
+    <!--Constants must appear before fields-->
+    <Rule Id="SA1203" Action="None" />
+
+    <!--Static members should appear before non-static members-->
+    <Rule Id="SA1204" Action="None" />
+
+    <!--Field names must not contain underscore-->
+    <Rule Id="SA1310" Action="None" />
+
+    <!--Field should be private-->
+    <Rule Id="SA1401" Action="None" />
+
+    <!--Elements should be documented.-->
+    <Rule Id="SA1600" Action="None" />
+
+    <!--Partial elements should be documented.-->
+    <Rule Id="SA1601" Action="None" />
+
+    <!--Enumeration items should be documented.-->
+    <Rule Id="SA1602" Action="None" />
+
+    <!--Constructor is missing documentation for one or more of its parameters.-->
+    <Rule Id="SA1611" Action="None" />
+
+    <!--A generic C# element is missing documentation for one or more of its generic type parameters..-->
+    <Rule Id="SA1618" Action="None" />
+
+    <!--The XML documentation header for a C# constructor does not contain the appropriate summary text.-->
+    <Rule Id="SA1642" Action="None" />
+  </Rules>
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+
+      <!--Missing XML comment for publicly visible type or member-->
+    <Rule Id="CS1591" Action="None" />
+  </Rules>
+</RuleSet>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="CodeAnalysis" ToolsVersion="15.0">
+  <Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp">
+
+    <!--Call 'ConfigureAwait(false)'-->
+    <Rule Id="RCS1090" Action="None" />
+  </Rules>
+
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+
+    <!--Using directive should appear within a namespace declaration-->
+    <Rule Id="SA1200" Action="None" />
+
+    <!--A C# code file contains more than one unique type.-->
+    <Rule Id="SA1402" Action="None" />
+
+    <!--The last statement in a multi-line C# initializer or list is missing a trailing comma.-->
+    <Rule Id="SA1413" Action="None" />
+
+    <!--Comments should end with a period.-->
+    <Rule Id="SA1629" Action="None" />
+
+    <!--A C# code file is missing a standard file header.-->
+    <Rule Id="SA1633" Action="Warning" />
+  </Rules>
+</RuleSet>

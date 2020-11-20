@@ -5,10 +5,14 @@ VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
+		..\linting\.editorconfig = ..\linting\.editorconfig
 		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
 		..\build\build.ps1 = ..\build\build.ps1
 		..\NuGet.Config = ..\NuGet.Config
 		SolutionInfo.cs = SolutionInfo.cs
+		..\linting\stylecop.json = ..\linting\stylecop.json
+		..\linting\codeanalysis.ruleset = ..\linting\codeanalysis.ruleset
+		..\linting\codeanalysis.tests.ruleset = ..\linting\codeanalysis.tests.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
