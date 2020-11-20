@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersAuthorizeRequirement requirement)
         {
-            var isAuth = IsAuthorized(context, requirement);
+            var isAuth = IsAuthorized(requirement);
             if (!isAuth.HasValue || isAuth.Value)
             {
                 context.Succeed(requirement);
@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             return Task.CompletedTask;
         }
 
-        private bool? IsAuthorized(AuthorizationHandlerContext context, AdminUsersAuthorizeRequirement requirement)
+        private bool? IsAuthorized(AdminUsersAuthorizeRequirement requirement)
         {
             int[] userIds;
 

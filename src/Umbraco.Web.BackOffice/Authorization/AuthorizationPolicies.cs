@@ -5,6 +5,7 @@
     /// </summary>
     public static class AuthorizationPolicies
     {
+        public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
         public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
         public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
 

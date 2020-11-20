@@ -166,7 +166,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Return a user group
         /// </summary>
         /// <returns></returns>
-        [UserGroupAuthorization("id")]
+        [Authorize(Policy = AuthorizationPolicies.UserBelongsToUserGroupInRequest)]
         public ActionResult<UserGroupDisplay> GetUserGroup(int id)
         {
             var found = _userService.GetUserGroupById(id);
@@ -180,7 +180,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [HttpPost]
         [HttpDelete]
-        [UserGroupAuthorization("userGroupIds")]
+        [Authorize(Policy = AuthorizationPolicies.UserBelongsToUserGroupInRequest)]
         public IActionResult PostDeleteUserGroups([FromQuery] int[] userGroupIds)
         {
             var userGroups = _userService.GetAllUserGroups(userGroupIds)

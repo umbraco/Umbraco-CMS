@@ -124,6 +124,7 @@ namespace Umbraco.Extensions
             services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
             services.AddSingleton<IAuthorizationHandler, UmbracoSectionAuthorizeHandler>();
             services.AddSingleton<IAuthorizationHandler, AdminUsersAuthorizeHandler>();
+            services.AddSingleton<IAuthorizationHandler, UserGroupAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, DenyLocalLoginAuthorizeHandler>();
 
             services.AddAuthorization(options =>
@@ -132,6 +133,12 @@ namespace Umbraco.Extensions
                 {
                     policy.Requirements.Add(new AdminUsersAuthorizeRequirement());
                     policy.Requirements.Add(new AdminUsersAuthorizeRequirement("userIds"));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.UserBelongsToUserGroupInRequest, policy =>
+                {
+                    policy.Requirements.Add(new UserGroupAuthorizeRequirement());
+                    policy.Requirements.Add(new UserGroupAuthorizeRequirement("userGroupIds"));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, policy =>
