@@ -159,7 +159,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static IProfilingLogger GetMockProfilingLogger()
         {
-            return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+            return new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
         }
 
         public static UmbracoContentIndex GetUmbracoIndexer(

@@ -52,7 +52,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             mock.Setup(x => x.GetService(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
             mock.Setup(x => x.GetService(typeof(ILoggerFactory))).Returns(loggerFactory);
-            mock.Setup(x => x.GetService(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetService(typeof (IProfilingLogger))).Returns(new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetService(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetService(typeof (IScopeProvider))).Returns(p);
 
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
-                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
                     if (type == typeof(ILogger<ComponentCollection>)) return Mock.Of<ILogger<ComponentCollection>>();
                     throw new NotSupportedException(type.FullName);
                 });
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
                     if (type == typeof(Composer5a)) return new Composer5a();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(Component5a)) return new Component5a();
-                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
                     if (type == typeof(ILogger<ComponentCollection>)) return Mock.Of<ILogger<ComponentCollection>>();
                     throw new NotSupportedException(type.FullName);
                 });

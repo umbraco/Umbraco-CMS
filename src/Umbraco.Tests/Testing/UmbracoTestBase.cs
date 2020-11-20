@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Testing
             _loggerFactory = loggerFactory;
             var profiler = new LogProfiler(loggerFactory.CreateLogger<LogProfiler>());
             var msLogger = loggerFactory.CreateLogger("msLogger");
-            var proflogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
+            var proflogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler);
             IOHelper = TestHelper.IOHelper;
 
             TypeFinder = new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Testing
 
             var services = TestHelper.GetRegister();
 
-            Builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+            Builder = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), typeLoader);
 
             //TestHelper.GetConfigs().RegisterWith(register);
             services.AddUnique(typeof(ILoggerFactory), loggerFactory);

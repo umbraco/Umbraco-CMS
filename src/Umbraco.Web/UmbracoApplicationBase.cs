@@ -113,7 +113,7 @@ namespace Umbraco.Web
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/App_Code")));
             // global.asax (the app domain also monitors this, if it changes will do a full restart)
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/global.asax")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(_loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(_loggerFactory.CreateLogger<ProfilingLogger>(), profiler), runtimeHashPaths);
             return new TypeFinder(_loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website
                 // in that case is essentially an exe. However in netframework there is no entry assembly, things don't really work that way since
