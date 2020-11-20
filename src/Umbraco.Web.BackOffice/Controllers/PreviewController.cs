@@ -64,6 +64,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             _viewEngines = viewEngines;
         }
 
+        // TODO: This should really be refactored. Redirection/Challenge is part of Authentication, not part of authorization directly
+        // We only use this redirectToUmbracoLogin flag in this one instance. I think this
+        // should be handled as part of the preview authentication process instead. 
         [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
         [DisableBrowserCache]
         public ActionResult Index()
