@@ -24,7 +24,7 @@
         controller: umbVariantContentController
     };
     
-    function umbVariantContentController($scope) {
+    function umbVariantContentController($scope, contentAppHelper) {
 
         var unsubscribe = [];
 
@@ -107,7 +107,7 @@
         function onAppChanged(activeApp) {
 
             // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = (activeApp && activeApp.alias !== "umbContent" && activeApp.alias !== "umbInfo" && activeApp.alias !== "umbListView");
+            vm.nameDisabled = (activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp));
 
         }
 
