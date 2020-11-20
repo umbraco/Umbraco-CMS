@@ -20,6 +20,8 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -28,7 +30,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [ValidationFilter]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
-    [UmbracoBackOfficeAuthorize]
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     public class DashboardController : UmbracoApiController
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

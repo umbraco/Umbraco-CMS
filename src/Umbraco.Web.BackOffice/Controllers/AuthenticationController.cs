@@ -110,8 +110,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
-        /// <returns></returns>
-        [UmbracoBackOfficeAuthorize]
+        /// <returns></returns>        
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
             return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -157,7 +157,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _umbracoMapper.Map<UserDisplay>(user);
         }
 
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [ValidateAngularAntiForgeryToken]
         public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
@@ -242,7 +242,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
         /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
         /// </remarks>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [SetAngularAntiForgeryTokens]
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
@@ -264,7 +264,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
         /// </remarks>
-        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [SetAngularAntiForgeryTokens]
         [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public ActionResult<UserDetail> GetCurrentInvitedUser()

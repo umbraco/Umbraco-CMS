@@ -25,6 +25,8 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -66,8 +68,10 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         // TODO: This should really be refactored. Redirection/Challenge is part of Authentication, not part of authorization directly
         // We only use this redirectToUmbracoLogin flag in this one instance. I think this
-        // should be handled as part of the preview authentication process instead. 
-        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
+        // should be handled as part of the preview authentication process instead.
+        // I'm actually not even sure this is required? Wouldn't we automatically redirect to the umbraco login screen anyway here?
+        //[UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [DisableBrowserCache]
         public ActionResult Index()
         {
@@ -110,7 +114,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The endpoint that is loaded within the preview iframe
         /// </summary>
         /// <returns></returns>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public ActionResult Frame(int id, string culture)
         {
             EnterPreview(id);

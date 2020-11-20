@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
 
@@ -16,7 +18,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
-    [UmbracoBackOfficeAuthorize]
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     [DisableBrowserCache]
     [RequireHttps]
     [CheckIfUserTicketDataIsStale]

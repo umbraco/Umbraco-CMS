@@ -120,6 +120,7 @@ namespace Umbraco.Extensions
             // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
             // any auth defining a matching requirement and scheme. 
 
+            services.AddSingleton<IAuthorizationHandler, BackOfficeAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, UmbracoTreeAuthorizeHandler>();
             services.AddSingleton<IAuthorizationHandler, UmbracoSectionAuthorizeHandler>();
             services.AddSingleton<IAuthorizationHandler, AdminUsersAuthorizeHandler>();
@@ -128,6 +129,18 @@ namespace Umbraco.Extensions
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
+                    policy.Requirements.Add(new BackOfficeAuthorizeRequirement());
+                });
+
+                options.AddPolicy(AuthorizationPolicies.BackOfficeAccessWithoutApproval, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
+                    policy.Requirements.Add(new BackOfficeAuthorizeRequirement(false));
+                });
+
                 options.AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);

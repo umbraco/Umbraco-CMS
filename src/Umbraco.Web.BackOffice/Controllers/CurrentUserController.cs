@@ -27,6 +27,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -170,7 +172,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This only works when the user is logged in (partially)
         /// </remarks>
-        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval : true)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
@@ -236,7 +238,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             throw HttpResponseException.CreateValidationErrorResponse(ModelState);
         }
 
-        [UmbracoBackOfficeAuthorize]
+        // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {

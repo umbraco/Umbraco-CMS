@@ -7,6 +7,8 @@
     {
         public const string UmbracoFeatureEnabled = nameof(UmbracoFeatureEnabled);
 
+        public const string BackOfficeAccess = nameof(BackOfficeAccess);
+        public const string BackOfficeAccessWithoutApproval = nameof(BackOfficeAccessWithoutApproval);
         public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
         public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
         public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
