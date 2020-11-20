@@ -8,10 +8,12 @@ namespace Umbraco.Web.Common.Filters
 {
 
     /// <summary>
-    /// Ensures authorization is successful for a back office user.
+    /// Ensures authorization is successful for a front-end member
     /// </summary>
     public class UmbracoMemberAuthorizeFilter : IAuthorizationFilter
     {
+        // TODO: Lets revisit this when we get members done and the front-end working and whether it can be replaced or moved to an authz policy
+
         /// <summary>
         /// Comma delimited list of allowed member types
         /// </summary>
