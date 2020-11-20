@@ -20,7 +20,6 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

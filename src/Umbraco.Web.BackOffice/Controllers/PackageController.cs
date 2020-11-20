@@ -13,9 +13,9 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Security;
 

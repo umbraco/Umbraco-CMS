@@ -19,8 +19,8 @@ using Umbraco.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

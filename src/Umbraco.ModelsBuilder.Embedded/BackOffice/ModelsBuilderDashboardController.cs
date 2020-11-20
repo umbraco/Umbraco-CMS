@@ -8,9 +8,9 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {

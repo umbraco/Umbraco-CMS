@@ -38,7 +38,7 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.Mapping;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

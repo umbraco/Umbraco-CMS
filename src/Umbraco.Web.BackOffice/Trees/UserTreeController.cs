@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;

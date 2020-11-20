@@ -23,7 +23,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

@@ -1,10 +1,12 @@
-﻿namespace Umbraco.Web.BackOffice.Authorization
+﻿namespace Umbraco.Web.Common.Authorization
 {
     /// <summary>
     /// A list of authorization policy names for use in the back office
     /// </summary>
     public static class AuthorizationPolicies
     {
+        public const string UmbracoFeatureEnabled = nameof(UmbracoFeatureEnabled);
+
         public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
         public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
         public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
@@ -25,7 +27,7 @@
         public const string SectionAccessForMemberTree = nameof(SectionAccessForMemberTree);
         public const string SectionAccessForMediaTree = nameof(SectionAccessForMediaTree);
         public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
-        public const string SectionAccessForDataTypeReading = nameof(SectionAccessForDataTypeReading);       
+        public const string SectionAccessForDataTypeReading = nameof(SectionAccessForDataTypeReading);
 
         // Single tree access
 

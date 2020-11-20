@@ -42,8 +42,8 @@ using Task = System.Threading.Tasks.Task;
 using Umbraco.Net;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Security;
-using Umbraco.Web.BackOffice.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

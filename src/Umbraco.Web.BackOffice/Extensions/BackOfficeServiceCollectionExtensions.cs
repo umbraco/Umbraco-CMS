@@ -14,6 +14,7 @@ using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
@@ -45,6 +46,7 @@ namespace Umbraco.Extensions
 
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
 
+            services.AddUmbracoCommonAuthorizationPolicies();
             services.AddBackOfficeAuthorizationPolicies();
         }
 

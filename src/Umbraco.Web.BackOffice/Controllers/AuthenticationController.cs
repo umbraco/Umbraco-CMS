@@ -31,7 +31,7 @@ using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

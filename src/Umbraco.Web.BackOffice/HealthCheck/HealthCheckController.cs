@@ -10,8 +10,8 @@ using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Microsoft.Extensions.Logging;
-using Umbraco.Web.BackOffice.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.HealthCheck
 {
