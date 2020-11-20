@@ -5,6 +5,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -17,11 +18,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// <returns></returns>
         public static IUmbracoBuilder AddTestCore(this IUmbracoBuilder builder, TestHelper testHelper)
         {
-            builder.AddUmbracoCore(
-                testHelper.GetWebHostEnvironment(),
-                typeof(UmbracoBuilderExtensions).Assembly,
-                testHelper.GetLoggingConfiguration(),
-                builder.Config);
+            builder.AddUmbracoCore();
 
             builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
 

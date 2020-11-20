@@ -61,13 +61,13 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly, webHostEnvironment,
+                    var typeLoader = services.AddTypeLoader(GetType().Assembly, webHostEnvironment,
                         testHelper.ConsoleLoggerFactory, AppCaches.NoCache, hostContext.Configuration);
 
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,  testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration();
-                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
+                    builder.AddUmbracoCore();
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -105,14 +105,14 @@ namespace Umbraco.Tests.Integration
                     
                     // Add it!
 
-                    var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly,
+                    var typeLoader = services.AddTypeLoader(GetType().Assembly,
                         webHostEnvironment, testHelper.ConsoleLoggerFactory, AppCaches.NoCache,
                         hostContext.Configuration);
 
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration()
-                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly,  testHelper.GetLoggingConfiguration(), hostContext.Configuration)
+                          .AddUmbracoCore()
                           .Build();
 
                     services.AddRouting(); // LinkGenerator

@@ -174,17 +174,14 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
 
-            var typeLoader = UmbracoCoreServiceCollectionExtensions.CreateTypeLoader(GetType().Assembly, webHostEnvironment, TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration);
+            var typeLoader = services.AddTypeLoader(GetType().Assembly, webHostEnvironment, TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
 
-          
+
+            builder.Services.AddLogger(TestHelper.GetLoggingConfiguration(), Configuration);
+
             builder.AddConfiguration()
-                .AddUmbracoCore(
-                    webHostEnvironment,
-                    GetType().Assembly,
-                    TestHelper.GetLoggingConfiguration(),
-                    Configuration
-                );
+                .AddUmbracoCore();
 
             builder.Services.AddUnique<AppCaches>(GetAppCaches());
 

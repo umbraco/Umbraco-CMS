@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Builder;
@@ -11,11 +10,11 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder AddAllBackOfficeComponents(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment)
+        public static IUmbracoBuilder AddAllBackOfficeComponents(this IUmbracoBuilder builder)
         {
             return builder
                 .AddConfiguration()
-                .AddCore(webHostEnvironment)
+                .AddUmbracoCore()
                 .AddWebComponents()
                 .AddRuntimeMinifier()
                 .AddBackOffice()

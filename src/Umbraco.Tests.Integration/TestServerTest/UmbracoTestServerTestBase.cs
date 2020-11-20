@@ -130,9 +130,12 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration, assembly: GetType().Assembly);
+            var typeLoader = services.AddTypeLoader(GetType().Assembly, TestHelper.GetWebHostEnvironment(),
+                TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration);
+
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader);
     
-            umbracoBuilder
+            builder
                 .AddConfiguration()
                 .AddTestCore(TestHelper) // This is the important one!
                 .AddWebComponents()
