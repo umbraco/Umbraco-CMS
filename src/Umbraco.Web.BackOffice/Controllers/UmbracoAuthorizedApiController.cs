@@ -18,7 +18,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoUserTimeoutFilter]
     [UmbracoBackOfficeAuthorize]
     [DisableBrowserCache]
-    [UmbracoWebApiRequireHttps]
+    [RequireHttps]
     [CheckIfUserTicketDataIsStale]
     [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
