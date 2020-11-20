@@ -37,8 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
-		..\build\NuSpecs\UmbracoCms.SqlCe.nuspec = ..\build\NuSpecs\UmbracoCms.SqlCe.nuspec
 		..\build\NuSpecs\UmbracoCms.Web.nuspec = ..\build\NuSpecs\UmbracoCms.Web.nuspec
+		..\build\NuSpecs\UmbracoCms.SqlCe.nuspec = ..\build\NuSpecs\UmbracoCms.SqlCe.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -66,8 +66,11 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+								UseIISExpress = "true"
+								TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_58896"
+		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
@@ -75,6 +78,9 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_58896"
+		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
 		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
@@ -82,9 +88,11 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+								DefaultWebSiteLanguage = "Visual C#"
+								StartServerOnDebug = "false"
+		VWDPort = "58896"
+		VWDPort = "62926"
 		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
-		DefaultWebSiteLanguage = "Visual C#"
-		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
@@ -103,10 +111,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\build\Umbraco.Cms.props = ..\build\NuSpecs\build\Umbraco.Cms.props
-		..\build\NuSpecs\build\Umbraco.Cms.targets = ..\build\NuSpecs\build\Umbraco.Cms.targets
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	..\build\NuSpecs\build\Umbraco.Cms.props = ..\build\NuSpecs\build\Umbraco.Cms.props
+	..\build\NuSpecs\build\Umbraco.Cms.targets = ..\build\NuSpecs\build\Umbraco.Cms.targets
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
 	ProjectSection(SolutionItems) = preProject
@@ -129,7 +137,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
 EndProject
