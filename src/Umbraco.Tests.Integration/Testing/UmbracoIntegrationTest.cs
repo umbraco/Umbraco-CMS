@@ -162,111 +162,7 @@ namespace Umbraco.Tests.Integration.Testing
                 });
             return hostBuilder;
         }
-
-        /// <summary>
-        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
-        /// </summary>
-        /// <param name="connectionStrings"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="profiler"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="backOfficeInfo"></param>
-        /// <param name="typeFinder"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="dbProviderFactoryCreator"></param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
-        public void ConfigureSomeMorebitsForTests(
-            IUmbracoBuilder builder,
-            GlobalSettings globalSettings,
-            ConnectionStrings connectionStrings,
-            IUmbracoVersion umbracoVersion,
-            IIOHelper ioHelper,
-            IProfiler profiler,
-            Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ITypeFinder typeFinder,
-            AppCaches appCaches,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
-        {
-            ConfigureSomeMorebitsForTests(
-                builder,
-                globalSettings,
-                connectionStrings,
-                umbracoVersion,
-                ioHelper,
-                profiler,
-                hostingEnvironment,
-                typeFinder,
-                appCaches,
-                dbProviderFactoryCreator,
-                TestHelper.MainDom // SimpleMainDom
-            );
-        }
-
-        /// <summary>
-        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
-        /// </summary>
-        /// <param name="connectionStrings"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="profiler"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="backOfficeInfo"></param>
-        /// <param name="typeFinder"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="dbProviderFactoryCreator"></param>
-        /// <param name="mainDom"></param>
-        /// <param name="eventHandler">The event handler used for DB installation</param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
-        public static void ConfigureSomeMorebitsForTests(
-            IUmbracoBuilder builder,
-            GlobalSettings globalSettings,
-            ConnectionStrings connectionStrings,
-            IUmbracoVersion umbracoVersion,
-            IIOHelper ioHelper,
-            IProfiler profiler,
-            Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ITypeFinder typeFinder,
-            AppCaches appCaches,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IMainDom mainDom)
-        {
-            // TODO: Don't do this, UmbracoBuilder ctor should handle it...
-            builder.TypeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache,
-                new DirectoryInfo(hostingEnvironment.LocalTempPath),
-                builder.BuilderLoggerFactory.CreateLogger<TypeLoader>(),
-                new ProfilingLogger(builder.BuilderLoggerFactory.CreateLogger<ProfilingLogger>(),profiler) );
-
-            var logger = builder.BuilderLoggerFactory.CreateLogger<object>();
-            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
-            builder.Services.AddUnique<IProfiler>(profiler);
-            builder.Services.AddUnique<IProfilingLogger>(new ProfilingLogger(logger, profiler));
-            builder.Services.AddUnique<IMainDom>(mainDom);
-            builder.Services.AddUnique<AppCaches>(appCaches);
-            builder.Services.AddUnique<IRequestCache>(appCaches.RequestCache);
-            builder.Services.AddUnique<TypeLoader>(builder.TypeLoader);
-            builder.Services.AddUnique<ITypeFinder>(typeFinder);
-            builder.Services.AddUnique<IIOHelper>(ioHelper);
-            builder.Services.AddUnique<IUmbracoVersion>(umbracoVersion);
-            builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
-            builder.Services.AddUnique<Core.Hosting.IHostingEnvironment>(hostingEnvironment);
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
-
-            // after bootstrapping we let the container wire up for us.
-            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
-
-            // re-create the state object with the essential services
-            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
-        }
-
+        
         #endregion
 
         #region IStartup
@@ -286,9 +182,11 @@ namespace Umbraco.Tests.Integration.Testing
                     GetType().Assembly,
                     GetAppCaches(),
                     TestHelper.GetLoggingConfiguration(),
-                    Configuration,
-                    ConfigureSomeMorebitsForTests
+                    Configuration
                 );
+
+            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
+            builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
 
             services.AddSignalR();
 

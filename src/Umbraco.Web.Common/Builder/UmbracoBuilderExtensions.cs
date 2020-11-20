@@ -18,6 +18,7 @@ using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.Logging;
@@ -46,6 +47,8 @@ namespace Umbraco.Web.Common.Builder
             loggingConfig ??= new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
             services.AddLogger(loggingConfig, config);
             loggerFactory ??= LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+
+        
 
             return new UmbracoBuilder(services, config, loggerFactory);
         }
@@ -103,8 +106,7 @@ namespace Umbraco.Web.Common.Builder
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
-                builder.Config,
-                UmbracoCoreServiceCollectionExtensions.ConfigureSomeMorebits);
+                builder.Config);
 
             return builder;
         }

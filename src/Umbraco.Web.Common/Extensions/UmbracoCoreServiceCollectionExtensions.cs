@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -46,18 +48,14 @@ namespace Umbraco.Extensions
         /// <param name="appCaches"></param>
         /// <param name="loggingConfiguration"></param>
         /// <param name="configuration"></param>
-        /// <param name="configureSomeMoreBits">Weird hack for tests, won't exist much longer</param>
         /// <returns></returns>
-        /// <remarks>Shouldn't exist</remarks>
         public static IUmbracoBuilder AddUmbracoCore(
             this IUmbracoBuilder builder,
             IWebHostEnvironment webHostEnvironment,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            //TODO: Yep that's extremely ugly
-            Action<IUmbracoBuilder, GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper,  IProfiler, IHostingEnvironment, ITypeFinder, AppCaches, IDbProviderFactoryCreator> configureSomeMoreBits)
+            IConfiguration configuration)
         {
             if (builder is null) throw new ArgumentNullException(nameof(builder));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
@@ -88,38 +86,70 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
 
-            // TODO: We should not be doing this at all.
-            var serviceProvider = builder.Services.BuildServiceProvider();
+            builder.Services.AddUnique<IIOHelper, IOHelper>();
+            builder.Services.AddLogger(loggingConfiguration, configuration); // TODO: remove this line
+            var loggerFactory = builder.BuilderLoggerFactory;
 
-            // Switching to IOptions vs IOptionsMonitor was rejected previously as it prevents setting IsDebug true without a restart
-            var hostingSettings = serviceProvider.GetService<IOptionsMonitor<HostingSettings>>();  // <--- We are now building ServiceProvider just for this line
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
-            var ioHelper = new IOHelper(hostingEnvironment);
-            var profiler = GetWebProfiler(hostingEnvironment);
+            var profiler = GetWebProfiler(configuration);
+            builder.Services.AddUnique<IProfiler>(profiler);
+           
+            var profilingLogger = new ProfilingLogger(builder.BuilderLoggerFactory.CreateLogger<ProfilingLogger>(), profiler);
+            builder.Services.AddUnique<IProfilingLogger>(profilingLogger);
+
+            var typeFinder = CreateTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, builder.Config);
+            builder.Services.AddUnique<ITypeFinder>(typeFinder);
+
+            var typeLoader = CreateTypeLoader(typeFinder, webHostEnvironment, loggerFactory, profilingLogger, appCaches.RuntimeCache, configuration);
+            builder.TypeLoader = typeLoader;
+            builder.Services.AddUnique<TypeLoader>(typeLoader);
 
             builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
 
-            builder.Services.AddLogger(loggingConfiguration, configuration);
-            var loggerFactory = builder.BuilderLoggerFactory;
+            // after bootstrapping we let the container wire up for us.
+            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
 
-            var typeFinderSettings = builder.Config.GetSection(Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
-            var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, Options.Create(typeFinderSettings));
-            var globalSettings = builder.Config.GetSection(Core.Constants.Configuration.ConfigGlobal).Get<GlobalSettings>() ?? new GlobalSettings();
-            var connectionStrings = builder.Config.GetSection("ConnectionStrings").Get<ConnectionStrings>(opt => opt.BindNonPublicProperties = true) ?? new ConnectionStrings();
+            builder.Services.AddUnique<AppCaches>(appCaches);
+            builder.Services.AddUnique<IRequestCache>(appCaches.RequestCache);
+            builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
-            configureSomeMoreBits(
-                builder,
-                globalSettings,
-                connectionStrings,
-                new UmbracoVersion(),
-                ioHelper,
-                profiler,
-                hostingEnvironment,
-                typeFinder,
-                appCaches,
-                dbProviderFactoryCreator);
+            builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
+            builder.Services.AddUnique<IRuntime, CoreRuntime>();
+            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
+            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
+
+            builder.Services.AddUnique<IMainDomLock>(factory =>
+            {
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+
+                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>()
+                    ; var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
+                    ? (IMainDomLock)new SqlMainDomLock(builder.BuilderLoggerFactory.CreateLogger<SqlMainDomLock>(), builder.BuilderLoggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
+                    : new MainDomSemaphoreLock(builder.BuilderLoggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+            });
+
+            builder.Services.AddUnique<IMainDom, MainDom>();
+
+            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(new AspNetCoreBootPermissionsChecker());
 
             builder.AddComposers();
+
+            var exceptionLogger = builder.BuilderLoggerFactory.CreateLogger<object>();
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                msg += ".";
+                exceptionLogger.LogError(exception, msg);
+            };
 
             return builder;
         }
@@ -238,82 +268,6 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptions<TypeFinderSettings> typeFinderSettings)
-        {
-            var runtimeHashPaths = new RuntimeHashPaths();
-            runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
-            return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
-        }
-
-        internal static void ConfigureSomeMorebits(
-            IUmbracoBuilder builder,
-            GlobalSettings globalSettings,
-            ConnectionStrings connectionStrings,
-            IUmbracoVersion umbracoVersion,
-            IIOHelper ioHelper,
-            IProfiler profiler,
-            IHostingEnvironment hostingEnvironment,
-            ITypeFinder typeFinder,
-            AppCaches appCaches,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
-        {
-            // Determine if we should use the sql main dom or the default
-            var appSettingMainDomLock = globalSettings.MainDomLock;
-
-            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(builder.BuilderLoggerFactory.CreateLogger<SqlMainDomLock>(), builder.BuilderLoggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(builder.BuilderLoggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
-
-            var mainDom = new MainDom(builder.BuilderLoggerFactory.CreateLogger<MainDom>(), mainDomLock);
-
-
-            var logger = builder.BuilderLoggerFactory.CreateLogger<object>();
-            var profilingLogger = new ProfilingLogger(logger, profiler);
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
-
-            // application environment
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
-            {
-                var exception = (Exception)args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
-
-                var msg = "Unhandled exception in AppDomain";
-                if (isTerminating) msg += " (terminating)";
-                msg += ".";
-                logger.LogError(exception, msg);
-            };
-
-            // TODO: Don't do this, UmbracoBuilder ctor should handle it...
-            builder.TypeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache,
-                new DirectoryInfo(hostingEnvironment.LocalTempPath),
-                builder.BuilderLoggerFactory.CreateLogger<TypeLoader>(), profilingLogger);
-
-            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(new AspNetCoreBootPermissionsChecker());
-            builder.Services.AddUnique<IProfiler>(profiler);
-            builder.Services.AddUnique<IProfilingLogger>(profilingLogger);
-            builder.Services.AddUnique<IMainDom>(mainDom);
-            builder.Services.AddUnique<AppCaches>(appCaches);
-            builder.Services.AddUnique<IRequestCache>(appCaches.RequestCache);
-            builder.Services.AddUnique<TypeLoader>(builder.TypeLoader);
-            builder.Services.AddUnique<ITypeFinder>(typeFinder);
-            builder.Services.AddUnique<IIOHelper>(ioHelper);
-            builder.Services.AddUnique<IUmbracoVersion>(umbracoVersion);
-            builder.Services.AddUnique<IDbProviderFactoryCreator>(dbProviderFactoryCreator);
-            builder.Services.AddUnique<IHostingEnvironment>(hostingEnvironment);
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
-
-            // after bootstrapping we let the container wire up for us.
-            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.Services.AddUnique<IBulkSqlInsertProvider>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
-
-            // re-create the state object with the essential services
-            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
-        }
-
 
         /// <summary>
         /// Create and configure the logger
@@ -357,10 +311,11 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)
+        private static IProfiler GetWebProfiler(IConfiguration config)
         {
+            var isDebug = config.GetValue<bool>($"{Constants.Configuration.ConfigHosting}:Debug");
             // create and start asap to profile boot
-            if (!hostingEnvironment.IsDebugMode)
+            if (!isDebug)
             {
                 // should let it be null, that's how MiniProfiler is meant to work,
                 // but our own IProfiler expects an instance so let's get one
@@ -371,6 +326,43 @@ namespace Umbraco.Extensions
             webProfiler.StartBoot();
 
             return webProfiler;
+        }
+
+        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IConfiguration config)
+        {
+            var profiler = GetWebProfiler(config);
+
+            var typeFinderSettings = config.GetSection(Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
+
+            var runtimeHashPaths = new RuntimeHashPaths().AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+
+            return new TypeFinder(
+                loggerFactory.CreateLogger<TypeFinder>(),
+                new DefaultUmbracoAssemblyProvider(entryAssembly),
+                runtimeHash,
+                new TypeFinderConfig(Options.Create(typeFinderSettings))
+            );
+        }
+
+        private static TypeLoader CreateTypeLoader(
+            ITypeFinder typeFinder,
+            IWebHostEnvironment webHostEnvironment,
+            ILoggerFactory loggerFactory,
+            IProfilingLogger profilingLogger,
+            IAppPolicyCache runtimeCache,
+            IConfiguration configuration)
+        {
+            var hostingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
+            var hostingEnvironment = new AspNetCoreHostingEnvironmentWithoutOptionsMonitor(hostingSettings, webHostEnvironment);
+
+            return new TypeLoader(
+                typeFinder,
+                runtimeCache,
+                new DirectoryInfo(hostingEnvironment.LocalTempPath),
+                loggerFactory.CreateLogger<TypeLoader>(),
+                profilingLogger
+            );
         }
 
         private class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker

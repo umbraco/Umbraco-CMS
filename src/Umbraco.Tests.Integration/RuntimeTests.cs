@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Integration
                   
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
                     builder.AddConfiguration();
-                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.ConfigureSomeMorebits);
+                    builder.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Integration
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, testHelper.ConsoleLoggerFactory);
 
                     builder.AddConfiguration()
-                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration, UmbracoCoreServiceCollectionExtensions.ConfigureSomeMorebits)
+                          .AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration)
                           .Build();
 
                     services.AddRouting(); // LinkGenerator
