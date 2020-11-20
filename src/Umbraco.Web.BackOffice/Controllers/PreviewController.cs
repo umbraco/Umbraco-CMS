@@ -66,11 +66,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _viewEngines = viewEngines;
         }
 
-        // TODO: This should really be refactored. Redirection/Challenge is part of Authentication, not part of authorization directly
-        // We only use this redirectToUmbracoLogin flag in this one instance. I think this
-        // should be handled as part of the preview authentication process instead.
-        // I'm actually not even sure this is required? Wouldn't we automatically redirect to the umbraco login screen anyway here?
-        //[UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [DisableBrowserCache]
         public ActionResult Index()
