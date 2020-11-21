@@ -11,9 +11,9 @@ namespace Umbraco.Core.Composing
         where TComponent : IComponent
     {
         /// <inheritdoc />
-        public virtual void Compose(IUmbracoBuilder composition)
+        public virtual void Compose(IUmbracoBuilder builder)
         {
-            composition.Components().Append<TComponent>();
+            builder.Components().Append<TComponent>();
         }
 
         // note: thanks to this class, a component that does not compose anything can be

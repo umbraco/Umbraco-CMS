@@ -422,10 +422,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
 
         public class Composer5 : TestComposerBase
         {
-            public override void Compose(IUmbracoBuilder composition)
+            public override void Compose(IUmbracoBuilder builder)
             {
-                base.Compose(composition);
-                composition.Components().Append<Component5>();
+                base.Compose(builder);
+                builder.Components().Append<Component5>();
             }
         }
 
