@@ -2300,6 +2300,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="hasTranslation">Has translation</key>
       <key alias="noTranslation">Missing translation</key>
       <key alias="dictionaryListCaption">Dictionary items</key>
+      <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
