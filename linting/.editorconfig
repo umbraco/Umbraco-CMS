@@ -392,14 +392,22 @@ dotnet_naming_rule.type_parameter_rule.symbols              = type_parameter_gro
 dotnet_naming_rule.type_parameter_rule.style                = prefix_type_parameters_with_t_style
 dotnet_naming_rule.type_parameter_rule.severity             = warning
 
-# Internal and private fields use camelCase and are prefixed with  '_'
-dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
-dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
-dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
-dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
-dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
-dotnet_naming_style.camel_case_underscore_style.required_prefix = _
-dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+# Static fields are camelCase and start with s_
+dotnet_naming_symbols.static_fields.applicable_kinds = field
+dotnet_naming_symbols.static_fields.required_modifiers = static
+dotnet_naming_style.static_field_style.capitalization = camel_case
+dotnet_naming_style.static_field_style.required_prefix = s_
+dotnet_naming_rule.static_fields_should_be_camel_case.style = static_field_style
+dotnet_naming_rule.static_fields_should_be_camel_case.symbols = static_fields
+dotnet_naming_rule.static_fields_should_be_camel_case.severity = warning
+
+# Instance fields use camelCase and are prefixed with  '_'
+dotnet_naming_symbols.instance_fields.applicable_kinds = field
+dotnet_naming_style.instance_field_style.capitalization = camel_case
+dotnet_naming_style.instance_field_style.required_prefix = _
+dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
+dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
+dotnet_naming_rule.instance_fields_should_be_camel_case.severity = warning
 
 # Function parameters use camelCase
 # https://docs.microsoft.com/dotnet/standard/design-guidelines/naming-parameters

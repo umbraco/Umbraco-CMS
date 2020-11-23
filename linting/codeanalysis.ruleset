@@ -17,6 +17,9 @@
     <!--Field names must not begin with underscore-->
     <Rule Id="SA1309" Action="None" />
 
+    <!--Static readonly fields must begin with upper case letter-->
+    <Rule Id="SA1311" Action="None" />
+
     <!--A C# code file contains more than one unique type.-->
     <Rule Id="SA1402" Action="None" />
 
