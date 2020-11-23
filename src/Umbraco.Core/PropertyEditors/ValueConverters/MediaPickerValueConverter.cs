@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache;
+
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
@@ -67,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-            var udis = (Udi[]) source;
+            var udis = (Udi[])source;
             var mediaItems = new List<IPublishedContent>();
 
             if (source == null) return isMultiple ? mediaItems : null;

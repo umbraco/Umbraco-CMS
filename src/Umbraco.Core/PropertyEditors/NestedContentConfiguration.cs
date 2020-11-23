@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -27,15 +27,17 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Hide the property label and let the item list span the full width of the editor window.")]
         public bool HideLabel { get; set; }
 
+
+        [DataContract]
         public class ContentType
         {
-            [JsonProperty("ncAlias")]
+            [DataMember(Name = "ncAlias")]
             public string Alias { get; set; }
 
-            [JsonProperty("ncTabAlias")]
+            [DataMember(Name = "ncTabAlias")]
             public string TabAlias { get; set; }
 
-            [JsonProperty("nameTemplate")]
+            [DataMember(Name = "nameTemplate")]
             public string Template { get; set; }
         }
     }

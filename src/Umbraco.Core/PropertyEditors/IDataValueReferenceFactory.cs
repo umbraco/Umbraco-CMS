@@ -5,7 +5,7 @@
         /// <summary>
         /// Gets a value indicating whether the DataValueReference lookup supports a datatype (data editor).
         /// </summary>
-        /// <param name="dataType">The datatype.</param>
+        /// <param name="dataEditor"></param>
         /// <returns>A value indicating whether the converter supports a datatype.</returns>
         bool IsForEditor(IDataEditor dataEditor);
 
