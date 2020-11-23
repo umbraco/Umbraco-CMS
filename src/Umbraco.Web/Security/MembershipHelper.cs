@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Models.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security.Providers;
-using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.Security
 {
@@ -443,7 +443,7 @@ namespace Umbraco.Web.Security
                 return null;
             }
 
-            var model = ProfileModel.CreateModel();
+            var model = new ProfileModel();
             model.Name = member.Name;
             model.MemberTypeAlias = member.ContentTypeAlias;
 
@@ -457,7 +457,6 @@ namespace Umbraco.Web.Security
             model.LastLoginDate = membershipUser.LastLoginDate;
             model.LastActivityDate = membershipUser.LastActivityDate;
             model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
-
 
             var memberType = _memberTypeService.Get(member.ContentTypeId);
 

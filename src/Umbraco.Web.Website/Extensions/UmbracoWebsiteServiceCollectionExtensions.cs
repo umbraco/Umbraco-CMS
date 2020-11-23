@@ -5,7 +5,7 @@ using Umbraco.Web.Website.ViewEngines;
 
 namespace Umbraco.Extensions
 {
-    public static class UmbracoWebstiteServiceCollectionExtensions
+    public static class UmbracoWebsiteServiceCollectionExtensions
     {
         public static void AddUmbracoWebsite(this IServiceCollection services)
         {
