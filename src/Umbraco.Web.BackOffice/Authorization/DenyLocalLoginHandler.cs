@@ -8,11 +8,11 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Ensures the resource cannot be accessed if <see cref="IBackOfficeExternalLoginProviders.HasDenyLocalLogin"/> returns true
     /// </summary>
-    public class DenyLocalLoginAuthorizeHandler : AuthorizationHandler<DenyLocalLoginRequirement>
+    public class DenyLocalLoginHandler : AuthorizationHandler<DenyLocalLoginRequirement>
     {
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
 
-        public DenyLocalLoginAuthorizeHandler(IBackOfficeExternalLoginProviders externalLogins)
+        public DenyLocalLoginHandler(IBackOfficeExternalLoginProviders externalLogins)
         {
             _externalLogins = externalLogins;
         }

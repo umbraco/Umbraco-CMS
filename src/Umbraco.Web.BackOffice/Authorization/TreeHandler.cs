@@ -16,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// This would allow a tree to be moved between sections.
     /// The user only needs access to one of the trees specified, not all of the trees.
     /// </remarks>
-    public class UmbracoTreeAuthorizeHandler : AuthorizationHandler<TreeAliasesRequirement>
+    public class TreeHandler : AuthorizationHandler<TreeRequirement>
     {
 
         private readonly ITreeService _treeService;
@@ -31,13 +31,13 @@ namespace Umbraco.Web.BackOffice.Authorization
         ///     If the user has access to the application that the treeAlias is specified in, they will be authorized.
         ///     Multiple trees may be specified.
         /// </param>
-        public UmbracoTreeAuthorizeHandler(ITreeService treeService, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        public TreeHandler(ITreeService treeService, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         {
             _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TreeAliasesRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TreeRequirement requirement)
         {
             if (IsAuthorized(requirement))
             {
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             return Task.CompletedTask;
         }
 
-        private bool IsAuthorized(TreeAliasesRequirement requirement)
+        private bool IsAuthorized(TreeRequirement requirement)
         {
             var apps = requirement.TreeAliases.Select(x => _treeService
                     .GetByAlias(x))

@@ -9,18 +9,18 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Ensures authorization is successful for a back office user.
     /// </summary>
-    public class BackOfficeAuthorizationHandler : AuthorizationHandler<BackOfficeAuthorizeRequirement>
+    public class BackOfficeHandler : AuthorizationHandler<BackOfficeRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurity;
         private readonly IRuntimeState _runtimeState;
 
-        public BackOfficeAuthorizationHandler(IBackOfficeSecurityAccessor backOfficeSecurity, IRuntimeState runtimeState)
+        public BackOfficeHandler(IBackOfficeSecurityAccessor backOfficeSecurity, IRuntimeState runtimeState)
         {
             _backOfficeSecurity = backOfficeSecurity;
             _runtimeState = runtimeState;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, BackOfficeAuthorizeRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, BackOfficeRequirement requirement)
         {
             if (!IsAuthorized(requirement))
             {
@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             return Task.CompletedTask;
         }
 
-        private bool IsAuthorized(BackOfficeAuthorizeRequirement requirement)
+        private bool IsAuthorized(BackOfficeRequirement requirement)
         {
             try
             {

@@ -4,15 +4,15 @@ using System.Collections.Generic;
 namespace Umbraco.Web.BackOffice.Authorization
 {
     /// <summary>
-    /// Authorization requirements for <see cref="UmbracoSectionAuthorizeHandler"/>
+    /// Authorization requirements for <see cref="SectionHandler"/>
     /// </summary>
-    public class SectionAliasesRequirement : IAuthorizationRequirement
+    public class SectionRequirement : IAuthorizationRequirement
     {
         /// <summary>
         /// The aliases for sections that the user will need access to
         /// </summary>
         public IReadOnlyCollection<string> SectionAliases { get; }
 
-        public SectionAliasesRequirement(params string[] aliases) => SectionAliases = aliases;
+        public SectionRequirement(params string[] aliases) => SectionAliases = aliases;
     }
 }

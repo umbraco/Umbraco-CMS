@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
@@ -15,14 +13,14 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// if the users being edited is an admin then we must ensure that the current user is also an admin
     /// </summary>
-    public class AdminUsersAuthorizeHandler : AuthorizationHandler<AdminUsersAuthorizeRequirement>
+    public class AdminUsersHandler : AuthorizationHandler<AdminUsersRequirement>
     {
         private readonly IHttpContextAccessor _httpContextAcessor;
         private readonly IUserService _userService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
 
-        public AdminUsersAuthorizeHandler(IHttpContextAccessor httpContextAcessor,
+        public AdminUsersHandler(IHttpContextAccessor httpContextAcessor,
                 IUserService userService,
                 IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 UserEditorAuthorizationHelper userEditorAuthorizationHelper)
@@ -33,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersAuthorizeRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
         {
             var isAuth = IsAuthorized(requirement);
             if (!isAuth.HasValue || isAuth.Value)
@@ -48,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             return Task.CompletedTask;
         }
 
-        private bool? IsAuthorized(AdminUsersAuthorizeRequirement requirement)
+        private bool? IsAuthorized(AdminUsersRequirement requirement)
         {
             int[] userIds;
 

@@ -39,6 +39,8 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.Mapping;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.BackOffice.Authorization;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -68,6 +70,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ActionCollection _actionCollection;
         private readonly IMemberGroupService _memberGroupService;
         private readonly ISqlContext _sqlContext;
+        private readonly IAuthorizationService _authorizationService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
 
@@ -97,7 +100,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ActionCollection actionCollection,
             IMemberGroupService memberGroupService,
             ISqlContext sqlContext,
-            IJsonSerializer serializer)
+            IJsonSerializer serializer,
+            IAuthorizationService authorizationService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
@@ -119,6 +123,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _actionCollection = actionCollection;
             _memberGroupService = memberGroupService;
             _sqlContext = sqlContext;
+            _authorizationService = authorizationService;
             _logger = loggerFactory.CreateLogger<ContentController>();
 
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -158,15 +163,21 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to update
         /// </remarks>
-        [EnsureUserPermissionForContent("saveModel.ContentId", 'R')]
-        public ActionResult<IEnumerable<AssignedUserGroupPermissions>> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
-        {
-            if (saveModel.ContentId <= 0) return NotFound();
+        public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions>>> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
+        {   if (saveModel.ContentId <= 0) return NotFound();
 
             // TODO: Should non-admins be allowed to set granular permissions?
 
             var content = _contentService.GetById(saveModel.ContentId);
             if (content == null) return NotFound();
+
+            // Authorize...
+            var requirement = new ContentPermissionResourceRequirement(ActionRights.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, content, requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             //current permissions explicitly assigned to this content item
             var contentPermissions = _contentService.GetPermissions(content)
@@ -220,7 +231,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to view
         /// </remarks>
-        [EnsureUserPermissionForContent("contentId", 'R')]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
         public ActionResult<IEnumerable<AssignedUserGroupPermissions>> GetDetailedPermissions(int contentId)
         {
             if (contentId <= 0) return NotFound();
@@ -336,8 +347,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForContent("id")]
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]        
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(int id)
         {
@@ -357,7 +368,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForContent("id")]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(Guid id)
         {
@@ -378,7 +389,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForContent("id")]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(Udi id)
         {
@@ -1491,8 +1502,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The EnsureUserPermissionForContent attribute will deny access to this method if the current user
         /// does not have Publish access to this node.
         /// </remarks>
-        ///
-        [EnsureUserPermissionForContent("id", 'U')]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionPublishById)]
         public IActionResult PostPublishById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -1539,7 +1549,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
         /// does not have Delete access to this node.
         /// </remarks>
-        [EnsureUserPermissionForContent("id", ActionDelete.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionDeleteById)]
         [HttpDelete]
         [HttpPost]
         public IActionResult DeleteById(int id)
@@ -1585,7 +1595,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionEmptyRecycleBin)]
         public IActionResult EmptyRecycleBin()
         {
             _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
@@ -1598,8 +1608,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("sorted.ParentId", 'S')]
-        public IActionResult PostSort(ContentSortOrder sorted)
+        public async Task<IActionResult> PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)
             {
@@ -1612,12 +1621,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Ok();
             }
 
+            // Authorize...
+            var requirement = new ContentPermissionResourceRequirement(ActionSort.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(sorted.ParentId), requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             try
             {
-                var contentService = _contentService;
-
                 // Save content with new sort order and update content xml in db accordingly
-                var sortResult = contentService.Sort(sorted.IdSortOrder, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                var sortResult = _contentService.Sort(sorted.IdSortOrder, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                 if (!sortResult.Success)
                 {
                     _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
@@ -1639,9 +1654,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("move.ParentId", 'M')]
-        public IActionResult PostMove(MoveOrCopy move)
+        public async Task<IActionResult> PostMove(MoveOrCopy move)
         {
+            // Authorize...
+            var requirement = new ContentPermissionResourceRequirement(ActionMove.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(move.ParentId), requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var toMove = ValidateMoveOrCopy(move);
 
             _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
@@ -1654,9 +1676,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("copy.ParentId", 'C')]
-        public IActionResult PostCopy(MoveOrCopy copy)
+        public async Task<IActionResult> PostCopy(MoveOrCopy copy)
         {
+            // Authorize...
+            var requirement = new ContentPermissionResourceRequirement(ActionCopy.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(copy.ParentId), requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var toCopy = ValidateMoveOrCopy(copy);
 
             var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
@@ -1669,14 +1698,23 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("model.Id", 'Z')]
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        public ContentItemDisplay PostUnpublish(UnpublishContent model)
+        public async Task<ActionResult<ContentItemDisplay>> PostUnpublish(UnpublishContent model)
         {
-            var foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
+            var foundContent = _contentService.GetById(model.Id);
 
             if (foundContent == null)
+            {
                 HandleContentNotFound(model.Id);
+            }   
+
+            // Authorize...
+            var requirement = new ContentPermissionResourceRequirement(ActionUnpublish.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, foundContent, requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
 
             var languageCount = _allLangs.Value.Count();
             if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
@@ -2267,7 +2305,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return display;
         }
 
-        [EnsureUserPermissionForContent("contentId", ActionBrowse.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         public ActionResult<IEnumerable<NotifySetting>> GetNotificationOptions(int contentId)
         {
             var notifications = new List<NotifySetting>();
@@ -2359,7 +2397,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
-        [EnsureUserPermissionForContent("contentId", ActionRollback.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionRollbackById)]
         [HttpPost]
         public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
@@ -2391,7 +2429,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
         }
 
-        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
         [HttpGet]
         public IActionResult GetPublicAccess(int contentId)
         {
@@ -2440,7 +2478,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         // set up public access using role based access
-        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
         [HttpPost]
         public IActionResult PostPublicAccess(int contentId, [FromQuery(Name = "groups[]")]string[] groups, [FromQuery(Name = "usernames[]")]string[] usernames, int loginPageId, int errorPageId)
         {
@@ -2507,7 +2545,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : Problem();
         }
 
-        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
         [HttpPost]
         public IActionResult RemovePublicAccess(int contentId)
         {

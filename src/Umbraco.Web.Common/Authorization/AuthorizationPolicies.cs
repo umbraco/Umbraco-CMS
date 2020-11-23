@@ -13,6 +13,16 @@
         public const string AdminUserEditsRequireAdmin = nameof(AdminUserEditsRequireAdmin);
         public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
 
+        // Content permission access
+
+        public const string ContentPermissionEmptyRecycleBin = nameof(ContentPermissionEmptyRecycleBin);
+        public const string ContentPermissionAdministrationById = nameof(ContentPermissionAdministrationById);
+        public const string ContentPermissionPublishById = nameof(ContentPermissionPublishById);
+        public const string ContentPermissionRollbackById = nameof(ContentPermissionRollbackById);
+        public const string ContentPermissionProtectById = nameof(ContentPermissionProtectById);
+        public const string ContentPermissionBrowseById = nameof(ContentPermissionBrowseById);
+        public const string ContentPermissionDeleteById = nameof(ContentPermissionDeleteById);
+
         // Single section access
 
         public const string SectionAccessContent = nameof(SectionAccessContent);

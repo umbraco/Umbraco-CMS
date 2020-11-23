@@ -2,12 +2,13 @@
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
+
     /// <summary>
-    /// Authorization requirement for the <see cref="UserGroupAuthorizationHandler"/>
+    /// Authorization requirement for the <see cref="AdminUsersHandler"/>
     /// </summary>
-    public class UserGroupAuthorizeRequirement : IAuthorizationRequirement
+    public class AdminUsersRequirement : IAuthorizationRequirement
     {
-        public UserGroupAuthorizeRequirement(string queryStringName = "id")
+        public AdminUsersRequirement(string queryStringName = "id")
         {
             QueryStringName = queryStringName;
         }

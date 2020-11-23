@@ -12,7 +12,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Authorizes that the current user has access to the user group Id in the request
     /// </summary>
-    public class UserGroupAuthorizationHandler : AuthorizationHandler<UserGroupAuthorizeRequirement>
+    public class UserGroupHandler : AuthorizationHandler<UserGroupRequirement>
     {
         private readonly IHttpContextAccessor _httpContextAcessor;
         private readonly IUserService _userService;
@@ -21,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Authorization
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
-        public UserGroupAuthorizationHandler(IHttpContextAccessor httpContextAcessor,
+        public UserGroupHandler(IHttpContextAccessor httpContextAcessor,
                 IUserService userService,
                 IContentService contentService,
                 IMediaService mediaService,
@@ -36,7 +36,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, UserGroupAuthorizeRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, UserGroupRequirement requirement)
         {
             var isAuth = IsAuthorized(requirement);
             if (!isAuth.HasValue || isAuth.Value)
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             return Task.CompletedTask;
         }
 
-        private bool? IsAuthorized(UserGroupAuthorizeRequirement requirement)
+        private bool? IsAuthorized(UserGroupRequirement requirement)
         {
             var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
