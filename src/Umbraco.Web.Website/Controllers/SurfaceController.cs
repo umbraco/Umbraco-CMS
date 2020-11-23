@@ -21,7 +21,13 @@ namespace Umbraco.Web.Website.Controllers
     // [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
+        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
+        {
+            PublishedUrlProvider = publishedUrlProvider;
+        }
+
+        protected IPublishedUrlProvider PublishedUrlProvider { get; }
 
         /// <summary>
         /// Gets the current page.
@@ -39,12 +45,6 @@ namespace Umbraco.Web.Website.Controllers
             }
         }
 
-        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
-        {
-            _publishedUrlProvider = publishedUrlProvider;
-        }
-
         /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey)
         {
-            return new RedirectToUmbracoPageResult(contentKey, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(contentKey, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey, QueryString queryString)
         {
-            return new RedirectToUmbracoPageResult(contentKey, queryString, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(contentKey, queryString, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(publishedContent, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, QueryString queryString)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, queryString, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(publishedContent, queryString, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(CurrentPage, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Website.Controllers
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(QueryString queryString)
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryString, _publishedUrlProvider, UmbracoContextAccessor);
+            return new RedirectToUmbracoPageResult(CurrentPage, queryString, PublishedUrlProvider, UmbracoContextAccessor);
         }
 
         /// <summary>
