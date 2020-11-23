@@ -243,6 +243,9 @@
             block.showSettings = block.config.settingsElementTypeKey != null;
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
+
+            // Index is set by umbblocklistblock component and kept up to date by it.
+            block.index = 0;
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
             }
