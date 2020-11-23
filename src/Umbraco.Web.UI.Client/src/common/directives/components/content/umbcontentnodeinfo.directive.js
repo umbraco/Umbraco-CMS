@@ -233,7 +233,7 @@
             }
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
-                //check if Redirect Url Management is enabled
+                //check if Redirect URL Management is enabled
                 redirectUrlsResource.getEnableState().then(function (response) {
                     scope.urlTrackerDisabled = response.enabled !== true;
                     if (scope.urlTrackerDisabled === false) {
@@ -314,13 +314,13 @@
             }
 
             function updateCurrentUrls() {
-                // never show urls for element types (if they happen to have been created in the content tree)
+                // never show URLs for element types (if they happen to have been created in the content tree)
                 if (scope.node.isElement) {
                     scope.currentUrls = null;
                     return;
                 }
 
-                // find the urls for the currently selected language
+                // find the URLs for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
                     scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language && scope.currentVariant.language.culture === url.culture));
@@ -329,7 +329,7 @@
                     scope.currentUrls = scope.node.urls;
                 }
 
-                // figure out if multiple cultures apply across the content urls
+                // figure out if multiple cultures apply across the content URLs
                 scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
             }
 
