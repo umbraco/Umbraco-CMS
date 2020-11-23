@@ -87,20 +87,20 @@
                                                                     input-id="rowconfig-{{$index}}"
                                                                     on-change="selectRow(currentSection, row)">
                                                     </umb-checkbox>
-                                                    <div ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
+                                                    <button type="button" ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
                                                         class="flex items-center cursor-pointer">
-                                                        <div class="umb-grid-preview--rows mr2">
-                                                            <div class="umb-grid-preview--row">
-                                                                <div class="umb-grid-preview--col"
+                                                        <span class="umb-grid-preview--rows mr2">
+                                                            <span class="umb-grid-preview--row">
+                                                                <span class="umb-grid-preview--col"
                                                                         ng-repeat="area in row.areas"
                                                                         ng-style="{width: percentage(area.grid) + '%'}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                        <span>
                                                             {{name}} <small>({{row.areas.length}} cell{{row.areas.length > 1 ? 's' : ''}})</small>
-                                                        </div>
-                                                    </div>
+                                                        </span>
+                                                    </button>
                                                 </li>
                                             </ul>
                                         </div>
