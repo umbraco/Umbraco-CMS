@@ -1825,12 +1825,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Opret ny blok</key>
-    <key alias="headlineAddSettingsElementType">Tilføj en indstillings afsnit</key>
+    <key alias="headlineCreateBlock">Vælg elementtype</key>
+    <key alias="headlineAddSettingsElementType">Tilføj en indstillings elementtype</key>
     <key alias="headlineAddCustomView">Tilføj visning</key>
     <key alias="headlineAddCustomStylesheet">Tilføj stylesheet</key>
     <key alias="headlineAddThumbnail">Vælg billede</key>
-    <key alias="labelcreateNewElementType">Opret ny</key>
+    <key alias="labelcreateNewElementType">Opret ny elementtype</key>
     <key alias="labelCustomStylesheet">Overskriv stylesheet</key>
     <key alias="addCustomStylesheet">Tilføj stylesheet</key>
     <key alias="headlineEditorAppearance">Redigerings udseende</key>
