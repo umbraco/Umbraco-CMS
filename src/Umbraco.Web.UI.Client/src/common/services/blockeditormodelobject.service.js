@@ -104,7 +104,7 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}}, blockObject.data);
+                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": blockObject.index || 0}, blockObject.data);
                 return blockObject.labelInterpolator(labelVars);
             }
             return blockObject.content.contentTypeName;
