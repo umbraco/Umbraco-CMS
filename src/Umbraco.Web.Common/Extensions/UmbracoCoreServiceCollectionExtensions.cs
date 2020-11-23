@@ -16,6 +16,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
+using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
 {
@@ -27,11 +28,12 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
+            IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(loggingConfiguration, configuration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
 
             // This is nessasary to pick up all the loggins to MS ILogger.
             Log.Logger = logger.SerilogLog;
@@ -58,6 +60,7 @@ namespace Umbraco.Extensions
 
             // Consumed by user code
             services.AddSingleton<IDiagnosticContext>(diagnosticContext);
+            services.AddSingleton(loggingConfiguration);
 
             return services;
         }
@@ -104,13 +107,12 @@ namespace Umbraco.Extensions
             this IServiceCollection services,
             Assembly entryAssembly,
             IWebHostEnvironment webHostEnvironment,
+            IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             AppCaches appCaches,
             IConfiguration configuration)
         {
             var typeFinder = services.AddTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, configuration);
-            var hostingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
-            var hostingEnvironment = new AspNetCoreHostingEnvironmentWithoutOptionsMonitor(hostingSettings, webHostEnvironment);
 
             var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), GetWebProfiler(configuration));
 

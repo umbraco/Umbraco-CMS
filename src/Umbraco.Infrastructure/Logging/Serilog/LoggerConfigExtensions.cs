@@ -22,16 +22,18 @@ namespace Umbraco.Core.Logging.Serilog
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="loggingConfiguration"></param>
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
+            IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-            Environment.SetEnvironmentVariable("BASEDIR", loggingConfiguration.LogDirectory.TrimEnd("\\"), EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("BASEDIR", hostingEnvironment.MapPathContentRoot("/").TrimEnd("\\"), EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
-                .Enrich.WithProperty("AppDomainAppId", AppDomain.CurrentDomain.Id.ToString().ReplaceNonAlphanumericChars(string.Empty))
+                .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich

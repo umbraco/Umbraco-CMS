@@ -54,8 +54,10 @@ namespace Umbraco.Web.Common.Builder
             if (config is null) throw new ArgumentNullException(nameof(config));
 
             var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
-            services.AddSingleton<ILoggingConfiguration>(loggingConfig);
-            services.AddLogger(loggingConfig, config);
+
+            var hostingSettings = config.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(new OptionsMonitorAdapter<HostingSettings>(hostingSettings), webHostEnvironment);
+            services.AddLogger(hostingEnvironment, loggingConfig, config);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
@@ -65,7 +67,7 @@ namespace Umbraco.Web.Common.Builder
             services.AddUnique<AppCaches>(appCaches);
 
             var loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
-            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, loggerFactory, appCaches, config);
+            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, hostingEnvironment, loggerFactory, appCaches, config);
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
