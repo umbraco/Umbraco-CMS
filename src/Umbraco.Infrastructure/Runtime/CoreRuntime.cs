@@ -13,7 +13,6 @@ namespace Umbraco.Core.Runtime
 
         private readonly ILogger<CoreRuntime> _logger;
         private readonly ComponentCollection _components;
-        private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IMainDom _mainDom;
@@ -23,7 +22,6 @@ namespace Umbraco.Core.Runtime
             ILogger<CoreRuntime> logger,
             IRuntimeState state,
             ComponentCollection components,
-            IUmbracoBootPermissionChecker umbracoBootPermissionChecker,
             IApplicationShutdownRegistry applicationShutdownRegistry,
             IProfilingLogger profilingLogger,
             IMainDom mainDom,
@@ -32,7 +30,6 @@ namespace Umbraco.Core.Runtime
             State = state;
             _logger = logger;
             _components = components;
-            _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
             _applicationShutdownRegistry = applicationShutdownRegistry;
             _profilingLogger = profilingLogger;
             _mainDom = mainDom;
@@ -42,13 +39,21 @@ namespace Umbraco.Core.Runtime
 
         public void Start()
         {
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                msg += ".";
+                _logger.LogError(exception, msg);
+            };
+
             DetermineRuntimeLevel();
 
             if (State.Level <= RuntimeLevel.BootFailed)
                 throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
-
-            // throws if not full-trust
-            _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
             var hostingEnvironmentLifetime = _applicationShutdownRegistry;
             if (hostingEnvironmentLifetime == null)
