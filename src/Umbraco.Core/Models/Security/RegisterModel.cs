@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
-using Umbraco.Core;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Core.Models.Security
 {
-    [ModelBinder(typeof(RegisterModelBinder))]
     public class RegisterModel : PostRedirectModel
     {
         /// <summary>
@@ -26,7 +23,6 @@ namespace Umbraco.Web.Models
             LoginOnSuccess = true;
             CreatePersistentLoginCookie = true;
         }
-
 
         [Required]
         [RegularExpression(@"[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?",
@@ -74,16 +70,5 @@ namespace Umbraco.Web.Models
         /// Default is true to create a persistent cookie if LoginOnSuccess is true
         /// </summary>
         public bool CreatePersistentLoginCookie { get; set; }
-
-        /// <summary>
-        /// A custom model binder for MVC because the default ctor performs a lookup!
-        /// </summary>
-        internal class RegisterModelBinder : DefaultModelBinder
-        {
-            protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
-            {
-                return RegisterModel.CreateModel();
-            }
-        }
     }
 }

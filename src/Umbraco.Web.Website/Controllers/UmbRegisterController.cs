@@ -1,37 +1,34 @@
 ﻿using System;
-using System.Web.Mvc;
-using System.Web.Security;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Security;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Security;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Controllers
+namespace Umbraco.Web.Website.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
-        private readonly MembershipHelper _membershipHelper;
-
-        public UmbRegisterController()
-        {
-        }
+        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
         public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger profilingLogger, MembershipHelper membershipHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
+            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            _membershipHelper = membershipHelper;
+            _websiteSecurityAccessor = websiteSecurityAccessor;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidateUmbracoFormRouteString]
-        public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
+        public async Task<IActionResult> HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
         {
             if (ModelState.IsValid == false)
             {
@@ -39,60 +36,52 @@ namespace Umbraco.Web.Controllers
             }
 
             // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
-            // If name field is empty, add the email address instead
+            // If name field is empty, add the email address instead.
             if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
             {
                 model.Name = model.Email;
             }
 
-            MembershipCreateStatus status;
-            var member = _membershipHelper.RegisterMember(model, out status, model.LoginOnSuccess);
+            var result = await _websiteSecurityAccessor.WebsiteSecurity.RegisterMemberAsync(model, model.LoginOnSuccess);
 
-            switch (status)
+            switch (result)
             {
-                case MembershipCreateStatus.Success:
+                case RegisterMemberStatus.Success:
 
                     TempData["FormSuccess"] = true;
 
-                    //if there is a specified path to redirect to then use it
+                    // If there is a specified path to redirect to then use it.
                     if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
                     {
                         return Redirect(model.RedirectUrl);
                     }
-                    //redirect to current page by default
 
+                    // Redirect to current page by default.
                     return RedirectToCurrentUmbracoPage();
-                case MembershipCreateStatus.InvalidUserName:
+                case RegisterMemberStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
                         ? "registerModel.Email"
                         : "registerModel.Username",
                         "Username is not valid");
                     break;
-                case MembershipCreateStatus.InvalidPassword:
+                case RegisterMemberStatus.InvalidPassword:
                     ModelState.AddModelError("registerModel.Password", "The password is not strong enough");
                     break;
-                case MembershipCreateStatus.InvalidQuestion:
-                case MembershipCreateStatus.InvalidAnswer:
-                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
-                    throw new NotImplementedException(status.ToString());
-                case MembershipCreateStatus.InvalidEmail:
+                case RegisterMemberStatus.InvalidEmail:
                     ModelState.AddModelError("registerModel.Email", "Email is invalid");
                     break;
-                case MembershipCreateStatus.DuplicateUserName:
+                case RegisterMemberStatus.DuplicateUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
                         ? "registerModel.Email"
                         : "registerModel.Username",
                         "A member with this username already exists.");
                     break;
-                case MembershipCreateStatus.DuplicateEmail:
+                case RegisterMemberStatus.DuplicateEmail:
                     ModelState.AddModelError("registerModel.Email", "A member with this e-mail address already exists");
                     break;
-                case MembershipCreateStatus.UserRejected:
-                case MembershipCreateStatus.InvalidProviderUserKey:
-                case MembershipCreateStatus.DuplicateProviderUserKey:
-                case MembershipCreateStatus.ProviderError:
-                    //don't add a field level error, just model level
-                    ModelState.AddModelError("registerModel", "An error occurred creating the member: " + status);
+                case RegisterMemberStatus.Error:
+                    // Don't add a field level error, just model level.
+                    ModelState.AddModelError("registerModel", $"An error occurred creating the member: {result}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -100,6 +89,5 @@ namespace Umbraco.Web.Controllers
 
             return CurrentUmbracoPage();
         }
-
     }
 }

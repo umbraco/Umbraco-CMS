@@ -65,9 +65,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     if (source is decimal sourceDecimal) return sourceDecimal;
                     if (source is string sourceDecimalString)
                         return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0;
-					if (source is double sourceDouble)
-						return Convert.ToDecimal(sourceDouble);
-                    return (decimal) 0;
+                    if (source is double sourceDouble)
+                        return Convert.ToDecimal(sourceDouble);
+                    return (decimal)0;
                 case ValueTypes.Integer:
                     if (source is int sourceInt) return sourceInt;
                     if (source is string sourceIntString)
@@ -76,7 +76,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 case ValueTypes.Bigint:
                     if (source is string sourceLongString)
                         return long.TryParse(sourceLongString, out var i) ? i : 0;
-                    return (long) 0;
+                    return (long)0;
                 default: // everything else is a string
                     return source?.ToString() ?? string.Empty;
             }

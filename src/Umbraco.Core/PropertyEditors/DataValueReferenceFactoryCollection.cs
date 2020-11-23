@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
                 //TODO: We will need to change this once we support tracking via variants/segments
                 // for now, we are tracking values from ALL variants
 
-                foreach(var propertyVal in p.Values)
+                foreach (var propertyVal in p.Values)
                 {
                     var val = propertyVal.EditedValue;
 
@@ -33,9 +33,9 @@ namespace Umbraco.Core.PropertyEditors
                     if (valueEditor is IDataValueReference reference)
                     {
                         var refs = reference.GetReferences(val);
-                        foreach(var r in refs)
+                        foreach (var r in refs)
                             trackedRelations.Add(r);
-                }
+                    }
 
                     // Loop over collection that may be add to existing property editors
                     // implementation of GetReferences in IDataValueReference.
@@ -48,14 +48,11 @@ namespace Umbraco.Core.PropertyEditors
                         // in the dataeditor/property has referecnes to media/content items
                         if (item.IsForEditor(editor))
                         {
-                            foreach(var r in item.GetDataValueReference().GetReferences(val))
+                            foreach (var r in item.GetDataValueReference().GetReferences(val))
                                 trackedRelations.Add(r);
                         }
-
                     }
                 }
-
-
             }
 
             return trackedRelations;

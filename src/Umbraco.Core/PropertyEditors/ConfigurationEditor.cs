@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a data type configuration editor.
