@@ -100,6 +100,12 @@
         opacity: .75;
     }
 }
+.umb-media-grid__item.-filtered {
+    cursor:not-allowed;
+    * {
+        pointer-events: none;
+    }
+}
 
 .umb-media-grid__item-file-icon {
     transform: translate(-50%,-50%);
@@ -180,7 +186,7 @@
    }
 }
 
-.umb-media-grid__item-name {
+.umb-media-grid__item-overlay {
    cursor: pointer;
 }
 

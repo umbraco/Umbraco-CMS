@@ -24,7 +24,7 @@
                     on-name-clicked="vm.editMedia(media, $index)"
                     ng-class="{'--active':vm.activeMediaEntry === media}">
                     <div class="__actions">
-                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveMediaByIndex($index); $event.stopPropagation();">
+                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveMedia(media); $event.stopPropagation();">
                             <i class="icon icon-wrong" aria-hidden="true"></i>
                             <localize key="general_remove" class="sr-only">Remove</localize>
                         </button>

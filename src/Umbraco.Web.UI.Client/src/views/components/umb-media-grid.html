@@ -6,7 +6,7 @@
              ng-click="clickItem(item, $event, $index)"
              ng-repeat="item in items | filter:filterBy"
              ng-style="item.flexStyle"
-             ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-folder': item.isFolder, '-svg': item.extension == 'svg', '-selectable': item.selectable, '-unselectable': !item.selectable}">
+             ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-folder': item.isFolder, '-svg': item.extension == 'svg', '-selectable': item.selectable, '-unselectable': !item.selectable, '-filtered': item.filtered}">
             <div>
                 <!--<i ng-show="item.selected" class="icon-check umb-media-grid__checkmark"></i>-->
                 <div data-element="media-grid-item-edit"

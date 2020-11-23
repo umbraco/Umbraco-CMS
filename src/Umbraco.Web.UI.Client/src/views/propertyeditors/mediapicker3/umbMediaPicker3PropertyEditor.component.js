@@ -33,8 +33,8 @@
         var unsubscribe = [];
 
         // Property actions:
-        var copyAllBlocksAction = null;
-        var deleteAllBlocksAction = null;
+        var copyAllMediasAction = null;
+        var removeAllMediasAction = null;
 
         var vm = this;
 
@@ -66,7 +66,7 @@
             vm.singleMode = vm.model.config.singleMode || false;
             vm.validationLimit = vm.model.config.validationLimit;
 
-            copyAllBlocksAction = {
+            copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
                 icon: "documents",
@@ -74,17 +74,17 @@
                 isDisabled: true
             };
 
-            deleteAllBlocksAction = {
+            removeAllMediasAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
                 labelTokens: [],
                 icon: 'trash',
-                method: requestDeleteAllMedia,
+                method: requestRemoveAllMedia,
                 isDisabled: true
             };
 
             var propertyActions = [
-                copyAllBlocksAction,
-                deleteAllBlocksAction
+                copyAllMediasAction,
+                removeAllMediasAction
             ];
 
             if (vm.umbProperty) {
@@ -132,7 +132,7 @@
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
-                //dataTypeKey: vm.model.dataTypeKey,
+                dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.isSingleMode !== true,
                 submit: function (model) {
                     editorService.close();
@@ -152,6 +152,10 @@
                 close: function () {
                     editorService.close();
                 }
+            }
+
+            if(vm.model.config.filter) {
+                mediaPicker.filter = vm.model.config.filter;
             }
 
             editorService.mediaPicker(mediaPicker);
@@ -178,6 +182,12 @@
         }
 
 
+        function removeMedia(media) {
+            var index = vm.model.value.indexOf(media);
+            if(index !== -1) {
+                vm.model.value.splice(index, 1);
+            }
+        }
         function deleteAllMedias() {
             vm.model.value = [];
         }
@@ -244,17 +254,18 @@
 
         }
 
-        function requestDeleteMedia(media) {
+        vm.requestRemoveMedia = requestRemoveMedia;
+        function requestRemoveMedia(media) {
             localizationService.localizeMany(["general_delete", "media_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
                 const overlay = {
                     title: data[0],
-                    content: localizationService.tokenReplace(data[1], [block.label]),
+                    content: localizationService.tokenReplace(data[1], [media.name]),
                     submitButtonLabel: data[2],
                     close: function () {
                         overlayService.close();
                     },
                     submit: function () {
-                        deleteMedia(media);
+                        removeMedia(media);
                         overlayService.close();
                     }
                 };
@@ -262,7 +273,7 @@
                 overlayService.confirmDelete(overlay);
             });
         }
-        function requestDeleteAllMedia() {
+        function requestRemoveAllMedia() {
             localizationService.localizeMany(["media_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[1],
@@ -297,11 +308,11 @@
         function onAmountOfMediaChanged() {
 
             // enable/disable property actions
-            if (copyAllBlocksAction) {
-                copyAllBlocksAction.isDisabled = vm.model.value.length === 0;
+            if (copyAllMediasAction) {
+                copyAllMediasAction.isDisabled = vm.model.value.length === 0;
             }
-            if (deleteAllBlocksAction) {
-                deleteAllBlocksAction.isDisabled = vm.model.value.length === 0;
+            if (removeAllMediasAction) {
+                removeAllMediasAction.isDisabled = vm.model.value.length === 0;
             }
 
             // validate limits:
