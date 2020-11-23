@@ -168,9 +168,7 @@
             // Copy config and only transfer coordinates.
             var newCrops = Utilities.copy(vm.model.config.crops);
             newCrops.forEach(crop => {
-                console.log("mediaEntry.crops", mediaEntry.crops);
                 var oldCrop = mediaEntry.crops.filter(x => x.alias === crop.alias).shift();
-                console.log("oldCrop", oldCrop);
                 if (oldCrop && oldCrop.height === crop.height && oldCrop.width === crop.width) {
                     crop.coordinates = oldCrop.coordinates;
                 }
@@ -231,8 +229,8 @@
         var requestCopyAllMedias = function() {
             // TODO..
         }
-        function copyBlock(block) {
-            //clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
+        function copyMedia(media) {
+            //clipboardService.copy(clipboardService.TYPES.MEDIA, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
         function requestPasteFromClipboard(index, pasteEntry, pasteType) {
 

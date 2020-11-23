@@ -40,6 +40,7 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
             $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
+            $scope.onlySpecificMediaTypes = dialogOptions.onlySpecificMediaTypes || null;
 
             $scope.filterOptions = {
                 excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
