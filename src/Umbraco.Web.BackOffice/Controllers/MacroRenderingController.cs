@@ -157,7 +157,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
+        public IActionResult CreatePartialViewMacroWithFile(CreatePartialViewMacroWithFileModel model)
         {
             if (model == null) throw new ArgumentNullException("model");
             if (string.IsNullOrWhiteSpace(model.Filename)) throw new ArgumentException("Filename cannot be null or whitespace", "model.Filename");
@@ -173,7 +173,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             };
 
             _macroService.Save(macro); // may throw
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            return Ok();
         }
 
         public class CreatePartialViewMacroWithFileModel
