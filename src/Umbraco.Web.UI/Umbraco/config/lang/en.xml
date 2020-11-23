@@ -250,9 +250,9 @@
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
-    <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
+    <key alias="getUrlException">Could not get the URL</key>
+    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>
@@ -311,7 +311,7 @@
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
 
     <key alias="variantsWillBeSaved">All new variants will be saved.</key>
-    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToPublish">Which variants would you like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
     <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
@@ -467,7 +467,7 @@
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
-    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
     <key alias="sitereindexed">Site is reindexed</key>
@@ -773,7 +773,7 @@
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">User</key>
     <key alias="username">Username</key>
     <key alias="value">Value</key>
@@ -1610,6 +1610,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="editRowConfiguration">Edit row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="noConfiguration">No further configuration available</key>
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
     <key alias="settings">Settings</key>
@@ -2055,8 +2056,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="maxCount">You can only have</key>
     <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
-    <key alias="urls">url(s)</key>
-    <key alias="urlsSelected">url(s) selected</key>
+    <key alias="urls">URL(s)</key>
+    <key alias="urlsSelected">URL(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
@@ -2181,7 +2182,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enableUrlTracker">Enable URL tracker</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Redirected To</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
+    <key alias="redirectUrlManagement">Redirect URL Management</key>
     <key alias="panelInformation">The following URLs redirect to this content item:</key>
     <key alias="noRedirects">No redirects have been made</key>
     <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
@@ -2277,6 +2278,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="hasTranslation">Has translation</key>
       <key alias="noTranslation">Missing translation</key>
       <key alias="dictionaryListCaption">Dictionary items</key>
+      <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2323,6 +2325,17 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
       <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
       <key alias="open">Open</key>
+      <key alias="polling">Polling</key>
+      <key alias="every2">Every 2 seconds</key>
+      <key alias="every5">Every 5 seconds</key>
+      <key alias="every10">Every 10 seconds</key>
+      <key alias="every20">Every 20 seconds</key>
+      <key alias="every30">Every 30 seconds</key>
+      <key alias="pollingEvery2">Polling every 2s</key>
+      <key alias="pollingEvery5">Polling every 5s</key>
+      <key alias="pollingEvery10">Polling every 10s</key>
+      <key alias="pollingEvery20">Polling every 20s</key>
+      <key alias="pollingEvery30">Polling every 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
@@ -2477,8 +2490,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete the content <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete the block configuration <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>

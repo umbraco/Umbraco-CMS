@@ -1,8 +1,8 @@
 (function () {
     "use strict";
 
-    function focusLockService() {
-        var elementToInert = document.querySelector('#mainwrapper');
+    function focusLockService($document) {
+        var elementToInert = $document[0].querySelector('#mainwrapper');
 
         function addInertAttribute() {
             if (elementToInert) {
@@ -24,7 +24,7 @@
         return service;
 
     }
-    
+
     angular.module("umbraco.services").factory("focusLockService", focusLockService);
 
 })();
