@@ -1,182 +1,184 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Security;
+﻿//using System;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.AspNetCore.Mvc.Filters;
+//using Umbraco.Core;
+//using Umbraco.Core.Models;
+//using Umbraco.Core.Security;
+//using Umbraco.Core.Services;
+//using Umbraco.Web.BackOffice.Controllers;
+//using Umbraco.Web.Common.Exceptions;
+//using Umbraco.Web.Editors;
+//using Umbraco.Web.Security;
 
-namespace Umbraco.Web.BackOffice.Filters
-{
-    /// <summary>
-    /// Auth filter to check if the current user has access to the content item
-    /// </summary>
-    /// <remarks>
-    /// Since media doesn't have permissions, this simply checks start node access
-    /// </remarks>
-    internal sealed class EnsureUserPermissionForMediaAttribute : TypeFilterAttribute
-    {
-        public EnsureUserPermissionForMediaAttribute(int nodeId)
-            : base(typeof(EnsureUserPermissionForMediaFilter))
-        {
-            Arguments = new object[]
-            {
-                nodeId
-            };
-        }
+//namespace Umbraco.Web.BackOffice.Filters
+//{
+//    /// <summary>
+//    /// Auth filter to check if the current user has access to the content item
+//    /// </summary>
+//    /// <remarks>
+//    /// Since media doesn't have permissions, this simply checks start node access
+//    /// </remarks>
+//    internal sealed class EnsureUserPermissionForMediaAttribute : TypeFilterAttribute
+//    {
+//        // TODO: This needs to be an authorization policy
 
-        public EnsureUserPermissionForMediaAttribute(string paramName)
-            : base(typeof(EnsureUserPermissionForMediaFilter))
-        {
-            Arguments = new object[]
-            {
-                paramName
-            };
-        }
-        private sealed class EnsureUserPermissionForMediaFilter : IActionFilter
-        {
-            private readonly int? _nodeId;
-            private readonly string _paramName;
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-            private readonly IEntityService _entityService;
-            private readonly IMediaService _mediaService;
+//        public EnsureUserPermissionForMediaAttribute(int nodeId)
+//            : base(typeof(EnsureUserPermissionForMediaFilter))
+//        {
+//            Arguments = new object[]
+//            {
+//                nodeId
+//            };
+//        }
 
-            /// <summary>
-            /// This constructor will only be able to test the start node access
-            /// </summary>
-            public EnsureUserPermissionForMediaFilter(
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                IEntityService entityService,
-                IMediaService mediaService,
-                int nodeId)
-                :this(backofficeSecurityAccessor, entityService, mediaService, nodeId, null)
-            {
-                _nodeId = nodeId;
-            }
+//        public EnsureUserPermissionForMediaAttribute(string paramName)
+//            : base(typeof(EnsureUserPermissionForMediaFilter))
+//        {
+//            Arguments = new object[]
+//            {
+//                paramName
+//            };
+//        }
+//        private sealed class EnsureUserPermissionForMediaFilter : IActionFilter
+//        {
+//            private readonly int? _nodeId;
+//            private readonly string _paramName;
+//            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+//            private readonly IEntityService _entityService;
+//            private readonly IMediaService _mediaService;
 
-            public EnsureUserPermissionForMediaFilter(
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                IEntityService entityService,
-                IMediaService mediaService,
-                string paramName)
-                :this(backofficeSecurityAccessor, entityService, mediaService,null, paramName)
-            {
-                if (paramName == null) throw new ArgumentNullException(nameof(paramName));
-                if (string.IsNullOrEmpty(paramName))
-                    throw new ArgumentException("Value can't be empty.", nameof(paramName));
-            }
+//            /// <summary>
+//            /// This constructor will only be able to test the start node access
+//            /// </summary>
+//            public EnsureUserPermissionForMediaFilter(
+//                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+//                IEntityService entityService,
+//                IMediaService mediaService,
+//                int nodeId)
+//                :this(backofficeSecurityAccessor, entityService, mediaService, nodeId, null)
+//            {
+//                _nodeId = nodeId;
+//            }
 
-            private EnsureUserPermissionForMediaFilter(
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                IEntityService entityService,
-                IMediaService mediaService,
-                int? nodeId, string paramName)
-            {
-                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-                _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+//            public EnsureUserPermissionForMediaFilter(
+//                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+//                IEntityService entityService,
+//                IMediaService mediaService,
+//                string paramName)
+//                :this(backofficeSecurityAccessor, entityService, mediaService,null, paramName)
+//            {
+//                if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+//                if (string.IsNullOrEmpty(paramName))
+//                    throw new ArgumentException("Value can't be empty.", nameof(paramName));
+//            }
 
-                _paramName = paramName;
+//            private EnsureUserPermissionForMediaFilter(
+//                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+//                IEntityService entityService,
+//                IMediaService mediaService,
+//                int? nodeId, string paramName)
+//            {
+//                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+//                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+//                _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
 
-                if (nodeId.HasValue)
-                {
-                    _nodeId = nodeId.Value;
-                }
-            }
+//                _paramName = paramName;
 
-            private int GetNodeIdFromParameter(object parameterValue)
-            {
-                if (parameterValue is int)
-                {
-                    return (int) parameterValue;
-                }
+//                if (nodeId.HasValue)
+//                {
+//                    _nodeId = nodeId.Value;
+//                }
+//            }
 
-                var guidId = Guid.Empty;
-                if (parameterValue is Guid)
-                {
-                    guidId = (Guid) parameterValue;
-                }
-                else if (parameterValue is GuidUdi)
-                {
-                    guidId = ((GuidUdi) parameterValue).Guid;
-                }
+//            private int GetNodeIdFromParameter(object parameterValue)
+//            {
+//                if (parameterValue is int)
+//                {
+//                    return (int) parameterValue;
+//                }
 
-                if (guidId != Guid.Empty)
-                {
-                    var found = _entityService.GetId(guidId, UmbracoObjectTypes.Media);
-                    if (found)
-                        return found.Result;
-                }
+//                var guidId = Guid.Empty;
+//                if (parameterValue is Guid)
+//                {
+//                    guidId = (Guid) parameterValue;
+//                }
+//                else if (parameterValue is GuidUdi)
+//                {
+//                    guidId = ((GuidUdi) parameterValue).Guid;
+//                }
 
-                throw new InvalidOperationException("The id type: " + parameterValue.GetType() +
-                                                    " is not a supported id");
-            }
+//                if (guidId != Guid.Empty)
+//                {
+//                    var found = _entityService.GetId(guidId, UmbracoObjectTypes.Media);
+//                    if (found)
+//                        return found.Result;
+//                }
 
-            public void OnActionExecuting(ActionExecutingContext context)
-            {
-                if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser == null)
-                {
-                    throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-                }
+//                throw new InvalidOperationException("The id type: " + parameterValue.GetType() +
+//                                                    " is not a supported id");
+//            }
 
-                int nodeId;
-                if (_nodeId.HasValue == false)
-                {
-                    var parts = _paramName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+//            public void OnActionExecuting(ActionExecutingContext context)
+//            {
+//                if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser == null)
+//                {
+//                    throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+//                }
 
-                    if (context.ActionArguments[parts[0]] == null)
-                    {
-                        throw new InvalidOperationException("No argument found for the current action with the name: " +
-                                                            _paramName);
-                    }
+//                int nodeId;
+//                if (_nodeId.HasValue == false)
+//                {
+//                    var parts = _paramName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (parts.Length == 1)
-                    {
-                        nodeId = GetNodeIdFromParameter(context.ActionArguments[parts[0]]);
-                    }
-                    else
-                    {
-                        //now we need to see if we can get the property of whatever object it is
-                        var pType = context.ActionArguments[parts[0]].GetType();
-                        var prop = pType.GetProperty(parts[1]);
-                        if (prop == null)
-                        {
-                            throw new InvalidOperationException(
-                                "No argument found for the current action with the name: " + _paramName);
-                        }
+//                    if (context.ActionArguments[parts[0]] == null)
+//                    {
+//                        throw new InvalidOperationException("No argument found for the current action with the name: " +
+//                                                            _paramName);
+//                    }
 
-                        nodeId = GetNodeIdFromParameter(prop.GetValue(context.ActionArguments[parts[0]]));
-                    }
-                }
-                else
-                {
-                    nodeId = _nodeId.Value;
-                }
+//                    if (parts.Length == 1)
+//                    {
+//                        nodeId = GetNodeIdFromParameter(context.ActionArguments[parts[0]]);
+//                    }
+//                    else
+//                    {
+//                        //now we need to see if we can get the property of whatever object it is
+//                        var pType = context.ActionArguments[parts[0]].GetType();
+//                        var prop = pType.GetProperty(parts[1]);
+//                        if (prop == null)
+//                        {
+//                            throw new InvalidOperationException(
+//                                "No argument found for the current action with the name: " + _paramName);
+//                        }
 
-                if (MediaController.CheckPermissions(
-                    context.HttpContext.Items,
-                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                    _mediaService,
-                    _entityService,
-                    nodeId))
-                {
+//                        nodeId = GetNodeIdFromParameter(prop.GetValue(context.ActionArguments[parts[0]]));
+//                    }
+//                }
+//                else
+//                {
+//                    nodeId = _nodeId.Value;
+//                }
 
-                }
-                else
-                {
-                    throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-                }
-            }
+//                if (MediaController.CheckPermissions(
+//                    context.HttpContext.Items,
+//                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+//                    _mediaService,
+//                    _entityService,
+//                    nodeId))
+//                {
 
-            public void OnActionExecuted(ActionExecutedContext context)
-            {
+//                }
+//                else
+//                {
+//                    throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+//                }
+//            }
 
-            }
+//            public void OnActionExecuted(ActionExecutedContext context)
+//            {
 
-        }
-    }
-}
+//            }
+
+//        }
+//    }
+//}

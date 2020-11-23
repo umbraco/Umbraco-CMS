@@ -11,45 +11,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-    /// <summary>
-    /// Used to authorize if the user has the correct permission access to the content for the <see cref="IContent"/> specified
-    /// </summary>
-    public class ContentPermissionResourceHandler : AuthorizationHandler<ContentPermissionResourceRequirement, IContent>
-    {
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly IEntityService _entityService;
-        private readonly IUserService _userService;
-
-        public ContentPermissionResourceHandler(
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IEntityService entityService,
-            IUserService userService)
-        {
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
-            _entityService = entityService;
-            _userService = userService;
-        }
-
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionResourceRequirement requirement, IContent resource)
-        {
-            var permissionResult = ContentPermissionsHelper.CheckPermissions(resource,
-                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                _userService,
-                _entityService,
-                new[] { requirement.PermissionToCheck });
-
-            if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
-            {
-                context.Fail();
-            }
-            else
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
-        }
-    }
 
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string
@@ -59,21 +20,18 @@ namespace Umbraco.Web.BackOffice.Authorization
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEntityService _entityService;
-        private readonly IUserService _userService;
-        private readonly IContentService _contentService;
+        private readonly ContentPermissions _contentPermissions;
 
         public ContentPermissionQueryStringHandler(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IHttpContextAccessor httpContextAccessor, 
             IEntityService entityService,
-            IUserService userService,
-            IContentService contentService)
+            ContentPermissions contentPermissions)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _httpContextAccessor = httpContextAccessor;
             _entityService = entityService;
-            _userService = userService;
-            _contentService = contentService;
+            _contentPermissions = contentPermissions;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionsQueryStringRequirement requirement)
@@ -118,20 +76,17 @@ namespace Umbraco.Web.BackOffice.Authorization
                 nodeId = requirement.NodeId.Value;
             }
 
-            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
-                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                _userService,
-                _contentService,
-                _entityService,
-                out var contentItem,
+            var permissionResult = _contentPermissions.CheckPermissions(nodeId,
+                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,                
+                out IContent contentItem,
                 new[] { requirement.PermissionToCheck });
 
-            if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
+            if (permissionResult == ContentPermissions.ContentAccess.NotFound)
             {
                 return null;
             }
 
-            if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
+            if (permissionResult == ContentPermissions.ContentAccess.Denied)
             {
                 context.Fail();
             }

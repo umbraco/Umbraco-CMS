@@ -96,6 +96,9 @@ namespace Umbraco.Web.Common.Runtime
             composition.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
             composition.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
             composition.Services.AddUnique(factory => new LegacyPasswordSecurity());
+
+            composition.Services.AddUnique<ContentPermissions>();
+            composition.Services.AddUnique<MediaPermissions>();
         }
     }
 }

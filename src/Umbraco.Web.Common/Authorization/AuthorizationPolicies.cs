@@ -23,6 +23,8 @@
         public const string ContentPermissionBrowseById = nameof(ContentPermissionBrowseById);
         public const string ContentPermissionDeleteById = nameof(ContentPermissionDeleteById);
 
+        public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
+
         // Single section access
 
         public const string SectionAccessContent = nameof(SectionAccessContent);

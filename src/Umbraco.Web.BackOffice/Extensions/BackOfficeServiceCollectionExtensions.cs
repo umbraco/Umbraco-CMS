@@ -128,10 +128,22 @@ namespace Umbraco.Extensions
             services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
             services.AddSingleton<IAuthorizationHandler, ContentPermissionQueryStringHandler>();
             services.AddSingleton<IAuthorizationHandler, ContentPermissionResourceHandler>();
+            services.AddSingleton<IAuthorizationHandler, ContentPermissionPublishBranchHandler>();
+            services.AddSingleton<IAuthorizationHandler, MediaPermissionResourceHandler>();
+            services.AddSingleton<IAuthorizationHandler, MediaPermissionQueryStringHandler>();
             services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
 
             services.AddAuthorization(options =>
             {
+                // these are the query strings we will check for media ids when permission checking
+                var mediaPermissionQueryStrings = new[] { "id" };
+
+                options.AddPolicy(AuthorizationPolicies.MediaPermissionPathById, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
+                    policy.Requirements.Add(new MediaPermissionsQueryStringRequirement(mediaPermissionQueryStrings));
+                });
+
                 // these are the query strings we will check for content ids when permission checking
                 var contentPermissionQueryStrings = new[] { "id", "contentId" };
 

@@ -638,9 +638,9 @@ namespace Umbraco.Web.BackOffice.Controllers
          /// <returns></returns>
          [FileUploadCleanupFilter]
          [ContentSaveValidation]
-         public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+         public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
          {
-             var contentItemDisplay = PostSaveInternal(contentItem,
+             var contentItemDisplay = await PostSaveInternal(contentItem,
                  content =>
                  {
                      EnsureUniqueName(content.Name, content, "Name");
@@ -666,9 +666,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public async Task<ContentItemDisplay> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            var contentItemDisplay = PostSaveInternal(
+            var contentItemDisplay = await PostSaveInternal(
                 contentItem,
                 content => _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id),
                 MapToDisplay);
@@ -676,7 +676,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return contentItemDisplay;
         }
 
-        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
+        private async Task<ContentItemDisplay> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
             //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -811,7 +811,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 case ContentSaveAction.PublishWithDescendants:
                 case ContentSaveAction.PublishWithDescendantsNew:
                     {
-                        if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
+                        if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
                                 _localizedTextService.Localize("publish"),
@@ -827,7 +827,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 case ContentSaveAction.PublishWithDescendantsForce:
                 case ContentSaveAction.PublishWithDescendantsForceNew:
                     {
-                        if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
+                        if (!await ValidatePublishBranchPermissionsAsync(contentItem))
                         {
                             globalNotifications.AddErrorNotification(
                                 _localizedTextService.Localize("publish"),
@@ -1198,33 +1198,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem"></param>
         /// <returns></returns>
-        private bool ValidatePublishBranchPermissions(ContentItemSave contentItem, out IReadOnlyList<IUmbracoEntity> noAccess)
+        private async Task<bool> ValidatePublishBranchPermissionsAsync(ContentItemSave contentItem)
         {
-            var denied = new List<IUmbracoEntity>();
-            var page = 0;
-            const int pageSize = 500;
-            var total = long.MaxValue;
-            while (page * pageSize < total)
-            {
-                var descendants = _entityService.GetPagedDescendants(contentItem.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
-                                //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
-                                //early if a permission higher up fails
-                                ordering: Ordering.By("path", Direction.Ascending));
-
-                foreach (var c in descendants)
-                {
-                    //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
-                    if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
-                        || (ContentPermissionsHelper.CheckPermissions(c,
-                            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, _userService, _entityService,
-                            ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
-                    {
-                        denied.Add(c);
-                    }
-                }
-            }
-            noAccess = denied;
-            return denied.Count == 0;
+            // Authorize...
+            var requirement = new ContentPermissionsPublishBranchRequirement(ActionPublish.ActionLetter);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, contentItem.PersistedContent, requirement);
+            return authorizationResult.Succeeded;
         }
 
         private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force, string cultureForInvariantErrors,

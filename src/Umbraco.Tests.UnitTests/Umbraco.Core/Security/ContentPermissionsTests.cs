@@ -8,10 +8,10 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
 {
     [TestFixture]
-    public class ContentControllerUnitTests
+    public class ContentPermissionsTests
     {
         [Test]
         public void Access_Allowed_By_Path()
@@ -28,12 +28,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var entityService = entityServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
             var userService = userServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent);
+            var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent);
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -54,12 +55,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.NotFound, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.NotFound, result);
         }
 
         [Test]
@@ -82,12 +84,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         [Test]
@@ -111,12 +114,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         [Test]
@@ -140,12 +144,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -159,12 +164,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent);
+            var result = contentPermissions.CheckPermissions(-1, user, out IContent _);
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -178,12 +184,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent);
+            var result = contentPermissions.CheckPermissions(-20, user, out IContent _);
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -199,12 +206,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent);
+            var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent);
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         [Test]
@@ -221,12 +229,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent);
+            var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent);
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         [Test]
@@ -247,12 +256,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent, new[] { 'A' });
+            var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'A' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -273,12 +283,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent, new[] { 'B' });
+            var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'B' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         [Test]
@@ -300,12 +311,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent, new[] { 'A' });
+            var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'A' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
         }
 
         [Test]
@@ -326,12 +338,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent, new[] { 'B' });
+            var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'B' });
 
             //assert
-            Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+            Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
         }
 
         private IUser CreateUser(int id = 0, int? startContentId = null, bool withUserGroup = true)
@@ -340,77 +353,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .WithId(id)
                 .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0]);
             if (withUserGroup)
-            {
                 builder = builder
                 .AddUserGroup()
                     .WithId(1)
                     .WithName("admin")
                     .WithAlias("admin")
                     .Done();
-            }
 
             return builder.Build();
         }
     }
 
-    //NOTE: The below self hosted stuff does work so need to get some tests written. Some are not possible atm because
-    // of the legacy SQL calls like checking permissions.
-
-    //[TestFixture]
-    //public class ContentControllerHostedTests : BaseRoutingTest
-    //{
-
-    //    protected override DatabaseBehavior DatabaseTestBehavior
-    //    {
-    //        get { return DatabaseBehavior.NoDatabasePerFixture; }
-    //    }
-
-    //    public override void TearDown()
-    //    {
-    //        base.TearDown();
-    //        UmbracoAuthorizeAttribute.Enable = true;
-    //        UmbracoApplicationAuthorizeAttribute.Enable = true;
-    //    }
-
-    //    /// <summary>
-    //    /// Tests to ensure that the response filter works so that any items the user
-    //    /// doesn't have access to are removed
-    //    /// </summary>
-    //    [Test]
-    //    public async void Get_By_Ids_Response_Filtered()
-    //    {
-    //        UmbracoAuthorizeAttribute.Enable = false;
-    //        UmbracoApplicationAuthorizeAttribute.Enable = false;
-
-    //        var baseUrl = string.Format("http://{0}:9876", Environment.MachineName);
-    //        var url = baseUrl + "/api/Content/GetByIds?ids=1&ids=2";
-
-    //        var routingCtx = GetRoutingContext(url, 1234, null, true);
-
-    //        var config = new HttpSelfHostConfiguration(baseUrl);
-    //        using (var server = new HttpSelfHostServer(config))
-    //        {
-    //            var route = config.Routes.MapHttpRoute("test", "api/Content/GetByIds",
-    //            new
-    //            {
-    //                controller = "Content",
-    //                action = "GetByIds",
-    //                id = RouteParameter.Optional
-    //            });
-    //            route.DataTokens["Namespaces"] = new string[] { "Umbraco.Web.Editors" };
-
-    //            var client = new HttpClient(server);
-
-    //            var request = new HttpRequestMessage
-    //            {
-    //                RequestUri = new Uri(url),
-    //                Method = HttpMethod.Get
-    //            };
-
-    //            var result = await client.SendAsync(request);
-    //        }
-
-    //    }
-
-    //}
 }
