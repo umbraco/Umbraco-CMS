@@ -27,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IPublishedContent);
+            => typeof(IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
