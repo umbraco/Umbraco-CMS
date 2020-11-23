@@ -10,14 +10,14 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-    public class MediaPermissionQueryStringHandler : AuthorizationHandler<MediaPermissionsQueryStringRequirement>
+    public class MediaPermissionsQueryStringHandler : AuthorizationHandler<MediaPermissionsQueryStringRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly MediaPermissions _mediaPermissions;
         private readonly IEntityService _entityService;
 
-        public MediaPermissionQueryStringHandler(
+        public MediaPermissionsQueryStringHandler(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IHttpContextAccessor httpContextAccessor,
             MediaPermissions mediaPermissions)

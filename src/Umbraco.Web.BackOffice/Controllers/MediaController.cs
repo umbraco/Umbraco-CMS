@@ -480,7 +480,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostMove(MoveOrCopy move)
         {
             // Authorize...
-            var requirement = new MediaPermissionResourceRequirement();
+            var requirement = new MediaPermissionsResourceRequirement();
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(move.Id), requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -635,7 +635,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             // Authorize...
-            var requirement = new MediaPermissionResourceRequirement();
+            var requirement = new MediaPermissionsResourceRequirement();
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(sorted.ParentId), requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -881,7 +881,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //ensure the user has access to this folder by parent id!
             if (validatePermissions)
             {
-                var requirement = new MediaPermissionResourceRequirement();
+                var requirement = new MediaPermissionsResourceRequirement();
                 var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(intParentId), requirement);
                 if (!authorizationResult.Succeeded)
                 {

@@ -110,8 +110,8 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
 
                 var requirement = contentToCheck == null
-                    ? new MediaPermissionResourceRequirement(contentIdToCheck)
-                    : new MediaPermissionResourceRequirement();
+                    ? new MediaPermissionsResourceRequirement(contentIdToCheck)
+                    : new MediaPermissionsResourceRequirement();
 
                 var authorizationResult = await _authorizationService.AuthorizeAsync(actionContext.HttpContext.User, contentToCheck, requirement);
                 if (!authorizationResult.Succeeded)

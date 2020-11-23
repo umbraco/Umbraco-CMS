@@ -13,13 +13,13 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// The user must have access to all descendant nodes of the content item in order to continue
     /// </summary>
-    public class ContentPermissionPublishBranchHandler : AuthorizationHandler<ContentPermissionsPublishBranchRequirement, IContent>
+    public class ContentPermissionsPublishBranchHandler : AuthorizationHandler<ContentPermissionsPublishBranchRequirement, IContent>
     {
         private readonly IEntityService _entityService;
         private readonly ContentPermissions _contentPermissions;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public ContentPermissionPublishBranchHandler(
+        public ContentPermissionsPublishBranchHandler(
             IEntityService entityService,
             ContentPermissions contentPermissions,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)

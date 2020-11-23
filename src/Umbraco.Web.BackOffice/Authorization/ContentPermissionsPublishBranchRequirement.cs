@@ -3,7 +3,7 @@
 namespace Umbraco.Web.BackOffice.Authorization
 {
     /// <summary>
-    /// Authorization requirement for <see cref="ContentPermissionPublishBranchHandler"/>
+    /// Authorization requirement for <see cref="ContentPermissionsPublishBranchHandler"/>
     /// </summary>
     public class ContentPermissionsPublishBranchRequirement : IAuthorizationRequirement
     {

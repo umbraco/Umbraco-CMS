@@ -15,14 +15,14 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string
     /// </summary>
-    public class ContentPermissionQueryStringHandler : AuthorizationHandler<ContentPermissionsQueryStringRequirement>
+    public class ContentPermissionsQueryStringHandler : AuthorizationHandler<ContentPermissionsQueryStringRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEntityService _entityService;
         private readonly ContentPermissions _contentPermissions;
 
-        public ContentPermissionQueryStringHandler(
+        public ContentPermissionsQueryStringHandler(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IHttpContextAccessor httpContextAccessor, 
             IEntityService entityService,

@@ -9,12 +9,12 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the <see cref="IContent"/> specified
     /// </summary>
-    public class ContentPermissionResourceHandler : AuthorizationHandler<ContentPermissionResourceRequirement, IContent>
+    public class ContentPermissionsResourceHandler : AuthorizationHandler<ContentPermissionsResourceRequirement, IContent>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ContentPermissions _contentPermissions;
 
-        public ContentPermissionResourceHandler(
+        public ContentPermissionsResourceHandler(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ContentPermissions contentPermissions)
         {
@@ -22,7 +22,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _contentPermissions = contentPermissions;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionResourceRequirement requirement, IContent resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionsResourceRequirement requirement, IContent resource)
         {
             var permissionResult = _contentPermissions.CheckPermissions(resource,
                 _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,

@@ -126,11 +126,11 @@ namespace Umbraco.Extensions
             services.AddSingleton<IAuthorizationHandler, SectionHandler>();
             services.AddSingleton<IAuthorizationHandler, AdminUsersHandler>();
             services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionQueryStringHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionResourceHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionPublishBranchHandler>();
-            services.AddSingleton<IAuthorizationHandler, MediaPermissionResourceHandler>();
-            services.AddSingleton<IAuthorizationHandler, MediaPermissionQueryStringHandler>();
+            services.AddSingleton<IAuthorizationHandler, ContentPermissionsQueryStringHandler>();
+            services.AddSingleton<IAuthorizationHandler, ContentPermissionsResourceHandler>();
+            services.AddSingleton<IAuthorizationHandler, ContentPermissionsPublishBranchHandler>();
+            services.AddSingleton<IAuthorizationHandler, MediaPermissionsResourceHandler>();
+            services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
             services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
 
             services.AddAuthorization(options =>

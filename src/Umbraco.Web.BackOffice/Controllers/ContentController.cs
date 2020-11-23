@@ -172,7 +172,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (content == null) return NotFound();
 
             // Authorize...
-            var requirement = new ContentPermissionResourceRequirement(ActionRights.ActionLetter);
+            var requirement = new ContentPermissionsResourceRequirement(ActionRights.ActionLetter);
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, content, requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -1601,7 +1601,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             // Authorize...
-            var requirement = new ContentPermissionResourceRequirement(ActionSort.ActionLetter);
+            var requirement = new ContentPermissionsResourceRequirement(ActionSort.ActionLetter);
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(sorted.ParentId), requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -1636,7 +1636,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostMove(MoveOrCopy move)
         {
             // Authorize...
-            var requirement = new ContentPermissionResourceRequirement(ActionMove.ActionLetter);
+            var requirement = new ContentPermissionsResourceRequirement(ActionMove.ActionLetter);
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(move.ParentId), requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -1658,7 +1658,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostCopy(MoveOrCopy copy)
         {
             // Authorize...
-            var requirement = new ContentPermissionResourceRequirement(ActionCopy.ActionLetter);
+            var requirement = new ContentPermissionsResourceRequirement(ActionCopy.ActionLetter);
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, _contentService.GetById(copy.ParentId), requirement);
             if (!authorizationResult.Succeeded)
             {
@@ -1688,7 +1688,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }   
 
             // Authorize...
-            var requirement = new ContentPermissionResourceRequirement(ActionUnpublish.ActionLetter);
+            var requirement = new ContentPermissionsResourceRequirement(ActionUnpublish.ActionLetter);
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, foundContent, requirement);
             if (!authorizationResult.Succeeded)
             {

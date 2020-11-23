@@ -231,8 +231,8 @@ namespace Umbraco.Web.BackOffice.Filters
 
 
                 var requirement = contentToCheck == null
-                    ? new ContentPermissionResourceRequirement(contentIdToCheck, permissionToCheck)
-                    : new ContentPermissionResourceRequirement(permissionToCheck);
+                    ? new ContentPermissionsResourceRequirement(contentIdToCheck, permissionToCheck)
+                    : new ContentPermissionsResourceRequirement(permissionToCheck);
 
                 var authorizationResult = await _authorizationService.AuthorizeAsync(actionContext.HttpContext.User, contentToCheck, requirement);
                 if (!authorizationResult.Succeeded)

@@ -4,7 +4,7 @@ namespace Umbraco.Web.BackOffice.Authorization
 {
 
     /// <summary>
-    /// An authorization requirement for <see cref="ContentPermissionQueryStringHandler"/>
+    /// An authorization requirement for <see cref="ContentPermissionsQueryStringHandler"/>
     /// </summary>
     public class ContentPermissionsQueryStringRequirement : IAuthorizationRequirement
     {
