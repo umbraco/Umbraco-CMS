@@ -55,7 +55,14 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
-      with:
-        config-file: ./.github/codeql-config.yml
+      paths-ignore: 
+        - node_modules
+        - Umbraco.TestData
+        - Umbraco.Tests
+        - Umbraco.Tests.AcceptanceTest
+        - Umbraco.Tests.Benchmarks
+        - bin
+      paths:
+        - src   
 
 
