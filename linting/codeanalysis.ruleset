@@ -8,8 +8,14 @@
 
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
 
+    <!--Prefix local calls with this-->
+    <Rule Id="SA1101" Action="None" />
+
     <!--Using directive should appear within a namespace declaration-->
     <Rule Id="SA1200" Action="None" />
+
+    <!--Field names must not begin with underscore-->
+    <Rule Id="SA1309" Action="None" />
 
     <!--A C# code file contains more than one unique type.-->
     <Rule Id="SA1402" Action="None" />
