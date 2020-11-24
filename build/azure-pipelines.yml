@@ -22,4 +22,4 @@ jobs:
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: '**\*.Tests.UnitTests.csproj'
+      projects: '**/*.Tests.UnitTests.csproj'
