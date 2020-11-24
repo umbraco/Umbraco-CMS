@@ -893,7 +893,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
         /// </returns>
-        public static IHtmlContent ReplaceLineBreaks(this HtmlHelper helper, string text)
+        public static IHtmlContent ReplaceLineBreaks(this IHtmlHelper helper, string text)
         {
             return StringUtilities.ReplaceLineBreaks(text);
         }
@@ -905,7 +905,7 @@ namespace Umbraco.Extensions
         /// <param name="helper"></param>
         /// <param name="text">The text to create a hash from</param>
         /// <returns>Hash of the text string</returns>
-        public static string CreateHash(this HtmlHelper helper, string text)
+        public static string CreateHash(this IHtmlHelper helper, string text)
         {
             return text.GenerateHash();
         }

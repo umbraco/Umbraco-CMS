@@ -308,8 +308,10 @@ namespace Umbraco.Tests.Testing
 
             // web
             Builder.Services.AddUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            Builder.Services.AddUnique<IBackOfficeSecurityAccessor>(_ => new HybridBackofficeSecurityAccessor(AppCaches.NoCache.RequestCache));
             Builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
             Builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
 
             Builder.DataValueReferenceFactories();
 
