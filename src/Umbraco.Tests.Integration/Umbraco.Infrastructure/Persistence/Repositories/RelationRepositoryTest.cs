@@ -250,7 +250,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         }
 
         [Test]
-        [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Boot = true)]
         public void Get_Paged_Child_Entities_By_Parent_Id()
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out _);

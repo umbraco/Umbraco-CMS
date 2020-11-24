@@ -34,10 +34,12 @@ using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
+using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Profiler;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.Common.Builder
@@ -55,9 +57,8 @@ namespace Umbraco.Web.Common.Builder
 
             var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
-            var hostingSettings = config.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(new OptionsMonitorAdapter<HostingSettings>(hostingSettings), webHostEnvironment);
-            services.AddLogger(hostingEnvironment, loggingConfig, config);
+            var tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
+            services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
@@ -66,8 +67,11 @@ namespace Umbraco.Web.Common.Builder
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique<AppCaches>(appCaches);
 
+            var profiler = GetWebProfiler(config);
+            services.AddUnique<IProfiler>(profiler);
+
             var loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
-            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, hostingEnvironment, loggerFactory, appCaches, config);
+            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -79,15 +83,6 @@ namespace Umbraco.Web.Common.Builder
 
             builder.Services.AddLazySupport();
 
-            // Add service session
-            // This can be overwritten by the user by adding their own call to AddSession
-            // since the last call of AddSession take precedence
-            builder.Services.AddSession(options =>
-            {
-                options.Cookie.Name = "UMB_SESSION";
-                options.Cookie.HttpOnly = true;
-            });
-            
             // Add supported databases
             builder.AddUmbracoSqlCeSupport();
             builder.AddUmbracoSqlServerSupport();
@@ -114,8 +109,6 @@ namespace Umbraco.Web.Common.Builder
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });
 
-            var profiler = UmbracoCoreServiceCollectionExtensions.GetWebProfiler(builder.Config);
-            builder.Services.AddUnique<IProfiler>(profiler);
             builder.Services.AddUnique<IIOHelper, IOHelper>();
             builder.Services.AddUnique<IAppPolicyCache>(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
             builder.Services.AddUnique<IRequestCache>(factory => factory.GetRequiredService<AppCaches>().RequestCache);
@@ -236,6 +229,15 @@ namespace Umbraco.Web.Common.Builder
 
         public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
         {
+            // Add service session
+            // This can be overwritten by the user by adding their own call to AddSession
+            // since the last call of AddSession take precedence
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.Name = "UMB_SESSION";
+                options.Cookie.HttpOnly = true;
+            });
+
             builder.Services.ConfigureOptions<UmbracoWebServiceCollectionExtensions.UmbracoMvcConfigureOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
@@ -313,6 +315,36 @@ namespace Umbraco.Web.Common.Builder
             builder.Services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
 
             return builder;
+        }
+
+        private static IProfiler GetWebProfiler(IConfiguration config)
+        {
+            var isDebug = config.GetValue<bool>($"{Core.Constants.Configuration.ConfigHosting}:Debug");
+            // create and start asap to profile boot
+            if (!isDebug)
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                return new VoidProfiler();
+            }
+
+            var webProfiler = new WebProfiler();
+            webProfiler.StartBoot();
+
+            return webProfiler;
+        }
+
+        /// <summary>
+        /// HACK: returns an AspNetCoreHostingEnvironment that doesn't monitor changes to configuration.<br/>
+        /// We require this to create a TypeLoader during ConfigureServices.<br/>
+        /// Instances returned from this method shouldn't be registered in the service collection.
+        /// </summary>
+        private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment, IConfiguration config)
+        {
+            var hostingSettings = config.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
+            var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
+
+            return new AspNetCoreHostingEnvironment(wrappedHostingSettings, webHostEnvironment);
         }
     }
 }

@@ -174,7 +174,14 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
 
-            var typeLoader = services.AddTypeLoader(GetType().Assembly, webHostEnvironment, TestHelper.GetHostingEnvironment(), TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration);
+            var typeLoader = services.AddTypeLoader(
+                GetType().Assembly,
+                webHostEnvironment,
+                TestHelper.GetHostingEnvironment(),
+                TestHelper.ConsoleLoggerFactory,
+                AppCaches.NoCache,
+                Configuration,
+                TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
 
 
@@ -184,8 +191,6 @@ namespace Umbraco.Tests.Integration.Testing
                 .AddUmbracoCore();
 
             builder.Services.AddUnique<AppCaches>(GetAppCaches());
-
-
             builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
 

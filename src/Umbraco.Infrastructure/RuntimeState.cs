@@ -161,6 +161,12 @@ namespace Umbraco.Core
             Reason = RuntimeLevelReason.UpgradeMigrations;
         }
 
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
+        {
+            Level = level;
+            Reason = reason;
+        }
+
         private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));

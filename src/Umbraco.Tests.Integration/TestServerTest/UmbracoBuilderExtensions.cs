@@ -2,8 +2,8 @@
 using Umbraco.Core;
 using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
-using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.Common.Builder;
 
@@ -21,7 +21,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
             builder.AddUmbracoCore();
 
             builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
-
             builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique<IMainDom>(testHelper.MainDom);
 

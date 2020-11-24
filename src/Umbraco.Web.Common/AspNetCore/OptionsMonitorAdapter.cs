@@ -4,9 +4,12 @@ using Microsoft.Extensions.Options;
 namespace Umbraco.Web.Common.AspNetCore
 {
     /// <summary>
-    /// OptionsMonitor but without the monitoring
+    /// HACK: OptionsMonitor but without the monitoring, hopefully temporary.
+    /// This is just used so we can get an AspNetCoreHostingEnvironment to
+    /// build a TypeLoader long before ServiceProvider is built.
     /// </summary>
-    public class OptionsMonitorAdapter<T> : IOptionsMonitor<T> where T : class, new()
+    [Obsolete("Please let the container wire up a real OptionsMonitor for you")]
+    internal class OptionsMonitorAdapter<T> : IOptionsMonitor<T> where T : class, new()
     {
         private readonly T _inner;
 
@@ -26,6 +29,5 @@ namespace Umbraco.Web.Common.AspNetCore
         }
 
         public T CurrentValue => _inner;
-
     }
 }

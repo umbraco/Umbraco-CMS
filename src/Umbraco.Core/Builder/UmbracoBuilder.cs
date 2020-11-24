@@ -11,6 +11,11 @@ namespace Umbraco.Web.Common.Builder
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
+        public IServiceCollection Services { get; }
+        public IConfiguration Config { get; }
+        public TypeLoader TypeLoader { get; }
+        public ILoggerFactory BuilderLoggerFactory { get; }
+
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
@@ -24,13 +29,6 @@ namespace Umbraco.Web.Common.Builder
             BuilderLoggerFactory = loggerFactory;
             TypeLoader = typeLoader;
         }
-
-        public IServiceCollection Services { get; }
-        public IConfiguration Config { get; }
-
-
-        public TypeLoader TypeLoader { get; }
-        public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <summary>
         /// Gets a collection builder (and registers the collection).
@@ -49,8 +47,6 @@ namespace Umbraco.Web.Common.Builder
             _builders[typeOfBuilder] = builder;
             return builder;
         }
-
-     
 
         public void Build()
         {

@@ -57,8 +57,6 @@ namespace Umbraco.Tests.Integration.Testing
 
             builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
             builder.Services.AddUnique<IProfiler, TestProfiler>();
-
-
         }
 
         /// <summary>

@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Infrastructure.Runtime
 {
     public class CoreRuntime : IRuntime
     {
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom(_mainDom, _applicationShutdownRegistry);
+            AcquireMainDom();
 
             // create & initialize the components
             _components.Initialize();
@@ -68,16 +69,16 @@ namespace Umbraco.Core.Runtime
 
         public void Terminate()
         {
-            _components?.Terminate();
+            _components.Terminate();
         }
 
-        private void AcquireMainDom(IMainDom mainDom, IApplicationShutdownRegistry applicationShutdownRegistry)
+        private void AcquireMainDom()
         {
             using (var timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    mainDom.Acquire(applicationShutdownRegistry);
+                    _mainDom.Acquire(_applicationShutdownRegistry);
                 }
                 catch
                 {
@@ -105,10 +106,7 @@ namespace Umbraco.Core.Runtime
             }
             catch
             {
-
-                // BOO a cast, yay no CoreRuntimeBootstrapper
-                ((RuntimeState)State).Level = RuntimeLevel.BootFailed;
-                ((RuntimeState)State).Reason = RuntimeLevelReason.BootFailedOnException;
+                State.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException);
                 timer?.Fail();
                 throw;
             }

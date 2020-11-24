@@ -65,31 +65,19 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        internal static IProfiler GetWebProfiler(IConfiguration config)
+        internal static ITypeFinder AddTypeFinder(
+            this IServiceCollection services,
+            ILoggerFactory loggerFactory,
+            IWebHostEnvironment webHostEnvironment,
+            Assembly entryAssembly,
+            IConfiguration config,
+            IProfilingLogger profilingLogger)
         {
-            var isDebug = config.GetValue<bool>($"{Constants.Configuration.ConfigHosting}:Debug");
-            // create and start asap to profile boot
-            if (!isDebug)
-            {
-                // should let it be null, that's how MiniProfiler is meant to work,
-                // but our own IProfiler expects an instance so let's get one
-                return new VoidProfiler();
-            }
-
-            var webProfiler = new WebProfiler();
-            webProfiler.StartBoot();
-
-            return webProfiler;
-        }
-
-        internal static ITypeFinder AddTypeFinder(this IServiceCollection services, ILoggerFactory loggerFactory, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IConfiguration config)
-        {
-            var profiler = GetWebProfiler(config);
 
             var typeFinderSettings = config.GetSection(Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
 
             var runtimeHashPaths = new RuntimeHashPaths().AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler), runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(profilingLogger, runtimeHashPaths);
 
             var typeFinder =  new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
@@ -103,20 +91,20 @@ namespace Umbraco.Extensions
             return typeFinder;
         }
 
-        internal static TypeLoader AddTypeLoader(
+        public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
             Assembly entryAssembly,
             IWebHostEnvironment webHostEnvironment,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             AppCaches appCaches,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IProfiler profiler)
         {
-            var typeFinder = services.AddTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, configuration);
+            var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler);
+            var typeFinder = services.AddTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, configuration, profilingLogger);
 
-            var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), GetWebProfiler(configuration));
-
-            var typeLoader =  new TypeLoader(
+            var typeLoader = new TypeLoader(
                 typeFinder,
                 appCaches.RuntimeCache,
                 new DirectoryInfo(hostingEnvironment.LocalTempPath),
@@ -128,15 +116,5 @@ namespace Umbraco.Extensions
 
             return typeLoader;
         }
-
-        internal class AspNetCoreBootPermissionsChecker : IUmbracoBootPermissionChecker
-        {
-            public void ThrowIfNotPermissions()
-            {
-                // nothing to check
-            }
-        }
-
     }
-
 }

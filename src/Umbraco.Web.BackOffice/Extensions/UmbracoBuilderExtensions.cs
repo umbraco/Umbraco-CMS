@@ -30,10 +30,6 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder)
         {
             builder.Services.AddAntiforgery();
-
-            // TODO: We had this check in v8 where we don't enable these unless we can run...
-            //if (runtimeState.Level != RuntimeLevel.Upgrade && runtimeState.Level != RuntimeLevel.Run) return app;
-
             builder.Services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
             builder.Services
                 .AddAuthentication(Core.Constants.Security.BackOfficeAuthenticationType)

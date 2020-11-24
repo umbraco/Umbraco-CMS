@@ -14,6 +14,7 @@ using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Runtime;
@@ -61,9 +62,15 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    var typeLoader = services.AddTypeLoader(GetType().Assembly, webHostEnvironment, testHelper.GetHostingEnvironment(),
-                        testHelper.ConsoleLoggerFactory, AppCaches.NoCache, hostContext.Configuration);
-
+                    var typeLoader = services.AddTypeLoader(
+                        GetType().Assembly,
+                        webHostEnvironment,
+                        testHelper.GetHostingEnvironment(),
+                        testHelper.ConsoleLoggerFactory,
+                        AppCaches.NoCache,
+                        hostContext.Configuration,
+                        testHelper.Profiler);
+                    
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,  testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration();
@@ -105,9 +112,14 @@ namespace Umbraco.Tests.Integration
                     
                     // Add it!
 
-                    var typeLoader = services.AddTypeLoader(GetType().Assembly,
-                        webHostEnvironment, testHelper.GetHostingEnvironment(), testHelper.ConsoleLoggerFactory, AppCaches.NoCache,
-                        hostContext.Configuration);
+                    var typeLoader = services.AddTypeLoader(
+                        GetType().Assembly,
+                        webHostEnvironment,
+                        testHelper.GetHostingEnvironment(),
+                        testHelper.ConsoleLoggerFactory,
+                        AppCaches.NoCache,
+                        hostContext.Configuration,
+                        testHelper.Profiler);
 
                     var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
