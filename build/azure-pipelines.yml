@@ -18,5 +18,23 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- task: UseDotNet@2
+  displayName: 'Use .Net Core sdk 3.1.100'
+  inputs:
+    version: 3.1.100
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet Latest'
+
+- task: NuGetCommand@2
+  displayName: 'Restore NuGet Packages'
+  inputs:
+    restoreSolution: '**/src/umbraco-netcore-only.sln'
+    feedsToUse: config
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: '**/src/Umbraco.Web.UI.NetCore/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
