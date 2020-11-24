@@ -36,7 +36,7 @@ namespace Umbraco.Infrastructure.PublishedCache
         /// <param name="service">A published snapshot service.</param>
         public static void SetPublishedSnapshotService(this IUmbracoBuilder builder, IPublishedSnapshotService service)
         {
-            builder.Services.AddUnique(_ => service);
+            builder.Services.AddUnique(service);
         }
     }
 }

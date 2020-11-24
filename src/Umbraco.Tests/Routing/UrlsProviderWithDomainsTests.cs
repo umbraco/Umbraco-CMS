@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Builder.Services.AddUnique(_ => Mock.Of<IDomainService>());
+            Builder.Services.AddUnique(Mock.Of<IDomainService>());
             Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 

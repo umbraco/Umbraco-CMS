@@ -67,7 +67,7 @@ namespace Umbraco.Web
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this IUmbracoBuilder builder, IContentLastChanceFinder finder)
         {
-            builder.Services.AddUnique(_ => finder);
+            builder.Services.AddUnique(finder);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Umbraco.Web
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainHelper helper)
         {
-            builder.Services.AddUnique(_ => helper);
+            builder.Services.AddUnique(helper);
         }
 
         #endregion

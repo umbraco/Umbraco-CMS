@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Cache
             base.Compose(builder);
             // refreshers.HandleEvents wants a UmbracoContext
             // which wants these
-            builder.Services.AddUnique(_ => Mock.Of<IPublishedSnapshotService>());
+            builder.Services.AddUnique(Mock.Of<IPublishedSnapshotService>());
             builder.WithCollectionBuilder<UrlProviderCollectionBuilder>();
         }
 

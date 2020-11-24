@@ -135,7 +135,7 @@ namespace Umbraco.Core
         /// <param name="factory">A factory.</param>
         public static void SetCultureDictionaryFactory(this IUmbracoBuilder builder, ICultureDictionaryFactory factory)
         {
-            builder.Services.AddUnique(_ => factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Umbraco.Core
         /// <param name="factory">A published content model factory.</param>
         public static void SetPublishedContentModelFactory(this IUmbracoBuilder builder, IPublishedModelFactory factory)
         {
-            builder.Services.AddUnique(_ => factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Umbraco.Core
         /// <param name="registrar">A server registrar.</param>
         public static void SetServerRegistrar(this IUmbracoBuilder builder, IServerRegistrar registrar)
         {
-            builder.Services.AddUnique(_ => registrar);
+            builder.Services.AddUnique(registrar);
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Umbraco.Core
         /// <param name="registrar">A server messenger.</param>
         public static void SetServerMessenger(this IUmbracoBuilder builder, IServerMessenger registrar)
         {
-            builder.Services.AddUnique(_ => registrar);
+            builder.Services.AddUnique(registrar);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace Umbraco.Core
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
         public static void SetDatabaseServerMessengerOptions(this IUmbracoBuilder builder, DatabaseServerMessengerCallbacks options)
         {
-            builder.Services.AddUnique(_ => options);
+            builder.Services.AddUnique(options);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace Umbraco.Core
         /// <param name="helper">A short string helper.</param>
         public static void SetShortStringHelper(this IUmbracoBuilder builder, IShortStringHelper helper)
         {
-            builder.Services.AddUnique(_ => helper);
+            builder.Services.AddUnique(helper);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace Umbraco.Core
         /// <param name="helper">A log viewer.</param>
         public static void SetLogViewer(this IUmbracoBuilder builder, ILogViewer viewer)
         {
-            builder.Services.AddUnique(_ => viewer);
+            builder.Services.AddUnique(viewer);
         }
 
         #endregion
