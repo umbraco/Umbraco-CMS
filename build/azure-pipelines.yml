@@ -19,7 +19,7 @@ jobs:
     inputs:
       version: 3.1.100
   - task: DotNetCoreCLI@2
-  displayName: 'dotnet test'
-  inputs:
-    command: test
-    projects: '**\Umbraco.Tests.UnitTests.csproj'
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: '**\Umbraco.Tests.UnitTests.csproj'
