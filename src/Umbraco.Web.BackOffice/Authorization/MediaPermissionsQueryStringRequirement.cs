@@ -4,11 +4,11 @@ namespace Umbraco.Web.BackOffice.Authorization
 {
     public class MediaPermissionsQueryStringRequirement : IAuthorizationRequirement
     {
-        public MediaPermissionsQueryStringRequirement(string[] paramNames)
+        public MediaPermissionsQueryStringRequirement(string paramName)
         {
-            QueryStringNames = paramNames;
+            QueryStringName = paramName;
         }
 
-        public string[] QueryStringNames { get; }
+        public string QueryStringName { get; }
     }
 }

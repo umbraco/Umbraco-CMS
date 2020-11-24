@@ -20,27 +20,21 @@ namespace Umbraco.Web.BackOffice.Authorization
         public MediaPermissionsQueryStringHandler(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IHttpContextAccessor httpContextAccessor,
+            IEntityService entityService,
             MediaPermissions mediaPermissions)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _httpContextAccessor = httpContextAccessor;
+            _entityService = entityService;
             _mediaPermissions = mediaPermissions;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MediaPermissionsQueryStringRequirement requirement)
         {
-            StringValues routeVal;
-            foreach (var qs in requirement.QueryStringNames)
+            if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
             {
-                if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue(qs, out routeVal))
-                {
-                    break;
-                }
-            }
-
-            if (routeVal.Count == 0)
-            {
-                throw new InvalidOperationException("No argument found for the current action with by names " + string.Join(", ", requirement.QueryStringNames));
+                // don't set status since we cannot determine ourselves
+                return Task.CompletedTask;
             }
 
             int nodeId;
@@ -68,18 +62,15 @@ namespace Umbraco.Web.BackOffice.Authorization
                 nodeId,
                 out var mediaItem);
 
-            if (permissionResult == MediaPermissions.MediaAccess.NotFound)
+            switch (permissionResult)
             {
-                return null;
-            }
-
-            if (permissionResult == MediaPermissions.MediaAccess.Denied)
-            {
-                context.Fail();
-            }
-            else
-            {
-                context.Succeed(requirement);
+                case MediaPermissions.MediaAccess.Denied:
+                    context.Fail();
+                    break;
+                case MediaPermissions.MediaAccess.NotFound:
+                default:
+                    context.Succeed(requirement);
+                    break;
             }
 
             if (mediaItem != null)

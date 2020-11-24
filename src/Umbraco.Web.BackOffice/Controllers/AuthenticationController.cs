@@ -27,7 +27,6 @@ using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
-using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;

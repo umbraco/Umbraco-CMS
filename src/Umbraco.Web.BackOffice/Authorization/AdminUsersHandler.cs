@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
@@ -33,8 +34,40 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
         {
-            var isAuth = IsAuthorized(requirement);
-            if (!isAuth.HasValue || isAuth.Value)
+            int[] userIds;
+
+            var queryString = _httpContextAcessor.HttpContext?.Request.Query[requirement.QueryStringName];
+            if (!queryString.HasValue)
+            {
+                // don't set status since we cannot determine ourselves
+                return Task.CompletedTask;
+            }
+
+            if (int.TryParse(queryString, out var userId))
+            {
+                userIds = new[] { userId };
+            }
+            else
+            {
+                var ids = _httpContextAcessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToList();
+                if (ids.Count == 0)
+                {
+                    // don't set status since we cannot determine ourselves
+                    return Task.CompletedTask;
+                }
+                userIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+            }
+
+            if (userIds.Length == 0)
+            {
+                // don't set status since we cannot determine ourselves
+                return Task.CompletedTask;
+            }
+
+            var users = _userService.GetUsersById(userIds);
+            var isAuth = users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, null) != false);
+
+            if (isAuth)
             {
                 context.Succeed(requirement);
             }
@@ -44,31 +77,6 @@ namespace Umbraco.Web.BackOffice.Authorization
             }
 
             return Task.CompletedTask;
-        }
-
-        private bool? IsAuthorized(AdminUsersRequirement requirement)
-        {
-            int[] userIds;
-
-            var queryString = _httpContextAcessor.HttpContext?.Request.Query[requirement.QueryStringName];
-            if (!queryString.HasValue) return null; 
-
-            if (int.TryParse(queryString, out var userId))
-            {
-                userIds = new[] { userId };
-            }
-            else
-            {
-                var ids = _httpContextAcessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToArray();
-                if (ids.Length == 0)
-                    return null; 
-                userIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
-            }
-
-            if (userIds.Length == 0) return null; 
-
-            var users = _userService.GetUsersById(userIds);
-            return users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, null) != false);
         }
     }
 }

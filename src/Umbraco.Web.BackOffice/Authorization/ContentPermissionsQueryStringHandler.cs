@@ -39,36 +39,30 @@ namespace Umbraco.Web.BackOffice.Authorization
             int nodeId;
             if (requirement.NodeId.HasValue == false)
             {
-                StringValues routeVal;
-                foreach(var qs in requirement.QueryStringNames)
+                if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
                 {
-                    if (_httpContextAccessor.HttpContext.Request.Query.TryGetValue(qs, out routeVal))
-                    {
-                        break;                        
-                    }
-                }
-
-                if (routeVal.Count == 0)
-                {
-                    throw new InvalidOperationException("No argument found for the current action with by names " + string.Join(", ", requirement.QueryStringNames));
-                }
-                
-                var argument = routeVal.ToString();
-                // if the argument is an int, it will parse and can be assigned to nodeId
-                // if might be a udi, so check that next
-                // otherwise treat it as a guid - unlikely we ever get here
-                if (int.TryParse(argument, out int parsedId))
-                {
-                    nodeId = parsedId;
-                }
-                else if (UdiParser.TryParse(argument, true, out var udi))
-                {
-                    nodeId = _entityService.GetId(udi).Result;
+                    // don't set status since we cannot determine ourselves
+                    return Task.CompletedTask;
                 }
                 else
                 {
-                    Guid.TryParse(argument, out Guid key);
-                    nodeId = _entityService.GetId(key, UmbracoObjectTypes.Document).Result;
+                    var argument = routeVal.ToString();
+                    // if the argument is an int, it will parse and can be assigned to nodeId
+                    // if might be a udi, so check that next
+                    // otherwise treat it as a guid - unlikely we ever get here
+                    if (int.TryParse(argument, out int parsedId))
+                    {
+                        nodeId = parsedId;
+                    }
+                    else if (UdiParser.TryParse(argument, true, out var udi))
+                    {
+                        nodeId = _entityService.GetId(udi).Result;
+                    }
+                    else
+                    {
+                        Guid.TryParse(argument, out Guid key);
+                        nodeId = _entityService.GetId(key, UmbracoObjectTypes.Document).Result;
+                    }
                 }
             }
             else
@@ -81,20 +75,16 @@ namespace Umbraco.Web.BackOffice.Authorization
                 out IContent contentItem,
                 new[] { requirement.PermissionToCheck });
 
-            if (permissionResult == ContentPermissions.ContentAccess.NotFound)
+            switch (permissionResult)
             {
-                return null;
+                case ContentPermissions.ContentAccess.Denied:
+                    context.Fail();
+                    break;
+                case ContentPermissions.ContentAccess.NotFound:
+                default:
+                    context.Succeed(requirement);
+                    break;
             }
-
-            if (permissionResult == ContentPermissions.ContentAccess.Denied)
-            {
-                context.Fail();
-            }
-            else
-            {
-                context.Succeed(requirement);
-            }
-
 
             if (contentItem != null)
             {

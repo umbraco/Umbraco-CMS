@@ -25,14 +25,14 @@ namespace Umbraco.Web.BackOffice.Authorization
         /// </summary>
         /// <param name="paramName"></param>
         /// <param name="permissionToCheck"></param>
-        public ContentPermissionsQueryStringRequirement(char permissionToCheck, string[] paramNames)
+        public ContentPermissionsQueryStringRequirement(char permissionToCheck, string paramName = "id")
         {
-            QueryStringNames = paramNames;
+            QueryStringName = paramName;
             PermissionToCheck = permissionToCheck;
         }
 
         public int? NodeId { get; }
-        public string[] QueryStringNames { get; }
+        public string QueryStringName { get; }
         public char PermissionToCheck { get; }
     }
 }

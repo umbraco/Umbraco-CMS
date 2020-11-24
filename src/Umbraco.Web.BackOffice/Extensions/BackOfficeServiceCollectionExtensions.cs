@@ -135,17 +135,11 @@ namespace Umbraco.Extensions
 
             services.AddAuthorization(options =>
             {
-                // these are the query strings we will check for media ids when permission checking
-                var mediaPermissionQueryStrings = new[] { "id" };
-
                 options.AddPolicy(AuthorizationPolicies.MediaPermissionPathById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new MediaPermissionsQueryStringRequirement(mediaPermissionQueryStrings));
+                    policy.Requirements.Add(new MediaPermissionsQueryStringRequirement("id"));
                 });
-
-                // these are the query strings we will check for content ids when permission checking
-                var contentPermissionQueryStrings = new[] { "id", "contentId" };
 
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionEmptyRecycleBin, policy =>
                 {
@@ -156,37 +150,41 @@ namespace Umbraco.Extensions
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionAdministrationById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter, contentPermissionQueryStrings));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter, "contentId"));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionProtectById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter, contentPermissionQueryStrings));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter, "contentId"));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionRollbackById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter, contentPermissionQueryStrings));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter, "contentId"));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.ContentPermissionPublishById, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionPublish.ActionLetter));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionBrowseById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionPublish.ActionLetter, contentPermissionQueryStrings));
-                });
-
-                options.AddPolicy(AuthorizationPolicies.ContentPermissionBrowseById, policy =>
-                {
-                    policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter, contentPermissionQueryStrings));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter, "contentId"));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.ContentPermissionDeleteById, policy =>
                 {
                     policy.AuthenticationSchemes.Add(Constants.Security.BackOfficeAuthenticationType);
-                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionDelete.ActionLetter, contentPermissionQueryStrings));
+                    policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionDelete.ActionLetter));
                 });
 
                 options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
