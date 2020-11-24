@@ -21,7 +21,7 @@ namespace Umbraco.Web.Mvc
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IBackOfficeSecurity BackOfficeSecurity => _backOfficeSecurityAccessor.BackOfficeSecurity ?? Current.UmbracoContext.Security;
+        private IBackOfficeSecurity BackOfficeSecurity => _backOfficeSecurityAccessor.BackOfficeSecurity ?? Current.BackOfficeSecurityAccessor.BackOfficeSecurity;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS

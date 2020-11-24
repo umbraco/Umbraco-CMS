@@ -23,7 +23,7 @@ namespace Umbraco.Web.Common.Filters
         /// </summary>
         internal static bool Enable = true;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoContextAccessor _umbracoContext;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly LinkGenerator _linkGenerator;
         private readonly bool _redirectToUmbracoLogin;
@@ -31,12 +31,13 @@ namespace Umbraco.Web.Common.Filters
 
         private UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContext,
-            IRuntimeState runtimeState, LinkGenerator linkGenerator,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IRuntimeState runtimeState,
+            LinkGenerator linkGenerator,
             bool redirectToUmbracoLogin, bool requireApproval, string redirectUrl)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
             _redirectToUmbracoLogin = redirectToUmbracoLogin;
@@ -54,17 +55,17 @@ namespace Umbraco.Web.Common.Filters
         /// <param name="redirectUrl"></param>
         public UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContext,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
-            string redirectUrl) : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, false, false, redirectUrl)
+            string redirectUrl) : this(hostingEnvironment, backOfficeSecurityAccessor, runtimeState, linkGenerator, false, false, redirectUrl)
         {
         }
 
         public UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContext,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IRuntimeState runtimeState, LinkGenerator linkGenerator,
-            bool redirectToUmbracoLogin, bool requireApproval) : this(hostingEnvironment, umbracoContext, runtimeState, linkGenerator, redirectToUmbracoLogin, requireApproval, null)
+            bool redirectToUmbracoLogin, bool requireApproval) : this(hostingEnvironment, backOfficeSecurityAccessor, runtimeState, linkGenerator, redirectToUmbracoLogin, requireApproval, null)
         {
         }
 
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Common.Filters
                 // otherwise we need to ensure that a user is logged in
                 return _runtimeState.Level == RuntimeLevel.Install
                     || _runtimeState.Level == RuntimeLevel.Upgrade
-                    || _umbracoContext.UmbracoContext?.Security.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
+                    || _backOfficeSecurityAccessor?.BackOfficeSecurity.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
             }
             catch (Exception)
             {
