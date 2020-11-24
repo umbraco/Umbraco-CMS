@@ -464,7 +464,7 @@ function serverValidationManager($timeout) {
      * @ngdoc function
      * @name addErrorsForModelState
      * @methodOf umbraco.services.serverValidationManager
-     * @param {any} modelState
+     * @param {any} modelState the modelState object
      * @param {any} parentValidationPath optional parameter specifying a nested element's UDI for which this property belongs (for complex editors)
      * @description
      * This wires up all of the server validation model state so that valServer and valServerField directives work

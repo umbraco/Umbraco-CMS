@@ -12,7 +12,7 @@ namespace Umbraco.Web
     public static class ImageCropperTemplateCoreExtensions
     {
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
+        /// Gets the ImageProcessor URL by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -21,7 +21,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, IImageUrlGenerator imageUrlGenerator)
         {
@@ -29,7 +29,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -41,7 +41,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator)
         {
@@ -49,7 +49,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the IPublishedContent item.
+        /// Gets the ImageProcessor URL from the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -156,10 +156,10 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="width">
         /// The width of the output image.
@@ -238,13 +238,13 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="imageUrlGenerator">
-        /// The generator that will process all the options and the image URL to return a full image urls with all processing options appended
+        /// The generator that will process all the options and the image URL to return a full image URLs with all processing options appended
         /// </param>
         /// <param name="cropDataSet"></param>
         /// <param name="width">
