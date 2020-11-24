@@ -68,6 +68,10 @@
         <None Remove="Umbraco/Models/all.dll.path" />
         <None Remove="Umbraco/Models/models.hash" />
         <None Remove="Umbraco/Models/models.err" />
+        <None Remove="umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
+        <None Remove="umbraco\PartialViewMacros\Templates\Login.cshtml" />
+        <None Remove="umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
+        <None Remove="umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

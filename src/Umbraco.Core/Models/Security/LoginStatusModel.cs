@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
-namespace Umbraco.Web.Models
+namespace Umbraco.Core.Models.Security
 {
     /// <summary>
     /// The model representing the status of a logged in member.

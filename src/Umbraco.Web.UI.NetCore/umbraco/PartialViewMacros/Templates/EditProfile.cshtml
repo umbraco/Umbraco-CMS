@@ -1,14 +1,12 @@
-﻿@using System.Web.Mvc.Html
-@using Umbraco.Web
-@using Umbraco.Web.Composing
-@using Umbraco.Web.Controllers
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
+﻿@using Umbraco.Core.Security
+@using Umbraco.Extensions
+@using Umbraco.Web.Website.Controllers
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
 
 @{
-    var profileModel = Current.MembershipHelper.GetCurrentMemberProfileModel();
+    var profileModel = await UmbracoWebsiteSecurityAccessor.WebsiteSecurity.GetCurrentMemberProfileModelAsync();
 
-    Html.EnableClientValidation();
-    Html.EnableUnobtrusiveJavaScript();
 
     var success = TempData["ProfileUpdateSuccess"] != null;
 }
@@ -17,7 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
-@if (Current.MembershipHelper.IsLoggedIn() && profileModel != null)
+@if (UmbracoWebsiteSecurityAccessor.WebsiteSecurity.IsLoggedIn() && profileModel != null)
 {
     if (success)
     {

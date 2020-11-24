@@ -1,8 +1,8 @@
-﻿@using System.Web.Mvc.Html
-@using Umbraco.Web
-@using Umbraco.Web.Composing
-@using Umbraco.Web.Controllers
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
+﻿@using Umbraco.Core.Security
+@using Umbraco.Extensions
+@using Umbraco.Web.Website.Controllers
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
 
 @{
     @*
@@ -12,7 +12,7 @@
         var registerModel = Members.CreateRegistrationModel("Custom Member");
     *@
 
-    var registerModel = Current.MembershipHelper.CreateRegistrationModel();
+    var registerModel = UmbracoWebsiteSecurityAccessor.WebsiteSecurity.CreateRegistrationModel();
 
     @*
         Configurable here:
@@ -30,9 +30,6 @@
                                           @Html.TextBoxFor(m => registerModel.Username)
                                           @Html.ValidationMessageFor(m => registerModel.Username)
     *@
-
-    Html.EnableClientValidation();
-    Html.EnableUnobtrusiveJavaScript();
 
     var success = TempData["FormSuccess"] != null;
 }
