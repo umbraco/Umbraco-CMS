@@ -20,32 +20,22 @@
                     ng-class="{ mb0 : $last }">
 
                     <button type="button" ng-click="vm.configureTemplate(template)" class="btn-reset umb-grid-preview--rows mr3" aria-label="Edit grid layout">
-                        <div class="umb-grid-preview--row">
-                            <div class="umb-grid-preview--col umb-grid-preview--col__deep"                                 
+                        <span class="umb-grid-preview--row">
+                            <span class="umb-grid-preview--col umb-grid-preview--col__deep"                                 
                                  ng-repeat="section in template.sections | filter: vm.zeroWidthFilter"
                                  ng-style="{width: vm.percentage(section.grid) + '%'}">
-                            </div>
-                        </div>
+                            </span>
+                        </span>
                     </button>
 
-                    <div>
-                        <p>{{template.name}}</p>
-                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
-                            <i class="icon-delete red" aria-hidden="true"></i>
-                            <localize key="general_delete">Delete</localize>
-                        </button>
-                    </div>
-                        {{template.name}}</div>
-
-                    <button type="button" class="btn-icon" ng-click="vm.deleteTemplate($index)" aria-label="Remove">
+                    <p class="mb0">{{template.name}}</p>
+                    <button type="button" class="btn-icon" ng-click="vm.deleteTemplate($index)" aria-label="Delete">
                         <umb-icon icon="icon-trash"></umb-icon>
                     </button>
-
                 </li>
             </ul>
 
-            <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
-                <umb-icon icon="icon-add"></umb-icon>
+            <button type="button" class="btn btn-info" ng-click="vm.configureTemplate()">
                 <localize key="grid_addGridLayout" />
             </button>
         </div>
@@ -71,18 +61,19 @@
                         ng-class="{ mb0: $last }">                       
 
                         <button type="button" ng-click="vm.configureLayout(layout)" class="btn-reset umb-grid-preview--rows mr3" aria-label="Edit row configuration">
-                            <div class="umb-grid-preview--row">
-                                <div class="umb-grid-preview--col"                                     
+                            <span class="umb-grid-preview--row">
+                                <span class="umb-grid-preview--col"                                     
                                      ng-repeat="area in layout.areas | filter: vm.zeroWidthFilter"
                                      ng-style="{width: vm.percentage(area.grid) + '%', 'max-width': '100%'}">
 
                                     <span ng-show="area.maxItems > 0" class="umb-grid-preview--col__text">{{area.maxItems}}</span>
-                                </div>
-                            </div>
+                                </span>
+                            </span>
                         </button>               
-                        
-                        <div>
-                            {{layout.label || layout.name}}</div>
+
+                        <p class="mb0">
+                            {{layout.label || layout.name}}
+                        </p>
 
                         <button type="button" class="btn-icon" ng-click="vm.deleteLayout(layout, $index, $event)" aria-label="Remove">
                             <umb-icon icon="icon-trash"></umb-icon>
@@ -90,8 +81,7 @@
                     </li>
                 </ul>
 
-                <button type="button" class="btn btn-small btn-info" ng-click="vm.configureLayout()">
-                    <umb-icon icon="icon-add"></umb-icon>
+                <button type="button" class="btn btn-info" ng-click="vm.configureLayout()">
                     <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
 
@@ -128,13 +118,13 @@
 
             <ul class="unstyled">
                 <li>                    
-                    <button type="button" ng-click="vm.editConfig()" class="btn btn-small btn-info">
+                    <button type="button" ng-click="vm.editConfig()" class="btn btn-info">
                         <localize key="general_edit">Edit</localize>
                     </button>
                 </li>
             </ul>
         </umb-control-group>
-
+         
 
         <umb-control-group label="@grid_styles"
                            description="@grid_stylesDetails">
@@ -156,7 +146,7 @@
 
             <ul class="unstyled">
                 <li>                    
-                    <button type="button" ng-click="vm.editStyles()" class="btn btn-small btn-info">
+                    <button type="button" ng-click="vm.editStyles()" class="btn btn-info">
                         <localize key="general_edit">Edit</localize>
                     </button>
                 </li>
