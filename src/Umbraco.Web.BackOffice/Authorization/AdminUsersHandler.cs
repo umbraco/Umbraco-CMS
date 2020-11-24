@@ -34,15 +34,15 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
         {
-            int[] userIds;
-
             var queryString = _httpContextAcessor.HttpContext?.Request.Query[requirement.QueryStringName];
             if (!queryString.HasValue)
             {
-                // don't set status since we cannot determine ourselves
+                // must succeed this requirement since we cannot process it
+                context.Succeed(requirement);
                 return Task.CompletedTask;
             }
 
+            int[] userIds;
             if (int.TryParse(queryString, out var userId))
             {
                 userIds = new[] { userId };
@@ -52,7 +52,8 @@ namespace Umbraco.Web.BackOffice.Authorization
                 var ids = _httpContextAcessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToList();
                 if (ids.Count == 0)
                 {
-                    // don't set status since we cannot determine ourselves
+                    // must succeed this requirement since we cannot process it
+                    context.Succeed(requirement);
                     return Task.CompletedTask;
                 }
                 userIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
@@ -60,7 +61,8 @@ namespace Umbraco.Web.BackOffice.Authorization
 
             if (userIds.Length == 0)
             {
-                // don't set status since we cannot determine ourselves
+                // must succeed this requirement since we cannot process it
+                context.Succeed(requirement);
                 return Task.CompletedTask;
             }
 

@@ -33,7 +33,8 @@ namespace Umbraco.Web.BackOffice.Authorization
         {
             if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
             {
-                // don't set status since we cannot determine ourselves
+                // must succeed this requirement since we cannot process it
+                context.Succeed(requirement);
                 return Task.CompletedTask;
             }
 
