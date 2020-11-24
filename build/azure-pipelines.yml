@@ -5,10 +5,6 @@
 ## https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core ##
 #############################################################################
 
-# Build Pipeline triggers
-trigger:
-- master
-
 # Variables & their default values
 variables:
   buildConfiguration: 'Release'
