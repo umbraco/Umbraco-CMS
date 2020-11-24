@@ -29,6 +29,12 @@
                     </button>
 
                     <div>
+                        <p>{{template.name}}</p>
+                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
+                            <i class="icon-delete red" aria-hidden="true"></i>
+                            <localize key="general_delete">Delete</localize>
+                        </button>
+                    </div>
                         {{template.name}}</div>
 
                     <button type="button" class="btn-icon" ng-click="vm.deleteTemplate($index)" aria-label="Remove">
