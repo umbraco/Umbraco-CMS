@@ -22,4 +22,4 @@ jobs:
     displayName: 'dotnet test'
     inputs:
       command: test
-      projects: '**/src/Umbraco.Web.UI.NetCore/*.csproj'
+      projects: '**\*.Tests.UnitTests.csproj'
