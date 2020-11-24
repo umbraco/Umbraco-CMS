@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -425,7 +425,11 @@
                         if (self.scaffolds) {
                             self.scaffolds.push(formatScaffoldData(scaffold));
                         }
-                    }));
+                    }).catch(
+                        () => {
+                            // Do nothing if we get an error.
+                        }
+                    ));
                 });
 
                 return $q.all(tasks);
@@ -439,7 +443,14 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(
+                    (blockConfiguration) => {
+                        var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
             },
 
             /**
@@ -519,7 +530,7 @@
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + contentUdi)
+                    console.error("Couldn't find content data of " + contentUdi)
                     return null;
                 }
 
@@ -591,7 +602,7 @@
 
                         var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
-                            console.error("Couldnt find content settings data of " + settingsUdi)
+                            console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
                         }
 
@@ -759,6 +770,57 @@
                 }
 
                 mapToPropertyModel(elementTypeDataModel, dataModel);
+
+                return layoutEntry;
+
+            },
+            /**
+             * @ngdoc method
+             * @name createFromBlockData
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Insert data from raw models
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
+             */
+            createFromBlockData: function (blockData) {
+
+                blockData = clipboardService.parseContentForPaste(blockData, clipboardService.TYPES.BLOCK);
+
+                // As the blockData is a cloned object we can use its layout part for our layout entry.
+                var layoutEntry = blockData.layout;
+                if (layoutEntry === null) {
+                    return null;
+                }
+
+                var blockConfiguration;
+
+                if (blockData.data) {
+                    // Ensure that we support the alias:
+                    blockConfiguration = this.getBlockConfiguration(blockData.data.contentTypeKey);
+                    if(blockConfiguration === null) {
+                        return null;
+                    }
+
+                    this.value.contentData.push(blockData.data);
+                } else {
+                    // We do not have data, this cannot be succesful paste.
+                    return null;
+                }
+
+                if (blockData.settingsData) {
+                    // Ensure that we support the alias:
+                    if(blockConfiguration.settingsElementTypeKey) {
+                        // If we have settings for this Block Configuration, we need to check that they align, if we dont we do not want to fail.
+                        if(blockConfiguration.settingsElementTypeKey === blockData.settingsData.contentTypeKey) {
+                            this.value.settingsData.push(blockData.settingsData);
+                        } else {
+                            notificationsService.error("Clipboard", "Couldn't paste because settings-data is not compatible.");
+                            return null;
+                        }
+                    } else {
+                        // We do not have settings currently, so lets get rid of the settings part and move on with the paste.
+                        delete layoutEntry.settingUdi;
+                    }
+                }
 
                 return layoutEntry;
 

@@ -66,11 +66,11 @@ namespace Umbraco.Web.Mvc
             //var meta = PluginController.GetMetadata(controllerType);
             if (isMvc)
             {
-                //create a new route with custom name, specified url, and the namespace of the controller plugin
+                //create a new route with custom name, specified URL, and the namespace of the controller plugin
                 controllerPluginRoute = routes.MapRoute(
                     //name
                     string.Format("umbraco-{0}-{1}", area.AreaName, controllerName),
-                    //url format
+                    //URL format
                     url,
                     //set the namespace of the controller to match
                     new[] {controllerType.Namespace});
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Mvc
                 controllerPluginRoute = routes.MapHttpRoute(
                     //name
                     string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
-                    //url format
+                    //URL format
                     url,
                     new {controller = controllerName, id = defaultId});
                 //web api routes don't set the data tokens object

@@ -12,7 +12,7 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
 
     vm.itemKey = "";
     vm.createItem = createItem;
-
+    $scope.$emit("$changeTitle", "");
     function createItem() {
 
         if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createDictionaryForm })) {

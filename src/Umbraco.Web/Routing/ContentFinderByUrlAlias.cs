@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
-            // but the only solution is to entirely refactor url providers to stop being dynamic
+            // but the only solution is to entirely refactor URL providers to stop being dynamic
 
             if (rootNodeId > 0)
             {
