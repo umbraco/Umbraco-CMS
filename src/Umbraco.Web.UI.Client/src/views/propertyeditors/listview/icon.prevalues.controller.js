@@ -5,8 +5,8 @@ function iconPreValsController($scope, editorService) {
     }
 
     let valueArray = $scope.model.value.split(' ');
-    $scope.icon = valueArray[0],
-    $scope.color = valueArray[1],
+    $scope.icon = valueArray[0];
+    $scope.color = valueArray[1];
 
     $scope.openIconPicker = function () {
         var iconPicker = {
