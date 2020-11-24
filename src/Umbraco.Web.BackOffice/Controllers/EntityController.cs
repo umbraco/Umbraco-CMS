@@ -250,7 +250,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
        [DetermineAmbiguousActionByPassingParameters]
-        public HttpResponseMessage GetUrl(Udi udi, string culture = "*")
+        public IActionResult GetUrl(Udi udi, string culture = "*")
         {
             var intId = _entityService.GetId(udi);
             if (!intId.Success)
@@ -284,7 +284,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// We are not restricting this with security because there is no sensitive data
         /// </remarks>
         [DetermineAmbiguousActionByPassingParameters]
-        public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type, string culture = null)
+        public IActionResult GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
             culture = culture ?? ClientCulture();
 
@@ -297,10 +297,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     returnUrl = foundUrl;
 
-                    return new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(returnUrl)
-                    };
+                    return Ok(returnUrl);
                 }
             }
 
@@ -314,10 +311,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             returnUrl = "/" + string.Join("/", ancestors.Select(x => x.Name));
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(returnUrl)
-            };
+            return Ok(returnUrl);
         }
 
 
