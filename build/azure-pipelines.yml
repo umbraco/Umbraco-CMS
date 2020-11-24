@@ -14,12 +14,31 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+
   - task: UseDotNet@2
     displayName: 'Use .Net Core sdk 3.1.100'
     inputs:
       version: 3.1.100
+
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
       projects: '**/*.Tests.UnitTests.csproj'
+
+
+- job: Windows
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+
+  - task: UseDotNet@2
+  displayName: 'Use .Net Core sdk 3.1.100'
+  inputs:
+    version: 3.1.100
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: '**\*.Tests.UnitTests.csproj'
