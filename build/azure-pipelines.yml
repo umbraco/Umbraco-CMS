@@ -1,0 +1,22 @@
+#############################################################################
+## ASP.NET Core                                                            ##
+## Build and test ASP.NET Core projects targeting .NET Core.               ##
+## Runs tests, creates NuGet packages:                                     ##
+## https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core ##
+#############################################################################
+
+# Build Pipeline triggers
+trigger:
+- master
+
+# VM to run the build on & it's installed software
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Variables & their default values
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
