@@ -32,6 +32,7 @@ using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Serialization;
+using Umbraco.Net;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -147,8 +148,10 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
+            var lifetime = new Mock<IUmbracoApplicationLifetime>();
             _snapshotService = new PublishedSnapshotService(options,
                 null,
+                lifetime.Object,
                 runtime,
                 serviceContext,
                 contentTypeFactory,
@@ -173,6 +176,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
+            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
