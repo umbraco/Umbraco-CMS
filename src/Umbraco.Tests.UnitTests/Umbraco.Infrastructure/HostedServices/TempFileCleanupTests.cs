@@ -15,7 +15,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     public class TempFileCleanupTests
     {
         private Mock<IIOHelper> _mockIOHelper;
-        private string _testPath = @"c:\test\temp\path";
+        private string _testPath = Path.GetTempPath();
 
         [Test]
         public async Task Does_Not_Execute_When_Not_Main_Dom()
