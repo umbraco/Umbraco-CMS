@@ -8,6 +8,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -34,6 +35,7 @@ namespace Umbraco.Web.BackOffice.Mapping
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly UriUtility _uriUtility;
@@ -43,9 +45,25 @@ namespace Umbraco.Web.BackOffice.Mapping
         private readonly ContentVariantMapper _contentVariantMapper;
 
 
-        public ContentMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
-            IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILoggerFactory loggerFactory,
-            IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, UriUtility uriUtility, IPublishedUrlProvider publishedUrlProvider, IEntityService entityService)
+        public ContentMapDefinition(
+            CommonMapper commonMapper,
+            CommonTreeNodeMapper commonTreeNodeMapper,
+            ICultureDictionary cultureDictionary,
+            ILocalizedTextService localizedTextService,
+            IContentService contentService,
+            IContentTypeService contentTypeService,
+            IFileService fileService,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedRouter publishedRouter,
+            ILocalizationService localizationService,
+            ILoggerFactory loggerFactory,
+            IUserService userService,
+            IVariationContextAccessor variationContextAccessor,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            UriUtility uriUtility,
+            IPublishedUrlProvider publishedUrlProvider,
+            IEntityService entityService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;
@@ -60,6 +78,7 @@ namespace Umbraco.Web.BackOffice.Mapping
             _loggerFactory = loggerFactory;
             _userService = userService;
             _entityService = entityService;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _variationContextAccessor = variationContextAccessor;
             _uriUtility = uriUtility;
             _publishedUrlProvider = publishedUrlProvider;
@@ -159,10 +178,10 @@ namespace Umbraco.Web.BackOffice.Mapping
 
         private IEnumerable<string> GetActions(IContent source)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
 
             //cannot check permissions without a context
-            if (umbracoContext == null)
+            if (backOfficeSecurity is null)
                 return Enumerable.Empty<string>();
 
             string path;
@@ -174,10 +193,7 @@ namespace Umbraco.Web.BackOffice.Mapping
                 path = parent == null ? "-1" : parent.Path;
             }
 
-            // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
-            // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
-            // reference exception :(
-            return _userService.GetPermissionsForPath(umbracoContext.Security.CurrentUser, path).GetAllPermissions();
+            return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
         }
 
         private UrlInfo[] GetUrls(IContent source)

@@ -18,6 +18,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.PublishedContent
@@ -57,7 +58,7 @@ namespace Umbraco.Tests.PublishedContent
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
                     loggerFactory,
-                    Mock.Of<IUmbracoContextAccessor>(),
+                    Mock.Of<IBackOfficeSecurityAccessor>(),
                     Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(),
                     imageSourceParser,

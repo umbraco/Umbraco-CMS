@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Models.ContentEditing;
@@ -16,19 +17,19 @@ namespace Umbraco.Examine
     {
         private readonly IExamineManager _examineManager;
         private readonly ILocalizationService _languageService;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IEntityService _entityService;
         private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
 
         public BackOfficeExamineSearcher(IExamineManager examineManager,
            ILocalizationService languageService,
-           IUmbracoContextAccessor umbracoContextAccessor,
+           IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
            IEntityService entityService,
            IUmbracoTreeSearcherFields treeSearcherFields)
         {
             _examineManager = examineManager;
             _languageService = languageService;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _entityService = entityService;
             _treeSearcherFields = treeSearcherFields;
         }
@@ -47,7 +48,7 @@ namespace Umbraco.Examine
                 query = "\"" + g.ToString() + "\"";
             }
 
-            var currentUser = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
             switch (entityType)
             {

@@ -42,12 +42,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Logging
 
             var loggingConfiguration = TestHelper.GetLoggingConfiguration(hostingEnv);
 
-            var exampleLogfilePath = Path.Combine(testRoot, @"TestHelpers\Assets\", _logfileName);
+            var exampleLogfilePath = Path.Combine(testRoot, "TestHelpers","Assets", _logfileName);
             _newLogfileDirPath = loggingConfiguration.LogDirectory;
             _newLogfilePath = Path.Combine(_newLogfileDirPath, _logfileName);
 
-            var exampleSearchfilePath = Path.Combine(testRoot, @"TestHelpers\Assets\", _searchfileName);
-            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"Config\");
+            var exampleSearchfilePath = Path.Combine(testRoot, "TestHelpers","Assets", _searchfileName);
+            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"Config");
             _newSearchfilePath = Path.Combine(_newSearchfileDirPath, _searchfileName);
 
             //Create/ensure Directory exists

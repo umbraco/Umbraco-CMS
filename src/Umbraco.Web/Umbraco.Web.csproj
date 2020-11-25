@@ -221,7 +221,6 @@
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
-    <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
