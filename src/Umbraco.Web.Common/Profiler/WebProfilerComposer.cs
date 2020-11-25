@@ -1,15 +1,16 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Common.Profiler
 {
     internal class WebProfilerComposer : ComponentComposer<WebProfilerComponent>, ICoreComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Services.AddUnique<WebProfilerHtml>();
+            builder.Services.AddUnique<WebProfilerHtml>();
         }
     }
 }

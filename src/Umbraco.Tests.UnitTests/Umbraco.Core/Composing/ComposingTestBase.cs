@@ -20,7 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         [SetUp]
         public void Initialize()
         {
-            ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+            ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
 
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;

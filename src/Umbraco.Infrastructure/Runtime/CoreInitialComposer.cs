@@ -59,9 +59,11 @@ using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Runtime
 {
@@ -69,12 +71,12 @@ namespace Umbraco.Core.Runtime
     [ComposeBefore(typeof(ICoreComposer))]
     public class CoreInitialComposer : ComponentComposer<CoreInitialComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
             // composers
-            composition
+            builder
                 .ComposeRepositories()
                 .ComposeServices()
                 .ComposeCoreMappingProfiles()
@@ -83,27 +85,27 @@ namespace Umbraco.Core.Runtime
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            composition.Mappers().AddCoreMappers();
+            builder.Mappers().AddCoreMappers();
 
             // register the scope provider
-            composition.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            composition.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
-            composition.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            builder.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
 
-            composition.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
-            composition.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
-            composition.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
-            composition.Services.AddUnique<InstallStatusTracker>();
+            builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
+            builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
+            builder.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            builder.Services.AddUnique<InstallStatusTracker>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around
-            composition.Services.AddTransient<DatabaseBuilder>();
+            builder.Services.AddTransient<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
-            composition.Services.AddUnique<IManifestParser, ManifestParser>();
+            builder.Services.AddUnique<IManifestParser, ManifestParser>();
 
             // register our predefined validators
-            composition.ManifestValueValidators()
+            builder.ManifestValueValidators()
                 .Add<RequiredValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedValueValidator>()
@@ -112,25 +114,25 @@ namespace Umbraco.Core.Runtime
                 .Add<DecimalValidator>();
 
             // register the manifest filter collection builder (collection is empty by default)
-            composition.ManifestFilters();
+            builder.ManifestFilters();
 
             // properties and parameters derive from data editors
-            composition.DataEditors()
-                .Add(() => composition.TypeLoader.GetDataEditors());
+            builder.DataEditors()
+                .Add(() => builder.TypeLoader.GetDataEditors());
 
-            composition.MediaUrlGenerators()
+            builder.MediaUrlGenerators()
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
-            composition.Services.AddUnique<PropertyEditorCollection>();
-            composition.Services.AddUnique<ParameterEditorCollection>();
+            builder.Services.AddUnique<PropertyEditorCollection>();
+            builder.Services.AddUnique<ParameterEditorCollection>();
 
             // Used to determine if a datatype/editor should be storing/tracking
             // references to media item/s
-            composition.DataValueReferenceFactories();
+            builder.DataValueReferenceFactories();
 
             // register a server registrar, by default it's the db registrar
-            composition.Services.AddUnique<IServerRegistrar>(f =>
+            builder.Services.AddUnique<IServerRegistrar>(f =>
             {
                 var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
@@ -146,7 +148,7 @@ namespace Umbraco.Core.Runtime
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by the db thing in the corresponding components in the web
             // project
-            composition.Services.AddUnique<IServerMessenger>(factory
+            builder.Services.AddUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetRequiredService<IMainDom>(),
                     factory.GetRequiredService<IScopeProvider>(),
@@ -161,107 +163,107 @@ namespace Umbraco.Core.Runtime
                     factory.GetRequiredService<IOptions<GlobalSettings>>()
                 ));
 
-            composition.CacheRefreshers()
-                .Add(() => composition.TypeLoader.GetCacheRefreshers());
+            builder.CacheRefreshers()
+                .Add(() => builder.TypeLoader.GetCacheRefreshers());
 
-            composition.PackageActions()
-                .Add(() => composition.TypeLoader.GetPackageActions());
+            builder.PackageActions()
+                .Add(() => builder.TypeLoader.GetPackageActions());
 
-            composition.PropertyValueConverters()
-                .Append(composition.TypeLoader.GetTypes<IPropertyValueConverter>());
+            builder.PropertyValueConverters()
+                .Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
 
-            composition.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            builder.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            composition.Services.AddUnique<IShortStringHelper>(factory
+            builder.Services.AddUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
 
-            composition.UrlSegmentProviders()
+            builder.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();
 
-            composition.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
+            builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             // by default, register a noop factory
-            composition.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
+            builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // by default
-            composition.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
-            composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
-            composition.Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
-            composition.Services.AddUnique<UriUtility>();
+            builder.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
+            builder.Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
+            builder.Services.AddUnique<UriUtility>();
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-            composition.Services.AddUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+            builder.Services.AddUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
-            composition.Services.AddUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
+            builder.Services.AddUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
-            composition.Services.AddUnique<IDashboardService, DashboardService>();
+            builder.Services.AddUnique<IDashboardService, DashboardService>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            composition.Dashboards()
-                .Add(composition.TypeLoader.GetTypes<IDashboard>());
+            builder.Dashboards()
+                .Add(builder.TypeLoader.GetTypes<IDashboard>());
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
-            composition.Services.AddUnique<IInstallationService, InstallationService>();
-            composition.Services.AddUnique<IUpgradeService, UpgradeService>();
+            builder.Services.AddUnique<IInstallationService, InstallationService>();
+            builder.Services.AddUnique<IUpgradeService, UpgradeService>();
 
             // Grid config is not a real config file as we know them
-            composition.Services.AddUnique<IGridConfig, GridConfig>();
+            builder.Services.AddUnique<IGridConfig, GridConfig>();
 
             // Config manipulator
-            composition.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
+            builder.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
 
             // register the umbraco context factory
             // composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
+            builder.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
 
-            composition.Services.AddUnique<HtmlLocalLinkParser>();
-            composition.Services.AddUnique<HtmlImageSourceParser>();
-            composition.Services.AddUnique<HtmlUrlParser>();
-            composition.Services.AddUnique<RichTextEditorPastedImages>();
-            composition.Services.AddUnique<BlockEditorConverter>();
+            builder.Services.AddUnique<HtmlLocalLinkParser>();
+            builder.Services.AddUnique<HtmlImageSourceParser>();
+            builder.Services.AddUnique<HtmlUrlParser>();
+            builder.Services.AddUnique<RichTextEditorPastedImages>();
+            builder.Services.AddUnique<BlockEditorConverter>();
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
             // (the limited one, defined in Core, is there for tests) - same for others
-            composition.PropertyValueConverters()
+            builder.PropertyValueConverters()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
 
-            composition.UrlProviders()
+            builder.UrlProviders()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>();
 
-            composition.MediaUrlProviders()
+            builder.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
-            composition.Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
+            builder.Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
 
             // register properties fallback
-            composition.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
+            builder.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
-            composition.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            composition.Services.AddUnique<UmbracoFeatures>();
+            builder.Services.AddUnique<UmbracoFeatures>();
 
-            composition.Actions()
-                .Add(() => composition.TypeLoader.GetTypes<IAction>());
+            builder.Actions()
+                .Add(() => builder.TypeLoader.GetTypes<IAction>());
 
-            composition.EditorValidators()
-                .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
+            builder.EditorValidators()
+                .Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
 
 
-            composition.TourFilters();
+            builder.TourFilters();
 
             // replace with web implementation
-            composition.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             // register OEmbed providers - no type scanning - all explicit opt-in of adding types
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
-            composition.OEmbedProviders()
+            builder.OEmbedProviders()
                 .Append<YouTube>()
                 .Append<Instagram>()
                 .Append<Twitter>()
@@ -278,7 +280,7 @@ namespace Umbraco.Core.Runtime
                 .Append<Giphy>();
 
             // register back office sections in the order we want them rendered
-            composition.Sections()
+            builder.Sections()
                 .Append<ContentSection>()
                 .Append<MediaSection>()
                 .Append<SettingsSection>()
@@ -289,7 +291,7 @@ namespace Umbraco.Core.Runtime
                 .Append<TranslationSection>();
 
             // register known content apps
-            composition.ContentApps()
+            builder.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>()
@@ -299,18 +301,18 @@ namespace Umbraco.Core.Runtime
                 .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register published router
-            composition.Services.AddUnique<IPublishedRouter, PublishedRouter>();
+            builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
-            composition.HealthChecks()
-                .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
+            builder.HealthChecks()
+                .Add(() => builder.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
-            composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
+            builder.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
+                .Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
 
-            composition.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
+            builder.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-            composition.ContentFinders()
+            builder.ContentFinders()
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
@@ -320,63 +322,66 @@ namespace Umbraco.Core.Runtime
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
-            composition.Services.AddScoped<UmbracoTreeSearcher>();
+            builder.Services.AddScoped<UmbracoTreeSearcher>();
 
-            composition.SearchableTrees()
-                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
+            builder.SearchableTrees()
+                .Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
 
             // replace some services
-            composition.Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
-            composition.Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            composition.Services.AddUnique<ITreeService, TreeService>();
-            composition.Services.AddUnique<ISectionService, SectionService>();
-            composition.Services.AddUnique<IEmailSender, EmailSender>();
-            composition.Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
+            builder.Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
+            builder.Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
+            builder.Services.AddUnique<ITreeService, TreeService>();
+            builder.Services.AddUnique<ISectionService, SectionService>();
+            builder.Services.AddUnique<IEmailSender, EmailSender>();
+            builder.Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
 
-            composition.Services.AddUnique<IExamineManager, ExamineManager>();
+            builder.Services.AddUnique<IExamineManager, ExamineManager>();
 
             // register distributed cache
-            composition.Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
+            builder.Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
 
 
-            composition.Services.AddScoped<ITagQuery, TagQuery>();
+            builder.Services.AddScoped<ITagQuery, TagQuery>();
 
-            composition.Services.AddUnique<HtmlLocalLinkParser>();
-            composition.Services.AddUnique<HtmlUrlParser>();
-            composition.Services.AddUnique<HtmlImageSourceParser>();
-            composition.Services.AddUnique<RichTextEditorPastedImages>();
+            builder.Services.AddUnique<HtmlLocalLinkParser>();
+            builder.Services.AddUnique<HtmlUrlParser>();
+            builder.Services.AddUnique<HtmlImageSourceParser>();
+            builder.Services.AddUnique<RichTextEditorPastedImages>();
 
-            composition.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            composition.Services.AddScoped<IPublishedContentQuery>(factory =>
+            builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+            builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
                 return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
 
-            composition.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
+            builder.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            composition.Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+            builder.Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
             // register accessors for cultures
-            composition.Services.AddUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
+            builder.Services.AddUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
-            composition.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
+            builder.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
 
-            composition.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+            builder.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
             // Register noop versions for examine to be overridden by examine
-            composition.Services.AddUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
-            composition.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+            builder.Services.AddUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
+            builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
-            composition.Services.AddUnique<UploadAutoFillProperties>();
+            builder.Services.AddUnique<UploadAutoFillProperties>();
 
-            composition.Services.AddUnique<ICronTabParser, NCronTabParser>();
+            builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
 
-            composition.Services.AddUnique<UserEditorAuthorizationHelper>();
+            builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
+            builder.Services.AddUnique<UserEditorAuthorizationHelper>();
+            builder.Services.AddUnique<ContentPermissions>();
+            builder.Services.AddUnique<MediaPermissions>();
         }
     }
 }

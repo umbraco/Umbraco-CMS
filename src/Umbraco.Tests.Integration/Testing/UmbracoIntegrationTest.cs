@@ -26,12 +26,15 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
+using Umbraco.Core.Builder;
+using Umbraco.Web.Common.Builder;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Integration.Testing
@@ -109,25 +112,27 @@ namespace Umbraco.Tests.Integration.Testing
 
         private ILoggerFactory CreateLoggerFactory()
         {
-            ILoggerFactory factory;
-            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
-            switch (testOptions.Logger)
+            try
             {
-                case UmbracoTestOptions.Logger.Mock:
-                    factory = NullLoggerFactory.Instance;
-                    break;
-                case UmbracoTestOptions.Logger.Serilog:
-                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
-                    break;
-                case UmbracoTestOptions.Logger.Console:
-                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
-                    break;
-                default:
-                    throw new NotSupportedException($"Logger option {testOptions.Logger} is not supported.");
+                var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
+                switch (testOptions.Logger)
+                {
+                    case UmbracoTestOptions.Logger.Mock:
+                        return NullLoggerFactory.Instance;
+                    case UmbracoTestOptions.Logger.Serilog:
+                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                    case UmbracoTestOptions.Logger.Console:
+                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
+                }
+            }
+            catch
+            {
+                // ignored
             }
 
-            return factory;
+            return NullLoggerFactory.Instance;
         }
+
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
@@ -156,95 +161,7 @@ namespace Umbraco.Tests.Integration.Testing
                 });
             return hostBuilder;
         }
-
-        /// <summary>
-        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
-        /// </summary>
-        /// <param name="connectionStrings"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="profiler"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="backOfficeInfo"></param>
-        /// <param name="typeFinder"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="dbProviderFactoryCreator"></param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
-        public CoreRuntimeBootstrapper CreateTestRuntime(
-            GlobalSettings globalSettings,
-            ConnectionStrings connectionStrings,
-            IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
-        {
-            var runtime = CreateTestRuntime(
-                globalSettings,
-                connectionStrings,
-                umbracoVersion,
-                ioHelper,
-                loggerFactory,
-                profiler,
-                hostingEnvironment,
-                backOfficeInfo,
-                typeFinder,
-                appCaches,
-                dbProviderFactoryCreator,
-                TestHelper.MainDom, // SimpleMainDom
-                UseTestLocalDb // DB Installation event handler
-            );
-
-            return runtime;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
-        /// </summary>
-        /// <param name="connectionStrings"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="profiler"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="backOfficeInfo"></param>
-        /// <param name="typeFinder"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="dbProviderFactoryCreator"></param>
-        /// <param name="mainDom"></param>
-        /// <param name="eventHandler">The event handler used for DB installation</param>
-        /// <param name="globalSettings"></param>
-        /// <returns></returns>
-        public static CoreRuntimeBootstrapper CreateTestRuntime(
-            GlobalSettings globalSettings,
-            ConnectionStrings connectionStrings,
-            IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IMainDom mainDom, Action<CoreRuntimeBootstrapper, RuntimeEssentialsEventArgs> eventHandler)
-        {
-            var runtime = new CoreRuntimeBootstrapper(
-                globalSettings,
-                connectionStrings,
-                umbracoVersion,
-                ioHelper,
-                loggerFactory,
-                profiler,
-                Mock.Of<IUmbracoBootPermissionChecker>(),
-                hostingEnvironment,
-                backOfficeInfo,
-                dbProviderFactoryCreator,
-                mainDom,
-                typeFinder,
-                appCaches);
-
-            runtime.RuntimeEssentials += (sender, args) => eventHandler(sender, args);
-
-            return runtime;
-        }
-
+        
         #endregion
 
         #region IStartup
@@ -256,24 +173,37 @@ namespace Umbraco.Tests.Integration.Testing
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
-            services.AddUmbracoConfiguration(Configuration);
 
-            services.AddUmbracoCore(
-                webHostEnvironment,
+            var typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                GetAppCaches(),
-                TestHelper.GetLoggingConfiguration(),
+                webHostEnvironment,
+                TestHelper.GetHostingEnvironment(),
+                TestHelper.ConsoleLoggerFactory,
+                AppCaches.NoCache,
                 Configuration,
-                CreateTestRuntime);
+                TestHelper.Profiler);
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
+
+
+            builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
+
+            builder.AddConfiguration()
+                .AddUmbracoCore();
+
+            builder.Services.AddUnique<AppCaches>(GetAppCaches());
+            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
+            builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
 
             services.AddSignalR();
 
-            services.AddUmbracoWebComponents(Configuration);
-            services.AddUmbracoRuntimeMinifier(Configuration);
-            services.AddUmbracoBackOffice();
-            services.AddUmbracoBackOfficeIdentity();
+            builder.AddWebComponents();
+            builder.AddRuntimeMinifier();
+            builder.AddBackOffice();
+            builder.AddBackOfficeIdentity();
 
             services.AddMvc();
+
+            builder.Build();
 
             CustomTestSetup(services);
         }
@@ -286,6 +216,8 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
+            UseTestLocalDb(app.ApplicationServices);
+
             //get the currently set options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
@@ -306,6 +238,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected void TerminateCoreRuntime()
         {
             Services.GetRequiredService<IRuntime>().Terminate();
+            StaticApplicationLogging.Initialize(null);
         }
 
         #endregion
@@ -315,24 +248,15 @@ namespace Umbraco.Tests.Integration.Testing
         private static readonly object _dbLocker = new object();
         private static LocalDbTestDatabase _dbInstance;
 
-        /// <summary>
-        /// Event handler for the <see cref="CoreRuntimeBootstrapper.RuntimeEssentials"/> to install the database
-        /// </summary>
-        /// <param name="runtimeBootstrapper"></param>
-        /// <param name="args"></param>
-        protected void UseTestLocalDb(CoreRuntimeBootstrapper runtimeBootstrapper, RuntimeEssentialsEventArgs args)
+        protected void UseTestLocalDb(IServiceProvider serviceProvider)
         {
-            // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtimeBootstrapper.RuntimeLoggerFactory, runtimeBootstrapper.State, TestHelper.WorkingDirectory);
-            TestDBConnectionString = args.DatabaseFactory.ConnectionString;
-            InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
+            var state = serviceProvider.GetRequiredService<IRuntimeState>();
+            var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
 
-            // Re-configure IOptions<ConnectionStrings> now that we have a test db
-            // This is what will be resolved first time IUmbracoDatabaseFactory is resolved from container (e.g. post CoreRuntime bootstrap)
-            args.Composition.Services.Configure<ConnectionStrings>((x) =>
-            {
-                x.UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, TestDBConnectionString);
-            });
+            // This will create a db, install the schema and ensure the app is configured to run
+            InstallTestLocalDb(databaseFactory, TestHelper.ConsoleLoggerFactory, state, TestHelper.WorkingDirectory);
+            TestDBConnectionString = databaseFactory.ConnectionString;
+            InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
 
         /// <summary>

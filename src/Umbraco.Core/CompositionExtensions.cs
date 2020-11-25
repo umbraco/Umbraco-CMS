@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Builder;
+using Umbraco.Core.Composing;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -20,82 +21,82 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the actions collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <returns></returns>
-        public static ActionCollectionBuilder Actions(this Composition composition)
-            => composition.WithCollectionBuilder<ActionCollectionBuilder>();
+        public static ActionCollectionBuilder Actions(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content apps collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <returns></returns>
-        public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
-            => composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
+        public static ContentAppFactoryCollectionBuilder ContentApps(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <returns></returns>
-        public static ContentFinderCollectionBuilder ContentFinders(this Composition composition)
-            => composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+        public static ContentFinderCollectionBuilder ContentFinders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
         /// <summary>
         /// Gets the editor validators collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <returns></returns>
-        public static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
-            => composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
+        public static EditorValidatorCollectionBuilder EditorValidators(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the health checks collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
-            => composition.WithCollectionBuilder<HealthCheckCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static HealthCheckCollectionBuilder HealthChecks(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<HealthCheckCollectionBuilder>();
 
         /// <summary>
         /// Gets the TourFilters collection builder.
         /// </summary>
-        public static TourFilterCollectionBuilder TourFilters(this Composition composition)
-            => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
+        public static TourFilterCollectionBuilder TourFilters(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
-            => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static UrlProviderCollectionBuilder UrlProviders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the media url providers collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this Composition composition)
-            => composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the backoffice sections/applications collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static SectionCollectionBuilder Sections(this Composition composition)
-            => composition.WithCollectionBuilder<SectionCollectionBuilder>();
+        /// <param name="builder">The builder.</param>
+        public static SectionCollectionBuilder Sections(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<SectionCollectionBuilder>();
 
         /// <summary>
         /// Gets the components collection builder.
         /// </summary>
-        public static ComponentCollectionBuilder Components(this Composition composition)
-            => composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+        public static ComponentCollectionBuilder Components(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
 
         /// <summary>
         /// Gets the backoffice dashboards collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static DashboardCollectionBuilder Dashboards(this Composition composition)
-            => composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+        /// <param name="builder">The builder.</param>
+        public static DashboardCollectionBuilder Dashboards(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<DashboardCollectionBuilder>()
                 .Add<ContentDashboard>()
                 .Add<ExamineDashboard>()
                 .Add<FormsDashboard>()
@@ -112,10 +113,10 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the content finders collection builder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <returns></returns>
-        public static MediaUrlGeneratorCollectionBuilder MediaUrlGenerators(this Composition composition)
-            => composition.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
+        public static MediaUrlGeneratorCollectionBuilder MediaUrlGenerators(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
 
         #endregion
     }

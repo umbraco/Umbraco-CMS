@@ -73,18 +73,18 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Composition.Services.AddTransient<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
-            Composition.Services.AddTransient(factory => PublishedSnapshotService);
-            Composition.Services.AddTransient(factory => DefaultCultureAccessor);
+            Builder.Services.AddTransient<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            Builder.Services.AddTransient(factory => PublishedSnapshotService);
+            Builder.Services.AddTransient(factory => DefaultCultureAccessor);
 
-            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
+            Builder.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
-                .Add(() => Composition.TypeLoader.GetDataEditors());
+                .Add(() => Builder.TypeLoader.GetDataEditors());
 
-            Composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-                .Add(Composition.TypeLoader.GetUmbracoApiControllers());
+            Builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(Builder.TypeLoader.GetUmbracoApiControllers());
 
-            Composition.Services.AddUnique(f =>
+            Builder.Services.AddUnique(f =>
             {
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();

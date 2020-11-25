@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Umbraco.Core.Composing;
 using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Strings;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
@@ -362,14 +363,14 @@ namespace Umbraco.TestData
 
     public class TestComposer : ComponentComposer<TestComponent>, IUserComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
             if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
                 return;
 
-            composition.Services.AddScoped(typeof(LoadTestController));
+            builder.Services.AddScoped(typeof(LoadTestController));
         }
     }
 }

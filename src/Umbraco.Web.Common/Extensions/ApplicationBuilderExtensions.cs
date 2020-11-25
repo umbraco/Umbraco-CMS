@@ -39,6 +39,9 @@ namespace Umbraco.Extensions
 
             if (!app.UmbracoCanBoot()) return app;
 
+            var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
+
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
 
             // Register a listener for application shutdown in order to terminate the runtime

@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
         protected override void ComposeSettings()
         {
             base.ComposeSettings();
-            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            Builder.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         /// <summary>

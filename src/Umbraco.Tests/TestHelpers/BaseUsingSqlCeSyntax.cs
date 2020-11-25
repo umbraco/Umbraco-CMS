@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
@@ -14,6 +15,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Web;
+using Umbraco.Web.Common.Builder;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
@@ -38,7 +40,7 @@ namespace Umbraco.Tests.TestHelpers
             var services = TestHelper.GetRegister();
 
             var ioHelper = TestHelper.IOHelper;
-            var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+            var logger = new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
             var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
@@ -46,7 +48,8 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new Composition(services, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+
 
             services.AddUnique<ILogger>(_ => Mock.Of<ILogger>());
             services.AddUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);

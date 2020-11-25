@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
 
             // var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-            _profilingLogger = new ProfilingLogger(NullLogger.Instance, new LogProfiler(NullLogger<LogProfiler>.Instance));
+            _profilingLogger = new ProfilingLogger(NullLoggerFactory.Instance.CreateLogger<ProfilingLogger>(), new LogProfiler(NullLogger<LogProfiler>.Instance));
         }
 
         private IProfilingLogger _profilingLogger;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Builder.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }
 }

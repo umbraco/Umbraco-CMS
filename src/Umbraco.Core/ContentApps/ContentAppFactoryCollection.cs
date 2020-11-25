@@ -5,24 +5,25 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.ContentApps
 {
     public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFactory>
     {
         private readonly ILogger<ContentAppFactoryCollection> _logger;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger<ContentAppFactoryCollection> logger, IUmbracoContextAccessor umbracoContextAccessor)
+        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger<ContentAppFactoryCollection> logger, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
             : base(items)
         {
             _logger = logger;
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 
         private IEnumerable<IReadOnlyUserGroup> GetCurrentUserGroups()
         {
-            var currentUser = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
             return currentUser == null
                 ? Enumerable.Empty<IReadOnlyUserGroup>()
                 : currentUser.Groups;

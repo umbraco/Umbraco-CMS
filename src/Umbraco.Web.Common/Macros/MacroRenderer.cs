@@ -25,6 +25,7 @@ namespace Umbraco.Web.Macros
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Macros
             IProfilingLogger profilingLogger ,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
@@ -54,6 +56,7 @@ namespace Umbraco.Web.Macros
             _profilingLogger = profilingLogger  ?? throw new ArgumentNullException(nameof(profilingLogger ));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
@@ -89,7 +92,7 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (_umbracoContextAccessor.GetRequiredUmbracoContext().Security.IsAuthenticated())
+                if (_backOfficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated())
                 {
                     key = _memberUserKeyProvider.GetMemberProviderUserKey() ?? 0;
                 }
