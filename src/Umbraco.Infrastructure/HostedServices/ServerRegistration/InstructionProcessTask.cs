@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Sync;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
     /// <summary>
     /// Implements periodic database instruction processing as a hosted service.
     /// </summary>
+    [UmbracoVolatile]
     public class InstructionProcessTask : RecurringHostedServiceBase
     {
         private readonly IRuntimeState _runtimeState;

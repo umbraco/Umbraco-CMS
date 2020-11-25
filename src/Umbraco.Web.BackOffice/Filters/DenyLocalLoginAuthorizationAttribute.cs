@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
+    [UmbracoVolatile]
     public sealed class DenyLocalLoginAuthorizationAttribute : TypeFilterAttribute
     {
         public DenyLocalLoginAuthorizationAttribute() : base(typeof(DenyLocalLoginFilter))

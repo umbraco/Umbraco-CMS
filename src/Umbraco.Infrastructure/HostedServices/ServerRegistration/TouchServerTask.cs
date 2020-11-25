@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -12,6 +13,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
     /// <summary>
     /// Implements periodic server "touching" (to mark as active/deactive) as a hosted service.
     /// </summary>
+    [UmbracoVolatile]
     public class TouchServerTask : RecurringHostedServiceBase
     {
         private readonly IRuntimeState _runtimeState;

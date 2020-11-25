@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Extensions
 {
+    [UmbracoVolatile]
     public static class ViewContextExtensions
     {
         /// <summary>
