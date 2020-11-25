@@ -51,6 +51,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public void WriteTo(IDictionary<string, PropertyData[]> value, Stream stream)
         {
             // write properties count
+            if (value == null)
+            {
+                PrimitiveSerializer.Int32.WriteTo(0, stream);
+                return;
+            }
             PrimitiveSerializer.Int32.WriteTo(value.Count, stream);
 
             // write each property

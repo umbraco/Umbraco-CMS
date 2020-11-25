@@ -21,8 +21,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class DatabaseDataSource : IDataSource
     {
         private const int PageSize = 500;
+        private readonly DatabaseDataSourceConfiguration _dataSourceConfiguration;
 
         // we want arrays, we want them all loaded, not an enumerable
+        public DatabaseDataSource(DatabaseDataSourceConfiguration dataSourceConfiguration)
+        {
+            _dataSourceConfiguration = dataSourceConfiguration;
+        }
 
         private Sql<ISqlContext> ContentSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
         {
@@ -64,8 +69,50 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             return sql;
         }
+        private static Sql<ISqlContext> PublishedOnlyContentSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        {
+            var sql = scope.SqlContext.Sql()
+                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+    x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
+    x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
+                .AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
 
-        public ContentNodeKit GetContentSource(IScope scope, int id)
+            .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"), x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
+            .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "EditTemplateId"))
+
+            .AndSelect<ContentVersionDto>("pcver", x => Alias(x.Id, "PublishedVersionId"), x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"), x => Alias(x.UserId, "PubWriterId"))
+            .AndSelect<DocumentVersionDto>("pdver", x => Alias(x.TemplateId, "PubTemplateId"))
+
+            .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
+
+
+            .From<NodeDto>();
+
+
+            // TODO: I'm unsure how we can format the below into SQL templates also because right.Current and right.Published end up being parameters
+
+            if (joins != null)
+                sql = joins(sql);
+
+            sql = sql
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                .LeftJoin<ContentVersionDto>(j =>
+                    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"), "pcver")
+                .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
+
+                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
+
+            return sql;
+        }
+
+
+    public ContentNodeKit GetContentSource(IScope scope, int id)
         {
             var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id && !x.Trashed)
@@ -77,9 +124,20 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
         {
-            var sql = ContentSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            Sql<ISqlContext> sql;
+
+            if (_dataSourceConfiguration.PublishedContentOnly)
+            {
+                sql = PublishedOnlyContentSourcesSelect(scope)
+                                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            }
+            else
+            {
+                sql = ContentSourcesSelect(scope)
+                                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            }
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
@@ -198,14 +256,14 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 yield return CreateMediaNodeKit(row);
         }
 
-        private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
         {
             ContentData d = null;
             ContentData p = null;
 
             if (dto.Edited)
             {
-                if (dto.EditData == null)
+                if (dto.EditData == null && !_dataSourceConfiguration.PublishedContentOnly)
                 {
                     if (Debugger.IsAttached)
                         throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
@@ -213,7 +271,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = DeserializeNestedData(dto.EditData);
+                    ContentNestedData nested = null;
+                    if (!_dataSourceConfiguration.PublishedContentOnly)
+                    {
+                        nested = DeserializeNestedData(dto.EditData);
+                    }
 
                     d = new ContentData
                     {
@@ -223,9 +285,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
-                        Properties = nested.PropertyData,
-                        CultureInfos = nested.CultureData,
-                        UrlSegment = nested.UrlSegment
+                        Properties = nested?.PropertyData,
+                        CultureInfos = nested?.CultureData,
+                        UrlSegment = nested?.UrlSegment
                     };
                 }
             }

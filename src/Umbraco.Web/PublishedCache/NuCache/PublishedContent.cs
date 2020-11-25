@@ -39,8 +39,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 // add one property per property type - this is required, for the indexing to work
                 // if contentData supplies pdatas, use them, else use null
-                contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas); // else will be null
-                properties[i++] =new Property(propertyType, this, pdatas, _publishedSnapshotAccessor);
+                if (contentData.Properties != null && contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas))
+                {
+                    properties[i++] = new Property(propertyType, this, pdatas, _publishedSnapshotAccessor);
+                }// else will be null
             }
             PropertiesArray = properties;
         }

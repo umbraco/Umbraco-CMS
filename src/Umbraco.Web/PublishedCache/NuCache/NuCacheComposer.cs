@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -11,6 +12,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             // register the NuCache database data source
+            var disallowUnpublishedContent = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.NoUnpublishedContentData"];
+            if (disallowUnpublishedContent == "true")
+            {
+                var dataSourceConfig = new DatabaseDataSourceConfiguration(true);
+                composition.RegisterUnique<DatabaseDataSourceConfiguration>(dataSourceConfig);
+            }
+            else
+            {
+                composition.RegisterUnique<DatabaseDataSourceConfiguration, DatabaseDataSourceConfiguration>();
+            }
             composition.Register<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
