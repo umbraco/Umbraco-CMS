@@ -184,7 +184,7 @@
     <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\IdentityAuditEventArgs.cs" />
-    <Compile Include="CompositionExtensions.cs" />
+    <Compile Include="UmbracoBuilderExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
     <Compile Include="OwinExtensions.cs" />
