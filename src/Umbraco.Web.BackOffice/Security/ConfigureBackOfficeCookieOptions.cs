@@ -225,11 +225,11 @@ namespace Umbraco.Web.BackOffice.Security
         /// </remarks>
         private async Task EnsureValidSessionId(CookieValidatePrincipalContext context)
         {
-            if (_runtimeState.Level == RuntimeLevel.Run)
-            {
-                var validator = _serviceProvider.GetRequiredService<BackOfficeSessionIdValidator>();
-                await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
-            }
+            if (_runtimeState.Level != RuntimeLevel.Run) return;
+            
+            using var scope = _serviceProvider.CreateScope();
+            var validator = scope.ServiceProvider.GetRequiredService<BackOfficeSessionIdValidator>();
+            await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
         }
 
         /// <summary>

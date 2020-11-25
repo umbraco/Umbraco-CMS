@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Mvc;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Mvc
     /// <seealso cref="System.Web.Mvc.IAuthorizationFilter" />
     /// <remarks>
     /// Applying this attribute/filter to a <see cref="SurfaceController"/> or SurfaceController Action will ensure that the Action can only be executed
-    /// when it is routed to from within Umbraco, typically when rendering a form with BegingUmbracoForm. It will mean that the natural MVC route for this Action
+    /// when it is routed to from within Umbraco, typically when rendering a form with BeginUmbracoForm. It will mean that the natural MVC route for this Action
     /// will fail with a <see cref="HttpUmbracoFormRouteStringException"/>.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
@@ -37,7 +38,6 @@ namespace Umbraco.Web.Mvc
             var ufprt = filterContext.HttpContext.Request["ufprt"];
             ValidateRouteString(ufprt, filterContext.ActionDescriptor?.ControllerDescriptor.ControllerName, filterContext.ActionDescriptor?.ActionName, filterContext.RouteData?.DataTokens["area"]?.ToString());
         }
-
         public void ValidateRouteString(string ufprt, string currentController, string currentAction, string currentArea)
         {
             if (ufprt.IsNullOrWhiteSpace())

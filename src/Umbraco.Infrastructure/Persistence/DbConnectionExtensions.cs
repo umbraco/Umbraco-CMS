@@ -5,9 +5,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
-using Umbraco.Composing;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Persistence
 {
@@ -55,7 +54,7 @@ namespace Umbraco.Core.Persistence
             catch (DbException e)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                Current.Logger.LogWarning(e, "Configured database is reporting as not being available.");
+                StaticApplicationLogging.Logger.LogWarning(e, "Configured database is reporting as not being available.");
                 return false;
             }
 

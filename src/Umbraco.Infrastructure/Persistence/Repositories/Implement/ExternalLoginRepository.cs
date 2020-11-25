@@ -21,25 +21,60 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public void DeleteUserLogins(int memberId)
         {
-            Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
+            Database.Delete<ExternalLoginDto>("WHERE userId=@userId", new { userId = memberId });
         }
 
-        public void SaveUserLogins(int memberId, IEnumerable<IUserLoginInfo> logins)
+        public void Save(int userId, IEnumerable<IExternalLogin> logins)
         {
-            //clear out logins for member
-            Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });
+            var sql = Sql()
+                .Select<ExternalLoginDto>()
+                .From<ExternalLoginDto>()
+                .Where<ExternalLoginDto>(x => x.UserId == userId)
+                .ForUpdate();
 
-            //add them all
-            foreach (var l in logins)
+            // deduplicate the logins
+            logins = logins.DistinctBy(x => x.ProviderKey + x.LoginProvider).ToList();
+
+            var toUpdate = new Dictionary<int, IExternalLogin>();
+            var toDelete = new List<int>();
+            var toInsert = new List<IExternalLogin>(logins);
+
+            var existingLogins = Database.Query<ExternalLoginDto>(sql).OrderByDescending(x => x.CreateDate).ToList();
+            // used to track duplicates so they can be removed
+            var keys = new HashSet<(string, string)>();
+
+            foreach (var existing in existingLogins)
             {
-                Database.Insert(new ExternalLoginDto
+                if (!keys.Add((existing.ProviderKey, existing.LoginProvider)))
                 {
-                    LoginProvider = l.LoginProvider,
-                    ProviderKey = l.ProviderKey,
-                    UserId = memberId,
-                    CreateDate = DateTime.Now
-                });
+                    // if it already exists we need to remove this one
+                    toDelete.Add(existing.Id);
+                }
+                else
+                {
+                    var found = logins.FirstOrDefault(x =>
+                    x.LoginProvider.Equals(existing.LoginProvider, StringComparison.InvariantCultureIgnoreCase)
+                    && x.ProviderKey.Equals(existing.ProviderKey, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (found != null)
+                    {
+                        toUpdate.Add(existing.Id, found);
+                        // if it's an update then it's not an insert
+                        toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
+                    }
+                    else
+                    {
+                        toDelete.Add(existing.Id);
+                    }
+                }
             }
+
+            // do the deletes, updates and inserts
+            if (toDelete.Count > 0)
+                Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            foreach (var u in toUpdate)
+                Database.Update(ExternalLoginFactory.BuildDto(userId, u.Value, u.Key));
+            Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userId, i)));
         }
 
         protected override IIdentityUserLogin PerformGet(int id)
@@ -66,7 +101,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return PerformGetAllOnIds(ids);
             }
 
-            var sql = GetBaseQuery(false);
+            var sql = GetBaseQuery(false).OrderByDescending<ExternalLoginDto>(x => x.CreateDate);
 
             return ConvertFromDtos(Database.Fetch<ExternalLoginDto>(sql))
                 .ToArray();// we don't want to re-iterate again!
@@ -102,7 +137,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var dto in dtos)
             {
-                yield return Get(dto.Id);
+                yield return ExternalLoginFactory.BuildEntity(dto);
             }
         }
 

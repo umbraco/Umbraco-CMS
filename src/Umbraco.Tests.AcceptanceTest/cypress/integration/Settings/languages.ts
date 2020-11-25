@@ -6,7 +6,7 @@ context('Languages', () => {
   });
 
   it('Add language', () => {
-    const name = "Kyrgyz (Kyrgyzstan)"; // Must be an option in the select box
+    const name = "Afrikaans"; // Must be an option in the select box
 
      cy.umbracoEnsureLanguageNameNotExists(name);
 

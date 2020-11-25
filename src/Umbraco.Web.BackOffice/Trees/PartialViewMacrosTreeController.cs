@@ -1,5 +1,4 @@
-﻿using Umbraco.Composing;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;

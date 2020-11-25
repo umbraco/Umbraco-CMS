@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// </summary>
             internal static bool Enable = true;
 
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly string[] _appNames;
 
             /// <summary>
@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="appName">
             /// If the user has access to any of the specified apps, they will be authorized.
             /// </param>
-            public UmbracoApplicationAuthorizeFilter(IBackofficeSecurityAccessor backofficeSecurityAccessor, params string[] appName)
+            public UmbracoApplicationAuthorizeFilter(IBackOfficeSecurityAccessor backofficeSecurityAccessor, params string[] appName)
             {
                 _backofficeSecurityAccessor = backofficeSecurityAccessor;
                 _appNames = appName;
@@ -55,9 +55,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     return true;
                 }
 
-                var authorized = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser != null
-                                 && _appNames.Any(app => _backofficeSecurityAccessor.BackofficeSecurity.UserHasSectionAccess(
-                                     app, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser));
+                var authorized = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
+                                 && _appNames.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
+                                     app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
 
                 return authorized;
             }

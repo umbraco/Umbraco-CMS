@@ -54,7 +54,7 @@
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
-                    content: localizationService.tokenReplace(data[1], [contentElementType.name]),
+                    content: localizationService.tokenReplace(data[1], [contentElementType ? contentElementType.name : "(Unavailable ElementType)"]),
                     confirmMessage: data[2],
                     close: function () {
                         overlayService.close();
@@ -91,7 +91,7 @@
             if (vm.elementTypes) {
                 return vm.elementTypes.find(function (type) {
                     return type.key === key;
-                });
+                }) || null;
             }
         };
 
@@ -99,8 +99,11 @@
 
             //we have to add the 'alias' property to the objects, to meet the data requirements of itempicker.
             var selectedItems = Utilities.copy($scope.model.value).forEach((obj) => {
-                obj.alias = vm.getElementTypeByKey(obj.contentElementTypeKey).alias;
-                return obj;
+                var elementType = vm.getElementTypeByKey(obj.contentElementTypeKey);
+                if(elementType) {
+                    obj.alias = elementType.alias;
+                    return obj;
+                }
             });
 
             var availableItems = vm.getAvailableElementTypes()
@@ -178,31 +181,37 @@
 
         vm.openBlockOverlay = function (block) {
 
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByKey(block.contentElementTypeKey).name]).then(function (data) {
+            var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
-                var clonedBlockData = Utilities.copy(block);
-                vm.openBlock = block;
+            if(elementType) {
+                localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
-                var overlayModel = {
-                    block: clonedBlockData,
-                    title: data,
-                    view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
-                    size: "small",
-                    submit: function(overlayModel) {
-                        loadElementTypes()// lets load elementType again, to ensure we are up to date.
-                        TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
-                        overlayModel.close();
-                    },
-                    close: function() {
-                        editorService.close();
-                        vm.openBlock = null;
-                    }
-                };
+                    var clonedBlockData = Utilities.copy(block);
+                    vm.openBlock = block;
 
-                // open property settings editor
-                editorService.open(overlayModel);
+                    var overlayModel = {
+                        block: clonedBlockData,
+                        title: data,
+                        view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
+                        size: "small",
+                        submit: function(overlayModel) {
+                            loadElementTypes()// lets load elementType again, to ensure we are up to date.
+                            TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
+                            overlayModel.close();
+                        },
+                        close: function() {
+                            editorService.close();
+                            vm.openBlock = null;
+                        }
+                    };
 
-            });
+                    // open property settings editor
+                    editorService.open(overlayModel);
+
+                });
+            } else {
+                alert("Cannot be edited cause ElementType does not exist.");
+            }
 
         };
 

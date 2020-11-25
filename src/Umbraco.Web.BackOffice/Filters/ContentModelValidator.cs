@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -22,14 +21,14 @@ namespace Umbraco.Web.BackOffice.Filters
     internal abstract class ContentModelValidator
     {
 
-        protected IBackofficeSecurity BackofficeSecurity { get; }
+        protected IBackOfficeSecurity BackOfficeSecurity { get; }
         public IPropertyValidationService PropertyValidationService { get; }
         protected ILogger<ContentModelValidator> Logger { get; }
 
-        protected ContentModelValidator(ILogger<ContentModelValidator> logger, IBackofficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
+        protected ContentModelValidator(ILogger<ContentModelValidator> logger, IBackOfficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            BackofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
+            BackOfficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
             PropertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
         }
     }
@@ -53,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
         protected ContentModelValidator(
             ILogger<ContentModelValidator> logger,
-            IBackofficeSecurity backofficeSecurity,
+            IBackOfficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
             : base(logger, backofficeSecurity, propertyValidationService)

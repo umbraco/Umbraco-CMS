@@ -37,6 +37,7 @@ namespace Umbraco.Core
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
+            public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
             [UmbracoVolatile]
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";

@@ -75,13 +75,13 @@ namespace Umbraco.Web.WebAssets
             _runtimeMinifier.CreateJsBundle(
                 UmbracoJsBundleName,
                 FormatPaths(
-                    GetScriptsForBackoffice(
+                    GetScriptsForBackOffice(
                         propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
 
             _runtimeMinifier.CreateCssBundle(
                 UmbracoCssBundleName,
                 FormatPaths(
-                    GetStylesheetsForBackoffice(
+                    GetStylesheetsForBackOffice(
                         propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));
         }
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.WebAssets
         /// Returns scripts used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForBackoffice(IEnumerable<string> propertyEditorScripts)
+        private string[] GetScriptsForBackOffice(IEnumerable<string> propertyEditorScripts)
         {
             var umbracoInit = GetInitBackOfficeScripts();
             var scripts = new HashSet<string>();
@@ -117,7 +117,7 @@ namespace Umbraco.Web.WebAssets
         /// Returns stylesheets used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetStylesheetsForBackoffice(IEnumerable<string> propertyEditorStyles)
+        private string[] GetStylesheetsForBackOffice(IEnumerable<string> propertyEditorStyles)
         {
             var stylesheets = new HashSet<string>();
 

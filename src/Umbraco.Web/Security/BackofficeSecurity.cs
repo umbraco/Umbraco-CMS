@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Security;
-using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
-using Microsoft.Owin;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
 
     // NOTE: Moved to netcore
-    public class BackofficeSecurity : IBackofficeSecurity
+    public class BackOfficeSecurity : IBackOfficeSecurity
     {
         public IUser CurrentUser => throw new NotImplementedException();
 

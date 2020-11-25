@@ -9,7 +9,7 @@ namespace Umbraco.Web.Mvc
     /// This controller essentially just uses a global UmbracoAuthorizeAttribute, inheritors that require more granular control over the
     /// authorization of each method can use this attribute instead of inheriting from this controller.
     /// </remarks>
-    [UmbracoAuthorize]
+    [UmbracoBackOfficeAuthorize]
     [DisableBrowserCache]
     public abstract class UmbracoAuthorizedController : UmbracoController
     {

@@ -6,9 +6,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using System.Buffers;
-using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.ModelBinding
@@ -45,7 +42,5 @@ namespace Umbraco.Web.Common.ModelBinding
                     jsonOptions)
             };
         }
-
-
     }
 }

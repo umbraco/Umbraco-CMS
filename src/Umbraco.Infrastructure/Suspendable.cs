@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Composing;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
@@ -30,7 +30,7 @@ namespace Umbraco.Web
 
             public static void SuspendDocumentCache()
             {
-                Current.Logger.LogInformation("Suspend document cache.");
+                StaticApplicationLogging.Logger.LogInformation("Suspend document cache.");
                 _suspended = true;
             }
 
@@ -38,7 +38,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.Logger.LogInformation("Resume document cache (reload:{Tried}).", _tried);
+                StaticApplicationLogging.Logger.LogInformation("Resume document cache (reload:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -74,7 +74,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.Logger.LogInformation("Resume indexers (rebuild:{Tried}).", _tried);
+                StaticApplicationLogging.Logger.LogInformation("Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -91,13 +91,13 @@ namespace Umbraco.Web
 
             public static void Suspend()
             {
-                Current.Logger.LogInformation("Suspend scheduled publishing.");
+                StaticApplicationLogging.Logger.LogInformation("Suspend scheduled publishing.");
                 _suspended = true;
             }
 
             public static void Resume()
             {
-                Current.Logger.LogInformation("Resume scheduled publishing.");
+                StaticApplicationLogging.Logger.LogInformation("Resume scheduled publishing.");
                 _suspended = false;
             }
         }

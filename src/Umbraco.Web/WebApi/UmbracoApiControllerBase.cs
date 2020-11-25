@@ -6,7 +6,6 @@ using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -14,8 +13,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -119,7 +118,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IBackofficeSecurity Security => UmbracoContext.Security;
+        public IBackOfficeSecurity Security => UmbracoContext.Security;
 
         /// <summary>
         /// Tries to get the current HttpContext.

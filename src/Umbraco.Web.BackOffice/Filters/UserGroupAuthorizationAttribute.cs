@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IContentService _contentService;
             private readonly IMediaService _mediaService;
             private readonly IEntityService _entityService;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
             public UserGroupAuthorizationFilter(
                 IRequestAccessor requestAccessor,
@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IContentService contentService,
                 IMediaService mediaService,
                 IEntityService entityService,
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 string parameterName)
             {
                 _requestAccessor = requestAccessor;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             private bool IsAuthorized(AuthorizationFilterContext actionContext)
             {
-                var currentUser = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+                var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
                 var queryString = actionContext.HttpContext.Request.Query;
 

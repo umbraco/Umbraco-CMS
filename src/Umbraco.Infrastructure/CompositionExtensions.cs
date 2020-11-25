@@ -236,7 +236,7 @@ namespace Umbraco.Core
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating the options.</param>
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
-        public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IServiceProvider, DatabaseServerMessengerOptions> factory)
+        public static void SetDatabaseServerMessengerCallbacks(this Composition composition, Func<IServiceProvider, DatabaseServerMessengerCallbacks> factory)
         {
             composition.Services.AddUnique(factory);
         }
@@ -247,7 +247,7 @@ namespace Umbraco.Core
         /// <param name="composition">The composition.</param>
         /// <param name="options">Options.</param>
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
-        public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerOptions options)
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerCallbacks options)
         {
             composition.Services.AddUnique(_ => options);
         }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Core.BackOffice
 {
@@ -14,6 +15,11 @@ namespace Umbraco.Core.BackOffice
     public interface  IBackOfficeUserManager<TUser>: IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
+
+        Task<IdentityResult> DeleteAsync(TUser user);
+
+        Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
         /// <summary>
         /// Finds and returns a user, if any, who has the specified <paramref name="userId"/>.
@@ -260,12 +266,51 @@ namespace Umbraco.Core.BackOffice
         /// </returns>
         Task<bool> VerifyTwoFactorTokenAsync(TUser user, string tokenProvider, string token);
 
+        /// <summary>
+        /// Adds an external Microsoft.AspNetCore.Identity.UserLoginInfo to the specified user.
+        /// </summary>
+        /// <param name="user">The user to add the login to.</param>
+        /// <param name="login">The external Microsoft.AspNetCore.Identity.UserLoginInfo to add to the specified user.</param>
+        /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
+        Task<IdentityResult> AddLoginAsync(TUser user, UserLoginInfo login);
+
+        /// <summary>
+        /// Attempts to remove the provided external login information from the specified user. and returns a flag indicating whether the removal succeed or not.
+        /// </summary>
+        /// <param name="user">The user to remove the login information from.</param>
+        /// <param name="loginProvider">The login provide whose information should be removed.</param>
+        /// <param name="providerKey">The key given by the external login provider for the specified user.</param>
+        /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
+        Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
+
         Task<IdentityResult> ResetAccessFailedCountAsync(TUser user);
+
+        Task<string> GenerateTwoFactorTokenAsync(TUser user, string tokenProvider);
+
+        /// <summary>
+        /// Gets the email address for the specified user.
+        /// </summary>
+        /// <param name="user">The user whose email should be returned.</param>
+        /// <returns> The task object containing the results of the asynchronous operation, the email address for the specified user.</returns>
+        Task<string> GetEmailAsync(TUser user);
+
+        /// <summary>
+        /// Gets the telephone number, if any, for the specified user.
+        /// </summary>
+        /// <param name="user">The user whose telephone number should be retrieved.</param>
+        /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the user's telephone number, if any.</returns>
+        /// <remarks>
+        /// A user can only support a phone number if the BackOfficeUserStore is replaced with another that implements IUserPhoneNumberStore
+        /// </remarks>
+        Task<string> GetPhoneNumberAsync(TUser user);
 
         void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
         void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
-        void RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
 
         void RaiseLoginSuccessEvent(TUser currentUser, int userId);
+
+        bool HasSendingUserInviteEventHandler { get; }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
-using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;

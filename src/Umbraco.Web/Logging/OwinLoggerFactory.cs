@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Owin.Logging;
-using Umbraco.Composing;
+using Umbraco.Core;
 using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Logging
@@ -15,7 +15,7 @@ namespace Umbraco.Web.Logging
         /// <returns/>
         public Microsoft.Owin.Logging.ILogger Create(string name)
         {
-            return new OwinLogger(Current.Logger, new Lazy<Type>(() => Type.GetType(name) ?? typeof (OwinLogger)));
+            return new OwinLogger(StaticApplicationLogging.Logger, new Lazy<Type>(() => Type.GetType(name) ?? typeof (OwinLogger)));
         }
     }
 }

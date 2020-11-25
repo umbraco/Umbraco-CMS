@@ -23,13 +23,13 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtime;
         private readonly IServerMessenger _serverMessenger;
-        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
+        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
         public ScheduledPublishing(
             IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory, ILogger<ScheduledPublishing> logger, IServerMessenger serverMessenger, IBackofficeSecurityFactory backofficeSecurityFactory)
+            IUmbracoContextFactory umbracoContextFactory, ILogger<ScheduledPublishing> logger, IServerMessenger serverMessenger, IBackOfficeSecurityFactory backofficeSecurityFactory)
             : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtime = runtime;
@@ -86,7 +86,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
-                _backofficeSecurityFactory.EnsureBackofficeSecurity();
+                _backofficeSecurityFactory.EnsureBackOfficeSecurity();
                 using var contextReference = _umbracoContextFactory.EnsureUmbracoContext();
                 try
                 {

@@ -26,16 +26,13 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
-using System.Diagnostics;
 using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
-using Umbraco.Core.Logging.Serilog;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -71,7 +68,10 @@ namespace Umbraco.Tests.Integration.Testing
         [TearDown]
         public virtual void TearDown()
         {
-            foreach (var a in _testTeardown) a();
+            if (_testTeardown != null)
+            {
+                foreach (var a in _testTeardown) a();
+            }
             _testTeardown = null;
             FirstTestInFixture = false;
             FirstTestInSession = false;
@@ -88,6 +88,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
         }
+
         [SetUp]
         public virtual void Setup()
         {
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         /// <summary>
-        /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
+        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
         /// </summary>
         /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
@@ -172,7 +173,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="dbProviderFactoryCreator"></param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public CoreRuntime CreateTestRuntime(
+        public CoreRuntimeBootstrapper CreateTestRuntime(
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
@@ -199,7 +200,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         /// <summary>
-        /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
+        /// Creates a <see cref="CoreRuntimeBootstrapper"/> instance for testing and registers an event handler for database install
         /// </summary>
         /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
@@ -216,15 +217,15 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="eventHandler">The event handler used for DB installation</param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public static CoreRuntime CreateTestRuntime(
+        public static CoreRuntimeBootstrapper CreateTestRuntime(
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
+            IMainDom mainDom, Action<CoreRuntimeBootstrapper, RuntimeEssentialsEventArgs> eventHandler)
         {
-            var runtime = new CoreRuntime(
+            var runtime = new CoreRuntimeBootstrapper(
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,
@@ -267,7 +268,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             services.AddSignalR();
 
-            services.AddUmbracoWebComponents();
+            services.AddUmbracoWebComponents(Configuration);
             services.AddUmbracoRuntimeMinifier(Configuration);
             services.AddUmbracoBackOffice();
             services.AddUmbracoBackOfficeIdentity();
@@ -289,10 +290,22 @@ namespace Umbraco.Tests.Integration.Testing
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
             {
-                Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
+                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
                 Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
                 app.UseUmbracoCore(); // Takes 200 ms
+
+                OnTestTearDown(TerminateCoreRuntime);
             }
+        }
+
+        /// <remarks>
+        /// Some IComponents hook onto static events (e.g. Published in ContentService)
+        /// If these fire after the components host has been shutdown, errors can occur.
+        /// If CoreRuntime.Start() is called We also need to de-register the events.
+        /// </remarks>
+        protected void TerminateCoreRuntime()
+        {
+            Services.GetRequiredService<IRuntime>().Terminate();
         }
 
         #endregion
@@ -303,19 +316,23 @@ namespace Umbraco.Tests.Integration.Testing
         private static LocalDbTestDatabase _dbInstance;
 
         /// <summary>
-        /// Event handler for the <see cref="CoreRuntime.RuntimeEssentials"/> to install the database and register the <see cref="IRuntime"/> to Terminate
+        /// Event handler for the <see cref="CoreRuntimeBootstrapper.RuntimeEssentials"/> to install the database
         /// </summary>
-        /// <param name="runtime"></param>
+        /// <param name="runtimeBootstrapper"></param>
         /// <param name="args"></param>
-        protected void UseTestLocalDb(CoreRuntime runtime, RuntimeEssentialsEventArgs args)
+        protected void UseTestLocalDb(CoreRuntimeBootstrapper runtimeBootstrapper, RuntimeEssentialsEventArgs args)
         {
-            // MUST be terminated on teardown
-            OnTestTearDown(() => runtime.Terminate());
-
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtime.RuntimeLoggerFactory, runtime.State, TestHelper.WorkingDirectory, out var connectionString);
-            TestDBConnectionString = connectionString;
+            InstallTestLocalDb(args.DatabaseFactory, runtimeBootstrapper.RuntimeLoggerFactory, runtimeBootstrapper.State, TestHelper.WorkingDirectory);
+            TestDBConnectionString = args.DatabaseFactory.ConnectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
+
+            // Re-configure IOptions<ConnectionStrings> now that we have a test db
+            // This is what will be resolved first time IUmbracoDatabaseFactory is resolved from container (e.g. post CoreRuntime bootstrap)
+            args.Composition.Services.Configure<ConnectionStrings>((x) =>
+            {
+                x.UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, TestDBConnectionString);
+            });
         }
 
         /// <summary>
@@ -356,9 +373,8 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         private void InstallTestLocalDb(
             IUmbracoDatabaseFactory databaseFactory, ILoggerFactory loggerFactory,
-            IRuntimeState runtimeState, string workingDirectory, out string connectionString)
+            IRuntimeState runtimeState, string workingDirectory)
         {
-            connectionString = null;
             var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
             // get the currently set db options
@@ -461,7 +477,6 @@ namespace Umbraco.Tests.Integration.Testing
                 default:
                     throw new ArgumentOutOfRangeException(nameof(testOptions), testOptions, null);
             }
-            connectionString = db.ConnectionString;
         }
 
         #endregion

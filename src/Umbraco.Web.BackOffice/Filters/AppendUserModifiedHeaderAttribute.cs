@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -43,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Filters
                     throw new InvalidOperationException($"No argument found for the current action with the name: {_userIdParameter}");
                 }
 
-                var backofficeSecurity = context.HttpContext.RequestServices.GetService<IBackofficeSecurity>();
+                var backofficeSecurity = context.HttpContext.RequestServices.GetService<IBackOfficeSecurity>();
                 var user = backofficeSecurity.CurrentUser;
                 if (user == null)
                 {

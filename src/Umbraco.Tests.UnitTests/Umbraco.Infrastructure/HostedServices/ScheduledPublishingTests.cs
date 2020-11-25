@@ -27,10 +27,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             VerifyScheduledPublishingNotPerformed();
         }
 
-        [Test]
-        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run()
+        [TestCase(RuntimeLevel.Boot)]
+        [TestCase(RuntimeLevel.Install)]
+        [TestCase(RuntimeLevel.Unknown)]
+        [TestCase(RuntimeLevel.Upgrade)]
+        [TestCase(RuntimeLevel.BootFailed)]
+        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateScheduledPublishing(runtimeLevel: RuntimeLevel.Boot);
+            var sut = CreateScheduledPublishing(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyScheduledPublishingNotPerformed();
         }
@@ -100,7 +104,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
-            var mockBackOfficeSecurityFactory = new Mock<IBackofficeSecurityFactory>();
+            var mockBackOfficeSecurityFactory = new Mock<IBackOfficeSecurityFactory>();
 
             return new ScheduledPublishing(mockRunTimeState.Object, mockMainDom.Object, mockServerRegistrar.Object, _mockContentService.Object,
                 mockUmbracoContextFactory.Object, _mockLogger.Object, mockServerMessenger.Object, mockBackOfficeSecurityFactory.Object);

@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// <param name="builder"></param>
         /// <returns></returns>
         public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper,
-            Action<CoreRuntime, RuntimeEssentialsEventArgs> dbInstallEventHandler)
+            Action<CoreRuntimeBootstrapper, RuntimeEssentialsEventArgs> dbInstallEventHandler)
         {
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
                     () =>

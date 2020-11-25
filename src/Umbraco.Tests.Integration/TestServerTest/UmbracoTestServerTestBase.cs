@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
@@ -89,7 +88,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
 
-            var backofficeSecurityFactory = GetRequiredService<IBackofficeSecurityFactory>();
+            var backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -104,7 +103,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 }
             };
 
-            backofficeSecurityFactory.EnsureBackofficeSecurity();
+            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;
@@ -118,13 +117,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void TearDown()
         {
             base.TearDown();
+            base.TerminateCoreRuntime();
 
             Factory.Dispose();
-
-            if (Current.IsInitialized)
-            {
-                Current.IsInitialized = false;
-            }
         }
 
         #region IStartup

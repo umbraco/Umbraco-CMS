@@ -75,14 +75,14 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 var databases = new List<object>()
                 {
-                    new { name = "Microsoft SQL Server", id = 1 },
-                    new { name = "Microsoft SQL Azure", id = 3 },
-                    new { name = "Custom connection string", id = -1 },
+                    new { name = "Microsoft SQL Server", id = DatabaseType.SqlServer.ToString() },
+                    new { name = "Microsoft SQL Azure", id = DatabaseType.SqlAzure.ToString() },
+                    new { name = "Custom connection string", id = DatabaseType.Custom.ToString() },
                 };
 
                 if (IsSqlCeAvailable())
                 {
-                    databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = 0 });
+                    databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = DatabaseType.SqlCe.ToString() });
                 }
 
                 return new

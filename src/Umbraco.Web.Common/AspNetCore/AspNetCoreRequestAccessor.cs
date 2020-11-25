@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Routing;
@@ -43,9 +42,8 @@ namespace Umbraco.Web.Common.AspNetCore
             RouteAttempt?.Invoke(sender, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
         }
 
-
-
         public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
+
         public string GetFormValue(string name)
         {
             var request = _httpContextAccessor.GetRequiredHttpContext().Request;
@@ -58,13 +56,14 @@ namespace Umbraco.Web.Common.AspNetCore
         public event EventHandler<UmbracoRequestEventArgs> EndRequest;
 
         public event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+
         public Uri GetRequestUrl() => _httpContextAccessor.HttpContext != null ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()) : null;
+
         public Uri GetApplicationUrl()
         {
             //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
             // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
-
 
             // see U4-10626 - in some cases we want to reset the application url
             // (this is a simplified version of what was in 7.x)
@@ -77,7 +76,10 @@ namespace Umbraco.Web.Common.AspNetCore
 
             var request = _httpContextAccessor.HttpContext?.Request;
 
-            if (request is null) return _currentApplicationUrl;
+            if (request is null)
+            {
+                return _currentApplicationUrl;
+            }
 
             var url = UriHelper.BuildAbsolute(request.Scheme, request.Host);
             var change = url != null && !_applicationUrls.Contains(url);

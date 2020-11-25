@@ -1,21 +1,16 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Services;
+using Umbraco.Core.Security;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Web
@@ -32,7 +27,7 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                Mock.Of<IBackofficeSecurity>(),
+                Mock.Of<IBackOfficeSecurity>(),
                 TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
@@ -53,7 +48,7 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                Mock.Of<IBackofficeSecurity>(),
+                Mock.Of<IBackOfficeSecurity>(),
                 TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
@@ -84,7 +79,7 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
-                Mock.Of<IBackofficeSecurity>(),
+                Mock.Of<IBackOfficeSecurity>(),
                 TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

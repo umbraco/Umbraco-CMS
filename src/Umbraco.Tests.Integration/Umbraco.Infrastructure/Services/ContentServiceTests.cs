@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common.Builders;
@@ -47,6 +48,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private INotificationService NotificationService => GetRequiredService<INotificationService>();
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+        private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
         [SetUp]
         public void Setup()
@@ -1509,6 +1511,56 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        public void Can_Update_Content_Property_Values()
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
+            IContent content = ContentBuilder.CreateSimpleContent(contentType, "hello");
+            content.SetValue("title", "title of mine");
+            content.SetValue("bodyText", "hello world");
+            ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            content.SetValue("title", "another title of mine");          // Change a value
+            content.SetValue("bodyText", null);                          // Clear a value
+            content.SetValue("author", "new author");                    // Add a value
+            ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            Assert.AreEqual("another title of mine", content.GetValue("title"));
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author", content.GetValue("author"));
+
+            content.SetValue("title", "new title");
+            content.SetValue("bodyText", "new body text");
+            content.SetValue("author", "new author text");
+            ContentService.Save(content);                // new non-published version
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            content.SetValue("title", null);                            // Clear a value
+            content.SetValue("bodyText", null);                         // Clear a value
+            ContentService.Save(content);                // saving non-published version
+
+            // re-get
+            content = ContentService.GetById(content.Id);
+            Assert.IsNull(content.GetValue("title"));                   // Test clearing the value worked with the non-published version
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author text", content.GetValue("author"));
+
+            // make sure that the published version remained the same
+            var publishedContent = ContentService.GetVersion(content.PublishedVersionId);
+            Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
+            Assert.IsNull(publishedContent.GetValue("bodyText"));
+            Assert.AreEqual("new author", publishedContent.GetValue("author"));
+        }
+
+        [Test]
         public void Can_Bulk_Save_Content()
         {
             // Arrange
@@ -1954,7 +2006,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType, "Simple Tags Page", Constants.System.Root);
-            content.AssignTags(PropertyEditorCollection, DataTypeService, propAlias, new[] {"hello", "world"});
+            content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, propAlias, new[] {"hello", "world"});
             ContentService.Save(content);
 
             // value has been set but no tags have been created (not published)

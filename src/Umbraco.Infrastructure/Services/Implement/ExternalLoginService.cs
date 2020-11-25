@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
@@ -19,53 +20,48 @@ namespace Umbraco.Core.Services.Implement
             _externalLoginRepository = externalLoginRepository;
         }
 
-        /// <summary>
-        /// Returns all user logins assigned
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IEnumerable<IIdentityUserLogin> GetAll(int userId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
-                    .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!
+                    .ToList();
             }
         }
 
-        /// <summary>
-        /// Returns all logins matching the login info - generally there should only be one but in some cases
-        /// there might be more than one depending on if an administrator has been editing/removing members
-        /// </summary>
-        /// <param name="login"></param>
-        /// <returns></returns>
-        public IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login)
+        /// <inheritdoc />
+        public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
-                    .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>()
+                    .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))
+                    .ToList();
             }
         }
 
-        /// <summary>
-        /// Save user logins
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="logins"></param>
-        public void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins)
+        /// <inheritdoc />
+        public void Save(int userId, IEnumerable<IExternalLogin> logins)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                _externalLoginRepository.SaveUserLogins(userId, logins);
+                _externalLoginRepository.Save(userId, logins);
                 scope.Complete();
             }
         }
 
-        /// <summary>
-        /// Deletes all user logins - normally used when a member is deleted
-        /// </summary>
-        /// <param name="userId"></param>
+        /// <inheritdoc />
+        public void Save(IIdentityUserLogin login)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                _externalLoginRepository.Save(login);
+                scope.Complete();
+            }
+        }
+
+        /// <inheritdoc />
         public void DeleteUserLogins(int userId)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -74,5 +70,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
             }
         }
+
+
     }
 }

@@ -28,13 +28,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
         private readonly IMediaService _mediaService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public UserGroupsController(IUserService userService, IContentService contentService,
-            IEntityService entityService, IMediaService mediaService, IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IEntityService entityService, IMediaService mediaService, IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             UmbracoMapper umbracoMapper, ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
         {
@@ -58,19 +58,19 @@ namespace Umbraco.Web.BackOffice.Controllers
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 _userService, _contentService, _mediaService, _entityService);
 
-            var isAuthorized = authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, userGroupSave.Alias);
+            var isAuthorized = authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
 
             //if start nodes were changed we need to check that the current user has access to them
-            isAuthorized = authHelper.AuthorizeStartNodeChanges(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeStartNodeChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.StartContentId,
                 userGroupSave.StartContentId,
                 userGroupSave.PersistedUserGroup.StartMediaId,
@@ -112,18 +112,18 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
         {
-            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin())
             {
                 return;
             }
 
             var userIds = userGroupSave.Users.ToList();
-            if (userIds.Contains(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id))
+            if (userIds.Contains(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id))
             {
                 return;
             }
 
-            userIds.Add(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            userIds.Add(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
             userGroupSave.Users = userIds;
         }
 
@@ -145,7 +145,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var allGroups = _umbracoMapper.MapEnumerable<IUserGroup, UserGroupBasic>(_userService.GetAllUserGroups())
                 .ToList();
 
-            var isAdmin = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin();
+            var isAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             if (isAdmin) return allGroups;
 
             if (onlyCurrentUserGroups == false)
@@ -156,7 +156,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //we cannot return user groups that this user does not have access to
-            var currentUserGroups = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Groups.Select(x => x.Alias).ToArray();
+            var currentUserGroups = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Groups.Select(x => x.Alias).ToArray();
             return allGroups.Where(x => currentUserGroups.Contains(x.Alias)).ToArray();
         }
 

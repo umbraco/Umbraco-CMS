@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Composing;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                     total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
-                Current.Logger.LogInformation("Returned {Total} items", total.Count);
+                StaticApplicationLogging.Logger.LogInformation("Returned {Total} items", total.Count);
             }
         }
 

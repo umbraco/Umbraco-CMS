@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -31,6 +32,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
         private IMemberTypeRepository MemberTypeRepository => GetRequiredService<IMemberTypeRepository>();
         private IMemberGroupRepository MemberGroupRepository => GetRequiredService<IMemberGroupRepository>();
+        private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         private MemberRepository CreateRepository(IScopeProvider provider)
         {
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var relationRepository = GetRequiredService<IRelationRepository>();
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
             return repository;
         }
 

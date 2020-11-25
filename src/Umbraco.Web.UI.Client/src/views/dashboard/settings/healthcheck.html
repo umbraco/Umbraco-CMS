@@ -15,7 +15,7 @@
                                     button-style="success"
                                     label="Check All Groups"
                                     action="vm.checkAllGroups(vm.groups)">
-                        </umb-button>                    
+                        </umb-button>
                 </div>
             </umb-box-content>
         </umb-box>
@@ -103,10 +103,10 @@
 
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
                             <div class="umb-panel-group__details-status-icon-container" aria-hidden="true">
-                                <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
-                                <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
-                                <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
-                                <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
+                                <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0 || status.resultType === 'Success' "></i>
+                                <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1 || status.resultType === 'Warning' "></i>
+                                <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2 || status.resultType === 'Error' "></i>
+                                <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3 || status.resultType === 'Info' "></i>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">

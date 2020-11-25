@@ -1,6 +1,5 @@
-﻿using Umbraco.Composing;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Events

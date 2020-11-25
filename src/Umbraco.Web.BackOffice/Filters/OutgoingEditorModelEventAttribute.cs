@@ -14,9 +14,9 @@ namespace Umbraco.Web.BackOffice.Filters
     internal sealed class OutgoingEditorModelEventAttribute : ActionFilterAttribute
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
-        public OutgoingEditorModelEventAttribute(IUmbracoContextAccessor umbracoContextAccessor, IBackofficeSecurityAccessor backofficeSecurityAccessor)
+        public OutgoingEditorModelEventAttribute(IUmbracoContextAccessor umbracoContextAccessor, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Filters
             if (context.Result == null) return;
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             if (user == null) return;
 
             if (context.Result is ObjectResult objectContent)

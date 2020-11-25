@@ -502,7 +502,7 @@
                     </umb-checkmark>
                     <h3 class="bold" style="margin: 0 0 0 10px;">
                         {{vm.newUser.name | umbWordLimit:1}}
-                        <localize key="user_userInvited">has been created</localize>
+                        <localize key="user_userInvited">has been invited</localize>
                     </h3>
                 </div>
 
@@ -517,6 +517,7 @@
                         size="m">
                     </umb-button>
                     <umb-button
+                        ng-if="vm.newUser.id"
                         type="button"
                         button-style="action"
                         label-key="user_goToProfile"

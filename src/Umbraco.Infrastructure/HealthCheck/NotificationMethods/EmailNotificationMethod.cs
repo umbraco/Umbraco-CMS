@@ -16,14 +16,14 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IEmailSender _emailSender;
 
-        private readonly GlobalSettings _globalSettings;
         private readonly ContentSettings _contentSettings;
 
         public EmailNotificationMethod(
             ILocalizedTextService textService,
             IRequestAccessor requestAccessor,
-            IOptions<GlobalSettings> globalSettings,
+            IEmailSender emailSender,
             IOptions<HealthChecksSettings> healthChecksSettings,
             IOptions<ContentSettings> contentSettings)
             : base(healthChecksSettings)
@@ -39,7 +39,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _requestAccessor = requestAccessor;
-            _globalSettings = globalSettings.Value;
+            _emailSender = emailSender;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
@@ -70,9 +70,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
-            var mailSender = new EmailSender(Options.Create(_globalSettings));
+
             var mailMessage = CreateMailMessage(subject, message);
-            await mailSender.SendAsync(mailMessage);
+            await _emailSender.SendAsync(mailMessage);
         }
 
         private EmailMessage CreateMailMessage(string subject, string message)

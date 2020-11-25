@@ -1,9 +1,8 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -21,7 +20,7 @@ using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -46,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly RuntimeSettings _runtimeSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
 
@@ -63,7 +62,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<RuntimeSettings> runtimeSettings,
             IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
-            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
             PreviewRoutes previewRoutes)
         {
@@ -79,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeSettings = runtimeSettings.Value;
             _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
-            _authenticationSchemeProvider = authenticationSchemeProvider;
+            _externalLogins = externalLogins;
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
         }
@@ -421,19 +420,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", (await _authenticationSchemeProvider.GetAllSchemesAsync())
-                                // Filter only external providers
-                                .Where(x => !x.DisplayName.IsNullOrWhiteSpace())
-                                // TODO: We need to filter only back office enabled schemes.
-                                // Before we used to have a property bag to check, now we don't so need to investigate the easiest/best
-                                // way to do this. We have the type so maybe we check for a marker interface, but maybe there's another way,
-                                // just need to investigate.
-                                //.Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                            "providers", _externalLogins.GetBackOfficeProviders()
                                 .Select(p => new
                                 {
-                                    authType = p.Name, caption = p.DisplayName,
-                                    // TODO: See above, if we need this property bag in the vars then we'll need to figure something out
-                                    // properties = p.Properties
+                                    authType = p.AuthenticationType, caption = p.Name,
+                                    properties = p.Properties
                                 })
                                 .ToArray()
                         }

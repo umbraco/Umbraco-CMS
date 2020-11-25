@@ -31,7 +31,7 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Umbraco.Web
             IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor,
-             IBackofficeSecurityAccessor backofficeSecurityAccessor)
+             IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -80,7 +80,7 @@ namespace Umbraco.Web
 
             return new UmbracoContext(
                 _publishedSnapshotService,
-                _backofficeSecurityAccessor.BackofficeSecurity,
+                _backofficeSecurityAccessor.BackOfficeSecurity,
                 _globalSettings,
                 _hostingEnvironment,
                 _variationContextAccessor,

@@ -34,10 +34,10 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         private readonly Type _outgoingType;
         private readonly IEntityService _entityService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly string _propertyName;
 
-        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IBackofficeSecurityAccessor backofficeSecurityAccessor, Type outgoingType, string propertyName)
+        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IBackOfficeSecurityAccessor backofficeSecurityAccessor, Type outgoingType, string propertyName)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
@@ -57,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             if (context.Result == null) return;
 
-            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             if (user == null) return;
 
             var objectContent = context.Result as ObjectResult;

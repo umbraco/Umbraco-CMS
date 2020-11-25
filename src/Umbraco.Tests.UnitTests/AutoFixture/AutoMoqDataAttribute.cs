@@ -5,6 +5,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -21,7 +22,7 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
 {
-    
+
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = true)]
     public class InlineAutoMoqDataAttribute : InlineAutoDataAttribute
     {
@@ -83,18 +84,20 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                             Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
                             new UmbracoApiControllerTypeCollection(Array.Empty<Type>()))));
-                    
+
                     fixture.Customize<PreviewRoutes>(u => u.FromFactory(
                         () => new PreviewRoutes(
                             Options.Create(new GlobalSettings()),
                             Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
-                    
+
                     var connectionStrings = new ConnectionStrings();
                     fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
 
 
-
+                    var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
+                    fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));
+                    fixture.Customize<IHttpContextAccessor>(x => x.FromFactory(() => httpContextAccessor));
 
                 }
             }

@@ -39,7 +39,6 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
 {
-    // TODO: MSDI - let's kill this class once and for all...
     // see notes in Umbraco.Core.Composing.Current.
     public static class Current
     {
@@ -133,9 +132,6 @@ namespace Umbraco.Web.Composing
 
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
             => Factory.GetRequiredService<UmbracoApiControllerTypeCollection>();
-
-        internal static SurfaceControllerTypeCollection SurfaceControllerTypes
-            => Factory.GetRequiredService<SurfaceControllerTypeCollection>();
 
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Factory.GetRequiredService<IPublishedSnapshotService>();

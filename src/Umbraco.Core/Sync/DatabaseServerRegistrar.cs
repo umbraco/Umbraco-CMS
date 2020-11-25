@@ -16,18 +16,12 @@ namespace Umbraco.Core.Sync
         private readonly Lazy<IServerRegistrationService> _registrationService;
 
         /// <summary>
-        /// Gets or sets the registrar options.
-        /// </summary>
-        public DatabaseServerRegistrarOptions Options { get; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServerRegistrar"/> class.
         /// </summary>
         /// <param name="registrationService">The registration service.</param>
         /// <param name="options">Some options.</param>
-        public DatabaseServerRegistrar(Lazy<IServerRegistrationService> registrationService, DatabaseServerRegistrarOptions options)
+        public DatabaseServerRegistrar(Lazy<IServerRegistrationService> registrationService)
         {
-            Options = options ?? throw new ArgumentNullException(nameof(options));
             _registrationService = registrationService ?? throw new ArgumentNullException(nameof(registrationService));
         }
 
