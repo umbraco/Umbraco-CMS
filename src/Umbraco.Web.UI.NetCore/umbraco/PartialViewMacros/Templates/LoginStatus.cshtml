@@ -6,7 +6,8 @@
 @inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
 
 @{
-    var loginStatusModel = await UmbracoWebsiteSecurityAccessor.WebsiteSecurity.GetCurrentLoginStatusAsync();
+    var websiteSecurity = UmbracoWebsiteSecurityAccessor.WebsiteSecurity;
+    var loginStatusModel = await websiteSecurity.GetCurrentLoginStatusAsync();
     var logoutModel = new PostRedirectModel();
 
     @*

@@ -5,7 +5,8 @@
 @inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
 
 @{
-    var profileModel = await UmbracoWebsiteSecurityAccessor.WebsiteSecurity.GetCurrentMemberProfileModelAsync();
+    var websiteSecurity = UmbracoWebsiteSecurityAccessor.WebsiteSecurity;
+    var profileModel = await websiteSecurity.GetCurrentMemberProfileModelAsync();
 
 
     var success = TempData["ProfileUpdateSuccess"] != null;
@@ -15,7 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
-@if (UmbracoWebsiteSecurityAccessor.WebsiteSecurity.IsLoggedIn() && profileModel != null)
+@if (websiteSecurity.IsLoggedIn() && profileModel != null)
 {
     if (success)
     {

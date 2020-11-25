@@ -12,7 +12,8 @@
         var registerModel = Members.CreateRegistrationModel("Custom Member");
     *@
 
-    var registerModel = UmbracoWebsiteSecurityAccessor.WebsiteSecurity.CreateRegistrationModel();
+    var websiteSecurity = UmbracoWebsiteSecurityAccessor.WebsiteSecurity;
+    var registerModel = websiteSecurity.CreateRegistrationModel();
 
     @*
         Configurable here:
