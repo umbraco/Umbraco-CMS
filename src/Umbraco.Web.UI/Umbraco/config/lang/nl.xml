@@ -288,7 +288,7 @@
     <key alias="childItems" version="7.0">Subitems</key>
     <key alias="target" version="7.0">Doel</key>
     <key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Wat houd dit in?</a>]]></key>
     <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
     <key alias="nestedContentDeleteAllItems">Ben je zeker dat je alle items wilt verwijderen?</key>
     <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door Nested Content.</key>
@@ -472,7 +472,7 @@
     <key alias="recycleBinDeleting">De items worden nu uit de prullenbak verwijderd. Sluit dit venster niet terwijl de actie nog niet voltooid is.</key>
     <key alias="recycleBinIsEmpty">De prullenbak is nu leeg.</key>
     <key alias="recycleBinWarning">Als items worden verwijderd uit de prullenbak, zijn ze voorgoed verwijderd.</key>
-    <key alias="regexSearchError"><![CDATA[De webservice van <a target='_blank' href='https://regexlib.com'>regexlib.com</a> ondervindt momenteel problemen waarover we geen controle hebben. Onze excuses voor het ongemak.]]></key>
+    <key alias="regexSearchError"><![CDATA[De webservice van <a target='_blank' rel='noopener' href='https://regexlib.com'>regexlib.com</a> ondervindt momenteel problemen waarover we geen controle hebben. Onze excuses voor het ongemak.]]></key>
     <key alias="regexSearchHelp">Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email', 'postcode', 'URL'.</key>
     <key alias="removeMacro">Verwijder Macro</key>
     <key alias="requiredField">Verplicht veld</key>
@@ -851,7 +851,7 @@
     <key alias="databaseHeader">Database configuratie </key>
     <key alias="databaseInstall"><![CDATA[Druk op de knop <strong>installeren</strong> om de Umbraco %0% database te installeren]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% is nu gekopieerd naar je database. Druk op <strong>Volgende</strong> om door te gaan.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Om deze stap te voltooien moet je enkele gegevens weten over je database server ("connection string").<br/> Gelieve contact op te nemen met je ISP indien nodig. Wanneer je installeert op een lokale computer of server, dan heb je waarschijnlijk informatie nodig van je systeembeheerder.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Klik de <strong>upgrade</strong> knop om je database te upgraden naar Umbraco %0%</p> <p> Maak je geen zorgen - er zal geen inhoud worden gewist en alles blijft gewoon werken! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Je database is geupgrade naar de definitieve versie %0%.<br />Klik <strong>Volgende</strong> om verder te gaan.]]></key>
@@ -928,7 +928,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="instruction">log hieronder in</key>
     <key alias="signInWith">Inloggen met</key>
     <key alias="timeout">Sessie is verlopen</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>]]></key>
     <key alias="forgottenPassword">Wachtwoord vergeten?</key>
     <key alias="forgottenPasswordInstruction">Er zal een e-mail worden gestuurd naar het e-mailadres van jouw account. Hierin staat een link om je wachtwoord te resetten</key>
     <key alias="requestPasswordResetConfirmation">Een e-mail met daarin de wachtwoord reset uitleg zal worden gestuurd als het e-mailadres in onze database voorkomt.</key>
@@ -1840,7 +1840,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Klik hier om de uitnodiging te accepteren
 																						</a>
 																					</td>
@@ -2027,7 +2027,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="helpText">
         <![CDATA[
     <p>De health checker evalueert verschillende delen van de website voor best practice instellingen, configuratie, mogelijke problemen, enzovoort. U kunt problemen eenvoudig oplossen met een druk op de knop.
-    U kunt uw eigen health checks toevoegen, kijk even naar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">de documentatie voor meer informatie</a> over aangepaste health checks.</p>
+    U kunt uw eigen health checks toevoegen, kijk even naar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">de documentatie voor meer informatie</a> over aangepaste health checks.</p>
     ]]>
     </key>
   </area>
@@ -2277,7 +2277,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="trainingHeadline">Je bent slechts een klik verwijderd van uren aan Umbraco trainingvideo's.</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Wil je Umbraco onder de knie krijgen? Besteed een paar minuten aan het leren van enkele best practices door een van deze video's over het gebruik van Umbraco te bekijken. Bezoek <a href="https://umbraco.tv" target="_blank">umbraco.tv</a> voor meer Umbraco videos</p>
+        <p>Wil je Umbraco onder de knie krijgen? Besteed een paar minuten aan het leren van enkele best practices door een van deze video's over het gebruik van Umbraco te bekijken. Bezoek <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> voor meer Umbraco videos</p>
     ]]>
     </key>
     <key alias="getStarted">Om je op weg te helpen</key>
@@ -2288,27 +2288,27 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="more">Meer te weten komen</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">in het Documentatiegedeelte</a> van Our Umbraco
+            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">in het Documentatiegedeelte</a> van Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Stel een vraag op het <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+            Stel een vraag op het <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Bekijk onze <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">instructievideo's</a> (sommige zijn gratis, andere vereisen een abonnement)
+            Bekijk onze <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">instructievideo's</a> (sommige zijn gratis, andere vereisen een abonnement)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Lees meer over onze <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">productiviteitsverhogende programma's en commerciële ondersteuning</a>
+            Lees meer over onze <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productiviteitsverhogende programma's en commerciële ondersteuning</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Lees meer over real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training en certificering</a> opportuniteiten
+            Lees meer over real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training en certificering</a> opportuniteiten
         ]]>
     </key>
   </area>
