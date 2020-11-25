@@ -4,6 +4,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -26,13 +27,13 @@ namespace Umbraco.Tests.Cache
     [UmbracoTest(WithApplication = true)]
     public class DistributedCacheBinderTests : UmbracoTestBase
     {
-        protected override void Compose(Composition composition)
+        protected override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
             // refreshers.HandleEvents wants a UmbracoContext
             // which wants these
-            composition.Services.AddUnique(_ => Mock.Of<IPublishedSnapshotService>());
-            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
+            builder.Services.AddUnique(Mock.Of<IPublishedSnapshotService>());
+            builder.WithCollectionBuilder<UrlProviderCollectionBuilder>();
         }
 
         [Test]

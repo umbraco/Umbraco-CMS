@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -9,9 +10,11 @@ using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Runtime;
@@ -20,6 +23,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.Integration
 {
@@ -42,68 +46,6 @@ namespace Umbraco.Tests.Integration
         }
 
         /// <summary>
-        /// Manually configure the containers/dependencies and call Boot on Core runtime
-        /// </summary>
-        [Test]
-        public void Boot_Core_Runtime()
-        {
-            var services = new ServiceCollection().AddLazySupport();
-
-            // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
-            services.AddTransient(x => Mock.Of<IHostApplicationLifetime>());
-
-            var testHelper = new TestHelper();
-
-            var globalSettings = new GlobalSettings();
-            var connectionStrings = new ConnectionStrings();
-
-            // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
-            // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
-
-            services.AddTransient(x => Options.Create(globalSettings));
-            services.AddTransient(x => Options.Create(connectionStrings));
-            services.AddTransient(x => Options.Create(new ContentSettings()));
-            services.AddTransient(x => Options.Create(new CoreDebugSettings()));
-            services.AddTransient(x => Options.Create(new NuCacheSettings()));
-            services.AddTransient(x => Options.Create(new RequestHandlerSettings()));
-            services.AddTransient(x => Options.Create(new UserPasswordConfigurationSettings()));
-            services.AddTransient(x => Options.Create(new WebRoutingSettings()));
-            services.AddTransient(x => Options.Create(new ModelsBuilderSettings()));
-            services.AddTransient(x => Options.Create(new RouteOptions()));
-            services.AddTransient(x => Options.Create(new IndexCreatorSettings()));
-            services.AddRouting(); // LinkGenerator
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-
-            // Create the core runtime
-            var bootstrapper = new CoreRuntimeBootstrapper(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
-                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
-                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
-
-            bootstrapper.Configure(services);
-
-            Assert.IsTrue(bootstrapper.MainDom.IsMainDom);
-            Assert.IsNull(bootstrapper.State.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, bootstrapper.State.Level);
-            Assert.IsTrue(MyComposer.IsComposed);
-            Assert.IsFalse(MyComponent.IsInit);
-            Assert.IsFalse(MyComponent.IsTerminated);
-
-            var container = services.BuildServiceProvider();
-
-            var runtime = container.GetRequiredService<IRuntime>();
-
-            runtime.Start();
-
-            Assert.IsTrue(MyComponent.IsInit);
-            Assert.IsFalse(MyComponent.IsTerminated);
-
-            runtime.Terminate();
-
-            Assert.IsTrue(MyComponent.IsTerminated);
-        }
-
-        /// <summary>
         /// Calling AddUmbracoCore to configure the container
         /// </summary>
         [Test]
@@ -120,8 +62,19 @@ namespace Umbraco.Tests.Integration
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-                    services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
+                    var typeLoader = services.AddTypeLoader(
+                        GetType().Assembly,
+                        webHostEnvironment,
+                        testHelper.GetHostingEnvironment(),
+                        testHelper.ConsoleLoggerFactory,
+                        AppCaches.NoCache,
+                        hostContext.Configuration,
+                        testHelper.Profiler);
+                    
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,  testHelper.ConsoleLoggerFactory);
+                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
+                    builder.AddConfiguration();
+                    builder.AddUmbracoCore();
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -133,7 +86,6 @@ namespace Umbraco.Tests.Integration
 
             Assert.IsFalse(mainDom.IsMainDom); // We haven't "Started" the runtime yet
             Assert.IsNull(runtimeState.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
             Assert.IsFalse(MyComponent.IsInit); // We haven't "Started" the runtime yet
 
             await host.StopAsync();
@@ -157,10 +109,23 @@ namespace Umbraco.Tests.Integration
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
-
+                    
                     // Add it!
-                    services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment,  GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration);
+
+                    var typeLoader = services.AddTypeLoader(
+                        GetType().Assembly,
+                        webHostEnvironment,
+                        testHelper.GetHostingEnvironment(),
+                        testHelper.ConsoleLoggerFactory,
+                        AppCaches.NoCache,
+                        hostContext.Configuration,
+                        testHelper.Profiler);
+
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
+                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
+                    builder.AddConfiguration()
+                          .AddUmbracoCore()
+                          .Build();
 
                     services.AddRouting(); // LinkGenerator
                 });
@@ -177,7 +142,6 @@ namespace Umbraco.Tests.Integration
 
             Assert.IsTrue(mainDom.IsMainDom);
             Assert.IsNull(runtimeState.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
             Assert.IsTrue(MyComponent.IsInit);
 
             await host.StopAsync();
@@ -187,9 +151,9 @@ namespace Umbraco.Tests.Integration
 
         public class MyComposer : IUserComposer
         {
-            public void Compose(Composition composition)
+            public void Compose(IUmbracoBuilder builder)
             {
-                composition.Components().Append<MyComponent>();
+                builder.Components().Append<MyComponent>();
                 IsComposed = true;
             }
 

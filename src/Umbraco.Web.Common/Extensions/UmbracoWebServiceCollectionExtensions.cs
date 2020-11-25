@@ -14,28 +14,17 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Smidge;
 using Smidge.Nuglify;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Web.Common.ApplicationModels;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoWebServiceCollectionExtensions
     {
-        /// <summary>
-        /// Registers the web components needed for Umbraco
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoWebComponents(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.ConfigureOptions<UmbracoMvcConfigureOptions>();
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
-            services.AddUmbracoImageSharp(configuration);
+     
 
-            return services;
-        }
 
         /// <summary>
         /// Adds Image Sharp with Umbraco settings
@@ -81,20 +70,6 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        /// <summary>
-        /// Adds the Umbraco runtime minifier
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoRuntimeMinifier(this IServiceCollection services,
-            IConfiguration configuration)
-        {
-            services.AddSmidge(configuration.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
-            services.AddSmidgeNuglify();
-
-            return services;
-        }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
         {
@@ -117,7 +92,7 @@ namespace Umbraco.Extensions
         /// We generally don't want to change the global MVC settings since we want to be unobtrusive as possible but some
         /// global mods are needed - so long as they don't interfere with normal user usages of MVC.
         /// </remarks>
-        private class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
+        public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
         {
 
             // TODO: we can inject params with DI here

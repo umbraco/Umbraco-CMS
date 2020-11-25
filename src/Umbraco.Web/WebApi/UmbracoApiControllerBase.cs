@@ -41,6 +41,7 @@ namespace Umbraco.Web.WebApi
             : this(
                 Current.Factory.GetRequiredService<GlobalSettings>(),
                 Current.Factory.GetRequiredService<IUmbracoContextAccessor>(),
+                Current.Factory.GetRequiredService<IBackOfficeSecurityAccessor>(),
                 Current.Factory.GetRequiredService<ISqlContext>(),
                 Current.Factory.GetRequiredService<ServiceContext>(),
                 Current.Factory.GetRequiredService<AppCaches>(),
@@ -54,9 +55,10 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoApiControllerBase(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, IBackOfficeSecurityAccessor  backOfficeSecurityAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
+            BackOfficeSecurityAccessor = backOfficeSecurityAccessor;
             SqlContext = sqlContext;
             Services = services;
             AppCaches = appCaches;
@@ -81,6 +83,8 @@ namespace Umbraco.Web.WebApi
         /// Gets the Umbraco context accessor.
         /// </summary>
         public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; }
+
+        public IBackOfficeSecurityAccessor BackOfficeSecurityAccessor { get; }
 
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IBackOfficeSecurity Security => UmbracoContext.Security;
+        public IBackOfficeSecurity Security => BackOfficeSecurityAccessor.BackOfficeSecurity;
 
         /// <summary>
         /// Tries to get the current HttpContext.

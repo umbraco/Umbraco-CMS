@@ -29,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             var typeFinder = TestHelper.GetTypeFinder();
             _typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
-                Mock.Of<ILogger<TypeLoader>>(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
+                Mock.Of<ILogger<TypeLoader>>(), new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()), false,
 
                 // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
                 // TODO: Should probably update this so it only searches this assembly and add custom types to be found
@@ -240,16 +240,16 @@ AnotherContentFinder
             var list3 = new[] { f1, f3, f5, f7 };
 
             //Act
-            var hash1 = GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash2 = GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            var hash3 = GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash1 = GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()));
+            var hash2 = GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()));
+            var hash3 = GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()));
 
             //Assert
             Assert.AreNotEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
             Assert.AreNotEqual(hash2, hash3);
 
-            Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())));
         }
 
         [Test]

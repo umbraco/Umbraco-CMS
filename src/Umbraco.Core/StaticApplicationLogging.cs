@@ -16,7 +16,7 @@ namespace Umbraco.Core
 
         public static ILogger<T> CreateLogger<T>()
         {
-            return _loggerFactory?.CreateLogger<T>() ?? new NullLogger<T>();
+            return _loggerFactory?.CreateLogger<T>() ?? NullLoggerFactory.Instance.CreateLogger<T>();
         }
     }
 }

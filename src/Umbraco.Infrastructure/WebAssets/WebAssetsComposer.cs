@@ -1,14 +1,15 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.WebAssets
 {
     public sealed class WebAssetsComposer : ComponentComposer<WebAssetsComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
-            composition.Services.AddUnique<BackOfficeWebAssets>();
+            base.Compose(builder);
+            builder.Services.AddUnique<BackOfficeWebAssets>();
         }
     }
 }
