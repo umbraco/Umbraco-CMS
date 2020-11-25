@@ -47,7 +47,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Logging
             _newLogfilePath = Path.Combine(_newLogfileDirPath, _logfileName);
 
             var exampleSearchfilePath = Path.Combine(testRoot, "TestHelpers","Assets", _searchfileName);
-            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"Config");
+            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"config");
             _newSearchfilePath = Path.Combine(_newSearchfileDirPath, _searchfileName);
 
             //Create/ensure Directory exists
