@@ -70,8 +70,4 @@
       </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="Umbraco.Core.CodeAnnotations.UmbracoSuppressVolatileAttribute"></AssemblyAttribute>
-    </ItemGroup>
-
 </Project>

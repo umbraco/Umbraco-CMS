@@ -37,8 +37,4 @@
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <AssemblyAttribute Include="Umbraco.Core.CodeAnnotations.UmbracoSuppressVolatileAttribute"></AssemblyAttribute>
-    </ItemGroup>
 </Project>

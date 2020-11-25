@@ -40,6 +40,3 @@ using Umbraco.Core.CodeAnnotations;
 // in order to mock loggers loggers with types from the assembly
 // I.E. Mock.Of<ILogger<TestControllerFactory>>()
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-
-// Supress UmbracoVolatile
-[assembly: UmbracoSuppressVolatile]

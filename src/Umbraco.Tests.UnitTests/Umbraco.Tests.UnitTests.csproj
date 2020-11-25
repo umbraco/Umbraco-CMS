@@ -28,8 +28,4 @@
       <Content Include="TestHelpers\Assets\logviewer.searches.config.js" />
       <Content Include="TestHelpers\Assets\UmbracoTraceLog.UNITTEST.20181112.json" />
     </ItemGroup>
-
-    <ItemGroup>
-        <AssemblyAttribute Include="Umbraco.Core.CodeAnnotations.UmbracoSuppressVolatileAttribute"></AssemblyAttribute>
-    </ItemGroup>
 </Project>
