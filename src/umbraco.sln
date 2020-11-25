@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\build\build.ps1 = ..\build\build.ps1
 		..\NuGet.Config = ..\NuGet.Config
 		SolutionInfo.cs = SolutionInfo.cs
+		..\build\azure-pipelines.yml = ..\build\azure-pipelines.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
