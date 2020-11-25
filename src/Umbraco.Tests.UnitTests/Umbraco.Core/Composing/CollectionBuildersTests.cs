@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UnitTests.TestHelpers;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class CollectionBuildersTests
     {
-        private Composition _composition;
+        private IUmbracoBuilder _composition;
 
         [SetUp]
         public void Setup()
         {
             var register = TestHelper.GetServiceCollection();
-            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            _composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
         }
 
         [TearDown]

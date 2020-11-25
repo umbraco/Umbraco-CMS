@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
@@ -19,21 +20,21 @@ using Current = Umbraco.Web.Composing.Current;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
-// Umbraco.Core's own CompositionExtensions class
+// Umbraco.Core's own IUmbracoBuilderExtensions class
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Provides extension methods to the <see cref="Composition"/> class.
+    /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
     /// </summary>
-    public static class WebCompositionExtensions
+    public static class WebIUmbracoBuilderExtensions
     {
         [Obsolete("This extension method exists only to ease migration, please refactor")]
-        public static IServiceProvider CreateServiceProvider(this Composition composition)
+        public static IServiceProvider CreateServiceProvider(this IUmbracoBuilder builder)
         {
-            composition.RegisterBuilders();
-            return composition.Services.BuildServiceProvider();
+            builder.Build();
+            return builder.Services.BuildServiceProvider();
         }
 
         #region Uniques
@@ -42,62 +43,62 @@ namespace Umbraco.Web
         /// Sets the content last chance finder.
         /// </summary>
         /// <typeparam name="T">The type of the content last chance finder.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetContentLastChanceFinder<T>(this Composition composition)
+        /// <param name="builder">The builder.</param>
+        public static void SetContentLastChanceFinder<T>(this IUmbracoBuilder builder)
             where T : class, IContentLastChanceFinder
         {
-            composition.Services.AddUnique<IContentLastChanceFinder, T>();
+            builder.Services.AddUnique<IContentLastChanceFinder, T>();
         }
 
         /// <summary>
         /// Sets the content last chance finder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceProvider, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this IUmbracoBuilder builder, Func<IServiceProvider, IContentLastChanceFinder> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the content last chance finder.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="finder">A last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
+        public static void SetContentLastChanceFinder(this IUmbracoBuilder builder, IContentLastChanceFinder finder)
         {
-            composition.Services.AddUnique(_ => finder);
+            builder.Services.AddUnique(finder);
         }
 
         /// <summary>
         /// Sets the site domain helper.
         /// </summary>
         /// <typeparam name="T">The type of the site domain helper.</typeparam>
-        /// <param name="composition"></param>
-        public static void SetSiteDomainHelper<T>(this Composition composition)
+        /// <param name="builder"></param>
+        public static void SetSiteDomainHelper<T>(this IUmbracoBuilder builder)
             where T : class, ISiteDomainHelper
         {
-            composition.Services.AddUnique<ISiteDomainHelper, T>();
+            builder.Services.AddUnique<ISiteDomainHelper, T>();
         }
 
         /// <summary>
         /// Sets the site domain helper.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceProvider, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, Func<IServiceProvider, ISiteDomainHelper> factory)
         {
-            composition.Services.AddUnique(factory);
+            builder.Services.AddUnique(factory);
         }
 
         /// <summary>
         /// Sets the site domain helper.
         /// </summary>
-        /// <param name="composition">The composition.</param>
+        /// <param name="builder">The builder.</param>
         /// <param name="helper">A helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
+        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainHelper helper)
         {
-            composition.Services.AddUnique(_ => helper);
+            builder.Services.AddUnique(helper);
         }
 
         #endregion

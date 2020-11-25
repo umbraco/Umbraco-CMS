@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         private void SetDomains1()

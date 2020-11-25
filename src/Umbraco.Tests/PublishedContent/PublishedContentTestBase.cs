@@ -35,7 +35,7 @@ namespace Umbraco.Tests.PublishedContent
             // FIXME: what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
 
-            Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            Builder.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Clear()
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()

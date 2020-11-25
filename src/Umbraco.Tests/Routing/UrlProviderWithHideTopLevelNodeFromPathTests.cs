@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Routing
         protected override void ComposeSettings()
         {
             base.ComposeSettings();
-            Composition.Services.AddUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            Builder.Services.AddUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [TestCase(1046, "/")]

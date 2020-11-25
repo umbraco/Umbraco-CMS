@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Packaging
             // pollute everything, they are ignored by the type finder and explicitely
             // added to the editors collection
 
-            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
+            Builder.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Add<Editor1>()
                 .Add<Editor2>();
         }
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Packaging
             if (!withApplication) return;
 
             // re-register with actual media fs
-            Composition.ComposeFileSystems();
+            Builder.ComposeFileSystems();
         }
 
         private PackageDataInstallation PackageDataInstallation => Factory.GetRequiredService<PackageDataInstallation>();
