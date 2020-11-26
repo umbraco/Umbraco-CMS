@@ -26,80 +26,86 @@ jobs:
       command: test
       projects: '**/*.Tests.UnitTests.csproj'
 
+stages:
+- stage: Windows
+  jobs:
 
-- job: Windows
-  pool:
-    vmImage: 'windows-latest'
-  steps:
+  - job: Unit Tests
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+  
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.100'
+      inputs:
+        version: 3.1.100
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**\*.Tests.UnitTests.csproj'
+  
+    - task: NuGetToolInstaller@1
+      displayName: 'Use NuGet Latest'
+  
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        restoreSolution: '*\src\umbraco.sln'
+        feedsToUse: config
+  
+    - task: PowerShell@1
+      displayName: 'Prepare Build'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get
+         
+         $ubuild.PrepareBuild("vso")
+  
+    - task: NodeTool@0
+      displayName: 'Use Node 11.x'
+      inputs:
+        versionSpec: 11.x
+  
+    - task: Npm@1
+      displayName: 'npm install'
+      inputs:
+        workingDir: src\Umbraco.Web.UI.Client
+        verbose: false
+  
+    - task: gulp@0
+      displayName: 'gulp build'
+      inputs:
+        gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+        targets: build
+        workingDirectory: src\Umbraco.Web.UI.Client
+        publishJUnitResults: true
+        testResultsFiles: '**\TESTS-*.xml'
+  
+    - task: PowerShell@1
+      displayName: 'Prepare Packages'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get -continue
+         
+         $ubuild.CompileUmbraco()
+         $ubuild.PreparePackages()
+  
+    - task: PowerShell@1
+      displayName: 'Verify & Package NuGet'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get -continue
+         
+         $ubuild.VerifyNuGet()
+         $ubuild.PackageNuGet()
 
-  - task: UseDotNet@2
-    displayName: 'Use .Net Core sdk 3.1.100'
-    inputs:
-      version: 3.1.100
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet test'
-    inputs:
-      command: test
-      projects: '**\*.Tests.UnitTests.csproj'
-
-  - task: NuGetToolInstaller@1
-    displayName: 'Use NuGet Latest'
-
-  - task: NuGetCommand@2
-    displayName: 'Restore NuGet Packages'
-    inputs:
-      restoreSolution: '*\src\umbraco.sln'
-      feedsToUse: config
-
-  - task: PowerShell@1
-    displayName: 'Prepare Build'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-       Write-Host "Working folder: $pwd"
-       $ubuild = build\build.ps1 -get
-       
-       $ubuild.PrepareBuild("vso")
-
-  - task: NodeTool@0
-    displayName: 'Use Node 11.x'
-    inputs:
-      versionSpec: 11.x
-
-  - task: Npm@1
-    displayName: 'npm install'
-    inputs:
-      workingDir: src\Umbraco.Web.UI.Client
-      verbose: false
-
-  - task: gulp@0
-    displayName: 'gulp build'
-    inputs:
-      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
-      targets: build
-      workingDirectory: src\Umbraco.Web.UI.Client
-      publishJUnitResults: true
-      testResultsFiles: '**\TESTS-*.xml'
-
-  - task: PowerShell@1
-    displayName: 'Prepare Packages'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-       Write-Host "Working folder: $pwd"
-       $ubuild = build\build.ps1 -get -continue
-       
-       $ubuild.CompileUmbraco()
-       $ubuild.PreparePackages()
-
-  - task: PowerShell@1
-    displayName: 'Verify & Package NuGet'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-       Write-Host "Working folder: $pwd"
-       $ubuild = build\build.ps1 -get -continue
-       
-       $ubuild.VerifyNuGet()
-       $ubuild.PackageNuGet()
+  - job: Integration Tests
