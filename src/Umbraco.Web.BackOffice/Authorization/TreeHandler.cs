@@ -16,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// This would allow a tree to be moved between sections.
     /// The user only needs access to one of the trees specified, not all of the trees.
     /// </remarks>
-    public class TreeHandler : AuthorizationHandler<TreeRequirement>
+    public class TreeHandler : MustSatisfyRequirementAuthorizationHandler<TreeRequirement>
     {
 
         private readonly ITreeService _treeService;
@@ -37,21 +37,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TreeRequirement requirement)
-        {
-            if (IsAuthorized(requirement))
-            {
-                context.Succeed(requirement);
-            }
-            else
-            {
-                context.Fail();
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private bool IsAuthorized(TreeRequirement requirement)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, TreeRequirement requirement)
         {
             var apps = requirement.TreeAliases.Select(x => _treeService
                     .GetByAlias(x))
@@ -60,9 +46,12 @@ namespace Umbraco.Web.BackOffice.Authorization
                 .Distinct()
                 .ToArray();
 
-            return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
+            var isAuth = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
                    && apps.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
                        app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
+
+            return Task.FromResult(isAuth);
         }
+
     }
 }

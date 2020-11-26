@@ -15,7 +15,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string
     /// </summary>
-    public class ContentPermissionsQueryStringHandler : AuthorizationHandler<ContentPermissionsQueryStringRequirement>
+    public class ContentPermissionsQueryStringHandler : MustSatisfyRequirementAuthorizationHandler<ContentPermissionsQueryStringRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _contentPermissions = contentPermissions;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionsQueryStringRequirement requirement)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsQueryStringRequirement requirement)
         {
             int nodeId;
             if (requirement.NodeId.HasValue == false)
@@ -42,8 +42,7 @@ namespace Umbraco.Web.BackOffice.Authorization
                 if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
                 {
                     // must succeed this requirement since we cannot process it
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
+                    return Task.FromResult(true);
                 }
                 else
                 {
@@ -72,20 +71,9 @@ namespace Umbraco.Web.BackOffice.Authorization
             }
 
             var permissionResult = _contentPermissions.CheckPermissions(nodeId,
-                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,                
+                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 out IContent contentItem,
                 new[] { requirement.PermissionToCheck });
-
-            switch (permissionResult)
-            {
-                case ContentPermissions.ContentAccess.Denied:
-                    context.Fail();
-                    break;
-                case ContentPermissions.ContentAccess.NotFound:
-                default:
-                    context.Succeed(requirement);
-                    break;
-            }
 
             if (contentItem != null)
             {
@@ -93,8 +81,11 @@ namespace Umbraco.Web.BackOffice.Authorization
                 _httpContextAccessor.HttpContext.Items[typeof(IContent).ToString()] = contentItem;
             }
 
-            return Task.CompletedTask;
+            return permissionResult switch
+            {
+                ContentPermissions.ContentAccess.Denied => Task.FromResult(false),
+                _ => Task.FromResult(true),
+            };
         }
-
     }
 }

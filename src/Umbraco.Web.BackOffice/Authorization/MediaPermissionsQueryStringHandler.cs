@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-    public class MediaPermissionsQueryStringHandler : AuthorizationHandler<MediaPermissionsQueryStringRequirement>
+    public class MediaPermissionsQueryStringHandler : MustSatisfyRequirementAuthorizationHandler<MediaPermissionsQueryStringRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -29,13 +29,12 @@ namespace Umbraco.Web.BackOffice.Authorization
             _mediaPermissions = mediaPermissions;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MediaPermissionsQueryStringRequirement requirement)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, MediaPermissionsQueryStringRequirement requirement)
         {
             if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
             {
                 // must succeed this requirement since we cannot process it
-                context.Succeed(requirement);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
 
             int nodeId;
@@ -63,24 +62,17 @@ namespace Umbraco.Web.BackOffice.Authorization
                 nodeId,
                 out var mediaItem);
 
-            switch (permissionResult)
-            {
-                case MediaPermissions.MediaAccess.Denied:
-                    context.Fail();
-                    break;
-                case MediaPermissions.MediaAccess.NotFound:
-                default:
-                    context.Succeed(requirement);
-                    break;
-            }
-
             if (mediaItem != null)
             {
                 //store the content item in request cache so it can be resolved in the controller without re-looking it up
                 _httpContextAccessor.HttpContext.Items[typeof(IMedia).ToString()] = mediaItem;
             }
 
-            return Task.CompletedTask;
+            return permissionResult switch
+            {
+                MediaPermissions.MediaAccess.Denied => Task.FromResult(false),
+                _ => Task.FromResult(true),
+            };
         }
     }
 }

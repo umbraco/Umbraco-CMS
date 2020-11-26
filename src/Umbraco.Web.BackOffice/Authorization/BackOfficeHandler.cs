@@ -9,7 +9,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Ensures authorization is successful for a back office user.
     /// </summary>
-    public class BackOfficeHandler : AuthorizationHandler<BackOfficeRequirement>
+    public class BackOfficeHandler : MustSatisfyRequirementAuthorizationHandler<BackOfficeRequirement>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurity;
         private readonly IRuntimeState _runtimeState;
@@ -20,34 +20,22 @@ namespace Umbraco.Web.BackOffice.Authorization
             _runtimeState = runtimeState;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, BackOfficeRequirement requirement)
-        {
-            if (!IsAuthorized(requirement))
-            {
-                context.Fail();
-            }
-            else
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private bool IsAuthorized(BackOfficeRequirement requirement)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, BackOfficeRequirement requirement)
         {
             try
             {
                 // if not configured (install or upgrade) then we can continue
                 // otherwise we need to ensure that a user is logged in
-                return _runtimeState.Level == RuntimeLevel.Install
+                var isAuth = _runtimeState.Level == RuntimeLevel.Install
                     || _runtimeState.Level == RuntimeLevel.Upgrade
                     || _backOfficeSecurity.BackOfficeSecurity?.ValidateCurrentUser(false, requirement.RequireApproval) == ValidateRequestAttempt.Success;
+                return Task.FromResult(isAuth);
             }
             catch (Exception)
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
+
     }
 }

@@ -13,10 +13,11 @@ using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
+
     /// <summary>
     /// if the users being edited is an admin then we must ensure that the current user is also an admin
     /// </summary>
-    public class AdminUsersHandler : AuthorizationHandler<AdminUsersRequirement>
+    public class AdminUsersHandler : MustSatisfyRequirementAuthorizationHandler<AdminUsersRequirement>
     {
         private readonly IHttpContextAccessor _httpContextAcessor;
         private readonly IUserService _userService;
@@ -34,14 +35,13 @@ namespace Umbraco.Web.BackOffice.Authorization
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
         {
             var queryString = _httpContextAcessor.HttpContext?.Request.Query[requirement.QueryStringName];
             if (!queryString.HasValue)
             {
                 // must succeed this requirement since we cannot process it
-                context.Succeed(requirement);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
 
             int[] userIds;
@@ -55,8 +55,7 @@ namespace Umbraco.Web.BackOffice.Authorization
                 if (ids.Count == 0)
                 {
                     // must succeed this requirement since we cannot process it
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
+                    return Task.FromResult(true);
                 }
                 userIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
             }
@@ -64,23 +63,13 @@ namespace Umbraco.Web.BackOffice.Authorization
             if (userIds.Length == 0)
             {
                 // must succeed this requirement since we cannot process it
-                context.Succeed(requirement);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
 
             var users = _userService.GetUsersById(userIds);
             var isAuth = users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, null) != false);
 
-            if (isAuth)
-            {
-                context.Succeed(requirement);
-            }
-            else
-            {
-                context.Fail();
-            }
-
-            return Task.CompletedTask;
+            return Task.FromResult(isAuth);
         }
     }
 }

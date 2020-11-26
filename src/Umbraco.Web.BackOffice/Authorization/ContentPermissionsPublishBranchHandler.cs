@@ -13,7 +13,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// The user must have access to all descendant nodes of the content item in order to continue
     /// </summary>
-    public class ContentPermissionsPublishBranchHandler : AuthorizationHandler<ContentPermissionsPublishBranchRequirement, IContent>
+    public class ContentPermissionsPublishBranchHandler : MustSatisfyRequirementAuthorizationHandler<ContentPermissionsPublishBranchRequirement, IContent>
     {
         private readonly IEntityService _entityService;
         private readonly ContentPermissions _contentPermissions;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Authorization
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ContentPermissionsPublishBranchRequirement requirement, IContent resource)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsPublishBranchRequirement requirement, IContent resource)
         {
             var denied = new List<IUmbracoEntity>();
             var page = 0;
@@ -55,16 +55,7 @@ namespace Umbraco.Web.BackOffice.Authorization
                 }
             }
 
-            if (denied.Count == 0)
-            {
-                context.Succeed(requirement);
-            }
-            else
-            {
-                context.Fail();
-            }
-
-            return Task.CompletedTask;
+            return Task.FromResult(denied.Count == 0);
         }
     }
 }
