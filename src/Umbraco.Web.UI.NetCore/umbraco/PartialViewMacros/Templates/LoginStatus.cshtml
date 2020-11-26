@@ -1,12 +1,13 @@
-﻿@using System.Web.Mvc.Html
-@using Umbraco.Web
-@using Umbraco.Web.Composing
-@using Umbraco.Web.Models
-@using Umbraco.Web.Controllers
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
+﻿@using Umbraco.Core.Security
+@using Umbraco.Core.Models.Security
+@using Umbraco.Extensions
+@using Umbraco.Web.Website.Controllers
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
 
 @{
-    var loginStatusModel = Current.MembershipHelper.GetCurrentLoginStatus();
+    var websiteSecurity = UmbracoWebsiteSecurityAccessor.WebsiteSecurity;
+    var loginStatusModel = await websiteSecurity.GetCurrentLoginStatusAsync();
     var logoutModel = new PostRedirectModel();
 
     @*

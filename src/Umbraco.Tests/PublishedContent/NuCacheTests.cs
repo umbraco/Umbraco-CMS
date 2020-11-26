@@ -21,6 +21,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
@@ -188,8 +189,10 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
+            var lifetime = new Mock<IUmbracoApplicationLifetime>();
             _snapshotService = new PublishedSnapshotService(options,
                 null,
+                lifetime.Object,
                 runtime,
                 serviceContext,
                 contentTypeFactory,
@@ -211,6 +214,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
+
+            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

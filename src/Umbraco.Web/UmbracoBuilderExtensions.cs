@@ -2,33 +2,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Builder;
-using Umbraco.Core.Composing;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Dashboards;
-using Umbraco.Web.Editors;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Media.EmbedProviders;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Search;
-using Umbraco.Web.Sections;
-using Umbraco.Web.Tour;
-using Umbraco.Web.Trees;
-using Current = Umbraco.Web.Composing.Current;
 
-// the namespace here is intentional -  although defined in Umbraco.Web assembly,
-// this class should be visible when using Umbraco.Core.Components, alongside
-// Umbraco.Core's own IUmbracoBuilderExtensions class
-
-// ReSharper disable once CheckNamespace
 namespace Umbraco.Web
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
     /// </summary>
-    public static class WebIUmbracoBuilderExtensions
+    public static class UmbracoBuilderExtensions
     {
         [Obsolete("This extension method exists only to ease migration, please refactor")]
         public static IServiceProvider CreateServiceProvider(this IUmbracoBuilder builder)
