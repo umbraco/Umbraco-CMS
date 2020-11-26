@@ -31,6 +31,14 @@ namespace Umbraco.Extensions
         {
             builder.Services.AddAntiforgery();
             builder.Services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
+
+            // TODO: We need to see if we are 'allowed' to do this, the docs say:
+            // "The call to AddIdentity configures the default scheme settings. The AddAuthentication(String) overload sets the DefaultScheme property. The AddAuthentication(Action<AuthenticationOptions>) overload allows configuring authentication options, which can be used to set up default authentication schemes for different purposes. Subsequent calls to AddAuthentication override previously configured AuthenticationOptions properties."
+            // So if someone calls services.AddAuthentication() ... in Startup does that overwrite all of this?
+            // It also says "When the app requires multiple providers, chain the provider extension methods behind AddAuthentication"
+            // Which leads me to believe it all gets overwritten? :/
+            // UPDATE: I have tested this breifly in Startup doing Services.AddAuthentication().AddGoogle() ... and the back office auth
+            // still seems to work. We'll see how it goes i guess.
             builder.Services
                 .AddAuthentication(Core.Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)

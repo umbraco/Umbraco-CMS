@@ -34,10 +34,11 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Security;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [DisableBrowserCache] //TODO Reintroduce
+    [DisableBrowserCache]
     //[UmbracoRequireHttps] //TODO Reintroduce
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : UmbracoController
@@ -413,7 +414,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                autoLinkOptions = _externalLogins.Get(authType.Name);
+                autoLinkOptions = _externalLogins.Get(authType.Name)?.AutoLinkOptions;
             }
 
             // Sign in the user with this external login provider if the user already has a login
@@ -460,7 +461,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return false;
 
             if (autoLinkOptions.AutoLinkExternalAccount == false)
+            {
                 return true; // TODO: This seems weird to return true, but it was like that before so must be a reason?
+            }   
 
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
 
@@ -577,10 +580,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                         linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList()));
             }
         }
-
-        // Used for XSRF protection when adding external logins
-        // TODO: This is duplicated in BackOfficeSignInManager
-        private const string XsrfKey = "XsrfId";
 
         private IActionResult RedirectToLocal(string returnUrl)
         {

@@ -21,6 +21,7 @@ using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
@@ -163,7 +164,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
             if (user == null) throw new InvalidOperationException("Could not find user");
 
-            ExternalSignInAutoLinkOptions autoLinkOptions = null;
             var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
                .FirstOrDefault(x => x.Name == unlinkLoginModel.LoginProvider);
 
@@ -173,11 +173,18 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                autoLinkOptions = _externalAuthenticationOptions.Get(authType.Name);
-                if (!autoLinkOptions.AllowManualLinking)
+                var opt = _externalAuthenticationOptions.Get(authType.Name);
+                if (opt == null)
                 {
-                    // If AllowManualLinking is disabled for this provider we cannot unlink
-                    return BadRequest();
+                    return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
+                }
+                else
+                {
+                    if (!opt.AutoLinkOptions.AllowManualLinking)
+                    {
+                        // If AllowManualLinking is disabled for this provider we cannot unlink
+                        return BadRequest();
+                    }
                 }
             }
 
@@ -243,7 +250,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [UmbracoBackOfficeAuthorize]
         [SetAngularAntiForgeryTokens]
-        //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
+        [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
