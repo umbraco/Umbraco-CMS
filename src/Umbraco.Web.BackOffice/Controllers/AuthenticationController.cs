@@ -180,7 +180,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 else
                 {
-                    if (!opt.AutoLinkOptions.AllowManualLinking)
+                    if (!opt.Options.AutoLinkOptions.AllowManualLinking)
                     {
                         // If AllowManualLinking is disabled for this provider we cannot unlink
                         return BadRequest();

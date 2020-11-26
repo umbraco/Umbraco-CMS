@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.BackOffice.Security
 {
 
-    // TODO: This is only for the back office, does it need to be in common?
 
     /// <summary>
     /// Options used to configure back office external login providers
@@ -12,13 +11,13 @@ namespace Umbraco.Web.BackOffice.Security
     public class BackOfficeExternalLoginProviderOptions
     {
         public BackOfficeExternalLoginProviderOptions(
-            string style, string icon, string callbackPath,
+            string buttonStyle, string icon, string callbackPath,
             ExternalSignInAutoLinkOptions autoLinkOptions = null,
             bool denyLocalLogin = false,
             bool autoRedirectLoginToExternalProvider = false,
             string customBackOfficeView = null)
         {
-            Style = style;
+            ButtonStyle = buttonStyle;
             Icon = icon;
             CallbackPath = callbackPath;
             AutoLinkOptions = autoLinkOptions ?? new ExternalSignInAutoLinkOptions();
@@ -27,10 +26,9 @@ namespace Umbraco.Web.BackOffice.Security
             CustomBackOfficeView = customBackOfficeView;
         }
 
-        public string Style { get; }
+        public string ButtonStyle { get; }
         public string Icon { get; }
         public string CallbackPath { get; }
-
 
         /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
