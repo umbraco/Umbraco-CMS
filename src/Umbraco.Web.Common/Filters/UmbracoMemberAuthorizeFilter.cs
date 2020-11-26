@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Filters
@@ -12,6 +13,13 @@ namespace Umbraco.Web.Common.Filters
     /// </summary>
     public class UmbracoMemberAuthorizeFilter : IAuthorizationFilter
     {
+        private readonly IUmbracoWebsiteSecurity _websiteSecurity;
+
+        public UmbracoMemberAuthorizeFilter(IUmbracoWebsiteSecurity websiteSecurity)
+        {
+            _websiteSecurity = websiteSecurity;
+        }
+
         /// <summary>
         /// Comma delimited list of allowed member types
         /// </summary>
@@ -27,9 +35,7 @@ namespace Umbraco.Web.Common.Filters
         /// </summary>
         public string AllowMembers { get; private set; }
 
-
-        private UmbracoMemberAuthorizeFilter(
-            string allowType, string allowGroup, string allowMembers)
+        private UmbracoMemberAuthorizeFilter(string allowType, string allowGroup, string allowMembers)
         {
             AllowType = allowType;
             AllowGroup = allowGroup;
@@ -48,11 +54,19 @@ namespace Umbraco.Web.Common.Filters
         private bool IsAuthorized()
         {
             if (AllowMembers.IsNullOrWhiteSpace())
-                AllowMembers = "";
+            {
+                AllowMembers = string.Empty;
+            }
+
             if (AllowGroup.IsNullOrWhiteSpace())
-                AllowGroup = "";
+            {
+                AllowGroup = string.Empty;
+            }
+
             if (AllowType.IsNullOrWhiteSpace())
-                AllowType = "";
+            {
+                AllowType = string.Empty;
+            }
 
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
@@ -63,7 +77,7 @@ namespace Umbraco.Web.Common.Filters
                 }
             }
 
-            return false;// TODO reintroduce when members are implemented: _memberHelper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            return _websiteSecurity.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
         }
     }
 }

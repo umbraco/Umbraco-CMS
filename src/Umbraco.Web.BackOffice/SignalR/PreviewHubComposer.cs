@@ -1,13 +1,14 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.BackOffice.SignalR
 {
     public class PreviewHubComposer : ComponentComposer<PreviewHubComponent>, ICoreComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
         }
     }
 }

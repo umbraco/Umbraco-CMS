@@ -9,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.ContentApps
 {
@@ -21,8 +22,8 @@ namespace Umbraco.Web.ContentApps
         {
             // get the logger factory just-in-time - see note below for manifest parser
             var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
-            var umbracoContextAccessor = factory.GetRequiredService<IUmbracoContextAccessor>();
-            return new ContentAppFactoryCollection(CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), umbracoContextAccessor);
+            var backOfficeSecurityAccessor = factory.GetRequiredService<IBackOfficeSecurityAccessor>();
+            return new ContentAppFactoryCollection(CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), backOfficeSecurityAccessor);
         }
 
         protected override IEnumerable<IContentAppFactory> CreateItems(IServiceProvider factory)

@@ -17,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -43,10 +44,10 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Composition.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Composition.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
-            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
+            Builder.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
+            Builder.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
+            Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(() => Builder.TypeLoader.GetCacheRefreshers());
         }
 
         public override void TearDown()
@@ -83,10 +84,11 @@ namespace Umbraco.Tests.Scoping
             var typeFinder = TestHelper.GetTypeFinder();
 
             var nuCacheSettings = new NuCacheSettings();
-
-            return new PublishedSnapshotService(
+            var lifetime = new Mock<IUmbracoApplicationLifetime>();
+            var snapshotService = new PublishedSnapshotService(
                 options,
                 null,
+                lifetime.Object,
                 runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
@@ -106,6 +108,10 @@ namespace Umbraco.Tests.Scoping
                 Mock.Of<IShortStringHelper>(),
                 IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
+
+            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
+
+            return snapshotService;
         }
 
         protected IUmbracoContext GetUmbracoContextNu(string url, RouteData routeData = null, bool setSingleton = false)

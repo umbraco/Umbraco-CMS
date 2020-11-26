@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 

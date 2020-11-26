@@ -7,6 +7,7 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Examine;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         public RichTextPropertyEditor(
             ILoggerFactory loggerFactory,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             HtmlImageSourceParser imageSourceParser,
@@ -52,7 +53,7 @@ namespace Umbraco.Web.PropertyEditors
             IImageUrlGenerator imageUrlGenerator)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
@@ -64,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -75,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly HtmlLocalLinkParser _localLinkParser;
             private readonly RichTextEditorPastedImages _pastedImages;
@@ -83,7 +84,7 @@ namespace Umbraco.Web.PropertyEditors
 
             public RichTextPropertyValueEditor(
                 DataEditorAttribute attribute,
-                IUmbracoContextAccessor umbracoContextAccessor,
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
                 IDataTypeService dataTypeService,
                 ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
@@ -94,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors
                 IImageUrlGenerator imageUrlGenerator)
                 : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, attribute)
             {
-                _umbracoContextAccessor = umbracoContextAccessor;
+                _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;
                 _localLinkParser = localLinkParser;
                 _pastedImages = pastedImages;
@@ -146,7 +147,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null)
                     return null;
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+                var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;

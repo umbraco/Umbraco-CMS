@@ -1,0 +1,36 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@using Umbraco.Core.Models.Security
+@using Umbraco.Extensions
+@using Umbraco.Web.Website.Controllers
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+
+@{
+    var loginModel = new LoginModel();
+    loginModel.RedirectUrl = Context.Request.GetDisplayUrl();
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+@using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin"))
+{
+    @Html.HiddenFor(m => loginModel.RedirectUrl)
+    <fieldset>
+        <legend>Login</legend>
+
+        @Html.ValidationSummary("loginModel", true)
+
+        @Html.LabelFor(m => loginModel.Username)
+        @Html.TextBoxFor(m => loginModel.Username)
+        @Html.ValidationMessageFor(m => loginModel.Username)
+        <br />
+
+        @Html.LabelFor(m => loginModel.Password)
+        @Html.PasswordFor(m => loginModel.Password)
+        @Html.ValidationMessageFor(m => loginModel.Password)
+        <br />
+
+        <button>Login</button>
+    </fieldset>
+}

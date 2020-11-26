@@ -64,5 +64,13 @@ namespace Umbraco.Core.Cache
         /// search through all keys on a global scale.</para>
         /// </remarks>
         public IsolatedCaches IsolatedCaches { get; }
+
+        public static AppCaches Create(IRequestCache requestCache)
+        {
+            return new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                requestCache,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+        }
     }
 }

@@ -7,23 +7,24 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Builder;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     [ComposeBefore(typeof(IPublishedCacheComposer))]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Components().Append<ModelsBuilderComponent>();
-            composition.Services.AddSingleton<UmbracoServices>();
-            composition.Services.AddUnique<ModelsGenerator>();
-            composition.Services.AddUnique<LiveModelsProvider>();
-            composition.Services.AddUnique<OutOfDateModelsStatus>();
-            composition.Services.AddUnique<ModelsGenerationError>();
+            builder.Components().Append<ModelsBuilderComponent>();
+            builder.Services.AddSingleton<UmbracoServices>();
+            builder.Services.AddUnique<ModelsGenerator>();
+            builder.Services.AddUnique<LiveModelsProvider>();
+            builder.Services.AddUnique<OutOfDateModelsStatus>();
+            builder.Services.AddUnique<ModelsGenerationError>();
 
-            composition.Services.AddUnique<PureLiveModelFactory>();
-            composition.Services.AddUnique<IPublishedModelFactory>(factory =>
+            builder.Services.AddUnique<PureLiveModelFactory>();
+            builder.Services.AddUnique<IPublishedModelFactory>(factory =>
             {
                 var config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)

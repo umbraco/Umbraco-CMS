@@ -37,8 +37,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Composition.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
-            Composition.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
+            Builder.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
+            Builder.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
         }
 
         protected override void Initialize()
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.TestHelpers
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+                new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()),
                 Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),

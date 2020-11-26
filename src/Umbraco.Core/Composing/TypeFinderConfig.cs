@@ -15,9 +15,9 @@ namespace Umbraco.Core.Composing
         private readonly TypeFinderSettings _settings;
         private IEnumerable<string> _assembliesAcceptingLoadExceptions;
 
-        public TypeFinderConfig(IOptionsMonitor<TypeFinderSettings> settings)
+        public TypeFinderConfig(IOptions<TypeFinderSettings> settings)
         {
-            _settings = settings.CurrentValue;
+            _settings = settings.Value;
         }
 
         public IEnumerable<string> AssembliesAcceptingLoadExceptions

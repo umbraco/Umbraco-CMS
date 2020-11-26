@@ -11,7 +11,12 @@ namespace Umbraco.Core.Composing
         private readonly List<DirectoryInfo> _paths = new List<DirectoryInfo>();
         private readonly Dictionary<FileInfo, bool> _files = new Dictionary<FileInfo, bool>();
 
-        public void AddFolder(DirectoryInfo pathInfo) => _paths.Add(pathInfo);
+        public RuntimeHashPaths AddFolder(DirectoryInfo pathInfo)
+        {
+            _paths.Add(pathInfo);
+            return this;
+        }
+
         public void AddFile(FileInfo fileInfo, bool scanFileContent = false) => _files.Add(fileInfo, scanFileContent);
 
         public IEnumerable<DirectoryInfo> GetFolders() => _paths;

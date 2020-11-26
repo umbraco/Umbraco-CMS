@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Actions;
@@ -183,7 +184,7 @@ namespace Umbraco.Web.Compose
         /// </summary>
         public sealed class Notifier
         {
-            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
             private readonly IRequestAccessor _requestAccessor;
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
@@ -194,15 +195,15 @@ namespace Umbraco.Web.Compose
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="umbracoContextAccessor"></param>
+            /// <param name="backOfficeSecurityAccessor"></param>
+            /// <param name="requestAccessor"></param>
             /// <param name="notificationService"></param>
             /// <param name="userService"></param>
             /// <param name="textService"></param>
             /// <param name="globalSettings"></param>
-            /// <param name="contentConfig"></param>
             /// <param name="logger"></param>
             public Notifier(
-                IUmbracoContextAccessor umbracoContextAccessor,
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
                 IRequestAccessor requestAccessor,
                 INotificationService notificationService,
                 IUserService userService,
@@ -210,7 +211,7 @@ namespace Umbraco.Web.Compose
                 IOptions<GlobalSettings> globalSettings,
                 ILogger<Notifier> logger)
             {
-                _umbracoContextAccessor = umbracoContextAccessor;
+                _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _requestAccessor = requestAccessor;
                 _notificationService = notificationService;
                 _userService = userService;
@@ -221,7 +222,7 @@ namespace Umbraco.Web.Compose
 
             public void Notify(IAction action, params IContent[] entities)
             {
-                var user = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
+                var user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
                 //if there is no current user, then use the admin
                 if (user == null)

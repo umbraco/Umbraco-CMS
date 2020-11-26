@@ -113,7 +113,7 @@ namespace Umbraco.Web
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/App_Code")));
             // global.asax (the app domain also monitors this, if it changes will do a full restart)
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/global.asax")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(_loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(_loggerFactory.CreateLogger<ProfilingLogger>(), profiler), runtimeHashPaths);
             return new TypeFinder(_loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website
                 // in that case is essentially an exe. However in netframework there is no entry assembly, things don't really work that way since
@@ -128,11 +128,6 @@ namespace Umbraco.Web
                 // getting rid of netframework.
                 Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()), runtimeHash);
         }
-
-        /// <summary>
-        /// Gets a runtime.
-        /// </summary>
-        protected abstract CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
@@ -177,17 +172,17 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            var boostrapper = GetRuntime(
-                _globalSettings,
-                _connectionStrings,
-                umbracoVersion,
-                _ioHelper,
-                _logger,
-                _loggerFactory,
-                null, // TODO get from somewhere that isn't Current.
-                null, // TODO get from somewhere that isn't Current.
-                null // TODO get from somewhere that isn't Current.
-                );
+            //var boostrapper = GetRuntime(
+            //    _globalSettings,
+            //    _connectionStrings,
+            //    umbracoVersion,
+            //    _ioHelper,
+            //    _logger,
+            //    _loggerFactory,
+            //    null, // TODO get from somewhere that isn't Current.
+            //    null, // TODO get from somewhere that isn't Current.
+            //    null // TODO get from somewhere that isn't Current.
+            //    );
             //_factory = Current.Factory = _runtime.Configure(register);
 
 
