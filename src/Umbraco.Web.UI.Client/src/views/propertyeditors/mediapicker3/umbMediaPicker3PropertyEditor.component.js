@@ -116,6 +116,7 @@
 
                 vm.loading = false;
 
+                // testing:
                 //editMedia(vm.model.value[0]);
             });
 
@@ -159,6 +160,47 @@
             }
 
             editorService.mediaPicker(mediaPicker);
+        }
+
+        // To be used by infinte editor. (defined here cause we need configuration from property editor)
+        function changeMediaFor(mediaEntry, onSuccess) {
+            var mediaPicker = {
+                startNodeId: vm.model.config.startNodeId,
+                startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
+                dataTypeKey: vm.model.dataTypeKey,
+                multiPicker: false,
+                submit: function (model) {
+                    editorService.close();
+
+                    model.selection.forEach((entry) => {// only one.
+                        mediaEntry.mediaKey = entry.key;
+                    });
+
+                    // reset focal and crops:
+                    mediaEntry.crops = null;
+                    mediaEntry.focalPoint = null;
+                    updateMediaEntryData(mediaEntry);
+
+                    if(onSuccess) {
+                        onSuccess();
+                    }
+                },
+                close: function () {
+                    editorService.close();
+                }
+            }
+
+            if(vm.model.config.filter) {
+                mediaPicker.filter = vm.model.config.filter;
+            }
+
+            editorService.mediaPicker(mediaPicker);
+        }
+
+        function resetCrop(cropEntry) {
+            Object.assign(cropEntry, vm.model.config.crops.find( c => c.alias === cropEntry.alias));
+            cropEntry.coordinates = null;
+            setDirty();
         }
 
         function updateMediaEntryData(mediaEntry) {
@@ -213,9 +255,11 @@
                 createFlow: options.createFlow === true,
                 title: vm.labels.mediaPicker_editMediaEntryLabel,
                 mediaEntry: mediaEntryClone,
-                //cropsConfig: config.crops,
-                //api: vm,
-                view: "views/common/infiniteeditors/mediapicker3/mediaEntryEditor.html",
+                propertyEditor: {
+                    changeMediaFor: changeMediaFor,
+                    resetCrop: resetCrop
+                },
+                view: "views/common/infiniteeditors/mediaEntryEditor/mediaEntryEditor.html",
                 size: "large",
                 submit: function(model) {
                     vm.model.value[vm.model.value.indexOf(mediaEntry)] = mediaEntryClone;

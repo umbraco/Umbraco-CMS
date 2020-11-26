@@ -42,7 +42,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MediaPicker3.CropC
         };
         $scope.useForAlias = function (crop) {
             if (crop.alias == null || crop.alias === "") {
-                crop.alias = crop.label.toCamelCase();
+                crop.alias = (crop.label || "").toCamelCase();
             }
         };
         $scope.validateWidth = function (crop) {

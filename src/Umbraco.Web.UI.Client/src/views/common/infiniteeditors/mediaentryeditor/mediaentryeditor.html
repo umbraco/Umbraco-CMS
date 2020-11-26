@@ -1,11 +1,11 @@
-<div class="umb-block-editor"  ng-controller="Umbraco.Editors.MediaEntryEditorController as vm">
+<div class="umb-media-entry-editor"  ng-controller="Umbraco.Editors.MediaEntryEditorController as vm">
 
     <ng-form name="vm.imageCropperForm" val-form-manager>
 
         <umb-editor-view umb-tabs ng-if="!page.loading">
 
             <umb-editor-header
-                name="vm.model.title"
+                name="vm.media.name"
                 name-required="false"
                 name-locked="true"
                 hide-alias="true"
@@ -19,30 +19,49 @@
                     <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
                 </div>
 
-                <div class="umb-pane">
-                    <div class="imagecropper clearfix">
+                <div class="umb-media-entry-editor__crops" ng-if="vm.isCroppable">
 
-                        <div ng-if="vm.currentCrop" style="float:left; max-width: 100%;" class="clearfix">
+                    <button class="btn-reset umb-outline" ng-class="{'--is-active':vm.currentCrop === null}" ng-click="vm.deselectCrop()">
+                        <span class="__text">Default crop</span>
+                    </button>
+
+                    <button ng-repeat="crop in vm.mediaEntry.crops track by crop.alias" class="btn-reset umb-outline" ng-class="{'--is-active':vm.currentCrop.alias === crop.alias, '--is-defined':!!vm.currentCrop.coordinates}" ng-click="vm.selectCrop(crop)">
+
+                        <umb-image-thumbnail center="vm.mediaEntry.focalPoint"
+                                            crop="crop.coordinates"
+                                            src="vm.imageSrc"
+                                            height="{{crop.height}}"
+                                            width="{{crop.width}}"
+                                            max-size="75">
+                        </umb-image-thumbnail>
+                        <span class="__text">{{crop.alias}}</span>
+                    </button>
+                </div>
+
+                <div class="umb-pane">
+                    <div class="imagecropper">
+
+                        <div ng-if="vm.currentCrop">
+
                             <div class="umb-cropper__container">
 
-                                <div ng-if="vm.currentCrop">
-                                    <umb-image-crop height="{{vm.currentCrop.height}}"
-                                                    width="{{vm.currentCrop.width}}"
-                                                    crop="vm.currentCrop.coordinates"
-                                                    center="vm.mediaEntry.focalPoint"
-                                                    max-size="450"
-                                                    src="vm.imageSrc">
-                                    </umb-image-crop>
-                                </div>
+                                <umb-image-crop height="{{vm.currentCrop.height}}"
+                                                width="{{vm.currentCrop.width}}"
+                                                crop="vm.currentCrop.coordinates"
+                                                alias="{{vm.currentCrop.alias}}"
+                                                force-update="{{vm.forceUpdateCrop}}"
+                                                center="vm.mediaEntry.focalPoint"
+                                                src="vm.imageSrc">
+                                </umb-image-crop>
 
                                 <div class="button-drawer" ng-if="vm.currentCrop">
-                                    <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                                    <button class="btn btn-link" ng-click="vm.resetCrop()"><localize key="imagecropper_reset">Reset this crop</localize></button>
                                 </div>
 
                             </div>
                         </div>
 
-                        <div ng-if="!vm.currentCrop" class="umb-cropper-imageholder clearfix">
+                        <div ng-show="!vm.currentCrop" class="umb-cropper-imageholder clearfix">
 
                             <umb-image-gravity
                                 ng-if="vm.imageSrc"
@@ -64,26 +83,6 @@
                             <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_replaceMedia">Replace media</localize></button>
                             <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="mediaPicker_openMedia">Open media</localize></button>
                         </div>
-
-
-                        <ul ng-if="vm.isCroppable" class="umb-sortable-thumbnails cropList clearfix">
-                            <li ng-repeat="crop in vm.mediaEntry.crops track by crop.alias" ng-class="{'current':vm.currentCrop.alias === crop.alias}" ng-click="vm.onCropClicked(crop)">
-
-                                <umb-image-thumbnail center="vm.mediaEntry.focalPoint"
-                                                    crop="crop.coordinates"
-                                                    src="vm.imageSrc"
-                                                    height="{{crop.height}}"
-                                                    width="{{crop.width}}"
-                                                    max-size="75">
-                                </umb-image-thumbnail>
-
-                                <div class="crop-information">
-                                    <span class="crop-name crop-text">{{crop.alias}}</span>
-                                    <span class="crop-size crop-text">{{crop.width}}px x {{crop.height}}px</span>
-                                    <span class="crop-annotation crop-text"><localize key="imagecropper_customCrop" ng-show="vm.isCustomCrop(crop)">User defined</localize>&nbsp;</span>
-                                </div>
-                            </li>
-                        </ul>
 
                     </div>
                 </div>

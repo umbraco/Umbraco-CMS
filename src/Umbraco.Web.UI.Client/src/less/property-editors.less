@@ -463,6 +463,13 @@
 
 .umb-cropper{
     position: relative;
+    width: 100%;
+}
+
+.umb-cropper .crop-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 9 / 16 * 100%;
 }
 
 .umb-cropper img, .umb-cropper-gravity img{
@@ -477,20 +484,32 @@
     max-width: none;
  }
 
- .umb-cropper .overlay, .umb-cropper-gravity .overlay {
+ .umb-cropper .overlay {
+    position: absolute;
+    top: 0 !important;
+    bottom: 0;
+    left: 0 !important;
+    right: 0;
+    cursor: move;
+    z-index: @zindexCropperOverlay;
+}
+.umb-cropper-gravity .overlay {
+    position: absolute;
     top: 0;
     left: 0;
     cursor: move;
     z-index: @zindexCropperOverlay;
-    position: absolute;
 }
 
-.umb-cropper .viewport{
+.umb-cropper .viewport {
+    position: absolute;
     overflow: hidden;
-    position: relative;
-    margin: auto;
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 100%;
+    .checkeredBackground();
+    > img {
+        position: absolute;
+    }
  }
 
 .umb-cropper-gravity .viewport{
@@ -498,19 +517,27 @@
     position: relative;
     width: 100%;
     height: 100%;
+    contain: content;
 }
 
 
-.umb-cropper .viewport:after {
-    content: "";
+.umb-cropper .viewport .__mask {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: @zindexCropperOverlay - 1;
-    opacity: .75;
-    box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 2000px rgba(255, 255, 255, .8);
+}
+.umb-cropper .viewport .__mask-info {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: @zindexCropperOverlay - 1;
+    font-size: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0px 6px;
 }
 
 .umb-cropper-gravity .overlay{
@@ -527,10 +554,6 @@
     font-size: 26px;
     line-height: 26px;
     opacity: 0.8 !important;
-}
-
-.umb-cropper .crop-container {
-    text-align: center;
 }
 
 .umb-cropper .crop-slider-wrapper {
@@ -572,6 +595,16 @@
         float: left;
     }
 
+    .umb-cropper-imageholder umb-image-gravity {
+        display:block;
+    }
+
+    .umb-crop-thumbnail-container {
+        img {
+            max-width: unset;
+        }
+    }
+
     .cropList {
         display: inline-block;
         position: relative;
@@ -611,8 +644,6 @@
 
         @media (max-width: 768px) {
             flex-direction: column;
-            float: left;
-            max-width: 100%;
         }
 
         .viewport img {
@@ -623,12 +654,8 @@
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        max-width: 100%;
+        width: 100%;
         border: 1px solid @gray-10;
-
-        @media (min-width: 769px) {
-            width: 600px;
-        }
     }
 
     .imagecropper .umb-cropper__container .button-drawer {

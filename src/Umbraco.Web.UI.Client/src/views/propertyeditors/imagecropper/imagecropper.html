@@ -22,7 +22,6 @@
                                             width="{{currentCrop.width}}"
                                             crop="currentCrop.coordinates"
                                             center="model.value.focalPoint"
-                                            max-size="450"
                                             src="imageSrc">
                             </umb-image-crop>
                         </div>
@@ -46,7 +45,7 @@
                     <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
                 </div>
 
-                
+
                 <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 

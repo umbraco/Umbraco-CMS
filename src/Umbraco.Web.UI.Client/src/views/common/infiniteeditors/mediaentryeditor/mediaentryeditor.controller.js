@@ -64,6 +64,24 @@ angular.module("umbraco")
             };
 
 
+            vm.repickMedia = repickMedia;
+            function repickMedia() {
+                vm.model.propertyEditor.changeMediaFor(vm.model.mediaEntry, onMediaReplaced);
+            }
+
+            function onMediaReplaced() {
+
+                // mark we have changes:
+                vm.imageCropperForm.$setDirty();
+
+                // un-select crop:
+                vm.currentCrop = null;
+
+                //
+                updateMedia();
+            }
+
+
             vm.focalPointChanged = function(left, top) {
                 //update the model focalpoint value
                 vm.mediaEntry.focalPoint = {
@@ -72,32 +90,38 @@ angular.module("umbraco")
                 };
 
                 //set form to dirty to track changes
-                vm.imageCropperForm.$setDirty();
+                setDirty();
             }
 
 
 
-            /**
-             * crop a specific crop
-             * @param {any} targetCrop
-             */
-            vm.onCropClicked = onCropClicked;
-            function onCropClicked(targetCrop) {
-                if (vm.currentCrop === targetCrop) {
-                    vm.currentCrop = null;
-                } else {
-                    vm.currentCrop = targetCrop;
-                    vm.imageCropperForm.$setDirty();
-                }
+            vm.selectCrop = selectCrop;
+            function selectCrop(targetCrop) {
+                vm.currentCrop = targetCrop;
+                setDirty();
+                // TODO: start watchin values of crop, first when changed set to dirty.
             };
 
-            function resetCrop(crop) {
-                // TODO: find a way to reset.
-                //vm.currentCrop.coordinates = {};
-                //crop.defined = false;// concept?
-                vm.imageCropperForm.$setDirty();
+            vm.deselectCrop = deselectCrop;
+            function deselectCrop() {
+                vm.currentCrop = null;
+            };
+
+            vm.resetCrop = resetCrop;
+            function resetCrop() {
+                if (vm.currentCrop) {
+                    $scope.$evalAsync( () => {
+                        console.log(vm.currentCrop);
+                        vm.model.propertyEditor.resetCrop(vm.currentCrop);
+                        vm.forceUpdateCrop = Math.random();
+                        console.log(vm.forceUpdateCrop);
+                    });
+                }
             }
 
+            function setDirty() {
+                vm.imageCropperForm.$setDirty();
+            }
 
 
             vm.submitAndClose = function () {

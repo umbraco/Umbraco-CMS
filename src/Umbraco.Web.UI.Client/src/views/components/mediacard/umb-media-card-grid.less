@@ -1,8 +1,8 @@
 .umb-media-card-grid {
     /* Grid Setup */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-auto-rows: minmax(160px, auto);
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-auto-rows: minmax(100px, auto);
     grid-gap: 10px;
 
     justify-items: center;
@@ -14,6 +14,7 @@
 .umb-media-card-grid__cell {
     position: relative;
     display: flex;
+    width: 100%;
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -27,7 +28,7 @@
     outline: none;
     left: 0;
     width: 12px;
-    margin-left: -9px;
+    margin-left: -7px;
     padding-left: 6px;
     margin-right: -6px;
     transition: opacity 240ms;
