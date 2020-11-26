@@ -60,7 +60,7 @@ jobs:
        Write-Host "Working folder: $pwd"
        $ubuild = build/build.ps1 -get
        
-       $uenv.CompileUmbraco()
+       $ubuild.CompileUmbraco()
        
        $ubuild.PreparePackages()
 
