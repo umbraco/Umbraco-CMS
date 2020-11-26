@@ -9,11 +9,13 @@
 }
 
 .umb-range-slider .noUi-handle {
+    outline: none;
     border-radius: 100px;
     border: none;
     box-shadow: none;
     width: 20px !important;
     height: 20px !important;
+    right: -10px !important; // half the handle width
     background-color: @blueMid;
 }
 
@@ -23,10 +25,6 @@
 
 .umb-range-slider .noUi-handle::after {
     display: none;
-}
-
-.umb-range-slider .noUi-handle {
-    right: -10px !important; // half the handle width
 }
 
 .umb-range-slider .noUi-marker-large.noUi-marker-horizontal {

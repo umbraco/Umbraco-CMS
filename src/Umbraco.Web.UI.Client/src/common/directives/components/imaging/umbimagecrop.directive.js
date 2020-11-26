@@ -50,10 +50,10 @@ angular.module("umbraco.directives")
                         "tooltips": [false],
                         "format": {
                             to: function (value) {
-                                return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
+                                return parseFloat(parseFloat(value).toFixed(3));
                             },
                             from: function (value) {
-                                return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
+                                return parseFloat(parseFloat(value).toFixed(3));
                             }
                         },
                         "range": {
@@ -214,7 +214,7 @@ angular.module("umbraco.directives")
 
                         // Update min and max based on original width/height
                         scope.dimensions.scale.min = ratioCalculation.ratio;
-                        //scope.dimensions.scale.max = 2;
+                        scope.dimensions.scale.max = ratioCalculation.ratio * 3;
 
                         updateSlider();
                     };
