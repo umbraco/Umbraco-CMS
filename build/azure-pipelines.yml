@@ -76,7 +76,7 @@ jobs:
   - task: gulp@0
     displayName: 'gulp build'
     inputs:
-      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+      gulpFile: 'src\Umbraco.Web.UI.Client\gulpfile.js'
       targets: build
       workingDirectory: src\Umbraco.Web.UI.Client
       publishJUnitResults: true
