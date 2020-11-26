@@ -53,12 +53,21 @@ jobs:
       feedsToUse: config
 
   - task: PowerShell@1
+    displayName: 'Prepare Build'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+       Write-Host "Working folder: $pwd"
+       $ubuild = build/build.ps1 -get
+       
+       $ubuild.PrepareBuild("vso")
+
+  - task: PowerShell@1
     displayName: 'Prepare Packages'
     inputs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
-       ls
        $ubuild = build/build.ps1 -get
        
        $ubuild.CompileUmbraco()
@@ -71,7 +80,6 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
-       ls
        $ubuild = build/build.ps1 -get -continue
        
        $ubuild.VerifyNuGet()
