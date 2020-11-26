@@ -62,10 +62,10 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
+            var virt = Path.Combine(ShadowFsPath , id , _shadowPath);
             _shadowDir = _hostingEnvironment.MapPathContentRoot(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), virt);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 

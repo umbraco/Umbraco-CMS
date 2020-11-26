@@ -137,7 +137,7 @@ namespace Umbraco.Core.IO
             {
                 var validDir = dir;
                 if (!PathStartsWith(validDir, mappedRoot))
-                    validDir = _hostingEnvironment.MapPathContentRoot(validDir);
+                    validDir = _hostingEnvironment.MapPathWebRoot(validDir);
 
                 if (PathStartsWith(filePath, validDir))
                     return true;

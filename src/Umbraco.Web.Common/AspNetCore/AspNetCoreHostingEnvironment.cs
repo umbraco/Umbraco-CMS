@@ -93,7 +93,7 @@ namespace Umbraco.Web.Common.AspNetCore
             // all those uses have been found and fixed
             if (newPath.StartsWith(root)) throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPath");
 
-            return Path.Combine(root, newPath.TrimStart('~', '/'));
+            return Path.Combine(root, newPath.TrimStart('~', '/', '\\'));
         }
 
         public string ToAbsolute(string virtualPath)

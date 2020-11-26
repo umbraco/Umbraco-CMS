@@ -31,6 +31,7 @@ namespace Umbraco.Core.IO
 
         // virtualRoot should be "~/path/to/root" eg "~/Views"
         // the "~/" is mandatory.
+        [Obsolete]
         public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string virtualRoot)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
