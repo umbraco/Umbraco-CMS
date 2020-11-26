@@ -42,3 +42,12 @@ jobs:
     inputs:
       command: test
       projects: '**\*.Tests.UnitTests.csproj'
+
+  - task: NuGetToolInstaller@1
+    displayName: 'Use NuGet Latest'
+
+  - task: NuGetCommand@2
+    displayName: 'Restore NuGet Packages'
+    inputs:
+      restoreSolution: '*\src\umbraco.sln'
+      feedsToUse: config
