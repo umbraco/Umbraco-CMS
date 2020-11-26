@@ -91,11 +91,10 @@ jobs:
        $ubuild = build\build.ps1 -get -continue
        
        $ubuild.CompileUmbraco()
-       
        $ubuild.PreparePackages()
 
   - task: PowerShell@1
-    displayName: 'Verify & Prepare NuGet'
+    displayName: 'Verify & Package NuGet'
     inputs:
       scriptType: inlineScript
       inlineScript: |
@@ -103,4 +102,4 @@ jobs:
        $ubuild = build\build.ps1 -get -continue
        
        $ubuild.VerifyNuGet()
-       $ubuild.PrepareNuGet()
+       $ubuild.PackageNuGet()
