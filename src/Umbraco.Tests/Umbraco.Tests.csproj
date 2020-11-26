@@ -131,7 +131,6 @@
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
-    <Compile Include="IO\FileSystemsTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
