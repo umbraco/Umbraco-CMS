@@ -33,13 +33,10 @@ namespace Umbraco.Web.BackOffice.Filters
         private sealed class ContentSaveValidationFilter : IAsyncActionFilter
         {
             private readonly IContentService _contentService;
-            private readonly IEntityService _entityService;
             private readonly IPropertyValidationService _propertyValidationService;
-            private readonly ContentPermissions _contentPermissions;
             private readonly IAuthorizationService _authorizationService;
             private readonly ILoggerFactory _loggerFactory;
             private readonly ILocalizedTextService _textService;
-            private readonly IUserService _userService;
             private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
 
@@ -48,20 +45,14 @@ namespace Umbraco.Web.BackOffice.Filters
                 IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IContentService contentService,
-                IUserService userService,
-                IEntityService entityService,
                 IPropertyValidationService propertyValidationService,
-                ContentPermissions contentPermissions,
                 IAuthorizationService authorizationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
                 _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-                _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
                 _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
-                _contentPermissions = contentPermissions;
                 _authorizationService = authorizationService;
             }
 
@@ -70,7 +61,12 @@ namespace Umbraco.Web.BackOffice.Filters
                 // on executing...
                 await OnActionExecutingAsync(context);
 
-                await next(); //need to pass the execution to next
+                if (context.Result == null)
+                {
+                    //need to pass the execution to next if a result was not set
+                    await next(); 
+                }
+                
 
                 // on executed...
             }

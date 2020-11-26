@@ -52,7 +52,11 @@ namespace Umbraco.Web.BackOffice.Filters
                 // on executing...
                 await OnActionExecutingAsync(context);
 
-                await next(); //need to pass the execution to next
+                if (context.Result == null)
+                {
+                    //need to pass the execution to next if a result was not set
+                    await next();
+                }
 
                 // on executed...
             }
