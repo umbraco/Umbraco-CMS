@@ -1,15 +1,16 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Builder;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     public class PreValueMigratorComposer : ICoreComposer
 {
-    public void Compose(Composition composition)
+    public void Compose(IUmbracoBuilder builder)
     {
         // do NOT add DefaultPreValueMigrator to this list!
         // it will be automatically used if nothing matches
 
-        composition.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
+        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
             .Append<RenamingPreValueMigrator>()
             .Append<RichTextPreValueMigrator>()
             .Append<UmbracoSliderPreValueMigrator>()

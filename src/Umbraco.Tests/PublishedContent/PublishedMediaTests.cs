@@ -43,11 +43,11 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            Builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
 
-            Composition.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
+            Builder.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         }
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)

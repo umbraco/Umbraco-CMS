@@ -1,15 +1,16 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Compose
 {
     public sealed class NotificationsComposer : ComponentComposer<NotificationsComponent>, ICoreComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Services.AddUnique<NotificationsComponent.Notifier>();
+            builder.Services.AddUnique<NotificationsComponent.Notifier>();
         }
     }
 }

@@ -78,9 +78,7 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="umbraco" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.9" />
@@ -178,22 +176,6 @@
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -249,21 +231,8 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>9000</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:9000/</IISUrl>
-          <IISUrl>http://localhost:8700</IISUrl>
-          <DevelopmentServerPort>8610</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8610</IISUrl>
-          <IISUrl>http://localhost:8700</IISUrl>          
-          <DevelopmentServerPort>8800</DevelopmentServerPort>
-          <DevelopmentServerPort>8900</DevelopmentServerPort>
           <DevelopmentServerPort>8910</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8800</IISUrl>
-          <IISUrl>http://localhost:8700</IISUrl>
-          <IISUrl>http://localhost:8900</IISUrl>
           <IISUrl>http://localhost:8910</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>

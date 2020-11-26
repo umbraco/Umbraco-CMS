@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.WebAssets;
 
@@ -6,10 +7,10 @@ namespace Umbraco.Web.WebAssets.CDF
 {
     public sealed class ClientDependencyComposer : ComponentComposer<ClientDependencyComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
-            composition.Services.AddUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
+            base.Compose(builder);
+            builder.Services.AddUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
         }
     }
 }

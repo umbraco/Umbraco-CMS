@@ -18,36 +18,6 @@ namespace Umbraco.Extensions
 {
     public static class BackOfficeServiceCollectionExtensions
     {
-        /// <summary>
-        /// Adds the services required for running the Umbraco back office
-        /// </summary>
-        /// <param name="services"></param>
-        public static void AddUmbracoBackOffice(this IServiceCollection services)
-        {
-            services.AddAntiforgery();
-
-            // TODO: We had this check in v8 where we don't enable these unless we can run...
-            //if (runtimeState.Level != RuntimeLevel.Upgrade && runtimeState.Level != RuntimeLevel.Run) return app;
-
-            services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
-            services
-                .AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
-                 {
-                     o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
-                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                 });
-
-            // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
-
-            services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
-        }
-
-        public static void AddUmbracoPreview(this IServiceCollection services)
-        {
-            services.AddSignalR();
-        }
 
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity

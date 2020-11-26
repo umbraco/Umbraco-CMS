@@ -64,11 +64,11 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Helper()
         {
             // unless we can inject them in MembershipHelper, we need need this
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IUserService>());
-            Composition.Services.AddTransient(_ => AppCaches.Disabled);
-            Composition.Services.AddTransient<ServiceContext>();
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IUserService>());
+            Builder.Services.AddTransient(_ => AppCaches.Disabled);
+            Builder.Services.AddTransient<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),

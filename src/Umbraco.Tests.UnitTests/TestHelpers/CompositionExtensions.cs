@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.UnitTests.TestHelpers
@@ -7,10 +8,10 @@ namespace Umbraco.Tests.UnitTests.TestHelpers
     public static class CompositionExtensions
     {
         [Obsolete("This extension method exists only to ease migration, please refactor")]
-        public static IServiceProvider CreateServiceProvider(this Composition composition)
+        public static IServiceProvider CreateServiceProvider(this IUmbracoBuilder builder)
         {
-            composition.RegisterBuilders();
-            return composition.Services.BuildServiceProvider();
+            builder.Build();
+            return builder.Services.BuildServiceProvider();
         }
     }
 }
