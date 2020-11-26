@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
                     height: '@',
                     crop: "=",
                     center: "=",
-                    maxSize: '@',
+                    maxSize: '@?',
                     alias: '@?',
                     forceUpdate: '@?'
                 },
@@ -140,18 +140,6 @@ angular.module("umbraco.directives")
                         //unscaled editor size
                         var _cropW = parseInt(scope.width, 10);
                         var _cropH = parseInt(scope.height, 10);
-
-                        //if we set a constraint we will scale it down if needed
-                        if (scope.maxSize) {
-                            if (scope.maxSize < scope.dimensions.viewport.width) {
-                                $viewport.css("width", parseInt(scope.maxSize, 10) + "px");
-                                scope.dimensions.viewport.width = scope.maxSize;
-                            }
-                            if (scope.maxSize < scope.dimensions.viewport.height) {
-                                $viewport.css("height", parseInt(scope.maxSize, 10) + "px");
-                                scope.dimensions.viewport.height = scope.maxSize;
-                            }
-                        }
 
                         var ratioCalculation = cropperHelper.scaleToMaxSize(
                             _cropW,
@@ -357,7 +345,16 @@ angular.module("umbraco.directives")
                         }
                     }));
 
+
                     // Init
+
+                    //if we have a max-size we will use it, to keep this backwards compatible.
+                    // I dont see this max size begin usefull, as we should aim for responsive UI.
+                    if (scope.maxSize) {
+                        element.css("max-width", parseInt(scope.maxSize, 10) + "px");
+                        element.css("max-height", parseInt(scope.maxSize, 10) + "px");
+                    }
+
                     $image.on("load", function () {
                         $timeout(function () {
                             init();
@@ -367,7 +364,6 @@ angular.module("umbraco.directives")
                     $window.addEventListener("resize", onViewportSizeChanged)
 
                     scope.$on('$destroy', function () {
-                        console.log("DESTROY!!");
                         $image.prop("src", "");
                         $window.removeEventListener("resize", onViewportSizeChanged)
                         unsubscribe.forEach(u => u());

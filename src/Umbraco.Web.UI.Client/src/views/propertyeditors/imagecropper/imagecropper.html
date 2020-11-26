@@ -12,9 +12,9 @@
                                   on-init="fileUploaderInit(value, files)"
                                   hide-selection="true">
 
-            <div class="imagecropper clearfix">
+            <div class="imagecropper">
 
-                <div ng-if="currentCrop || pendingCrop" style="float:left; max-width: 100%;" class="clearfix">
+                <div ng-if="currentCrop || pendingCrop" style="flex:1;">
                     <div class="umb-cropper__container">
 
                         <div ng-if="currentCrop">
