@@ -51,3 +51,26 @@ jobs:
     inputs:
       restoreSolution: '*\src\umbraco.sln'
       feedsToUse: config
+
+  - task: PowerShell@1
+    displayName: 'Prepare Packages'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+       Write-Host "Working folder: $pwd"
+       $ubuild = build/build.ps1 -get
+       
+       $uenv.CompileUmbraco()
+       
+       $ubuild.PreparePackages()
+
+  - task: PowerShell@1
+    displayName: 'Verify & Prepare NuGet'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+       Write-Host "Working folder: $pwd"
+       $ubuild = build/build.ps1 -get -continue
+       
+       $ubuild.VerifyNuGet()
+       $ubuild.PrepareNuGet()
