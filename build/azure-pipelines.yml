@@ -58,9 +58,29 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
-       $ubuild = build/build.ps1 -get
+       $ubuild = build\build.ps1 -get
        
        $ubuild.PrepareBuild("vso")
+
+  - task: NodeTool@0
+    displayName: 'Use Node 11.x'
+    inputs:
+      versionSpec: 11.x
+
+  - task: Npm@1
+    displayName: 'npm install'
+    inputs:
+      workingDir: *\src\Umbraco.Web.UI.Client
+      verbose: false
+
+  - task: gulp@0
+    displayName: 'gulp build'
+    inputs:
+      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+      targets: build
+      workingDirectory: src\Umbraco.Web.UI.Client
+      publishJUnitResults: true
+      testResultsFiles: '**\TESTS-*.xml'
 
   - task: PowerShell@1
     displayName: 'Prepare Packages'
@@ -68,7 +88,7 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
-       $ubuild = build/build.ps1 -get
+       $ubuild = build\build.ps1 -get -continue
        
        $ubuild.CompileUmbraco()
        
@@ -80,7 +100,7 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
-       $ubuild = build/build.ps1 -get -continue
+       $ubuild = build\build.ps1 -get -continue
        
        $ubuild.VerifyNuGet()
        $ubuild.PrepareNuGet()
