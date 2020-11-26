@@ -14,7 +14,8 @@ stages:
   displayName: 'Linux'
   jobs:
 
-  - job: Linux Unit Tests
+  - job: Unit_Tests
+    displayName: 'Unit Tests'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -35,7 +36,8 @@ stages:
   displayName: 'Windows'
   jobs:
 
-  - job: Unit Tests
+  - job: Unit_Tests
+    displayName: 'Unit Tests'
     pool:
       vmImage: 'windows-latest'
     steps:
@@ -113,4 +115,5 @@ stages:
          $ubuild.PackageNuGet()
 
 
-  - job: Integration Tests
+  - job: Integration_Tests
+    displayName: 'Integration Tests'
