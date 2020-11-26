@@ -58,6 +58,7 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
+       ls
        $ubuild = build/build.ps1 -get
        
        $ubuild.CompileUmbraco()
@@ -70,6 +71,7 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
        Write-Host "Working folder: $pwd"
+       ls
        $ubuild = build/build.ps1 -get -continue
        
        $ubuild.VerifyNuGet()
