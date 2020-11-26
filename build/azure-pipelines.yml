@@ -11,7 +11,9 @@ variables:
 
 stages:
 - stage: Linux
+  displayName: 'Linux'
   jobs:
+
   - job: Linux Unit Tests
     pool:
       vmImage: 'ubuntu-latest'
@@ -30,6 +32,7 @@ stages:
 
 
 - stage: Windows
+  displayName: 'Windows'
   jobs:
 
   - job: Unit Tests
