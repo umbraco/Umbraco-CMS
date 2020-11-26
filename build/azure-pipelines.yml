@@ -70,13 +70,13 @@ jobs:
   - task: Npm@1
     displayName: 'npm install'
     inputs:
-      workingDir: *\src\Umbraco.Web.UI.Client
+      workingDir: src\Umbraco.Web.UI.Client
       verbose: false
 
   - task: gulp@0
     displayName: 'gulp build'
     inputs:
-      gulpFile: 'src\Umbraco.Web.UI.Client\gulpfile.js'
+      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
       targets: build
       workingDirectory: src\Umbraco.Web.UI.Client
       publishJUnitResults: true
