@@ -94,6 +94,35 @@ angular.module("umbraco.directives")
                         }
                     };
 
+                    function onScroll(event) {
+                        // cross-browser wheel delta
+                        var event = window.event || event; // old IE support
+                        var delta = Math.max(-50, Math.min(50, (event.wheelDelta || -event.detail)));
+
+                        if(sliderRef) {
+                            var currentScale =sliderRef.noUiSlider.get();
+                            /*
+                            if (delta > 0 && scope.dimensions.scale.max.toFixed(3) === currentScale.toFixed(3))
+                                return;
+                            if (delta < 0 && scope.dimensions.scale.min.toFixed(3) === currentScale.toFixed(3))
+                                return;
+                            */
+
+                            var newScale = Math.min(Math.max(currentScale + delta*.001*scope.dimensions.image.ratio, scope.dimensions.scale.min), scope.dimensions.scale.max);
+                            sliderRef.noUiSlider.set(newScale);
+                            scope.$evalAsync(() => {
+                                scope.dimensions.scale.current = newScale;
+                            });
+
+                            // for IE
+                            event.returnValue = false;
+                            // for Chrome and Firefox
+                            if(event.preventDefault)  {
+                                event.preventDefault();
+                            }
+                        }
+                    }
+
 
                     //live rendering of viewport and image styles
                     function updateStyles() {
@@ -120,6 +149,14 @@ angular.module("umbraco.directives")
                     var $image = element.find("img");
                     var $overlay = element.find(".overlay");
                     //var $container = element.find(".crop-container");
+
+                    $overlay.bind("focus", function () {
+                        $overlay.bind("DOMMouseScroll mousewheel onmousewheel", onScroll);
+                    });
+                    $overlay.bind("blur", function () {
+                        $overlay.unbind("DOMMouseScroll mousewheel onmousewheel", onScroll);
+                    });
+
 
                     //default constraints for drag n drop
                     var constraints = { left: { max: 0, min: 0 }, top: { max: 0, min: 0 } };
@@ -332,16 +369,16 @@ angular.module("umbraco.directives")
                         }
                     }));
 
-                    var throttledResizing = _.throttle(function () {
+                    var throttledScale = _.throttle(() => scope.$evalAsync(() => {
                         resizeImageToScale(scope.dimensions.scale.current);
                         calculateCropBox();
                         saveCropBox();
-                    }, 15);
+                    }), 16);
 
                     // Happens when we change the scale
                     unsubscribe.push(scope.$watch("dimensions.scale.current", function (newValue, oldValue) {
                         if (scope.loaded) {
-                            throttledResizing();
+                            throttledScale();
                         }
                     }));
 

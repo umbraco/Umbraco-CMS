@@ -7,10 +7,10 @@
                 'width': dimensions.image.width,
                 'height': dimensions.image.height
             }"/>
-            <div class="__mask-info">{{width}}px x {{height}}px</div>
             <div class="__mask" ng-style="maskStyle">
+                <div class="__mask-info">{{width}}px x {{height}}px</div>
             </div>
-            <div class="overlay"></div>
+            <div class="overlay" tabindex="1"></div>
         </div>
 	</div>
 
@@ -29,5 +29,5 @@
 
         <i class="icon-picture" aria-hidden="true" style="font-size: 22px"></i>
     </div>
-    
+
 </div>
