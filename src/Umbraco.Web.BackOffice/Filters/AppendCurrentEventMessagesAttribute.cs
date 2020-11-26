@@ -7,6 +7,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+
     /// <summary>
     /// Automatically checks if any request is a non-GET and if the
     /// resulting message is INotificationModel in which case it will append any Event Messages

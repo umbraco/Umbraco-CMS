@@ -16,11 +16,11 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// is logged in using forms authentication which indicates the seconds remaining
     /// before their timeout expires.
     /// </remarks>
-    [IsBackOffice]
+    [IsBackOffice] 
     [UmbracoUserTimeoutFilter]
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     [DisableBrowserCache]
-    [RequireHttps]
+    [UmbracoRequireHttps]
     [CheckIfUserTicketDataIsStale]
     [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController

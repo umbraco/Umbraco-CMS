@@ -19,6 +19,8 @@ namespace Umbraco.Web.Common.Controllers
     [UmbracoApiController]
     public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
     {
+        // TODO: Should this only exist in the back office project? These really are only ever used for the back office AFAIK
+
         public UmbracoApiControllerBase()
         {
         }

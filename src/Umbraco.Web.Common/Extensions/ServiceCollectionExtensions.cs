@@ -9,6 +9,9 @@ namespace Umbraco.Extensions
     {
         public static void AddUmbracoCommonAuthorizationPolicies(this IServiceCollection services)
         {
+            // TODO: Should this only exist in the back office project? These really are only ever used for the back office AFAIK
+            // If it is moved it should only target the back office scheme
+
             services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
 
             services.AddAuthorization(options =>
