@@ -9,6 +9,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Common.Security
 {
+    // TODO: This is only for the back office, does it need to be in common?
+
     public class BackOfficeSecurityFactory: IBackOfficeSecurityFactory
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;

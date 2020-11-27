@@ -17,9 +17,9 @@ using Umbraco.Web.BackOffice.HealthCheck;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Security;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -422,7 +422,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Name,
-                                    properties = p.Properties
+                                    properties = p.Options
                                 })
                                 .ToArray()
                         }
