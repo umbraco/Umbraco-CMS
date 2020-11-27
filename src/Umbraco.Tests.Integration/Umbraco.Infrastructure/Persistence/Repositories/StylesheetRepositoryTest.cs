@@ -19,7 +19,7 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.None, Logger = UmbracoTestOptions.Logger.Console)]
     public class StylesheetRepositoryTest : UmbracoIntegrationTest
     {
         private IFileSystems _fileSystems;
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IStylesheetRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
-            return new StylesheetRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new StylesheetRepository(Mock.Of<ILogger<StylesheetRepository>>(), _fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
         [Test]
