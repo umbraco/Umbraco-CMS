@@ -17,8 +17,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
         {
-            // TODO: It would be nice to get rid of this and only rely on Claims, not a strongly typed identity instance
-
             //If it's already a UmbracoBackOfficeIdentity
             if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
 
@@ -55,10 +53,10 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static double GetRemainingAuthSeconds(this IPrincipal user, DateTimeOffset now)
         {
-            var claimsPrincipal = user as ClaimsPrincipal;
-            if (claimsPrincipal == null) return 0;
+            var umbIdentity = user.GetUmbracoIdentity();
+            if (umbIdentity == null) return 0;
 
-            var ticketExpires = claimsPrincipal.FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
+            var ticketExpires = umbIdentity.FindFirstValue(Constants.Security.TicketExpiresClaimType);
             if (ticketExpires.IsNullOrWhiteSpace()) return 0;
 
             var utcExpired = DateTimeOffset.Parse(ticketExpires, null, DateTimeStyles.RoundtripKind);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -207,26 +206,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public async Task<double> GetRemainingTimeoutSeconds()
+        public double GetRemainingTimeoutSeconds()
         {
-            // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
-            if (!result.Succeeded)
-            {
-                return 0;
-            }
-
+            var backOfficeIdentity = HttpContext.User.GetUmbracoIdentity();
             var remainingSeconds = HttpContext.User.GetRemainingAuthSeconds();
-            if (remainingSeconds <= 30)
+            if (remainingSeconds <= 30 && backOfficeIdentity != null)
             {
-                var username = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
-
                 //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                 // the timeout process.
 
                 _logger.LogInformation(
                     "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
-                    username ?? "unknown",
+                    backOfficeIdentity.Name,
                     _ipResolver.GetCurrentRequestIpAddress());
             }
 
@@ -238,11 +229,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<bool> IsAuthenticated()
+        public bool IsAuthenticated()
         {
-            // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
-            return result.Succeeded;
+            var attempt = _backofficeSecurityAccessor.BackOfficeSecurity.AuthorizeRequest();
+            if (attempt == ValidateRequestAttempt.Success)
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -590,6 +584,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return Ok();
         }
+
 
 
         /// <summary>
