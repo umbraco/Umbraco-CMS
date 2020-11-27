@@ -208,6 +208,13 @@ umb-property:last-of-type .umb-control-group {
     .control-description {
         display: block;
         clear: both;
+        overflow-wrap: break-word;
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
 

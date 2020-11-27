@@ -247,7 +247,7 @@
     <key alias="recycleBinIsEmpty">ごみ箱は空です</key>
     <key alias="recycleBinWarning">ごみ箱から削除すると復活させることはできません</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
-    <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'URL'</key>
     <key alias="removeMacro">マクロを削除</key>
     <key alias="requiredField">必須フィールド</key>
     <key alias="sitereindexed">サイトは再インデックスされました</key>

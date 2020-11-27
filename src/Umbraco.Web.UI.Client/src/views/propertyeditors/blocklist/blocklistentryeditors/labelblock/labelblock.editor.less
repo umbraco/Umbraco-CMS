@@ -1,6 +1,7 @@
 .blockelement-labelblock-editor {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
     margin-bottom: 4px;
     margin-top: 4px;
     width: 100%;
@@ -11,22 +12,21 @@
     color: @ui-action-discreet-type;
     background-color: white;
     text-align: left;
-    padding-left: 20px;
-    padding-bottom: 2px;
+    padding: 0 20px;
     user-select: none;
-    transition: border-color 120ms;
+    transition: border-color 120ms, background-color 120ms;
 
-    i {
+    > i {
         font-size: 22px;
-        margin-right: 5px;
+        margin-right: 10px;
         display: inline-block;
-        vertical-align: middle;
     }
 
-    span {
+    > span {
         position: relative;
         display: inline-block;
-        vertical-align: middle;
+        padding-top:2px;
+        padding-bottom:2px;
     }
 
     &:hover {
@@ -44,7 +44,7 @@
         color: @formErrorText;
     }
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block:not(.--active) > .umb-block-list__block--content > div > & {
-        span {
+        > span {
             &::after {
                 content: "!";
                 text-align: center;
@@ -62,7 +62,7 @@
                 line-height: 10px;
                 background-color: @formErrorText;
                 font-weight: 900;
-    
+
                 animation-duration: 1.4s;
                 animation-iteration-count: infinite;
                 animation-name: blockelement-inlineblock-editor--badge-bounce;
