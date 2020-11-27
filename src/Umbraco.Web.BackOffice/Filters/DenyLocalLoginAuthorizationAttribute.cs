@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {

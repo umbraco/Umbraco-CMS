@@ -41,6 +41,7 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Net;
 using Umbraco.Web.Common.ActionsResults;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
