@@ -13,6 +13,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private byte[] _bytes;
         private string _str;
         private readonly object _locker;
+        private bool _isDecompressed;
 
         /// <summary>
         /// Constructor
@@ -22,7 +23,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             _locker = new object();
             _bytes = bytes;
-            _str = null;            
+            _str = null;
+            _isDecompressed = false;
         }
 
         public byte[] GetBytes()
@@ -30,6 +32,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (_bytes == null)
                 throw new InvalidOperationException("The bytes have already been expanded");
             return _bytes;
+        }
+        public bool IsDecompressed()
+        {
+            return _isDecompressed;
         }
 
         public override string ToString()
@@ -41,6 +47,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 if (_bytes == null) throw new PanicException("Bytes have already been cleared");
                 _str = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(_bytes));
                 _bytes = null;
+                _isDecompressed = true;
             }
             return _str;
         }
