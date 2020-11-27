@@ -41,6 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [DisableBrowserCache]
     //[UmbracoRequireHttps] //TODO Reintroduce
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
+    [IsBackOffice]
     public class BackOfficeController : UmbracoController
     {
         private readonly IBackOfficeUserManager _userManager;
