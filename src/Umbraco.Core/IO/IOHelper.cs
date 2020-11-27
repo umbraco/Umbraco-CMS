@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -127,7 +128,10 @@ namespace Umbraco.Core.IO
 
             var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
             if (!PathStartsWith(filePath, mappedRoot))
-                filePath = _hostingEnvironment.MapPathContentRoot(filePath);
+            {
+                // TODO this is going to fail.. Scripts Stylesheets need to use WebRoot, PartialViews need to use ContentRoot
+                filePath = _hostingEnvironment.MapPathWebRoot(filePath);
+            }
 
             // yes we can (see above)
             //// don't trust what we get, it may contain relative segments
