@@ -333,14 +333,6 @@ dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.symbols        
 dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.style                 = disallowed_style
 dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.severity              = error
 
-# Private fields must be camelCase
-# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1306.md
-dotnet_naming_symbols.stylecop_private_fields_group.applicable_accessibilities = private
-dotnet_naming_symbols.stylecop_private_fields_group.applicable_kinds           = field
-dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.symbols     = stylecop_private_fields_group
-dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.style       = camel_case_style
-dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.severity    = warning
-
 # Local variables must be camelCase
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1312.md
 dotnet_naming_symbols.stylecop_local_fields_group.applicable_accessibilities = local
@@ -393,9 +385,16 @@ dotnet_naming_rule.type_parameter_rule.symbols              = type_parameter_gro
 dotnet_naming_rule.type_parameter_rule.style                = prefix_type_parameters_with_t_style
 dotnet_naming_rule.type_parameter_rule.severity             = warning
 
+# Function parameters use camelCase
+# https://docs.microsoft.com/dotnet/standard/design-guidelines/naming-parameters
+dotnet_naming_symbols.parameters_group.applicable_kinds = parameter
+dotnet_naming_rule.parameters_rule.symbols              = parameters_group
+dotnet_naming_rule.parameters_rule.style                = camel_case_style
+dotnet_naming_rule.parameters_rule.severity             = warning
+
 # Private static fields use camelCase and start with s_
 dotnet_naming_symbols.private_static_field_symbols.applicable_accessibilities                        = private
-dotnet_naming_symbols.private_static_field_symbols.required_modifiers                                = static,shared
+dotnet_naming_symbols.private_static_field_symbols.required_modifiers                                = static, shared
 dotnet_naming_symbols.private_static_field_symbols.applicable_kinds                                  = field
 dotnet_naming_rule.private_static_fields_must_be_camel_cased_and_prefixed_with_s_underscore.symbols  = private_static_field_symbols
 dotnet_naming_rule.private_static_fields_must_be_camel_cased_and_prefixed_with_s_underscore.style    = camel_case_and_prefix_with_s_underscore_style
@@ -411,13 +410,6 @@ dotnet_naming_rule.private_instance_fields_must_be_camel_cased_and_prefixed_with
 dotnet_naming_rule.private_instance_fields_must_be_camel_cased_and_prefixed_with_underscore.severity = warning
 dotnet_naming_style.camel_case_and_prefix_with_underscore_style.required_prefix                      = _
 dotnet_naming_style.camel_case_and_prefix_with_underscore_style.capitalization                       = camel_case
-
-# Function parameters use camelCase
-# https://docs.microsoft.com/dotnet/standard/design-guidelines/naming-parameters
-dotnet_naming_symbols.parameters_group.applicable_kinds = parameter
-dotnet_naming_rule.parameters_rule.symbols              = parameters_group
-dotnet_naming_rule.parameters_rule.style                = camel_case_style
-dotnet_naming_rule.parameters_rule.severity             = warning
 
 ##########################################
 # License
