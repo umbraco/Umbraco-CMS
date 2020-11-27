@@ -7,6 +7,8 @@ using SecurityConstants = Umbraco.Core.Constants.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {
+    // TODO: This is only for the back office, does it need to be in common?
+
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>

@@ -1,109 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Authentication.OAuth;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.Builder;
+
 
 namespace Umbraco.Web.BackOffice.Security
 {
-    /// <summary>
-    /// Custom <see cref="AuthenticationBuilder"/> used to associate external logins with umbraco external login options
-    /// </summary>
-    public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
-    {
-        private readonly BackOfficeExternalLoginProviderOptions _loginProviderOptions;
-
-        public BackOfficeAuthenticationBuilder(IServiceCollection services, BackOfficeExternalLoginProviderOptions loginProviderOptions)
-            : base(services)
-        {
-            _loginProviderOptions = loginProviderOptions;
-        }
-
-        /// <summary>
-        /// Overridden to track the final authenticationScheme being registered for the external login
-        /// </summary>
-        /// <typeparam name="TOptions"></typeparam>
-        /// <typeparam name="THandler"></typeparam>
-        /// <param name="authenticationScheme"></param>
-        /// <param name="displayName"></param>
-        /// <param name="configureOptions"></param>
-        /// <returns></returns>
-        public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string displayName, Action<TOptions> configureOptions)
-        {
-            //Ensure the prefix is set
-            if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
-            {
-                authenticationScheme = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + authenticationScheme;
-            }
-
-            // add our login provider to the container along with a custom options configuration
-            Services.AddSingleton(x => new BackOfficeExternalLoginProvider(displayName, authenticationScheme, _loginProviderOptions));
-            Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
-
-            return base.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configureOptions);
-        }
-
-        // TODO: We could override and throw NotImplementedException for other methods?
-
-        // Ensures that the sign in scheme is always the Umbraco back office external type
-        private class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions> where TOptions : RemoteAuthenticationOptions
-        {
-            public void PostConfigure(string name, TOptions options)
-            {
-                options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Used to add back office login providers
-    /// </summary>
-    public class BackOfficeExternalLoginsBuilder
-    {
-        public BackOfficeExternalLoginsBuilder(IServiceCollection services)
-        {
-            _services = services;
-        }
-
-        private readonly IServiceCollection _services;
-
-        /// <summary>
-        /// Add a back office login provider with options
-        /// </summary>
-        /// <param name="loginProviderOptions"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
-            BackOfficeExternalLoginProviderOptions loginProviderOptions,
-            Action<BackOfficeAuthenticationBuilder> build)
-        {
-            build(new BackOfficeAuthenticationBuilder(_services, loginProviderOptions));
-            return this;
-        }
-    }
-
-    public static class AuthenticationBuilderExtensions
-    {
-        public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder, Action<BackOfficeExternalLoginsBuilder> builder)
-        {
-            builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
-            return umbracoBuilder;
-        }
-    }
+    // TODO: This is only for the back office, does it need to be in common?
 
     // TODO: We need to implement this and extend it to support the back office external login options
     // basically migrate things from AuthenticationManagerExtensions & AuthenticationOptionsExtensions
     // and use this to get the back office external login infos
     public interface IBackOfficeExternalLoginProviders
     {
-        BackOfficeExternalLoginProvider Get(string authenticationType);
+        /// <summary>
+        /// Register a login provider for the back office
+        /// </summary>
+        /// <param name="provider"></param>
+        void Register(BackOfficeExternalLoginProvider provider);
+
+        BackOfficeExternalLoginProviderOptions Get(string authenticationType);
 
         IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders();
 
@@ -114,41 +32,42 @@ namespace Umbraco.Web.BackOffice.Security
         /// <returns></returns>
         string GetAutoLoginProvider();
 
-        /// <summary>
-        /// Returns true if there is any external provider that has the Deny Local Login option configured
-        /// </summary>
-        /// <returns></returns>
         bool HasDenyLocalLogin();
     }
 
+    // TODO: This class is just a placeholder for later
     public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProviders
     {
-        public BackOfficeExternalLoginProviders(IEnumerable<BackOfficeExternalLoginProvider> externalLogins)
+        private ConcurrentDictionary<string, BackOfficeExternalLoginProvider> _providers = new ConcurrentDictionary<string, BackOfficeExternalLoginProvider>();
+
+        public void Register(BackOfficeExternalLoginProvider provider)
         {
-            _externalLogins = externalLogins;
+            _providers.TryAdd(provider.AuthenticationType, provider);
+
+            // TODO: we need to be able to set things like we were doing in ForUmbracoBackOffice.
+            // Ok, most is done but we'll also need to take into account the callback path to ignore when we
+            // do front-end routing
         }
 
-        private readonly IEnumerable<BackOfficeExternalLoginProvider> _externalLogins;
-
-        public BackOfficeExternalLoginProvider Get(string authenticationType)
+        public BackOfficeExternalLoginProviderOptions Get(string authenticationType)
         {
-            return _externalLogins.FirstOrDefault(x => x.AuthenticationType == authenticationType);
+            return _providers.TryGetValue(authenticationType, out var opt) ? opt.Options : null;
         }
 
         public string GetAutoLoginProvider()
         {
-            var found = _externalLogins.Where(x => x.Options.AutoRedirectLoginToExternalProvider).ToList();
-            return found.Count > 0 ? found[0].AuthenticationType : null;
+            var found = _providers.Where(x => x.Value.Options.AutoRedirectLoginToExternalProvider).ToList();
+            return found.Count > 0 ? found[0].Key : null;
         }
 
         public IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders()
         {
-            return _externalLogins;
+            return _providers.Values;
         }
 
         public bool HasDenyLocalLogin()
         {
-            var found = _externalLogins.Where(x => x.Options.DenyLocalLogin).ToList();
+            var found = _providers.Where(x => x.Value.Options.DenyLocalLogin).ToList();
             return found.Count > 0;
         }
     }

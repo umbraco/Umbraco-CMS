@@ -414,7 +414,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                autoLinkOptions = _externalLogins.Get(authType.Name)?.Options?.AutoLinkOptions;
+                autoLinkOptions = _externalLogins.Get(authType.Name)?.AutoLinkOptions;
             }
 
             // Sign in the user with this external login provider if the user already has a login
@@ -445,7 +445,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     ViewData.SetExternalSignInProviderErrors(
                         new BackOfficeExternalLoginProviderErrors(
                             loginInfo.LoginProvider,
-                            new[] { "The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office." }));
+                            new[] { "The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account" }));
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -462,7 +462,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (autoLinkOptions.AutoLinkExternalAccount == false)
             {
-                return false; 
+                return true; // TODO: This seems weird to return true, but it was like that before so must be a reason?
             }   
 
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
