@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\linting\stylecop.json = ..\linting\stylecop.json
 		..\linting\codeanalysis.ruleset = ..\linting\codeanalysis.ruleset
 		..\linting\codeanalysis.tests.ruleset = ..\linting\codeanalysis.tests.ruleset
+		..\Directory.Build.props = ..\Directory.Build.props
+		..\Directory.Build.targets = ..\Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
