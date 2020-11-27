@@ -19,11 +19,19 @@
     align-items: center;
     align-self: stretch;
 
+    border-radius: @baseBorderRadius;
+
     margin: 10px;
     position: relative;
     user-select: none;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
     transition: box-shadow 150ms ease-in-out;
+
+    > div {
+        overflow: hidden;
+        border-radius: @baseBorderRadius;
+    }
+
 }
 
 .umb-media-grid__item.-unselectable {
@@ -35,7 +43,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(230, 230, 230, .5);
+        border-radius: @baseBorderRadius;
+        background-color: rgba(230, 230, 230, .8);
         pointer-events: none;
     }
 }
