@@ -526,6 +526,6 @@ namespace Umbraco.Core.Services
         OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         #endregion
-      
+
     }
 }

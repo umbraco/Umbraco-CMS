@@ -403,37 +403,37 @@ namespace Umbraco.Web.Media.Exif
             public Fraction32(int numerator, int denominator)
                 : this(numerator, denominator, 0)
             {
-                ;
+
             }
 
             public Fraction32(int numerator)
                 : this(numerator, (int)1)
             {
-                ;
+
             }
 
             public Fraction32(Fraction32 f)
                 : this(f.Numerator, f.Denominator, f.Error)
             {
-                ;
+
             }
 
             public Fraction32(float value)
                 : this((double)value)
             {
-                ;
+
             }
 
             public Fraction32(double value)
                 : this(FromDouble(value))
             {
-                ;
+
             }
 
             public Fraction32(string s)
                 : this(FromString(s))
             {
-                ;
+
             }
             #endregion
 
@@ -1033,37 +1033,37 @@ namespace Umbraco.Web.Media.Exif
             public UFraction32(uint numerator, uint denominator)
                 : this(numerator, denominator, 0)
             {
-                ;
+
             }
 
             public UFraction32(uint numerator)
                 : this(numerator, (uint)1)
             {
-                ;
+
             }
 
             public UFraction32(UFraction32 f)
                 : this(f.Numerator, f.Denominator, f.Error)
             {
-                ;
+
             }
 
             public UFraction32(float value)
                 : this((double)value)
             {
-                ;
+
             }
 
             public UFraction32(double value)
                 : this(FromDouble(value))
             {
-                ;
+
             }
 
             public UFraction32(string s)
                 : this(FromString(s))
             {
-                ;
+
             }
             #endregion
 

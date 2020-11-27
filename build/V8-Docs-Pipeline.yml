@@ -1,0 +1,52 @@
+##############################################################
+## V8 CMS - .NET & AngularJS Doc sites                      ##
+## Built on demand only, NO automatic PR/branch triggers    ##
+##                                                          ##
+## This build pipeline has a webhook for sucessful          ##
+## builds, that sends the ZIP artifacts to our.umb to host  ##
+##############################################################
+
+# Name != name of pipeline but the build number format
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
+
+# Build Pipeline triggers
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#ci-triggers
+trigger: none
+pr: none
+
+# Variables & their default values
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+# VM to run the build on & it's installed software
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops
+# https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md
+pool:
+  vmImage: 'windows-2019'
+
+jobs:
+  - job: buildDocs
+    displayName: 'Build static docs site as ZIPs'
+    steps:
+    
+    - task: PowerShell@2
+      displayName: 'Prep build tool, build C# & JS Docs'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $uenv=./build.ps1 -get -doc
+          $uenv.SandboxNode()
+          $uenv.CompileBelle()
+          $uenv.PrepareAngularDocs()
+          $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
+          $uenv.PrepareCSharpDocs()
+          $uenv.RestoreNode()
+        errorActionPreference: 'continue'
+        workingDirectory: 'build'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.Repository.LocalPath)\build.out\'
+        artifact: 'docs'
+        publishLocation: 'pipeline'

@@ -37,7 +37,7 @@
         </div>
         <!-- Listview body section -->
         <div class="umb-table-body">
-            <div class="umb-table-row -selectable"
+            <div class="umb-table-row -selectable umb-outline"
                  ng-repeat="item in vm.items track by $index"
                  ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
                  ng-click="vm.selectItem(item, $index, $event)">

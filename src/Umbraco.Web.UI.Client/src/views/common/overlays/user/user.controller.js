@@ -1,5 +1,8 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, dashboardResource, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
+    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout,
+        dashboardResource, userService, historyService, eventsService,
+        externalLoginInfo, externalLoginInfoService, authResource,
+        currentUserResource, formHelper, localizationService) {
 
         $scope.history = historyService.getCurrent();
         //$scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
@@ -14,7 +17,12 @@ angular.module("umbraco")
             });
         }
         */
-        $scope.externalLoginProviders = externalLoginInfo.providers;
+
+        // Set flag if any have deny local login, in which case we must disable all password functionality
+        $scope.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
+        // Only include login providers that have editable options
+        $scope.externalLoginProviders = externalLoginInfoService.getLoginProvidersWithOptions();
+
         $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
         var evts = [];
         evts.push(eventsService.on("historyService.add", function (e, args) {
@@ -72,10 +80,9 @@ angular.module("umbraco")
                     //updateTimeout();
 
                     authResource.getCurrentUserLinkedLogins().then(function(logins) {
+
                         //reset all to be un-linked
-                        for (var provider in $scope.externalLoginProviders) {
-                            $scope.externalLoginProviders[provider].linkedProviderKey = undefined;
-                        }
+                        $scope.externalLoginProviders.forEach(provider => provider.linkedProviderKey = undefined);
 
                         //set the linked logins
                         for (var login in logins) {
@@ -89,6 +96,10 @@ angular.module("umbraco")
                     });
                 }
             });
+        }
+
+        $scope.linkProvider = function (e) {
+            e.target.submit();
         }
 
         $scope.unlink = function (e, loginProvider, providerKey) {
@@ -156,7 +167,7 @@ angular.module("umbraco")
                     }, 2000);
 
                 }, function (err) {
-
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     formHelper.handleError(err);
 
                     $scope.changePasswordButtonState = "error";

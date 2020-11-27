@@ -2,12 +2,12 @@
     "use strict";
 
     function TabNameController($scope) {
-        
+
         var vm = this;
-        var element = angular.element($scope.model.currentStep.element);
+        var element = $($scope.model.currentStep.element);
 
         vm.error = false;
-        
+
         vm.initNextStep = initNextStep;
 
         function initNextStep() {

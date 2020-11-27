@@ -69,7 +69,7 @@
     <key alias="save">Salva</key>
     <key alias="saveAndPublish">Salva e pubblica</key>
     <key alias="saveToPublish">Salva e invia per approvazione</key>
-    <key alias="showPage">Anteprima</key>
+    <key alias="saveAndPreview">Anteprima</key>
     <key alias="showPageDisabled"><![CDATA[L'anteprima è disabilitata dato che non è stato assegnato alcun template]]></key>
     <key alias="styleChoose">Scegli lo stile</key>
     <key alias="styleShow">Mostra gli stili</key>
@@ -187,7 +187,7 @@
     <key alias="recycleBinIsEmpty"><![CDATA[Il cestino è vuoto]]></key>
     <key alias="recycleBinWarning"><![CDATA[Gli elementi cancellati dal cestino non potranno essere recuperati.]]></key>
     <key alias="regexSearchError"><![CDATA[Il webservice <a target='_blank' href='http://regexlib.com'>regexlib.com</a> ha attualmente qualche problema, di cui non abbiamo il controllo. Siamo spiacevoli dell'inconveniente.]]></key>
-    <key alias="regexSearchHelp"><![CDATA[Ricerca un'espressione regolare da aggiungere al campo della form per poter validare il contenuto. Esempio: 'email, 'zip-code' 'url']]></key>
+    <key alias="regexSearchHelp"><![CDATA[Ricerca un'espressione regolare da aggiungere al campo della form per poter validare il contenuto. Esempio: 'email, 'zip-code', 'URL'.]]></key>
     <key alias="removeMacro">Elimina Macro</key>
     <key alias="requiredField">Campo obbligatorio</key>
     <key alias="sitereindexed"><![CDATA[Il sito è stato reindicizzato]]></key>
@@ -330,7 +330,7 @@
     <key alias="update">Aggiorna</key>
     <key alias="upgrade">Aggiornamento</key>
     <key alias="upload">Carica</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Utente</key>
     <key alias="username"><![CDATA[Username]]></key>
     <key alias="value">Valore</key>
@@ -339,7 +339,7 @@
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
     <key alias="reorder">Riordina</key>
-    <key alias="reorderDone">Ho finito di ordinare/key>
+    <key alias="reorderDone">Ho finito di ordinare</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Colore di sfondo</key>
@@ -742,7 +742,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="standardFields">Campi Standard</key>
     <key alias="uppercase">Maiuscolo</key>
     <key alias="urlEncode"><![CDATA[Codifica URL]]></key>
-    <key alias="urlEncodeHelp"><![CDATA[Andrà a sostituire i caratteri speciali con il loro equivalente negli url.]]></key>
+    <key alias="urlEncodeHelp"><![CDATA[Andrà a sostituire i caratteri speciali con il loro equivalente negli URL.]]></key>
     <key alias="usedIfAllEmpty"><![CDATA[Sarà usato solo se i valori dei campi sopra sono vuoti]]></key>
     <key alias="usedIfEmpty"><![CDATA[Questo campo sarà usato soltanto se il campo primario è vuoto]]></key>
     <key alias="withTime"><![CDATA[Si, aggiungi l'ora. Separatore: ]]></key>

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
-        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
-
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
@@ -189,7 +187,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds a dto from an IMedia item.
         /// </summary>
-        public static MediaDto BuildDto(IMedia entity)
+        public static MediaDto BuildDto(PropertyEditorCollection propertyEditors, IMedia entity)
         {
             var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
 
@@ -197,7 +195,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 ContentDto = contentDto,
-                MediaVersionDto = BuildMediaVersionDto(entity, contentDto)
+                MediaVersionDto = BuildMediaVersionDto(propertyEditors, entity, contentDto)
             };
 
             return dto;
@@ -291,12 +289,20 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static MediaVersionDto BuildMediaVersionDto(IMedia entity, ContentDto contentDto)
+        private static MediaVersionDto BuildMediaVersionDto(PropertyEditorCollection propertyEditors, IMedia entity, ContentDto contentDto)
         {
             // try to get a path from the string being stored for media
             // TODO: only considering umbracoFile
 
-            TryMatch(entity.GetValue<string>("umbracoFile"), out var path);
+            string path = null;
+
+            if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out var property)
+                && propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
+            {
+                var value = property.GetValue();
+                path = dataEditor.GetMediaPath(value);
+            }
 
             var dto = new MediaVersionDto
             {
@@ -307,23 +313,6 @@ namespace Umbraco.Core.Persistence.Factories
             };
 
             return dto;
-        }
-
-        // TODO: this should NOT be here?!
-        // more dark magic ;-(
-        internal static bool TryMatch(string text, out string path)
-        {
-            // In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
-            // can tell us directly what any URL is for a given property if it contains an asset
-
-            path = null;
-            if (string.IsNullOrWhiteSpace(text)) return false;
-
-            var m = MediaPathPattern.Match(text);
-            if (!m.Success || m.Groups.Count != 2) return false;
-
-            path = m.Groups[1].Value;
-            return true;
         }
     }
 }

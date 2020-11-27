@@ -1,22 +1,35 @@
 ﻿using System;
-using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Default media url provider.
+    /// Default media URL provider.
     /// </summary>
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
+        private readonly PropertyEditorCollection _propertyEditors;
+
+        public DefaultMediaUrlProvider(PropertyEditorCollection propertyEditors)
+        {
+            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+        }
+
+        [Obsolete("Use the constructor with all parameters instead")]
+        public DefaultMediaUrlProvider() : this(Current.PropertyEditors)
+        {
+        }
+
         /// <inheritdoc />
         public virtual UrlInfo GetMediaUrl(UmbracoContext umbracoContext, IPublishedContent content,
-            string propertyAlias,
-            UrlMode mode, string culture, Uri current)
+            string propertyAlias, UrlMode mode, string culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);
-            var value = prop?.GetValue(culture);
+
+            // get the raw source value since this is what is used by IDataEditorWithMediaPath for processing
+            var value = prop?.GetSourceValue(culture);
             if (value == null)
             {
                 return null;
@@ -25,15 +38,10 @@ namespace Umbraco.Web.Routing
             var propType = prop.PropertyType;
             string path = null;
 
-            switch (propType.EditorAlias)
+            if (_propertyEditors.TryGet(propType.EditorAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
             {
-                case Constants.PropertyEditors.Aliases.UploadField:
-                    path = value.ToString();
-                    break;
-                case Constants.PropertyEditors.Aliases.ImageCropper:
-                    //get the url from the json format
-                    path = value is ImageCropperValue stronglyTyped ? stronglyTyped.Src : value.ToString();
-                    break;
+                path = dataEditor.GetMediaPath(value);
             }
 
             var url = AssembleUrl(path, current, mode);

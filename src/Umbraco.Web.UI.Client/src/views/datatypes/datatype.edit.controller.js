@@ -10,7 +10,11 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     
     var evts = [];
     var vm = this;
-    
+
+    vm.header = {};
+    vm.header.editorfor = "visuallyHiddenTexts_newDataType";
+    vm.header.setPageTitle = true;
+
     //setup scope vars
     vm.page = {};
     vm.page.loading = false;
@@ -24,10 +28,6 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
             alias: "selectedEditor",
             description: "Select a property editor",
             label: "Property editor"
-        },
-        selectedEditorId: {
-            alias: "selectedEditorId",
-            label: "Property editor alias"
         }
     };
 
@@ -128,6 +128,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
 
                 }, function(err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     //NOTE: in the case of data type values we are setting the orig/new props
                     // to be the same thing since that only really matters for content/media.
                     contentEditingHelper.handleSaveError({
@@ -205,7 +206,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         
         var labelKeys = [
             "general_settings",
-            "references_tabName"
+            "general_info"
         ];
         
         localizationService.localizeMany(labelKeys).then(function (values) {
@@ -220,9 +221,9 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 },
                 {
                     "name": values[1],
-                    "alias": "references",
-                    "icon": "icon-molecular-network",
-                    "view": "views/datatypes/views/datatype.references.html"
+                    "alias": "info",
+                    "icon": "icon-info",
+                    "view": "views/datatypes/views/datatype.info.html"
                 }
             ];
         });

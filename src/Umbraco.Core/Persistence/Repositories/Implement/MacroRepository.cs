@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (macroDto == null)
                 return null;
-            
+
             var entity = MacroFactory.BuildEntity(macroDto);
 
             // reset dirty initial properties (U4-1946)
@@ -153,7 +153,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IMacro entity)
         {
             entity.UpdatingEntity();
-;
             var dto = MacroFactory.BuildDto(entity);
 
             Database.Update(dto);

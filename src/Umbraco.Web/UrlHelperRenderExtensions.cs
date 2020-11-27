@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Composing;
@@ -25,7 +23,7 @@ namespace Umbraco.Web
         #region GetCropUrl
 
         /// <summary>
-        /// Gets the ImageProcessor Url of a media item by the crop alias (using default media item property alias of "umbracoFile")
+        /// Gets the ImageProcessor URL of a media item by the crop alias (using default media item property alias of "umbracoFile")
         /// </summary>
         /// <param name="urlHelper"></param>
         /// <param name="mediaItem">
@@ -48,7 +46,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
         /// <param name="urlHelper"></param>
         /// <param name="mediaItem">
@@ -65,7 +63,7 @@ namespace Umbraco.Web
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
         {
@@ -76,7 +74,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -159,10 +157,10 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="width">
         /// The width of the output image.
@@ -302,8 +300,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, string controllerName, string area, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
 
             var encryptedRoute = CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
@@ -333,7 +333,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
@@ -392,8 +393,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
         {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
-            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentNullOrEmptyException(nameof(controllerAction));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
+            if (controllerAction == null) throw new ArgumentNullException(nameof(controllerAction));
+            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentException("Value can't be empty.", nameof(controllerAction));
             if (area == null) throw new ArgumentNullException(nameof(area));
 
             //need to create a params string as Base64 to put into our hidden field to use during the routes

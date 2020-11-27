@@ -60,19 +60,20 @@ namespace Umbraco.Web.Trees
             //System ListView nodes
             var systemListViewDataTypeIds = GetNonDeletableSystemListViewDataTypeIds();
 
+            var children = Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType).ToArray();
+            var dataTypes = Services.DataTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(dt => dt.Id);
+
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType)
+                children
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, Constants.Icons.DataType, false);
+                        var dataType = dataTypes[dt.Id];
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor.Icon, false);
                         node.Path = dt.Path;
-                        if (systemListViewDataTypeIds.Contains(dt.Id))
-                        {
-                            node.Icon = Constants.Icons.ListView;
-                        }
                         return node;
-                    }));
+                    })
+            );
 
             return nodes;
         }

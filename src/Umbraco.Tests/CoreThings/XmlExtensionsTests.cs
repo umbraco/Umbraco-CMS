@@ -16,7 +16,7 @@ namespace Umbraco.Tests.CoreThings
 
             var xmlNode = cdata.GetXmlNode(xdoc);
 
-            Assert.AreEqual(xmlNode.InnerText, "hello world");
+            Assert.AreEqual("hello world", xmlNode.InnerText);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.CoreThings
 
             var xmlNode = cdata.GetXmlNode(xdoc);
 
-            Assert.AreEqual(xmlNode.InnerText, "hello world");
+            Assert.AreEqual("hello world", xmlNode.InnerText);
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.CoreThings
 
             var xmlNode = cdata.GetXmlNode(xdoc);
 
-            Assert.AreEqual(xmlNode.InnerText, "hello world");
+            Assert.AreEqual("hello world", xmlNode.InnerText);
             Assert.AreEqual(xml, xdoc.OuterXml);
         }
     }

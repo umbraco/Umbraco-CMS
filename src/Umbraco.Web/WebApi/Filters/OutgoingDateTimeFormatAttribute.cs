@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
-using Umbraco.Core;
-using Umbraco.Core.Exceptions;
+using Newtonsoft.Json.Converters;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -21,7 +19,9 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="format"></param>
         public JsonDateTimeFormatAttributeAttribute(string format)
         {
-            if (string.IsNullOrEmpty(format)) throw new ArgumentNullOrEmptyException(nameof(format));
+            if (format == null) throw new ArgumentNullException(nameof(format));
+            if (string.IsNullOrEmpty(format)) throw new ArgumentException("Value can't be empty.", nameof(format));
+
             _format = format;
         }
 

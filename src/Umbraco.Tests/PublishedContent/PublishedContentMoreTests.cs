@@ -7,6 +7,7 @@ using Umbraco.Web;
 using Umbraco.Core;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
+using System;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -21,9 +22,9 @@ namespace Umbraco.Tests.PublishedContent
                 yield return factory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes);
-            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
-            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2Sub = factory.CreateContentType(Guid.NewGuid(), 3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
 
             var content = new SolidPublishedContent(contentType1)
             {

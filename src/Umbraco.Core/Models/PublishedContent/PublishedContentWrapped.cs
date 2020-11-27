@@ -94,6 +94,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
         /// <inheritdoc />
+        [Obsolete("Use the Url() extension instead")]
         public virtual string Url => _content.Url;
 
         /// <inheritdoc />

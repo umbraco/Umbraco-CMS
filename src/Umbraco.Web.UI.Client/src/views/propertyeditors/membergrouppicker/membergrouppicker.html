@@ -10,13 +10,11 @@
 		</umb-node-preview>
 	</div>
 
-	<a 
-		class="umb-node-preview-add" 
-		href="#"
-		ng-click="openMemberGroupPicker()"
-		prevent-default>
+	<button type="button"
+            class="umb-node-preview-add"
+            ng-click="openMemberGroupPicker()">
 		<localize key="general_add">Add</localize>
-	</a>
+	</button>
 
     <input type="hidden" name="mandatory" ng-model="model.mandatory" ng-required="model.validation.mandatory && !renderModel.length" />
 

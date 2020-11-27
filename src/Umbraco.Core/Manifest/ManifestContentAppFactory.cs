@@ -19,6 +19,8 @@ namespace Umbraco.Core.Manifest
     //       '-content/foo',        // hide for content type 'foo'
     //       '+content/*',          // show for all other content types
     //       '+media/*',            // show for all media types
+    //       '-member/foo'          // hide for member type 'foo'
+    //       '+member/*'            // show for all member types
     //       '+role/admin'          // show for admin users. Role based permissions will override others.
     //     ]
     //   },
@@ -55,6 +57,14 @@ namespace Umbraco.Core.Manifest
                 case IMedia media:
                     partA = "media";
                     partB = media.ContentType.Alias;
+                    break;
+                case IMember member:
+                    partA = "member";
+                    partB = member.ContentType.Alias;
+                    break;
+                case IContentType contentType:
+                    partA = "contentType";
+                    partB = contentType.Alias;
                     break;
 
                 default:

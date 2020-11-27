@@ -61,7 +61,7 @@ namespace Umbraco.Web
         public WebSecurity Security => UmbracoContextAccessor.UmbracoContext.Security;
 
         /// <summary>
-        /// Gets the Url helper.
+        /// Gets the URL helper.
         /// </summary>
         /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
         public UrlHelper Url => _url ?? (_url = new UrlHelper(HttpContext.Current.Request.RequestContext));

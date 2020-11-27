@@ -102,8 +102,8 @@ namespace Umbraco.Web.Editors
             model.LicenseUrl = ins.LicenseUrl;
             model.Readme = ins.Readme;
             model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
-            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
-            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias);
             model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;

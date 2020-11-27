@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -17,7 +13,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security; 
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -107,7 +102,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IUser"/></returns>
         private IUser CreateUserWithIdentity(string username, string email, string passwordValue, bool isApproved = true)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
+            if (username == null) throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
 
             // TODO: PUT lock here!!
 
@@ -258,6 +254,13 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        // explicit implementation because we don't need it now but due to the way that the members membership provider is put together
+        // this method must exist in this service as an implementation (legacy)
+        void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date)
+        {
+            throw new NotSupportedException("This method is not implemented or supported for users");
+        }
+
         /// <summary>
         /// Saves an <see cref="IUser"/>
         /// </summary>
@@ -376,7 +379,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            return "writer";
+            return Constants.Security.WriterGroupAlias;
         }
 
         /// <summary>
@@ -1201,12 +1204,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
 
         /// <summary>
         /// Occurs before Delete

@@ -1,5 +1,7 @@
 function ColorPickerController($scope, $timeout) {
 
+    var vm = this;
+
     //setup the default config
     var config = {
         items: [],
@@ -18,14 +20,17 @@ function ColorPickerController($scope, $timeout) {
 
         for (var key in $scope.model.config.items) {
             if (!$scope.model.config.items[key].hasOwnProperty("value"))
-                $scope.model.config.items[key] = { value: $scope.model.config.items[key], label: $scope.model.config.items[key] };
+                $scope.model.config.items[key] = {
+                    value: $scope.model.config.items[key],
+                    label: $scope.model.config.items[key]
+                };
         }
 
-        $scope.model.useLabel = isTrue($scope.model.config.useLabel);
+        $scope.model.useLabel = Object.toBoolean($scope.model.config.useLabel);
         initActiveColor();
     }
 
-    if (!angular.isArray($scope.model.config.items)) {
+    if (!Utilities.isArray($scope.model.config.items)) {
         //make an array from the dictionary
         var items = [];
         for (var i in $scope.model.config.items) {
@@ -54,13 +59,13 @@ function ColorPickerController($scope, $timeout) {
         $scope.model.config.items = items;
     }
 
-    $scope.selectColor = function (color) {
+    vm.selectColor = function (color) {
         // this is required to re-validate
         $timeout(function () {
             var newColor = color ? color.value : null;
             $scope.propertyForm.selectedColor.$setViewValue(newColor);
         });
-    }
+    };
 
     // Method required by the valPropertyValidator directive (returns true if the property editor has at least one color selected)
     $scope.validateMandatory = function () {
@@ -71,11 +76,10 @@ function ColorPickerController($scope, $timeout) {
         );
         return {
             isValid: isValid,
-            errorMsg: "Value cannot be empty",
+            errorMsg: $scope.model.validation.mandatoryMessage || "Value cannot be empty",
             errorKey: "required"
         };
-    }
-    $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
+    };
 
     // Finds the color best matching the model's color,
     // and sets the model color to that one. This is useful when
@@ -137,11 +141,6 @@ function ColorPickerController($scope, $timeout) {
             $scope.model.value.value = foundItem.value;
             $scope.model.value.label = foundItem.label;
         }
-    }
-
-    // figures out if a value is trueish enough
-    function isTrue(bool) {
-        return !!bool && bool !== "0" && bool.toString().toLowerCase() !== "false";
     }
 }
 

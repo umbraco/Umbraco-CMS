@@ -297,10 +297,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 Mandatory = dto.Mandatory,
+                MandatoryMessage = dto.MandatoryMessage,
                 Name = dto.Name,
                 PropertyGroupId = groupId.HasValue ? new Lazy<int>(() => groupId.Value) : null,
                 SortOrder = dto.SortOrder,
                 ValidationRegExp = dto.ValidationRegExp,
+                ValidationRegExpMessage = dto.ValidationRegExpMessage,
                 Variations = (ContentVariation)dto.Variations
             };
         }

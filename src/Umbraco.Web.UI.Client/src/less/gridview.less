@@ -21,7 +21,7 @@
      overflow: hidden;
      padding: 5px;
      border-radius:5px;
-     box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     box-shadow: 3px 3px 12px 0 rgba(50, 50, 50, 0.45);
  }
 
  .usky-grid .ui-sortable-helper *{
@@ -101,6 +101,9 @@
      position:relative;
  }
 
+ .usky-grid .grid-layout {
+    max-width: 600px;
+}
 
  // ROW
  // -------------------------
@@ -147,7 +150,7 @@
 .usky-grid  .cell-tools-add {
     position: absolute;
     text-align: center;
-    bottom: 0px;
+    bottom: 0;
     left: 0;
     right: 0;
     margin: 0 45px 1px 0;
@@ -157,14 +160,14 @@
     }
 }
 
-.usky-grid  .usky-control:hover .cell-tools-add{
+.usky-grid .usky-control:hover .cell-tools-add{
     opacity: 1;
 }
 
-.usky-grid  .cell-tools-remove {
+.usky-grid .cell-tools-remove {
     display:inline-block;
     position: absolute;
-    top: 0px;
+    top: 0;
     right: 5px;
     text-align: right;
     z-index: 500;
@@ -218,7 +221,7 @@
     top: -22px;
     left: -1px;
     text-decoration: none;
-    padding: 0px 7px;
+    padding: 0 7px;
     display:none;
     font-size:0.8em;
     background-color: @white;
@@ -231,7 +234,7 @@
 
 .usky-grid .usky-row-inner > ins.item-label{
     top: -20px;
-    left: 0px;
+    left: 0;
 }
 
 .usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
@@ -365,12 +368,12 @@
 
  .usky-grid  .iconBox.selected {
      -webkit-appearance: none;
-     background-image: -webkit-gradient(linear,0 0,0 100%,from(#e6e6e6),to(#bfbfbf));
-     background-image: -webkit-linear-gradient(top,#e6e6e6,#bfbfbf);
-     background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
+     background-image: -webkit-gradient(linear,0 0,0 100%,from(@gray-9),to(@gray-7));
+     background-image: -webkit-linear-gradient(top,@gray-9,@gray-7);
+     background-image: linear-gradient(to bottom,@gray-9,@gray-7);
      background-repeat: repeat-x;
      zoom: 1;
-     border-color: #bfbfbf #bfbfbf #999;
+     border-color: @gray-7 @gray-7 @gray-6;
      border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
      border-radius: 3px;
@@ -379,7 +382,7 @@
 
  .usky-grid  .iconBox i {
      font-size:16px !important;
-     color: #5F5F5F;
+     color: @gray-4;
      display:block;
  }
 
@@ -405,7 +408,7 @@
  .usky-grid  ul li {
      display: inline-block;
      width: 120px;
-     margin: 8px 8px 0px 8px;
+     margin: 8px 8px 0 8px;
  }
 
 
@@ -432,7 +435,7 @@
      padding: -1px;
      position: absolute;
      margin: -1px -1px 0 -1px;
-     box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     box-shadow: 2px 2px 10px 0 rgba(50, 50, 50, 0.14);
      z-index: 9999999;
  }
 
@@ -517,6 +520,25 @@
     position:relative;
  }
 
+ .usky-grid .uSky-templates .layout {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    float: left;
+}
+
+
+.usky-grid .uSky-templates .columns {
+    margin-top: 5px;
+    margin-bottom: 25px;
+    float: left;
+}
+
+
+.usky-grid .uSky-templates .columns .preview-cell p {
+    font-size: 6px;
+    line-height: 8px;
+    text-align: center;
+}
 
 
  /**************************************************************************************************/
@@ -536,7 +558,8 @@
      margin: 20px;
  }
 
- .usky-grid .uSky-templates-template a.tb:hover {
+ .usky-grid .uSky-templates-template button.tb:hover,
+ .usky-grid .uSky-templates-template button.tb:focus {
      border:5px solid @blueMid;
  }
 
@@ -565,7 +588,9 @@
      border-right: 1px dashed @gray-8 !important;
  }
 
- .usky-grid a.uSky-templates-column:hover, .usky-grid a.uSky-templates-column.selected{
+ .usky-grid button.uSky-templates-column:hover, 
+ .usky-grid button.uSky-templates-column:focus, 
+ .usky-grid button.uSky-templates-column.selected{
     background-color: @blueMid;
  }
 
@@ -606,13 +631,13 @@
 		transition: border 200ms linear;
 
         &.prevalues-rows {
-            margin: 0px 20px 20px 0px;
+            margin: 0 20px 20px 0;
             width: 80px;
             float:left;
         }
 
         &.prevalues-templates {
-            margin: 0px 20px 20px 0px;
+            margin: 0 20px 20px 0;
             float:left;
 
         }
@@ -781,7 +806,7 @@
 .usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
     max-height: 50px;
     border-width: 2px !important;
-    padding: 0px;
+    padding: 0;
     border-spacing:2px;
     overflow: hidden;
 }
@@ -822,13 +847,13 @@
 }
 
 .usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
-    margin: 0px 50px 20px 0px;
+    margin: 0 50px 20px 0;
     width: 60px;
 }
 
 .usky-grid-configuration .uSky-templates-rows .uSky-templates-row .tb{
     border-width: 2px !important;
-    padding: 0px;
+    padding: 0;
     border-spacing:2px;
 }
 
@@ -836,4 +861,6 @@
     height: 10px !important;
 }
 
-.usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
+.usky-grid-configuration button.uSky-templates-column {
+    height: 70px !important;
+}

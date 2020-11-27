@@ -13,12 +13,12 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor
+    /// Provides extension methods for getting ImageProcessor URL from the core Image Cropper property editor
     /// </summary>
     public static class ImageCropperTemplateExtensions
     {
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
+        /// Gets the ImageProcessor URL by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -27,15 +27,12 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias)
-        {
-            return mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
-        }
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator);
 
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -47,15 +44,12 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
-        {
-            return mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
-        }
+        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, propertyAlias, cropAlias, Current.ImageUrlGenerator);
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the IPublishedContent item.
+        /// Gets the ImageProcessor URL from the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -121,50 +115,13 @@ namespace Umbraco.Web
              bool cacheBuster = true,
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
-             bool upScale = true)
-        {
-            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
-
-            var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
-
-            if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
-                return string.Empty;
-
-            var mediaItemUrl = mediaItem.MediaUrl(propertyAlias: propertyAlias);
-
-            //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(propertyAlias);
-
-            //is it strongly typed?
-            var stronglyTyped = cropperValue as ImageCropperValue;
-            if (stronglyTyped != null)
-            {
-                return GetCropUrl(
-                    mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
-            }
-
-            //this shouldn't be the case but we'll check
-            var jobj = cropperValue as JObject;
-            if (jobj != null)
-            {
-                stronglyTyped = jobj.ToObject<ImageCropperValue>();
-                return GetCropUrl(
-                    mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
-            }
-
-            //it's a single string
-            return GetCropUrl(
-                mediaItemUrl, width, height, mediaItemUrl, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                cacheBusterValue, furtherOptions, ratioMode, upScale);
-        }
+             bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="width">
         /// The width of the output image.
@@ -227,25 +184,13 @@ namespace Umbraco.Web
             string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true)
-        {
-            if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
-
-            ImageCropperValue cropDataSet = null;
-            if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-            {
-                cropDataSet = imageCropperValue.DeserializeImageCropperValue();
-            }
-            return GetCropUrl(
-                imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
-        }
+            bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(imageUrl, Current.ImageUrlGenerator, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="cropDataSet"></param>
         /// <param name="width">
@@ -306,129 +251,8 @@ namespace Umbraco.Web
             string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true)
-        {
-            if (string.IsNullOrEmpty(imageUrl) == false)
-            {
-                var imageProcessorUrl = new StringBuilder();
+            bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(imageUrl, Current.ImageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
 
-                if (cropDataSet != null  && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-                {
-                    var crop = cropDataSet.GetCrop(cropAlias);
-
-                    // if a crop was specified, but not found, return null
-                    if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
-                        return null;
-
-                    imageProcessorUrl.Append(imageUrl);
-                    cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
-
-                    if (crop != null & useCropDimensions)
-                    {
-                        width = crop.Width;
-                        height = crop.Height;
-                    }
-
-                    // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
-                    if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
-                    {
-                        var heightRatio = (decimal)crop.Height / (decimal)crop.Width;
-                        imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
-                    }
-
-                    // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
-                    if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
-                    {
-                        var widthRatio = (decimal)crop.Width / (decimal)crop.Height;
-                        imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
-                    }
-                }
-                else
-                {
-                    imageProcessorUrl.Append(imageUrl);
-
-                    if (imageCropMode == null)
-                    {
-                        imageCropMode = ImageCropMode.Pad;
-                    }
-
-                    imageProcessorUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
-
-                    if (imageCropAnchor != null)
-                    {
-                        imageProcessorUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
-                    }
-                }
-
-                var hasFormat = furtherOptions != null && furtherOptions.InvariantContains("&format=");
-
-                //Only put quality here, if we don't have a format specified.
-                //Otherwise we need to put quality at the end to avoid it being overridden by the format.
-                if (quality != null && hasFormat == false)
-                {
-                    imageProcessorUrl.Append("&quality=" + quality);
-                }
-
-                if (width != null && ratioMode != ImageCropRatioMode.Width)
-                {
-                    imageProcessorUrl.Append("&width=" + width);
-                }
-
-                if (height != null && ratioMode != ImageCropRatioMode.Height)
-                {
-                    imageProcessorUrl.Append("&height=" + height);
-                }
-
-                if (ratioMode == ImageCropRatioMode.Width && height != null)
-                {
-                    // if only height specified then assume a square
-                    if (width == null)
-                    {
-                        width = height;
-                    }
-
-                    var widthRatio = (decimal)width / (decimal)height;
-                    imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
-                }
-
-                if (ratioMode == ImageCropRatioMode.Height && width != null)
-                {
-                    // if only width specified then assume a square
-                    if (height == null)
-                    {
-                        height = width;
-                    }
-
-                    var heightRatio = (decimal)height / (decimal)width;
-                    imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
-                }
-
-                if (upScale == false)
-                {
-                    imageProcessorUrl.Append("&upscale=false");
-                }
-
-                if (furtherOptions != null)
-                {
-                    imageProcessorUrl.Append(furtherOptions);
-                }
-
-                //If furtherOptions contains a format, we need to put the quality after the format.
-                if (quality != null && hasFormat)
-                {
-                    imageProcessorUrl.Append("&quality=" + quality);
-                }
-
-                if (cacheBusterValue != null)
-                {
-                    imageProcessorUrl.Append("&rnd=").Append(cacheBusterValue);
-                }
-
-                return imageProcessorUrl.ToString();
-            }
-
-            return string.Empty;
-        }
 
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {

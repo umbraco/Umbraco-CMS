@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Misc
         [Test]
         public void SetApplicationUrlWhenNoSettings()
         {
-            // no applicable settings, cannot set url
+            // no applicable settings, cannot set URL
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
                 section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null));

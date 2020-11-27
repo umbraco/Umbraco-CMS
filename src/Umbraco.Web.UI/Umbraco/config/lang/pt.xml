@@ -67,7 +67,7 @@
     <key alias="save">Salvar</key>
     <key alias="saveAndPublish">Salvar e publicar</key>
     <key alias="saveToPublish">Salvar e mandar para aprovação</key>
-    <key alias="showPage">Prévia</key>
+    <key alias="saveAndPreview">Prévia</key>
     <key alias="styleChoose">Escolha estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
     <key alias="tableInsert">Inserir tabela</key>
@@ -181,7 +181,7 @@
     <key alias="recycleBinIsEmpty">A lixeira agora está vazia</key>
     <key alias="recycleBinWarning">Quando itens são removidos da lixeira estes somem para sempre</key>
     <key alias="regexSearchError"><![CDATA[O serviço web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está no momento sofrendo dificuldades dos quais não temos controle. Pedimos desculpas pela inconveniência.]]></key>
-    <key alias="regexSearchHelp">Busque por uma expressão regular para adicionar validação à um campo de formulário. Exemplo: 'email', 'zip-code' (código postal), 'url'</key>
+    <key alias="regexSearchHelp">Busque por uma expressão regular para adicionar validação à um campo de formulário. Exemplo: 'email', 'zip-code' (código postal), 'URL'</key>
     <key alias="removeMacro">Remover Macro</key>
     <key alias="requiredField">Campo obrigatório</key>
     <key alias="sitereindexed">Site foi re-indexado</key>
@@ -324,7 +324,7 @@
     <key alias="update">Atualizar</key>
     <key alias="upgrade">Atualizar</key>
     <key alias="upload">Subir (Upload)</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Usuário</key>
     <key alias="username">Usuário</key>
     <key alias="value">Valor</key>

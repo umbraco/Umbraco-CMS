@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -18,7 +17,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         public ContentCultureInfos(string culture)
         {
-            if (culture.IsNullOrWhiteSpace()) throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
+
             Culture = culture;
         }
 

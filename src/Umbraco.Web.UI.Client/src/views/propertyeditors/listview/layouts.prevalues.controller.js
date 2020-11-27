@@ -15,6 +15,8 @@
       vm.focusLayoutName = false;
 
       vm.layoutsSortableOptions = {
+         axis: "y",
+         containment: "parent",
          distance: 10,
          tolerance: "pointer",
          opacity: 0.7,
@@ -41,7 +43,6 @@
          };
 
          $scope.model.value.push(layout);
-
       }
 
       function showPrompt(layout) {

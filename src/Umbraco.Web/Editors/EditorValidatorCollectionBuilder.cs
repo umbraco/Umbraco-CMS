@@ -2,7 +2,7 @@
 
 namespace Umbraco.Web.Editors
 {
-    internal class EditorValidatorCollectionBuilder : LazyCollectionBuilderBase<EditorValidatorCollectionBuilder, EditorValidatorCollection, IEditorValidator>
+    public class EditorValidatorCollectionBuilder : LazyCollectionBuilderBase<EditorValidatorCollectionBuilder, EditorValidatorCollection, IEditorValidator>
     {
         protected override EditorValidatorCollectionBuilder This => this;
     }

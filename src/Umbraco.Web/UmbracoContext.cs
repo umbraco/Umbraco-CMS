@@ -66,7 +66,7 @@ namespace Umbraco.Web
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
-            // set the urls...
+            // set the URLs...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
             // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
@@ -101,7 +101,7 @@ namespace Umbraco.Web
         internal Uri OriginalRequestUrl { get; }
 
         /// <summary>
-        /// Gets the cleaned up url that is handled by Umbraco.
+        /// Gets the cleaned up URL that is handled by Umbraco.
         /// </summary>
         /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
         internal Uri CleanedUmbracoUrl { get; }
@@ -144,7 +144,7 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
-        /// Gets the url provider.
+        /// Gets the URL provider.
         /// </summary>
         public UrlProvider UrlProvider { get; }
 
@@ -197,57 +197,57 @@ namespace Umbraco.Web
         #region Urls
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier.
+        /// Gets the URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier.
+        /// Gets the URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(Guid contentId, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// Gets the URL of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(int contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// Gets the URL of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
 
         /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
+        /// Gets the absolute URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
+        /// <returns>The absolute URL for the content.</returns>
         [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(int contentId, string culture = null)
         {
@@ -255,11 +255,11 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
+        /// Gets the absolute URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
+        /// <returns>The absolute URL for the content.</returns>
         [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(Guid contentId, string culture = null)
         {

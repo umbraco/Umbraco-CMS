@@ -14,29 +14,22 @@
             hide-icon="true"
             hide-description="true"
             hide-alias="true"
+            navigation="content.apps"
+            on-select-navigation-item="appChanged(item)"
             show-back-button="showBack()"
             on-back="onBack()"
             editorfor="header.editorfor"
             setpagetitle="header.setPageTitle">
           </umb-editor-header>
 
-         <umb-editor-container class="form-horizontal">
-
-            <div class="umb-group-panel" ng-repeat="group in content.tabs track by group.label">
-
-                <div class="umb-group-panel__header">
-                    <div>{{ group.label }}</div>
+          
+        <umb-editor-container>
+            <div class="umb-editor-sub-views" ng-if="!page.loading">
+                <div id="sub-view-{{$index}}" ng-repeat="app in content.apps track by app.alias">
+                    <umb-editor-sub-view model="app" content="content"  />
                 </div>
-
-                <div class="umb-group-panel__content">
-                    <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
-                        <umb-property-editor model="property"></umb-property-editor>
-                    </umb-property>
-                </div>
-
             </div>
-
-         </umb-editor-container>
+        </umb-editor-container>
 
          <umb-editor-footer>
 

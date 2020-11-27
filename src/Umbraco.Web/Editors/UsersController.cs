@@ -26,8 +26,10 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors.Filters;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
@@ -174,6 +176,33 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var result = Mapper.Map<IUser, UserDisplay>(user);
+            return result;
+        }
+
+        /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = Services.UserService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = Mapper.MapEnumerable<IUser, UserDisplay>(users);
             return result;
         }
 
@@ -345,12 +374,6 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (EmailSender.CanSendRequiredEmail == false)
-            {
-                throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
-            }
-
             IUser user;
             if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
@@ -360,9 +383,17 @@ namespace Umbraco.Web.Editors
             else
             {
                 //first validate the username if we're showing it
-                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
             }
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
+            
+            if (!EmailSender.CanSendRequiredEmail && !userMgr.HasSendingUserInviteEventHandler)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
+            }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
@@ -396,16 +427,48 @@ namespace Umbraco.Web.Editors
             //ensure the invited date is set
             user.InvitedDate = DateTime.Now;
 
-            //Save the updated user
+            //Save the updated user (which will process the user groups too)
             Services.UserService.Save(user);
             var display = Mapper.Map<UserDisplay>(user);
 
-            //send the email
+            var inviteArgs = new UserInviteEventArgs(
+                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
+                performingUser: Security.GetUserId().Result,
+                userSave,
+                user);
 
-            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
+            try
+            {
+                userMgr.RaiseSendingUserInvite(inviteArgs);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<UsersController>(ex, "An error occurred in a custom event handler while inviting the user");
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse($"An error occurred inviting the user (check logs for more info): {ex.Message}"));
+            }
+
+            // If the event is handled then no need to send the email
+            if (inviteArgs.InviteHandled)
+            {
+                // if no user result was created then map the minimum args manually for the UI
+                if (!inviteArgs.ShowUserResult)
+                {
+                    display = new UserDisplay
+                    {
+                        Name = userSave.Name,
+                        Email = userSave.Email,
+                        Username = userSave.Username
+                    };
+                }                
+            }
+            else
+            {
+                //send the email
+                await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);                
+            }
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
-
             return display;
         }
 
@@ -450,7 +513,7 @@ namespace Umbraco.Web.Editors
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            // Get an mvc helper to get the url
+            // Get an mvc helper to get the URL
             var http = EnsureHttpContext();
             var urlHelper = new UrlHelper(http.Request.RequestContext);
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
@@ -490,9 +553,9 @@ namespace Umbraco.Web.Editors
         /// <param name="userSave"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<UserDisplay> PostSaveUser(UserSave userSave)
+        public UserDisplay PostSaveUser(UserSave userSave)
         {
-            if (userSave == null) throw new ArgumentNullException("userSave");
+            if (userSave == null) throw new ArgumentNullException(nameof(userSave));
 
             if (ModelState.IsValid == false)
             {
@@ -516,6 +579,14 @@ namespace Umbraco.Web.Editors
             }
 
             var hasErrors = false;
+
+            // we need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed
+            var owinContext = Request.TryGetOwinContext().Result;
+            var hasDenyLocalLogin = owinContext.Authentication.HasDenyLocalLogin();
+            if (hasDenyLocalLogin)
+            {
+                userSave.Email = found.Email; // it cannot change, this would only happen if people are mucking around with the request
+            }
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null && existing.Id != userSave.Id)
@@ -549,29 +620,7 @@ namespace Umbraco.Web.Editors
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
-            }
-
-            if (userSave.ChangePassword != null)
-            {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
-
-                //this will change the password and raise appropriate events
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
-                if (passwordChangeResult.Success)
-                {
-                    //need to re-get the user
-                    found = Services.UserService.GetUserById(intId.Result);
-                }
-                else
-                {
-                    hasErrors = true;
-
-                    foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
-                    {
-                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
-                    }
-                }
-            }
+            }          
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
@@ -586,6 +635,51 @@ namespace Umbraco.Web.Editors
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changingPasswordModel"></param>
+        /// <returns></returns>
+        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
+        {
+            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));            
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            if (intId.Success == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var found = Services.UserService.GetUserById(intId.Result);
+            if (found == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, changingPasswordModel, UserManager);
+
+            if (passwordChangeResult.Success)
+            {
+                var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
+                result.AddSuccessNotification(Services.TextService.Localize("general/success"), Services.TextService.Localize("user/passwordChangedGeneric"));
+                return result;
+            }
+
+            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            {
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
+            }
+
+            throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+        }
+
 
         /// <summary>
         /// Disables the users with the given user ids

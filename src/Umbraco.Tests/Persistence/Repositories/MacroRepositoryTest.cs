@@ -38,7 +38,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
 
                 var macro = new Macro("test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
-                ;
 
                 Assert.Throws<SqlCeException>(() => repository.Save(macro));
             }
@@ -56,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var macro = repository.Get(1);
                 macro.Alias = "test2";
-                
+
                 Assert.Throws<SqlCeException>(() => repository.Save(macro));
             }
 

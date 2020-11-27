@@ -2,7 +2,7 @@
     "use strict";
 
     function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
-        
+
         var vm = this;
 
         vm.rollback = rollback;
@@ -56,7 +56,7 @@
                 });
 
             });
-            
+
         }
 
         function changeLanguage(language) {
@@ -68,14 +68,20 @@
 
             if(version && version.versionId) {
 
+                vm.loading = true;
+
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
                 contentResource.getRollbackVersion(version.versionId, culture)
-                    .then(function(data){
+                    .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
                         createDiff(vm.currentVersion, vm.previousVersion);
+
+                        vm.loading = false;
                         vm.rollbackButtonDisabled = false;
+                    }, function () {
+                        vm.loading = false;
                     });
 
             } else {
@@ -97,7 +103,7 @@
                             var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
                             version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
                             return version;
-                        }); 
+                        });
                     });
                 });
         }
@@ -118,6 +124,10 @@
                 tab.properties.forEach((property, propertyIndex) => {
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
 
+                    // copy existing properties, so it doesn't manipulate existing properties on page
+                    oldProperty = Utilities.copy(oldProperty);
+                    property = Utilities.copy(property);
+
                     // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                     if(property.value instanceof Object) {
                         property.value = JSON.stringify(property.value, null, 1);
@@ -130,13 +140,13 @@
                     }
 
                     // diff requires a string
-                    property.value = property.value ? property.value : "";
-                    oldProperty.value = oldProperty.value ? oldProperty.value : "";
+                    property.value = property.value ? property.value + "" : "";
+                    oldProperty.value = oldProperty.value ? oldProperty.value + "" : "";
 
                     var diffProperty = {
                         "alias": property.alias,
                         "label": property.label,
-                        "diff": JsDiff.diffWords(property.value, oldProperty.value),
+                        "diff": (property.isObject) ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
                         "isObject": (property.isObject || oldProperty.isObject) ? true : false
                     };
 
@@ -153,7 +163,7 @@
 
             const nodeId = $scope.model.node.id;
             const versionId = vm.previousVersion.versionId;
-            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;            
+            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
             return contentResource.rollback(nodeId, versionId, culture)
                 .then(data => {

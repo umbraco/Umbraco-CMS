@@ -79,6 +79,9 @@ namespace Umbraco.Core.Persistence
                         case SpecialDbTypes.NCHAR:
                             sqlDbType = SqlDbType.NChar;
                             break;
+                        case SpecialDbTypes.NVARCHARMAX:
+                            sqlDbType = SqlDbType.NVarChar;
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }

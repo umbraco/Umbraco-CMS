@@ -26,6 +26,30 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class MediaServiceTests : TestWithSomeContentBase
     {
+        [Test]
+        public void Can_Update_Media_Property_Values()
+        {
+            IMediaType mediaType = MockedContentTypes.CreateSimpleMediaType("test", "Test");
+            ServiceContext.MediaTypeService.Save(mediaType);
+            IMedia media = MockedMedia.CreateSimpleMedia(mediaType, "hello", -1);
+            media.SetValue("title", "title of mine");
+            media.SetValue("bodyText", "hello world");
+            ServiceContext.MediaService.Save(media);
+
+            // re-get
+            media = ServiceContext.MediaService.GetById(media.Id);
+            media.SetValue("title", "another title of mine");          // Change a value
+            media.SetValue("bodyText", null);                          // Clear a value
+            media.SetValue("author", "new author");                    // Add a value
+            ServiceContext.MediaService.Save(media);
+
+            // re-get
+            media = ServiceContext.MediaService.GetById(media.Id);
+            Assert.AreEqual("another title of mine", media.GetValue("title"));
+            Assert.IsNull(media.GetValue("bodyText"));
+            Assert.AreEqual("new author", media.GetValue("author"));
+        }
+
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
@@ -184,7 +208,7 @@ namespace Umbraco.Tests.Services
         public void Can_Get_Media_With_Crop_By_Path()
         {
             var mediaService = ServiceContext.MediaService;
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType = MockedContentTypes.CreateImageMediaTypeWithCrop("Image2");
             ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);

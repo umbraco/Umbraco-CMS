@@ -50,6 +50,13 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
+        /// Gets the data value reference factory collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DataValueReferenceFactoryCollectionBuilder DataValueReferenceFactories(this Composition composition)
+            => composition.WithCollectionBuilder<DataValueReferenceFactoryCollectionBuilder>();
+
+        /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -57,7 +64,7 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url segment providers collection builder.
+        /// Gets the URL segment providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)

@@ -286,7 +286,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => throw new WontImplementException();
+        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected override void PersistNewItem(IUserGroup entity)
         {
@@ -370,35 +370,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             protected override UserGroupWithUsers PerformGet(int id)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[] ids)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<UserGroupWithUsers> PerformGetByQuery(IQuery<UserGroupWithUsers> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
-            protected override Guid NodeObjectTypeId => throw new WontImplementException();
+            protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
             #endregion
 

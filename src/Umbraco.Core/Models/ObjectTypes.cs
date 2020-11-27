@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static UmbracoObjectTypes GetUmbracoObjectType(string name)
         {
-            return (UmbracoObjectTypes) Enum.Parse(typeof (UmbracoObjectTypes), name, false);
+            return (UmbracoObjectTypes) Enum.Parse(typeof (UmbracoObjectTypes), name, true);
         }
 
         #region Guid object type utilities

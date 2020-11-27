@@ -21,7 +21,7 @@ angular.module("umbraco.directives")
 
             var totalOffset = 0;
             var offsety = parseInt(attrs.autoScale, 10);
-            var window = angular.element($window);
+            var window = $($window);
             if (offsety !== undefined) {
                 totalOffset += offsety;
             }
@@ -34,7 +34,7 @@ angular.module("umbraco.directives")
                 el.height(window.height() - (el.offset().top + totalOffset));
             }
 
-            var resizeCallback = function() {
+            var resizeCallback = function () {
                 setElementSize();
             };
 

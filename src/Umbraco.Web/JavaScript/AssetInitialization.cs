@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using ClientDependency.Core;
 using ClientDependency.Core.Config;
+using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
@@ -35,7 +36,7 @@ namespace Umbraco.Web.JavaScript
             var requestUrl = httpContext.Request.Url;
             if (requestUrl == null) throw new ArgumentException("HttpContext.Request.Url is null.", nameof(httpContext));
 
-            var dependencies = assets.Select(x =>
+            var dependencies = assets.Where(x => x.IsNullOrWhiteSpace() == false).Select(x =>
             {
                 // most declarations with be made relative to the /umbraco folder, so things
                 // like lib/blah/blah.js so we need to turn them into absolutes here

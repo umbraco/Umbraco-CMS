@@ -79,9 +79,12 @@ namespace Umbraco.Core.Composing
                 foreach (var type in types)
                     EnsureType(type, "register");
 
-                // register them
+                // register them - ensuring that each item is registered with the same lifetime as the collection.
+                // NOTE: Previously each one was not registered with the same lifetime which would mean that if there
+                // was a dependency on an individual item, it would resolve a brand new transient instance which isn't what
+                // we would expect to happen. The same item should be resolved from the container as the collection.
                 foreach (var type in types)
-                    register.Register(type);
+                    register.Register(type, CollectionLifetime);
 
                 _registeredTypes = types;
             }
