@@ -26,11 +26,6 @@ namespace Umbraco.Web.BackOffice.Security
             _loginProviderOptions = loginProviderOptions;
         }
 
-        public string SchemeForBackOffice(string scheme)
-        {
-            return Constants.Security.BackOfficeExternalAuthenticationTypePrefix + scheme;
-        }
-
         /// <summary>
         /// Overridden to track the final authenticationScheme being registered for the external login
         /// </summary>
@@ -41,11 +36,11 @@ namespace Umbraco.Web.BackOffice.Security
         /// <param name="configureOptions"></param>
         /// <returns></returns>
         public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string displayName, Action<TOptions> configureOptions)
-        {            
-            // Validate that the prefix is set
+        {
+            //Ensure the prefix is set
             if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
             {
-                throw new InvalidOperationException($"The {nameof(authenticationScheme)} is not prefixed with {Constants.Security.BackOfficeExternalAuthenticationTypePrefix}. The scheme must be created with a call to the method {nameof(SchemeForBackOffice)}");
+                authenticationScheme = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + authenticationScheme;
             }
 
             // add our login provider to the container along with a custom options configuration
