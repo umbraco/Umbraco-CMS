@@ -9,10 +9,18 @@
     }
 }
 
+.umb-media-entry-editor__pane {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
 .umb-media-entry-editor__crops {
     background-color: white;
-
+    
     display: flex;
+    flex-direction: column;
 
     > button {
         display: flex;
@@ -75,4 +83,8 @@
             line-height: 1em;
         }
     }
+}
+
+.umb-media-entry-editor__imagecropper {
+    flex: auto;
 }
