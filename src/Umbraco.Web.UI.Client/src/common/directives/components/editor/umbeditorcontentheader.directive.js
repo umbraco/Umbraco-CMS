@@ -220,6 +220,7 @@
                 nameDisabled: "<?",
                 menu: "=",
                 hideActionsMenu: "<?",
+                disableActionsMenu: "<?",
                 content: "=",
                 editor: "=",
                 hideChangeVariant: "<?",

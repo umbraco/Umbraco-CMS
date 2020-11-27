@@ -20,7 +20,7 @@
                         <div class="umb-forms-settings form-horizontal">
 
                             <p>
-                                <localize key="grid_addGridLayoutDetail"/>
+                                <localize key="grid_addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</localize>
                             </p>
 
                             <umb-control-group label="@general_name">
@@ -108,27 +108,27 @@
                                                                       on-change="selectRow(currentSection, row)">
                                                         </umb-checkbox>
 
-                                                        <div
+                                                        <button
                                                             ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
-                                                            class="flex flex-auto cursor-pointer">
+                                                            class="btn-reset flex flex-auto">
 
-                                                            <div class="preview-rows columns" style="margin-top: auto;">
-                                                                <div class="preview-row">
-                                                                    <div class="preview-col"
+                                                            <span class="preview-rows columns" style="margin-top: auto;">
+                                                                <span class="preview-row">
+                                                                    <span class="preview-col"
                                                                          ng-class="{last:$last}"
                                                                          ng-repeat="area in row.areas"
                                                                          ng-style="{width: percentage(area.grid) + '%'}">
 
-                                                                        <div class="preview-cell"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                                        <span class="preview-cell"></span>
+                                                                    </span>
+                                                                </span>
+                                                            </span>
 
-                                                            <div>
+                                                            <span>
                                                                 {{row.name}}<br/>
                                                                 <small>{{row.areas.length}} cells</small>
-                                                            </div>
-                                                        </div>
+                                                            </span>
+                                                        </button>
 
                                                     </div>
 

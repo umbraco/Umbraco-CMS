@@ -17,17 +17,16 @@
                 <umb-box-content>
 
                     <div class="umb-control-group">
-                        <div class="form-search">
-                            <i class="icon-search"></i>
-                            <input type="text"
-                                   style="width: 100%"
-                                   ng-model="searchTerm"
-                                   class="umb-search-field search-query input-block-level"
-                                   localize="placeholder"
-                                   placeholder="@placeholders_filter"
-                                   umb-auto-focus
-                                   no-dirty-check />
-                        </div>
+
+                        <umb-search-filter
+                            input-id="composition-search"
+                            model="searchTerm"
+                            label-key="placeholders_filter"
+                            text="Type to filter..."
+                            css-class="w-100"
+                            auto-focus="true">
+                        </umb-search-filter>
+
                     </div>
 
                     <div class="umb-control-group">
@@ -113,7 +112,7 @@
         </umb-editor-footer>
 
         </form>
-        
+
     </umb-editor-view>
 
 </div>
