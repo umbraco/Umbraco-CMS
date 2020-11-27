@@ -50,7 +50,7 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
                 return true;
             }
             else {
-                return x.properties.AutoLinkOptions.AllowManualLinking;
+                return x.properties.ExternalSignInAutoLinkOptions.AllowManualLinking;
             }
         });        
         return providers;

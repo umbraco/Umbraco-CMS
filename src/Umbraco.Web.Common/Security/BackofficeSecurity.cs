@@ -13,7 +13,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Security
 {
-    // TODO: This is only for the back office, does it need to be in common?
 
     public class BackOfficeSecurity : IBackOfficeSecurity
     {
@@ -50,6 +49,18 @@ namespace Umbraco.Web.Common.Security
 
                 return _currentUser;
             }
+        }
+
+        /// <inheritdoc />
+        public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
+        {
+            // check for secure connection
+            if (_globalSettings.UseHttps && !_httpContextAccessor.GetRequiredHttpContext().Request.IsHttps)
+            {
+                if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+                return ValidateRequestAttempt.FailedNoSsl;
+            }
+            return ValidateCurrentUser(throwExceptions);
         }
 
         /// <inheritdoc />
@@ -94,7 +105,6 @@ namespace Umbraco.Web.Common.Security
 
             var user = CurrentUser;
 
-            // TODO: All of this is done as part of identity/backofficesigninmanager
             // Check for console access
             if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor, _globalSettings, _hostingEnvironment)))
             {
