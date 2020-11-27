@@ -9,6 +9,7 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Templates;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         Group = Constants.PropertyEditors.Groups.RichContent)]
     public class GridPropertyEditor : DataEditor
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IIOHelper _ioHelper;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly RichTextEditorPastedImages _pastedImages;
@@ -37,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
 
         public GridPropertyEditor(
             ILoggerFactory loggerFactory,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
@@ -49,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             IImageUrlGenerator imageUrlGenerator)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _ioHelper = ioHelper;
             _imageSourceParser = imageSourceParser;
             _pastedImages = pastedImages;
@@ -63,13 +64,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
         internal class GridPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
@@ -78,7 +79,7 @@ namespace Umbraco.Web.PropertyEditors
 
             public GridPropertyValueEditor(
                 DataEditorAttribute attribute,
-                IUmbracoContextAccessor umbracoContextAccessor,
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
                 IDataTypeService dataTypeService,
                 ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
@@ -89,10 +90,10 @@ namespace Umbraco.Web.PropertyEditors
                 IImageUrlGenerator imageUrlGenerator)
                 : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
             {
-                _umbracoContextAccessor = umbracoContextAccessor;
+                _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator);
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, backOfficeSecurityAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator);
                 _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute);
                 _imageUrlGenerator = imageUrlGenerator;
             }
@@ -121,7 +122,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var grid = DeserializeGridValue(rawJson, out var rtes, out _);
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+                var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
                 // Process the rte values
                 foreach (var rte in rtes)

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
@@ -62,12 +63,12 @@ namespace Umbraco.Web.Compose
             };
         }
 
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.SetDatabaseServerMessengerCallbacks(GetCallbacks);
-            composition.SetServerMessenger<BatchedDatabaseServerMessenger>();
+            builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
+            builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
         }
     }
 

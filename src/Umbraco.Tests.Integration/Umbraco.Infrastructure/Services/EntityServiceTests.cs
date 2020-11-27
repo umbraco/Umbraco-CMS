@@ -9,10 +9,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -42,7 +44,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
 
             //This is super nasty, but this lets us initialize the cache while it is empty.
-            _ = GetRequiredService<IPublishedSnapshotService>();
+            var publishedSnapshotService = GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;
+            publishedSnapshotService?.OnApplicationInit(null, EventArgs.Empty);
 
             if (_langFr == null && _langEs == null)
             {

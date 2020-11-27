@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Cache
@@ -9,11 +10,11 @@ namespace Umbraco.Web.Cache
     [ComposeBefore(typeof(ICoreComposer))] // runs before every other IUmbracoCoreComponent!
     public sealed class DistributedCacheBinderComposer : ComponentComposer<DistributedCacheBinderComponent>, ICoreComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
+            builder.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
         }
     }
 }

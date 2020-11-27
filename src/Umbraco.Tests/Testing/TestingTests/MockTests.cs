@@ -19,6 +19,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Templates;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -63,11 +64,11 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Helper()
         {
             // unless we can inject them in MembershipHelper, we need need this
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IUserService>());
-            Composition.Services.AddTransient(_ => AppCaches.Disabled);
-            Composition.Services.AddTransient<ServiceContext>();
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IUserService>());
+            Builder.Services.AddTransient(_ => AppCaches.Disabled);
+            Builder.Services.AddTransient<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
@@ -113,7 +114,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, NullLoggerFactory.Instance, ShortStringHelper, Mock.Of<IEntityService>());
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
 
-            var umbracoApiController = new FakeUmbracoApiController(new GlobalSettings(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, profilingLogger , Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
+            var umbracoApiController = new FakeUmbracoApiController(new GlobalSettings(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<IBackOfficeSecurityAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, profilingLogger , Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
 
             Assert.Pass();
         }
@@ -121,7 +122,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
     internal class FakeUmbracoApiController : UmbracoApiController
     {
-        public FakeUmbracoApiController(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider) { }
+        public FakeUmbracoApiController(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, backOfficeSecurityAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider) { }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
@@ -10,12 +11,12 @@ namespace Umbraco.Infrastructure.Logging.Serilog
 {
     public class SerilogComposer : ICoreComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<ThreadAbortExceptionEnricher>();
-            composition.Services.AddUnique<HttpSessionIdEnricher>();
-            composition.Services.AddUnique<HttpRequestNumberEnricher>();
-            composition.Services.AddUnique<HttpRequestIdEnricher>();
+            builder.Services.AddUnique<ThreadAbortExceptionEnricher>();
+            builder.Services.AddUnique<HttpSessionIdEnricher>();
+            builder.Services.AddUnique<HttpRequestNumberEnricher>();
+            builder.Services.AddUnique<HttpRequestIdEnricher>();
         }
     }    
 }

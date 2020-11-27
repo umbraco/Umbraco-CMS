@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Common.Middleware;
 
@@ -9,9 +10,9 @@ namespace Umbraco.Web.Common.Runtime
     /// </summary>
     public class AspNetCoreBootFailedComposer : IComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<BootFailedMiddleware>();
+            builder.Services.AddUnique<BootFailedMiddleware>();
         }
     }
 }

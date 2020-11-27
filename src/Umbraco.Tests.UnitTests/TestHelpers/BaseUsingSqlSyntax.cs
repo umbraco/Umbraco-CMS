@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
@@ -11,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.UnitTests.TestHelpers;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -32,7 +34,8 @@ namespace Umbraco.Tests.TestHelpers
             var container = TestHelper.GetServiceCollection();
             var typeLoader = TestHelper.GetMockedTypeLoader();
 
-            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
+    
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();

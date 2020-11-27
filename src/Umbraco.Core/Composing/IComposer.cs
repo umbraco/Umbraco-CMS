@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Composing
+﻿using Umbraco.Core.Builder;
+
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Represents a composer.
@@ -8,6 +10,6 @@
         /// <summary>
         /// Compose.
         /// </summary>
-        void Compose(Composition composition);
+        void Compose(IUmbracoBuilder builder);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Examine
@@ -8,18 +9,18 @@ namespace Umbraco.Examine
     [ComposeAfter(typeof(ICoreComposer))]
     public sealed class ExamineLuceneComposer : ComponentComposer<ExamineLuceneComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if(!isWindows) return;
 
 
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-            composition.Services.AddUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
-            composition.Services.AddUnique<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
-            composition.Services.AddUnique<ILuceneDirectoryFactory, LuceneFileSystemDirectoryFactory>();
+            builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
+            builder.Services.AddUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            builder.Services.AddUnique<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+            builder.Services.AddUnique<ILuceneDirectoryFactory, LuceneFileSystemDirectoryFactory>();
         }
     }
 }

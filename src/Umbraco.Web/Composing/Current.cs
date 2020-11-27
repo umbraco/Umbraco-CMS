@@ -21,6 +21,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -86,6 +87,9 @@ namespace Umbraco.Web.Composing
 
         public static IUmbracoContext UmbracoContext
             => UmbracoContextAccessor.UmbracoContext;
+
+        public static IBackOfficeSecurityAccessor BackOfficeSecurityAccessor
+            => Factory.GetRequiredService<IBackOfficeSecurityAccessor>();
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetRequiredService<UmbracoHelper>();

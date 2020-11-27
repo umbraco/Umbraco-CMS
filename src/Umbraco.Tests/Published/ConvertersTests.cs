@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -20,6 +21,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Common.Builder;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
@@ -35,14 +37,7 @@ namespace Umbraco.Tests.Published
            // Current.Reset();
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(
-                register,
-                TestHelper.GetMockedTypeLoader(),
-                Mock.Of<IProfilingLogger>(),
-                Mock.Of<IRuntimeState>(),
-                Mock.Of<IIOHelper>(),
-                AppCaches.NoCache
-            );
+            var composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()

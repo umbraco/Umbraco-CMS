@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Mapping;
 
@@ -11,13 +12,13 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <summary>
         /// Registers the core Umbraco mapper definitions
         /// </summary>
-        /// <param name="composition"></param>
+        /// <param name="builder"></param>
         /// <returns></returns>
-        public static Composition ComposeCoreMappingProfiles(this Composition composition)
+        public static IUmbracoBuilder ComposeCoreMappingProfiles(this IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<UmbracoMapper>();
+            builder.Services.AddUnique<UmbracoMapper>();
 
-            composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
+            builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<IdentityMapDefinition>()
                 .Add<AuditMapDefinition>()
                 .Add<CodeFileMapDefinition>()
@@ -37,10 +38,10 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<IdentityMapDefinition>()
                ;
 
-            composition.Services.AddTransient<CommonMapper>();
-            composition.Services.AddTransient<MemberTabsAndPropertiesMapper>();
+            builder.Services.AddTransient<CommonMapper>();
+            builder.Services.AddTransient<MemberTabsAndPropertiesMapper>();
 
-            return composition;
+            return builder;
         }
     }
 }

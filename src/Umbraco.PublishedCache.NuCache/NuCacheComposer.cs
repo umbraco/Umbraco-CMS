@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -11,21 +12,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     public class NuCacheComposer : ComponentComposer<NuCacheComponent>, IPublishedCacheComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
             // register the NuCache database data source
-            composition.Services.AddTransient<IDataSource, DatabaseDataSource>();
+            builder.Services.AddTransient<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
-            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions());
-            composition.SetPublishedSnapshotService<PublishedSnapshotService>();
+            builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions());
+            builder.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // replace this service since we want to improve the content/media
             // mapping lookups if we are using nucache.
-            composition.Services.AddUnique<IIdKeyMap>(factory =>
+            builder.Services.AddUnique<IIdKeyMap>(factory =>
             {
                 var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>());
                 var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;
