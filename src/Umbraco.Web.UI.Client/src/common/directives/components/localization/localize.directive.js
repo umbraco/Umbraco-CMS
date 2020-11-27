@@ -30,7 +30,7 @@ angular.module("umbraco.directives")
     .directive('localize', function ($log, localizationService) {
         return {
             restrict: 'E',
-            scope:{
+            scope: {
                 key: '@',
                 tokens: '=',
                 watchTokens: '@'
@@ -40,13 +40,13 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs) {
                 var key = scope.key;
                 scope.text = "";
-                
+
                 // A render function to be able to update tokens as values update.
                 function render() {
                     element.html(localizationService.tokenReplace(scope.text, scope.tokens || null));
                 }
-                
-                localizationService.localize(key).then(function(value){
+
+                localizationService.localize(key).then(function (value) {
                     scope.text = value;
                     render();
                 });
@@ -64,19 +64,19 @@ angular.module("umbraco.directives")
                 //Support one or more attribute properties to update
                 var keys = attrs.localize.split(',');
 
-                angular.forEach(keys, function(value, key){
+                Utilities.forEach(keys, (value, key) => {
                     var attr = element.attr(value);
 
-                    if(attr){
-                        if(attr[0] === '@'){
+                    if (attr) {
+                        if (attr[0] === '@') {
                             //If the translation key starts with @ then remove it
                             attr = attr.substring(1);
                         }
 
                         var t = localizationService.tokenize(attr, scope);
-                        
-                        localizationService.localize(t.key, t.tokens).then(function(val){
-                                element.attr(value, val);
+
+                        localizationService.localize(t.key, t.tokens).then(function (val) {
+                            element.attr(value, val);
                         });
                     }
                 });

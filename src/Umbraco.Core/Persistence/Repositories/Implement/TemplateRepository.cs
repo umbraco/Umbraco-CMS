@@ -215,7 +215,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //Save updated entity to db
 
             template.UpdateDate = DateTime.Now;
-            ;
             var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
 
             Database.Update(dto.NodeDto);

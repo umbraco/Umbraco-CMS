@@ -14,6 +14,17 @@
     pointer-events: none;
 }
 
+.umb-nested-content--mandatory {
+    /*
+        yeah so this is a pain, but we must be super specific in targeting the mandatory property labels,
+        otherwise all properties within a reqired, nested, nested content property will all appear mandatory
+    */
+    .umb-property > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
+        content: '*';
+        color: @red;
+    }
+}
+
 .umb-nested-content-overlay {
     position: absolute;
     top: 0;
@@ -27,14 +38,20 @@
     position: relative;
     text-align: left;
     background: @white;
+    border: 1px solid @gray-9;
+    border-radius: @baseBorderRadius;
+    transition: border-color 120ms;
+    margin-bottom: 4px;
+    margin-top: 4px;
+
+    &.--error {
+        border-color: @formErrorBorder !important;
+    }
 }
 
 .umb-nested-content__item.ui-sortable-placeholder {
-    background: @gray-10;
-    border: 1px solid @gray-9;
+    margin-top: 1px;
     visibility: visible !important;
-    height: 55px;
-    margin-top: -1px;
 }
 
 .umb-nested-content__item--single > .umb-nested-content__content {
@@ -46,7 +63,7 @@
 }
 
 .umb-nested-content__header-bar {
-    border-bottom: 1px solid @gray-9;
+    
     cursor: pointer;
     background-color: @white;
 
@@ -67,18 +84,17 @@
 .umb-nested-content__heading {
     line-height: 20px;
     position: relative;
-    margin-top:1px;
     padding: 15px 5px;
     color:@ui-option-type;
-    border-radius: 3px 3px 0 0;
-    
+
     &:hover {
         color:@ui-option-type-hover;
     }
 
-    i {
+    .umb-nested-content__item-icon {
         position: absolute;
-        margin-top: -1px;
+        margin-top: -3px;
+        font-size: 22px;
     }
 
     .umb-nested-content__item-name {
@@ -93,7 +109,7 @@
             padding-left: 30px;
         }
     }
-    
+
 }
 
 .umb-nested-content__icons {
@@ -101,7 +117,7 @@
     transition: opacity 120ms ease-in-out;
     position: absolute;
     right: 0;
-    top: 3px;
+    top: 5px;
     padding: 5px;
     background-color: @white;
 }
@@ -127,6 +143,8 @@
 
 
 .umb-nested-content__header-bar:hover .umb-nested-content__icons,
+.umb-nested-content__header-bar:focus .umb-nested-content__icons,
+.umb-nested-content__header-bar:focus-within .umb-nested-content__icons,
 .umb-nested-content__item--active > .umb-nested-content__header-bar .umb-nested-content__icons {
     opacity: 1;
 }
@@ -134,6 +152,8 @@
 
 
 .umb-nested-content__icon {
+    background: transparent;
+    border: 0 none;
     display: inline-block;
     padding: 4px;
     margin: 2px;
@@ -148,7 +168,7 @@
 
 .umb-nested-content__icon .icon {
     display: block;
-    font-size: 16px !important;
+    font-size: 18px !important;
 }
 
 .umb-nested-content__icon--disabled {
@@ -189,15 +209,15 @@
 .umb-nested-content__add-content.--disabled:hover {
     color: @gray-7;
     border-color: @gray-7;
-    cursor: default;
+    cursor: not-allowed;
 }
 
 
 .umb-nested-content__content {
     border-top: 1px solid transparent;
-    border-bottom: 1px solid @gray-9;
-    border-left: 1px solid @gray-9;
-    border-right: 1px solid @gray-9;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
     border-radius: 0 0 3px 3px;
 }
 
@@ -213,19 +233,19 @@
     display: none !important;
 }
 
-.umb-nested-content__doctypepicker table input, 
+.umb-nested-content__doctypepicker table input,
 .umb-nested-content__doctypepicker table select {
     width: 100%;
     padding-right: 0;
 }
 
-.umb-nested-content__doctypepicker table td.icon-navigation, 
+.umb-nested-content__doctypepicker table td.icon-navigation,
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon {
     vertical-align: middle;
     color: @gray-7;
 }
 
-.umb-nested-content__doctypepicker table td.icon-navigation:hover, 
+.umb-nested-content__doctypepicker table td.icon-navigation:hover,
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon:hover {
     color: @gray-2;
 }
@@ -235,43 +255,27 @@
 }
 
 .umb-nested-content__placeholder {
-    height: 22px;
-    padding: 4px 6px;    
-    border: 1px dashed #d8d7d9;
+    padding: 4px 6px;
+    border: 1px dashed @gray-8;
     background: 0 0;
     cursor: pointer;
-    color: #1b264f;    
+    color: @blueExtraDark;
     -webkit-animation: fadeIn .5s;
     animation: fadeIn .5s;
     text-align: center;
 
     &--selected {
-        border: 1px solid #d8d7d9;
+        border: none;
         text-align: left;
+        padding: 0;
     }
 }
 
-.umb-nested-content__placeholder-name{
-    font-size: 15px;
-}
-
 .umb-nested-content__placeholder:hover {
-    color: #2152a3;
-    border-color: #2152a3;
+    color: @blueMid;
+    border-color: @blueMid;
     text-decoration: none;
 }
-
-.umb-nested-content__placeholder-icon-holder {    
-    width: 20px;
-    text-align: center;
-    display: inline-block;
-}
-
-.umb-nested-content__placeholder-icon {
-    font-size: 18px;
-    vertical-align: middle;
-}
-
 
 .form-horizontal .umb-nested-content--narrow .controls-row {
     margin-left: 40% !important;
@@ -291,7 +295,7 @@
 // the attribute selector ensures the change only applies to the linkpicker overlay
 .form-horizontal .umb-nested-content--narrow [ng-controller*="Umbraco.Overlays.LinkPickerController"] .controls-row {
     margin-left:0!important;
-    
+
     .umb-textarea, .umb-textstring {
         width:100%;
     }

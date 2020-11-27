@@ -13,7 +13,8 @@ Use this directive to generate a list of breadcrumbs.
         <umb-breadcrumbs
             ng-if="vm.ancestors && vm.ancestors.length > 0"
             ancestors="vm.ancestors"
-            entity-type="content">
+            entity-type="content"
+            on-open="clickBreadcrumb(ancestor)">
         </umb-breadcrumbs>
     </div>
 </pre>
@@ -32,6 +33,9 @@ Use this directive to generate a list of breadcrumbs.
                 vm.ancestors = ancestors;
             });
 
+            $scope.clickBreadcrumb = function(ancestor) {
+                // manipulate breadcrumb display
+            }
         }
 
         angular.module("umbraco").controller("My.Controller", Controller);
@@ -40,7 +44,7 @@ Use this directive to generate a list of breadcrumbs.
 
 @param {array} ancestors Array of ancestors
 @param {string} entityType The content entity type (member, media, content).
-@param {callback} Callback when an ancestor is clicked. It will override the default link behaviour.
+@param {callback=} onOpen Function callback when an ancestor is clicked. This will override the default link behaviour.
 **/
 
 (function () {
@@ -73,7 +77,7 @@ Use this directive to generate a list of breadcrumbs.
 
                 var path = scope.pathTo(ancestor);
                 $location.path(path);
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
             }
 
             scope.pathTo = function (ancestor) {

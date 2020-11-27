@@ -10,7 +10,11 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     
     var evts = [];
     var vm = this;
-    
+
+    vm.header = {};
+    vm.header.editorfor = "visuallyHiddenTexts_newDataType";
+    vm.header.setPageTitle = true;
+
     //setup scope vars
     vm.page = {};
     vm.page.loading = false;
@@ -124,6 +128,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
 
                 }, function(err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     //NOTE: in the case of data type values we are setting the orig/new props
                     // to be the same thing since that only really matters for content/media.
                     contentEditingHelper.handleSaveError({

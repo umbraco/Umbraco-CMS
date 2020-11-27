@@ -1,6 +1,10 @@
 // Listview
 // -------------------------
 
+.umb-listview {
+    min-height: 100px;
+}
+
 .umb-listview table {
 	border: 1px solid @gray-8;
 }
@@ -28,7 +32,10 @@
             position: absolute;
             padding: 5px 8px;
             pointer-events: none;
-            top: 2px;
+
+            &i {
+                top: 2px;
+            }
         }
 
         input[type="text"] {
@@ -43,6 +50,15 @@
     /* add padding */
     .left-addon input[type="text"]  { padding-left: 30px !important; padding-right: 6px; }
     .right-addon input[type="text"] { padding-right: 30px; padding-left: 6px !important; }
+
+    &__label-icon{
+        width: 30px; 
+        height: 30px; 
+        position: absolute; 
+        top: -1px; 
+        left:0; 
+        margin:0
+      }
 }
 
 .umb-listview table form {
@@ -136,7 +152,36 @@
 /* TEMP */
 
 .umb-minilistview {
-    .umb-table-row.not-allowed { opacity: 0.6; cursor: not-allowed; }
+    .umb-table-row.not-allowed {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    div.umb-mini-list-view__breadcrumb {
+        margin-bottom: 10px;
+    }
+
+    div.no-display {
+        display: none
+    }
+
+    div.umb-table-cell-padding {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    div.umb-table-cell .form-search {
+        width: 100%;
+        margin-right: 0;
+
+        input {
+            width: 100%;
+        }
+
+        .icon-search {
+            font-size: 14px;
+        }
+    }
 }
 
 .umb-listview .table-striped tbody td {
@@ -214,20 +259,21 @@
    margin-right: 15px;
 }
 
+.list-view-layout__icon-wrapper {
+    margin-right: 10px;
+}
+
 .list-view-layout__icon {
    font-size: 18px;
-   margin-right: 10px;
    vertical-align: middle;
    border: 1px solid @gray-8;
    background: @white;
-   padding: 6px 8px;
-   display: block;
-}
-
-.list-view-layout__icon:hover,
-.list-view-layout__icon:focus,
-.list-view-layout__icon:active {
-   text-decoration: none;
+   padding: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 30px;
+   height: 30px;
 }
 
 .list-view-layout__remove {
@@ -236,20 +282,9 @@
 }
 
 .list-view-add-layout {
-   width:100%; 
-   background:0 0;
-   margin-top: 10px;
-   color: @ui-action-discreet-type;
-   border: 1px dashed @ui-action-discreet-border;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   padding: 5px 0;
-   box-sizing: border-box;
+    &:extend(.umb-node-preview-add);
 }
 
 .list-view-add-layout:hover {
-   text-decoration: none;
-   color: @ui-action-discreet-type-hover;
-   border-color: @ui-action-discreet-border-hover;
+    &:extend(.umb-node-preview-add:hover);
 }

@@ -16,7 +16,6 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -506,7 +505,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Corrects the property type variations for the given entity
         /// to make sure the property type variation is compatible with the
-        /// variation set on the entity itself.        
+        /// variation set on the entity itself.
         /// </summary>
         /// <param name="entity">Entity to correct properties for</param>
         private void CorrectPropertyTypeVariations(IContentTypeComposition entity)
@@ -754,7 +753,7 @@ AND umbracoNode.id <> @id",
                 //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
 
                 //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
-                // if we want these SQL statements back, look into GIT history    
+                // if we want these SQL statements back, look into GIT history
             }
         }
 
@@ -1033,7 +1032,7 @@ AND umbracoNode.id <> @id",
 
             //keep track of this node/lang to mark or unmark a culture as edited
             var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
-            //keep track of which node to mark or unmark as edited 
+            //keep track of which node to mark or unmark as edited
             var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
@@ -1185,7 +1184,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1310,18 +1309,31 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             return test;
         }
 
-        /// <summary>
-        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
-        /// </summary>
-        /// <param name="contentPath"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse);
+            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            return HasContainerInPath(ids);
+        }
+
+        /// <inheritdoc />
+        public bool HasContainerInPath(params int[] ids)
+        {
             var sql = new Sql($@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
 WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        public bool HasContentNodes(int id)
+        {
+            var sql = new Sql(
+                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
+                new { id });
+            return Database.ExecuteScalar<int>(sql) == 1;
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

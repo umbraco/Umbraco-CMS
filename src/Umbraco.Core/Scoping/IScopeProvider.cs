@@ -13,7 +13,7 @@ namespace Umbraco.Core.Scoping
     /// Provides scopes.
     /// </summary>
     public interface IScopeProvider
-    {
+    {    
         /// <summary>
         /// Creates an ambient scope.
         /// </summary>

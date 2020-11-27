@@ -32,14 +32,18 @@
 .umb-lightbox__close {
     position: absolute;
     top: 20px;
-    right: 60px;
+    right: 20px;
+    height: 40px;
+    width: 40px;
 }
 
 .umb-lightbox__close i {
     font-size: 20px;
-    cursor: pointer;
-    height: 40px;
-    width: 40px;
+    height: inherit;
+    width: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .umb-lightbox__images {
@@ -75,12 +79,20 @@
     right: 20px;
     top: 50%;
     transform: translate(0, -50%);
+
+    .umb-lightbox__control-icon {
+        margin-right: -4px;
+    }
 }
 
 .umb-lightbox__control.-prev {
     left: 20px;
     top: 50%;
     transform: translate(0, -50%);
+
+    .umb-lightbox__control-icon {
+        margin-left: -4px;
+    }
 }
 
 .umb-lightbox__control-icon {

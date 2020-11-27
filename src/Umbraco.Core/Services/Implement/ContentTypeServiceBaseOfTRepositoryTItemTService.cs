@@ -321,6 +321,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContainerInPath(params int[] ids)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // can use same repo for both content and media
+                return Repository.HasContainerInPath(ids);
+            }
+        }
+
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -369,6 +378,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Count(Query<TItem>());
+            }
+        }
+
+        public bool HasContentNodes(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(ReadLockIds);
+                return Repository.HasContentNodes(id);
             }
         }
 
@@ -493,6 +511,16 @@ namespace Umbraco.Core.Services.Implement
 
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
+                
+                // Next find all other document types that have a reference to this content type
+                var referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
+                foreach (var reference in referenceToAllowedContentTypes)
+                {                                        
+                    reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);                   
+                    var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
+                    // Fire change event
+                    OnChanged(scope, changedRef.ToEventArgs());                  
+                }
 
                 // finally delete the content type
                 // - recursively deletes all descendants
@@ -500,7 +528,7 @@ namespace Umbraco.Core.Services.Implement
                 //  (contents of any descendant type have been deleted but
                 //   contents of any composed (impacted) type remain but
                 //   need to have their property data cleared)
-                Repository.Delete(item);
+                Repository.Delete(item);                               
 
                 //...
                 var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))

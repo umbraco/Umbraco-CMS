@@ -80,6 +80,21 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            //Find any characters between the last . and the start of a query string or the end of the string
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
+        }
+
+        /// <summary>
         /// Based on the input string, this will detect if the string is a JS path or a JS snippet.
         /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
         /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
@@ -91,7 +106,7 @@ namespace Umbraco.Core
         /// </remarks>
         internal static Attempt<string> DetectIsJavaScriptPath(this string input)
         {
-            //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+            //validate that this is a URL, if it is not, we'll assume that it is a text block and render it as a text
             //block instead.
             var isValid = true;
 
@@ -99,7 +114,7 @@ namespace Umbraco.Core
             {
                 //ok it validates, but so does alert('hello'); ! so we need to do more checks
 
-                //here are the valid chars in a url without escaping
+                //here are the valid chars in a URL without escaping
                 if (Regex.IsMatch(input, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
                     isValid = false;
 
@@ -841,7 +856,7 @@ namespace Umbraco.Core
             var pos = str.IndexOf('=');
             if (pos < 0) pos = str.Length;
 
-            // replace chars that would cause problems in urls
+            // replace chars that would cause problems in URLs
             var chArray = new char[pos];
             for (var i = 0; i < pos; i++)
             {
@@ -1080,13 +1095,13 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
-        // the new methods to get a url segment
+        // the new methods to get a URL segment
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// Cleans a string to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -1096,11 +1111,11 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -1109,7 +1124,7 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
-        // the new methods to clean a string (to alias, url segment...)
+        // the new methods to clean a string (to alias, URL segment...)
 
         /// <summary>
         /// Cleans a string.
@@ -1190,7 +1205,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe filename.</returns>
@@ -1201,7 +1216,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>

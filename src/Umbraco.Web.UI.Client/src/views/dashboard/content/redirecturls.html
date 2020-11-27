@@ -30,18 +30,16 @@
 
             <umb-editor-sub-header-section ng-if="vm.dashboard.urlTrackerDisabled === false">
 
-                <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
+                <ng-form novalidate>
                     <div class="inner-addon left-addon">
-                        <i class="icon icon-search"></i>
-                        <input
-                            class="form-control search-input"
-                            type="text"
-                            localize="placeholder"
-                            placeholder="@general_typeToSearch"
-                            ng-model="vm.dashboard.searchTerm"
-                            ng-change="vm.filter()"
-                            prevent-enter-submit
-                            no-dirty-check>
+                        <umb-search-filter
+                            input-id="redirect-search"
+                            model="vm.dashboard.searchTerm"
+                            label-key="general_typeToSearch"
+                            text="Type to search"
+                            on-change="vm.filter()"
+                            prevent-submit-on-enter="true">
+                        </umb-search-filter>
                     </div>
                 </ng-form>
 

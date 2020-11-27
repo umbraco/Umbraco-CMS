@@ -32,7 +32,7 @@ function fixNumber($parse) {
 
             //always try to format the model value as an int
             ctrl.$formatters.push(function (value) {
-                if (angular.isString(value)) {
+                if (Utilities.isString(value)) {
                     return parseFloat(value, 10);
                 }
                 return value;

@@ -254,6 +254,13 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        // explicit implementation because we don't need it now but due to the way that the members membership provider is put together
+        // this method must exist in this service as an implementation (legacy)
+        void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date)
+        {
+            throw new NotSupportedException("This method is not implemented or supported for users");
+        }
+
         /// <summary>
         /// Saves an <see cref="IUser"/>
         /// </summary>
@@ -372,7 +379,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            return "writer";
+            return Constants.Security.WriterGroupAlias;
         }
 
         /// <summary>
@@ -1197,12 +1204,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
 
         /// <summary>
         /// Occurs before Delete

@@ -294,15 +294,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 stylesheet = repository.Get("missing.css");
                 Assert.IsNull(stylesheet);
 
-                // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<UnauthorizedAccessException>(() =>
-                {
-                    stylesheet = repository.Get("\\test-path-4.css"); // outside the filesystem, does not exist
-                });
-                Assert.Throws<UnauthorizedAccessException>(() =>
-                {
-                    stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists
-                });
+                // #7713 changes behaviour to return null when outside the filesystem
+                // to accomodate changing the CSS path and not flooding the backoffice with errors
+                stylesheet = repository.Get("\\test-path-4.css"); // outside the filesystem, does not exist
+                Assert.IsNull(stylesheet);
+
+                stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists
+                Assert.IsNull(stylesheet);                
             }
         }
 

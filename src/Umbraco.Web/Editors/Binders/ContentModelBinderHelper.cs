@@ -15,9 +15,9 @@ namespace Umbraco.Web.Editors.Binders
     /// <summary>
     /// Helper methods to bind media/member models
     /// </summary>
-    internal class ContentModelBinderHelper
+    internal static class ContentModelBinderHelper
     {
-        public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public static TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
             var result = actionContext.ReadAsMultipart(SystemDirectories.TempFileUploads);
@@ -50,7 +50,19 @@ namespace Umbraco.Web.Editors.Binders
                     }
                 }
 
-                // TODO: anything after 3 parts we can put in metadata
+                //if there are 4 parts part 4 is always segment
+                string segment = null;
+                if (parts.Length > 3)
+                {
+                    segment = parts[3];
+                    //normalize to null if empty
+                    if (segment.IsNullOrWhiteSpace())
+                    {
+                        segment = null;
+                    }
+                }
+
+                // TODO: anything after 4 parts we can put in metadata
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
 
@@ -59,6 +71,7 @@ namespace Umbraco.Web.Editors.Binders
                     TempFilePath = file.LocalFileName,
                     PropertyAlias = propAlias,
                     Culture = culture,
+                    Segment = segment,
                     FileName = fileName
                 });
             }
@@ -73,7 +86,7 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
+        public static void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)

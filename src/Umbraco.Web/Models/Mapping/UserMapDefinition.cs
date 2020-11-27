@@ -380,8 +380,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
         }
 
-        private static string MapContentTypeIcon(EntitySlim entity)
-            => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+        private static string MapContentTypeIcon(IEntitySlim entity)
+            => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, MapperContext context)
         {

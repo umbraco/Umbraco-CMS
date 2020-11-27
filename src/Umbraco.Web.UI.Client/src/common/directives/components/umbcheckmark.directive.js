@@ -10,7 +10,8 @@
             templateUrl: 'views/components/umb-checkmark.html',
             scope: {
                 size: "@?",
-                checked: "="
+                checked: "=",
+                readonly: "@?"
             }
         };
 

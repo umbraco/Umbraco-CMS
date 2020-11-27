@@ -6,11 +6,24 @@ var karmaServer = require('karma').Server;
  * Build tests
  **************************/
 
- // Karma test
+// Karma test
 function testUnit() {
 
     return new karmaServer({
+        configFile: __dirname + "/../../test/config/karma.conf.js"
+    })
+    .start();
+};
+
+// Run karma test server
+function runUnitTestServer() {
+
+    return new karmaServer({
         configFile: __dirname + "/../../test/config/karma.conf.js",
+        autoWatch: true,
+        port: 9999,
+        singleRun: false,
+        browsers: ['ChromeDebugging'],
         keepalive: true
     })
     .start();
@@ -24,4 +37,4 @@ function testE2e() {
     .start();
 };
 
-module.exports = { testUnit: testUnit, testE2e: testE2e };
+module.exports = { testUnit: testUnit, testE2e: testE2e, runUnitTestServer: runUnitTestServer };

@@ -15,7 +15,7 @@
 
             packageResource.getAllCreated().then(createdPackages => {
                 vm.createdPackages = createdPackages;
-            }, angular.noop);
+            }, Utilities.noop);
 
         }
 

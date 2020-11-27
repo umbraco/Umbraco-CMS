@@ -12,26 +12,25 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
             var sectionItemsWidth = [];
             var evts = [];
-            var maxSections = 8;
 
             //setup scope vars
-            scope.maxSections = maxSections;
-            scope.overflowingSections = 0;
             scope.sections = [];
+            scope.visibleSections = 0;
             scope.currentSection = appState.getSectionState("currentSection");
-            scope.showTray = false; //appState.getGlobalState("showTray");
+            scope.showTray = false;
             scope.stickyNavigation = appState.getGlobalState("stickyNavigation");
-            scope.needTray = false;
 
             function loadSections() {
                 sectionService.getSectionsForUser()
                     .then(function (result) {
                         scope.sections = result;
+                        scope.visibleSections = scope.sections.length;
+
                         // store the width of each section so we can hide/show them based on browser width 
                         // we store them because the sections get removed from the dom and then we 
                         // can't tell when to show them gain
                         $timeout(function () {
-                            $("#applications .sections li").each(function (index) {
+                            $("#applications .sections li:not(:last)").each(function (index) {
                                 sectionItemsWidth.push($(this).outerWidth());
                             });
                         });
@@ -42,25 +41,22 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             function calculateWidth() {
                 $timeout(function () {
                     //total width minus room for avatar, search, and help icon
-                    var windowWidth = $(window).width() - 150;
+                    var containerWidth = $(".umb-app-header").outerWidth() - $(".umb-app-header__actions").outerWidth();
+                    var trayToggleWidth = $("#applications .sections li.expand").outerWidth();
                     var sectionsWidth = 0;
-                    scope.totalSections = scope.sections.length;
-                    scope.maxSections = maxSections;
-                    scope.overflowingSections = scope.maxSections - scope.totalSections;
-                    scope.needTray = scope.sections.length > scope.maxSections;
-
+                    
                     // detect how many sections we can show on the screen
                     for (var i = 0; i < sectionItemsWidth.length; i++) {
                         var sectionItemWidth = sectionItemsWidth[i];
                         sectionsWidth += sectionItemWidth;
 
-                        if (sectionsWidth > windowWidth) {
-                            scope.needTray = true;
-                            scope.maxSections = i - 1;
-                            scope.overflowingSections = scope.maxSections - scope.totalSections;
-                            break;
+                        if (sectionsWidth + trayToggleWidth > containerWidth) {
+                            scope.visibleSections =  i;
+                            return;
                         }
                     }
+
+                    scope.visibleSections = scope.sections.length;
                 });
             }
 
@@ -131,6 +127,12 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 } else {
                     navigationService.showTray();
                 }
+            };
+
+            scope.currentSectionInOverflow = function () {
+                var currentSection = scope.sections.filter(s => s.alias === scope.currentSection);
+
+                return currentSection.length > 0 && scope.sections.indexOf(currentSection[0]) > scope.visibleSections - 1;
             };
 
             loadSections();

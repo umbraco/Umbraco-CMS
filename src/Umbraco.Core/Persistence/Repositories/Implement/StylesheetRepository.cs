@@ -25,8 +25,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             path = path.EnsureEndsWith(".css");
 
-            if (FileSystem.FileExists(path) == false)
+            // if the css directory is changed, references to the old path can still exist (ie in RTE config)
+            // these old references will throw an error, which breaks the RTE
+            // try-catch here makes the request fail silently, and allows RTE to load correctly
+            try
+            {
+                if (FileSystem.FileExists(path) == false)
+                    return null;
+            } catch
+            {
                 return null;
+            }
 
             // content will be lazy-loaded when required
             var created = FileSystem.GetCreated(path).UtcDateTime;

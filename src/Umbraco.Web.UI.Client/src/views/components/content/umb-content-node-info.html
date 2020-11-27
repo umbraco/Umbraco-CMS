@@ -5,23 +5,21 @@
         <umb-box ng-if="currentUrls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
-                <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                <ul class="nav nav-stacked mb0">
                     <li ng-repeat="url in currentUrls">
                         <a href="{{url.text}}" target="_blank" ng-if="url.isUrl" class="umb-outline">
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
                             <span>{{url.text}}</span>
                         </a>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
-
-                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
+                            <span ng-if="currentUrlsHaveMultipleCultures && url.culture" style="font-size: 13px; color: #cccccc; width: 55px;display: inline-block">{{url.culture}}</span>
                             <em>{{url.text}}</em>
-
                         </div>
                     </li>
                 </ul>
             </umb-box-content>
         </umb-box>
-        <umb-box data-element="node-info-redirects" style="display:none;" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
+        <umb-box data-element="node-info-redirects" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
             <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
             <umb-box-content class="block-form">
                 <div style="position: relative;">
@@ -31,7 +29,10 @@
                         <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
                         <ul class="nav nav-stacked" style="margin-bottom: 0;">
                             <li ng-repeat="redirectUrl in redirectUrls">
-                                <a href="{{redirectUrl.originalUrl}}" target="_blank" class="umb-outline"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank" class="umb-outline">
+                                    <i ng-class="value.icon" class="icon-out" aria-hidden="true"></i>
+                                    {{redirectUrl.originalUrl}}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -41,8 +42,7 @@
 
         <umb-box data-element="node-info-history">
 
-            <umb-box-header
-                title-key="{{historyLabelKey}}" ng-if="historyLabelKey">
+            <umb-box-header title="{{historyLabel}}">
                 <umb-button
                     ng-hide="node.trashed"
                     type="button"
@@ -102,8 +102,6 @@
                                 <span class="history-item__description">
                                     <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
-
-
                             </div>
 
                         </div>
@@ -167,7 +165,7 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
-                        <button ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                        <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
                         </button>
                     </div>

@@ -506,6 +506,49 @@ namespace Umbraco.Core.Composing
 
         #endregion
 
+        #region Get Assembly Attributes
+
+        /// <summary>
+        /// Gets the assembly attributes of the specified type <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>
+        /// The assembly attributes of the specified type <typeparamref name="T" />.
+        /// </returns>
+        public IEnumerable<T> GetAssemblyAttributes<T>()
+            where T : Attribute
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>()).ToList();
+        }
+
+        /// <summary>
+        /// Gets all the assembly attributes.
+        /// </summary>
+        /// <returns>
+        /// All assembly attributes.
+        /// </returns>
+        public IEnumerable<Attribute> GetAssemblyAttributes()
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes()).ToList();
+        }
+
+        /// <summary>
+        /// Gets the assembly attributes of the specified <paramref name="attributeTypes" />.
+        /// </summary>
+        /// <param name="attributeTypes">The attribute types.</param>
+        /// <returns>
+        /// The assembly attributes of the specified types.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">attributeTypes</exception>
+        public IEnumerable<Attribute> GetAssemblyAttributes(params Type[] attributeTypes)
+        {
+            if (attributeTypes == null) throw new ArgumentNullException(nameof(attributeTypes));
+
+            return AssembliesToScan.SelectMany(a => attributeTypes.SelectMany(at => a.GetCustomAttributes(at))).ToList();
+        }
+
+        #endregion
+
         #region Get Types
 
         /// <summary>

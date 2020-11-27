@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// Provide an abstract base class for <c>IPublishedContent</c> implementations.
     /// </summary>
-    /// <remarks>This base class does which (a) consistently resolves and caches the Url, (b) provides an implementation
+    /// <remarks>This base class does which (a) consistently resolves and caches the URL, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
     [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
@@ -54,6 +54,7 @@ namespace Umbraco.Web.Models
         public abstract int CreatorId { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         public abstract string CreatorName { get; }
 
         /// <inheritdoc />
@@ -63,12 +64,14 @@ namespace Umbraco.Web.Models
         public abstract int WriterId { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         public abstract string WriterName { get; }
 
         /// <inheritdoc />
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use the Url() extension instead")]
         public virtual string Url => this.Url();
 
         /// <inheritdoc />

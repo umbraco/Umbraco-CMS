@@ -30,6 +30,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2014 = 6,
             V2016 = 7,
             V2017 = 8,
+            V2019 = 9,
             Other = 99
         }
 
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Unknown = 0,
             Desktop = 1,
             Standard = 2,
-            Enterprise = 3,
+            Enterprise = 3,// Also developer edition
             Express = 4,
             Azure = 5
         }
@@ -79,6 +80,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 case "??":
                     return VersionName.Invalid;
+                case "15":
+                    return VersionName.V2019;
                 case "14":
                     return VersionName.V2017;
                 case "13":
@@ -251,6 +254,11 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
+            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
+        {
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
@@ -260,7 +268,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                db.Execute(@"SET LOCK_TIMEOUT 1800;");
+                db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
                 var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.");

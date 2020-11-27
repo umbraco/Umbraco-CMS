@@ -87,7 +87,7 @@
     <key alias="saveAndPublish">保存並發佈</key>
     <key alias="saveToPublish">保存並提交審核</key>
     <key alias="saveListView">保存清單檢視</key>
-    <key alias="showPage">預覽</key>
+    <key alias="saveAndPreview">預覽</key>
     <key alias="showPageDisabled">因未設置範本無法預覽</key>
     <key alias="styleChoose">選擇樣式</key>
     <key alias="styleShow">顯示樣式</key>
@@ -255,7 +255,7 @@
     <key alias="recycleBinIsEmpty">回收站已清空</key>
     <key alias="recycleBinWarning">從回收站刪除的項目將不可恢復</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的網站服務目前出現些狀況，而我們無能為力。我們對此不便感到十分抱歉。]]></key>
-    <key alias="regexSearchHelp">查找規則運算式來驗證輸入，如: 'email、'zip-code'、'url'。</key>
+    <key alias="regexSearchHelp">查找規則運算式來驗證輸入，如: 'email、'zip-code'、'URL'。</key>
     <key alias="removeMacro">移除巨集</key>
     <key alias="requiredField">必填項目</key>
     <key alias="sitereindexed">網站已重建索引</key>

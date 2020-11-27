@@ -38,7 +38,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
       }
 
       //set the model defaults
-      if (!angular.isObject($scope.model.value)) {
+      if (!Utilities.isObject($scope.model.value)) {
         //if it's not an object then just create a new one
         $scope.model.value = {
           newPassword: null,

@@ -45,6 +45,34 @@ namespace Umbraco.Web
             return html.Partial(view, model);
         }
 
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedElement contentItem)
+        {
+            return html.GetGridHtml(contentItem, "bodyText", "bootstrap3");
+        }
+
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedElement contentItem, string propertyAlias)
+        {
+            if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
+
+            return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
+        }
+
+        public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedElement contentItem, string propertyAlias, string framework)
+        {
+            if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
+            if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
+
+            var view = "Grid/" + framework;
+            var prop = contentItem.GetProperty(propertyAlias);
+            if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
+            var model = prop.GetValue();
+
+            var asString = model as string;
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
+
+            return html.Partial(view, model);
+        }
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
             var asString = property.GetValue() as string;

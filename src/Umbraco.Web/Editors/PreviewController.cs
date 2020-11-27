@@ -12,6 +12,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -24,19 +25,39 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
+        private readonly IIconService _iconService;
 
+        [Obsolete("Use the constructor that injects IIconService.")]
         public PreviewController(
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService)
+            :this(features,
+                globalSettings,
+                publishedSnapshotService,
+                umbracoContextAccessor,
+                localizationService,
+                Current.IconService)
+        {
+
+        }
+
+        public PreviewController(
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IPublishedSnapshotService publishedSnapshotService,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizationService localizationService,
+            IIconService iconService)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
+            _iconService = iconService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -45,7 +66,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages, _iconService);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -80,19 +101,24 @@ namespace Umbraco.Web.Editors
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
+            EnterPreview(id);
+
+            // use a numeric URL because content may not be in cache and so .Url would fail
+            var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
+            Response.Redirect($"../../{id}.aspx{query}", true);
+
+            return null;
+        }
+        public ActionResult EnterPreview(int id)
+        {
             var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 
             Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
 
-            // use a numeric url because content may not be in cache and so .Url would fail
-            var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
-            Response.Redirect($"../../{id}.aspx{query}", true);
-
             return null;
         }
-
         public ActionResult End(string redir = null)
         {
             var previewToken = Request.GetPreviewCookieValue();
@@ -100,6 +126,9 @@ namespace Umbraco.Web.Editors
             service.ExitPreview(previewToken);
 
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
+            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false

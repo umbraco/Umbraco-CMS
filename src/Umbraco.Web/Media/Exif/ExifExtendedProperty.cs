@@ -28,7 +28,7 @@ namespace Umbraco.Web.Media.Exif
         public ExifEnumProperty(ExifTag tag, T value)
             : this(tag, value, false)
         {
-            ;
+
         }
 
         public override ExifInterOperability Interoperability
@@ -210,13 +210,13 @@ namespace Umbraco.Web.Media.Exif
         public ExifPointSubjectArea(ExifTag tag, ushort[] value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public ExifPointSubjectArea(ExifTag tag, ushort x, ushort y)
-            : base(tag, new ushort[] { x, y })
+            : base(tag, new ushort[] {x, y})
         {
-            ;
+
         }
     }
 
@@ -239,13 +239,13 @@ namespace Umbraco.Web.Media.Exif
         public ExifCircularSubjectArea(ExifTag tag, ushort[] value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public ExifCircularSubjectArea(ExifTag tag, ushort x, ushort y, ushort d)
             : base(tag, new ushort[] { x, y, d })
         {
-            ;
+
         }
     }
 
@@ -269,13 +269,13 @@ namespace Umbraco.Web.Media.Exif
         public ExifRectangularSubjectArea(ExifTag tag, ushort[] value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public ExifRectangularSubjectArea(ExifTag tag, ushort x, ushort y, ushort w, ushort h)
             : base(tag, new ushort[] { x, y, w, h })
         {
-            ;
+
         }
     }
 
@@ -303,13 +303,13 @@ namespace Umbraco.Web.Media.Exif
         public GPSLatitudeLongitude(ExifTag tag, MathEx.UFraction32[] value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public GPSLatitudeLongitude(ExifTag tag, float d, float m, float s)
             : base(tag, new MathEx.UFraction32[] { new MathEx.UFraction32(d), new MathEx.UFraction32(m), new MathEx.UFraction32(s) })
         {
-            ;
+
         }
     }
 
@@ -331,13 +331,13 @@ namespace Umbraco.Web.Media.Exif
         public GPSTimeStamp(ExifTag tag, MathEx.UFraction32[] value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public GPSTimeStamp(ExifTag tag, float h, float m, float s)
             : base(tag, new MathEx.UFraction32[] { new MathEx.UFraction32(h), new MathEx.UFraction32(m), new MathEx.UFraction32(s) })
         {
-            ;
+
         }
     }
 

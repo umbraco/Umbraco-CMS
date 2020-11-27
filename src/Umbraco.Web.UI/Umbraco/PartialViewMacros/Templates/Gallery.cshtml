@@ -29,13 +29,13 @@
             @* a single image *@
             if (media.IsDocumentType("Image"))
             {
-                @Render(media);
+                @Render(media)
             }
 
             @* a folder with images under it *@
             foreach (var image in media.Children())
             {
-                @Render(image);
+                @Render(image)
             }
         }
     </div>

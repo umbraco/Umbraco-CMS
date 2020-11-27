@@ -23,8 +23,7 @@
   border-radius: 3px;
 
     // Hover/focus state
-    &:hover,
-    &:focus {
+    &:hover {
         background: @btnBackgroundHighlight;
         color: @gray-4;
         background-position: 0 -15px;
@@ -33,11 +32,6 @@
         // transition is only when going to hover/focus, otherwise the background
         // behind the gradient (there for IE<=9 fallback) gets mismatched
         .transition(background-position .1s linear);
-    }
-
-    // Focus state for keyboard and accessibility
-    &:focus {
-        .tab-focus();
     }
 
     // Active state
@@ -54,7 +48,7 @@
     &:disabled:hover {
         cursor: default;
         border-color: @btnBorder;
-        .opacity(65);
+        .opacity(80);
         .box-shadow(none);
     }
 
@@ -219,7 +213,7 @@ input[type="button"] {
 }
 // Made for Umbraco, 2019, used for buttons that has to stand back.
 .btn-white {
-  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
+  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover, @gray-10, @gray-7);
 }
 // Inverse appears as dark gray
 .btn-inverse {
@@ -230,8 +224,7 @@ input[type="button"] {
   .buttonBackground(@btnNeutralBackground, @btnNeutralBackgroundHighlight);
   color: @gray-5;
   // Hover/focus state
-  &:hover,
-  &:focus {
+  &:hover {
     color: @gray-5;
   }
 
@@ -261,18 +254,18 @@ input[type="button"] {
 .btn-outline {
   border: 1px solid;
   border-color: @gray-7;
-  background: @white;
+  background: transparent;
   color: @blueExtraDark;
   padding: 5px 13px;
-  transition: all .2s linear;
+  transition: border-color .12s linear, color .12s linear;
+  font-weight: 600;
 }
 
-.btn-outline:hover,
-.btn-outline:focus,
-.btn-outline:active {
+.btn-outline:hover {
   border-color: @ui-light-type-hover;
   color: @ui-light-type-hover;
-  background: @white;
+  background: transparent;
+  transition: border-color .12s linear, color .12s linear;
 }
 
 // Cross-browser Jank
@@ -309,14 +302,12 @@ input[type="submit"].btn {
   color: @linkColor;
   .border-radius(0);
 }
-.btn-link:hover,
-.btn-link:focus {
+.btn-link:hover {
   color: @linkColorHover;
   text-decoration: underline;
   background-color: transparent;
 }
-.btn-link[disabled]:hover,
-.btn-link[disabled]:focus {
+.btn-link[disabled]:hover {
   color: @gray-4;
   text-decoration: none;
 }
@@ -324,8 +315,7 @@ input[type="submit"].btn {
 // Make a reverse type of a button link
 .btn-link-reverse{
     text-decoration:underline;
-  &:hover,
-  &:focus{
+  &:hover {
     text-decoration:none;
   }
 }
@@ -346,23 +336,20 @@ input[type="submit"].btn {
 // This is lifted from umb-group-builder.less
 
 .btn-icon {
-    border: none;
-        
+    border: none;      
     font-size: 18px;
     position: relative;
     cursor: pointer;
     color: @ui-icon;
-
     margin: 0;
-    padding: 5px 10px;
+    padding: 3px 5px;
     width: auto;
     overflow: visible;
     background: transparent;
     line-height: normal;
-    outline: 0;
     -webkit-appearance: none;
 
-    &:hover, &:focus  {
+    &:hover {
         color: @ui-icon-hover;
     }
 }

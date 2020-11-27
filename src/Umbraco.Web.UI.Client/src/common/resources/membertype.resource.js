@@ -16,16 +16,15 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             }
 
             var query = "";
-            _.each(filterContentTypes, function (item) {
-                query += "filterContentTypes=" + item + "&";
-            });
+            filterContentTypes.forEach(fct => query += `filterContentTypes=${fct}&`);
+
             // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
             if (filterContentTypes.length === 0) {
                 query += "filterContentTypes=&";
             }
-            _.each(filterPropertyTypes, function (item) {
-                query += "filterPropertyTypes=" + item + "&";
-            });
+
+            filterPropertyTypes.forEach(fpt => query += `filterPropertyTypes=${fpt}&`);
+
             // if filterPropertyTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
             if (filterPropertyTypes.length === 0) {
                 query += "filterPropertyTypes=&";

@@ -20,7 +20,7 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
         },
         filterCssClass: "not-allowed",
         callback: function(data) {
-            if (angular.isArray(data)) {
+            if (Utilities.isArray(data)) {
                 _.each(data, function (item, i) {
                     $scope.add(item);
                 });
@@ -56,10 +56,9 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
         };
 
         editorService.treePicker(memberPicker);
-
     };
 
-    $scope.remove =function(index){
+    $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
     };
 

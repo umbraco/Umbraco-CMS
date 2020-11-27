@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Core.Models.Editors
 {
+
     /// <summary>
     /// Represents an uploaded file for a property.
     /// </summary>
@@ -14,6 +15,11 @@
         /// When dealing with content variants, this is the culture for the variant
         /// </summary>
         public string Culture { get; set; }
+
+        /// <summary>
+        /// When dealing with content variants, this is the segment for the variant
+        /// </summary>
+        public string Segment { get; set; }
 
         /// <summary>
         /// An array of metadata that is parsed out from the file info posted to the server which is set on the client. 

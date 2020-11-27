@@ -102,10 +102,15 @@
             if (!scope.editLabelKey) {
                 scope.editLabelKey = "general_edit";
             }
-            userService.getCurrentUser().then(function (u) {
-                var isAdmin = u.userGroups.indexOf('admin') !== -1;
-                scope.alias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.alias : null;
-            });
+
+            scope.nodeNameTitle = null;
+            if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                userService.getCurrentUser().then(function (u) {
+                    if (u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                        scope.nodeNameTitle = scope.alias;
+                    }
+                });
+            }
         }
 
         var directive = {

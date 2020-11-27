@@ -32,7 +32,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     if (string.IsNullOrEmpty(dataType.Configuration))
                     {
                         config.Format = "YYYY-MM-DD";
-                    };
+                    }
                 }
                 catch (Exception ex)
                 {
