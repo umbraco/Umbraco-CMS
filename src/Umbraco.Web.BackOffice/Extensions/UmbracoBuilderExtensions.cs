@@ -31,8 +31,10 @@ namespace Umbraco.Extensions
         {
             builder.Services.AddAntiforgery();
             builder.Services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
+
             builder.Services
-                .AddAuthentication(Core.Constants.Security.BackOfficeAuthenticationType)
+                .AddAuthentication() // This just creates a builder, nothing more
+                // Add our custom schemes which are cookie handlers
                 .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Core.Constants.Security.BackOfficeExternalAuthenticationType, o =>
                 {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -10,6 +11,8 @@ using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.Common.Filters
 {
+
+    
 
     /// <summary>
     /// Ensures authorization is successful for a back office user.
@@ -28,6 +31,7 @@ namespace Umbraco.Web.Common.Filters
         private readonly LinkGenerator _linkGenerator;
         private readonly bool _redirectToUmbracoLogin;
         private string _redirectUrl;
+        
 
         private UmbracoBackOfficeAuthorizeFilter(
             IHostingEnvironment hostingEnvironment,

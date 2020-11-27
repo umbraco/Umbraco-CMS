@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,7 @@ using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
@@ -44,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]  // TODO: Maybe this could be applied with our Application Model conventions
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
-    [IsBackOffice] // TODO: This could be applied with our Application Model conventions
+    [IsBackOffice]
     public class AuthenticationController : UmbracoApiControllerBase
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -163,7 +165,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
             if (user == null) throw new InvalidOperationException("Could not find user");
 
-            ExternalSignInAutoLinkOptions autoLinkOptions = null;
             var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
                .FirstOrDefault(x => x.Name == unlinkLoginModel.LoginProvider);
 
@@ -173,11 +174,18 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                autoLinkOptions = _externalAuthenticationOptions.Get(authType.Name);
-                if (!autoLinkOptions.AllowManualLinking)
+                var opt = _externalAuthenticationOptions.Get(authType.Name);
+                if (opt == null)
                 {
-                    // If AllowManualLinking is disabled for this provider we cannot unlink
-                    return BadRequest();
+                    return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
+                }
+                else
+                {
+                    if (!opt.Options.AutoLinkOptions.AllowManualLinking)
+                    {
+                        // If AllowManualLinking is disabled for this provider we cannot unlink
+                        return BadRequest();
+                    }
                 }
             }
 
@@ -199,18 +207,26 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public double GetRemainingTimeoutSeconds()
+        public async Task<double> GetRemainingTimeoutSeconds()
         {
-            var backOfficeIdentity = HttpContext.User.GetUmbracoIdentity();
-            var remainingSeconds = HttpContext.User.GetRemainingAuthSeconds();
-            if (remainingSeconds <= 30 && backOfficeIdentity != null)
+            // force authentication to occur since this is not an authorized endpoint
+            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            if (!result.Succeeded)
             {
+                return 0;
+            }
+
+            var remainingSeconds = result.Principal.GetRemainingAuthSeconds();
+            if (remainingSeconds <= 30)
+            {
+                var username = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
                 //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                 // the timeout process.
 
                 _logger.LogInformation(
                     "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
-                    backOfficeIdentity.Name,
+                    username ?? "unknown",
                     _ipResolver.GetCurrentRequestIpAddress());
             }
 
@@ -222,14 +238,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public bool IsAuthenticated()
+        public async Task<bool> IsAuthenticated()
         {
-            var attempt = _backofficeSecurityAccessor.BackOfficeSecurity.AuthorizeRequest();
-            if (attempt == ValidateRequestAttempt.Success)
-            {
-                return true;
-            }
-            return false;
+            // force authentication to occur since this is not an authorized endpoint
+            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            return result.Succeeded;
         }
 
         /// <summary>
@@ -243,7 +256,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [UmbracoBackOfficeAuthorize]
         [SetAngularAntiForgeryTokens]
-        //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
+        [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
@@ -559,13 +572,17 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [ValidateAngularAntiForgeryToken]
-        public IActionResult PostLogout()
+        public async Task<IActionResult> PostLogout()
         {
-            HttpContext.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
+            // force authentication to occur since this is not an authorized endpoint
+            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            if (!result.Succeeded) return Ok();
+
+            await _signInManager.SignOutAsync();
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = int.Parse(User.Identity.GetUserId());
+            var userId = int.Parse(result.Principal.Identity.GetUserId());
             var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
@@ -577,7 +594,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return Ok();
         }
-
 
 
         /// <summary>
