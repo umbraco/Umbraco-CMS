@@ -216,7 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return 0;
             }
 
-            var remainingSeconds = result.Principal.GetRemainingAuthSeconds();
+            var remainingSeconds = HttpContext.User.GetRemainingAuthSeconds();
             if (remainingSeconds <= 30)
             {
                 var username = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
@@ -572,17 +572,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [ValidateAngularAntiForgeryToken]
-        public async Task<IActionResult> PostLogout()
+        public IActionResult PostLogout()
         {
-            // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
-            if (!result.Succeeded) return Ok();
-
-            await _signInManager.SignOutAsync();
+            HttpContext.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = int.Parse(result.Principal.Identity.GetUserId());
+            var userId = int.Parse(User.Identity.GetUserId());
             var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {

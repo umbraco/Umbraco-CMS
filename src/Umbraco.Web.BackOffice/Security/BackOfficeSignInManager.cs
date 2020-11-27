@@ -200,8 +200,7 @@ namespace Umbraco.Web.Common.Security
 
             await Context.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
             await Context.SignOutAsync(Constants.Security.BackOfficeExternalAuthenticationType);
-            // TODO: Put this back in when we implement it
-            //await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
+            await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
         }
 
         
