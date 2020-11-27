@@ -117,7 +117,7 @@
                 vm.loading = false;
 
                 // testing:
-                //editMedia(vm.model.value[0]);
+                editMedia(vm.model.value[0]);
             });
 
         };
