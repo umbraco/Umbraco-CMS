@@ -13,7 +13,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Security
 {
-    // TODO: This is only for the back office, does it need to be in common?
 
     public class BackOfficeSecurity : IBackOfficeSecurity
     {

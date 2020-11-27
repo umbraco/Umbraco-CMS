@@ -1,44 +1,23 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Web.Common.Security
 {
-
 
     /// <summary>
     /// Options used to configure back office external login providers
     /// </summary>
     public class BackOfficeExternalLoginProviderOptions
     {
-        public BackOfficeExternalLoginProviderOptions(
-            string buttonStyle, string icon, string callbackPath,
-            ExternalSignInAutoLinkOptions autoLinkOptions = null,
-            bool denyLocalLogin = false,
-            bool autoRedirectLoginToExternalProvider = false,
-            string customBackOfficeView = null)
-        {
-            ButtonStyle = buttonStyle;
-            Icon = icon;
-            CallbackPath = callbackPath;
-            AutoLinkOptions = autoLinkOptions ?? new ExternalSignInAutoLinkOptions();
-            DenyLocalLogin = denyLocalLogin;
-            AutoRedirectLoginToExternalProvider = autoRedirectLoginToExternalProvider;
-            CustomBackOfficeView = customBackOfficeView;
-        }
-
-        public string ButtonStyle { get; }
-        public string Icon { get; }
-        public string CallbackPath { get; }
-
         /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
         /// </summary>
-        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; }
+        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; } = new ExternalSignInAutoLinkOptions();
 
         /// <summary>
         /// When set to true will disable all local user login functionality
         /// </summary>
-        public bool DenyLocalLogin { get; }
+        public bool DenyLocalLogin { get; set; }
 
         /// <summary>
         /// When specified this will automatically redirect to the OAuth login provider instead of prompting the user to click on the OAuth button first.
@@ -47,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// This is generally used in conjunction with <see cref="DenyLocalLogin"/>. If more than one OAuth provider specifies this, the last registered
         /// provider's redirect settings will win.
         /// </remarks>
-        public bool AutoRedirectLoginToExternalProvider { get; }
+        public bool AutoRedirectLoginToExternalProvider { get; set; }
 
         /// <summary>
         /// A virtual path to a custom angular view that is used to replace the entire UI that renders the external login button that the user interacts with
@@ -56,6 +35,6 @@ namespace Umbraco.Web.BackOffice.Security
         /// If this view is specified it is 100% up to the user to render the html responsible for rendering the link/un-link buttons along with showing any errors
         /// that occur. This overrides what Umbraco normally does by default.
         /// </remarks>
-        public string CustomBackOfficeView { get; }
+        public string CustomBackOfficeView { get; set; }
     }
 }

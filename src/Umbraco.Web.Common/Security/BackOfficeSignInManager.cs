@@ -14,7 +14,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Security
 {
-
     using Constants = Umbraco.Core.Constants;
 
     // TODO: There's potential to extract an interface for this for only what we use and put that in Core without aspnetcore refs, but we need to wait till were done with it since there's a bit to implement
@@ -24,7 +23,7 @@ namespace Umbraco.Web.Common.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         private const string LoginProviderKey = "LoginProvider";
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string XsrfKey = "XsrfId"; 
+        private const string XsrfKey = "XsrfId"; // TODO: See BackOfficeController.XsrfKey
 
         private BackOfficeUserManager _userManager;
 
