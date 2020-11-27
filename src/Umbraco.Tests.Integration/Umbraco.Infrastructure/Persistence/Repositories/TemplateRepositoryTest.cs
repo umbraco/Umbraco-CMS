@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -28,6 +29,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TemplateRepositoryTest : UmbracoIntegrationTest
     {
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
@@ -560,7 +562,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var testHelper = new TestHelper();
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), HostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);

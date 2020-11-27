@@ -29,24 +29,6 @@ namespace Umbraco.Core.IO
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
-        // virtualRoot should be "~/path/to/root" eg "~/Views"
-        // the "~/" is mandatory.
-        [Obsolete]
-        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string virtualRoot)
-        {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            if (virtualRoot == null) throw new ArgumentNullException(nameof(virtualRoot));
-            if (virtualRoot.StartsWith("~/") == false)
-                throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
-
-            _rootPath = EnsureDirectorySeparatorChar(hostingEnvironment.MapPathContentRoot(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
-            _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-            _rootUrl = EnsureUrlSeparatorChar(hostingEnvironment.ToAbsolute(virtualRoot)).TrimEnd('/');
-        }
-
         public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
