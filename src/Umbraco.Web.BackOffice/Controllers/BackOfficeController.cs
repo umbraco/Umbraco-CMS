@@ -403,182 +403,55 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (loginInfo == null) throw new ArgumentNullException(nameof(loginInfo));
             if (response == null) throw new ArgumentNullException(nameof(response));
-            ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
-            var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
-                .FirstOrDefault(x => x.Name == loginInfo.LoginProvider);
+            // Sign in the user with this external login provider (which auto links, etc...)
+            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
 
-            if (authType == null)
+            var errors = new List<string>();
+
+            if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
-                _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", loginInfo.LoginProvider);
+
             }
-            else
+            else if (result == Microsoft.AspNetCore.Identity.SignInResult.LockedOut)
             {
-                autoLinkOptions = _externalLogins.Get(authType.Name)?.Options?.AutoLinkOptions;
+                // TODO: We've never actually dealt with this before
+            }
+            else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
+            {
+                // TODO: We've never actually dealt with this before
+            }
+            else if (result == Microsoft.AspNetCore.Identity.SignInResult.NotAllowed)
+            {
+                // TODO: We've never actually dealt with this before
+            }
+            else if (result == Microsoft.AspNetCore.Identity.SignInResult.Failed)
+            {
+                // Failed only occurs when the user does not exist
+                errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
+            }
+            else if (result == AutoLinkSignInResult.FailedNotLinked)
+            {
+                errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
+            }
+            else if (result == AutoLinkSignInResult.FailedNoEmail)
+            {
+                errors.Add($"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked.");                
+            }
+            else if (result is AutoLinkSignInResult autoLinkSignInResult && autoLinkSignInResult.Errors.Count > 0)
+            {
+                errors.AddRange(autoLinkSignInResult.Errors);
             }
 
-            // Sign in the user with this external login provider if the user already has a login
-
-            var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-            if (user != null)
+            if (errors.Count > 0)
             {
-                var shouldSignIn = true;
-                if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
-                {
-                    shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
-                    if (shouldSignIn == false)
-                    {
-                        _logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
-                    }
-                }
-
-                if (shouldSignIn)
-                {
-                    //sign in
-                    await _signInManager.SignInAsync(user, false);
-                }
-            }
-            else
-            {
-                if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
-                {
-                    ViewData.SetExternalSignInProviderErrors(
-                        new BackOfficeExternalLoginProviderErrors(
-                            loginInfo.LoginProvider,
-                            new[] { "The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office." }));
-                }
-
-                //Remove the cookie otherwise this message will keep appearing
-                Response.Cookies.Delete(Constants.Security.BackOfficeExternalCookieName);
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.LoginProvider,
+                        errors));
             }
 
             return response();
-        }
-
-        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
-        {
-            if (autoLinkOptions == null)
-                return false;
-
-            if (autoLinkOptions.AutoLinkExternalAccount == false)
-            {
-                return false; 
-            }   
-
-            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-
-            //we are allowing auto-linking/creating of local accounts
-            if (email.IsNullOrWhiteSpace())
-            {
-                ViewData.SetExternalSignInProviderErrors(
-                    new BackOfficeExternalLoginProviderErrors(
-                        loginInfo.LoginProvider,
-                        new[] { $"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked." }));
-            }
-            else
-            {
-                //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var autoLinkUser = await _userManager.FindByEmailAsync(email);
-                if (autoLinkUser != null)
-                {
-                    try
-                    {
-                        //call the callback if one is assigned
-                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
-                        ViewData.SetExternalSignInProviderErrors(
-                            new BackOfficeExternalLoginProviderErrors(
-                                loginInfo.LoginProvider,
-                                new[] { "Could not link login provider " + loginInfo.LoginProvider + ". " + ex.Message }));
-                        return true;
-                    }
-
-                    await LinkUser(autoLinkUser, loginInfo);
-                }
-                else
-                {
-                    var name = loginInfo.Principal?.Identity?.Name;
-                    if (name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
-
-                    autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
-
-                    foreach (var userGroup in autoLinkOptions.DefaultUserGroups)
-                    {
-                        autoLinkUser.AddRole(userGroup);
-                    }
-
-                    //call the callback if one is assigned
-                    try
-                    {
-                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
-                        ViewData.SetExternalSignInProviderErrors(
-                            new BackOfficeExternalLoginProviderErrors(
-                                loginInfo.LoginProvider,
-                                new[] { "Could not link login provider " + loginInfo.LoginProvider + ". " + ex.Message }));
-                        return true;
-                    }
-
-                    var userCreationResult = await _userManager.CreateAsync(autoLinkUser);
-
-                    if (userCreationResult.Succeeded == false)
-                    {
-                        ViewData.SetExternalSignInProviderErrors(
-                            new BackOfficeExternalLoginProviderErrors(
-                                loginInfo.LoginProvider,
-                                userCreationResult.Errors.Select(x => x.Description).ToList()));
-                    }
-                    else
-                    {
-                        await LinkUser(autoLinkUser, loginInfo);
-                    }
-                }
-            }
-            return true;
-        }
-
-        private async Task LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
-        {
-            var existingLogins = await _userManager.GetLoginsAsync(autoLinkUser);
-            var exists = existingLogins.FirstOrDefault(x => x.LoginProvider == loginInfo.LoginProvider && x.ProviderKey == loginInfo.ProviderKey);
-
-            // if it already exists (perhaps it was added in the AutoLink callbak) then we just continue
-            if (exists != null)
-            {
-                //sign in
-                await _signInManager.SignInAsync(autoLinkUser, isPersistent: false);
-                return;
-            }
-
-            var linkResult = await _userManager.AddLoginAsync(autoLinkUser, loginInfo);
-            if (linkResult.Succeeded)
-            {
-                //we're good! sign in
-                await _signInManager.SignInAsync(autoLinkUser, isPersistent: false);
-                return;
-            }
-
-            ViewData.SetExternalSignInProviderErrors(
-                   new BackOfficeExternalLoginProviderErrors(
-                       loginInfo.LoginProvider,
-                       linkResult.Errors.Select(x => x.Description).ToList()));
-
-            //If this fails, we should really delete the user since it will be in an inconsistent state!
-            var deleteResult = await _userManager.DeleteAsync(autoLinkUser);
-            if (!deleteResult.Succeeded)
-            {
-                //DOH! ... this isn't good, combine all errors to be shown
-                ViewData.SetExternalSignInProviderErrors(
-                    new BackOfficeExternalLoginProviderErrors(
-                        loginInfo.LoginProvider,
-                        linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList()));
-            }
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

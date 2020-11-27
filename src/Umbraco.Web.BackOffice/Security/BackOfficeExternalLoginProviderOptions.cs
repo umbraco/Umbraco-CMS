@@ -11,7 +11,7 @@ namespace Umbraco.Web.BackOffice.Security
     public class BackOfficeExternalLoginProviderOptions
     {
         public BackOfficeExternalLoginProviderOptions(
-            string buttonStyle, string icon, string callbackPath,
+            string buttonStyle, string icon, 
             ExternalSignInAutoLinkOptions autoLinkOptions = null,
             bool denyLocalLogin = false,
             bool autoRedirectLoginToExternalProvider = false,
@@ -19,7 +19,6 @@ namespace Umbraco.Web.BackOffice.Security
         {
             ButtonStyle = buttonStyle;
             Icon = icon;
-            CallbackPath = callbackPath;
             AutoLinkOptions = autoLinkOptions ?? new ExternalSignInAutoLinkOptions();
             DenyLocalLogin = denyLocalLogin;
             AutoRedirectLoginToExternalProvider = autoRedirectLoginToExternalProvider;
@@ -28,7 +27,6 @@ namespace Umbraco.Web.BackOffice.Security
 
         public string ButtonStyle { get; }
         public string Icon { get; }
-        public string CallbackPath { get; }
 
         /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
