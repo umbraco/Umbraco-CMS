@@ -17,8 +17,7 @@ namespace Umbraco.Web.Common.ApplicationModels
         {
             ActionModelConventions = new List<IActionModelConvention>()
             {
-                new BackOfficeIdentityCultureConvention(),
-                new AuthenticateAsBackOfficeSchemeConvention()
+                new BackOfficeIdentityCultureConvention()
             };
         }
 

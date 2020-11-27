@@ -33,13 +33,6 @@ namespace Umbraco.Core.Security
         ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true);
 
         /// <summary>
-        /// Authorizes the full request, checks for SSL and validates the current user
-        /// </summary>
-        /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
-        /// <returns></returns>
-        ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false);
-
-        /// <summary>
         /// Checks if the specified user as access to the app
         /// </summary>
         /// <param name="section"></param>
