@@ -29,7 +29,7 @@
         }
     );
 
-    function BlockListBlockController($scope, $compile, $element, umbRequestHelper) {
+    function BlockListBlockController($scope, $compile, $element, assetsService, umbRequestHelper) {
         var model = this;
 
         model.$onInit = function () {
@@ -49,19 +49,21 @@
             $scope.index = model.index;
             $scope.parentForm = model.parentForm;
             $scope.valFormManager = model.valFormManager;
+            $scope.view = assetsService.appendCacheBuster(model.view);
 
             if (model.stylesheet) {
+                $scope.stylesheet = assetsService.appendCacheBuster(model.stylesheet);
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
-                    @import "${model.stylesheet}"
+                    @import "{{$scope.stylesheet}}"
                     </style>
-                    <div ng-include="'${model.view}'"></div>
+                    <div ng-include="view"></div>
                 `;
                 $compile(shadowRoot)($scope);
             }
             else {
-                $element.append($compile('<div ng-include="model.view"></div>')($scope));
+                $element.append($compile('<div ng-include="view"></div>')($scope));
             }
         };
 

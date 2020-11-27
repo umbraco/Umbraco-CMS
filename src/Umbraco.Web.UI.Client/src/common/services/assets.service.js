@@ -339,7 +339,21 @@ angular.module('umbraco.services')
                 }
 
                 return promise;
-            }
+            },
+
+            /**
+             * @ngdoc method
+             * @name umbraco.services.assetsService#appendCacheBuster
+             * @methodOf umbraco.services.assetsService
+             *
+             * @description
+             * Appends the standard cache buster to an url
+             *
+             *
+             * @param {string} url the original url without cache buster 
+             * @returns {string} The url with the cache buster appended
+             */
+            appendCacheBuster: appendRnd
         };
 
         return service;
