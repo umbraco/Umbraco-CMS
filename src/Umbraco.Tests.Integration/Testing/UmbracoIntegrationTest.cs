@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Integration.Testing
         #region LocalDb
 
         private static readonly object _dbLocker = new object();
-        private static LocalDbTestDatabase _dbInstance;
+        private static ITestDatabase _dbInstance;
 
         protected void UseTestLocalDb(IServiceProvider serviceProvider)
         {
@@ -267,17 +267,14 @@ namespace Umbraco.Tests.Integration.Testing
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory dbFactory)
+        private static ITestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory dbFactory)
         {
             lock (_dbLocker)
             {
                 if (_dbInstance != null)
                     return _dbInstance;
 
-                var localDb = new LocalDb();
-                if (localDb.IsAvailable == false)
-                    throw new InvalidOperationException("LocalDB is not available.");
-                _dbInstance = new LocalDbTestDatabase(loggerFactory, localDb, filesPath, dbFactory);
+                _dbInstance = TestDatabaseFactory.Create(filesPath, loggerFactory, dbFactory);
                 return _dbInstance;
             }
         }

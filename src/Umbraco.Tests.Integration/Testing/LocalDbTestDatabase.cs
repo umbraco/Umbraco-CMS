@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Integration.Testing
     /// <summary>
     /// Manages a pool of LocalDb databases for integration testing
     /// </summary>
-    public class LocalDbTestDatabase
+    public class LocalDbTestDatabase : ITestDatabase
     {
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         }
 
-        private static void AddParameter(IDbCommand cmd, UmbracoDatabase.ParameterInfo parameterInfo)
+        internal static void AddParameter(IDbCommand cmd, UmbracoDatabase.ParameterInfo parameterInfo)
         {
             var p = cmd.CreateParameter();
             p.ParameterName = parameterInfo.Name;
@@ -149,22 +149,6 @@ namespace Umbraco.Tests.Integration.Testing
             cmd.Parameters.Add(p);
         }
 
-        public void Clear()
-        {
-            var filename = Path.Combine(_filesPath, DatabaseName).ToUpper();
-
-            foreach (var database in _instance.GetDatabases())
-            {
-                if (database.StartsWith(filename))
-                    _instance.DropDatabase(database);
-            }
-
-            foreach (var file in Directory.EnumerateFiles(_filesPath))
-            {
-                if (file.EndsWith(".mdf") == false && file.EndsWith(".ldf") == false) continue;
-                File.Delete(file);
-            }
-        }
 
         private static void ResetLocalDb(IDbCommand cmd)
         {
