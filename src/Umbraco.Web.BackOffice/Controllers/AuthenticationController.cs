@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]  // TODO: Maybe this could be applied with our Application Model conventions
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
-    [IsBackOffice] // TODO: This could be applied with our Application Model conventions
+    [IsBackOffice]
     public class AuthenticationController : UmbracoApiControllerBase
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;

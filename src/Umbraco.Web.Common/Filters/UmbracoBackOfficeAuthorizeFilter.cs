@@ -12,6 +12,8 @@ using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 namespace Umbraco.Web.Common.Filters
 {
 
+    
+
     /// <summary>
     /// Ensures authorization is successful for a back office user.
     /// </summary>

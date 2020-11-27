@@ -8,8 +8,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [IsBackOffice]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]    
     public class PublishedSnapshotCacheStatusController : UmbracoAuthorizedApiController
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
