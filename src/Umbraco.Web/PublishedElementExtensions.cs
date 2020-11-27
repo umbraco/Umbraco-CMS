@@ -193,17 +193,17 @@ namespace Umbraco.Web
         #region MediaUrl
 
         /// <summary>
-        /// Gets the url for a media.
+        /// Gets the URL for a media.
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="culture">The culture (use current culture by default).</param>
-        /// <param name="mode">The url mode (use site configuration by default).</param>
+        /// <param name="mode">The URL mode (use site configuration by default).</param>
         /// <param name="propertyAlias">The alias of the property (use 'umbracoFile' by default).</param>
-        /// <returns>The url for the media.</returns>
+        /// <returns>The URL for the media.</returns>
         /// <remarks>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any. In addition, when the content type is multi-lingual, this is the url for the
-        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// if any. In addition, when the content type is multi-lingual, this is the URL for the
+        /// specified culture. Otherwise, it is the invariant URL.</para>
         /// </remarks>
         public static string MediaUrl(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
         {
