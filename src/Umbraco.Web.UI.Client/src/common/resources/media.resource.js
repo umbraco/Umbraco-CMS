@@ -225,15 +225,13 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         getByIds: function (ids) {
 
-            var idQuery = "";
-            ids.forEach(id => idQuery += `ids=${id}&`);
-
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "mediaApiBaseUrl",
-                        "GetByIds",
-                        idQuery)),
+                        "GetByIds"), {
+                            params: { ids: ids }
+                        }),
                 'Failed to retrieve data for media ids ' + ids);
         },
 

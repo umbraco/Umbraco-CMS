@@ -64,7 +64,9 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
+                ));
             }
         }
 
@@ -175,12 +177,36 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Return media for the specified ids
+        /// Get media by integer ids
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
+        {
+            var foundMedia = Services.MediaService.GetByIds(ids);
+            return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
+        }
+
+        /// <summary>
+        /// Get media by GUID ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
+        public IEnumerable<MediaItemDisplay> GetByIds([FromUri] Guid[] ids)
+        {
+            var foundMedia = Services.MediaService.GetByIds(ids);
+            return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
+        }
+
+        /// <summary>
+        /// Get media by UDIs
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
+        public IEnumerable<MediaItemDisplay> GetByIds([FromUri] Udi[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));

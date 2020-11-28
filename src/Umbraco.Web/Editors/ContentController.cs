@@ -74,7 +74,8 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
                 ));
             }
         }
@@ -89,15 +90,39 @@ namespace Umbraco.Web.Editors
         {
             var contentTypes = Services.ContentTypeService.GetAll();
             return contentTypes.Any(contentType => contentType.VariesByCulture());
-        }
+        } 
 
         /// <summary>
-        /// Return content for the specified ids
+        /// Get content by integer ids
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] int[] ids)
+        {
+            var foundContent = Services.ContentService.GetByIds(ids);
+            return foundContent.Select(MapToDisplay);
+        }
+
+        /// <summary>
+        /// Get content by GUID ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] Guid[] ids)
+        {
+            var foundContent = Services.ContentService.GetByIds(ids);
+            return foundContent.Select(MapToDisplay);
+        }
+
+        /// <summary>
+        /// Get content by UDIs
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] Udi[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
