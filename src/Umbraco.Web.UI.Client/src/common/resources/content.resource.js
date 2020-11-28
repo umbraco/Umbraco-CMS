@@ -442,12 +442,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             return umbRequestHelper.resourcePromise(
-                $http.get(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetByIds"), {
-                            params: { ids: ids }
-                    }),
+                        "GetByIds"),
+                        {
+                            ids: ids
+                        }),
                 'Failed to retrieve data for content with multiple ids')
                 .then(function (result) {
                     //each item needs to be re-formatted

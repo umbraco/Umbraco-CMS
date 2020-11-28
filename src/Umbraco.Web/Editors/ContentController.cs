@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] int[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromJsonPath] int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] Guid[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromJsonPath] Guid[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] Udi[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromJsonPath] Udi[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);

@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<MediaItemDisplay> GetByIds([FromJsonPath] int[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromUri] Guid[] ids)
+        public IEnumerable<MediaItemDisplay> GetByIds([FromJsonPath] Guid[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
@@ -206,7 +206,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromUri] Udi[] ids)
+        public IEnumerable<MediaItemDisplay> GetByIds([FromJsonPath] Udi[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
