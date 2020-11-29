@@ -43,6 +43,7 @@ namespace Umbraco.Web.Templates
         /// </summary>
         /// <param name="text"></param>
         /// <param name="preview"></param>
+        /// <param name="markdown">Indicates the text in Markdown rather than HTML</param>
         /// <returns></returns>
         public string EnsureInternalLinks(string text, bool preview, bool markdown = false)
         {
@@ -62,7 +63,6 @@ namespace Umbraco.Web.Templates
         /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="urlProvider"></param>
         /// <returns></returns>
         public string EnsureInternalLinks(string text)
         {
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Templates
         /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="urlProvider"></param>
+        /// <param name="markdown">Indicates the text in Markdown rather than HTML</param>
         /// <returns></returns>
         private string EnsureInternalLinksInternal(string text, bool markdown)
         {
