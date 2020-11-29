@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
@@ -70,6 +72,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
 
             //assert
             Assert.IsTrue(identityResult.Succeeded);
+            Assert.IsTrue(!identityResult.Errors.Any());
         }
     }
 }
