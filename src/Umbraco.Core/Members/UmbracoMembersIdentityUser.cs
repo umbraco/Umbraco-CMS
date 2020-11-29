@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 
@@ -10,77 +7,28 @@ namespace Umbraco.Core.Members
     /// <summary>
     /// An Umbraco member user type
     /// </summary>
-    public class UmbracoMembersIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
+    public class UmbracoMembersIdentityUser
+    //: IRememberBeingDirty
+    //TODO: use of identity classes
+    //: IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, 
     {
-        private readonly BeingDirty _beingDirty = new BeingDirty();
+        public int Id;
+        public string Name;
+        public string Email;
+        public string UserName;
+        public string MemberTypeAlias;
+        public bool IsLockedOut;
 
-        #region BeingDirty
-        public event PropertyChangedEventHandler PropertyChanged
-        {
-            add
-            {
-                _beingDirty.PropertyChanged += value;
-            }
-            remove
-            {
-                _beingDirty.PropertyChanged -= value;
-            }
-        }
+        string Comment;
+        bool IsApproved;
+        DateTime LastLockoutDate;
+        DateTime CreationDate;
+        DateTime LastLoginDate;
+        DateTime LastActivityDate;
+        DateTime LastPasswordChangedDate;
 
-        public void DisableChangeTracking()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EnableChangeTracking()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> GetDirtyProperties()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> GetWereDirtyProperties()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsDirty()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsPropertyDirty(string propName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetDirtyProperties(bool rememberDirty)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetDirtyProperties()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetWereDirtyProperties()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool WasDirty()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool WasPropertyDirty(string propertyName)
-        {
-            throw new NotImplementedException();
-        }
+        //TODO: needed?
+        //public bool LoginsChanged;
+        //public bool RolesChanged;
     }
-    #endregion
 }
