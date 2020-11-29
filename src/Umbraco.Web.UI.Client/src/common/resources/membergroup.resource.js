@@ -31,16 +31,15 @@ function memberGroupResource($q, $http, umbRequestHelper) {
 
         getByIds: function (ids) {
 
-            var idQuery = "";
-            ids.forEach(id => idQuery += `ids=${id}&`);
-
             return umbRequestHelper.resourcePromise(
-                $http.get(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "memberGroupApiBaseUrl",
-                        "GetByIds",
-                        idQuery)),
-                "Failed to retrieve member group");
+                        "GetByIds"),
+                        {
+                            ids: ids
+                        }),
+                "Failed to retrieve member groups");
         },
 
         deleteById: function (id) {
