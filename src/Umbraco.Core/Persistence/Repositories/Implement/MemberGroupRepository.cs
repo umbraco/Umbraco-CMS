@@ -316,7 +316,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public bool Exists(Guid id)
         {
-            throw new NotImplementedException();
+            return Get(id) != null;
         }
 
         private class AssignedRolesDto
