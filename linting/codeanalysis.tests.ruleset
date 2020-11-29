@@ -54,4 +54,10 @@
       <!--Missing XML comment for publicly visible type or member-->
     <Rule Id="CS1591" Action="None" />
   </Rules>
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharpFeatures" RuleNamespace="Microsoft.CodeAnalysis.CSharpFeatures">
+
+    <!--Expression value is never used-->
+    <Rule Id="IDE0058" Action="None" />
+  </Rules>
 </RuleSet>
