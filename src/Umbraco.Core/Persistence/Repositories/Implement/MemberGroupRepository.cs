@@ -297,6 +297,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 new { /*memberIds =*/ memberIds, memberGroups = existingRolesIds });
         }
 
+        public IEnumerable<IMemberGroup> GetMany(params Guid[] ids)
+        {
+            var memberObjectType = Constants.ObjectTypes.Member;
+
+            var memberSql = Sql()
+                .Select("*")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                .WhereIn<NodeDto>(x => x.NodeId, ids);
+
+            return Database.Fetch<NodeDto>(memberSql)
+                .DistinctBy(dto => dto.NodeId)
+                .Select(x => MemberGroupFactory.BuildEntity(x));
+        }
+
+        public bool Exists(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         private class AssignedRolesDto
         {
             [Column("text")]

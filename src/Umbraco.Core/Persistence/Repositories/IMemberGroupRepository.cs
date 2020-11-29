@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMemberGroupRepository : IReadWriteQueryRepository<int, IMemberGroup>
+    public interface IMemberGroupRepository : IReadWriteQueryRepository<int, IMemberGroup>, IReadRepository<Guid, IMemberGroup>
     {
         /// <summary>
         /// Gets a member group by it's uniqueId

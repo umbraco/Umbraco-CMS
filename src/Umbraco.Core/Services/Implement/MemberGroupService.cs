@@ -62,6 +62,19 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<IMemberGroup> GetByIds(IEnumerable<Guid> ids)
+        {
+            if (ids == null || ids.Any() == false)
+            {
+                return new IMemberGroup[0];
+            }
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _memberGroupRepository.GetMany(ids.ToArray());
+            }
+        }
+
         public IMemberGroup GetById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
