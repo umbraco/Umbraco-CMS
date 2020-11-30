@@ -25,9 +25,7 @@ namespace Umbraco.Web.Telemetry
         {
             _runtime = runtime;
             _logger = logger;
-
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
+            _httpClient = new HttpClient();
         }
 
         /// <summary>
