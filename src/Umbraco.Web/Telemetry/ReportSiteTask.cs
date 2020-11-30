@@ -92,16 +92,19 @@ namespace Umbraco.Web.Telemetry
                 var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
                 request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
+
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/
                 // Fire & Forget, do not need to know if its a 200, 500 etc
                 var result = await _httpClient.SendAsync(request);
 
             }
-            catch (Exception ex)
+            catch
             {
                 // Silently swallow
-                // The user does need logs being polluted if our service has fallen over or is down etc
+                // The user does not need the logs being polluted if our service has fallen over or is down etc
+                // Hence only loggigng this at a more verbose level (Which users should not be using in prod)
+                _logger.Debug<ReportSiteTask>("There was a problem sending a request to the Umbraco telemetry service");
             }
 
             // Keep recurring this task & pinging the telemetry service
