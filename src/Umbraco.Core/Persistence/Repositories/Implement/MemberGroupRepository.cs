@@ -299,19 +299,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<IMemberGroup> GetMany(params Guid[] ids)
         {
-            var memberObjectType = Constants.ObjectTypes.Member;
-
-            var memberSql = Sql()
-                .Select("*")
+            var sql = Sql()
+                .SelectAll()
                 .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .WhereIn<NodeDto>(x => x.NodeId, ids);
+                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
 
-            return Database.Fetch<NodeDto>(memberSql)
-                .DistinctBy(dto => dto.NodeId)
-                .Select(x => MemberGroupFactory.BuildEntity(x));
+            if (ids.Any())
+                sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
+
+            return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
         public bool Exists(Guid id)

@@ -45,7 +45,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _memberGroupRepository.GetMany();
+                return _memberGroupRepository.GetMany(new int[0]);
             }
         }
 
