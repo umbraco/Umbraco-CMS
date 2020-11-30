@@ -89,19 +89,21 @@ namespace Umbraco.Web.Telemetry
                 _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
 
-                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
-                var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
-                request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
+                using (_httpClient)
+                {
+                    _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
+                    var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
+                    request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
-                // Set a low timeout - no need to use a larger default timeout for this POST request
-                _httpClient.Timeout = new TimeSpan(0,0,1);
+                    // Set a low timeout - no need to use a larger default timeout for this POST request
+                    _httpClient.Timeout = new TimeSpan(0, 0, 1);
 
-                // Make a HTTP Post to telemetry service
-                // https://telemetry.umbraco.com/installs/
-                // Fire & Forget, do not need to know if its a 200, 500 etc
-                var result = await _httpClient.SendAsync(request);
-
+                    // Make a HTTP Post to telemetry service
+                    // https://telemetry.umbraco.com/installs/
+                    // Fire & Forget, do not need to know if its a 200, 500 etc
+                    var result = await _httpClient.SendAsync(request);
+                }
             }
             catch
             {
