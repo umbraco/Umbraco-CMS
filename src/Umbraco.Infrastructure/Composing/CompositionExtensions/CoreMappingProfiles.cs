@@ -33,6 +33,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<TagMapDefinition>()
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
+                .Add<MemberMapDefinition>()
                 .Add<LanguageMapDefinition>()
                 .Add<IdentityMapDefinition>()
                ;

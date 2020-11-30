@@ -356,16 +356,16 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
             }
 
-            string resetPassword;
-            string password = _memberManager.GeneratePassword();
+            //string resetPassword;
+            //string password = _memberManager.GeneratePassword();
 
-            IdentityResult result = await _memberManager.AddPasswordAsync(identityMember, password);
-            if (result.Succeeded == false)
-            {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
-            }
+            //IdentityResult result = await _memberManager.AddPasswordAsync(identityMember, password);
+            //if (result.Succeeded == false)
+            //{
+            //    throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+            //}
 
-            resetPassword = password;
+            //resetPassword = password;
 
             //now re-look the member back up which will now exist
             IMember member = _memberService.GetByEmail(memberSave.Email);
