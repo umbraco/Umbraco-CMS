@@ -8,12 +8,12 @@ namespace Umbraco.Web.Common.Security
 {
     public class AutoLinkSignInResult : SignInResult
     {
-        public static AutoLinkSignInResult FailedNotLinked = new()
+        public static AutoLinkSignInResult FailedNotLinked = new AutoLinkSignInResult()
         {
             Succeeded = false
         };
 
-        public static AutoLinkSignInResult FailedNoEmail = new()
+        public static AutoLinkSignInResult FailedNoEmail = new AutoLinkSignInResult()
         {
             Succeeded = false
         };
