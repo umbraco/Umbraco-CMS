@@ -24,6 +24,7 @@ public class TestsSetup
     public void TearDown()
     {
         LocalDbTestDatabase.KillLocalDb();
+        SqlDeveloperTestDatabase.Instance?.Finish();
         Console.WriteLine("TOTAL TESTS DURATION: {0}", _stopwatch.Elapsed);
     }
 }

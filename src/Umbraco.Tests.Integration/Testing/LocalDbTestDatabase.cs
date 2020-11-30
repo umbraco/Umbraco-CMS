@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
 
-        private static void ResetLocalDb(IDbCommand cmd)
+        internal static void ResetLocalDb(IDbCommand cmd)
         {
             // https://stackoverflow.com/questions/536350
 
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Integration.Testing
             }
         }
 
-        private static void Retry(int maxIterations, Action action)
+        internal static void Retry(int maxIterations, Action action)
         {
             for (var i = 0; i < maxIterations; i++)
             {

@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Integration.Testing
             var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(databaseFactory, TestHelper.ConsoleLoggerFactory, state, TestHelper.WorkingDirectory);
+            InstallTestLocalDb(databaseFactory, serviceProvider.GetRequiredService<ILoggerFactory>(), state, TestHelper.WorkingDirectory);
             TestDBConnectionString = databaseFactory.ConnectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
