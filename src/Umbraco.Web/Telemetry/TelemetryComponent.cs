@@ -15,11 +15,13 @@ namespace Umbraco.Web.Telemetry
         {
             _logger = logger;
             _runtime = runtime;
-            _telemetryReporterRunner = new BackgroundTaskRunner<IBackgroundTask>("TelemetryReporter", _logger);
         }
 
         public void Initialize()
         {
+            // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
+            _telemetryReporterRunner = new BackgroundTaskRunner<IBackgroundTask>("TelemetryReporter", _logger);
+
             int delayBeforeWeStart = 60 * 1000; // 60 * 1000ms = 1min (60,000)
             int howOftenWeRepeat = 60 * 1000 * 60 * 24; // 60 * 1000 * 60 * 24 = 24hrs (86400000)
 
