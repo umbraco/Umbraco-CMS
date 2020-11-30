@@ -16,14 +16,12 @@ namespace Umbraco.Web.Telemetry
 {
     public class ReportSiteTask : RecurringTaskBase
     {
-        private IRuntimeState _runtime;
         private IProfilingLogger _logger;
         private static HttpClient _httpClient;
 
-        public ReportSiteTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayBeforeWeStart, int howOftenWeRepeat, IRuntimeState runtime, IProfilingLogger logger)
+        public ReportSiteTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayBeforeWeStart, int howOftenWeRepeat, IProfilingLogger logger)
             : base(runner, delayBeforeWeStart, howOftenWeRepeat)
         {
-            _runtime = runtime;
             _logger = logger;
             _httpClient = new HttpClient();
         }
