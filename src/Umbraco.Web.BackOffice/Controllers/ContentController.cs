@@ -133,6 +133,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        // TODO: We need to move this since we are going to delete OverrideAuthorization
         [UmbracoBackOfficeAuthorize, OverrideAuthorization]
         public bool AllowsCultureVariation()
         {

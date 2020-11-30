@@ -21,7 +21,7 @@ function dependencies() {
     const nodeModules = [
         {
             "name": "ace-builds",
-            "src":  [
+            "src": [
                 "./node_modules/ace-builds/src-min-noconflict/ace.js",
                 "./node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
                 "./node_modules/ace-builds/src-min-noconflict/ext-searchbox.js",
@@ -43,23 +43,23 @@ function dependencies() {
         },
         {
             "name": "angular",
-            "src":  ["./node_modules/angular/angular.js"],
+            "src": ["./node_modules/angular/angular.js"],
             "base": "./node_modules/angular"
         },
         {
             "name": "angular-aria",
-            "src":  ["./node_modules/angular-aria/angular-aria.min.js",
-                    "./node_modules/angular-aria/angular-aria.min.js.map"],
+            "src": ["./node_modules/angular-aria/angular-aria.min.js",
+                "./node_modules/angular-aria/angular-aria.min.js.map"],
             "base": "./node_modules/angular-aria"
         },
         {
             "name": "angular-cookies",
-            "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
+            "src": ["./node_modules/angular-cookies/angular-cookies.js"],
             "base": "./node_modules/angular-cookies"
         },
         {
             "name": "angular-dynamic-locale",
-            "src":  [
+            "src": [
                 "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js",
                 "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js.map"
             ],
@@ -67,32 +67,32 @@ function dependencies() {
         },
         {
             "name": "angular-sanitize",
-            "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
+            "src": ["./node_modules/angular-sanitize/angular-sanitize.js"],
             "base": "./node_modules/angular-sanitize"
         },
         {
             "name": "angular-touch",
-            "src":  ["./node_modules/angular-touch/angular-touch.js"],
+            "src": ["./node_modules/angular-touch/angular-touch.js"],
             "base": "./node_modules/angular-touch"
         },
         {
             "name": "angular-ui-sortable",
-            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.js"],
+            "src": ["./node_modules/angular-ui-sortable/dist/sortable.js"],
             "base": "./node_modules/angular-ui-sortable/dist"
         },
         {
             "name": "angular-route",
-            "src":  ["./node_modules/angular-route/angular-route.js"],
+            "src": ["./node_modules/angular-route/angular-route.js"],
             "base": "./node_modules/angular-route"
         },
         {
             "name": "angular-animate",
-            "src":  ["./node_modules/angular-animate/angular-animate.js"],
+            "src": ["./node_modules/angular-animate/angular-animate.js"],
             "base": "./node_modules/angular-animate"
         },
         {
             "name": "angular-i18n",
-            "src":  [
+            "src": [
                 "./node_modules/angular-i18n/angular-i18n.js",
                 "./node_modules/angular-i18n/angular-locale_*.js"
             ],
@@ -100,7 +100,7 @@ function dependencies() {
         },
         {
             "name": "angular-local-storage",
-            "src":  [
+            "src": [
                 "./node_modules/angular-local-storage/dist/angular-local-storage.min.js",
                 "./node_modules/angular-local-storage/dist/angular-local-storage.min.js.map"
             ],
@@ -108,48 +108,48 @@ function dependencies() {
         },
         {
             "name": "angular-messages",
-            "src":  ["./node_modules/angular-messages/angular-messages.js"],
+            "src": ["./node_modules/angular-messages/angular-messages.js"],
             "base": "./node_modules/angular-messages"
-        },        
+        },
         {
             "name": "angular-mocks",
-            "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
+            "src": ["./node_modules/angular-mocks/angular-mocks.js"],
             "base": "./node_modules/angular-mocks"
         },
         {
             "name": "animejs",
-            "src":  ["./node_modules/animejs/anime.min.js"],
+            "src": ["./node_modules/animejs/anime.min.js"],
             "base": "./node_modules/animejs"
         },
         {
             "name": "bootstrap-social",
-            "src":  ["./node_modules/bootstrap-social/bootstrap-social.css"],
+            "src": ["./node_modules/bootstrap-social/bootstrap-social.css"],
             "base": "./node_modules/bootstrap-social"
         },
 
         {
             "name": "angular-chart.js",
-            "src":  ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
+            "src": ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
             "base": "./node_modules/angular-chart.js/dist"
         },
         {
             "name": "chart.js",
-            "src":  ["./node_modules/chart.js/dist/Chart.min.js"],
+            "src": ["./node_modules/chart.js/dist/Chart.min.js"],
             "base": "./node_modules/chart.js/dist"
         },
         {
             "name": "clipboard",
-            "src":  ["./node_modules/clipboard/dist/clipboard.min.js"],
+            "src": ["./node_modules/clipboard/dist/clipboard.min.js"],
             "base": "./node_modules/clipboard/dist"
         },
         {
             "name": "jsdiff",
-            "src":  ["./node_modules/diff/dist/diff.min.js"],
+            "src": ["./node_modules/diff/dist/diff.min.js"],
             "base": "./node_modules/diff/dist"
         },
         {
             "name": "flatpickr",
-            "src":  [
+            "src": [
                 "./node_modules/flatpickr/dist/flatpickr.js",
                 "./node_modules/flatpickr/dist/flatpickr.css",
                 "./node_modules/flatpickr/dist/l10n/*.js"
@@ -158,7 +158,7 @@ function dependencies() {
         },
         {
             "name": "font-awesome",
-            "src":  [
+            "src": [
                 "./node_modules/font-awesome/fonts/*",
                 "./node_modules/font-awesome/css/font-awesome.min.css"
             ],
@@ -166,7 +166,7 @@ function dependencies() {
         },
         {
             "name": "jquery",
-            "src":  [
+            "src": [
                 "./node_modules/jquery/dist/jquery.min.js",
                 "./node_modules/jquery/dist/jquery.min.map"
             ],
@@ -174,37 +174,37 @@ function dependencies() {
         },
         {
             "name": "jquery-ui",
-            "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
+            "src": ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
             "base": "./node_modules/jquery-ui-dist"
         },
         {
             "name": "jquery-ui-touch-punch",
-            "src":  ["./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"],
+            "src": ["./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"],
             "base": "./node_modules/jquery-ui-touch-punch"
         },
         {
             "name": "lazyload-js",
-            "src":  ["./node_modules/lazyload-js/LazyLoad.min.js"],
+            "src": ["./node_modules/lazyload-js/LazyLoad.min.js"],
             "base": "./node_modules/lazyload-js"
         },
         {
             "name": "moment",
-            "src":  ["./node_modules/moment/min/moment.min.js"],
+            "src": ["./node_modules/moment/min/moment.min.js"],
             "base": "./node_modules/moment/min"
         },
         {
             "name": "moment",
-            "src":  ["./node_modules/moment/locale/*.js"],
+            "src": ["./node_modules/moment/locale/*.js"],
             "base": "./node_modules/moment/locale"
         },
         {
             "name": "ng-file-upload",
-            "src":  ["./node_modules/ng-file-upload/dist/ng-file-upload.min.js"],
+            "src": ["./node_modules/ng-file-upload/dist/ng-file-upload.min.js"],
             "base": "./node_modules/ng-file-upload/dist"
         },
         {
             "name": "nouislider",
-            "src":  [
+            "src": [
                 "./node_modules/nouislider/distribute/nouislider.min.js",
                 "./node_modules/nouislider/distribute/nouislider.min.css"
             ],
@@ -212,14 +212,14 @@ function dependencies() {
         },
         {
             "name": "signalr",
-            "src":  [
+            "src": [
                 "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
             ],
             "base": "./node_modules/@microsoft/signalr/dist/browser"
         },
         {
             "name": "spectrum",
-            "src":  [
+            "src": [
                 "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
                 "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
             ],
@@ -227,7 +227,7 @@ function dependencies() {
         },
         {
             "name": "tinymce",
-            "src":  [
+            "src": [
                 "./node_modules/tinymce/tinymce.min.js",
                 "./node_modules/tinymce/plugins/**",
                 "./node_modules/tinymce/skins/**",
@@ -237,12 +237,12 @@ function dependencies() {
         },
         {
             "name": "typeahead.js",
-            "src":  ["./node_modules/typeahead.js/dist/typeahead.bundle.min.js"],
+            "src": ["./node_modules/typeahead.js/dist/typeahead.bundle.min.js"],
             "base": "./node_modules/typeahead.js/dist"
         },
         {
             "name": "underscore",
-            "src":  ["node_modules/underscore/underscore-min.js"],
+            "src": ["node_modules/underscore/underscore-min.js"],
             "base": "./node_modules/underscore"
         },
         {
@@ -257,71 +257,58 @@ function dependencies() {
 
     // add streams for node modules
     nodeModules.forEach(module => {
-        var task = gulp.src(module.src, { base: module.base, allowEmpty: true });
-        
-        _.forEach(config.roots, function(root){
-            task = task.pipe(gulp.dest(root + config.targets.lib + "/" + module.name))
-        });
-        
-        stream.add(task);
+        stream.add(
+            gulp.src(module.src,
+                { base: module.base, allowEmpty: true })
+                .pipe(gulp.dest(config.root + config.targets.lib + "/" + module.name))
+        );
     });
 
     //copy over libs which are not on npm (/lib)
-    var libTask = gulp.src(config.sources.globs.lib, { allowEmpty: true });
-
-    _.forEach(config.roots, function(root){
-        libTask = libTask.pipe(gulp.dest(root + config.targets.lib))
-    });
-    
-    stream.add(libTask);
+    stream.add(
+        gulp.src(config.sources.globs.lib, { allowEmpty: true })
+            .pipe(gulp.dest(config.root + config.targets.lib))
+    );
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    
+
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
     assetsTask = assetsTask.pipe(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.mozjpeg({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.gifsicle({ interlaced: true }),
+        imagemin.mozjpeg({ progressive: true }),
+        imagemin.optipng({ optimizationLevel: 5 }),
         imagemin.svgo({
             plugins: [
-                {removeViewBox: true},
-                {cleanupIDs: false}
+                { removeViewBox: true },
+                { cleanupIDs: false }
             ]
         })
     ]));
 
-    _.forEach(config.roots, function(root){
-        assetsTask = assetsTask.pipe(gulp.dest(root + config.targets.assets));
-    });
-   
-    
+    assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
+
+
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less compiler client side
-    var lessTask = gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true });
+    stream.add(
+        gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true })
+            .pipe(gulp.dest(config.root + config.targets.assets + "/less"))
+    );
 
-    _.forEach(config.roots, function(root){
-        lessTask = lessTask.pipe(gulp.dest(root + config.targets.assets + "/less"));
-    });
-    stream.add(lessTask);
+    // TODO: check if we need these fileSize
+    stream.add(
+        gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true })
+            .pipe(gulp.dest(config.root + config.targets.views + "/propertyeditors/grid/config"))
+    );
 
+    stream.add(
+        gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true })
+            .pipe(gulp.dest(config.root + config.targets.views + "/dashboard/default"))
+    );
 
-
-	// TODO: check if we need these fileSize
-    var configTask = gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true });
-    _.forEach(config.roots, function(root){
-        configTask = configTask.pipe(gulp.dest(root + config.targets.views + "/propertyeditors/grid/config"));
-    });
-    stream.add(configTask);
-    
-    var dashboardTask = gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true });
-    _.forEach(config.roots, function(root){
-        dashboardTask = dashboardTask .pipe(gulp.dest(root + config.targets.views + "/dashboard/default"));
-    });
-    stream.add(dashboardTask);
-  
     return stream;
 };
 

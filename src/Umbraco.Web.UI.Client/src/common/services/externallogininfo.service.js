@@ -14,8 +14,8 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
     }
 
     function getLoginProviderView(provider) {
-        if (provider && provider.properties && provider.properties.UmbracoBackOfficeExternalLoginOptions && provider.properties.UmbracoBackOfficeExternalLoginOptions.CustomBackOfficeView) {
-            return umbRequestHelper.convertVirtualToAbsolutePath(provider.properties.UmbracoBackOfficeExternalLoginOptions.CustomBackOfficeView);
+        if (provider && provider.properties && provider.properties.CustomBackOfficeView) {
+            return umbRequestHelper.convertVirtualToAbsolutePath(provider.properties.CustomBackOfficeView);
         }
         return null;
     }
@@ -26,10 +26,10 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
      */
     function hasDenyLocalLogin(provider) {
         if (!provider) {
-            return _.some(externalLoginInfo.providers, x => x.properties && x.properties.UmbracoBackOfficeExternalLoginOptions && (x.properties.UmbracoBackOfficeExternalLoginOptions.DenyLocalLogin === true));
+            return _.some(externalLoginInfo.providers, x => x.properties && (x.properties.DenyLocalLogin === true));
         }
         else {
-            return provider && provider.properties && provider.properties.UmbracoBackOfficeExternalLoginOptions && (provider.properties.UmbracoBackOfficeExternalLoginOptions.DenyLocalLogin === true);
+            return provider && provider.properties && (provider.properties.DenyLocalLogin === true);
         }
     }
 

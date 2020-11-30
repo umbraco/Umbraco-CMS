@@ -14,19 +14,17 @@ function views() {
     _.forEach(config.sources.views, function (group) {
 
         var task = gulp.src(group.files)
-            .pipe(rename(function(path) {
-               path.dirname = path.dirname.toLowerCase();
-               path.basename = path.basename.toLowerCase();
-               path.extname = path.extname.toLowerCase();
-             }));
+            .pipe(rename(function (path) {
+                path.dirname = path.dirname.toLowerCase();
+                path.basename = path.basename.toLowerCase();
+                path.extname = path.extname.toLowerCase();
+            }));
 
-        _.forEach(config.roots, function(root){
-            var destPath = root + config.targets.views + group.folder;
-            console.log("copying " + group.files + " to " + destPath)
-            task = task.pipe( gulp.dest(destPath));
-        })
+        var destPath = config.root + config.targets.views + group.folder;
+        console.log("copying " + group.files + " to " + destPath)
+        task = task.pipe(gulp.dest(destPath));
 
-        stream.add (task);
+        stream.add(task);
 
     });
 

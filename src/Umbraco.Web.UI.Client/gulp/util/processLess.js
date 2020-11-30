@@ -17,10 +17,8 @@ module.exports = function(files, out) {
         autoprefixer,
         cssnano({zindex: false})
     ];
-    _.forEach(config.roots, function(root){
-        console.log("LESS: ", files, " -> ", root + config.targets.css + out);
-    })
-    
+
+    console.log("LESS: ", files, " -> ", config.root + config.targets.css + out)
 
     var task = gulp.src(files);
 
@@ -37,12 +35,7 @@ module.exports = function(files, out) {
         task = task.pipe(sourcemaps.write('./maps'));
     }
 
-    _.forEach(config.roots, function(root){
-        task = task.pipe(gulp.dest(root + config.targets.css));
-    })
-
-    
-   
+    task = task.pipe(gulp.dest(config.root + config.targets.css));
 
     return task;
 
