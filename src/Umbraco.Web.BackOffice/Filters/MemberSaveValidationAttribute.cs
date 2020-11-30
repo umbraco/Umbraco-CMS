@@ -24,7 +24,6 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             private readonly ILoggerFactory _loggerFactory;
             private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-            private readonly ILocalizedTextService _textService;
             private readonly IMemberTypeService _memberTypeService;
             private readonly IMemberService _memberService;
             private readonly IShortStringHelper _shortStringHelper;
@@ -33,7 +32,6 @@ namespace Umbraco.Web.BackOffice.Filters
             public MemberSaveValidationFilter(
                 ILoggerFactory loggerFactory,
                 IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                ILocalizedTextService textService,
                 IMemberTypeService memberTypeService,
                 IMemberService memberService,
                 IShortStringHelper shortStringHelper,
@@ -41,7 +39,6 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
                 _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
                 _memberService = memberService  ?? throw new ArgumentNullException(nameof(memberService));
                 _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
@@ -51,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MemberSave)context.ActionArguments["contentItem"];
-                var contentItemValidator = new MemberSaveModelValidator(_loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
+                var contentItemValidator = new MemberSaveModelValidator(_loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, context))
                     if (contentItemValidator.ValidateProperties(model, model, context))

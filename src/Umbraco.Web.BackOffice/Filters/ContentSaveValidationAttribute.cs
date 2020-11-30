@@ -13,6 +13,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 
@@ -36,21 +37,15 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IPropertyValidationService _propertyValidationService;
             private readonly IAuthorizationService _authorizationService;
             private readonly ILoggerFactory _loggerFactory;
-            private readonly ILocalizedTextService _textService;
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                ILocalizedTextService textService,
                 IContentService contentService,
                 IPropertyValidationService propertyValidationService,
                 IAuthorizationService authorizationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
                 _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
                 _authorizationService = authorizationService;
@@ -74,11 +69,11 @@ namespace Umbraco.Web.BackOffice.Filters
             private async Task OnActionExecutingAsync(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!await ValidateUserAccessAsync(model, context, _backofficeSecurityAccessor.BackOfficeSecurity)) return;
+                if (!await ValidateUserAccessAsync(model, context)) return;
 
                 //validate for each variant that is being updated
                 foreach (var variant in model.Variants.Where(x => x.Save))
@@ -117,8 +112,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="backofficeSecurity"></param>
             private async Task<bool> ValidateUserAccessAsync(
                 ContentItemSave contentItem,
-                ActionExecutingContext actionContext,
-                IBackOfficeSecurity backofficeSecurity)
+                ActionExecutingContext actionContext)
             {
                 // We now need to validate that the user is allowed to be doing what they are doing.
                 // Based on the action we need to check different permissions.
@@ -226,11 +220,15 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
 
 
-                var requirement = contentToCheck == null
-                    ? new ContentPermissionsResourceRequirement(contentIdToCheck, permissionToCheck)
-                    : new ContentPermissionsResourceRequirement(permissionToCheck);
+                var resource = contentToCheck == null
+                    ? new ContentPermissionsResource(contentToCheck, contentIdToCheck, permissionToCheck)
+                    : new ContentPermissionsResource(contentToCheck, permissionToCheck);
 
-                var authorizationResult = await _authorizationService.AuthorizeAsync(actionContext.HttpContext.User, contentToCheck, requirement);
+                var authorizationResult = await _authorizationService.AuthorizeAsync(
+                    actionContext.HttpContext.User,
+                    resource,
+                    AuthorizationPolicies.ContentPermissionByResource);
+
                 if (!authorizationResult.Succeeded)
                 {
                     actionContext.Result = new ForbidResult();

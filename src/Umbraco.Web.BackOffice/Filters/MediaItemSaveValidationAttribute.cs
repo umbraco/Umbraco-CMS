@@ -27,21 +27,15 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IPropertyValidationService _propertyValidationService;
             private readonly IAuthorizationService _authorizationService;
             private readonly IMediaService _mediaService;
-            private readonly ILocalizedTextService _textService;
             private readonly ILoggerFactory _loggerFactory;
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
             public MediaItemSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                ILocalizedTextService textService,
                 IMediaService mediaService,
                 IPropertyValidationService propertyValidationService,
                 IAuthorizationService authorizationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
                 _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
                 _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
@@ -64,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private async Task OnActionExecutingAsync(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _propertyValidationService);
 
                 if (await ValidateUserAccessAsync(model, context))
                 {

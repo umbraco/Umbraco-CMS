@@ -111,6 +111,12 @@ namespace Umbraco.Extensions
                 policy.Requirements.Add(new MediaPermissionsQueryStringRequirement("id"));
             });
 
+            options.AddPolicy(AuthorizationPolicies.ContentPermissionByResource, policy =>
+            {
+                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+                policy.Requirements.Add(new ContentPermissionsResourceRequirement());
+            });
+
             options.AddPolicy(AuthorizationPolicies.ContentPermissionEmptyRecycleBin, policy =>
             {
                 policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);

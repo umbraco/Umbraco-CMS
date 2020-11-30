@@ -15,6 +15,7 @@
 
         // Content permission access
 
+        public const string ContentPermissionByResource = nameof(ContentPermissionByResource);
         public const string ContentPermissionEmptyRecycleBin = nameof(ContentPermissionEmptyRecycleBin);
         public const string ContentPermissionAdministrationById = nameof(ContentPermissionAdministrationById);
         public const string ContentPermissionPublishById = nameof(ContentPermissionPublishById);
