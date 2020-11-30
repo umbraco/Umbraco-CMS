@@ -93,6 +93,8 @@ namespace Umbraco.Web.Telemetry
                 var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
                 request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
+                // Set a low timeout - no need to use a larger default timeout for this POST request
+                _httpClient.Timeout = new TimeSpan(0,0,1);
 
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/
