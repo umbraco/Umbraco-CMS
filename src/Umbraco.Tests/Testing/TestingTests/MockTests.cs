@@ -64,12 +64,18 @@ namespace Umbraco.Tests.Testing.TestingTests
             Composition.Register(_ => AppCaches.Disabled);
             Composition.Register<ServiceContext>();
 
+            var logger = Mock.Of<IProfilingLogger>();
+            var memberService = Mock.Of<IMemberService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
+            var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, logger, ShortStringHelper, Mock.Of<IEntityService>());
+
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(),
-                Mock.Of<MembershipHelper>());
+                membershipHelper);
             Assert.Pass();
         }
 
