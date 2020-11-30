@@ -24,9 +24,9 @@ namespace Umbraco.Web.Common.Security
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string LoginProviderKey = "LoginProvider";
+        private const string UmbracoSignInMgrLoginProviderKey = "LoginProvider";
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string XsrfKey = "XsrfId"; 
+        private const string UmbracoSignInMgrXsrfKey = "XsrfId"; 
 
         private BackOfficeUserManager _userManager;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
@@ -277,18 +277,18 @@ namespace Umbraco.Web.Common.Security
 
             var auth = await Context.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType);
             var items = auth?.Properties?.Items;
-            if (auth?.Principal == null || items == null || !items.ContainsKey(LoginProviderKey))
+            if (auth?.Principal == null || items == null || !items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
             {
                 return null;
             }
 
             if (expectedXsrf != null)
             {
-                if (!items.ContainsKey(XsrfKey))
+                if (!items.ContainsKey(UmbracoSignInMgrXsrfKey))
                 {
                     return null;
                 }
-                var userId = items[XsrfKey] as string;
+                var userId = items[UmbracoSignInMgrXsrfKey];
                 if (userId != expectedXsrf)
                 {
                     return null;
@@ -296,7 +296,7 @@ namespace Umbraco.Web.Common.Security
             }
 
             var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var provider = items[LoginProviderKey] as string;
+            var provider = items[UmbracoSignInMgrLoginProviderKey] as string;
             if (providerKey == null || provider == null)
             {
                 return null;
@@ -346,6 +346,27 @@ namespace Umbraco.Web.Common.Security
                 return error;
             }
             return await SignInOrTwoFactorAsync(user, isPersistent, loginInfo.LoginProvider, bypassTwoFactor);
+        }
+
+        /// <summary>
+        /// Configures the redirect URL and user identifier for the specified external login <paramref name="provider"/>.
+        /// </summary>
+        /// <param name="provider">The provider to configure.</param>
+        /// <param name="redirectUrl">The external login URL users should be redirected to during the login flow.</param>
+        /// <param name="userId">The current user's identifier, which will be used to provide CSRF protection.</param>
+        /// <returns>A configured <see cref="AuthenticationProperties"/>.</returns>
+        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string userId = null)
+        {
+            // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
+            // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/
+
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            properties.Items[UmbracoSignInMgrLoginProviderKey] = provider;
+            if (userId != null)
+            {
+                properties.Items[UmbracoSignInMgrXsrfKey] = userId;
+            }
+            return properties;
         }
 
         public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync()

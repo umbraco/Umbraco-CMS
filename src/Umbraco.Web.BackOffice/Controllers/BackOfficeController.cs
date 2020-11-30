@@ -268,10 +268,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                 redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
             }
 
+            // Configures the redirect URL and user identifier for the specified external login
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            // TODO: I believe we will have to fill in our own XsrfKey like we use to do since I think
-            // we validate against that key?
-            // see https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/src/Umbraco.Web/Editors/ChallengeResult.cs#L48
+            
             return Challenge(properties, provider);
         }
 
@@ -286,10 +285,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, User.Identity.GetUserId());
-            // TODO: I believe we will have to fill in our own XsrfKey like we use to do since I think
-            // we validate against that key?
-            // see https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/src/Umbraco.Web/Editors/ChallengeResult.cs#L48
+
+            // Configures the redirect URL and user identifier for the specified external login including xsrf data
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
+            
             return Challenge(properties, provider);
         }
 
@@ -320,25 +319,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<IActionResult> ExternalLinkLoginCallback()
         {
-            // TODO: Do we need/want to tell it an expected xsrf.
-            // In v8 the xsrf used to be set to the user id which was verified manually, in this case I think we don't specify
-            // the key and that is up to the underlying sign in manager to set so we'd just tell it to expect the user id,
-            // the XSRF value used to be set in our ChallengeResult but now we don't have that so this needs to be set in the
-            // BackOfficeController when we issue a Challenge, see TODO notes there.
-            var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                // ... this should really not happen
+                TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
+                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+            }
+
+            var loginInfo = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
 
             if (loginInfo == null)
             {
                 //Add error and redirect for it to be displayed
                 TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
-                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
-            }
-
-            var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
-            if (user == null)
-            {
-                // ... this should really not happen
-                TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 

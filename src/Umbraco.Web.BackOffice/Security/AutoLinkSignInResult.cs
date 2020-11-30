@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Umbraco.Web.Common.Security
 {
+    /// <summary>
+    /// Result returned from signing in when auto-linking takes place
+    /// </summary>
     public class AutoLinkSignInResult : SignInResult
     {
         public static AutoLinkSignInResult FailedNotLinked = new AutoLinkSignInResult()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,12 @@ namespace Umbraco.Core.BackOffice
     public interface  IBackOfficeUserManager<TUser>: IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        Task<string> GetUserIdAsync(TUser user);
+
+        Task<TUser> GetUserAsync(ClaimsPrincipal principal);
+
+        string GetUserId(ClaimsPrincipal principal);
+
         Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
 
         Task<IdentityResult> DeleteAsync(TUser user);
