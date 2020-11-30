@@ -24,6 +24,7 @@ using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Tests.Common.Builders;
 using System.Runtime.InteropServices;
+using Umbraco.Tests.Common.TestHelpers;
 
 namespace Umbraco.Tests.Common
 {
@@ -89,8 +90,23 @@ namespace Umbraco.Tests.Common
                 if (_ioHelper == null)
                 {
                     var hostingEnvironment = GetHostingEnvironment();
-                    _ioHelper = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? new IOHelperLinux(hostingEnvironment)
-                        : (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? (IIOHelper)new IOHelperOSX(hostingEnvironment) : new IOHelperWindows(hostingEnvironment));
+
+                    if (TestEnvironment.IsWindows)
+                    {
+                        _ioHelper = new IOHelperWindows(hostingEnvironment);
+                    }
+                    else if (TestEnvironment.IsLinux)
+                    {
+                        _ioHelper = new IOHelperLinux(hostingEnvironment);
+                    }
+                    else if (TestEnvironment.IsOSX)
+                    {
+                        _ioHelper = new IOHelperOSX(hostingEnvironment);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Unexpected OS");
+                    }
                 }
                 return _ioHelper;
             }
