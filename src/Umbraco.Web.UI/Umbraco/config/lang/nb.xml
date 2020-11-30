@@ -241,7 +241,7 @@
     <key alias="recycleBinIsEmpty">Papirkurven er nå tom</key>
     <key alias="recycleBinWarning">Når elementer blir slettet fra papirkurven vil de være slettet for alltid</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
-    <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Nettstedet er indeksert</key>
@@ -398,7 +398,7 @@
     <key alias="update">Oppdater</key>
     <key alias="upgrade">Oppgrader</key>
     <key alias="upload">Last opp</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Bruker</key>
     <key alias="username">Brukernavn</key>
     <key alias="value">Verdi</key>

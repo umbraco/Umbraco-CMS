@@ -62,7 +62,7 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url providers collection builder.
+        /// Gets the URL providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)

@@ -7,11 +7,11 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice urls and a template.
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice URLs and a template.
     /// </summary>
     /// <remarks>
     /// <para>This finder allows for an odd routing pattern similar to altTemplate, probably only use case is if there is an alternative mime type template and it should be routable by something like "/hello/world/json" where the JSON template is to be used for the "world" page</para>
-    /// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
+    /// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice URL of a document, and <c>template</c> a template alias.</para>
     /// <para>If successful, then the template of the document request is also assigned.</para>
     /// </remarks>
     public class ContentFinderByUrlAndTemplate : ContentFinderByUrl

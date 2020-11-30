@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Templates
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"#\" world ")]
         public void ParseLocalLinks(string input, string result)
         {
-            //setup a mock url provider which we'll use for testing
+            //setup a mock URL provider which we'll use for testing
             var contentUrlProvider = new Mock<IUrlProvider>();
             contentUrlProvider
                 .Setup(x => x.GetUrl( It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))

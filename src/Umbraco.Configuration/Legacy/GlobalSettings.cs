@@ -100,9 +100,9 @@ namespace Umbraco.Core.Configuration.Legacy
         }
 
         /// <summary>
-        /// Gets the reserved urls from web.config.
+        /// Gets the reserved URLs from web.config.
         /// </summary>
-        /// <value>The reserved urls.</value>
+        /// <value>The reserved URLs.</value>
         public string ReservedUrls
         {
             get
@@ -253,10 +253,10 @@ namespace Umbraco.Core.Configuration.Legacy
         }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
+        /// Gets a value indicating whether umbraco should hide top level nodes from generated URLs.
         /// </summary>
         /// <value>
-        ///     <c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        ///     <c>true</c> if umbraco hides top level nodes from URLs; otherwise, <c>false</c>.
         /// </value>
         public bool HideTopLevelNodeFromPath
         {

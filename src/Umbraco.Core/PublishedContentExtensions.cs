@@ -40,11 +40,11 @@ namespace Umbraco.Core
         #region Url segment
 
         /// <summary>
-        /// Gets the url segment of the content item.
+        /// Gets the URL segment of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
-        /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
+        /// <param name="culture">The specific culture to get the URL segment for. If null is used the current culture is used (Default is null).</param>
         public static string UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
         {
             // invariant has invariant value (whatever the requested culture)
@@ -824,7 +824,7 @@ namespace Umbraco.Core
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">
-        /// The specific culture to get the url children for. Default is null which will use the current culture in <see cref="VariationContext"/>
+        /// The specific culture to get the URL children for. Default is null which will use the current culture in <see cref="VariationContext"/>
         /// </param>
         /// <remarks>
         /// <para>Gets children that are available for the specified culture.</para>

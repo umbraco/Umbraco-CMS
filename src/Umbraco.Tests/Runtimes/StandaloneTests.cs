@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
-            // no published url
+            // no published URL
             Assert.AreEqual("#", pcontent.Url());
 
             // now publish the document + make some unpublished changes
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsFalse(pcontent.IsDraft());
 
-            // but the url is the published one - no draft url
+            // but the URL is the published one - no draft URL
             Assert.AreEqual("/test/", pcontent.Url());
 
             // and also an updated draft document
@@ -234,7 +234,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("testx", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
-            // and the published document has a url
+            // and the published document has a URL
             Assert.AreEqual("/test/", pcontent.Url());
 
             umbracoContextReference.Dispose();

@@ -97,7 +97,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
                 var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;

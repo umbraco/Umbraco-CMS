@@ -208,5 +208,17 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             var rules = result.Items.Select(Map);
             return rules;
         }
+
+        public IRedirectUrl GetMostRecentUrl(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentUrl(url);
+            var urlHash = url.GenerateHash<SHA1>();
+            var sql = GetBaseQuery(false)
+                .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.Culture == culture.ToLower())
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
+            var dtos = Database.Fetch<RedirectUrlDto>(sql);
+            var dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
     }
 }

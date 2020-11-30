@@ -163,6 +163,7 @@
     <Content Include="Config\Lang\zh-CN.user.xml" />
     <None Include="Config\splashes\NoNodes.cshtml" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
+    <Content Include="Umbraco\Config\Lang\cy.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\Install\Views\Web.config" />

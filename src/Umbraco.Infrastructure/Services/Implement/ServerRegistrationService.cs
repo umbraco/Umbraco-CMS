@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Touches a server to mark it as active; deactivate stale servers.
         /// </summary>
-        /// <param name="serverAddress">The server url.</param>
+        /// <param name="serverAddress">The server URL.</param>
         /// <param name="serverIdentity">The server unique identity.</param>
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout)

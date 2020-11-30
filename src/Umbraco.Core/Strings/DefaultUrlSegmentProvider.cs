@@ -15,11 +15,11 @@ namespace Umbraco.Core.Strings
         }
 
         /// <summary>
-        /// Gets the url segment for a specified content and culture.
+        /// Gets the URL segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The url segment.</returns>
+        /// <returns>The URL segment.</returns>
         public string GetUrlSegment(IContentBase content, string culture = null)
         {
             return GetUrlSegmentSource(content, culture).ToUrlSegment(_shortStringHelper, culture);

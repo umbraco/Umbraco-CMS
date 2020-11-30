@@ -185,7 +185,7 @@ namespace Umbraco.Core.Services.Implement
             var folderNames = string.Empty;
             if (dataType.Level != 1)
             {
-                //get url encoded folder names
+                //get URL encoded folder names
                 var folders = _dataTypeService.GetContainers(dataType)
                     .OrderBy(x => x.Level)
                     .Select(x => WebUtility.UrlEncode(x.Name));
@@ -527,7 +527,7 @@ namespace Umbraco.Core.Services.Implement
             //don't add folders if this is a child doc type
             if (contentType.Level != 1 && masterContentType == null)
             {
-                //get url encoded folder names
+                //get URL encoded folder names
                 var folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => WebUtility.UrlEncode(x.Name));

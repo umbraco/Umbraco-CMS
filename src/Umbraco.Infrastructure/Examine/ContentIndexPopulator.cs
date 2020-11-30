@@ -123,7 +123,7 @@ namespace Umbraco.Examine
                 content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
                     Ordering.By("Path", Direction.Ascending)).ToArray();
 
-
+                
                 if (content.Length > 0)
                 {
                     var indexableContent = new List<IContent>();

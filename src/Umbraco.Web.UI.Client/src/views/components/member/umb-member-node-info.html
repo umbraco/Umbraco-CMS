@@ -1,7 +1,7 @@
 <div class="umb-package-details">
     <div class="umb-package-details__main-content">
 
-        <umb-box data-element="node-info-membership" ng-repeat="group in node.tabs| filter: {properties:{view:'readonlyvalue'}} track by group.label">
+        <umb-box data-element="node-info-membership" ng-repeat="group in node.tabs| filter: {properties:{view:'readonlyvalue'}} track by group.id">
 
             <div class="umb-group-panel__header">
                 <div>{{ group.label }}</div>

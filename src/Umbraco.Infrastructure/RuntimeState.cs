@@ -74,7 +74,7 @@ namespace Umbraco.Core
             // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
 
 
-            // see U4-10626 - in some cases we want to reset the application url
+            // see U4-10626 - in some cases we want to reset the application URL
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
             var url = _backOfficeInfo.GetAbsoluteUrl;

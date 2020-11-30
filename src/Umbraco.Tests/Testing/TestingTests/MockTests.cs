@@ -68,7 +68,8 @@ namespace Umbraco.Tests.Testing.TestingTests
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>());
+                Mock.Of<IPublishedContentQuery>(),
+                Mock.Of<MembershipHelper>());
             Assert.Pass();
         }
 

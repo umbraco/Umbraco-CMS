@@ -187,7 +187,7 @@ namespace Umbraco.Web.Runtime
             var url = umbracoPath + (meta.IsBackOffice ? "/BackOffice" : "") + "/Api/" + meta.ControllerName + "/{action}/{id}";
             var route = RouteTable.Routes.MapHttpRoute(
                 $"umbraco-api-{meta.ControllerName}",
-                url, // url to match
+                url, // URL to match
                 new { controller = meta.ControllerName, id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace });
             if (route.DataTokens == null) // web api routes don't set the data tokens object
@@ -201,7 +201,7 @@ namespace Umbraco.Web.Runtime
             var url = umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}";
             var route = RouteTable.Routes.MapRoute(
                 $"umbraco-surface-{meta.ControllerName}",
-                url, // url to match
+                url, // URL to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); // look in this namespace to create the controller
             route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); // ensure the umbraco token is set

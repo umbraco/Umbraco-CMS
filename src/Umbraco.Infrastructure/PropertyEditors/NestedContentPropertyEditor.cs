@@ -380,6 +380,9 @@ namespace Umbraco.Web.PropertyEditors
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return new List<NestedContentRowValue>();
 
+                 if (!propertyValue.ToString().DetectIsJson())
+                    return new List<NestedContentRowValue>();
+
                 var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString());
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
@@ -404,23 +407,26 @@ namespace Umbraco.Web.PropertyEditors
                         propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
 
                     // find any keys that are not real property types and remove them
-                    foreach(var prop in row.RawPropertyValues.ToList())
+                    if (row.RawPropertyValues != null)
                     {
-                        if (IsSystemPropertyKey(prop.Key)) continue;
+                        foreach (var prop in row.RawPropertyValues.ToList())
+                        {
+                            if (IsSystemPropertyKey(prop.Key)) continue;
 
-                        // doesn't exist so remove it
-                        if (!propertyTypes.TryGetValue(prop.Key, out var propType))
-                        {
-                            row.RawPropertyValues.Remove(prop.Key);
-                        }
-                        else
-                        {
-                            // set the value to include the resolved property type
-                            row.PropertyValues[prop.Key] = new NestedContentPropertyValue
+                            // doesn't exist so remove it
+                            if (!propertyTypes.TryGetValue(prop.Key, out var propType))
                             {
-                                PropertyType = propType,
-                                Value = prop.Value
-                            };
+                                row.RawPropertyValues.Remove(prop.Key);
+                            }
+                            else
+                            {
+                                // set the value to include the resolved property type
+                                row.PropertyValues[prop.Key] = new NestedContentPropertyValue
+                                {
+                                    PropertyType = propType,
+                                    Value = prop.Value
+                                };
+                            }
                         }
                     }
                 }

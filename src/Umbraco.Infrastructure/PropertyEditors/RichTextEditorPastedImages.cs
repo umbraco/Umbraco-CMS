@@ -107,7 +107,7 @@ namespace Umbraco.Web.PropertyEditors
                 // Add the UDI to the img element as new data attribute
                 img.SetAttributeValue("data-udi", udi.ToString());
 
-                // Get the new persisted image url
+                // Get the new persisted image URL
                 var mediaTyped = _umbracoContextAccessor?.UmbracoContext?.Media.GetById(udi.Guid);
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");

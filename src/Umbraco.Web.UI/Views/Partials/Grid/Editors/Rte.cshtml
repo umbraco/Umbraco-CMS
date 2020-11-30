@@ -6,8 +6,8 @@
     var htmlUrlParser = Current.Factory.GetInstance<HtmlUrlParser>();
     var htmlImageSourceParser = Current.Factory.GetInstance<HtmlImageSourceParser>();
 
-    var value = htmlUrlParser.EnsureUrls(Model.value.ToString());
+    var value = htmlLocalLinkParser.EnsureInternalLinks(Model.value.ToString());
+    value = htmlUrlParser.EnsureUrls(value);
     value = htmlImageSourceParser.EnsureImageSources(value);
-    value = htmlLocalLinkParser.EnsureInternalLinks(value);
 }
 @Html.Raw(value)

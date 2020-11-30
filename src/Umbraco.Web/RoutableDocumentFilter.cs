@@ -47,7 +47,7 @@ namespace Umbraco.Web
             var maybeDoc = true;
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
-            // handle directory-urls used for asmx
+            // handle directory-URLs used for asmx
             // TODO: legacy - what's the point really?
             var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
             if (asmxPos >= 0)
@@ -126,7 +126,7 @@ namespace Umbraco.Web
                 return newReservedList;
             });
 
-            //The url should be cleaned up before checking:
+            //The URL should be cleaned up before checking:
             // * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
             // * We shouldn't be comparing the query at all
             var pathPart = url.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
@@ -135,7 +135,7 @@ namespace Umbraco.Web
                 pathPart = pathPart.EnsureEndsWith('/');
             }
 
-            // return true if url starts with an element of the reserved list
+            // return true if URL starts with an element of the reserved list
             return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
         }
 

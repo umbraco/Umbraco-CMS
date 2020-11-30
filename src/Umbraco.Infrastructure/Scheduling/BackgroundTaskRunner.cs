@@ -762,9 +762,17 @@ namespace Umbraco.Web.Scheduling
                 lock (_locker)
                 {
                     if (_runningTask != null)
-                        _runningTask.ContinueWith(_ => StopImmediate());
+                    {
+                        _runningTask.ContinueWith(
+                            _ => StopImmediate(),
+                            // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                            TaskScheduler.Default);
+                    }   
                     else
+                    {
                         StopImmediate();
+                    }
+                        
                 }
             }
 

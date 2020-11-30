@@ -23,7 +23,7 @@ namespace Umbraco.Core.IO
         // (is used in GetRelativePath)
         private readonly string _rootPathFwd;
 
-        // the relative url, using url separator chars, NOT ending with a separator
+        // the relative URL, using URL separator chars, NOT ending with a separator
         // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
@@ -255,9 +255,9 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Gets the filesystem-relative path of a full path or of an url.
+        /// Gets the filesystem-relative path of a full path or of an URL.
         /// </summary>
-        /// <param name="fullPathOrUrl">The full path or url.</param>
+        /// <param name="fullPathOrUrl">The full path or URL.</param>
         /// <returns>The path, relative to this filesystem's root.</returns>
         /// <remarks>
         /// <para>The relative path is relative to this filesystem's root, not starting with any
@@ -265,10 +265,10 @@ namespace Umbraco.Core.IO
         /// </remarks>
         public string GetRelativePath(string fullPathOrUrl)
         {
-            // test url
-            var path = fullPathOrUrl.Replace('\\', '/'); // ensure url separator char
+            // test URL
+            var path = fullPathOrUrl.Replace('\\', '/'); // ensure URL separator char
 
-            // if it starts with the root url, strip it and trim the starting slash to make it relative
+            // if it starts with the root URL, strip it and trim the starting slash to make it relative
             // eg "/Media/1234/img.jpg" => "1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
                 return path.Substring(_rootUrl.Length).TrimStart('/');
@@ -331,10 +331,10 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Gets the url.
+        /// Gets the URL.
         /// </summary>
         /// <param name="path">The filesystem-relative path.</param>
-        /// <returns>The url.</returns>
+        /// <returns>The URL.</returns>
         /// <remarks>All separators are forward-slashes.</remarks>
         public string GetUrl(string path)
         {

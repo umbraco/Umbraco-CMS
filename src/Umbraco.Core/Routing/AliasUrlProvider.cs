@@ -9,7 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides urls using the <c>umbracoUrlAlias</c> property.
+    /// Provides URLs using the <c>umbracoUrlAlias</c> property.
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
@@ -47,15 +47,15 @@ namespace Umbraco.Web.Routing
         #region GetOtherUrls
 
         /// <summary>
-        /// Gets the other urls of a published content.
+        /// Gets the other URLs of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The other urls for the published content.</returns>
+        /// <param name="current">The current absolute URL.</param>
+        /// <returns>The other URLs for the published content.</returns>
         /// <remarks>
-        /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
-        /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
+        /// <para>Other URLs are those that <c>GetUrl</c> would not return in the current context, but would be valid
+        /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Routing
             if (domainUris == null)
             {
                 // no domain
-                // if the property is invariant, then url "/<alias>" is ok
+                // if the property is invariant, then URL "/<alias>" is ok
                 // if the property varies, then what are we supposed to do?
                 //  the content finder may work, depending on the 'current' culture,
                 //  but there's no way we can return something meaningful here
@@ -105,11 +105,11 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                // some domains: one url per domain, which is "<domain>/<alias>"
-                foreach(var domainUri in domainUris)
+                // some domains: one URL per domain, which is "<domain>/<alias>"
+                foreach (var domainUri in domainUris)
                 {
-                    // if the property is invariant, get the invariant value, url is "<domain>/<invariant-alias>"
-                    // if the property varies, get the variant value, url is "<domain>/<variant-alias>"
+                    // if the property is invariant, get the invariant value, URL is "<domain>/<invariant-alias>"
+                    // if the property varies, get the variant value, URL is "<domain>/<variant-alias>"
 
                     // but! only if the culture is published, else ignore
                     if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;

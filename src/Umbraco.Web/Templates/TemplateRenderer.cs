@@ -47,7 +47,7 @@ namespace Umbraco.Web.Templates
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // instantiate a request and process
-            // important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
+            // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
             var contentRequest = _publishedRouter.CreateRequest(umbracoContext);
 

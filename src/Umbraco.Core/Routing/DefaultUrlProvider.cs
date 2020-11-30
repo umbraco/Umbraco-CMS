@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public virtual UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
-            if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
+            if (!current.IsAbsoluteUri) throw new ArgumentException("Current URL must be absolute.", nameof(current));
 
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             // will not use cache if previewing
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Routing
                 ? null
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
 
-            // assemble the url from domainUri (maybe null) and path
+            // assemble the URL from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
 
             return UrlInfo.Url(url, culture);
@@ -70,15 +70,15 @@ namespace Umbraco.Web.Routing
         #region GetOtherUrls
 
         /// <summary>
-        /// Gets the other urls of a published content.
+        /// Gets the other URLs of a published content.
         /// </summary>
         /// <param name="umbracoContextAccessor">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The other urls for the published content.</returns>
+        /// <param name="current">The current absolute URL.</param>
+        /// <returns>The other URLs for the published content.</returns>
         /// <remarks>
-        /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
-        /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
+        /// <para>Other URLs are those that <c>GetUrl</c> would not return in the current context, but would be valid
+        /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
@@ -171,7 +171,7 @@ namespace Umbraco.Web.Routing
             }
 
             // UriFromUmbraco will handle vdir
-            // meaning it will add vdir into domain urls too!
+            // meaning it will add vdir into domain URLs too!
             return _uriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 

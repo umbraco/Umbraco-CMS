@@ -100,7 +100,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             // so we have a route that maps to a content... say "1234/path/to/content" - however, there could be a
             // domain set on "to" and route "4567/content" would also map to the same content - and due to how
-            // urls computing work (by walking the tree up to the first domain we find) it is that second route
+            // URLs computing work (by walking the tree up to the first domain we find) it is that second route
             // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
             // longer one - so make sure we don't cache the wrong route
 
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             if (node == null) return null;
 
             // walk up from that node until we hit a node with a domain,
-            // or we reach the content root, collecting urls in the way
+            // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
             var n = node;
             var hasDomains = _domainCache.HasAssigned(n.Id);
