@@ -1,15 +1,14 @@
 .umb-media-entry-editor {
-
-    .imagecropper {
-        height: 100%;
-    }
+    
     .umb-cropper-imageholder {
-        
-    }
-    .imagecropper .umb-cropper__container {
+        position: relative;
+        width: 100%;
         height: 100%;
     }
-    .imagecropper > div {
+    .umb-cropper-gravity {
+        height: 100%;
+    }
+    .umb-cropper__container {
         width: 100%;
         height: 100%;
     }
@@ -24,12 +23,14 @@
 
 .umb-media-entry-editor__pane {
     display: flex;
+    flex-flow: row-reverse;
     height: 100%;
     width: 100%;
 }
 
 .umb-media-entry-editor__crops {
     background-color: white;
+    overflow: auto;
 
     > button {
         display: flex;
@@ -98,4 +99,18 @@
 
 .umb-media-entry-editor__imagecropper {
     flex: auto;
+    height: 100%;
 }
+
+.umb-media-entry-editor__imageholder {
+    display: block;
+    position: relative;
+    height: calc(100% - 50px);
+}
+.umb-media-entry-editor__imageholder-actions {
+    background-color: white;
+    height: 50px;
+    display: flex;
+    justify-content: flex-end;
+}
+

@@ -514,15 +514,6 @@
     z-index: @zindexCropperOverlay;
 }
 
-.umb-cropper-gravity .viewport{
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    contain: content;
-}
-
-
 .umb-cropper .viewport {
     position: absolute;
     overflow: hidden;
@@ -614,6 +605,7 @@
     font-size: 22px;
 }
 
+/*
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
         max-width: 100%;
@@ -626,6 +618,7 @@
     .umb-cropper-imageholder umb-image-gravity {
         display:block;
     }
+    */
 
     .umb-crop-thumbnail-container {
         img {
@@ -643,21 +636,24 @@
     .gravity-container {
         border: 1px solid @gray-8;
         line-height: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .checkeredBackground();
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        contain: content;
 
         .viewport {
-            max-width: 600px;
-            .checkeredBackground();
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            max-height: 100%;
+            max-width: 100%;
 
             img {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
             }
 
             &:hover {

@@ -42,26 +42,24 @@
 
                     <div class="imagecropper umb-media-entry-editor__imagecropper">
 
-                        <div ng-if="vm.currentCrop">
+                        <div ng-if="vm.currentCrop" class="umb-cropper__container">
 
-                            <div class="umb-cropper__container">
+                            <umb-image-crop height="{{vm.currentCrop.height}}"
+                                            width="{{vm.currentCrop.width}}"
+                                            crop="vm.currentCrop.coordinates"
+                                            alias="{{vm.currentCrop.alias}}"
+                                            force-update="{{vm.forceUpdateCrop}}"
+                                            center="vm.mediaEntry.focalPoint"
+                                            src="vm.imageSrc">
+                                <button class="btn btn-link" ng-click="vm.resetCrop()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                            </umb-image-crop>
 
-                                <umb-image-crop height="{{vm.currentCrop.height}}"
-                                                width="{{vm.currentCrop.width}}"
-                                                crop="vm.currentCrop.coordinates"
-                                                alias="{{vm.currentCrop.alias}}"
-                                                force-update="{{vm.forceUpdateCrop}}"
-                                                center="vm.mediaEntry.focalPoint"
-                                                src="vm.imageSrc">
-                                    <button class="btn btn-link" ng-click="vm.resetCrop()"><localize key="imagecropper_reset">Reset this crop</localize></button>
-                                </umb-image-crop>
-
-                            </div>
                         </div>
 
-                        <div ng-show="!vm.currentCrop" class="umb-cropper-imageholder clearfix">
+                        <div ng-show="!vm.currentCrop" class="umb-cropper-imageholder">
 
                             <umb-image-gravity
+                                class="umb-media-entry-editor__imageholder"
                                 ng-if="vm.imageSrc"
                                 src="vm.imageSrc"
                                 center="vm.mediaEntry.focalPoint"
@@ -70,6 +68,7 @@
                             </umb-image-gravity>
 
                             <umb-file-icon
+                                class="umb-media-entry-editor__imageholder"
                                 ng-if="vm.loading === false && !vm.imageSrc"
                                 ng-class="{'trashed': vm.media.trashed}"
                                 extension="{{vm.media.extension}}"
@@ -78,8 +77,10 @@
                                 text="{{vm.media.name}}">
                             </umb-file-icon>
 
-                            <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_replaceMedia">Replace media</localize></button>
-                            <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="mediaPicker_openMedia">Open media</localize></button>
+                            <div class="umb-media-entry-editor__imageholder-actions">
+                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_replaceMedia">Replace media</localize></button>
+                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="mediaPicker_openMedia">Open media</localize></button>
+                            </div>
                         </div>
 
                     </div>
