@@ -12,10 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
@@ -31,7 +29,6 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
@@ -55,7 +52,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IIOHelper _ioHelper;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -84,7 +80,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
-            IIOHelper ioHelper,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
@@ -111,7 +106,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _ioHelper = ioHelper;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -618,7 +612,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult Import(string file)
         {
-            var filePath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
+            var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
             if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
             {
                 return NotFound();

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [SetUp]
         public void SetUp()
         {
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews), HostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
         }
 
         [TearDown]

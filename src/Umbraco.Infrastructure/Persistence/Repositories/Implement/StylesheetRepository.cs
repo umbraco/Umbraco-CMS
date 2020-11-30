@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -14,12 +16,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
+        private readonly ILogger<StylesheetRepository> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public StylesheetRepository(ILogger<StylesheetRepository> logger, IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
+            _logger = logger;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
         }
@@ -126,17 +130,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             try
             {
                 // may throw for security reasons
+
                 fullPath = FileSystem.GetFullPath(stylesheet.Path);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Can't get full path");
                 return false;
             }
 
             // validate path and extension
             var validDir = _globalSettings.UmbracoCssPath;
+            _logger.LogWarning("fullPath {fullPath}, validDir: {validDir}",fullPath,  validDir);
+
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var isValidExtension = _ioHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
+
+            _logger.LogWarning("isValidPath {isValidPath}, isValidExtension: {isValidExtension}",isValidPath,  isValidExtension);
             return isValidPath && isValidExtension;
         }
 
