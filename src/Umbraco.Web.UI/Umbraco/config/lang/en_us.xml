@@ -652,6 +652,7 @@
     <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="general">
+        <key alias="addUpTo">Add up to</key>
     <key alias="options">Options</key>
     <key alias="about">About</key>
     <key alias="action">Action</key>

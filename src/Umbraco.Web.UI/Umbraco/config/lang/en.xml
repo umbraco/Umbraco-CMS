@@ -645,6 +645,7 @@
     <key alias="propertyHasErrors">This property is invalid</key>
   </area>
   <area alias="general">
+        <key alias="addUpTo">Add up to</key>
     <key alias="about">About</key>
     <key alias="action">Action</key>
     <key alias="actions">Actions</key>
