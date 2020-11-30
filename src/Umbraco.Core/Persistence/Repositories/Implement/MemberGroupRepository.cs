@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
 
             if (ids.Any())
-                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
+                sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
         }
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IMemberGroup Get(Guid uniqueId)
         {
             var sql = GetBaseQuery(false);
-            sql.Where("umbracoNode.uniqueId = @uniqueId", new { uniqueId });
+            sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
 
             var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
@@ -203,7 +203,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<MemberDto>()
                 .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
+                .WhereIn<MemberDto>(x => x.LoginName, usernames);
+
             return Database.Fetch<int>(memberSql).ToArray();
         }
 
@@ -232,8 +233,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var existingSql = Sql()
                .SelectAll()
                .From<NodeDto>()
-               .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-               .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+               .WhereIn<NodeDto>(x => x.Text, roleNames);
+
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
             var missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
@@ -255,9 +257,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select($"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
-                .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
+                .On<NodeDto, Member2MemberGroupDto>(x => x.NodeId, x => x.MemberGroup)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
+                .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds);
 
             var currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
 
@@ -289,9 +291,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var existingSql = Sql()
                     .SelectAll()
                     .From<NodeDto>()
-                    .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-                    .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .WhereIn<NodeDto>(x => x.Text, roleNames);
+
             var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
+
+            // TODO: Test if we can replace with strongly typed delete query
+
+            //var deleteSql = Sql()
+            //        .Delete<Member2MemberGroupDto>()
+            //        .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds)
+            //        .WhereIn<Member2MemberGroupDto>(x => x.MemberGroup, existingRolesIds);
+
+            //Database.Execute(deleteSql);
 
             Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",
                 new { /*memberIds =*/ memberIds, memberGroups = existingRolesIds });
