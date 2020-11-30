@@ -105,6 +105,12 @@ namespace Umbraco.Extensions
 
         private static void CreatePolicies(AuthorizationOptions options, string backOfficeAuthenticationScheme)
         {
+            options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
+            {
+                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+                policy.Requirements.Add(new MediaPermissionsResourceRequirement());
+            });
+
             options.AddPolicy(AuthorizationPolicies.MediaPermissionPathById, policy =>
             {
                 policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -107,11 +108,15 @@ namespace Umbraco.Web.BackOffice.Filters
                         return false;
                 }
 
-                var requirement = contentToCheck == null
-                    ? new MediaPermissionsResourceRequirement(contentIdToCheck)
-                    : new MediaPermissionsResourceRequirement();
+                var resource = contentToCheck == null
+                    ? new MediaPermissionsResource(contentIdToCheck)
+                    : new MediaPermissionsResource(contentToCheck);
 
-                var authorizationResult = await _authorizationService.AuthorizeAsync(actionContext.HttpContext.User, contentToCheck, requirement);
+                var authorizationResult = await _authorizationService.AuthorizeAsync(
+                    actionContext.HttpContext.User,
+                    resource,
+                    AuthorizationPolicies.MediaPermissionByResource);
+
                 if (!authorizationResult.Succeeded)
                 {
                     actionContext.Result = new ForbidResult();

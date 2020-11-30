@@ -24,7 +24,6 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsResourceRequirement requirement, ContentPermissionsResource resource)
         {
-
             var permissionResult = resource.NodeId.HasValue
                     ? _contentPermissions.CheckPermissions(
                             resource.NodeId.Value,

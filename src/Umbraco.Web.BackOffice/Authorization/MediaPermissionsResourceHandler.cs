@@ -8,7 +8,7 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the <see cref="IContent"/> specified
     /// </summary>
-    public class MediaPermissionsResourceHandler : MustSatisfyRequirementAuthorizationHandler<MediaPermissionsResourceRequirement, IMedia>
+    public class MediaPermissionsResourceHandler : MustSatisfyRequirementAuthorizationHandler<MediaPermissionsResourceRequirement, MediaPermissionsResource>
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly MediaPermissions _mediaPermissions;
@@ -21,23 +21,16 @@ namespace Umbraco.Web.BackOffice.Authorization
             _mediaPermissions = mediaPermissions;
         }
 
-        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, MediaPermissionsResourceRequirement requirement, IMedia resource)
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, MediaPermissionsResourceRequirement requirement, MediaPermissionsResource resource)
         {
-            var permissionResult = MediaPermissions.MediaAccess.NotFound;
-
-            if (resource != null)
-            {
-                permissionResult = _mediaPermissions.CheckPermissions(
-                    resource,
-                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
-            }
-            else if (requirement.NodeId.HasValue)
-            {
-                permissionResult = _mediaPermissions.CheckPermissions(
+            var permissionResult = resource.NodeId.HasValue
+                ? _mediaPermissions.CheckPermissions(
                     _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                    requirement.NodeId.Value,
-                    out _);
-            }
+                    resource.NodeId.Value,
+                    out _)
+                : _mediaPermissions.CheckPermissions(
+                    resource.Media,
+                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
 
             return Task.FromResult(permissionResult != MediaPermissions.MediaAccess.Denied);
         }
