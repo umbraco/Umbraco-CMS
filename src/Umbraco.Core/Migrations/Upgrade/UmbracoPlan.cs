@@ -199,7 +199,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.9.0
             To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
 			
-            // to 8.10.0...
+            // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
             //FINAL
