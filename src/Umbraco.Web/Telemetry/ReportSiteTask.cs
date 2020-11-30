@@ -79,19 +79,20 @@ namespace Umbraco.Web.Telemetry
 
             try
             {
-                using (_httpClient)
-                {
-                    // Send data to LIVE telemetry
-                    _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+
+                // Send data to LIVE telemetry
+                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
-                    // Send data to DEBUG telemetry service
-                    _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                // Send data to DEBUG telemetry service
+                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
 
-                    _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
+                {
                     var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
-                    var request = new HttpRequestMessage(HttpMethod.Post, "installs/");
                     request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
                     // Set a low timeout - no need to use a larger default timeout for this POST request
