@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.IO
 {
-    public class IOHelper : IIOHelper
+    public abstract class IOHelper : IIOHelper
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -29,7 +31,7 @@ namespace Umbraco.Core.IO
             if (virtualPath.StartsWith("~"))
                 retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
 
-            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(_hostingEnvironment.ApplicationVirtualPath) == false)
+            if (virtualPath.StartsWith("/") && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
                 retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart('/');
 
             return retval;
@@ -64,19 +66,15 @@ namespace Umbraco.Core.IO
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
 
-            // Check if the path is already mapped
-            if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
-                || path.StartsWith(@"\\")) //UNC Paths start with "\\". If the site is running off a network drive mapped paths will look like "\\Whatever\Boo\Bar"
+            // Check if the path is already mapped - TODO: This should be switched to Path.IsPathFullyQualified once we are on Net Standard 2.1
+            if (IsPathFullyQualified(path))
             {
                 return path;
             }
-            // Check that we even have an HttpContext! otherwise things will fail anyways
-            // http://umbraco.codeplex.com/workitem/30946
-
 
             if (_hostingEnvironment.IsHosted)
             {
-                var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(_hostingEnvironment.ApplicationVirtualPath)))
+                var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath)))
                     ? _hostingEnvironment.MapPathWebRoot(path)
                     : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart('/'));
 
@@ -90,6 +88,14 @@ namespace Umbraco.Core.IO
 
             return retval;
         }
+
+        /// <summary>
+        /// Returns true if the path has a root, and is considered fully qualified for the OS it is on
+        /// See https://github.com/dotnet/runtime/blob/30769e8f31b20be10ca26e27ec279cd4e79412b9/src/libraries/System.Private.CoreLib/src/System/IO/Path.cs#L281 for the .NET Standard 2.1 version of this
+        /// </summary>
+        /// <param name="path">The path to check</param>
+        /// <returns>True if the path is fully qualified, false otherwise</returns>
+        public abstract bool IsPathFullyQualified(string path);
 
 
         /// <summary>
@@ -121,8 +127,11 @@ namespace Umbraco.Core.IO
             // not going to fix everything today
 
             var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
-            if (filePath.StartsWith(mappedRoot) == false)
-                filePath = _hostingEnvironment.MapPathContentRoot(filePath);
+            if (!PathStartsWith(filePath, mappedRoot))
+            {
+                // TODO this is going to fail.. Scripts Stylesheets need to use WebRoot, PartialViews need to use ContentRoot
+                filePath = _hostingEnvironment.MapPathWebRoot(filePath);
+            }
 
             // yes we can (see above)
             //// don't trust what we get, it may contain relative segments
@@ -131,10 +140,10 @@ namespace Umbraco.Core.IO
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (validDir.StartsWith(mappedRoot) == false)
-                    validDir = _hostingEnvironment.MapPathContentRoot(validDir);
+                if (!PathStartsWith(validDir, mappedRoot))
+                    validDir = _hostingEnvironment.MapPathWebRoot(validDir);
 
-                if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
+                if (PathStartsWith(filePath, validDir))
                     return true;
             }
 
@@ -153,16 +162,7 @@ namespace Umbraco.Core.IO
             return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
         }
 
-        public bool PathStartsWith(string path, string root, char separator)
-        {
-            // either it is identical to root,
-            // or it is root + separator + anything
-
-            if (path.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) return false;
-            if (path.Length == root.Length) return true;
-            if (path.Length < root.Length) return false;
-            return path[root.Length] == separator;
-        }
+        public abstract bool PathStartsWith(string path, string root, params char[] separators);
 
         public void EnsurePathExists(string path)
         {
@@ -181,7 +181,7 @@ namespace Umbraco.Core.IO
             if (path.IsFullPath())
             {
                 var rootDirectory = MapPath("~");
-                var relativePath = path.ToLowerInvariant().Replace(rootDirectory.ToLowerInvariant(), string.Empty);
+                var relativePath = PathStartsWith(path, rootDirectory) ? path.Substring(rootDirectory.Length) : path;
                 path = relativePath;
             }
 

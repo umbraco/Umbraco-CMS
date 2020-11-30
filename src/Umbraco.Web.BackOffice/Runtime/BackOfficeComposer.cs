@@ -45,11 +45,17 @@ namespace Umbraco.Web.BackOffice.Runtime
             builder.ComposeWebMappingProfiles();
 
             builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
-                new PhysicalFileSystem(
+            {
+                var path = "~/";
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                return new PhysicalFileSystem(
                     factory.GetRequiredService<IIOHelper>(),
-                    factory.GetRequiredService<IHostingEnvironment>(),
+                    hostingEnvironment,
                     factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
-                    "~/"));
+                    hostingEnvironment.MapPathContentRoot(path),
+                    hostingEnvironment.ToAbsolute(path)
+                );
+            });
 
             builder.Services.AddUnique<IIconService, IconService>();
             builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();

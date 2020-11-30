@@ -5,10 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Semver;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
@@ -22,7 +20,7 @@ namespace Umbraco.Core.Services.Implement
     public class PackagingService : IPackagingService
     {
         private readonly IPackageInstallation _packageInstallation;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
         private readonly IInstalledPackagesRepository _installedPackages;
@@ -33,13 +31,13 @@ namespace Umbraco.Core.Services.Implement
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation,
-            IIOHelper ioHelper)
+            IHostingEnvironment hostingEnvironment)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         #region Package Files
@@ -66,7 +64,7 @@ namespace Umbraco.Core.Services.Implement
             //successful
             if (bytes.Length > 0)
             {
-                var packagePath = _ioHelper.MapPath(Constants.SystemDirectories.Packages);
+                var packagePath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages);
 
                 // Check for package directory
                 if (Directory.Exists(packagePath) == false)

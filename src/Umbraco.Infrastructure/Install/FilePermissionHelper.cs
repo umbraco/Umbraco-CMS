@@ -4,12 +4,12 @@ using System.Linq;
 using System.IO;
 using System.Security.AccessControl;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Install
 {
@@ -23,12 +23,14 @@ namespace Umbraco.Web.Install
         private readonly string[] _permissionFiles = { };
         private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
+        public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IPublishedSnapshotService publishedSnapshotService)
         {
             _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _publishedSnapshotService = publishedSnapshotService;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
             _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
@@ -140,7 +142,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = _ioHelper.MapPath(dir + "/" + _ioHelper.CreateRandomFileName());
+                var path = _hostingEnvironment.MapPathContentRoot(dir + "/" + _ioHelper.CreateRandomFileName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
                 return true;
@@ -163,7 +165,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var dirPath = _ioHelper.MapPath(dir);
+                var dirPath = _hostingEnvironment.MapPathContentRoot(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     return true;
@@ -228,7 +230,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = _ioHelper.MapPath(file);
+                var path = _hostingEnvironment.MapPathContentRoot(file);
                 File.AppendText(path).Close();
                 return true;
             }

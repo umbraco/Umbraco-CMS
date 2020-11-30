@@ -109,7 +109,24 @@ namespace Umbraco.Web.Common.Builder
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });
 
-            builder.Services.AddUnique<IIOHelper, IOHelper>();
+            builder.Services.AddUnique<IIOHelper>(factory =>
+            {
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return new IOHelperLinux(hostingEnvironment);
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return new IOHelperOSX(hostingEnvironment);
+                }
+
+                return new IOHelperWindows(hostingEnvironment);
+            }
+
+                );
             builder.Services.AddUnique<IAppPolicyCache>(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
             builder.Services.AddUnique<IRequestCache>(factory => factory.GetRequiredService<AppCaches>().RequestCache);
             builder.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
@@ -124,7 +141,7 @@ namespace Umbraco.Web.Common.Builder
             builder.Services.AddUnique<IMainDom, MainDom>();
 
             builder.AddComposers();
-            
+
             return builder;
         }
 

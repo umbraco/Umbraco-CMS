@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Semver;
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
 
+                _httpClient.Timeout = TimeSpan.FromSeconds(1);
                 var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl,content);
                 var json = await task.Content.ReadAsStringAsync();
                 var result = _jsonSerializer.Deserialize<UpgradeResult>(json);
