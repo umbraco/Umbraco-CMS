@@ -61,6 +61,9 @@ namespace Umbraco.Web.Telemetry
                 // Silently swallow ex - but lets log it (ReadAllText throws a ton of different types of ex)
                 // Hence the use of general exception type
                 _logger.Error<ReportSiteTask>(ex, "Error in reading file contents of telemetry marker file found at '{filePath}'", telemetricsFilePath);
+
+                // Exit out early, but mark this task to be repeated in case its a file lock so it can be rechecked the next time round
+                return true;
             }
 
 
