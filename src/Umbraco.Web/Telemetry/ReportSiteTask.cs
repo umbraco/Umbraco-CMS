@@ -114,14 +114,14 @@ namespace Umbraco.Web.Telemetry
         public override bool IsAsync => true;
 
 
+        [DataContract]
         private class TelemetryReportData
         {
-            [JsonProperty("id")]
+            [DataMember(Name = "id")]
             public Guid Id { get; set; }
 
-            [JsonProperty("version")]
+            [DataMember(Name = "version")]
             public string Version { get; set; }
         }
     }
 }
-
