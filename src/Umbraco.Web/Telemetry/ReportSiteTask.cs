@@ -83,10 +83,10 @@ namespace Umbraco.Web.Telemetry
                 // Send data to LIVE telemetry
                 _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
-//#if DEBUG
+#if DEBUG
                 // Send data to DEBUG telemetry service
                 _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
-//#endif
+#endif
 
                 _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                 var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
