@@ -52,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
-        private readonly BackOfficeSignInManager _signInManager;
+        private readonly IBackOfficeSignInManager _signInManager;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger<BackOfficeController> _logger;
         private readonly IJsonSerializer _jsonSerializer;
@@ -68,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
-            BackOfficeSignInManager signInManager,
+            IBackOfficeSignInManager signInManager,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<BackOfficeController> logger,
             IJsonSerializer jsonSerializer,

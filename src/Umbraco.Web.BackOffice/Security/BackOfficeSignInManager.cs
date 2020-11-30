@@ -19,19 +19,17 @@ namespace Umbraco.Web.Common.Security
 
     using Constants = Umbraco.Core.Constants;
 
-    // TODO: There's potential to extract an interface for this for only what we use and put that in Core without aspnetcore refs, but we need to wait till were done with it since there's a bit to implement
-
-    public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
+    public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         private const string UmbracoSignInMgrLoginProviderKey = "LoginProvider";
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string UmbracoSignInMgrXsrfKey = "XsrfId"; 
+        private const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
         private BackOfficeUserManager _userManager;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly GlobalSettings _globalSettings;
-        
+
 
         public BackOfficeSignInManager(
             BackOfficeUserManager userManager,
@@ -75,7 +73,7 @@ namespace Umbraco.Web.Common.Security
                 return await HandleSignIn(null, userName, SignInResult.Failed);
             return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }
-        
+
         /// <inheritdoc />
         public override async Task<BackOfficeIdentityUser> GetTwoFactorAuthenticationUserAsync()
         {
@@ -122,7 +120,7 @@ namespace Umbraco.Web.Common.Security
             return await HandleSignIn(user, user?.UserName, SignInResult.Failed);
         }
 
-        
+
         /// <inheritdoc />
         public override bool IsSignedIn(ClaimsPrincipal principal)
         {
@@ -204,7 +202,7 @@ namespace Umbraco.Web.Common.Security
             //await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<bool> IsTwoFactorClientRememberedAsync(BackOfficeIdentityUser user)
         {
@@ -216,7 +214,7 @@ namespace Umbraco.Web.Common.Security
             return (result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task RememberTwoFactorClientAsync(BackOfficeIdentityUser user)
         {
@@ -229,7 +227,7 @@ namespace Umbraco.Web.Common.Security
                 new AuthenticationProperties { IsPersistent = true });
         }
 
-        
+
         /// <inheritdoc />
         public override Task ForgetTwoFactorClientAsync()
         {
@@ -239,7 +237,7 @@ namespace Umbraco.Web.Common.Security
             return Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
         {
@@ -268,7 +266,7 @@ namespace Umbraco.Web.Common.Security
             return SignInResult.Failed;
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
         {
@@ -328,9 +326,9 @@ namespace Umbraco.Web.Common.Security
             if (user == null)
             {
                 // user doesn't exist so see if we can auto link
-                return await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions);                
+                return await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions);
             }
-                        
+
             if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
             {
                 var shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
@@ -422,7 +420,7 @@ namespace Umbraco.Web.Common.Security
             if (username.IsNullOrWhiteSpace())
             {
                 username = "UNKNOWN"; // could happen in 2fa or something else weird
-            }   
+            }
 
             if (result.Succeeded)
             {
@@ -432,14 +430,14 @@ namespace Umbraco.Web.Common.Security
                 {
                     //we have successfully logged in, reset the AccessFailedCount
                     user.AccessFailedCount = 0;
-                }   
+                }
                 await UserManager.UpdateAsync(user);
 
                 Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
                 if (user != null)
                 {
                     _userManager.RaiseLoginSuccessEvent(user, user.Id);
-                }   
+                }
             }
             else if (result.IsLockedOut)
             {
@@ -449,7 +447,7 @@ namespace Umbraco.Web.Common.Security
             else if (result.RequiresTwoFactor)
             {
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }   
+            }
             else if (!result.Succeeded || result.IsNotAllowed)
             {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
@@ -560,7 +558,7 @@ namespace Umbraco.Web.Common.Security
             if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)
             {
                 return SignInResult.Failed;
-            }   
+            }
 
             var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
 

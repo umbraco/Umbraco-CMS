@@ -31,7 +31,7 @@ namespace Umbraco.Extensions
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
-                .AddSignInManager<BackOfficeSignInManager>()
+                .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
