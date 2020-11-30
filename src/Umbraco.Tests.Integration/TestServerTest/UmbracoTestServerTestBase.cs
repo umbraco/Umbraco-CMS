@@ -134,6 +134,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
+                .WithUmbracoMembersIdentity()
                 .WithPreview()
                 //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>

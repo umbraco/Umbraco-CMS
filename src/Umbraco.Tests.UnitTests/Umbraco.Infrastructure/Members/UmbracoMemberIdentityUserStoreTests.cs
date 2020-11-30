@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -22,7 +24,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public UmbracoMembersUserStore CreateSut()
         {
             _mockMemberService = new Mock<IMemberService>();
-            return new UmbracoMembersUserStore(_mockMemberService.Object);
+            return new UmbracoMembersUserStore(
+                _mockMemberService.Object,
+                new UmbracoMapper(new MapDefinitionCollection(
+                    new Mock<IEnumerable<IMapDefinition>>().Object)));
         }
 
         [Test]
@@ -41,20 +46,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
 
 
         [Test]
-        public async Task GivenICreateUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResult()
+        public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             //arrange
             UmbracoMembersUserStore sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser()
-            {
-                
-            };
-
+            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser() { };
             CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
-
-            var mockMember = Mock.Of<IMember>(m =>
+            IMember mockMember = Mock.Of<IMember>(m =>
                 m.Name == "fakeName" &&
                 m.Email == "fakeemail@umbraco.com" &&
                 m.Username == "fakeUsername" &&
@@ -74,5 +74,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
         }
+
+        //FindByNameAsync
+        [Test]
+        public async Task GivenIGetUserNameAsync()
+        {
+        }
+
+        [Test]
+        public async Task GivenIFindByNameAsync()
+        {
+        }
+
+        //SetNormalizedUserNameAsync
+        //SetUserNameAsync
+        //HasPasswordAsync
+        //GetPasswordHashAsync
+        //SetPasswordHashAsync
+        //GetUserIdAsync
     }
 }

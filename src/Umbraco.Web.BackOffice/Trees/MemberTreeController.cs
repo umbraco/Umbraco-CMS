@@ -69,6 +69,7 @@ namespace Umbraco.Web.BackOffice.Trees
             var node = GetSingleTreeNode(id, queryStrings);
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
+            //TODO: ID is null since new member created
             node.Value.AdditionalData["treeAlias"] = TreeAlias;
             return node;
         }

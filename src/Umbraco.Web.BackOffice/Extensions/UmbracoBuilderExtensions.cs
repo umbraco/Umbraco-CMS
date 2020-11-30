@@ -13,6 +13,7 @@ namespace Umbraco.Extensions
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
+                .WithUmbracoMembersIdentity()
                 .WithMiniProfiler()
                 .WithMvcAndRazor()
                 .WithWebServer()
@@ -26,6 +27,9 @@ namespace Umbraco.Extensions
 
         public static IUmbracoBuilder WithBackOfficeIdentity(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithBackOfficeIdentity), () => builder.Services.AddUmbracoBackOfficeIdentity());
+
+        public static IUmbracoBuilder WithUmbracoMembersIdentity(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithUmbracoMembersIdentity), () => builder.Services.AddUmbracoMembersIdentity());
 
         public static IUmbracoBuilder WithPreview(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithPreview), () => builder.Services.AddUmbracoPreview());
