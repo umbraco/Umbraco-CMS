@@ -23,13 +23,13 @@
                                             crop="currentCrop.coordinates"
                                             center="model.value.focalPoint"
                                             src="imageSrc">
+                                <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                                <button class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
+                                <button class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
                             </umb-image-crop>
                         </div>
 
                         <div class="button-drawer" ng-if="currentCrop">
-                            <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
-                            <button class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
-                            <button class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
                         </div>
 
                     </div>

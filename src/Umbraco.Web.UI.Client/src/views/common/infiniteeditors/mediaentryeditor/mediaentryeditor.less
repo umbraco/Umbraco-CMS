@@ -1,11 +1,24 @@
 .umb-media-entry-editor {
 
+    .imagecropper {
+        height: 100%;
+    }
+    .umb-cropper-imageholder {
+        
+    }
+    .imagecropper .umb-cropper__container {
+        height: 100%;
+    }
     .imagecropper > div {
         width: 100%;
+        height: 100%;
+    }
+    .umb-cropper {
+        height: 100%;
     }
     .umb-cropper .crop-container {
         padding-bottom: 0;
-        height: calc(100vh - 320px);
+        height: calc(100% - 50px)
     }
 }
 
@@ -18,9 +31,6 @@
 .umb-media-entry-editor__crops {
     background-color: white;
 
-    display: flex;
-    flex-direction: column;
-
     > button {
         display: flex;
         flex-direction: column;
@@ -29,9 +39,10 @@
         position: relative;
         text-align: center;
         padding: 4px 10px 0 10px;
-        border-right: 1px solid @gray-9;
+        border-bottom: 1px solid @gray-9;
         box-sizing: border-box;
         height: 120px;
+        width: 120px;
         color: @ui-active-type;
 
         &:hover {
@@ -80,6 +91,7 @@
         > .__text {
             font-size: 12px;
             line-height: 1em;
+            margin-top: 4px;
         }
     }
 }

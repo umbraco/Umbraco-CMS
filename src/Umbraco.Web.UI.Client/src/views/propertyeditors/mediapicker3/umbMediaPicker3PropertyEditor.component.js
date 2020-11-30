@@ -300,7 +300,7 @@
 
         vm.requestRemoveMedia = requestRemoveMedia;
         function requestRemoveMedia(media) {
-            localizationService.localizeMany(["general_delete", "media_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
+            localizationService.localizeMany(["general_delete", "mediaPicker_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
                 const overlay = {
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [media.name]),
@@ -318,7 +318,7 @@
             });
         }
         function requestRemoveAllMedia() {
-            localizationService.localizeMany(["media_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
+            localizationService.localizeMany(["mediaPicker_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],

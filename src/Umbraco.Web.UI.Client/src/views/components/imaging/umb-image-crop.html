@@ -14,20 +14,23 @@
         </div>
 	</div>
 
-	<div class="crop-slider-wrapper" ng-if="loaded">
-        <i class="icon-picture" aria-hidden="true"></i>
+	<div class="crop-controls-wrapper" ng-if="loaded">
+        <div class="crop-slider-wrapper">
+            <i class="icon-picture crop-controls-wrapper__icon-left" aria-hidden="true"></i>
 
-        <div class="crop-slider">
-            <umb-range-slider
-                ng-model="sliderValue"
-                options="sliderOptions"
-                on-setup="setup(slider)"
-                on-slide="slide(values)"
-                on-change="change(values)">
-            </umb-range-slider>
+            <div class="crop-slider">
+                <umb-range-slider
+                    ng-model="sliderValue"
+                    options="sliderOptions"
+                    on-setup="setup(slider)"
+                    on-slide="slide(values)"
+                    on-change="change(values)">
+                </umb-range-slider>
+            </div>
+
+            <i class="icon-picture crop-controls-wrapper__icon-right" aria-hidden="true"></i>
         </div>
-
-        <i class="icon-picture" aria-hidden="true" style="font-size: 22px"></i>
+        <ng-transclude></ng-transclude>
     </div>
 
 </div>

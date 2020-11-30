@@ -10,6 +10,7 @@ angular.module("umbraco.directives")
             return {
                 restrict: 'E',
                 replace: true,
+                transclude: true,
                 templateUrl: 'views/components/imaging/umb-image-crop.html',
                 scope: {
                     src: '=',

@@ -133,7 +133,7 @@ angular.module("umbraco")
             vm.close = function () {
                 if (vm.model && vm.model.close) {
                     if (vm.model.createFlow === true || vm.imageCropperForm.$dirty === true) {
-                        var labels = vm.model.createFlow === true ? ["media_confirmCancelMediaEntryCreationHeadline", "media_confirmCancelMediaEntryCreationMessage"] : ["prompt_discardChanges", "media_confirmCancelMediaEntryHasChanges"];
+                        var labels = vm.model.createFlow === true ? ["mediaPicker_confirmCancelMediaEntryCreationHeadline", "mediaPicker_confirmCancelMediaEntryCreationMessage"] : ["prompt_discardChanges", "mediaPicker_confirmCancelMediaEntryHasChanges"];
                         localizationService.localizeMany(labels).then(function (localizations) {
                             const confirm = {
                                 title: localizations[0],
