@@ -15,8 +15,8 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
-    /// Implements an Application Event Handler for managing redirect urls tracking.
-    /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old url</para>
+    /// Implements an Application Event Handler for managing redirect URLs tracking.
+    /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old URL</para>
     /// <para>
     ///     not managing domains because we don't know how to do it - changing domains => must create a higher level
     ///     strategy using rewriting rules probably

@@ -166,7 +166,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Sets the menu item to display a dialog based on a url path in an iframe
+        /// Sets the menu item to display a dialog based on a URL path in an iframe
         /// </summary>
         /// <param name="url"></param>
         /// <param name="dialogTitle"></param>

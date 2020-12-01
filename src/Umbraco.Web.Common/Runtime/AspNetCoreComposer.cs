@@ -97,8 +97,7 @@ namespace Umbraco.Web.Common.Runtime
             builder.Services.AddUnique<UmbracoJsonModelBinder>();
 
             builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
-            builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
-            builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
+            builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();            
         }
     }
 }

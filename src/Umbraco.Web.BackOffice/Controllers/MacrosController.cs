@@ -19,6 +19,8 @@ using Umbraco.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -27,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The API controller used for editing dictionary items
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.Macros)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
     public class MacrosController : BackOfficeNotificationsController
     {
         private readonly ParameterEditorCollection _parameterEditorCollection;

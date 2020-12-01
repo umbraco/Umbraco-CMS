@@ -32,7 +32,7 @@ context('Document Types', () => {
     cy.get('[data-element="editor-add"]').click();
 
     //Search for textstring
-    cy.get('.umb-search-field').type('Textstring');
+    cy.get('#datatype-search').type('Textstring');
 
     // Choose first item
     cy.get('ul.umb-card-grid [title="Textstring"]').closest("li").click();
@@ -70,7 +70,7 @@ context('Document Types', () => {
     cy.umbracoContextMenuAction("action-delete").click();
 
     cy.get('label.checkbox').click();
-    cy.umbracoButtonByLabelKey("general_ok").click();
+    cy.umbracoButtonByLabelKey("delete").click();
 
     cy.contains(name).should('not.exist');
 

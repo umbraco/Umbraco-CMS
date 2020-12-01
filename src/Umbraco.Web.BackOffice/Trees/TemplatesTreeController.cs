@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -10,6 +11,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
@@ -19,7 +21,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Templates, SortOrder = 6, TreeGroup = Constants.Trees.Groups.Templating)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -12,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
@@ -80,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a language with a given ID
         /// </summary>
-        [UmbracoTreeAuthorize(Constants.Trees.Languages)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
         [HttpDelete]
         [HttpPost]
         public IActionResult DeleteLanguage(int id)
@@ -109,7 +111,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Creates or saves a language
         /// </summary>
-        [UmbracoTreeAuthorize(Constants.Trees.Languages)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
         [HttpPost]
         public Language SaveLanguage(Language language)
         {

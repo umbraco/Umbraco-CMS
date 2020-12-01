@@ -4,6 +4,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    // TODO: Need to figure out if we need this and what we should be doing
     public class OverrideAuthorizationFilterProvider : IFilterProvider, IFilterMetadata
     {
         public void OnProvidersExecuted(FilterProviderContext context)

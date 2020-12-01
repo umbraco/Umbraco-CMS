@@ -10,6 +10,8 @@ using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.HealthCheck
 {
@@ -17,7 +19,7 @@ namespace Umbraco.Web.BackOffice.HealthCheck
     /// The API controller used to display the health check info and execute any actions
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Settings)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly HealthCheckCollection _checks;

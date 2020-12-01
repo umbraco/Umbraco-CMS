@@ -22,6 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="scripts\aaa" />
+        <Folder Include="umbraco\MediaCache\2\c\6\9\3\a\6\5" />
+        <Folder Include="umbraco\MediaCache\a\e\e\1\9\e\4\b" />
+        <Folder Include="umbraco\MediaCache\c\3\b\5\0\9\f\9" />
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
       <Folder Include="Views" />
@@ -39,6 +43,7 @@
 
     <ItemGroup>
         <Content Remove="App_Data\**" />
+        <Content Remove="wwwroot\Web.config" />
     </ItemGroup>
 
 
@@ -55,6 +60,7 @@
         </None>
         <None Remove="App_Data\**" />
         <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
+        <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
     </ItemGroup>
 
     <!-- We don't want to include the generated files, they will throw a lot of errors -->

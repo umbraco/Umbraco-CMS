@@ -161,6 +161,7 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
+    <Compile Include="Services\RedirectUrlServiceTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />

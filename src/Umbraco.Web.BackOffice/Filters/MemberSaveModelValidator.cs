@@ -20,6 +20,7 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     internal class MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
     {
+        private readonly IBackOfficeSecurity _backofficeSecurity;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
         private readonly IShortStringHelper _shortStringHelper;
@@ -27,13 +28,13 @@ namespace Umbraco.Web.BackOffice.Filters
         public MemberSaveModelValidator(
             ILogger<MemberSaveModelValidator> logger,
             IBackOfficeSecurity backofficeSecurity,
-            ILocalizedTextService textService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IShortStringHelper shortStringHelper,
             IPropertyValidationService propertyValidationService)
-            : base(logger, backofficeSecurity, textService, propertyValidationService)
+            : base(logger, propertyValidationService)
         {
+            _backofficeSecurity = backofficeSecurity;
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
@@ -96,7 +97,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
             //if a sensitive value is being submitted.
-            if (BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (_backofficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 var contentType = _memberTypeService.Get(model.PersistedContent.ContentTypeId);
                 var sensitiveProperties = contentType

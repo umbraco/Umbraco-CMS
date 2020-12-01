@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Integration.Testing
             builder.AddWebComponents();
             builder.AddRuntimeMinifier();
             builder.AddBackOffice();
-            services.AddUmbracoBackOfficeIdentity();
+            builder.AddBackOfficeIdentity();
 
             services.AddMvc();
 

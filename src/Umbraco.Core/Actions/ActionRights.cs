@@ -7,7 +7,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionRights : IAction
     {
-        public char Letter => 'R';
+        public const char ActionLetter = 'R';
+
+        public char Letter => ActionLetter;
         public string Alias => "rights";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
         public string Icon => "vcard";

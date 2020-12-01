@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
@@ -12,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -27,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     ///     An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         private readonly IContentTypeService _contentTypeService;
@@ -78,7 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public MediaTypeDisplay GetById(int id)
         {
             var ct = _mediaTypeService.Get(id);
@@ -97,7 +99,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public MediaTypeDisplay GetById(Guid id)
         {
             var mediaType = _mediaTypeService.Get(id);
@@ -116,7 +118,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public MediaTypeDisplay GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -314,7 +316,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         ///     Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
@@ -361,7 +363,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         ///     Returns the allowed child content type objects for the content item id passed in - based on a GUID id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
@@ -378,7 +380,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         ///     Returns the allowed child content type objects for the content item id passed in - based on a UDI id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
         {

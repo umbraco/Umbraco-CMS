@@ -13,10 +13,8 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         public ContentSaveModelValidator(
             ILogger<ContentSaveModelValidator> logger,
-            IBackOfficeSecurity backofficeSecurity,
-            ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(logger, backofficeSecurity, textService, propertyValidationService)
+            : base(logger, propertyValidationService)
         {
         }
 
