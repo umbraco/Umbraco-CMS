@@ -20,9 +20,9 @@ stages:
     steps:
   
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 3.1.x'
       inputs:
-        version: 5.0.x
+        version: 3.1.x
   
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -41,9 +41,9 @@ stages:
     steps:
   
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 3.1.x'
       inputs:
-        version: 5.0.x
+        version: 3.1.x
   
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -120,9 +120,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 3.1.x'
       inputs:
-        version: 5.0.x
+        version: 3.1.x
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
