@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
@@ -14,18 +15,16 @@ namespace Umbraco.Web.Common.Security
     /// </summary>
     internal class BackOfficeUserManagerAuditer : IDisposable
     {
-        private readonly IBackOfficeUserManager _backOfficeUserManager;
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
         private readonly GlobalSettings _globalSettings;
         private bool _disposedValue;
 
-        public BackOfficeUserManagerAuditer(IBackOfficeUserManager backOfficeUserManager, IAuditService auditService, IUserService userService, GlobalSettings globalSettings)
+        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService, IOptions<GlobalSettings> globalSettings)
         {
-            _backOfficeUserManager = backOfficeUserManager;
             _auditService = auditService;
             _userService = userService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         /// <summary>
@@ -34,17 +33,18 @@ namespace Umbraco.Web.Common.Security
         public void Start()
         {
             // NOTE: This was migrated as-is from v8 including these missing entries
-            //_backOfficeUserManager.AccountLocked += ;
-            //_backOfficeUserManager.AccountUnlocked += ;
-            _backOfficeUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
-            _backOfficeUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
-            _backOfficeUserManager.LoginFailed += OnLoginFailed;
-            //_backOfficeUserManager.LoginRequiresVerification += ;
-            _backOfficeUserManager.LoginSuccess += OnLoginSuccess;
-            _backOfficeUserManager.LogoutSuccess += OnLogoutSuccess;
-            _backOfficeUserManager.PasswordChanged += OnPasswordChanged;
-            _backOfficeUserManager.PasswordReset += OnPasswordReset;
-            //_backOfficeUserManager.ResetAccessFailedCount += ;        
+            // TODO: See note about static events in BackOfficeUserManager
+            //BackOfficeUserManager.AccountLocked += ;
+            //BackOfficeUserManager.AccountUnlocked += ;
+            BackOfficeUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
+            BackOfficeUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
+            BackOfficeUserManager.LoginFailed += OnLoginFailed;
+            //BackOfficeUserManager.LoginRequiresVerification += ;
+            BackOfficeUserManager.LoginSuccess += OnLoginSuccess;
+            BackOfficeUserManager.LogoutSuccess += OnLogoutSuccess;
+            BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
+            BackOfficeUserManager.PasswordReset += OnPasswordReset;
+            //BackOfficeUserManager.ResetAccessFailedCount += ;        
         }
 
         private IUser GetPerformingUser(int userId)
@@ -138,16 +138,16 @@ namespace Umbraco.Web.Common.Security
             {
                 if (disposing)
                 {
-                    //_backOfficeUserManager.AccountLocked -= ;
-                    //_backOfficeUserManager.AccountUnlocked -= ;
-                    _backOfficeUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
-                    _backOfficeUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
-                    _backOfficeUserManager.LoginFailed -= OnLoginFailed;
-                    //_backOfficeUserManager.LoginRequiresVerification -= ;
-                    _backOfficeUserManager.LoginSuccess -= OnLoginSuccess;
-                    _backOfficeUserManager.LogoutSuccess -= OnLogoutSuccess;
-                    _backOfficeUserManager.PasswordChanged -= OnPasswordChanged;
-                    _backOfficeUserManager.PasswordReset -= OnPasswordReset;
+                    //BackOfficeUserManager.AccountLocked -= ;
+                    //BackOfficeUserManager.AccountUnlocked -= ;
+                    BackOfficeUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
+                    BackOfficeUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
+                    BackOfficeUserManager.LoginFailed -= OnLoginFailed;
+                    //BackOfficeUserManager.LoginRequiresVerification -= ;
+                    BackOfficeUserManager.LoginSuccess -= OnLoginSuccess;
+                    BackOfficeUserManager.LogoutSuccess -= OnLogoutSuccess;
+                    BackOfficeUserManager.PasswordChanged -= OnPasswordChanged;
+                    BackOfficeUserManager.PasswordReset -= OnPasswordReset;
                 }
                 _disposedValue = true;
             }

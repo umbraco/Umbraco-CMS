@@ -340,9 +340,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     StatusCode = StatusCodes.Status402PaymentRequired
                 };
 
-                
-
-                //return verifyResponse;
+                return verifyResponse;
             }
 
             // return BadRequest (400), we don't want to return a 401 because that get's intercepted

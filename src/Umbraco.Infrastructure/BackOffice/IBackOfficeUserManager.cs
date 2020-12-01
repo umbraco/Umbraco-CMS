@@ -318,20 +318,7 @@ namespace Umbraco.Core.BackOffice
         void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
         SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
         UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
-
         bool HasSendingUserInviteEventHandler { get; }
 
-
-        event EventHandler<IdentityAuditEventArgs> AccountLocked;
-        event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
-        event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;
-        event EventHandler<IdentityAuditEventArgs> ForgotPasswordChangedSuccess;
-        event EventHandler<IdentityAuditEventArgs> LoginFailed;
-        event EventHandler<IdentityAuditEventArgs> LoginRequiresVerification;
-        event EventHandler<IdentityAuditEventArgs> LoginSuccess;
-        event EventHandler<SignOutAuditEventArgs> LogoutSuccess;
-        event EventHandler<IdentityAuditEventArgs> PasswordChanged;
-        event EventHandler<IdentityAuditEventArgs> PasswordReset;
-        event EventHandler<IdentityAuditEventArgs> ResetAccessFailedCount;
     }
 }

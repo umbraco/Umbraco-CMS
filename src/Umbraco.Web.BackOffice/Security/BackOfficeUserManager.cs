@@ -436,17 +436,20 @@ namespace Umbraco.Web.Common.Security
 
         public bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
 
-        public event EventHandler<IdentityAuditEventArgs> AccountLocked;
-        public event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
-        public event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;
-        public event EventHandler<IdentityAuditEventArgs> ForgotPasswordChangedSuccess;
-        public event EventHandler<IdentityAuditEventArgs> LoginFailed;
-        public event EventHandler<IdentityAuditEventArgs> LoginRequiresVerification;
-        public event EventHandler<IdentityAuditEventArgs> LoginSuccess;
-        public event EventHandler<SignOutAuditEventArgs> LogoutSuccess;
-        public event EventHandler<IdentityAuditEventArgs> PasswordChanged;
-        public event EventHandler<IdentityAuditEventArgs> PasswordReset;
-        public event EventHandler<IdentityAuditEventArgs> ResetAccessFailedCount;
+        // TODO: These static events are problematic. Moving forward we don't want static events at all but we cannot
+        // have non-static events here because the user manager is a Scoped instance not a singleton
+        // so we'll have to deal with this a diff way i.e. refactoring how events are done entirely
+        public static event EventHandler<IdentityAuditEventArgs> AccountLocked;
+        public static event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
+        public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;
+        public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordChangedSuccess;
+        public static event EventHandler<IdentityAuditEventArgs> LoginFailed;
+        public static event EventHandler<IdentityAuditEventArgs> LoginRequiresVerification;
+        public static event EventHandler<IdentityAuditEventArgs> LoginSuccess;
+        public static event EventHandler<SignOutAuditEventArgs> LogoutSuccess;
+        public static event EventHandler<IdentityAuditEventArgs> PasswordChanged;
+        public static event EventHandler<IdentityAuditEventArgs> PasswordReset;
+        public static event EventHandler<IdentityAuditEventArgs> ResetAccessFailedCount;
 
         /// <summary>
         /// Raised when a user is invited
