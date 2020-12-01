@@ -28,6 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
         [Test]
         public async Task CanPublishEvents()
         {
+            _builder.Services.AddScoped<Adder>();
             _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
             _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
             _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
@@ -65,10 +66,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 
         public class NotificationHandlerC : INotificationHandler<Notification>
         {
+            private readonly Adder _adder;
+
+            public NotificationHandlerC(Adder adder) => _adder = adder;
+
             public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
             {
-                notification.SubscriberCount += C;
+                notification.SubscriberCount = _adder.Add(notification.SubscriberCount, C);
                 return Task.CompletedTask;
+            }
+        }
+
+        public class Adder
+        {
+            public int Add(int a, int b)
+            {
+                return a + b;
             }
         }
     }

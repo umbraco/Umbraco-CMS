@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Umbraco.Web.Common.Builder
 {
@@ -62,13 +61,9 @@ namespace Umbraco.Web.Common.Builder
 
         private void AddCoreServices()
         {
-            // TODO: Should this be an explicit public method accepting a service lifetime?
-            // Register the aggregator and factory as transient.
-            // Use TryAdd to allow simple refactoring to allow additional registrations.
-            // Transiant registration matches the default registration of Mediatr and
-            // should encourage the avoidance of singletons throughout the codebase.
-            Services.TryAddTransient<ServiceFactory>(p => p.GetService);
-            Services.TryAdd(new ServiceDescriptor(typeof(IEventAggregator), typeof(EventAggregator), ServiceLifetime.Transient));
+            // Register as singleton to allow injection everywhere.
+            Services.AddSingleton<ServiceFactory>(p => p.GetService);
+            Services.AddSingleton<IEventAggregator, EventAggregator>();
         }
     }
 }
