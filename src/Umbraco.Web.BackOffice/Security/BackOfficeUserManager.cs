@@ -20,6 +20,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Common.Security
 {
+
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
     {
         public BackOfficeUserManager(

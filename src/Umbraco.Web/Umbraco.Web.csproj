@@ -135,8 +135,6 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
-    <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
-    <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
@@ -212,7 +210,6 @@
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
-    <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
