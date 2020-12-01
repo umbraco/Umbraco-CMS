@@ -35,44 +35,41 @@ namespace Umbraco.Infrastructure.Members
             _mapper = mapper;
         }
 
-        public Task<IdentityResult> CreateAsync(UmbracoMembersIdentityUser memberUser, CancellationToken cancellationToken)
+        public Task<IdentityResult> CreateAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            if (memberUser == null) throw new ArgumentNullException(nameof(memberUser));
-
-
-            // [Comments from Identity package and BackOfficeUser - do we need this?]
-            // the password must be 'something' it could be empty if authenticating
-            // with an external provider so we'll just generate one and prefix it, the
-            // prefix will help us determine if the password hasn't actually been specified yet.
-            //this will hash the guid with a salt so should be nicely random
-            var aspHasher = new PasswordHasher<UmbracoMembersIdentityUser>();
-            var emptyPasswordValue =
-                Constants.Security.EmptyPasswordPrefix +
-                aspHasher.HashPassword(memberUser, Guid.NewGuid().ToString("N"));
-
-            if (memberUser.RawPasswordValue.IsNullOrWhiteSpace())
-            {
-                memberUser.RawPasswordValue = emptyPasswordValue;
-            }
+            if (user == null) throw new ArgumentNullException(nameof(user));
 
             //create member
-            //TODO: are we keeping this method, e.g. the Member Service?
-            IMember memberEntity = _memberService.CreateMember(
-                memberUser.UserName,
-                memberUser.Email,
-                memberUser.Name.IsNullOrWhiteSpace() ? memberUser.UserName : memberUser.Name,
-                memberUser.MemberTypeAlias.IsNullOrWhiteSpace() ?
-                    Constants.Security.DefaultMemberTypeAlias : memberUser.MemberTypeAlias);
-            //IMember member = new Member(memberUser.Name, memberUser.Email.ToLower().Trim(), memberUser.UserName, null);
+            //TODO: are we keeping this method, e.g. the Member Service? The user service creates it directly, but this gets the membertype 
+            IMember member = _memberService.CreateMember(
+                user.UserName,
+                user.Email,
+                user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
+                user.MemberTypeAlias.IsNullOrWhiteSpace() ?
+                    Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
 
-            bool anythingChanged = UpdateMemberProperties(memberEntity, memberUser);
+            UpdateMemberProperties(member, user);
 
-            _memberService.Save(memberEntity);
+            if (member.RawPasswordValue.IsNullOrWhiteSpace())
+            {
+                // [Comments from Identity package and BackOfficeUser - can/should we share this functionality]
+                // the password must be 'something' it could be empty if authenticating
+                // with an external provider so we'll just generate one and prefix it, the
+                // prefix will help us determine if the password hasn't actually been specified yet.
+                //this will hash the guid with a salt so should be nicely random
+                var aspHasher = new PasswordHasher<UmbracoMembersIdentityUser>();
+                var emptyPasswordValue =
+                    Constants.Security.EmptyPasswordPrefix +
+                    aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
+                member.RawPasswordValue = emptyPasswordValue;
+            }
+
+            _memberService.Save(member);
 
             //re-assign id
-            memberUser.Id = memberEntity.Id;
+            user.Id = member.Id;
 
             // TODO: do we need this?
             // TODO: [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -88,7 +85,7 @@ namespace Umbraco.Infrastructure.Members
             //            x.UserData)));
             //}
 
-            if (!memberEntity.HasIdentity) throw new DataException("Could not create the user, check logs for details");
+            if (!member.HasIdentity) throw new DataException("Could not create the user, check logs for details");
 
             return Task.FromResult(IdentityResult.Success);
 
