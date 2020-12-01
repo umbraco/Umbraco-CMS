@@ -311,12 +311,13 @@ namespace Umbraco.Core.BackOffice
         /// </remarks>
         Task<string> GetPhoneNumberAsync(TUser user);
 
+        // TODO: These are raised from outside the signinmanager and usermanager in the auth and user controllers,
+        // let's see if there's a way to avoid that and only have these called within signinmanager and usermanager
+        // which means we can remove these from the interface (things like invite seems like they cannot be moved)
         void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
         void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
         SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
         UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
-
-        void RaiseLoginSuccessEvent(TUser currentUser, int userId);
 
         bool HasSendingUserInviteEventHandler { get; }
     }

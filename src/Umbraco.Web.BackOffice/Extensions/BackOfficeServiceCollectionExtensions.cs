@@ -63,6 +63,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
             services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
+            services.TryAddSingleton<IBackOfficeTwoFactorOptions, NoopBackOfficeTwoFactorOptions>();
 
             /*
              * IdentityBuilderExtensions.AddUserManager adds UserManager<BackOfficeIdentityUser> to service collection

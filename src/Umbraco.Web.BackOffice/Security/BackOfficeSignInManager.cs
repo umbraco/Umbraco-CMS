@@ -10,8 +10,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Net;
 using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.Common.Security
@@ -436,16 +439,17 @@ namespace Umbraco.Web.Common.Security
                 Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
                 if (user != null)
                 {
-                    _userManager.RaiseLoginSuccessEvent(user, user.Id);
+                    _userManager.RaiseLoginSuccessEvent(Context.User, user.Id);
                 }
             }
             else if (result.IsLockedOut)
             {
-                _userManager.RaiseAccountLockedEvent(user, user.Id);
+                _userManager.RaiseAccountLockedEvent(Context.User, user.Id);
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
             }
             else if (result.RequiresTwoFactor)
             {
+                _userManager.RaiseLoginRequiresVerificationEvent(Context.User, user.Id);
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
             }
             else if (!result.Succeeded || result.IsNotAllowed)

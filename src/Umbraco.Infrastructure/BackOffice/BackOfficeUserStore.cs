@@ -156,7 +156,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="user"/>
         /// <param name="cancellationToken"></param>
         /// <returns/>
-        public async Task<IdentityResult> UpdateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IdentityResult> UpdateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -192,7 +192,7 @@ namespace Umbraco.Core.BackOffice
                 }
             }
 
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>

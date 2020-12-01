@@ -10,6 +10,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Compose
 {
+    // TODO: Move to netcore
     public sealed class BackOfficeUserAuditEventsComponent : IComponent
     {
         private readonly IAuditService _auditService;
@@ -27,14 +28,14 @@ namespace Umbraco.Web.Compose
         {
             //BackOfficeUserManager.AccountLocked += ;
             //BackOfficeUserManager.AccountUnlocked += ;
-            BackOfficeOwinUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
-            BackOfficeOwinUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
-            BackOfficeOwinUserManager.LoginFailed += OnLoginFailed;
+            //BackOfficeOwinUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
+            //BackOfficeOwinUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
+            //BackOfficeOwinUserManager.LoginFailed += OnLoginFailed;
             //BackOfficeUserManager.LoginRequiresVerification += ;
-            BackOfficeOwinUserManager.LoginSuccess += OnLoginSuccess;
-            BackOfficeOwinUserManager.LogoutSuccess += OnLogoutSuccess;
-            BackOfficeOwinUserManager.PasswordChanged += OnPasswordChanged;
-            BackOfficeOwinUserManager.PasswordReset += OnPasswordReset;
+            //BackOfficeOwinUserManager.LoginSuccess += OnLoginSuccess;
+            //BackOfficeOwinUserManager.LogoutSuccess += OnLogoutSuccess;
+            //BackOfficeOwinUserManager.PasswordChanged += OnPasswordChanged;
+            //BackOfficeOwinUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
         }
 
@@ -42,14 +43,14 @@ namespace Umbraco.Web.Compose
         {
             //BackOfficeUserManager.AccountLocked -= ;
             //BackOfficeUserManager.AccountUnlocked -= ;
-            BackOfficeOwinUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
-            BackOfficeOwinUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
-            BackOfficeOwinUserManager.LoginFailed -= OnLoginFailed;
+            //BackOfficeOwinUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
+            //BackOfficeOwinUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
+            //BackOfficeOwinUserManager.LoginFailed -= OnLoginFailed;
             //BackOfficeUserManager.LoginRequiresVerification -= ;
-            BackOfficeOwinUserManager.LoginSuccess -= OnLoginSuccess;
-            BackOfficeOwinUserManager.LogoutSuccess -= OnLogoutSuccess;
-            BackOfficeOwinUserManager.PasswordChanged -= OnPasswordChanged;
-            BackOfficeOwinUserManager.PasswordReset -= OnPasswordReset;
+            //BackOfficeOwinUserManager.LoginSuccess -= OnLoginSuccess;
+            //BackOfficeOwinUserManager.LogoutSuccess -= OnLogoutSuccess;
+            //BackOfficeOwinUserManager.PasswordChanged -= OnPasswordChanged;
+            //BackOfficeOwinUserManager.PasswordReset -= OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount -= ;
         }
 

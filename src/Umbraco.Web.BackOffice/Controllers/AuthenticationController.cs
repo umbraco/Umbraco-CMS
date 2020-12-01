@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -66,6 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRequestAccessor _requestAccessor;
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
+        private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -87,7 +89,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor,
             LinkGenerator linkGenerator,
-            IBackOfficeExternalLoginProviders externalAuthenticationOptions)
+            IBackOfficeExternalLoginProviders externalAuthenticationOptions,
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -106,6 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _requestAccessor = requestAccessor;
             _linkGenerator = linkGenerator;
             _externalAuthenticationOptions = externalAuthenticationOptions;
+            _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         }
 
         /// <summary>
@@ -303,7 +307,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
         [DenyLocalLoginAuthorization]
-        public async Task<UserDetail> PostLogin(LoginModel loginModel)
+        public async Task<ActionResult<UserDetail>> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
             // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
@@ -318,40 +322,25 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.RequiresTwoFactor)
             {
-                throw new NotImplementedException("Implement MFA/2FA, we need to have some IOptions or similar to configure this");
+                var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
+                if (twofactorView.IsNullOrWhiteSpace())
+                {
+                    return new ValidationErrorResult($"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
+                }
 
-                //var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
-                //if (twofactorOptions == null)
-                //{
-                //    throw new HttpResponseException(
-                //        Request.CreateErrorResponse(
-                //            HttpStatusCode.BadRequest,
-                //            "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
-                //}
+                var attemptedUser = _userService.GetByUsername(loginModel.Username);
 
-                //var twofactorView = twofactorOptions.GetTwoFactorView(
-                //    owinContext,
-                //    UmbracoContext,
-                //    loginModel.Username);
+                // create a with information to display a custom two factor send code view
+                var verifyResponse = new ObjectResult(new
+                {
+                    twoFactorView = twofactorView,
+                    userId = attemptedUser.Id
+                })
+                {
+                    StatusCode = StatusCodes.Status402PaymentRequired
+                };
 
-                //if (twofactorView.IsNullOrWhiteSpace())
-                //{
-                //    throw new HttpResponseException(
-                //        Request.CreateErrorResponse(
-                //            HttpStatusCode.BadRequest,
-                //            typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
-                //}
-
-                //var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
-
-                //// create a with information to display a custom two factor send code view
-                //var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
-                //{
-                //    twoFactorView = twofactorView,
-                //    userId = attemptedUser.Id
-                //});
-
-                //_userManager.RaiseLoginRequiresVerificationEvent(User, attemptedUser.Id);
+                
 
                 //return verifyResponse;
             }
