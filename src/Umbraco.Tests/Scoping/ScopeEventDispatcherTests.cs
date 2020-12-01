@@ -6,12 +6,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
@@ -21,7 +18,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Scoping
 {

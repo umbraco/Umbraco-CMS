@@ -15,8 +15,8 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Web;
-using Umbraco.Web.Common.Builder;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
