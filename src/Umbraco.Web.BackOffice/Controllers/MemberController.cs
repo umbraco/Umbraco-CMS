@@ -167,6 +167,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public MemberDisplay GetByKey(Guid key)
         {
+            //TODO: this is not finding the key currently
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
