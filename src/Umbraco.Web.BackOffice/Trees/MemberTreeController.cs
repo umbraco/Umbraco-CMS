@@ -20,15 +20,12 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
-    //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
-    // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
-    [UmbracoApplicationAuthorize(
-        Constants.Applications.Content,
-        Constants.Applications.Media,
-        Constants.Applications.Members)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessForMemberTree)]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

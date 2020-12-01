@@ -25,6 +25,8 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -64,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _viewEngines = viewEngines;
         }
 
-        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: true, requireApproval : false)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [DisableBrowserCache]
         public ActionResult Index()
         {
@@ -107,7 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The endpoint that is loaded within the preview iframe
         /// </summary>
         /// <returns></returns>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public ActionResult Frame(int id, string culture)
         {
             EnterPreview(id);

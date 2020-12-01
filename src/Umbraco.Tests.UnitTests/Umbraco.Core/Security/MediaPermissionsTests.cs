@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Exceptions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
 {
     [TestFixture]
-    public class MediaControllerUnitTests
+    public class MediaPermissionsTests
     {
         [Test]
         public void Access_Allowed_By_Path()
@@ -28,16 +26,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, 1234);
+            var result = mediaPermissions.CheckPermissions(user, 1234, out _);
 
             //assert
-            Assert.IsTrue(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
         }
 
         [Test]
-        public void Throws_Exception_When_No_Media_Found()
+        public void Returns_Not_Found_When_No_Media_Found()
         {
             //arrange
             var user = CreateUser(id: 9);
@@ -49,9 +48,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act/assert
-            Assert.Throws<HttpResponseException>(() => MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, 1234));
+            var result = mediaPermissions.CheckPermissions(user, 1234, out _);
+            Assert.AreEqual(MediaPermissions.MediaAccess.NotFound, result);
         }
 
         [Test]
@@ -69,12 +70,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, 1234);
+            var result = mediaPermissions.CheckPermissions(user, 1234, out _);
 
             //assert
-            Assert.IsFalse(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Denied, result);
         }
 
         [Test]
@@ -86,12 +88,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, -1);
+            var result = mediaPermissions.CheckPermissions(user, -1, out _);
 
             //assert
-            Assert.IsTrue(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
         }
 
         [Test]
@@ -105,12 +108,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, -1);
+            var result = mediaPermissions.CheckPermissions(user, -1, out _);
 
             //assert
-            Assert.IsFalse(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Denied, result);
         }
 
         [Test]
@@ -122,12 +126,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, -21);
+            var result = mediaPermissions.CheckPermissions(user, -21, out _);
 
             //assert
-            Assert.IsTrue(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
         }
 
         [Test]
@@ -141,12 +146,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             var entityService = entityServiceMock.Object;
+            var mediaPermissions = new MediaPermissions(mediaService, entityService);
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<object, object>(), user, mediaService, entityService, -21);
+            var result = mediaPermissions.CheckPermissions(user, -21, out _);
 
             //assert
-            Assert.IsFalse(result);
+            Assert.AreEqual(MediaPermissions.MediaAccess.Denied, result);
         }
 
         private IUser CreateUser(int id = 0, int? startMediaId = null)

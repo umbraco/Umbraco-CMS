@@ -63,6 +63,7 @@ using Umbraco.Core.Builder;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Runtime
 {
@@ -376,6 +377,11 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique<UploadAutoFillProperties>();
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
+
+            builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
+            builder.Services.AddUnique<UserEditorAuthorizationHelper>();
+            builder.Services.AddUnique<ContentPermissions>();
+            builder.Services.AddUnique<MediaPermissions>();
         }
     }
 }

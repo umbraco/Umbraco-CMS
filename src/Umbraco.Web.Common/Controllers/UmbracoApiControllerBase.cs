@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Features;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Common.Controllers
 {
@@ -13,11 +14,13 @@ namespace Umbraco.Web.Common.Controllers
     /// <para>These controllers are NOT auto-routed.</para>
     /// <para>The base class is <see cref="ControllerBase"/> which are netcore API controllers without any view support</para>
     /// </remarks>
-    [FeatureAuthorize] // TODO: This could be part of our conventions
+    [Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)] // TODO: This could be part of our conventions
     [TypeFilter(typeof(HttpResponseExceptionFilter))] // TODO: This could be part of our conventions
     [UmbracoApiController]
     public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
     {
+        // TODO: Should this only exist in the back office project? These really are only ever used for the back office AFAIK
+
         public UmbracoApiControllerBase()
         {
         }

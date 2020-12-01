@@ -30,7 +30,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
@@ -52,7 +51,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
@@ -74,7 +72,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] {"FunGroup"});
@@ -96,7 +93,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
@@ -133,7 +129,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
@@ -171,7 +166,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
@@ -209,7 +203,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
@@ -247,7 +240,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
@@ -286,7 +278,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
@@ -324,7 +315,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
@@ -362,7 +352,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
@@ -400,7 +389,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                userService.Object,
                 entityService.Object);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok

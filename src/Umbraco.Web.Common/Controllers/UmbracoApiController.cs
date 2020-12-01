@@ -7,6 +7,8 @@ namespace Umbraco.Web.Common.Controllers
     /// </summary>
     public abstract class UmbracoApiController : UmbracoApiControllerBase, IDiscoverable
     {
+        // TODO: Should this only exist in the back office project? These really are only ever used for the back office AFAIK
+
         protected UmbracoApiController()
         {
         }

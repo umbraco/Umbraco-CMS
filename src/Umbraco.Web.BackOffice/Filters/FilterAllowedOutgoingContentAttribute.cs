@@ -10,8 +10,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Security;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
