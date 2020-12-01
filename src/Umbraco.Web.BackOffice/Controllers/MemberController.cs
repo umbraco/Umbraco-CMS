@@ -261,8 +261,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             //TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope
             // but it would be nicer to have this taken care of within the Save method itself
 
-            //create/save the IMember
-            _memberService.Save(contentItem.PersistedContent);
+            //TODO: create/save the IMember: this is now saved in CreateAsync, remove once logic is clarified
+            //_memberService.Save(contentItem.PersistedContent);
 
             //Now let's do the role provider stuff - now that we've saved the content item (that is important since
             // if we are changing the username, it must be persisted before looking up the member roles).
@@ -395,9 +395,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //map the save info over onto the user
             member = _umbracoMapper.Map(memberSave, member);
-
-            _memberService.Save(member);
-
             return member;
         }
 

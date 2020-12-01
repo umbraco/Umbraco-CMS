@@ -65,6 +65,7 @@ namespace Umbraco.Infrastructure.Members
                 memberUser.Name.IsNullOrWhiteSpace() ? memberUser.UserName : memberUser.Name,
                 memberUser.MemberTypeAlias.IsNullOrWhiteSpace() ?
                     Constants.Security.DefaultMemberTypeAlias : memberUser.MemberTypeAlias);
+            //IMember member = new Member(memberUser.Name, memberUser.Email.ToLower().Trim(), memberUser.UserName, null);
 
             bool anythingChanged = UpdateMemberProperties(memberEntity, memberUser);
 
