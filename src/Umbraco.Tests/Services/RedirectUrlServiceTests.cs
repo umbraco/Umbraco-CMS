@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -28,10 +29,9 @@ namespace Umbraco.Tests.Services
         {
             base.CreateTestData();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new RedirectUrlRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger>());
+                var repository = new RedirectUrlRepository((IScopeAccessor)ScopeProvider, AppCaches.Disabled, Mock.Of<ILogger<RedirectUrlRepository>>());
                 var rootContent = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
                 var subPages = ServiceContext.ContentService.GetPagedChildren(rootContent.Id, 0, 2, out _).ToList();
                 _testPage = subPages[0];

@@ -51,7 +51,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -112,7 +111,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -153,7 +151,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -208,7 +205,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -263,7 +259,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
 
@@ -284,7 +279,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -301,7 +295,6 @@ namespace Umbraco.Tests.Routing
 
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: _globalSettings);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
