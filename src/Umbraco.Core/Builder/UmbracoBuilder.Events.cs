@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Events;
 
-namespace Umbraco.Core.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
     /// Contains extensions methods for <see cref="IUmbracoBuilder"/>.

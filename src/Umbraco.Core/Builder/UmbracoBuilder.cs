@@ -4,11 +4,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 
-namespace Umbraco.Web.Common.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {

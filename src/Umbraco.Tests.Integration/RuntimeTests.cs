@@ -10,7 +10,7 @@ using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
@@ -23,7 +23,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Integration
 {

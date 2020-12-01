@@ -4,10 +4,9 @@ using Moq;
 using NUnit.Framework;
 using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 {

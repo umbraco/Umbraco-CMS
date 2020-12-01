@@ -6,13 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UnitTests.TestHelpers;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {

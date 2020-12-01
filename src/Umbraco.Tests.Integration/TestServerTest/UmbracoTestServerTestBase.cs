@@ -18,7 +18,7 @@ using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.Cache;

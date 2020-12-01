@@ -33,8 +33,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
-using Umbraco.Core.Builder;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DependencyInjection;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Integration.Testing

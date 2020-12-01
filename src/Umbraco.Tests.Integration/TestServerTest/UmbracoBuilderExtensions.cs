@@ -1,11 +1,11 @@
 ﻿using Moq;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {

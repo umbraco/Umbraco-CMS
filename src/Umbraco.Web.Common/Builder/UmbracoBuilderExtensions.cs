@@ -20,7 +20,7 @@ using Serilog;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -42,7 +42,7 @@ using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Common.Profiler;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     // TODO: We could add parameters to configure each of these for flexibility
     public static class UmbracoBuilderExtensions
