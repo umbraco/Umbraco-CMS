@@ -62,7 +62,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
 
         private static IServiceCollection MockRegister()
         {
-            return Mock.Of<IServiceCollection>();
+            // Why mock something you can spin up an instance of?
+            return new ServiceCollection(); // Mock.Of<IServiceCollection>();
         }
 
         private static TypeLoader MockTypeLoader()
