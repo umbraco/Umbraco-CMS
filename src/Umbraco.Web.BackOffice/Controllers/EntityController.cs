@@ -244,7 +244,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the url of an entity
+        /// Gets the URL of an entity
         /// </summary>
         /// <param name="udi">UDI of the entity to fetch URL for</param>
         /// <param name="culture">The culture to fetch the URL for</param>
@@ -274,7 +274,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the url of an entity
+        /// Gets the URL of an entity
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>

@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the item.
+        /// Gets the URL segment of the item.
         /// </summary>
         public string UrlSegment { get; }
 

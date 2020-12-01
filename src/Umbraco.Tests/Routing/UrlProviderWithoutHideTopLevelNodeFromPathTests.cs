@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Routing
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
-            //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
+            //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative URL.
             var url = publishedUrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);

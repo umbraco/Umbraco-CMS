@@ -114,7 +114,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             EnterPreview(id);
 
-            // use a numeric url because content may not be in cache and so .Url would fail
+            // use a numeric URL because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
 
             return RedirectPermanent($"../../{id}.aspx{query}");

@@ -6,7 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.Trees;
@@ -84,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Trees
             }
             else
             {
-                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
                 var parentDictionary = _localizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;

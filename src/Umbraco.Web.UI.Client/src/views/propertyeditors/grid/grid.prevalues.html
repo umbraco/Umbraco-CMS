@@ -17,20 +17,20 @@
 
                 <li ng-repeat="template in model.value.templates" class="clearfix">
 
-                    <div ng-click="vm.configureTemplate(template)" class="preview-rows layout">
+                    <button type="button" ng-click="vm.configureTemplate(template)" class="btn-reset preview-rows layout">
 
-                        <div class="preview-row">
-                            <div class="preview-col"
+                        <span class="preview-row">
+                            <span class="preview-col"
                                  ng-class="{last:$last}"
                                  ng-repeat="section in template.sections | filter: vm.zeroWidthFilter"
                                  ng-style="{width: vm.percentage(section.grid) + '%', height: '60px', 'max-width': '100%'}">
-                                <div class="preview-cell"></div>
-                            </div>
-                        </div>
-                    </div>
+                                <span class="preview-cell"></span>
+                            </span>
+                        </span>
+                    </button>
 
                     <div>
-                        {{template.name}} <br />
+                        <p>{{template.name}}</p>
                         <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
                             <i class="icon-delete red" aria-hidden="true"></i>
                             <localize key="general_delete">Delete</localize>
@@ -42,7 +42,7 @@
 
             <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
                 <i class="icon-add" aria-hidden="true"></i>
-                <localize key="grid_addGridLayout" />
+                <localize key="grid_addGridLayout">Add Grid Layout</localize>
             </button>
         </div>
     </div>
@@ -64,23 +64,23 @@
 
                     <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
-                        <div ng-click="vm.configureLayout(layout)" class="preview-rows columns">
+                        <button type="button" ng-click="vm.configureLayout(layout)" class="btn-reset preview-rows columns">
 
-                            <div class="preview-row">
-                                <div class="preview-col"
+                            <span class="preview-row">
+                                <span class="preview-col"
                                      ng-class="{last:$last}"
                                      ng-repeat="area in layout.areas | filter: vm.zeroWidthFilter"
                                      ng-style="{width: vm.percentage(area.grid) + '%', 'max-width': '100%'}">
 
-                                    <div class="preview-cell">
-                                        <p ng-show="area.maxItems > 0">{{area.maxItems}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <span class="preview-cell">
+                                        <span ng-show="area.maxItems > 0">{{area.maxItems}}</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
 
                         <div>
-                            {{layout.label || layout.name}}<br />
+                            <p>{{layout.label || layout.name}}</p>
                             <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteLayout(layout, $index, $event)">
                                 <i class="icon-delete red" aria-hidden="true"></i>
                                 <localize key="general_delete">Delete</localize>
@@ -126,7 +126,7 @@
             </ul>
 
             <ul class="unstyled list-icons">
-                <li>                    
+                <li>
                     <button type="button" ng-click="vm.editConfig()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>
@@ -155,7 +155,7 @@
             </ul>
 
             <ul class="unstyled list-icons">
-                <li>                    
+                <li>
                     <button type="button" ng-click="vm.editStyles()" class="btn-link">
                         <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                         <localize key="general_edit">Edit</localize>

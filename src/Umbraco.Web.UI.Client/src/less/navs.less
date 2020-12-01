@@ -168,8 +168,7 @@
 
 // Active state
 .nav-pills > .active > a,
-.nav-pills > .active > a:hover,
-.nav-pills > .active > a:focus {
+.nav-pills > .active > a:hover {
   color: @white;
   background-color: @linkColor;
 }
@@ -184,7 +183,14 @@
   float: none;
 }
 .nav-stacked > li > a {
+  position: relative;
   margin-right: 0; // no need for the gap between nav items
+  color: @ui-action-discreet-type;
+  border-radius: 3px;
+}
+.nav-stacked > li > a:hover {
+  color: @ui-action-discreet-type-hover;
+  background-color: @ui-action-discreet-hover;
 }
 
 // Tabs

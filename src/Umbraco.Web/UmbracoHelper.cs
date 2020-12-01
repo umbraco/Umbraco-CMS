@@ -11,6 +11,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Mvc;
 using Microsoft.Extensions.Logging;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -24,6 +25,7 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IUmbracoComponentRenderer _componentRenderer;
+        private readonly MembershipHelper _membershipHelper;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
         private IPublishedContent _currentPage;
@@ -38,14 +40,17 @@ namespace Umbraco.Web
         /// <param name="cultureDictionary"></param>
         /// <param name="componentRenderer"></param>
         /// <param name="publishedContentQuery"></param>
+        /// <param name="membershipHelper"></param>
         /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
         public UmbracoHelper(IPublishedContent currentPage,
             ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            IPublishedContentQuery publishedContentQuery)
+            IPublishedContentQuery publishedContentQuery,
+            MembershipHelper membershipHelper)
         {
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
+            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
             _currentPage = currentPage;
         }
@@ -178,7 +183,99 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region Membership
 
+        /// <summary>
+        /// Check if the current user has access to a document
+        /// </summary>
+        /// <param name="path">The full path of the document object to check</param>
+        /// <returns>True if the current user has access or if the current document isn't protected</returns>
+        public bool MemberHasAccess(string path)
+        {
+            return _membershipHelper.MemberHasAccess(path);
+        }
+
+        /// <summary>
+        /// Whether or not the current member is logged in (based on the membership provider)
+        /// </summary>
+        /// <returns>True is the current user is logged in</returns>
+        public bool MemberIsLoggedOn()
+        {
+            return _membershipHelper.IsLoggedIn();
+        }
+
+        #endregion
+
+
+
+        #region Member/Content/Media from Udi
+
+        #endregion
+
+        #region Members
+
+        public IPublishedContent Member(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            return guidUdi == null ? null : Member(guidUdi.Guid);
+        }
+
+        public IPublishedContent Member(Guid id)
+        {
+            return _membershipHelper.GetById(id);
+        }
+
+        public IPublishedContent Member(int id)
+        {
+            return _membershipHelper.GetById(id);
+        }
+
+        public IPublishedContent Member(string id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
+        {
+            return _membershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
+        {
+            return _membershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+        public IEnumerable<IPublishedContent> Members(params int[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params string[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
+        {
+            return _membershipHelper.GetByIds(ids);
+        }
+
+        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
+        {
+            return ids.Select(Member).WhereNotNull();
+        }
+
+        #endregion
 
         #region Content
 
@@ -245,9 +342,6 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids) => _publishedContentQuery.Content(ids);
-
-        private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids) => _publishedContentQuery.Content(ids);
-
         /// <summary>
         /// Gets content items from the cache.
         /// </summary>
@@ -363,8 +457,6 @@ namespace Umbraco.Web
         /// <returns>The existing medias corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(params object[] ids) => _publishedContentQuery.Media(ids);
-
-        private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids) => _publishedContentQuery.Media(ids);
 
         /// <summary>
         /// Gets the medias corresponding to the identifiers.

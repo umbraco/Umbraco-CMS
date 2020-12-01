@@ -78,7 +78,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         /// <summary>
-        /// Gets the value image url for a specified crop.
+        /// Gets the value image URL for a specified crop.
         /// </summary>
         public string GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
@@ -102,7 +102,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         /// <summary>
-        /// Gets the value image url for a specific width and height.
+        /// Gets the value image URL for a specific width and height.
         /// </summary>
         public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, bool useFocalPoint = false, string cacheBusterValue = null)
         {

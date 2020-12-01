@@ -121,7 +121,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
@@ -485,8 +485,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occured in a custom event handler while inviting the user");
-                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occured inviting the user (check logs for more info): {ex.Message}");
+                _logger.LogError(ex, "An error occurred in a custom event handler while inviting the user");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occurred inviting the user (check logs for more info): {ex.Message}");
             }
 
             // If the event is handled then no need to send the email
@@ -549,7 +549,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            // Get an mvc helper to get the url
+            // Get an mvc helper to get the URL
             var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
                 {
                     area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),

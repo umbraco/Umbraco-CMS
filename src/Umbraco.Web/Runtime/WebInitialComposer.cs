@@ -47,7 +47,7 @@ namespace Umbraco.Web.Runtime
                 {
                     var umbCtx = factory.GetRequiredService<IUmbracoContext>();
                     return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
-                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
+                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>(), factory.GetRequiredService<MembershipHelper>());
                 }
 
                 return new UmbracoHelper();

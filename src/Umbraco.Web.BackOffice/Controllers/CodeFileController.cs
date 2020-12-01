@@ -167,7 +167,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Used to get a specific file from disk via the FileService
         /// </summary>
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
-        /// <param name="virtualPath">The filename or urlencoded path of the file to open</param>
+        /// <param name="virtualPath">The filename or URL encoded path of the file to open</param>
         /// <returns>The file and its contents from the virtualPath</returns>
         public ActionResult<CodeFileDisplay> GetByPath(string type, string virtualPath)
         {
@@ -317,7 +317,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Used to delete a specific file from disk via the FileService
         /// </summary>
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
-        /// <param name="virtualPath">The filename or urlencoded path of the file to delete</param>
+        /// <param name="virtualPath">The filename or URL encoded path of the file to delete</param>
         /// <returns>Will return a simple 200 if file deletion succeeds</returns>
         [HttpDelete]
         [HttpPost]
