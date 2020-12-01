@@ -15,12 +15,14 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
-using Umbraco.Web.WebApi.Filters;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -29,10 +31,10 @@ namespace Umbraco.Web.BackOffice.Controllers
     [ValidationFilter]
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
-    [UmbracoBackOfficeAuthorize]
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     public class DashboardController : UmbracoApiController
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly AppCaches _appCaches;
         private readonly ILogger<DashboardController> _logger;
         private readonly IDashboardService _dashboardService;
@@ -43,18 +45,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
         public DashboardController(
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext,
-            ServiceContext services,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             AppCaches appCaches,
             ILogger<DashboardController> logger,
-            IRuntimeState runtimeState,
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper)
 
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _appCaches = appCaches;
             _logger = logger;
             _dashboardService = dashboardService;
@@ -69,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var user = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticString();
@@ -214,7 +213,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {
-            var currentUser = _umbracoContextAccessor.GetRequiredUmbracoContext().Security.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             return _dashboardService.GetDashboards(section, currentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,

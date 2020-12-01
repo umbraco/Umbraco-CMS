@@ -22,6 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="scripts\aaa" />
+        <Folder Include="umbraco\MediaCache\2\c\6\9\3\a\6\5" />
+        <Folder Include="umbraco\MediaCache\a\e\e\1\9\e\4\b" />
+        <Folder Include="umbraco\MediaCache\c\3\b\5\0\9\f\9" />
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
       <Folder Include="Views" />
@@ -39,6 +43,7 @@
 
     <ItemGroup>
         <Content Remove="App_Data\**" />
+        <Content Remove="wwwroot\Web.config" />
     </ItemGroup>
 
 
@@ -55,19 +60,20 @@
         </None>
         <None Remove="App_Data\**" />
         <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
+        <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
     </ItemGroup>
 
     <!-- We don't want to include the generated files, they will throw a lot of errors -->
     <ItemGroup>
-        <None Remove="Umbraco/Models/all.generated.cs" />
-        <Compile Remove="Umbraco/Models/all.generated.cs" />
-        <None Remove="Umbraco/Models/models.generated.cs" />
-        <Compile Remove="Umbraco/Models/models.generated.cs" />
-        <Folder Remove="Umbraco/Models/Compiled" />
-        <None Remove="Umbraco/Models/Compiled/**" />
-        <None Remove="Umbraco/Models/all.dll.path" />
-        <None Remove="Umbraco/Models/models.hash" />
-        <None Remove="Umbraco/Models/models.err" />
+        <None Remove="umbraco\Models\all.generated.cs" />
+        <Compile Remove="umbraco\Models\all.generated.cs" />
+        <None Remove="umbraco\Models\models.generated.cs" />
+        <Compile Remove="umbraco\Models\models.generated.cs" />
+        <Folder Remove="umbraco\Models\Compiled" />
+        <None Remove="umbraco\Models\Compiled\**" />
+        <None Remove="umbraco\Models\all.dll.path" />
+        <None Remove="umbraco\Models\models.hash" />
+        <None Remove="umbraco\Models\models.err" />
     </ItemGroup>
 
     <ItemGroup>

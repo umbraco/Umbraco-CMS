@@ -21,6 +21,7 @@ namespace Umbraco.Web
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
+        private IBackOfficeSecurity _backofficeSecurity;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -46,7 +47,7 @@ namespace Umbraco.Web
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            Security = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
+            _backofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
@@ -73,11 +74,6 @@ namespace Umbraco.Web
         /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
         /// </summary>
         public Guid UmbracoRequestId { get; }
-
-        /// <summary>
-        /// Gets the BackofficeSecurity class
-        /// </summary>
-        public IBackOfficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
@@ -168,7 +164,7 @@ namespace Umbraco.Web
             var requestUrl = _requestAccessor.GetRequestUrl();
             if (requestUrl != null
                 && requestUrl.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
-                && Security.CurrentUser != null)
+                && _backofficeSecurity.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
@@ -189,8 +185,6 @@ namespace Umbraco.Web
         protected override void DisposeResources()
         {
             // DisposableObject ensures that this runs only once
-
-            Security.DisposeIfDisposable();
 
             // help caches release resources
             // (but don't create caches just to dispose them)

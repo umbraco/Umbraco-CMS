@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
@@ -11,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
@@ -18,7 +20,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoMapper _umbracoMapper;
@@ -56,20 +58,5 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _umbracoMapper.MapEnumerable<IRelation, RelationDisplay>(relations);
         }
 
-        [HttpDelete]
-        [HttpPost]
-        public IActionResult DeleteById(int id)
-        {
-            var foundRelation = _relationService.GetById(id);
-
-            if (foundRelation == null)
-            {
-                return new UmbracoProblemResult("No relation found with the specified id", HttpStatusCode.NotFound);
-            }
-
-            _relationService.Delete(foundRelation);
-
-            return Ok();
-        }
     }
 }

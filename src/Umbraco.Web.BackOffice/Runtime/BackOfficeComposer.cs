@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -22,36 +23,42 @@ namespace Umbraco.Web.BackOffice.Runtime
     [ComposeAfter(typeof(AspNetCoreComposer))]
     public class BackOfficeComposer : IComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<BackOfficeAreaRoutes>();
-            composition.Services.AddUnique<PreviewRoutes>();
-            composition.Services.AddUnique<BackOfficeServerVariables>();
-            composition.Services.AddScoped<BackOfficeSessionIdValidator>();
-            composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
+            builder.Services.AddUnique<BackOfficeAreaRoutes>();
+            builder.Services.AddUnique<PreviewRoutes>();
+            builder.Services.AddUnique<BackOfficeServerVariables>();
+            builder.Services.AddScoped<BackOfficeSessionIdValidator>();
+            builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
-            composition.Services.AddUnique<PreviewAuthenticationMiddleware>();
-            composition.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
-            composition.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
+            builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
+            builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute
-            var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
-            composition.Trees()
+            var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+            builder.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
-            composition.ComposeWebMappingProfiles();
+            builder.ComposeWebMappingProfiles();
 
-            composition.Services.AddUnique<IPhysicalFileSystem>(factory =>
-                new PhysicalFileSystem(
+            builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
+            {
+                var path = "~/";
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                return new PhysicalFileSystem(
                     factory.GetRequiredService<IIOHelper>(),
-                    factory.GetRequiredService<IHostingEnvironment>(),
+                    hostingEnvironment,
                     factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
-                    "~/"));
+                    hostingEnvironment.MapPathContentRoot(path),
+                    hostingEnvironment.ToAbsolute(path)
+                );
+            });
 
-            composition.Services.AddUnique<IIconService, IconService>();
-            composition.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
+            builder.Services.AddUnique<IIconService, IconService>();
+            builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
         }
     }
 }

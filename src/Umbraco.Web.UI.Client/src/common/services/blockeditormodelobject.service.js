@@ -104,8 +104,8 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
-                return blockObject.labelInterpolator(blockObject.data);
+                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                return blockObject.labelInterpolator(labelVars);
             }
             return blockObject.content.contentTypeName;
         }

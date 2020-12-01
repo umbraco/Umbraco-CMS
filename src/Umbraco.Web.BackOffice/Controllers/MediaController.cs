@@ -40,6 +40,9 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -48,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// access to ALL of the methods on this controller will need access to the media application.
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Media)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
     public class MediaController : ContentControllerBase
     {
         private readonly IShortStringHelper _shortStringHelper;
@@ -65,6 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRelationService _relationService;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IJsonSerializer _serializer;
+        private readonly IAuthorizationService _authorizationService;
         private readonly ILogger<MediaController> _logger;
 
         public MediaController(
@@ -87,7 +91,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaFileSystem mediaFileSystem,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
-            IJsonSerializer serializer)
+            IJsonSerializer serializer,
+            IAuthorizationService authorizationService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
@@ -108,6 +113,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
             _serializer = serializer;
+            _authorizationService = authorizationService;
         }
 
         /// <summary>
@@ -165,7 +171,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForMedia("id")]
+        [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
         {
@@ -186,7 +192,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForMedia("id")]
+        [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
         {
@@ -207,7 +213,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [EnsureUserPermissionForMedia("id")]
+        [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Udi id)
         {
@@ -430,7 +436,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForMedia("id")]
+        [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [HttpPost]
         public IActionResult DeleteById(int id)
         {
@@ -471,9 +477,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForMedia("move.Id")]
-        public IActionResult PostMove(MoveOrCopy move)
+        public async Task<IActionResult> PostMove(MoveOrCopy move)
         {
+            // Authorize...
+            var requirement = new MediaPermissionsResourceRequirement();
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(move.Id), requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var toMove = ValidateMoveOrCopy(move);
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
@@ -608,8 +621,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForMedia("sorted.ParentId")]
-        public IActionResult PostSort(ContentSortOrder sorted)
+        public async Task<IActionResult> PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)
             {
@@ -622,14 +634,21 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Ok();
             }
 
-            var mediaService = _mediaService;
+            // Authorize...
+            var requirement = new MediaPermissionsResourceRequirement();
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(sorted.ParentId), requirement);
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
             var sortedMedia = new List<IMedia>();
             try
             {
-                sortedMedia.AddRange(sorted.IdSortOrder.Select(mediaService.GetById));
+                sortedMedia.AddRange(sorted.IdSortOrder.Select(_mediaService.GetById));
 
                 // Save Media with new sort order and update content xml in db accordingly
-                if (mediaService.Sort(sortedMedia) == false)
+                if (_mediaService.Sort(sortedMedia) == false)
                 {
                     _logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
                     throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
@@ -643,19 +662,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-        public ActionResult<MediaItemDisplay> PostAddFolder(PostedFolder folder)
+        public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
         {
-            var parentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
+            var parentId = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true);
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
             }
 
-
-            var mediaService = _mediaService;
-
-            var f = mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
-            mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var f = _mediaService.CreateMedia(folder.Name, parentId.Value, Constants.Conventions.MediaTypes.Folder);
+            _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             return _umbracoMapper.Map<MediaItemDisplay>(f);
         }
@@ -680,13 +696,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //get the string json from the request
-            var parentId = GetParentIdAsInt(currentFolder, validatePermissions: true);
+            var parentId = await GetParentIdAsIntAsync(currentFolder, validatePermissions: true);
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
             }
             var tempFiles = new PostedFiles();
-            var mediaService = _mediaService;
+            
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (!string.IsNullOrEmpty(path))
@@ -704,18 +720,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                     {
                         //look for matching folder
                         folderMediaItem =
-                            mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
                         if (folderMediaItem == null)
                         {
                             //if null, create a folder
-                            folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
-                            mediaService.Save(folderMediaItem);
+                            folderMediaItem = _mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.Save(folderMediaItem);
                         }
                     }
                     else
                     {
                         //get current parent
-                        var mediaRoot = mediaService.GetById(parentId.Value);
+                        var mediaRoot = _mediaService.GetById(parentId.Value);
 
                         //if the media root is null, something went wrong, we'll abort
                         if (mediaRoot == null)
@@ -729,8 +745,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                         if (folderMediaItem == null)
                         {
                             //if null, create a folder
-                            folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
-                            mediaService.Save(folderMediaItem);
+                            folderMediaItem = _mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
+                            _mediaService.Save(folderMediaItem);
                         }
                     }
                     //set the media root to the folder id so uploaded files will end there.
@@ -763,7 +779,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     var mediaItemName = fileName.ToFriendlyName();
 
-                    var f = mediaService.CreateMedia(mediaItemName, parentId.Value, mediaType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                    var f = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
 
                     await using (var stream = formFile.OpenReadStream())
@@ -772,7 +788,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
 
 
-                    var saveResult = mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                    var saveResult = _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,
@@ -828,7 +844,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// and if that check fails an unauthorized exception will occur
         /// </param>
         /// <returns></returns>
-        private int? GetParentIdAsInt(string parentId, bool validatePermissions)
+        private async Task<int?> GetParentIdAsIntAsync(string parentId, bool validatePermissions)
         {
             int intParentId;
 
@@ -861,22 +877,23 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
             }
 
+            // Authorize...
             //ensure the user has access to this folder by parent id!
-            if (validatePermissions && CheckPermissions(
-                    new Dictionary<object, object>(),
-                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                    _mediaService,
-                    _entityService,
-                    intParentId) == false)
+            if (validatePermissions)
             {
-                throw new HttpResponseException(
+                var requirement = new MediaPermissionsResourceRequirement();
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(intParentId), requirement);
+                if (!authorizationResult.Succeeded)
+                {
+                    throw new HttpResponseException(
                     HttpStatusCode.Forbidden,
                     new SimpleNotificationModel(new BackOfficeNotification(
                         _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
                         _localizedTextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         NotificationStyle.Warning)));
+                }
             }
-
+           
             return intParentId;
         }
 
@@ -892,8 +909,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var mediaService = _mediaService;
-            var toMove = mediaService.GetById(model.Id);
+            
+            var toMove = _mediaService.GetById(model.Id);
             if (toMove == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -912,7 +929,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else
             {
-                var parent = mediaService.GetById(model.ParentId);
+                var parent = _mediaService.GetById(model.ParentId);
                 if (parent == null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -940,45 +957,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return toMove;
         }
 
-        /// <summary>
-        /// Performs a permissions check for the user to check if it has access to the node based on
-        /// start node and/or permissions for the node
-        /// </summary>
-        /// <param name="storage">The storage to add the content item to so it can be reused</param>
-        /// <param name="user"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
-        /// <param name="media">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
-        /// <returns></returns>
-        internal static bool CheckPermissions(IDictionary<object, object> storage, IUser user, IMediaService mediaService, IEntityService entityService, int nodeId, IMedia media = null)
-        {
-            if (storage == null) throw new ArgumentNullException("storage");
-            if (user == null) throw new ArgumentNullException("user");
-            if (mediaService == null) throw new ArgumentNullException("mediaService");
-            if (entityService == null) throw new ArgumentNullException("entityService");
-
-            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
-            {
-                media = mediaService.GetById(nodeId);
-                //put the content item into storage so it can be retrieved
-                // in the controller (saves a lookup)
-                storage[typeof(IMedia).ToString()] = media;
-            }
-
-            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            var hasPathAccess = (nodeId == Constants.System.Root)
-                ? user.HasMediaRootAccess(entityService)
-                : (nodeId == Constants.System.RecycleBinMedia)
-                    ? user.HasMediaBinAccess(entityService)
-                    : user.HasPathAccess(media, entityService);
-
-            return hasPathAccess;
-        }
+        
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {

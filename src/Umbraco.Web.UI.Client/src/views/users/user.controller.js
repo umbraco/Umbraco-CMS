@@ -448,8 +448,7 @@
 
         function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
-                formHelper.showNotifications(data);
-                goToPage(vm.breadcrumbs[0]);
+               goToPage(vm.breadcrumbs[0]);
             }, function (error) {
                 vm.deleteNotLoggedInUserButtonState = "error";
                 formHelper.showNotifications(error.data);

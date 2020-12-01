@@ -2,6 +2,7 @@
 using System.Threading;
 using Semver;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
@@ -32,9 +33,9 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(GlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger<RuntimeState> logger)
+        public RuntimeState(IOptions<GlobalSettings> globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger<RuntimeState> logger)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
@@ -158,6 +159,12 @@ namespace Umbraco.Core
             _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
             Level = RuntimeLevel.Upgrade;
             Reason = RuntimeLevelReason.UpgradeMigrations;
+        }
+
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
+        {
+            Level = level;
+            Reason = reason;
         }
 
         private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)

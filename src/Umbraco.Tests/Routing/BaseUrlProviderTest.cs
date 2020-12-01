@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         protected override void ComposeSettings()
@@ -28,8 +28,8 @@ namespace Umbraco.Tests.Routing
             var contentSettings = new ContentSettings();
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
-            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
-            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Builder.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Builder.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
         }
 
         protected IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)

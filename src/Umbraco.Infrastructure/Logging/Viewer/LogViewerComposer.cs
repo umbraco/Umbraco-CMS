@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging.Viewer
@@ -8,11 +9,11 @@ namespace Umbraco.Core.Logging.Viewer
     // ReSharper disable once UnusedMember.Global
     public class LogViewerComposer : ICoreComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<ILogViewerConfig, LogViewerConfig>();
-            composition.SetLogViewer<SerilogJsonLogViewer>();
-            composition.Services.AddUnique<ILogViewer>(factory =>
+            builder.Services.AddUnique<ILogViewerConfig, LogViewerConfig>();
+            builder.SetLogViewer<SerilogJsonLogViewer>();
+            builder.Services.AddUnique<ILogViewer>(factory =>
             {
 
                 return new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),

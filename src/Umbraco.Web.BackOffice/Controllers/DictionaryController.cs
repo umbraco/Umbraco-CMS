@@ -18,6 +18,8 @@ using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -30,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Dictionary
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]
     public class DictionaryController : BackOfficeNotificationsController
     {
         private readonly ILogger<DictionaryController> _logger;

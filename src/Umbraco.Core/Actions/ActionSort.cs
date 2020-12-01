@@ -9,7 +9,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionSort : IAction
     {
-        public char Letter => 'S';
+        public const char ActionLetter = 'S';
+
+        public char Letter => ActionLetter;
         public string Alias => "sort";
         public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
         public string Icon => "navigation-vertical";

@@ -84,7 +84,7 @@ namespace Umbraco.Web.Templates
         }
 
         /// <summary>
-        /// Removes media urls from &lt;img&gt; tags where a data-udi attribute is present
+        /// Removes media URLs from &lt;img&gt; tags where a data-udi attribute is present
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>

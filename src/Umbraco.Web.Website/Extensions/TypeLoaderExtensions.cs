@@ -4,7 +4,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Website.Controllers;
 
-
 namespace Umbraco.Extensions
 {
     /// <summary>

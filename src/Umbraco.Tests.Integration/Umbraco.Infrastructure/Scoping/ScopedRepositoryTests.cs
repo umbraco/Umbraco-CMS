@@ -44,6 +44,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             return result;
         }
+
         [TearDown]
         public void Teardown()
         {

@@ -22,6 +22,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -29,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Packages)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
 

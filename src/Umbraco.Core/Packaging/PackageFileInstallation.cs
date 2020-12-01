@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Packaging;
@@ -15,13 +16,15 @@ namespace Umbraco.Core.Packaging
     {
         private readonly CompiledPackageXmlParser _parser;
         private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IProfilingLogger _logger;
         private readonly PackageExtraction _packageExtraction;
 
-        public PackageFileInstallation(CompiledPackageXmlParser parser, IIOHelper ioHelper, IProfilingLogger logger)
+        public PackageFileInstallation(CompiledPackageXmlParser parser, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IProfilingLogger logger)
         {
             _parser = parser;
             _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _logger = logger;
             _packageExtraction = new PackageExtraction();
         }
@@ -62,9 +65,8 @@ namespace Umbraco.Core.Packaging
                 var file = _ioHelper.FindFile(item);
                 if (file != null)
                 {
-                    // TODO: Surely this should be ~/ ?
                     file = file.EnsureStartsWith("/");
-                    var filePath = _ioHelper.MapPath(file);
+                    var filePath = _hostingEnvironment.MapPathContentRoot(file);
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);

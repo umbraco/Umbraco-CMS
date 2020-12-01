@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -12,6 +13,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 
@@ -52,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _sqlContext = sqlContext ?? throw new ArgumentNullException(nameof(sqlContext));
          }
 
-        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media)]
+        [Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
             int pageSize = 10,

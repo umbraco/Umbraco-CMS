@@ -3,6 +3,7 @@ using System.Web.Security;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Templates;
@@ -23,36 +24,36 @@ namespace Umbraco.Web.Runtime
     [ComposeBefore(typeof(ICoreComposer))]
     public sealed class WebInitialComposer : ComponentComposer<WebInitialComponent>
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Services.AddTransient<UmbracoInjectedModule>();
+            builder.Services.AddTransient<UmbracoInjectedModule>();
 
 
             // register membership stuff
-            composition.Services.AddTransient(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
-            composition.Services.AddTransient(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
-            composition.Services.AddScoped<MembershipHelper>();
-            composition.Services.AddTransient<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
-            composition.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
-            composition.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+            builder.Services.AddTransient(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
+            builder.Services.AddTransient(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
+            builder.Services.AddScoped<MembershipHelper>();
+            builder.Services.AddTransient<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
+            builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
+            builder.Services.AddTransient<UmbracoHelper>(factory =>
+            {
+                var state = factory.GetRequiredService<IRuntimeState>();
 
-            // register the umbraco helper - this is Transient! very important!
-            // also, if not level.Run, we cannot really use the helper (during upgrade...)
-            // so inject a "void" helper (not exactly pretty but...)
-            if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Services.AddTransient<UmbracoHelper>(factory =>
+                if (state.Level == RuntimeLevel.Run)
                 {
                     var umbCtx = factory.GetRequiredService<IUmbracoContext>();
                     return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
-                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
-                });
-            else
-                composition.Services.AddTransient(_ => new UmbracoHelper());
+                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>(), factory.GetRequiredService<MembershipHelper>());
+                }
 
-            composition.Services.AddUnique<RoutableDocumentFilter>();
+                return new UmbracoHelper();
+            });
+
+            builder.Services.AddUnique<RoutableDocumentFilter>();
 
             // configure the container for web
             //composition.ConfigureForWeb();

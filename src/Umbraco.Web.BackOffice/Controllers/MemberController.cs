@@ -8,6 +8,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -31,6 +32,7 @@ using Umbraco.Infrastructure.Members;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
@@ -44,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// access to ALL of the methods on this controller will need access to the member application.
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Members)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {

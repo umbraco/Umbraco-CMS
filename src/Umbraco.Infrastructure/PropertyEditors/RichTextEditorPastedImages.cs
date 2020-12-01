@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger<RichTextEditorPastedImages> _logger;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IMediaFileSystem _mediaFileSystem;
@@ -30,11 +31,11 @@ namespace Umbraco.Web.PropertyEditors
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider,  IJsonSerializer serializer)
+        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IHostingEnvironment hostingEnvironment, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider,  IJsonSerializer serializer)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
             _mediaFileSystem = mediaFileSystem;
@@ -73,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
-                var absoluteTempImagePath = _ioHelper.MapPath(tmpImgPath);
+                var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
 
@@ -110,7 +111,7 @@ namespace Umbraco.Web.PropertyEditors
                 // Add the UDI to the img element as new data attribute
                 img.SetAttributeValue("data-udi", udi.ToString());
 
-                // Get the new persisted image url
+                // Get the new persisted image URL
                 var mediaTyped = _umbracoContextAccessor?.UmbracoContext?.Media.GetById(udi.Guid);
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");

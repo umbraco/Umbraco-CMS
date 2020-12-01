@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.Options;
+@using System.Globalization
 @using Umbraco.Core
 @using Umbraco.Web.WebAssets
 @using Umbraco.Web.Common.Security
@@ -25,7 +26,7 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.Name">
 <head>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="utf-8">

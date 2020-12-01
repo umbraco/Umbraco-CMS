@@ -55,5 +55,7 @@ namespace Umbraco.Core
         /// </summary>
         void DetermineRuntimeLevel();
 
+        void Configure(RuntimeLevel level, RuntimeLevelReason reason);
+
     }
 }

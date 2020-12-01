@@ -24,6 +24,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -31,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// An API controller used for dealing with member types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         private readonly IMemberTypeService _memberTypeService;
@@ -71,7 +73,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public MemberTypeDisplay GetById(int id)
         {
@@ -90,7 +91,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public MemberTypeDisplay GetById(Guid id)
         {
@@ -109,7 +109,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         [DetermineAmbiguousActionByPassingParameters]
         public MemberTypeDisplay GetById(Udi id)
         {
@@ -134,7 +133,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public IActionResult DeleteById(int id)
         {
             var foundType = _memberTypeService.Get(id);
@@ -161,8 +159,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
-
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public IActionResult GetAvailableCompositeMemberTypes(int contentTypeId,
             [FromQuery]string[] filterContentTypes,
             [FromQuery]string[] filterPropertyTypes)
@@ -176,7 +172,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok(result);
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(_shortStringHelper, -1);
@@ -190,13 +185,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns all member types
         /// </summary>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
             return _memberTypeService.GetAll()
                                .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>);
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public ActionResult<MemberTypeDisplay> PostSave(MemberTypeSave contentTypeSave)
         {
             //get the persisted member type

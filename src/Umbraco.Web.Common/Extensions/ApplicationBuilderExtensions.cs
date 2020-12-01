@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,9 +7,7 @@ using Smidge;
 using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Runtime;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 
@@ -41,6 +38,9 @@ namespace Umbraco.Extensions
             if (app == null) throw new ArgumentNullException(nameof(app));
 
             if (!app.UmbracoCanBoot()) return app;
+
+            var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
 
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
 

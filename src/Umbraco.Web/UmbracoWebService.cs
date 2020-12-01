@@ -16,17 +16,18 @@ namespace Umbraco.Web
     {
         private UrlHelper _url;
 
-        protected UmbracoWebService(ILogger logger, IProfilingLogger profilingLogger, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, GlobalSettings globalSettings)
+        protected UmbracoWebService(ILogger logger, IProfilingLogger profilingLogger, IUmbracoContextAccessor umbracoContextAccessor, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, ServiceContext services, GlobalSettings globalSettings)
         {
             Logger = logger;
             ProfilingLogger = profilingLogger;
             UmbracoContextAccessor = umbracoContextAccessor;
+            BackOfficeSecurityAccessor = backOfficeSecurityAccessor;
             Services = services;
             GlobalSettings = globalSettings;
         }
 
         protected UmbracoWebService()
-        : this(Current.Logger, Current.ProfilingLogger, Current.UmbracoContextAccessor,  Current.Services, new GlobalSettings())
+        : this(Current.Logger, Current.ProfilingLogger, Current.UmbracoContextAccessor, Current.BackOfficeSecurityAccessor, Current.Services,new GlobalSettings())
         {
         }
 
@@ -50,6 +51,8 @@ namespace Umbraco.Web
         /// </summary>
         public IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
+        public IBackOfficeSecurityAccessor BackOfficeSecurityAccessor { get; }
+
         /// <summary>
         /// Gets the services context.
         /// </summary>
@@ -63,10 +66,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IBackOfficeSecurity Security => UmbracoContext.Security;
+        public IBackOfficeSecurity Security => BackOfficeSecurityAccessor.BackOfficeSecurity;
 
         /// <summary>
-        /// Gets the Url helper.
+        /// Gets the URL helper.
         /// </summary>
         /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
         public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));

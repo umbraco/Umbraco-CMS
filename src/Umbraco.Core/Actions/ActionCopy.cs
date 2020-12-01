@@ -7,7 +7,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionCopy : IAction
     {
-        public char Letter => 'O';
+        public const char ActionLetter = 'O';
+
+        public char Letter => ActionLetter;
         public string Alias => "copy";
         public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
         public string Icon => "documents";

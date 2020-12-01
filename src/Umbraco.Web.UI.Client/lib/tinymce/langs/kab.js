@@ -150,7 +150,7 @@ tinymce.addI18n('kab',{
 "Insert link": "Ger azday",
 "Insert\/edit link": "Ger\/\u1e93reg azday",
 "Text to display": "A\u1e0dris ara yettwabeqq\u1e0den",
-"Url": "Url",
+"Url": "URL",
 "Target": "Target",
 "None": "Ulac",
 "New window": "Asfaylu amaynut",

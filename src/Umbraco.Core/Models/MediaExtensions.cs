@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     public static class MediaExtensions
     {
         /// <summary>
-        /// Gets the url of a media item.
+        /// Gets the URL of a media item.
         /// </summary>
         public static string GetUrl(this IMedia media, string propertyAlias, MediaUrlGeneratorCollection mediaUrlGenerators)
         {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the urls of a media item.
+        /// Gets the URLs of a media item.
         /// </summary>
         public static string[] GetUrls(this IMedia media, ContentSettings contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
         {

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     // TODO: these comments are not true anymore
     // TODO: this class needs not be disposable!
-    internal class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
+    public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
     {
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly GlobalSettings _globalSettings;

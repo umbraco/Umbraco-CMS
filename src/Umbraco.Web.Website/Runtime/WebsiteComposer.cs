@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Extensions;
 using Umbraco.Web.Website.Routing;
@@ -12,12 +13,12 @@ namespace Umbraco.Web.Website.Runtime
     [ComposeAfter(typeof(AspNetCoreComposer))]
     public class WebsiteComposer : IComposer
     {
-        public void Compose(Composition composition)
+        public void Compose(IUmbracoBuilder builder)
         {
-            composition.Services.AddUnique<NoContentRoutes>();
+            builder.Services.AddUnique<NoContentRoutes>();
 
-            composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
-                 .Add(composition.TypeLoader.GetSurfaceControllers());
+            builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+                 .Add(builder.TypeLoader.GetSurfaceControllers());
         }
     }
 }

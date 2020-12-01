@@ -1,0 +1,34 @@
+﻿@using Umbraco.Core.Security
+@using Umbraco.Core.Models.Security
+@using Umbraco.Extensions
+@using Umbraco.Web.Website.Controllers
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IUmbracoWebsiteSecurityAccessor UmbracoWebsiteSecurityAccessor
+
+@{
+    var websiteSecurity = UmbracoWebsiteSecurityAccessor.WebsiteSecurity;
+    var loginStatusModel = await websiteSecurity.GetCurrentLoginStatusAsync();
+    var logoutModel = new PostRedirectModel();
+
+    @*
+        Here you can specify a redirect URL for after logging out, by default umbraco will simply
+        redirect to the current page. Example to redirect to the home page:
+
+        logoutModel.RedirectUrl = "/";
+    *@
+}
+
+@if (loginStatusModel.IsLoggedIn)
+{
+    <p>You are currently logged in as @loginStatusModel.Name</p>
+
+    using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout"))
+    {
+        <fieldset>
+            <legend>Logout</legend>
+            <button>Logout</button>
+        </fieldset>
+
+        @Html.HiddenFor(m => logoutModel.RedirectUrl)
+    }
+}
