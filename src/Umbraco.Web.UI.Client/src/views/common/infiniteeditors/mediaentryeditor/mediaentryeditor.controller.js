@@ -81,6 +81,20 @@ angular.module("umbraco")
                 updateMedia();
             }
 
+            vm.openMedia = openMedia;
+            function openMedia(item) {
+                var mediaEditor = {
+                    id: item.id,
+                    submit: function () {
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.mediaEditor(mediaEditor);
+            }
+
 
             vm.focalPointChanged = function(left, top) {
                 //update the model focalpoint value

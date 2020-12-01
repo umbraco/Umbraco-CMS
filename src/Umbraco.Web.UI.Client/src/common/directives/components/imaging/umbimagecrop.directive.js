@@ -7,6 +7,9 @@
 angular.module("umbraco.directives")
     .directive('umbImageCrop',
         function ($timeout, $window, cropperHelper) {
+
+            const MAX_SCALE = 4;
+
             return {
                 restrict: 'E',
                 replace: true,
@@ -39,8 +42,8 @@ angular.module("umbraco.directives")
                         viewport: {},
                         margin: {},
                         scale: {
-                            min: 0,
-                            max: 3,
+                            min: 1,
+                            max: MAX_SCALE,
                             current: 1
                         }
                     };
@@ -70,7 +73,9 @@ angular.module("umbraco.directives")
 
                     function updateSlider() {
                         if(sliderRef) {
+
                             // Set slider handle position
+                            console.log("set:", scope.dimensions.scale.current.toFixed(3), "   ", scope.dimensions.scale.min, "  max", scope.dimensions.scale.max)
                             sliderRef.noUiSlider.set(scope.dimensions.scale.current);
 
                             // Update slider range min/max
@@ -239,8 +244,11 @@ angular.module("umbraco.directives")
                         scope.dimensions.scale.current = scope.dimensions.image.ratio;
 
                         // Update min and max based on original width/height
+                        // Here we update the slider to use the scala of the current setup, i dont know why its made in this way but this is how it is.
                         scope.dimensions.scale.min = ratioCalculation.ratio;
-                        scope.dimensions.scale.max = ratioCalculation.ratio * 3;
+                        // TODO: Investigate wether we can limit users to not scale bigger than the amount of pixels in the source:
+                        //scope.dimensions.scale.max = ratioCalculation.ratio * Math.min(MAX_SCALE, scope.dimensions.image.originalWidth/scope.dimensions.cropper.width);
+                        scope.dimensions.scale.max = ratioCalculation.ratio * MAX_SCALE;
 
                         updateSlider();
                     };
