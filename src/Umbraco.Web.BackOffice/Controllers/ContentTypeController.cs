@@ -33,6 +33,8 @@ using ContentType = Umbraco.Core.Models.ContentType;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -45,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
@@ -130,7 +132,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public bool HasContentNodes(int id)
         {
             return _contentTypeService.HasContentNodes(id);
@@ -217,10 +219,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Gets all user defined properties.
         /// </summary>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]        
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return _contentTypeService.GetAllPropertyTypeAliases();
@@ -230,10 +229,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Gets all the standard fields.
         /// </summary>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllStandardFields()
         {
             string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
@@ -274,10 +270,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok(result);
         }
 
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = _dataTypeService.GetDataType(id);
@@ -517,7 +510,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)

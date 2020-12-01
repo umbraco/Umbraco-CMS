@@ -36,15 +36,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
-            var properties = new List<IPublishedProperty>();
+            var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
+            int i =0;
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
             {
                 // add one property per property type - this is required, for the indexing to work
                 // if contentData supplies pdatas, use them, else use null
                 contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas); // else will be null
-                properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
+                properties[i++] =new Property(propertyType, this, pdatas, _publishedSnapshotAccessor);
             }
-            PropertiesArray = properties.ToArray();
+            PropertiesArray = properties;
         }
 
         // used when cloning in ContentNode

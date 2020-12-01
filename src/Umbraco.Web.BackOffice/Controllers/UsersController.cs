@@ -42,11 +42,13 @@ using Task = System.Threading.Tasks.Task;
 using Umbraco.Net;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Security;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
@@ -65,14 +67,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IEntityService _entityService;
-        private readonly IMediaService _mediaService;
-        private readonly IContentService _contentService;
         private readonly GlobalSettings _globalSettings;
         private readonly IBackOfficeUserManager _userManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
@@ -90,14 +90,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper,
-            IEntityService entityService,
-            IMediaService mediaService,
-            IContentService contentService,
             IOptions<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,
-            IBackOfficeExternalLoginProviders externalLogins)
+            IBackOfficeExternalLoginProviders externalLogins,
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
@@ -113,19 +111,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService = userService;
             _localizedTextService = localizedTextService;
             _umbracoMapper = umbracoMapper;
-            _entityService = entityService;
-            _mediaService = mediaService;
-            _contentService = contentService;
             _globalSettings = globalSettings.Value;
             _userManager = backOfficeUserManager;
             _loggerFactory = loggerFactory;
             _linkGenerator = linkGenerator;
             _externalLogins = externalLogins;
+            _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
             _logger = _loggerFactory.CreateLogger<UsersController>();
         }
 
         /// <summary>
-        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
@@ -138,7 +134,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [AppendUserModifiedHeader("id")]
-        [AdminUsersAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
         {
             return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
@@ -191,7 +187,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [AppendUserModifiedHeader("id")]
-        [AdminUsersAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public ActionResult<string[]> PostClearAvatar(int id)
         {
             var found = _userService.GetUserById(id);
@@ -230,7 +226,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [AdminUsersAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public UserDisplay GetById(int id)
         {
             var user = _userService.GetUserById(id);
@@ -248,7 +244,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="ids"></param>
         /// <returns></returns>
         [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
-        [AdminUsersAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
         {
             if (ids == null)
@@ -365,8 +361,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             CheckUniqueEmail(userSave.Email, null);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
@@ -449,8 +444,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
@@ -491,8 +485,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occured in a custom event handler while inviting the user");
-                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occured inviting the user (check logs for more info): {ex.Message}");
+                _logger.LogError(ex, "An error occurred in a custom event handler while inviting the user");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occurred inviting the user (check logs for more info): {ex.Message}");
             }
 
             // If the event is handled then no need to send the email
@@ -555,7 +549,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            // Get an mvc helper to get the url
+            // Get an mvc helper to get the URL
             var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
                 {
                     area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
@@ -603,8 +597,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
@@ -717,7 +710,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Disables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        [AdminUsersAuthorize("userIds")]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostDisableUsers([FromQuery]int[] userIds)
         {
             var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
@@ -748,7 +741,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Enables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        [AdminUsersAuthorize("userIds")]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostEnableUsers([FromQuery]int[] userIds)
         {
             var users = _userService.GetUsersById(userIds).ToArray();
@@ -772,7 +765,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Unlocks the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
-        [AdminUsersAuthorize("userIds")]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public async Task<IActionResult> PostUnlockUsers([FromQuery]int[] userIds)
         {
             if (userIds.Length <= 0) return Ok();
@@ -805,7 +798,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
-        [AdminUsersAuthorize("userIds")]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostSetUserGroupsOnUsers([FromQuery]string[] userGroupAliases, [FromQuery]int[] userIds)
         {
             var users = _userService.GetUsersById(userIds).ToArray();
@@ -831,7 +824,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Limited to users that haven't logged in to avoid issues with related records constrained
         /// with a foreign key on the user Id
         /// </remarks>
-        [AdminUsersAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostDeleteNonLoggedInUser(int id)
         {
             var user = _userService.GetUserById(id);

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -6,9 +8,9 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -21,39 +23,45 @@ namespace Umbraco.Web.BackOffice.Filters
         {
         }
 
-        private sealed class MediaItemSaveValidationFilter : IActionFilter
+        private sealed class MediaItemSaveValidationFilter : IAsyncActionFilter
         {
-            private readonly IEntityService _entityService;
             private readonly IPropertyValidationService _propertyValidationService;
-
-
+            private readonly IAuthorizationService _authorizationService;
             private readonly IMediaService _mediaService;
-            private readonly ILocalizedTextService _textService;
             private readonly ILoggerFactory _loggerFactory;
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
             public MediaItemSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                ILocalizedTextService textService,
                 IMediaService mediaService,
-                IEntityService entityService,
-                IPropertyValidationService propertyValidationService)
+                IPropertyValidationService propertyValidationService,
+                IAuthorizationService authorizationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
                 _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
+                _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
             }
 
-            public void OnActionExecuting(ActionExecutingContext context)
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+            {
+                // on executing...
+                await OnActionExecutingAsync(context);
+
+                if (context.Result == null)
+                {
+                    //need to pass the execution to next if a result was not set
+                    await next();
+                }
+
+                // on executed...
+            }
+
+            private async Task OnActionExecutingAsync(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _propertyValidationService);
 
-                if (ValidateUserAccess(model, context))
+                if (await ValidateUserAccessAsync(model, context))
                 {
                     //now do each validation step
                     if (contentItemValidator.ValidateExistingContent(model, context))
@@ -68,7 +76,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// </summary>
             /// <param name="mediaItem"></param>
             /// <param name="actionContext"></param>
-            private bool ValidateUserAccess(MediaItemSave mediaItem, ActionExecutingContext actionContext)
+            private async Task<bool> ValidateUserAccessAsync(MediaItemSave mediaItem, ActionExecutingContext actionContext)
             {
                 //We now need to validate that the user is allowed to be doing what they are doing.
                 //Then if it is new, we need to lookup those permissions on the parent.
@@ -100,22 +108,22 @@ namespace Umbraco.Web.BackOffice.Filters
                         return false;
                 }
 
-                if (MediaController.CheckPermissions(
-                    actionContext.HttpContext.Items,
-                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
-                    _mediaService, _entityService,
-                    contentIdToCheck, contentToCheck) == false)
+                var resource = contentToCheck == null
+                    ? new MediaPermissionsResource(contentIdToCheck)
+                    : new MediaPermissionsResource(contentToCheck);
+
+                var authorizationResult = await _authorizationService.AuthorizeAsync(
+                    actionContext.HttpContext.User,
+                    resource,
+                    AuthorizationPolicies.MediaPermissionByResource);
+
+                if (!authorizationResult.Succeeded)
                 {
                     actionContext.Result = new ForbidResult();
                     return false;
                 }
 
                 return true;
-            }
-
-            public void OnActionExecuted(ActionExecutedContext context)
-            {
-
             }
         }
     }

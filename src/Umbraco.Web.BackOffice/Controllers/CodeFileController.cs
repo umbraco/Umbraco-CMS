@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -19,6 +20,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
@@ -30,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     //[PrefixlessBodyModelValidator]
-    [UmbracoApplicationAuthorize(Constants.Applications.Settings)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -165,7 +167,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Used to get a specific file from disk via the FileService
         /// </summary>
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
-        /// <param name="virtualPath">The filename or urlencoded path of the file to open</param>
+        /// <param name="virtualPath">The filename or URL encoded path of the file to open</param>
         /// <returns>The file and its contents from the virtualPath</returns>
         public ActionResult<CodeFileDisplay> GetByPath(string type, string virtualPath)
         {
@@ -315,7 +317,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Used to delete a specific file from disk via the FileService
         /// </summary>
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
-        /// <param name="virtualPath">The filename or urlencoded path of the file to delete</param>
+        /// <param name="virtualPath">The filename or URL encoded path of the file to delete</param>
         /// <returns>Will return a simple 200 if file deletion succeeds</returns>
         [HttpDelete]
         [HttpPost]

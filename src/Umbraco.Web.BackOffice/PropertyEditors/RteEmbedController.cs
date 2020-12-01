@@ -32,8 +32,8 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
 
             foreach (var provider in _embedCollection)
             {
-                //Url Scheme Regex is an array of possible regex patterns to match against the URL
-                foreach(var urlPattern in provider.UrlSchemeRegex)
+                // UrlSchemeRegex is an array of possible regex patterns to match against the URL
+                foreach (var urlPattern in provider.UrlSchemeRegex)
                 {
                     var regexPattern = new Regex(urlPattern, RegexOptions.IgnoreCase);
                     if (regexPattern.IsMatch(url))
@@ -63,7 +63,7 @@ namespace Umbraco.Web.BackOffice.PropertyEditors
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
+                _logger.LogError(ex, "Error embedding URL {Url} - width: {Width} height: {Height}", url, width, height);
                 result.OEmbedStatus = OEmbedStatus.Error;
             }
 

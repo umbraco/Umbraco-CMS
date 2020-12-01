@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page url rewrites
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page URL rewrites
     /// that are stored when moving, saving, or deleting a node.
     /// </summary>
     /// <remarks>
@@ -37,7 +37,9 @@ namespace Umbraco.Web.Routing
                 ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
                 : frequest.Uri.GetAbsolutePathDecoded();
 
-            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
+
+
+            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture.Name);
 
             if (redirectUrl == null)
             {
@@ -49,14 +51,14 @@ namespace Umbraco.Web.Routing
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
+                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
                 return false;
             }
 
-            // Appending any querystring from the incoming request to the redirect url.
+            // Appending any querystring from the incoming request to the redirect URL
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.LogDebug("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
 
 

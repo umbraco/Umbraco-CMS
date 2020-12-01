@@ -39,7 +39,6 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                     // no new groups selected
                     editorService.close();
                 }
-                editorService.close();
             },
             close: function() {
                 editorService.close();

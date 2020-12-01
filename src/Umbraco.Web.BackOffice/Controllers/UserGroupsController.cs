@@ -16,11 +16,13 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
     public class UserGroupsController : UmbracoAuthorizedJsonController
     {
@@ -164,7 +166,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Return a user group
         /// </summary>
         /// <returns></returns>
-        [UserGroupAuthorization("id")]
+        [Authorize(Policy = AuthorizationPolicies.UserBelongsToUserGroupInRequest)]
         public ActionResult<UserGroupDisplay> GetUserGroup(int id)
         {
             var found = _userService.GetUserGroupById(id);
@@ -178,7 +180,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [HttpPost]
         [HttpDelete]
-        [UserGroupAuthorization("userGroupIds")]
+        [Authorize(Policy = AuthorizationPolicies.UserBelongsToUserGroupInRequest)]
         public IActionResult PostDeleteUserGroups([FromQuery] int[] userGroupIds)
         {
             var userGroups = _userService.GetAllUserGroups(userGroupIds)

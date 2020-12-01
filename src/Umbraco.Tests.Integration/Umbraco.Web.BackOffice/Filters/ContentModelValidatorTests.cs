@@ -139,12 +139,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             var logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
             var backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
             backofficeSecurityFactory.EnsureBackOfficeSecurity();
-            var backofficeSecurityAccessor = Services.GetRequiredService<IBackOfficeSecurityAccessor>();
-            var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
             var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
             var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
-            var validator = new ContentSaveModelValidator(logger, backofficeSecurityAccessor.BackOfficeSecurity, localizedTextService, propertyValidationService);
+            var validator = new ContentSaveModelValidator(logger, propertyValidationService);
 
             var content = ContentBuilder.CreateTextpageContent(_contentType, "test", -1);
 

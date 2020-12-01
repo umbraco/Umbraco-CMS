@@ -244,7 +244,7 @@ namespace Umbraco.Web.Compose
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null)
                 {
-                    _logger.LogWarning("Notifications can not be sent, no site url is set (might be during boot process?)");
+                    _logger.LogWarning("Notifications can not be sent, no site URL is set (might be during boot process?)");
                     return;
                 }
 

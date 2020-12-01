@@ -34,7 +34,7 @@ namespace Umbraco.Core
         {
             Guid guid;
             if (Guid.TryParse(uriValue.AbsolutePath.TrimStart('/'), out guid) == false)
-                throw new FormatException("Url \"" + uriValue + "\" is not a guid entity id.");
+                throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
 
             Guid = guid;
         }

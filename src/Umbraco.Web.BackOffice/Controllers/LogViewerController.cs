@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Models;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -14,6 +15,8 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Backoffice controller supporting the dashboard for viewing logs with some simple graphs & filtering
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+
     public class LogViewerController : UmbracoAuthorizedJsonController
     {
         private readonly ILogViewer _logViewer;

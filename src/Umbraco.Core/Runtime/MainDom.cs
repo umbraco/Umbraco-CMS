@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
+using System.Threading.Tasks;
 
 namespace Umbraco.Core.Runtime
 {
@@ -36,6 +37,9 @@ namespace Umbraco.Core.Runtime
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
         private const int LockTimeoutMilliseconds = 40000; // 40 seconds
+
+        private Task _listenTask;
+        private Task _listenCompleteTask;
 
         #endregion
 
@@ -172,7 +176,13 @@ namespace Umbraco.Core.Runtime
             try
             {
                 // Listen for the signal from another AppDomain coming online to release the lock
-                _mainDomLock.ListenAsync().ContinueWith(_ => OnSignal("signal"));
+                _listenTask = _mainDomLock.ListenAsync();
+                _listenCompleteTask = _listenTask.ContinueWith(t =>
+                {
+                    _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+
+                    OnSignal("signal");
+                }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             }
             catch (OperationCanceledException ex)
             {

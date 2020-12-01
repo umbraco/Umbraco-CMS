@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -10,6 +12,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 
@@ -27,43 +31,49 @@ namespace Umbraco.Web.BackOffice.Filters
         }
 
 
-        private sealed class ContentSaveValidationFilter : IActionFilter
+        private sealed class ContentSaveValidationFilter : IAsyncActionFilter
         {
             private readonly IContentService _contentService;
-            private readonly IEntityService _entityService;
             private readonly IPropertyValidationService _propertyValidationService;
+            private readonly IAuthorizationService _authorizationService;
             private readonly ILoggerFactory _loggerFactory;
-            private readonly ILocalizedTextService _textService;
-            private readonly IUserService _userService;
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-                ILocalizedTextService textService,
                 IContentService contentService,
-                IUserService userService,
-                IEntityService entityService,
-                IPropertyValidationService propertyValidationService)
+                IPropertyValidationService propertyValidationService,
+                IAuthorizationService authorizationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-                _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-                _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-                _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
                 _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
+                _authorizationService = authorizationService;
             }
 
-            public void OnActionExecuting(ActionExecutingContext context)
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+            {
+                // on executing...
+                await OnActionExecutingAsync(context);
+
+                if (context.Result == null)
+                {
+                    //need to pass the execution to next if a result was not set
+                    await next(); 
+                }
+                
+
+                // on executed...
+            }
+
+            private async Task OnActionExecutingAsync(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!ValidateUserAccess(model, context, _backofficeSecurityAccessor.BackOfficeSecurity)) return;
+                if (!await ValidateUserAccessAsync(model, context)) return;
 
                 //validate for each variant that is being updated
                 foreach (var variant in model.Variants.Where(x => x.Save))
@@ -74,9 +84,6 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
             }
 
-            public void OnActionExecuted(ActionExecutedContext context)
-            {
-            }
 
             /// <summary>
             ///     If there are no variants tagged for Saving, then this is an invalid request
@@ -84,7 +91,8 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="contentItem"></param>
             /// <param name="actionContext"></param>
             /// <returns></returns>
-            private bool ValidateAtLeastOneVariantIsBeingSaved(ContentItemSave contentItem,
+            private bool ValidateAtLeastOneVariantIsBeingSaved(
+                ContentItemSave contentItem,
                 ActionExecutingContext actionContext)
             {
                 if (!contentItem.Variants.Any(x => x.Save))
@@ -102,8 +110,9 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="actionContext"></param>
             /// <param name="contentItem"></param>
             /// <param name="backofficeSecurity"></param>
-            private bool ValidateUserAccess(ContentItemSave contentItem, ActionExecutingContext actionContext,
-                IBackOfficeSecurity backofficeSecurity)
+            private async Task<bool> ValidateUserAccessAsync(
+                ContentItemSave contentItem,
+                ActionExecutingContext actionContext)
             {
                 // We now need to validate that the user is allowed to be doing what they are doing.
                 // Based on the action we need to check different permissions.
@@ -210,42 +219,26 @@ namespace Umbraco.Web.BackOffice.Filters
                         throw new ArgumentOutOfRangeException();
                 }
 
-                ContentPermissionsHelper.ContentAccess accessResult;
-                if (contentToCheck != null)
-                {
-                    //store the content item in request cache so it can be resolved in the controller without re-looking it up
-                    actionContext.HttpContext.Items[typeof(IContent).ToString()] = contentItem;
 
-                    accessResult = ContentPermissionsHelper.CheckPermissions(
-                        contentToCheck, backofficeSecurity.CurrentUser,
-                        _userService, _entityService, permissionToCheck.ToArray());
-                }
-                else
-                {
-                    accessResult = ContentPermissionsHelper.CheckPermissions(
-                        contentIdToCheck, backofficeSecurity.CurrentUser,
-                        _userService, _contentService, _entityService,
-                        out contentToCheck,
-                        permissionToCheck.ToArray());
-                    if (contentToCheck != null)
-                    {
-                        //store the content item in request cache so it can be resolved in the controller without re-looking it up
-                        actionContext.HttpContext.Items[typeof(IContent).ToString()] = contentToCheck;
-                    }
-                }
+                var resource = contentToCheck == null
+                    ? new ContentPermissionsResource(contentToCheck, contentIdToCheck, permissionToCheck)
+                    : new ContentPermissionsResource(contentToCheck, permissionToCheck);
 
-                if (accessResult == ContentPermissionsHelper.ContentAccess.NotFound)
-                {
-                    actionContext.Result = new NotFoundResult();
-                }
+                var authorizationResult = await _authorizationService.AuthorizeAsync(
+                    actionContext.HttpContext.User,
+                    resource,
+                    AuthorizationPolicies.ContentPermissionByResource);
 
-                if (accessResult != ContentPermissionsHelper.ContentAccess.Granted)
+                if (!authorizationResult.Succeeded)
                 {
                     actionContext.Result = new ForbidResult();
+                    return false;
                 }
 
-                return accessResult == ContentPermissionsHelper.ContentAccess.Granted;
+                return true;
             }
+
+            
         }
     }
 }

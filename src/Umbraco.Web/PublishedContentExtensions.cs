@@ -837,25 +837,20 @@ namespace Umbraco.Web
         #region Url
 
         /// <summary>
-             /// Gets the url of the content item.
+             /// Gets the URL of the content item.
              /// </summary>
              /// <remarks>
-             /// <para>If the content item is a document, then this method returns the url of the
-             /// document. If it is a media, then this methods return the media url for the
-             /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+             /// <para>If the content item is a document, then this method returns the URL of the
+             /// document. If it is a media, then this methods return the media URL for the
+             /// 'umbracoFile' property. Use the MediaUrl() method to get the media URL for other
              /// properties.</para>
              /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-             /// if any. In addition, when the content type is multi-lingual, this is the url for the
-             /// specified culture. Otherwise, it is the invariant url.</para>
+             /// if any. In addition, when the content type is multi-lingual, this is the URL for the
+             /// specified culture. Otherwise, it is the invariant URL.</para>
              /// </remarks>
              public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
              {
-                var umbracoContext = Current.UmbracoContext;
-
-                if (umbracoContext == null)
-                    throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-
-                return content.Url(Current.PublishedUrlProvider, culture, mode);
+                 return content.Url(Current.PublishedUrlProvider, culture, mode);
              }
 
 

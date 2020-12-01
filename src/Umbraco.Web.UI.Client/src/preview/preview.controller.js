@@ -29,7 +29,28 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             window.addEventListener("keydown", handleFirstTab);
         }
 
+        var iframeWrapper = angular.element("#demo-iframe-wrapper");
+        var canvasDesignerPanel = angular.element("#canvasdesignerPanel");
+        
         window.addEventListener("keydown", handleFirstTab);
+        window.addEventListener("resize", scaleIframeWrapper);
+        iframeWrapper.on("transitionend", scaleIframeWrapper);
+
+        function scaleIframeWrapper() {
+            if ($scope.previewDevice.name == "fullsize") { // dont scale fullsize preview
+                iframeWrapper.css({"transform": ""});
+            }
+            else {
+                var wrapWidth = canvasDesignerPanel.width(); // width of the wrapper
+                var wrapHeight = canvasDesignerPanel.height();
+                var childWidth = iframeWrapper.width() + 30; // width of child iframe plus some space
+                var childHeight = iframeWrapper.height() + 30; // child height plus some space
+                var wScale = wrapWidth / childWidth;
+                var hScale = wrapHeight / childHeight;
+                var scale = Math.min(wScale,hScale,1);  // get the lowest ratio, but not higher than 1
+                iframeWrapper.css({"transform": "scale("+scale+")" });  // set scale
+            }
+        }
 
 
         //gets a real query string value

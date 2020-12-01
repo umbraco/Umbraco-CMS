@@ -1,7 +1,9 @@
-﻿using Umbraco.Core.IO;
+﻿using Microsoft.AspNetCore.Authorization;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
@@ -14,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Trees
     /// Tree for displaying partial views in the settings app
     /// </summary>
     [Tree(Core.Constants.Applications.Settings, Core.Constants.Trees.PartialViews, SortOrder = 7, TreeGroup = Core.Constants.Trees.Groups.Templating)]
-    [UmbracoTreeAuthorize(Constants.Trees.PartialViews)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class PartialViewsTreeController : FileSystemTreeController

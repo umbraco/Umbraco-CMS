@@ -751,7 +751,7 @@ namespace Umbraco.Core
             var pos = str.IndexOf('=');
             if (pos < 0) pos = str.Length;
 
-            // replace chars that would cause problems in urls
+            // replace chars that would cause problems in URLs
             var chArray = new char[pos];
             for (var i = 0; i < pos; i++)
             {

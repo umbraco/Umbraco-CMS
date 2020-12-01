@@ -6,8 +6,8 @@
 
 @{
 
-    var value = HtmlUrlParser.EnsureUrls(Model.value.ToString());
+    var value = HtmlLocalLinkParser.EnsureInternalLinks(Model.value.ToString());
+    value = HtmlUrlParser.EnsureUrls(value);
     value = HtmlImageSourceParser.EnsureImageSources(value);
-    value = HtmlLocalLinkParser.EnsureInternalLinks(value);
 }
 @Html.Raw(value)

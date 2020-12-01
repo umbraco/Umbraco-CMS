@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Entities;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a redirect url.
+    /// Represents a redirect URL.
     /// </summary>
     public interface IRedirectUrl : IEntity, IRememberBeingDirty
     {
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         Guid ContentKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the redirect url creation date.
+        /// Gets or sets the redirect URL creation date.
         /// </summary>
         [DataMember]
         DateTime CreateDateUtc { get; set; }
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models
         string Culture { get; set; }
 
         /// <summary>
-        /// Gets or sets the redirect url route.
+        /// Gets or sets the redirect URL route.
         /// </summary>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
         [DataMember]

@@ -46,8 +46,8 @@ namespace Umbraco.Web.Website.Controllers
             // If there is a specified path to redirect to then use it.
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
-                // Validate the redirect url.
-                // If it's not a local url we'll redirect to the root of the current site.
+                // Validate the redirect URL.
+                // If it's not a local URL we'll redirect to the root of the current site.
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
                     : CurrentPage.AncestorOrSelf(1).Url(PublishedUrlProvider));

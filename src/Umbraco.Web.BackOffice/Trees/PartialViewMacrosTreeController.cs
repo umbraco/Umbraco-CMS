@@ -1,7 +1,9 @@
-﻿using Umbraco.Core.IO;
+﻿using Microsoft.AspNetCore.Authorization;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
@@ -12,7 +14,7 @@ namespace Umbraco.Web.BackOffice.Trees
     /// Tree for displaying partial view macros in the developer app
     /// </summary>
     [Tree(Constants.Applications.Settings, Constants.Trees.PartialViewMacros, SortOrder = 8, TreeGroup = Constants.Trees.Groups.Templating)]
-    [UmbracoTreeAuthorize(Constants.Trees.PartialViewMacros)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViewMacros)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class PartialViewMacrosTreeController : PartialViewsTreeController
