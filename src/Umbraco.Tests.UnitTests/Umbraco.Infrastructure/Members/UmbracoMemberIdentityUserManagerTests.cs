@@ -26,6 +26,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         private IdentityErrorDescriber _mockErrorDescriber;
         private Mock<IServiceProvider> _mockServiceProviders;
         private Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>> _mockLogger;
+        private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
         public UmbracoMembersUserManager<UmbracoMembersIdentityUser> CreateSut()
         {
@@ -46,6 +47,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
             _mockErrorDescriber = new IdentityErrorDescriber();
             _mockServiceProviders = new Mock<IServiceProvider>();
             _mockLogger = new Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>>();
+            _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
+            _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
+                new MemberPasswordConfigurationSettings()
+                {
+                    
+                });
 
             var pwdValidators = new List<PasswordValidator<UmbracoMembersIdentityUser>>
             {
@@ -62,7 +69,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
                 new IdentityErrorDescriber(),
                 _mockServiceProviders.Object,
                 new Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>>().Object,
-                new Mock<IOptions<MemberPasswordConfigurationSettings>>().Object);
+                _mockPasswordConfiguration.Object);
 
             validator.Setup(v => v.ValidateAsync(
                     userManager,
@@ -77,7 +84,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         {
             //arrange
             UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser() { };
+            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser()
+            {
+                PasswordConfig = "testConfig"
+            };
             CancellationToken fakeCancellationToken = new CancellationToken() { };
             IdentityError[] identityErrors =
             {
@@ -107,7 +117,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         {
             //arrange
             UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser() { };
             CancellationToken fakeCancellationToken = new CancellationToken() { };
             IdentityError[] identityErrors =
             {
@@ -136,7 +145,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         {
             //arrange
             UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser() { };
+            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser()
+            {
+                PasswordConfig = "testConfig"
+            };
             CancellationToken fakeCancellationToken = new CancellationToken() { };
             _mockMemberStore.Setup(x =>
                 x.CreateAsync(fakeUser, fakeCancellationToken))
