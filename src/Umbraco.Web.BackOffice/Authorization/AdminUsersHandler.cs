@@ -57,7 +57,9 @@ namespace Umbraco.Web.BackOffice.Authorization
                     // must succeed this requirement since we cannot process it
                     return Task.FromResult(true);
                 }
-                userIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+                userIds = ids
+                    .Select(x => x.Value.ToString())
+                    .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
             }
 
             if (userIds.Length == 0)

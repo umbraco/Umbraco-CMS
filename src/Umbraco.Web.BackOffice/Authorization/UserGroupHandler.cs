@@ -54,7 +54,10 @@ namespace Umbraco.Web.BackOffice.Authorization
                 return Task.FromResult(true);
             }
 
-            var intIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+            var intIds = ids
+                .Select(x => x.Value.ToString())
+                .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 _userService,
                 _contentService,
