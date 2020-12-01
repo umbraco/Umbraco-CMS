@@ -44,12 +44,15 @@ namespace Umbraco.Extensions
                 });
 
             // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
+
+            builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
             return builder;
         }
 
         public static IUmbracoBuilder AddUmbracoMembersIdentity(this IUmbracoBuilder builder)
         {
-            builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+            builder.Services.AddUmbracoMembersIdentity();
+
             return builder;
         }
 
