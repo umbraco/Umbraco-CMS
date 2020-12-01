@@ -12,8 +12,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="TUserManager">The type of the user manager to add.</typeparam>
         /// <typeparam name="TInterface"></typeparam>
         /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
-        public static IdentityBuilder AddUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder)
-            where TUserManager : UserManager<BackOfficeIdentityUser>, TInterface
+        public static IdentityBuilder AddUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder) where TUserManager : UserManager<BackOfficeIdentityUser>, TInterface
         {
             identityBuilder.AddUserManager<TUserManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
