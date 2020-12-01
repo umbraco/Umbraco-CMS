@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
@@ -48,7 +49,8 @@ namespace Umbraco.Web.Hosting
                 return HostingEnvironment.MapPath(path);
 
             // this will be the case in unit tests, we'll manually map the path
-            return ApplicationPhysicalPath + path.TrimStart("~").EnsureStartsWith("/");
+            var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            return newPath.StartsWith(ApplicationPhysicalPath) ? newPath : Path.Combine(ApplicationPhysicalPath, newPath.TrimStart('~', '/'));
         }
 
         public string MapPathContentRoot(string path) => MapPathWebRoot(path);

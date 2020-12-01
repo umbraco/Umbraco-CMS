@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.WebAssets.CDF
 {
@@ -28,11 +28,11 @@ namespace Umbraco.Web.WebAssets.CDF
             set => XmlFileMapper.FileMapDefaultFolder = value;
         }
 
-        public ClientDependencyConfiguration(ILogger<ClientDependencyConfiguration> logger, IIOHelper ioHelper)
+        public ClientDependencyConfiguration(ILogger<ClientDependencyConfiguration> logger, IHostingEnvironment hostingEnvironment)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _fileName = ioHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
+            _fileName = hostingEnvironment.MapPathContentRoot(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
         }
 
         /// <summary>

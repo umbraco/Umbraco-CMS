@@ -21,7 +21,7 @@ namespace Umbraco.Web
         // #region GetCropUrl
         //
         // /// <summary>
-        // /// Gets the ImageProcessor Url of a media item by the crop alias (using default media item property alias of "umbracoFile")
+        // /// Gets the ImageProcessor URL of a media item by the crop alias (using default media item property alias of "umbracoFile")
         // /// </summary>
         // /// <param name="urlHelper"></param>
         // /// <param name="mediaItem">
@@ -44,7 +44,7 @@ namespace Umbraco.Web
         // }
         //
         // /// <summary>
-        // /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        // /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         // /// </summary>
         // /// <param name="urlHelper"></param>
         // /// <param name="mediaItem">
@@ -61,7 +61,7 @@ namespace Umbraco.Web
         // /// set to false if using the result of this method for CSS.
         // /// </param>
         // /// <returns>
-        // /// The ImageProcessor.Web Url.
+        // /// The ImageProcessor.Web URL.
         // /// </returns>
         // public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator, bool htmlEncode = true)
         // {
@@ -72,7 +72,7 @@ namespace Umbraco.Web
         // }
         //
         // /// <summary>
-        // /// Gets the ImageProcessor Url from the image path.
+        // /// Gets the ImageProcessor URL from the image path.
         // /// </summary>
         // /// <param name="mediaItem">
         // /// The IPublishedContent item.
@@ -156,10 +156,10 @@ namespace Umbraco.Web
         // }
         //
         // /// <summary>
-        // /// Gets the ImageProcessor Url from the image path.
+        // /// Gets the ImageProcessor URL from the image path.
         // /// </summary>
         // /// <param name="imageUrl">
-        // /// The image url.
+        // /// The image URL.
         // /// </param>
         // /// <param name="width">
         // /// The width of the output image.

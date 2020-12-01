@@ -60,7 +60,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void Ensure_Image_Sources()
         {
-            //setup a mock url provider which we'll use for testing
+            //setup a mock URL provider which we'll use for testing
 
             var mediaType = new PublishedContentType(Guid.NewGuid(), 777, "image", PublishedItemType.Media, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var media = new Mock<IPublishedContent>();

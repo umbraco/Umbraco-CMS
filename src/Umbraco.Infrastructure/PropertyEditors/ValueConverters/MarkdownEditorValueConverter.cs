@@ -33,7 +33,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (source == null) return null;
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls are resolved correctly
+            // ensures string is parsed for {localLink} and URLs are resolved correctly
             sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
             sourceString = _urlParser.EnsureUrls(sourceString);
 

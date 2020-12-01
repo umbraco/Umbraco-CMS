@@ -32,7 +32,7 @@ namespace Umbraco.Tests.IO
         public void SetUp()
         {
             SafeCallContext.Clear();
-            ClearFiles(_ioHelper);
+            ClearFiles(_hostingEnvironment);
             FileSystems.ResetShadowId();
         }
 
@@ -40,14 +40,14 @@ namespace Umbraco.Tests.IO
         public void TearDown()
         {
             SafeCallContext.Clear();
-            ClearFiles(TestHelper.IOHelper);
+            ClearFiles(_hostingEnvironment);
             FileSystems.ResetShadowId();
         }
 
-        private static void ClearFiles(IIOHelper _ioHelper)
+        private static void ClearFiles(IHostingEnvironment hostingEnvironment)
         {
-            TestHelper.DeleteDirectory(_ioHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(_ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(hostingEnvironment.MapPathContentRoot("FileSysTests"));
+            TestHelper.DeleteDirectory(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         private static string NormPath(string path)
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectory()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectoryInDir()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFile()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFileInDir()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
 
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
@@ -236,7 +236,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCantCreateFile()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFile()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -294,7 +294,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFileInDir()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -334,7 +334,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowAbort()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -356,7 +356,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowComplete()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -393,8 +393,8 @@ namespace Umbraco.Tests.IO
         public void ShadowScopeComplete()
         {
             var loggerFactory = NullLoggerFactory.Instance;
-            var path = _ioHelper.MapPath("FileSysTests");
-            var shadowfs = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
+            var shadowfs = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(shadowfs);
 
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             // explicit shadow without scope does not work
-            sw.Shadow(id = ShadowWrapper.CreateShadowId(_ioHelper));
+            sw.Shadow(id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.IO
 
             // shadow with scope but no complete does not complete
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_ioHelper));
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f3.txt", ms);
@@ -448,7 +448,7 @@ namespace Umbraco.Tests.IO
 
             // shadow with scope and complete does complete
             scopedFileSystems = true; // pretend we have a scope
-            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_ioHelper));
+            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f4.txt", ms);
@@ -464,7 +464,7 @@ namespace Umbraco.Tests.IO
             // test scope for "another thread"
 
             scopedFileSystems = true; // pretend we have a scope
-            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_ioHelper));
+            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f5.txt", ms);
@@ -487,8 +487,8 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowScopeCompleteWithFileConflict()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
-            var shadowfs = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
+            var shadowfs = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
@@ -508,7 +508,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_ioHelper));
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
@@ -539,8 +539,8 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowScopeCompleteWithDirectoryConflict()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
-            var shadowfs = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
+            var shadowfs = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
@@ -560,7 +560,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_ioHelper));
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(_hostingEnvironment));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
@@ -608,7 +608,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void GetFilesReturnsChildrenOnly()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");
@@ -630,7 +630,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void DeleteDirectoryAndFiles()
         {
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");
@@ -651,7 +651,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFiles()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -683,7 +683,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingEmptyFilter()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -718,7 +718,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingNullFilter()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -750,7 +750,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingWildcardFilter()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -785,7 +785,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingSingleCharacterFilter()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -832,7 +832,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFullPath()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -866,7 +866,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetRelativePath()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -892,12 +892,12 @@ namespace Umbraco.Tests.IO
         }
 
         /// <summary>
-        /// Ensure the url returned contains the path relative to the FS root,
+        /// Ensure the URL returned contains the path relative to the FS root,
         /// but including the rootUrl the FS was initialized with.
         /// </summary>
         /// <remarks>
         /// This file stuff in this test is kinda irrelevant with the current implementation.
-        /// We do tests that the files are written to the correct places and the url is returned correct,
+        /// We do tests that the files are written to the correct places and the URL is returned correct,
         /// but GetUrl is currently really just string manipulation so files are not actually hit by the code.
         /// Leaving the file stuff in here for now in case the method becomes more clever at some point.
         /// </remarks>
@@ -905,7 +905,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetUrl()
         {
             // Arrange
-            var path = _ioHelper.MapPath("FileSysTests");
+            var path = _hostingEnvironment.MapPathContentRoot("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");

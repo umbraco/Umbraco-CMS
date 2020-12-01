@@ -446,7 +446,7 @@
     <key alias="recycleBinIsEmpty">Der Papierkorb ist leer</key>
     <key alias="recycleBinWarning">Wenn Sie den Papierkorb leeren, werden die enthaltenen Elemente endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</key>
     <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
-    <key alias="regexSearchHelp">Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'url' oder ähnlich.</key>
+    <key alias="regexSearchHelp">Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.</key>
     <key alias="removeMacro">Macro entfernen</key>
     <key alias="requiredField">Pflichtfeld</key>
     <key alias="sitereindexed">Die Website-Index wurd neu erstellt</key>
@@ -2181,7 +2181,7 @@
     <key alias="culture">Kultur</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Weiterleiten zu</key>
-    <key alias="redirectUrlManagement">Url-Weiterleitungen verwalten</key>
+    <key alias="redirectUrlManagement">URL-Weiterleitungen verwalten</key>
     <key alias="panelInformation">Die folgenden URLs leiten auf diesen Inhalt:</key>
     <key alias="noRedirects">Es wurden keine Weiterleitungen angelegt</key>
     <key alias="noRedirectsDescription">

@@ -135,6 +135,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Content Include="Umbraco\Config\Lang\cs.xml" />
+    <Content Include="Umbraco\Config\Lang\cy.xml" />
+    <Content Include="Umbraco\Config\Lang\tr.xml" />
+    <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -165,7 +169,6 @@
       <DependentUpon>serilog.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\logviewer.searches.config.js" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -147,8 +147,8 @@
     <key alias="otherElements">Eigenschappen</key>
     <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende node '%0%' niet gepubliceerd is</key>
     <key alias="parentNotPublishedAnomaly">Dit document is gepubliceerd, maar het staat niet in de cache (interne serverfout)</key>
-    <key alias="getUrlException">Kan de Url niet ophalen</key>
-    <key alias="routeError">Dit document is gepubliceerd, maar de Url conflicteert met %0%</key>
+    <key alias="getUrlException">Kan de URL niet ophalen</key>
+    <key alias="routeError">Dit document is gepubliceerd, maar de URL conflicteert met %0%</key>
     <key alias="publish">Publiceren</key>
     <key alias="publishStatus">Publicatiestatus</key>
     <key alias="releaseDate">Publiceren op</key>
@@ -270,7 +270,7 @@
     <key alias="recycleBinIsEmpty">De prullenbak is nu leeg.</key>
     <key alias="recycleBinWarning">Als items worden verwijderd uit de prullenbak, zijn ze voorgoed verwijderd.</key>
     <key alias="regexSearchError"><![CDATA[De webservice van <a target='_blank' href='http://regexlib.com'>regexlib.com</a> ondervindt momenteel problemen waarover we geen controle hebben. Onze excuses voor het ongemak.]]></key>
-    <key alias="regexSearchHelp">Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email, 'post-code' 'url'</key>
+    <key alias="regexSearchHelp">Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email', 'postcode', 'URL'.</key>
     <key alias="removeMacro">Verwijder Macro</key>
     <key alias="requiredField">Verplicht veld</key>
     <key alias="sitereindexed">Site is opnieuw geïndexeerd</key>
@@ -469,7 +469,7 @@
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Gebruiker</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="value">Waarde</key>
@@ -1292,7 +1292,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="validation">Validatie</key>
     <key alias="validateAsEmail">Valideer als email</key>
     <key alias="validateAsNumber">Valideer als nummer</key>
-    <key alias="validateAsUrl">Valideer als Url</key>
+    <key alias="validateAsUrl">Valideer als URL</key>
     <key alias="enterCustomValidation">...of gebruik custom validatie</key>
     <key alias="fieldIsMandatory">Veld is verplicht</key>
   </area>

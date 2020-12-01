@@ -79,16 +79,21 @@ namespace Umbraco.Web.Common.AspNetCore
             }
         }
 
-        public string MapPathWebRoot(string path)
-        {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(_webHostEnvironment.WebRootPath, newPath);
-        }
+        public string MapPathWebRoot(string path) => MapPath(_webHostEnvironment.WebRootPath, path);
+        public string MapPathContentRoot(string path) => MapPath(_webHostEnvironment.ContentRootPath, path);
 
-        public string MapPathContentRoot(string path)
+        private string MapPath(string root, string path)
         {
-            var newPath = path.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(_webHostEnvironment.ContentRootPath, newPath);
+            var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+
+            // TODO: This is a temporary error because we switched from IOHelper.MapPath to HostingEnvironment.MapPathXXX
+            // IOHelper would check if the path passed in started with the root, and not prepend the root again if it did,
+            // however if you are requesting a path be mapped, it should always assume the path is relative to the root, not
+            // absolute in the file system.  This error will help us find and fix improper uses, and should be removed once
+            // all those uses have been found and fixed
+            if (newPath.StartsWith(root)) throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPath");
+
+            return Path.Combine(root, newPath.TrimStart('~', '/', '\\'));
         }
 
         public string ToAbsolute(string virtualPath)
@@ -100,7 +105,7 @@ namespace Umbraco.Web.Common.AspNetCore
             if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
 
-            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart("~/").TrimStart("/");
+            var fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart('~', '/');
 
             return fullPath;
         }
