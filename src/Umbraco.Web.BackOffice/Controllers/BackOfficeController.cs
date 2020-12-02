@@ -104,7 +104,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> Default()
         {
             // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);            
+            var result = await this.AuthenticateBackOfficeAsync();
 
             var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
@@ -119,7 +119,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> VerifyInvite(string invite)
         {
-            var authenticate = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var authenticate = await this.AuthenticateBackOfficeAsync();
 
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
@@ -190,7 +190,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> AuthorizeUpgrade()
         {
             // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var result = await this.AuthenticateBackOfficeAsync();
 
             var viewPath = Path.Combine(_globalSettings.UmbracoPath, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 

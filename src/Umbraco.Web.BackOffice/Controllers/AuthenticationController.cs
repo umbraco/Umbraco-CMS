@@ -218,7 +218,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<double> GetRemainingTimeoutSeconds()
         {
             // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var result = await this.AuthenticateBackOfficeAsync();
             if (!result.Succeeded)
             {
                 return 0;
@@ -250,7 +250,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<bool> IsAuthenticated()
         {
             // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var result = await this.AuthenticateBackOfficeAsync();
             return result.Succeeded;
         }
 
@@ -572,7 +572,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostLogout()
         {
             // force authentication to occur since this is not an authorized endpoint
-            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var result = await this.AuthenticateBackOfficeAsync();
             if (!result.Succeeded) return Ok();
 
             await _signInManager.SignOutAsync();

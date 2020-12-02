@@ -74,7 +74,7 @@ namespace Umbraco.Web.Common.Install
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                var authResult = await HttpContext.AuthenticateAsync(Core.Constants.Security.BackOfficeAuthenticationType);
+                var authResult = await this.AuthenticateBackOfficeAsync();
 
                 if (!authResult.Succeeded)
                 {
