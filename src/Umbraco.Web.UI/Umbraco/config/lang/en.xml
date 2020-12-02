@@ -2274,10 +2274,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="name">Name</key>
     <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
-      <key alias="hasTranslation">Has translation</key>
-      <key alias="noTranslation">Missing translation</key>
-      <key alias="dictionaryListCaption">Dictionary items</key>
-      <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
+    <key alias="hasTranslation">Has translation</key>
+    <key alias="noTranslation">Missing translation</key>
+    <key alias="dictionaryListCaption">Dictionary items</key>
+    <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
+    <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
