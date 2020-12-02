@@ -103,7 +103,7 @@ namespace Umbraco.Core
             public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage";
 
             /// <summary>
-            /// A true/false value indicating whether umbraco should hide top level nodes from generated urls.
+            /// A true/false value indicating whether umbraco should hide top level nodes from generated URLs.
             /// </summary>
             public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath";
 

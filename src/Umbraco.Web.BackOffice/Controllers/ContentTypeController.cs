@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
@@ -33,6 +32,8 @@ using ContentType = Umbraco.Core.Models.ContentType;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -49,7 +50,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IIOHelper _ioHelper;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -78,7 +78,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
-            IIOHelper ioHelper,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
@@ -105,7 +104,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _ioHelper = ioHelper;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -124,14 +122,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             _jsonSerializer = jsonSerializer;
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public int GetCount()
         {
             return _contentTypeService.Count();
         }
 
         [HttpGet]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public bool HasContentNodes(int id)
         {
             return _contentTypeService.HasContentNodes(id);
@@ -143,7 +141,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(int id)
         {
             var ct = _contentTypeService.Get(id);
@@ -162,7 +160,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Guid id)
         {
             var contentType = _contentTypeService.Get(id);
@@ -181,7 +179,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -205,7 +203,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult DeleteById(int id)
         {
             var foundType = _contentTypeService.Get(id);
@@ -222,10 +220,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Gets all user defined properties.
         /// </summary>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]        
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return _contentTypeService.GetAllPropertyTypeAliases();
@@ -235,10 +230,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Gets all the standard fields.
         /// </summary>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllStandardFields()
         {
             string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
@@ -252,7 +244,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
         {
             var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
@@ -270,7 +262,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
             var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType)
@@ -281,10 +273,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok(result);
         }
 
-        [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = _dataTypeService.GetDataType(id);
@@ -313,7 +302,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult DeleteContainer(int id)
         {
             _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -321,7 +310,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok();
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostCreateContainer(int parentId, string name)
         {
             var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -331,7 +320,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostRenameContainer(int id, string name)
         {
             var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -341,7 +330,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
             // create item doctype
@@ -398,7 +387,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             };
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
             //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
@@ -451,7 +440,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return display;
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<TemplateDisplay> PostCreateDefaultTemplate(int id)
         {
             var contentType = _contentTypeService.Get(id);
@@ -492,7 +481,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetEmpty(int parentId)
         {
             IContentType ct;
@@ -514,7 +503,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns all content type objects
         /// </summary>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IEnumerable<ContentTypeBasic> GetAll()
         {
             var types = _contentTypeService.GetAll();
@@ -532,7 +521,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
@@ -587,7 +576,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostMove(MoveOrCopy move)
         {
             return PerformMove(
@@ -601,7 +590,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostCopy(MoveOrCopy copy)
         {
             return PerformCopy(
@@ -611,7 +600,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult Export(int id)
         {
             var contentType = _contentTypeService.Get(id);
@@ -628,10 +617,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult Import(string file)
         {
-            var filePath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
+            var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
             if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
             {
                 return NotFound();
@@ -661,7 +650,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<ContentTypeImportModel> Upload(List<IFormFile> file)
         {
             var model = new ContentTypeImportModel();

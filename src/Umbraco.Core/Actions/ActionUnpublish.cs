@@ -10,7 +10,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionUnpublish : IAction
     {
-        public char Letter => 'Z';
+        public const char ActionLetter = 'Z';
+
+        public char Letter => ActionLetter;
         public string Alias => "unpublish";
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
         public string Icon => "circle-dotted";

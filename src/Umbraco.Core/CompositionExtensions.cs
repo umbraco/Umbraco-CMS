@@ -64,7 +64,7 @@ namespace Umbraco.Core
             => builder.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url providers collection builder.
+        /// Gets the URL providers collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
         public static UrlProviderCollectionBuilder UrlProviders(this IUmbracoBuilder builder)

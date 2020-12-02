@@ -104,6 +104,20 @@
 // --------------------------------------------------
 
 /* pre-value editor */
+.umb-prevalues-multivalues.umb-colors {
+    max-width: 600px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
 .control-group.color-picker-preval {
     .thumbnail {
         width: 34px;
@@ -158,21 +172,6 @@
         margin-right: 15px;
         min-width: auto;
         width: auto;
-    }
-
-    .sp-replacer {
-        display: inline-flex;
-        margin-right: 18px;
-        height: auto;
-
-        .sp-preview {
-            margin: 5px;
-            height: auto;
-        }
-
-        .sp-dd {
-            line-height: 2rem;
-        }
     }
 
     label {

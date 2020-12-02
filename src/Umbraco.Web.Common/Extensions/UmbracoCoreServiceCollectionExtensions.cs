@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
-  
+
         /// <summary>
         /// Create and configure the logger
         /// </summary>

@@ -8,10 +8,12 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Macros)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 namespace Umbraco.Core.Strings
 {
     /// <summary>
-    /// New default implementation of string functions for short strings such as aliases or url segments.
+    /// New default implementation of string functions for short strings such as aliases or URL segments.
     /// </summary>
     /// <remarks>
     /// <para>Not optimized to work on large bodies of text.</para>
@@ -94,10 +94,10 @@ namespace Umbraco.Core.Strings
         }
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// Cleans a string to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         /// <remarks>
         /// <para>The string will be cleaned in the context of the default culture.</para>
         /// <para>Url segments are Ascii only (no accents...).</para>
@@ -108,11 +108,11 @@ namespace Umbraco.Core.Strings
         }
 
         /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         /// <remarks>
         /// <para>Url segments are Ascii only (no accents...).</para>
         /// </remarks>
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Strings
 
         /// <summary>
         /// Cleans a string, in the context of the default culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe filename.</returns>
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Strings
 
         /// <summary>
         /// Cleans a string to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>

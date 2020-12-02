@@ -63,6 +63,7 @@ using Umbraco.Core.Builder;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Runtime
 {
@@ -264,7 +265,6 @@ namespace Umbraco.Core.Runtime
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
             builder.OEmbedProviders()
                 .Append<YouTube>()
-                .Append<Instagram>()
                 .Append<Twitter>()
                 .Append<Vimeo>()
                 .Append<DailyMotion>()
@@ -376,6 +376,11 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique<UploadAutoFillProperties>();
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
+
+            builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
+            builder.Services.AddUnique<UserEditorAuthorizationHelper>();
+            builder.Services.AddUnique<ContentPermissions>();
+            builder.Services.AddUnique<MediaPermissions>();
         }
     }
 }

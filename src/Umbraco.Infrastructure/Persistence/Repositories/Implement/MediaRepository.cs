@@ -203,7 +203,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
             var isResized = Regex.IsMatch(mediaPath, pattern);
 
-            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" URL.
             if (isResized)
             {
                 var underscoreIndex = mediaPath.LastIndexOf('_');

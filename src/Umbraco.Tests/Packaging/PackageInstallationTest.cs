@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Packaging
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,
-            new PackageFileInstallation(Parser, IOHelper, ProfilingLogger),
+            new PackageFileInstallation(Parser, IOHelper, HostingEnvironment, ProfilingLogger),
             Parser, Mock.Of<IPackageActionRunner>(),
             //we don't want to extract package files to the real root, so extract to a test folder
             Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == _testBaseFolder.FullName));

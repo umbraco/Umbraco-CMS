@@ -34,6 +34,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -235,7 +237,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return nestedDictionary;
         }
 
-        [UmbracoBackOfficeAuthorize(Order = 0)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
@@ -246,7 +248,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
-        [UmbracoBackOfficeAuthorize(Order = 0)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [MinifyJavaScriptResult(Order = 1)]
         public async Task<JavaScriptResult> ServerVariables()
         {
@@ -281,7 +283,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [HttpPost]
         public ActionResult LinkLogin(string provider)
         {
@@ -317,7 +319,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Callback path when the user initiates a link login request from the back office to the external provider from the <see cref="LinkLogin(string)"/> action
         /// </summary>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [HttpGet]
         public async Task<IActionResult> ExternalLinkLoginCallback()
         {

@@ -64,7 +64,7 @@ namespace Umbraco.Web
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
-            // set the urls...
+            // set the URLs...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
             // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
@@ -98,7 +98,7 @@ namespace Umbraco.Web
         public Uri OriginalRequestUrl { get; }
 
         /// <summary>
-        /// Gets the cleaned up url that is handled by Umbraco.
+        /// Gets the cleaned up URL that is handled by Umbraco.
         /// </summary>
         /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
         public Uri CleanedUmbracoUrl { get; }

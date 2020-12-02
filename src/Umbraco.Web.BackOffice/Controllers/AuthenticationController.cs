@@ -30,10 +30,11 @@ using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
-using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -114,8 +115,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
-        /// <returns></returns>
-        [UmbracoBackOfficeAuthorize]
+        /// <returns></returns>        
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
             return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -131,7 +132,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<ActionResult<UserDisplay>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -161,7 +162,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _umbracoMapper.Map<UserDisplay>(user);
         }
 
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [ValidateAngularAntiForgeryToken]
         public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
@@ -257,7 +258,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
         /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
         /// </remarks>
-        [UmbracoBackOfficeAuthorize]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [SetAngularAntiForgeryTokens]
         [CheckIfUserTicketDataIsStale]
         public UserDetail GetCurrentUser()
@@ -279,9 +280,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
         /// </remarks>
-        [UmbracoBackOfficeAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
@@ -305,7 +306,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<ActionResult<UserDetail>> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
@@ -355,7 +356,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
+        [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
         public async Task<IActionResult> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.

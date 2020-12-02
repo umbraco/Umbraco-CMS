@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.Permissions
@@ -19,14 +19,14 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
         private readonly ILocalizedTextService _textService;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IFilePermissionHelper _filePermissionHelper;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IHostingEnvironment hostingEnvironment)
         {
             _textService = textService;
             _globalSettings = globalSettings;
             _filePermissionHelper = filePermissionHelper;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
         {
             return pathsToCheck
                 .Where(x => x.Value == requirement)
-                .Select(x => _ioHelper.MapPath(x.Key))
+                .Select(x => _hostingEnvironment.MapPathContentRoot(x.Key))
                 .OrderBy(x => x)
                 .ToArray();
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
 
         private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)
         {
-            var rootFolder = _ioHelper.MapPath("/");
+            var rootFolder = _hostingEnvironment.MapPathContentRoot("/");
             var failedFolders = failedPaths
                 .Select(x => ParseFolderFromFullPath(rootFolder, x));
             return _textService.Localize(messageKey,

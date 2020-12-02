@@ -123,7 +123,7 @@ namespace Umbraco.Web.BackOffice.Trees
         internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormCollection queryStrings,
             int[] startNodeIds, string[] startNodePaths)
         {
-            var entityIsAncestorOfStartNodes = ContentPermissionsHelper.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
+            var entityIsAncestorOfStartNodes = ContentPermissions.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
             var ignoreUserStartNodes = IgnoreUserStartNodes(queryStrings);
             if (ignoreUserStartNodes == false && entityIsAncestorOfStartNodes == false)
                 return null;

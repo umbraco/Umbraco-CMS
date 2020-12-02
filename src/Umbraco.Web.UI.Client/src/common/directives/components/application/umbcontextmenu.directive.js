@@ -1,3 +1,11 @@
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbContextMenu
+* @restrict A
+ *
+ * @description
+ * Handles the click events on the context menu
+**/
 angular.module("umbraco.directives")
 .directive('umbContextMenu', function (navigationService, keyboardService, backdropService) {
     return {

@@ -146,7 +146,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     {
                         // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
-                        // having each url defined here explicitly - we can do that in v8! for now
+                        // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
                         {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Collections;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Install.Models;
 
@@ -15,12 +15,12 @@ namespace Umbraco.Web.Install
     /// </summary>
     public class InstallStatusTracker
     {
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IJsonSerializer _jsonSerializer;
 
-        public InstallStatusTracker(IIOHelper ioHelper, IJsonSerializer jsonSerializer)
+        public InstallStatusTracker(IHostingEnvironment hostingEnvironment, IJsonSerializer jsonSerializer)
         {
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Install
 
         private string GetFile(Guid installId)
         {
-            var file = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
+            var file = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
                                                                                                   + "install_"
                                                                                                   + installId.ToString("N")
                                                                                                   + ".txt");
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Install
 
         public void ClearFiles()
         {
-            var dir = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
+            var dir = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
             if (Directory.Exists(dir))
             {
                 var files = Directory.GetFiles(dir);

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the content item for the current culture.
+        /// Gets the URL segment of the content item for the current culture.
         /// </summary>
         string UrlSegment { get; }
 
