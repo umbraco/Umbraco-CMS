@@ -4,10 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.Common.Security;
 
