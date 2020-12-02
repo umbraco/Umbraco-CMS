@@ -407,8 +407,6 @@ namespace Umbraco.Web.Common.Security
 
         public void RaiseLoginFailedEvent(IPrincipal currentUser, int userId) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, userId, string.Empty));
 
-        //public void RaiseInvalidLoginAttemptEvent(IPrincipal currentUser, string username) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, Constants.Security.SuperUserId, username));
-
         public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
 
         public void RaiseLoginSuccessEvent(IPrincipal currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));

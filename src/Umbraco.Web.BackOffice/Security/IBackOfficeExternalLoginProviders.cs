@@ -11,8 +11,17 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public interface IBackOfficeExternalLoginProviders
     {
+        /// <summary>
+        /// Get the <see cref="BackOfficeExternalLoginProvider"/> for the specified scheme
+        /// </summary>
+        /// <param name="authenticationType"></param>
+        /// <returns></returns>
         BackOfficeExternalLoginProvider Get(string authenticationType);
 
+        /// <summary>
+        /// Get all registered <see cref="BackOfficeExternalLoginProvider"/>
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders();
 
         /// <summary>

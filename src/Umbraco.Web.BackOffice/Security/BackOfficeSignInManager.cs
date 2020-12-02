@@ -51,12 +51,8 @@ namespace Umbraco.Web.Common.Security
             _globalSettings = globalSettings.Value;
         }
 
-        // TODO: Need to migrate more from Umbraco.Web.Security.BackOfficeSignInManager
-        // Things like dealing with auto-linking, cookie options, and a ton of other stuff. Some might not need to be ported but it
-        // will be a case by case basis.
-        // Have a look into RefreshSignInAsync since we might be able to use this new functionality for auto-cookie renewal in our middleware, though
+        // TODO: Have a look into RefreshSignInAsync since we might be able to use this new functionality for auto-cookie renewal in our middleware, though
         // i suspect it's taken care of already.
-
 
 
         /// <inheritdoc />
@@ -201,8 +197,7 @@ namespace Umbraco.Web.Common.Security
 
             await Context.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
             await Context.SignOutAsync(Constants.Security.BackOfficeExternalAuthenticationType);
-            // TODO: Put this back in when we implement it
-            //await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
+            await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
         }
 
 
