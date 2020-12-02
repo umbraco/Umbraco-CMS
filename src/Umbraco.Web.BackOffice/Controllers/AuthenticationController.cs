@@ -51,6 +51,9 @@ namespace Umbraco.Web.BackOffice.Controllers
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiControllerBase
     {
+        // NOTE: Each action must either be explicitly authorized or explicitly [AllowAnonymous], the latter is optional because
+        // this controller itself doesn't require authz but it's more clear what the intention is.
+
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IBackOfficeUserManager _userManager;
         private readonly IBackOfficeSignInManager _signInManager;
@@ -211,6 +214,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<double> GetRemainingTimeoutSeconds()
         {
             // force authentication to occur since this is not an authorized endpoint
@@ -242,6 +246,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<bool> IsAuthenticated()
         {
             // force authentication to occur since this is not an authorized endpoint
@@ -399,6 +404,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<string>>> Get2FAProviders()
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -413,6 +419,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [SetAngularAntiForgeryTokens]
+        [AllowAnonymous]
         public async Task<IActionResult> PostSend2FACode([FromBody] string provider)
         {
             if (provider.IsNullOrWhiteSpace())
@@ -458,6 +465,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [SetAngularAntiForgeryTokens]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDetail>> PostVerify2FACode(Verify2FACodeModel model)
         {
             if (ModelState.IsValid == false)
@@ -495,6 +503,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [AllowAnonymous]
         public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
         {
             var identityUser = await _userManager.FindByIdAsync(model.UserId.ToString());
@@ -559,6 +568,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [ValidateAngularAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> PostLogout()
         {
             // force authentication to occur since this is not an authorized endpoint

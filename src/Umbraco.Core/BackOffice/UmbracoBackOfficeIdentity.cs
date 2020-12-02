@@ -12,6 +12,10 @@ namespace Umbraco.Core.BackOffice
     [Serializable]
     public class UmbracoBackOfficeIdentity : ClaimsIdentity
     {
+        // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
+        // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
+        // values from it. 
+
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
             //validate that all claims exist

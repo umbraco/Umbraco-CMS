@@ -76,7 +76,7 @@ namespace Umbraco.Web.Mvc
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
                     || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || BackOfficeSecurity.ValidateCurrentUser();
+                    || (httpContext.User?.Identity?.IsAuthenticated ?? false);
             }
             catch (Exception)
             {

@@ -36,15 +36,19 @@ using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [DisableBrowserCache]
-    //[UmbracoRequireHttps] //TODO Reintroduce
+    [UmbracoRequireHttps]
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     [IsBackOffice]
     public class BackOfficeController : UmbracoController
     {
+        // NOTE: Each action must either be explicitly authorized or explicitly [AllowAnonymous], the latter is optional because
+        // this controller itself doesn't require authz but it's more clear what the intention is.
+
         private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly GlobalSettings _globalSettings;
@@ -96,23 +100,31 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Default()
         {
+            // force authentication to occur since this is not an authorized endpoint
+            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);            
+
             var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
             return await RenderDefaultOrProcessExternalLoginAsync(
+                result,
                 () => View(viewPath),
                 () => View(viewPath));
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyInvite(string invite)
         {
+            var authenticate = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
             //dumped at the default admin view with no detail
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated())
+            if (authenticate.Succeeded)
             {
                 await _signInManager.SignOutAsync();
             }
@@ -174,10 +186,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpGet]
         [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
+        [AllowAnonymous]
         public async Task<IActionResult> AuthorizeUpgrade()
         {
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Umbraco.Core.Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            // force authentication to occur since this is not an authorized endpoint
+            var result = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+
+            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+
             return await RenderDefaultOrProcessExternalLoginAsync(
+                result,
                 //The default view to render when there is no external login info or errors
                 () => View(viewPath),
                 //The IActionResult to perform if external login is successful
@@ -190,6 +208,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [MinifyJavaScriptResult(Order = 0)]
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Application()
         {
             var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);
@@ -203,6 +222,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="culture"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
             var isAuthenticated = _backofficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated();
@@ -265,6 +285,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
             if (redirectUrl == null)
@@ -297,6 +318,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -362,6 +384,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         private async Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
+            AuthenticateResult authenticateResult,
             Func<IActionResult> defaultResponse,
             Func<IActionResult> externalSignInResponse)
         {
@@ -382,7 +405,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (loginInfo == null || loginInfo.Principal == null)
             {
                 // if the user is not logged in, check if there's any auto login redirects specified
-                if (!_backofficeSecurityAccessor.BackOfficeSecurity.ValidateCurrentUser())
+                if (!authenticateResult.Succeeded)
                 {
                     var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
                     if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())

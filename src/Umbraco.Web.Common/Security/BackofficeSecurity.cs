@@ -72,41 +72,5 @@ namespace Umbraco.Web.Common.Security
             return user.HasSectionAccess(section);
         }
 
-        /// <inheritdoc />
-        public bool ValidateCurrentUser()
-        {
-            return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
-        }
-
-        /// <inheritdoc />
-        public ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
-        {
-            //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
-            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't
-            // need to check it a second time because that requires another decryption phase and nothing can tamper with it during the request.
-
-            if (IsAuthenticated() == false)
-            {
-                //There is no user
-                if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
-                return ValidateRequestAttempt.FailedNoContextId;
-            }
-
-            var user = CurrentUser;
-
-            // TODO: All of this is done as part of identity/backofficesigninmanager
-            // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor, _globalSettings, _hostingEnvironment)))
-            {
-                if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
-                return ValidateRequestAttempt.FailedNoPrivileges;
-            }
-            return ValidateRequestAttempt.Success;
-        }
-
-        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        {
-            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToString().IndexOf(hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath), StringComparison.InvariantCultureIgnoreCase) > -1;
-        }
     }
 }

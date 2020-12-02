@@ -9,28 +9,21 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Gets the current user.
         /// </summary>
-        /// <value>The current user.</value>
+        /// <returns>The current user that has been authenticated for the request.</returns>
+        /// <remarks>If authentication hasn't taken place this will be null.</remarks>
+        // TODO: This is used a lot but most of it can be refactored to not use this at all since the IUser instance isn't
+        // needed in most cases. Where an IUser is required this could be an ext method on the ClaimsIdentity/ClaimsPrincipal that passes in
+        // an IUserService, like HttpContext.User.GetUmbracoUser(_userService);
+        // This one isn't as easy to remove as the others below.
         IUser CurrentUser { get; }
 
         /// <summary>
         /// Gets the current user's id.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current user's Id that has been authenticated for the request.</returns>
+        /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
+        // TODO: This should just be an extension method on ClaimsIdentity
         Attempt<int> GetUserId();
-
-        /// <summary>
-        /// Validates the currently logged in user and ensures they are not timed out
-        /// </summary>
-        /// <returns></returns>
-        bool ValidateCurrentUser();
-
-        /// <summary>
-        /// Validates the current user assigned to the request and ensures the stored user data is valid
-        /// </summary>
-        /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
-        /// <param name="requiresApproval">If true requires that the user is approved to be validated</param>
-        /// <returns></returns>
-        ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true);
 
         /// <summary>
         /// Checks if the specified user as access to the app
@@ -38,12 +31,16 @@ namespace Umbraco.Core.Security
         /// <param name="section"></param>
         /// <param name="user"></param>
         /// <returns></returns>
+        /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
+        // TODO: Should be part of IBackOfficeUserManager
         bool UserHasSectionAccess(string section, IUser user);
 
         /// <summary>
         /// Ensures that a back office user is logged in
         /// </summary>
         /// <returns></returns>
+        /// <remarks>This does not force authentication, that must be done before calls to this are made.</remarks>
+        // TODO: Should be removed, this should not be necessary
         bool IsAuthenticated();
     }
 }
