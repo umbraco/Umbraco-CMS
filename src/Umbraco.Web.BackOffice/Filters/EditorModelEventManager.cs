@@ -12,38 +12,38 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     public sealed class EditorModelEventManager
     {
-        public static event TypedEventHandler<ActionExecutedContext, EditorModelEventArgs<ContentItemDisplay>> SendingContentModel;
-        public static event TypedEventHandler<ActionExecutedContext, EditorModelEventArgs<MediaItemDisplay>> SendingMediaModel;
-        public static event TypedEventHandler<ActionExecutedContext, EditorModelEventArgs<MemberDisplay>> SendingMemberModel;
-        public static event TypedEventHandler<ActionExecutedContext, EditorModelEventArgs<UserDisplay>> SendingUserModel;
+        public static event TypedEventHandler<ResultExecutedContext, EditorModelEventArgs<ContentItemDisplay>> SendingContentModel;
+        public static event TypedEventHandler<ResultExecutedContext, EditorModelEventArgs<MediaItemDisplay>> SendingMediaModel;
+        public static event TypedEventHandler<ResultExecutedContext, EditorModelEventArgs<MemberDisplay>> SendingMemberModel;
+        public static event TypedEventHandler<ResultExecutedContext, EditorModelEventArgs<UserDisplay>> SendingUserModel;
 
-        public static event TypedEventHandler<ActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>> SendingDashboardSlimModel;
+        public static event TypedEventHandler<ResultExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>> SendingDashboardSlimModel;
 
-        private static void OnSendingDashboardModel(ActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>> e)
+        private static void OnSendingDashboardModel(ResultExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>> e)
         {
             var handler = SendingDashboardSlimModel;
             handler?.Invoke(sender, e);
         }
 
-        private static void OnSendingUserModel(ActionExecutedContext sender, EditorModelEventArgs<UserDisplay> e)
+        private static void OnSendingUserModel(ResultExecutedContext sender, EditorModelEventArgs<UserDisplay> e)
         {
             var handler = SendingUserModel;
             handler?.Invoke(sender, e);
         }
 
-        private static void OnSendingContentModel(ActionExecutedContext sender, EditorModelEventArgs<ContentItemDisplay> e)
+        private static void OnSendingContentModel(ResultExecutedContext sender, EditorModelEventArgs<ContentItemDisplay> e)
         {
             var handler = SendingContentModel;
             handler?.Invoke(sender, e);
         }
 
-        private static void OnSendingMediaModel(ActionExecutedContext sender, EditorModelEventArgs<MediaItemDisplay> e)
+        private static void OnSendingMediaModel(ResultExecutedContext sender, EditorModelEventArgs<MediaItemDisplay> e)
         {
             var handler = SendingMediaModel;
             handler?.Invoke(sender, e);
         }
 
-        private static void OnSendingMemberModel(ActionExecutedContext sender, EditorModelEventArgs<MemberDisplay> e)
+        private static void OnSendingMemberModel(ResultExecutedContext sender, EditorModelEventArgs<MemberDisplay> e)
         {
             var handler = SendingMemberModel;
             handler?.Invoke(sender, e);
@@ -54,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Filters
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        internal static void EmitEvent(ActionExecutedContext sender, EditorModelEventArgs e)
+        internal static void EmitEvent(ResultExecutedContext sender, EditorModelEventArgs e)
         {
             if (e.Model is ContentItemDisplay)
                 OnSendingContentModel(sender, new EditorModelEventArgs<ContentItemDisplay>(e));

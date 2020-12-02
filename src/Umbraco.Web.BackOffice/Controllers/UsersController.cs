@@ -225,7 +225,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public UserDisplay GetById(int id)
         {
@@ -243,7 +243,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
         {
@@ -578,7 +578,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public UserDisplay PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException(nameof(userSave));

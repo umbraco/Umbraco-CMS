@@ -149,7 +149,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromQuery]int[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromQuery] int[] ids)
         {
             var foundContent = _contentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
@@ -164,7 +164,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to update
         /// </remarks>
         public async Task<ActionResult<IEnumerable<AssignedUserGroupPermissions>>> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
-        {   if (saveModel.ContentId <= 0) return NotFound();
+        {
+            if (saveModel.ContentId <= 0) return NotFound();
 
             // TODO: Should non-admins be allowed to set granular permissions?
 
@@ -347,7 +348,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]        
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(int id)
@@ -367,7 +368,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(Guid id)
@@ -388,7 +389,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetById(Udi id)
@@ -407,7 +408,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
@@ -426,7 +427,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeKey"></param>
         /// <param name="parentId"></param>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeKey);
@@ -454,7 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return mapped;
         }
 
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [DetermineAmbiguousActionByPassingParameters]
         public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
@@ -598,7 +599,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent([FromQuery]int contentId, [FromQuery]string name)
+        public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent([FromQuery] int contentId, [FromQuery] string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
@@ -632,32 +633,32 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-         /// <summary>
-         /// Saves content
-         /// </summary>
-         /// <returns></returns>
-         [FileUploadCleanupFilter]
-         [ContentSaveValidation]
-         public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
-         {
-             var contentItemDisplay = await PostSaveInternal(contentItem,
-                 content =>
-                 {
-                     EnsureUniqueName(content.Name, content, "Name");
+        /// <summary>
+        /// Saves content
+        /// </summary>
+        /// <returns></returns>
+        [FileUploadCleanupFilter]
+        [ContentSaveValidation]
+        public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+        {
+            var contentItemDisplay = await PostSaveInternal(contentItem,
+                content =>
+                {
+                    EnsureUniqueName(content.Name, content, "Name");
 
-                     _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                    _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                      //we need to reuse the underlying logic so return the result that it wants
                      return OperationResult.Succeed(new EventMessages());
-                 },
-                 content =>
-                 {
-                     var display = MapToDisplay(content);
-                     SetupBlueprint(display, content);
-                     return display;
-                 });
+                },
+                content =>
+                {
+                    var display = MapToDisplay(content);
+                    SetupBlueprint(display, content);
+                    return display;
+                });
 
-             return contentItemDisplay;
-         }
+            return contentItemDisplay;
+        }
 
         /// <summary>
         /// Saves content
@@ -665,7 +666,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public async Task<ContentItemDisplay> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
@@ -1459,7 +1460,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         private string GetVariantName(string culture, string segment)
         {
-            if(culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
+            if (culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
             {
                 // TODO: Get name for default variant from somewhere?
                 return "Default";
@@ -1677,7 +1678,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public async Task<ActionResult<ContentItemDisplay>> PostUnpublish(UnpublishContent model)
         {
             var foundContent = _contentService.GetById(model.Id);
@@ -1685,7 +1686,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (foundContent == null)
             {
                 HandleContentNotFound(model.Id);
-            }   
+            }
 
             // Authorize...
             var resource = new ContentPermissionsResource(foundContent, ActionUnpublish.ActionLetter);
@@ -2309,7 +2310,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return notifications;
         }
 
-        public IActionResult PostNotificationOptions(int contentId, [FromQuery(Name="notifyOptions[]")] string[] notifyOptions)
+        public IActionResult PostNotificationOptions(int contentId, [FromQuery(Name = "notifyOptions[]")] string[] notifyOptions)
         {
             if (contentId <= 0) return NotFound();
             var content = _contentService.GetById(contentId);
@@ -2459,7 +2460,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         // set up public access using role based access
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
         [HttpPost]
-        public IActionResult PostPublicAccess(int contentId, [FromQuery(Name = "groups[]")]string[] groups, [FromQuery(Name = "usernames[]")]string[] usernames, int loginPageId, int errorPageId)
+        public IActionResult PostPublicAccess(int contentId, [FromQuery(Name = "groups[]")] string[] groups, [FromQuery(Name = "usernames[]")] string[] usernames, int loginPageId, int errorPageId)
         {
             if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
             {
@@ -2520,7 +2521,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return _publicAccessService.Save(entry).Success
-                ? (IActionResult) Ok()
+                ? (IActionResult)Ok()
                 : Problem();
         }
 
@@ -2541,7 +2542,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return _publicAccessService.Delete(entry).Success
-                ? (IActionResult) Ok()
+                ? (IActionResult)Ok()
                 : Problem();
         }
     }
