@@ -247,12 +247,12 @@
     <key alias="parentNotPublished">Tento dokument je publikován, ale není viditelný, protože jeho rodič '%0%' publikován není</key>
     <key alias="parentCultureNotPublished">Tato jazyková verze je publikována, ale není viditelná, protože její rodič '%0%' publikován není</key>
     <key alias="parentNotPublishedAnomaly">Jejda: tento dokument je publikován, ale není v mezipaměti (vnitřní chyba)</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
-    <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
+    <key alias="getUrlException">Could not get the URL</key>
+    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publikovat</key>
     <key alias="published">Published</key>
-    <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
+    <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Stav publikování</key>
     <key alias="publishDescendantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> and the same languages of content items underneath and thereby making their content publicly available.]]></key>
@@ -452,7 +452,7 @@
     <key alias="recycleBinIsEmpty">Koš je nyní prázdný</key>
     <key alias="recycleBinWarning">Odebrání položek z koše způsobí jejich trvalé odstranění</key>
     <key alias="regexSearchError"><![CDATA[Webová služba<a target='_blank' href='http://regexlib.com'>regexlib.com</a> má v tuto chvíli nějaké problémy, které jsou mimo naší kontrolu. Omlouváme se za vzniklé nepříjemnosti.]]></key>
-    <key alias="regexSearchHelp">Vyhledat regulární výraz pro přidání validace formulářového prvku. Například: 'email, 'PSČ' 'url'</key>
+    <key alias="regexSearchHelp">Vyhledat regulární výraz pro přidání validace formulářového prvku. Například: 'email, 'PSČ' 'URL'</key>
     <key alias="removeMacro">Odstranit makro</key>
     <key alias="requiredField">Pole je vyžadování</key>
     <key alias="sitereindexed">Web je přeindexován</key>
@@ -745,7 +745,7 @@
     <key alias="update">Aktualizovat</key>
     <key alias="upgrade">Povýšit</key>
     <key alias="upload">Nahrání</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Uživatel</key>
     <key alias="username">Uživatelské jméno</key>
     <key alias="value">Hodnota</key>
@@ -768,7 +768,6 @@
     <key alias="other">Další</key>
     <key alias="articles">Články</key>
     <key alias="videos">Videa</key>
-    <key alias="clear">Vyčistit</key>
     <key alias="installing">Instalování</key>
   </area>
   <area alias="colors">

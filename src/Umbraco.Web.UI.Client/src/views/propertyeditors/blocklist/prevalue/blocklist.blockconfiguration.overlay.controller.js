@@ -10,7 +10,7 @@
 (function () {
     "use strict";
 
-    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService) {
+    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService, udiService) {
 
         var unsubscribe = [];
 
@@ -35,17 +35,20 @@
         };
 
         vm.openElementType = function(elementTypeKey) {
-            var elementTypeId = vm.getElementTypeByKey(elementTypeKey).id;
-            const editor = {
-                id: elementTypeId,
-                submit: function (model) {
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.documentTypeEditor(editor);
+            var elementType = vm.getElementTypeByKey(elementTypeKey);
+            if (elementType) {
+                var elementTypeId = elementType.id;
+                const editor = {
+                    id: elementTypeId,
+                    submit: function (model) {
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.documentTypeEditor(editor);
+            }
         };
 
         vm.createElementTypeAndCallback = function(callback) {
@@ -53,6 +56,7 @@
                 create: true,
                 infiniteMode: true,
                 isElement: true,
+                noTemplate: true,
                 submit: function (model) {
                     callback(model.documentTypeKey);
                     editorService.close();
@@ -66,35 +70,45 @@
 
         vm.addSettingsForBlock = function($event, block) {
 
-            localizationService.localizeMany(["blockEditor_headlineAddSettingsElementType", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
+            localizationService.localize("blockEditor_headlineAddSettingsElementType").then(function(localizedTitle) {
 
-                var elemTypeSelectorOverlay = {
-                    view: "itempicker",
-                    title: localized[0],
-                    availableItems: vm.elementTypes,
-                    position: "target",
-                    event: $event,
-                    size: vm.elementTypes.length < 7 ? "small" : "medium",
-                    createNewItem: {
-                        action: function() {
-                            overlayService.close();
-                            vm.createElementTypeAndCallback((key) => {
-                                vm.applySettingsToBlock(block, key);
-                            });
-                        },
-                        icon: "icon-add",
-                        name: localized[1]
+                const settingsTypePicker = {
+                    title: localizedTitle,
+                    section: "settings",
+                    treeAlias: "documentTypes",
+                    entityType: "documentType",
+                    isDialog: true,
+                    filter: function (node) {
+                        if (node.metaData.isElement === true) {
+                            return false;
+                        }
+                        return true;
                     },
-                    submit: function (overlay) {
-                        vm.applySettingsToBlock(block, overlay.selectedItem.key);
-                        overlayService.close();
+                    filterCssClass: "not-allowed",
+                    select: function (node) {
+                        vm.applySettingsToBlock(block, udiService.getKey(node.udi));
+                        editorService.close();
                     },
                     close: function () {
-                        overlayService.close();
-                    }
-                };
+                        editorService.close();
+                    },
+                    extraActions: [
+                        {
+                            style: "primary",
+                            labelKey: "blockEditor_labelcreateNewElementType",
+                            action: function () {
+                                vm.createElementTypeAndCallback((key) => {
+                                    vm.applySettingsToBlock(block, key);
 
-                overlayService.open(elemTypeSelectorOverlay);
+                                    // At this point we will close the contentTypePicker.
+                                    editorService.close();
+                                });
+                            }
+                        }
+                    ]
+                };
+                editorService.treePicker(settingsTypePicker);
+
             });
         };
 
@@ -110,7 +124,7 @@
 
                 overlayService.confirmRemove({
                     title: data[0],
-                    content: localizationService.tokenReplace(data[1], [settingsElementType.name]),
+                    content: localizationService.tokenReplace(data[1], [(settingsElementType ? settingsElementType.name : "(Unavailable ElementType)")]),
                     close: function () {
                         overlayService.close();
                     },
@@ -157,6 +171,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".html") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.view = "~/" + filepath;
@@ -203,6 +218,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".css") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.stylesheet = "~/" + filepath;
