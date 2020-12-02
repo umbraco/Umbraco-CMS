@@ -76,6 +76,7 @@ stages:
 
 
   - job: Integration_Tests
+    timeoutInMinutes: 120
     displayName: 'Integration Tests'
     pool:
       vmImage: 'windows-latest'
