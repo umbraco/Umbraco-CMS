@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Routing
         protected override void ComposeSettings()
         {
             base.ComposeSettings();
-            Composition.Services.AddUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            Builder.Services.AddUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [TestCase(1046, "/")]
@@ -48,7 +48,6 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 

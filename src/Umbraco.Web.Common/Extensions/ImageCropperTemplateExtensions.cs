@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Umbraco.Extensions
 {
     /// <summary>
-    /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor
+    /// Provides extension methods for getting ImageProcessor URL from the core Image Cropper property editor
     /// </summary>
     public static class ImageCropperTemplateExtensions
     {

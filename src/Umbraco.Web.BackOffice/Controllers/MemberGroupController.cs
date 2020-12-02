@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
@@ -9,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
@@ -19,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// An API controller used for dealing with member groups
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
         private readonly IMemberGroupService _memberGroupService;

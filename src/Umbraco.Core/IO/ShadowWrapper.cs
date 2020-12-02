@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.IO
@@ -31,7 +30,7 @@ namespace Umbraco.Core.IO
             _isScoped = isScoped;
         }
 
-        public static string CreateShadowId(IIOHelper ioHelper)
+        public static string CreateShadowId(IHostingEnvironment hostingEnvironment)
         {
             const int retries = 50; // avoid infinite loop
             const int idLength = 8; // 6 chars
@@ -46,7 +45,7 @@ namespace Umbraco.Core.IO
                 var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
-                var shadowDir = ioHelper.MapPath(virt);
+                var shadowDir = hostingEnvironment.MapPathContentRoot(virt);
                 if (Directory.Exists(shadowDir))
                     continue;
 
@@ -63,10 +62,10 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
-            _shadowDir = _ioHelper.MapPath(virt);
+            var virt = Path.Combine(ShadowFsPath , id , _shadowPath);
+            _shadowDir = _hostingEnvironment.MapPathContentRoot(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), virt);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 
@@ -91,7 +90,7 @@ namespace Umbraco.Core.IO
 
                     // shadowPath make be path/to/dir, remove each
                     dir = dir.Replace("/", "\\");
-                    var min = _ioHelper.MapPath(ShadowFsPath).Length;
+                    var min = _hostingEnvironment.MapPathContentRoot(ShadowFsPath).Length;
                     var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
                     while (pos > min)
                     {

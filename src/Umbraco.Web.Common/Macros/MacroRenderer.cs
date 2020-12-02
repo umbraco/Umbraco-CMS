@@ -10,13 +10,13 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Macros;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Macros
 {
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Macros
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IMemberUserKeyProvider _memberUserKeyProvider;
         private readonly ISessionManager _sessionManager;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Macros
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
             IMemberUserKeyProvider memberUserKeyProvider,
             ISessionManager sessionManager,
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Macros
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _cookieManager = cookieManager;
             _memberUserKeyProvider = memberUserKeyProvider;
             _sessionManager = sessionManager;
@@ -186,7 +186,7 @@ namespace Umbraco.Web.Macros
             var filename = GetMacroFileName(model);
             if (filename == null) return null;
 
-            var mapped = _ioHelper.MapPath(filename);
+            var mapped = _hostingEnvironment.MapPathContentRoot(filename);
             if (mapped == null) return null;
 
             var file = new FileInfo(mapped);
@@ -356,7 +356,7 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _ioHelper);
+            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _hostingEnvironment);
             return engine.Execute(macro, content);
         }
 

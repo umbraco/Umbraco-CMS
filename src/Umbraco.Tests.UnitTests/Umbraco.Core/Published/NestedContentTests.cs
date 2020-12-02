@@ -27,7 +27,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<ILogger<ProfilingLogger>>();
             var loggerFactory = NullLoggerFactory.Instance;
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);

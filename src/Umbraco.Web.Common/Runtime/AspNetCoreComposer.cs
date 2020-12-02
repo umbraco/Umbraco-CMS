@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Diagnostics;
@@ -40,65 +41,63 @@ namespace Umbraco.Web.Common.Runtime
     [ComposeAfter(typeof(CoreInitialComposer))]
     public class AspNetCoreComposer : ComponentComposer<AspNetCoreComponent>, IComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
             // AspNetCore specific services
-            composition.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
-            composition.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
+            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
 
             // Our own netcore implementations
-            composition.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            builder.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
 
-            composition.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
+            builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+            builder.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
             // Password hasher
-            composition.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
+            builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
-            composition.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
-            composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
-            composition.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
+            builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+            builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
+            builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
-            composition.Services.AddMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+            builder.Services.AddMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
 
-            composition.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
+            builder.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
 
-            composition.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
+            builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
-            composition.Services.AddUnique<IMacroRenderer, MacroRenderer>();
-            composition.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
-            composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
 
-            composition.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
-            composition.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
-
-            composition.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
 
             //register the install components
-            composition.ComposeInstaller();
+            builder.ComposeInstaller();
 
-            var umbracoApiControllerTypes = composition.TypeLoader.GetUmbracoApiControllers().ToList();
-            composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
 
-            composition.Services.AddUnique<InstallAreaRoutes>();
+            builder.Services.AddUnique<InstallAreaRoutes>();
 
-            composition.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
-            composition.Services.AddUnique<UmbracoRequestMiddleware>();
-            composition.Services.AddUnique<BootFailedMiddleware>();
+            builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddUnique<UmbracoRequestMiddleware>();
+            builder.Services.AddUnique<BootFailedMiddleware>();
 
-            composition.Services.AddUnique<UmbracoJsonModelBinder>();
+            builder.Services.AddUnique<UmbracoJsonModelBinder>();
 
-            composition.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
-            composition.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.Services.AddUnique(factory => new LegacyPasswordSecurity());
+            builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
+            builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();            
         }
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Semver;
@@ -14,6 +15,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Security;
 
@@ -23,7 +25,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// A controller used for managing packages in the back office
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Packages)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
         private readonly IHostingEnvironment _hostingEnvironment;

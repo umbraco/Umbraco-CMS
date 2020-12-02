@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -17,16 +18,13 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-
+using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoApplicationAuthorize(
-        Constants.Applications.Content,
-        Constants.Applications.Media,
-        Constants.Applications.Members)]
+    [Authorize(Policy = AuthorizationPolicies.SectionAccessForTinyMce)]    
     public class TinyMceController : UmbracoAuthorizedApiController
     {
         private readonly IHostingEnvironment _hostingEnvironment;

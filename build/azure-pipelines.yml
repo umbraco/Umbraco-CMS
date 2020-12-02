@@ -9,36 +9,177 @@
 variables:
   buildConfiguration: 'Release'
 
-jobs:
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
+stages:
+- stage: Linux
+  jobs:
 
-  - task: UseDotNet@2
-    displayName: 'Use .Net Core sdk 3.1.100'
-    inputs:
-      version: 3.1.100
+  - job: Unit_Tests
+    displayName: 'Unit Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+  
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.x'
+      inputs:
+        version: 3.1.x
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**/*.Tests.UnitTests.csproj'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet test'
-    inputs:
-      command: test
-      projects: '**/*.Tests.UnitTests.csproj'
+
+- stage: Windows
+  jobs:
+
+  - job: Unit_Tests
+    displayName: 'Unit Tests'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+  
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.x'
+      inputs:
+        version: 3.1.x
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**\*.Tests.UnitTests.csproj'
+  
+    - task: NuGetToolInstaller@1
+      displayName: 'Use NuGet Latest'
+  
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        restoreSolution: '*\src\umbraco.sln'
+        feedsToUse: config
+  
+    - task: PowerShell@1
+      displayName: 'Prepare Build'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get
+         
+         $ubuild.PrepareBuild("vso")
+  
+    - task: NodeTool@0
+      displayName: 'Use Node 11.x'
+      inputs:
+        versionSpec: 11.x
+  
+    - task: Npm@1
+      displayName: 'npm install'
+      inputs:
+        workingDir: src\Umbraco.Web.UI.Client
+        verbose: false
+  
+    - task: gulp@0
+      displayName: 'gulp build'
+      inputs:
+        gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+        targets: build
+        workingDirectory: src\Umbraco.Web.UI.Client
+        publishJUnitResults: true
+        testResultsFiles: '**\TESTS-*.xml'
+  
+    - task: PowerShell@1
+      displayName: 'Prepare Packages & Zip'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get -continue
+         
+         $ubuild.CompileUmbraco()
+         $ubuild.PreparePackages()
+         $ubuild.PackageZip()
+
+    - task: CopyFiles@2
+      displayName: 'Copy Zip Files to Staging'
+      inputs:
+        SourceFolder: build.out
+        Contents: '*.zip'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Zip Files'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: zips
+  
+    - task: PowerShell@1
+      displayName: 'Verify & Package NuGet'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+         Write-Host "Working folder: $pwd"
+         $ubuild = build\build.ps1 -get -continue
+         
+         $ubuild.VerifyNuGet()
+         $ubuild.PackageNuGet()
+
+    - task: CopyFiles@2
+      displayName: 'Copy NuPkg Files to Staging'
+      inputs:
+        SourceFolder: build.out
+        Contents: '*.nupkg'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+    
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish NuPkg Files'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: nupkg
+
+    - task: CopyFiles@2
+      displayName: 'Copy Log Files to Staging'
+      inputs:
+        SourceFolder: build.tmp
+        Contents: '*.log'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+      condition: succeededOrFailed()
+    
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Log Files'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: logs
+      condition: succeededOrFailed()
 
 
-- job: Windows
-  pool:
-    vmImage: 'windows-latest'
-  steps:
+  - job: Integration_Tests
+    displayName: 'Integration Tests'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
 
-  - task: UseDotNet@2
-    displayName: 'Use .Net Core sdk 3.1.100'
-    inputs:
-      version: 3.1.100
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.x'
+      inputs:
+        version: 3.1.x
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet test'
-    inputs:
-      command: test
-      projects: '**\*.Tests.UnitTests.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        projects: '**\Umbraco.Tests.Integration.csproj'
+    
+    - powershell: 'sqllocaldb start mssqllocaldb'
+      displayName: 'Start MSSQL LocalDb'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**\Umbraco.Tests.Integration.csproj'
+        arguments: '--no-build'

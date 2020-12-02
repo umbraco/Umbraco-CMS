@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -20,6 +21,8 @@ namespace Umbraco.Core.Manifest
     public class ManifestParser : IManifestParser
     {
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
@@ -27,7 +30,6 @@ namespace Umbraco.Core.Manifest
 
         private readonly IAppPolicyCache _cache;
         private readonly ILogger<ManifestParser> _logger;
-        private readonly IIOHelper _ioHelper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ManifestValueValidatorCollection _validators;
@@ -45,12 +47,13 @@ namespace Umbraco.Core.Manifest
             ILogger<ManifestParser> logger,
             ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             IJsonSerializer jsonSerializer,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, loggerFactory, ioHelper, dataTypeService, localizationService)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, loggerFactory, ioHelper, hostingEnvironment, dataTypeService, localizationService)
         {
             _loggerFactory = loggerFactory;
             _jsonSerializer = jsonSerializer;
@@ -61,11 +64,10 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IDataTypeService dataTypeService, ILocalizationService localizationService)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
-            _ioHelper = ioHelper;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
@@ -75,6 +77,7 @@ namespace Umbraco.Core.Manifest
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
 
             Path = path;
 
@@ -84,7 +87,7 @@ namespace Umbraco.Core.Manifest
         public string Path
         {
             get => _path;
-            set => _path = value.StartsWith("~/") ? _ioHelper.MapPath(value) : value;
+            set => _path = value.StartsWith("~/") ? _hostingEnvironment.MapPathContentRoot(value) : value;
         }
 
         /// <summary>

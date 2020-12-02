@@ -15,6 +15,8 @@ using Umbraco.Core.Mapping;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -22,7 +24,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The API controller for editing relation types.
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
     public class RelationTypeController : BackOfficeNotificationsController
     {
         private readonly ILogger<RelationTypeController> _logger;

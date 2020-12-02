@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -30,8 +25,8 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
@@ -40,6 +35,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
+        private readonly PublishedSnapshotServiceOptions _options;
+        private readonly IMainDom _mainDom;
+        private readonly IUmbracoApplicationLifetime _lifeTime;
+        private readonly IRuntimeState _runtime;
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IProfilingLogger _profilingLogger;
@@ -63,9 +62,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // volatile because we read it with no lock
         private volatile bool _isReady;
 
-        private readonly ContentStore _contentStore;
-        private readonly ContentStore _mediaStore;
-        private readonly SnapDictionary<int, Domain> _domainStore;
+        private ContentStore _contentStore;
+        private ContentStore _mediaStore;
+        private SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
@@ -84,13 +83,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
-            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
+        public PublishedSnapshotService(
+            PublishedSnapshotServiceOptions options,
+            IMainDom mainDom,
+            IUmbracoApplicationLifetime lifeTime,
+            IRuntimeState runtime,
+            ServiceContext serviceContext,
+            IPublishedContentTypeFactory publishedContentTypeFactory,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IVariationContextAccessor variationContextAccessor,
             IProfilingLogger profilingLogger,
             ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            IDocumentRepository documentRepository,
+            IMediaRepository mediaRepository,
+            IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource,
             IOptions<GlobalSettings> globalSettings,
@@ -106,6 +113,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instantiated only once!");
 
+            _options = options;
+            _mainDom = mainDom;
+            _lifeTime = lifeTime;
+            _runtime = runtime;
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _profilingLogger = profilingLogger;
@@ -134,12 +145,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // (ideally we'd have Upgrading.App vs Upgrading.Data application states...)
             InitializeRepositoryEvents();
 
+            _lifeTime.ApplicationInit += OnApplicationInit;
+        }
+
+        internal void OnApplicationInit(object sender, EventArgs e)
+        {
             // however, the cache is NOT available until we are configured, because loading
             // content (and content types) from database cannot be consistent (see notes in "Handle
             // Notifications" region), so
             // - notifications will be ignored
             // - trying to obtain a published snapshot from the service will throw
-            if (runtime.Level != RuntimeLevel.Run)
+            if (_runtime.Level != RuntimeLevel.Run)
                 return;
 
             // lock this entire call, we only want a single thread to be accessing the stores at once and within
@@ -148,25 +164,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // it will not be able to close the stores until we are done populating (if the store is empty)
             lock (_storesLock)
             {
-                if (options.IgnoreLocalDb == false)
+                if (!_options.IgnoreLocalDb)
                 {
-                    var registered = mainDom.Register(MainDomRegister, MainDomRelease);
+                    _mainDom.Register(MainDomRegister, MainDomRelease);
 
                     // stores are created with a db so they can write to it, but they do not read from it,
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
 
                     _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory,  publishedModelFactory, _localContentDb);
+                    _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localContentDb);
                     _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory, _localMediaDb);
+                    _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localMediaDb);
                 }
                 else
                 {
                     _logger.LogInformation("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory);
+                    _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
                     _logger.LogInformation("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory);
+                    _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();
@@ -330,6 +346,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Dispose()
         {
             TearDownRepositoryEvents();
+            _lifeTime.ApplicationInit -= OnApplicationInit;
             base.Dispose();
         }
 

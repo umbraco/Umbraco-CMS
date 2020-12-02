@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Web;
 using System.Web.Security;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
@@ -23,7 +22,6 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -31,7 +29,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Tests.Common.Builders;
+
 
 namespace Umbraco.Tests.Testing.TestingTests
 {
@@ -64,17 +62,24 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Helper()
         {
             // unless we can inject them in MembershipHelper, we need need this
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
-            Composition.Services.AddTransient(_ => Mock.Of<IUserService>());
-            Composition.Services.AddTransient(_ => AppCaches.Disabled);
-            Composition.Services.AddTransient<ServiceContext>();
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IMemberTypeService>());
+            Builder.Services.AddTransient(_ => Mock.Of<IUserService>());
+            Builder.Services.AddTransient(_ => AppCaches.Disabled);
+            Builder.Services.AddTransient<ServiceContext>();
+
+            var loggerFactory = Mock.Of<ILoggerFactory>();
+            var memberService = Mock.Of<IMemberService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
+            var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, loggerFactory, ShortStringHelper, Mock.Of<IEntityService>());
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>());
+                Mock.Of<IPublishedContentQuery>(),
+                membershipHelper);
             Assert.Pass();
         }
 

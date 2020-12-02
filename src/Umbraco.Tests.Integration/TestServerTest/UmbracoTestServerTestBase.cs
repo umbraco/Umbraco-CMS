@@ -21,6 +21,9 @@ using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -44,7 +47,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
                 {
-                    services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+                    // Add a test auth scheme with a test auth handler to authn and assign the user
+                    services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { });
                 });
             });
 
@@ -70,6 +75,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
+                     UseTestLocalDb(app.ApplicationServices);
                      Services = app.ApplicationServices;
                      Configure(app);
                  });
@@ -126,21 +132,26 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
-            umbracoBuilder
-                .WithConfiguration()
-                .WithTestCore(TestHelper, UseTestLocalDb) // This is the important one!
-                .WithWebComponents()
-                .WithRuntimeMinifier()
-                .WithBackOffice()
-                .WithBackOfficeIdentity()
-                .WithPreview()
+            var typeLoader = services.AddTypeLoader(GetType().Assembly, TestHelper.GetWebHostEnvironment(), TestHelper.GetHostingEnvironment(),
+                TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration, TestHelper.Profiler);
+
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader);
+    
+            builder
+                .AddConfiguration()
+                .AddTestCore(TestHelper) // This is the important one!
+                .AddWebComponents()
+                .AddRuntimeMinifier()
+                .AddBackOffice()
+                .AddBackOfficeIdentity()
+                .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
+                .AddPreviewSupport()
                 //.WithMiniProfiler() // we don't want this running in tests
-                .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
+                .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
                     mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
                 })
-                .WithWebServer()
+                .AddWebServer()
                 .Build();
         }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
@@ -9,28 +10,28 @@ namespace Umbraco.Web.Composing.CompositionExtensions
 {
     public static class Installer
     {
-        public static Composition ComposeInstaller(this Composition composition)
+        public static IUmbracoBuilder ComposeInstaller(this IUmbracoBuilder builder)
         {
             // register the installer steps
 
-            composition.Services.AddScoped<InstallSetupStep,NewInstallStep>();
-            composition.Services.AddScoped<InstallSetupStep,UpgradeStep>();
-            composition.Services.AddScoped<InstallSetupStep,FilePermissionsStep>();
-            composition.Services.AddScoped<InstallSetupStep,DatabaseConfigureStep>();
-            composition.Services.AddScoped<InstallSetupStep,DatabaseInstallStep>();
-            composition.Services.AddScoped<InstallSetupStep,DatabaseUpgradeStep>();
+            builder.Services.AddScoped<InstallSetupStep,NewInstallStep>();
+            builder.Services.AddScoped<InstallSetupStep,UpgradeStep>();
+            builder.Services.AddScoped<InstallSetupStep,FilePermissionsStep>();
+            builder.Services.AddScoped<InstallSetupStep,DatabaseConfigureStep>();
+            builder.Services.AddScoped<InstallSetupStep,DatabaseInstallStep>();
+            builder.Services.AddScoped<InstallSetupStep,DatabaseUpgradeStep>();
 
             // TODO: Add these back once we have a compatible Starter kit
             // composition.Services.AddScoped<InstallSetupStep,StarterKitDownloadStep>();
             // composition.Services.AddScoped<InstallSetupStep,StarterKitInstallStep>();
             // composition.Services.AddScoped<InstallSetupStep,StarterKitCleanupStep>();
 
-            composition.Services.AddScoped<InstallSetupStep,CompleteInstallStep>();
+            builder.Services.AddScoped<InstallSetupStep,CompleteInstallStep>();
 
-            composition.Services.AddTransient<InstallStepCollection>();
-            composition.Services.AddUnique<InstallHelper>();
+            builder.Services.AddTransient<InstallStepCollection>();
+            builder.Services.AddUnique<InstallHelper>();
 
-            return composition;
+            return builder;
         }
     }
 }

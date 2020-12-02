@@ -87,7 +87,7 @@ namespace Umbraco.Web.BackOffice.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && ContentPermissionsHelper.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
+                var hasPathAccess = (item != null && ContentPermissions.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
                 if (hasPathAccess == false)
                 {
                     toRemove.Add(item);

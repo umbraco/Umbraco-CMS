@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
@@ -224,7 +225,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = NullLoggerFactory.Instance.CreateLogger("ProfilingLogger");
+            var logger = NullLoggerFactory.Instance.CreateLogger<ProfilingLogger>();
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }

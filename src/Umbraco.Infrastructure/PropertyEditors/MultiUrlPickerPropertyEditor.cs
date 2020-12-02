@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.MultiUrlPicker,
         EditorType.PropertyValue,
-        "Multi Url Picker",
+        "Multi URL Picker",
         "multiurlpicker",
         ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Pickers,

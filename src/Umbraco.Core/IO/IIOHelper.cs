@@ -19,7 +19,16 @@ namespace Umbraco.Core.IO
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        [Obsolete("Use IHostingEnvironment.MapPathContentRoot or IHostingEnvironment.MapPathWebRoot instead")]
         string MapPath(string path);
+
+        /// <summary>
+        /// Returns true if the path has a root, and is considered fully qualified for the OS it is on
+        /// See https://github.com/dotnet/runtime/blob/30769e8f31b20be10ca26e27ec279cd4e79412b9/src/libraries/System.Private.CoreLib/src/System/IO/Path.cs#L281 for the .NET Standard 2.1 version of this
+        /// </summary>
+        /// <param name="path">The path to check</param>
+        /// <returns>True if the path is fully qualified, false otherwise</returns>
+        bool IsPathFullyQualified(string path);
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -45,7 +54,7 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions);
 
-        bool PathStartsWith(string path, string root, char separator);
+        bool PathStartsWith(string path, string root, params char[] separators);
 
         void EnsurePathExists(string path);
 

@@ -13,6 +13,8 @@ namespace Umbraco.Web.Common.Install
     /// </summary>
     public class InstallAuthorizeAttribute : TypeFilterAttribute
     {
+        // NOTE: This doesn't need to be an authz policy, it's only used for the installer
+
         public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))
         {
         }

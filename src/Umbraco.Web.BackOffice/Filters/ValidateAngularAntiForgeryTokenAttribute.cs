@@ -53,13 +53,13 @@ namespace Umbraco.Web.BackOffice.Filters
                 var cookieToken = _cookieManager.GetCookieValue(Constants.Web.CsrfValidationCookieName);
                 var httpContext = context.HttpContext;
 
-            var validateResult = await ValidateHeaders(httpContext, cookieToken);
-            if (validateResult.Item1 == false)
-            {
-                httpContext.SetReasonPhrase(validateResult.Item2);
-                context.Result = new StatusCodeResult((int)HttpStatusCode.ExpectationFailed);
-                return;
-            }
+                var validateResult = await ValidateHeaders(httpContext, cookieToken);
+                if (validateResult.Item1 == false)
+                {
+                    httpContext.SetReasonPhrase(validateResult.Item2);
+                    context.Result = new StatusCodeResult((int)HttpStatusCode.ExpectationFailed);
+                    return;
+                }
 
                 await next();
             }

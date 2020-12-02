@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -17,6 +18,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -32,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -415,8 +417,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages)]
+        [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return _dataTypeService
@@ -431,8 +432,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages)]
+        [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = _dataTypeService
@@ -463,9 +463,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages)]
-
+        [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
@@ -496,9 +494,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Packages)]
-
+        [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return _propertyEditorCollection

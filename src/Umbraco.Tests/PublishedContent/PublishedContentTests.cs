@@ -44,11 +44,11 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
             _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-            Composition.Services.AddUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
+            Builder.Services.AddUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
-            Composition.Services.AddUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
-            Composition.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Composition.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
+            Builder.Services.AddUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
+            Builder.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Builder.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             var loggerFactory = NullLoggerFactory.Instance;
             var mediaService = Mock.Of<IMediaService>();
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PublishedContent
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
             var serializer = new ConfigurationEditorJsonSerializer();
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), HostingEnvironment, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
 
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.PublishedContent
                 new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService), serializer) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService), serializer) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService), serializer) { Id = 1005 });
-            Composition.Services.AddUnique<IDataTypeService>(f => dataTypeService);
+            Builder.Services.AddUnique<IDataTypeService>(f => dataTypeService);
         }
 
         protected override void Initialize()

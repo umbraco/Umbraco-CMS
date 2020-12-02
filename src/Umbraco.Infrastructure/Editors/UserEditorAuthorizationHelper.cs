@@ -12,14 +12,12 @@ namespace Umbraco.Web.Editors
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
-        private readonly IUserService _userService;
         private readonly IEntityService _entityService;
 
-        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IUserService userService, IEntityService entityService)
+        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService)
         {
             _contentService = contentService;
             _mediaService = mediaService;
-            _userService = userService;
             _entityService = entityService;
         }
 
@@ -114,7 +112,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (contentId == Constants.System.Root)
                     {
-                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        var hasAccess = ContentPermissions.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the content root");
                     }
@@ -135,7 +133,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (mediaId == Constants.System.Root)
                     {
-                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        var hasAccess = ContentPermissions.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media root");
                     }
