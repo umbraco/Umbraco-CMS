@@ -19,17 +19,17 @@ namespace Umbraco.Web.Common.Security
             Succeeded = false
         };
 
-        public static AutoLinkSignInResult FailedException(string error) => new(new[] { error })
+        public static AutoLinkSignInResult FailedException(string error) => new AutoLinkSignInResult(new[] { error })
         {
             Succeeded = false
         };
 
-        public static AutoLinkSignInResult FailedCreatingUser(IReadOnlyCollection<string> errors) => new(errors)
+        public static AutoLinkSignInResult FailedCreatingUser(IReadOnlyCollection<string> errors) => new AutoLinkSignInResult(errors)
         {
             Succeeded = false
         };
 
-        public static AutoLinkSignInResult FailedLinkingUser(IReadOnlyCollection<string> errors) => new(errors)
+        public static AutoLinkSignInResult FailedLinkingUser(IReadOnlyCollection<string> errors) => new AutoLinkSignInResult(errors)
         {
             Succeeded = false
         };
