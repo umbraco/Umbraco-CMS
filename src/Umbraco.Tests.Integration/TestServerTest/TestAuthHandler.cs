@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
 
             var principal = await _backOfficeSignInManager.CreateUserPrincipalAsync(_fakeUser);
-            var ticket = new AuthenticationTicket(principal, TestAuthenticationScheme);
+            var ticket = new AuthenticationTicket(principal, Constants.Security.BackOfficeAuthenticationType);
 
             return AuthenticateResult.Success(ticket);
         }

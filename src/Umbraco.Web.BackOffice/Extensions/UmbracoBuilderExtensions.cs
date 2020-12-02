@@ -62,9 +62,9 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Umbraco.Core.Constants.Security.BackOfficeAuthenticationType)
+        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder)
         {
-            builder.Services.AddBackOfficeAuthorizationPolicies(backOfficeAuthenticationScheme);
+            builder.Services.AddBackOfficeAuthorizationPolicies(Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
             // TODO: See other TODOs in things like UmbracoApiControllerBase ... AFAIK all of this is only used for the back office
             // so IMO these controllers and the features auth policies should just be moved to the back office project and then this
             // ext method can be removed.
