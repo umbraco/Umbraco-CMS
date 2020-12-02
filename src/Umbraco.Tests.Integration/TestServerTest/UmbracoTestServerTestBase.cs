@@ -48,8 +48,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 builder.ConfigureTestServices(services =>
                 {
                     // Add a test auth scheme with a test auth handler to authn and assign the user
-                    services.AddAuthentication(Constants.Security.BackOfficeAuthenticationType)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(Constants.Security.BackOfficeAuthenticationType, options => { });
+                    services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { });
                 });
             });
 
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddRuntimeMinifier()
                 .AddBackOffice()
                 .AddBackOfficeIdentity()
-                .AddBackOfficeAuthorizationPolicies()
+                .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
                 //.WithMiniProfiler() // we don't want this running in tests
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>

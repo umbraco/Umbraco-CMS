@@ -14,8 +14,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
 {
     public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        private readonly IBackOfficeSignInManager _backOfficeSignInManager;
+        public const string TestAuthenticationScheme = "Test";
 
+        private readonly IBackOfficeSignInManager _backOfficeSignInManager;
 
         private readonly BackOfficeIdentityUser _fakeUser;
         public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
 
             var principal = await _backOfficeSignInManager.CreateUserPrincipalAsync(_fakeUser);
-            var ticket = new AuthenticationTicket(principal, Constants.Security.BackOfficeAuthenticationType);
+            var ticket = new AuthenticationTicket(principal, TestAuthenticationScheme);
 
             return AuthenticateResult.Success(ticket);
         }
