@@ -25,7 +25,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
-                throw new ArgumentException("Not a valid Url");
+                throw new ArgumentException("Not a valid URL.", nameof(url));
 
             var fullUrl = new StringBuilder();
 

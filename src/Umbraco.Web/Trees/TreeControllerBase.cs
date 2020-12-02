@@ -250,7 +250,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="entityObjectType"></param>
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="entityObjectType"></param>
@@ -289,7 +289,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
+        /// Helper method to create tree nodes and automatically generate the json URL
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>
@@ -306,7 +306,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
+        /// Helper method to create tree nodes and automatically generate the json URL
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>

@@ -2,7 +2,7 @@
     "use strict";
 
     function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
-        
+
         var vm = this;
 
         vm.rollback = rollback;
@@ -56,7 +56,7 @@
                 });
 
             });
-            
+
         }
 
         function changeLanguage(language) {
@@ -103,7 +103,7 @@
                             var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
                             version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
                             return version;
-                        }); 
+                        });
                     });
                 });
         }
@@ -146,7 +146,7 @@
                     var diffProperty = {
                         "alias": property.alias,
                         "label": property.label,
-                        "diff": JsDiff.diffWords(property.value, oldProperty.value),
+                        "diff": (property.isObject) ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
                         "isObject": (property.isObject || oldProperty.isObject) ? true : false
                     };
 
@@ -163,7 +163,7 @@
 
             const nodeId = $scope.model.node.id;
             const versionId = vm.previousVersion.versionId;
-            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;            
+            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
             return contentResource.rollback(nodeId, versionId, culture)
                 .then(data => {

@@ -301,7 +301,7 @@
     <key alias="recycleBinIsEmpty">Papperskorgen är nu tom</key>
     <key alias="recycleBinWarning">Om du tömmer papperskorgen kommer allt som ligger i den att tas bort permanent</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webbtjänst har för närvarande driftsstörningar. Tyvärr kan vi inte göra något åt detta.]]></key>
-    <key alias="regexSearchHelp">Sök efter en regular expression som kan validera ett formulärsfält. t.ex. 'email' eller 'url'</key>
+    <key alias="regexSearchHelp">Sök efter en regular expression som kan validera ett formulärsfält. t.ex. 'email' eller 'URL'</key>
     <key alias="removeMacro">Ta bort makro</key>
     <key alias="requiredField">Obligatoriskt formulärsfält</key>
     <key alias="sitereindexed">Webbplatsen har indexerats</key>
@@ -589,6 +589,11 @@
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
       <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
   </area>
+  <area alias="member">
+        <key alias="createNewMember">Skapa en ny medlem</key>
+        <key alias="allMembers">Alla medlemmar</key>
+        <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
+  </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
     <key alias="copyDone">%0% har kopierats till %1%</key>
@@ -864,7 +869,7 @@
     <key alias="standardFields">Standardfält</key>
     <key alias="uppercase">Versaler</key>
     <key alias="urlEncode">URL-koda</key>
-    <key alias="urlEncodeHelp">Om fältets innehåll skall sändas till en url, skall detta slås på så att specialtecken kodas</key>
+    <key alias="urlEncodeHelp">Om fältets innehåll skall sändas till en URL, skall detta slås på så att specialtecken kodas</key>
     <key alias="usedIfAllEmpty">Texten kommer användas om ovanstående fält är tomma</key>
     <key alias="usedIfEmpty">Fältet kommer användas om det primära fältet ovan är tomt</key>
     <key alias="withTime">Ja, med tid. Separator:</key>
