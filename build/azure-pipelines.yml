@@ -124,6 +124,29 @@ stages:
               feedsToUse: config
 
         - task: PowerShell@1
+          displayName: 'Update Version'
+          condition: eq(variables['Umbraco.IsReleaseBuild'], 'false')
+          inputs:
+              scriptType: inlineScript
+              inlineScript: |
+                Write-Host "Working folder: $pwd"
+                $ubuild = build/build.ps1 -get -continue
+
+                $version = $ubuild.GetUmbracoVersion()
+                if ($version.Comment -ne "")
+                  {
+                    # 8.0.0-beta.33.1234
+                    $continuous = "$($version.Semver).$(Build.BuildNumber)"
+                  }
+                else
+                  {
+                    # 8.0.0-alpha.1234
+                    $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
+                  }
+                $ubuild.SetUmbracoVersion($continuous)
+                Write-Host "Building: $continuous"
+
+        - task: PowerShell@1
           displayName: 'Prepare Build'
           inputs:
               scriptType: inlineScript
