@@ -43,14 +43,14 @@ namespace Umbraco.Web.BackOffice.Authorization
             var queryString = _httpContextAcessor.HttpContext?.Request.Query;
             if (queryString == null)
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }   
 
             var ids = queryString.Where(x => x.Key == requirement.QueryStringName).ToArray();
             if (ids.Length == 0)
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
