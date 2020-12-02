@@ -270,7 +270,6 @@ namespace Umbraco.Web.Runtime
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
             composition.OEmbedProviders()
                 .Append<YouTube>()
-                .Append<Instagram>()
                 .Append<Twitter>()
                 .Append<Vimeo>()
                 .Append<DailyMotion>()

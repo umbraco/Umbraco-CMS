@@ -102,10 +102,11 @@ That said, the Umbraco development team likes to follow the hints that ReSharper
 
 The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
 
-- [Anders Bjerner](https://github.com/abjerner)
-- [Emma Burstow](https://github.com/emmaburstow)
-- [Poornima Nayar](https://github.com/poornimanayar)
-- [Kenn Jacobsen](https://twitter.com/KennJacobsen_DK)
+- [Nathan Woulfe](https://github.com/nathanwoulfe)
+- [Joe Glombek](https://github.com/glombek)
+- [Laura Weatherhead](https://github.com/lssweatherhead)
+- [Michael Latouche](https://github.com/mikecp)
+- [Owain Williams](https://github.com/OwainWilliams)
 
 
 These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
@@ -128,7 +129,7 @@ In order to build the Umbraco source code locally, first make sure you have the 
   * npm v6.4.1+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
 
-The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
+The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2019 (version 16.3 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
 Alternatively, you can run `build.ps1` from the Powershell command line, which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 
