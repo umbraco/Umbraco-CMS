@@ -2284,6 +2284,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="dictionaryListCaption">Dictionary items</key>
     <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
+    <key alias="addImageCaption">Add image caption</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
