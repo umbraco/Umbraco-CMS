@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -33,8 +32,8 @@ using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Web.Security;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.ActionsResults;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -58,6 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
@@ -73,7 +73,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILogger<BackOfficeController> logger,
             IJsonSerializer jsonSerializer,
             IBackOfficeExternalLoginProviders externalLogins,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -89,6 +90,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _jsonSerializer = jsonSerializer;
             _externalLogins = externalLogins;
             _httpContextAccessor = httpContextAccessor;
+            _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         }
 
         [HttpGet]
@@ -407,18 +409,44 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
 
+            }            
+            else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
+            {
+
+                var attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                if (attemptedUser == null)
+                {
+                    return new ValidationErrorResult($"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
+                }
+
+                var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(attemptedUser.UserName);
+                if (twofactorView.IsNullOrWhiteSpace())
+                {
+                    return new ValidationErrorResult($"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
+                }
+
+                // create a with information to display a custom two factor send code view
+                var verifyResponse = new ObjectResult(new
+                {
+                    twoFactorView = twofactorView,
+                    userId = attemptedUser.Id
+                })
+                {
+                    StatusCode = StatusCodes.Status402PaymentRequired
+                };
+
+                return verifyResponse;
+
             }
             else if (result == Microsoft.AspNetCore.Identity.SignInResult.LockedOut)
             {
-                // TODO: We've never actually dealt with this before
-            }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
-            {
-                // TODO: We've never actually dealt with this before
+                errors.Add($"The local user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
             }
             else if (result == Microsoft.AspNetCore.Identity.SignInResult.NotAllowed)
             {
-                // TODO: We've never actually dealt with this before
+                // This occurs when SignInManager.CanSignInAsync fails which is when RequireConfirmedEmail , RequireConfirmedPhoneNumber or RequireConfirmedAccount fails
+                // however since we don't enforce those rules (yet) this shouldn't happen.
+                errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
             }
             else if (result == Microsoft.AspNetCore.Identity.SignInResult.Failed)
             {

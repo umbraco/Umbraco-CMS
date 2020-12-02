@@ -69,7 +69,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
 
-        // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
@@ -480,14 +479,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.IsLockedOut)
             {
-                throw HttpResponseException.CreateValidationErrorResponse("User is locked out");
+                return new ValidationErrorResult("User is locked out");
             }
             if (result.IsNotAllowed)
             {
-                throw HttpResponseException.CreateValidationErrorResponse("User is not allowed");
+                return new ValidationErrorResult("User is not allowed");
             }
 
-            throw HttpResponseException.CreateValidationErrorResponse("Invalid code");
+            return new ValidationErrorResult("Invalid code");
         }
 
         /// <summary>
