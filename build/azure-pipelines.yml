@@ -78,7 +78,7 @@ stages:
         projects: '**\Umbraco.Tests.Integration.csproj'
         arguments: '--no-build'
 
-    - job: Build_artifacts
+  - job: Build_artifacts
       displayName: 'Build Artifacts'
       pool:
           vmImage: 'windows-latest'
