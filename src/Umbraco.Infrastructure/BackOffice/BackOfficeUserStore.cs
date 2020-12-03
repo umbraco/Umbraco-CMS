@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -18,6 +17,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.BackOffice
 {
+    // TODO: Make this into a base class that can be re-used
+
     public class BackOfficeUserStore : DisposableObjectSlim,
             IUserPasswordStore<BackOfficeIdentityUser>,
             IUserEmailStore<BackOfficeIdentityUser>,
@@ -28,11 +29,11 @@ namespace Umbraco.Core.BackOffice
             IUserSessionStore<BackOfficeIdentityUser>
 
         // TODO: This would require additional columns/tables and then a lot of extra coding support to make this happen natively within umbraco
-        //IUserTwoFactorStore<BackOfficeIdentityUser>,
+        // IUserTwoFactorStore<BackOfficeIdentityUser>,
         // TODO: This would require additional columns/tables for now people will need to implement this on their own
-        //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
+        // IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
         // TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
-        //IQueryableUserStore<BackOfficeIdentityUser, int>
+        // IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly IUserService _userService;
@@ -42,15 +43,16 @@ namespace Umbraco.Core.BackOffice
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
+        /// </summary>
         public BackOfficeUserStore(IScopeProvider scopeProvider, IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptions<GlobalSettings> globalSettings, UmbracoMapper mapper)
         {
             _scopeProvider = scopeProvider;
-            _userService = userService;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService;
-            _externalLoginService = externalLoginService;
+            _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
             _globalSettings = globalSettings.Value;
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
             _mapper = mapper;
             _userService = userService;
             _externalLoginService = externalLoginService;
@@ -59,10 +61,7 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
         /// </summary>
-        protected override void DisposeResources()
-        {
-            _disposed = true;
-        }
+        protected override void DisposeResources() => _disposed = true;
 
         public Task<string> GetUserIdAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
         {
@@ -105,9 +104,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Insert a new user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<IdentityResult> CreateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -158,9 +154,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Update a user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<IdentityResult> UpdateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -206,8 +199,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Delete a user
         /// </summary>
-        /// <param name="user"/>
-        /// <returns/>
         public Task<IdentityResult> DeleteAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -227,9 +218,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Finds a user
         /// </summary>
-        /// <param name="userId"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public async Task<BackOfficeIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -244,9 +232,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Find a user by name
         /// </summary>
-        /// <param name="userName"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public async Task<BackOfficeIdentityUser> FindByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -265,9 +250,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Set the user password hash
         /// </summary>
-        /// <param name="user"/><param name="passwordHash"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -278,6 +260,7 @@ namespace Umbraco.Core.BackOffice
 
             user.PasswordHash = passwordHash;
             user.PasswordConfig = null; // Clear this so that it's reset at the repository level
+            user.LastPasswordChangeDateUtc = DateTime.UtcNow;
 
             return Task.CompletedTask;
         }
@@ -285,9 +268,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Get the user password hash
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<string> GetPasswordHashAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -300,9 +280,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns true if a user has a password set
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<bool> HasPasswordAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -315,9 +292,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Set the user email
         /// </summary>
-        /// <param name="user"/><param name="email"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task SetEmailAsync(BackOfficeIdentityUser user, string email, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -333,9 +307,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Get the user email
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<string> GetEmailAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -348,9 +319,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns true if the user email is confirmed
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<bool> GetEmailConfirmedAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -363,9 +331,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Sets whether the user email is confirmed
         /// </summary>
-        /// <param name="user"/><param name="confirmed"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task SetEmailConfirmedAsync(BackOfficeIdentityUser user, bool confirmed, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -377,9 +342,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns the user associated with this email
         /// </summary>
-        /// <param name="email"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<BackOfficeIdentityUser> FindByEmailAsync(string email, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -393,22 +355,14 @@ namespace Umbraco.Core.BackOffice
         }
 
         public Task<string> GetNormalizedEmailAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
-        {
-            return GetEmailAsync(user, cancellationToken);
-        }
+            => GetEmailAsync(user, cancellationToken);
 
         public Task SetNormalizedEmailAsync(BackOfficeIdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
-        {
-            return SetEmailAsync(user, normalizedEmail, cancellationToken);
-        }
+            => SetEmailAsync(user, normalizedEmail, cancellationToken);
 
         /// <summary>
         /// Adds a user login with the specified provider and key
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="login"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -427,11 +381,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Removes the user login with the specified combination if it exists
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="providerKey"></param>
-        /// <param name="cancellationToken"></param>
-        /// <param name="loginProvider"></param>
-        /// <returns/>
         public Task RemoveLoginAsync(BackOfficeIdentityUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -447,9 +396,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns the linked accounts for this user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<IList<UserLoginInfo>> GetLoginsAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -498,10 +444,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Adds a user to a role (user group)
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="normalizedRoleName"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -523,10 +465,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Removes the role (user group) for the user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="normalizedRoleName"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -548,9 +486,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns the roles (user groups) for this user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -562,10 +497,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns true if a user is in the role
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="normalizedRoleName"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -597,10 +528,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Set the security stamp for the user
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="stamp"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task SetSecurityStampAsync(BackOfficeIdentityUser user, string stamp, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -614,9 +541,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Get the user security stamp
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<string> GetSecurityStampAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -644,10 +568,7 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns the DateTimeOffset that represents the end of a user's lockout, any time in the past should be considered not locked out.
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
         /// <returns/>
-        /// <remarks>
         /// Currently we do not support a timed lock out, when they are locked out, an admin will  have to reset the status
         /// </remarks>
         public Task<DateTimeOffset?> GetLockoutEndDateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
@@ -664,9 +585,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Locks a user out until the specified end date (set to a past date, to unlock a user)
         /// </summary>
-        /// <param name="user"/><param name="lockoutEnd"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         /// <remarks>
         /// Currently we do not support a timed lock out, when they are locked out, an admin will  have to reset the status
         /// </remarks>
@@ -683,9 +601,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Used to record when an attempt to access the user has failed
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<int> IncrementAccessFailedCountAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -699,9 +614,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Used to reset the access failed count, typically after the account is successfully accessed
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task ResetAccessFailedCountAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -716,9 +628,6 @@ namespace Umbraco.Core.BackOffice
         /// Returns the current number of failed access attempts.  This number usually will be reset whenever the password is
         ///                 verified or the account is locked out.
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<int> GetAccessFailedCountAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -730,9 +639,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns true
         /// </summary>
-        /// <param name="user"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task<bool> GetLockoutEnabledAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -744,9 +650,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Doesn't actually perform any function, users can always be locked out
         /// </summary>
-        /// <param name="user"/><param name="enabled"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
         public Task SetLockoutEnabledAsync(BackOfficeIdentityUser user, bool enabled, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -904,8 +807,7 @@ namespace Umbraco.Core.BackOffice
 
         public Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            Guid guidSessionId;
-            if (Guid.TryParse(sessionId, out guidSessionId))
+            if (Guid.TryParse(sessionId, out Guid guidSessionId))
             {
                 return Task.FromResult(_userService.ValidateLoginSession(UserIdToInt(userId), guidSessionId));
             }

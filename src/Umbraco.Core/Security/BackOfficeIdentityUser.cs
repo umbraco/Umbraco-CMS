@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
@@ -12,7 +8,10 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeIdentityUser : IdentityUser
+    /// <summary>
+    /// The identity user used for the back office
+    /// </summary>
+    public class BackOfficeIdentityUser : UmbracoIdentityUser
     {
         private string _name;
         private string _passwordConfig;
@@ -34,11 +33,7 @@ namespace Umbraco.Core.Security
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
-        /// <param name="globalSettings"></param>
-        /// <param name="username"></param>
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
         public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -80,9 +75,6 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeIdentityUser"/> class.
         /// </summary>
-        /// <param name="globalSettings"></param>
-        /// <param name="userId"></param>
-        /// <param name="groups"></param>
         public BackOfficeIdentityUser(GlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
             : this(globalSettings, groups.ToArray())
         {
@@ -184,7 +176,7 @@ namespace Umbraco.Core.Security
 
 
         /// <summary>
-        /// Based on the user's lockout end date, this will determine if they are locked out
+        /// Gets a value indicating whether the user is locked out based on the user's lockout end date
         /// </summary>
         public bool IsLockedOut
         {
@@ -196,7 +188,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This is a 1:1 mapping with IUser.IsApproved
+        /// Gets or sets a value indicating the IUser IsApproved
         /// </summary>
         public bool IsApproved { get; set; }
 

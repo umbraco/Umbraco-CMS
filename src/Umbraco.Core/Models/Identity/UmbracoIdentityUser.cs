@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Identity
     /// to a user. We will continue using this approach since it works fine for what we need which does the change tracking of
     /// claims, roles and logins directly on the user model.
     /// </remarks>
-    public abstract class IdentityUser : IRememberBeingDirty
+    public abstract class UmbracoIdentityUser : IRememberBeingDirty
     {
         private int _id;
         private string _email;
@@ -32,9 +32,9 @@ namespace Umbraco.Core.Models.Identity
         private ObservableCollection<IdentityUserRole> _roles;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IdentityUser"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoIdentityUser"/> class.
         /// </summary>
-        public IdentityUser()
+        public UmbracoIdentityUser()
         {
             // must initialize before setting groups
             _roles = new ObservableCollection<IdentityUserRole>();
