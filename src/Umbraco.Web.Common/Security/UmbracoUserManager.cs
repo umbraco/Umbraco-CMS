@@ -12,7 +12,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Net;
 
-
 namespace Umbraco.Web.Common.Security
 {
 
