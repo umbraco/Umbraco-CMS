@@ -105,8 +105,7 @@ namespace Umbraco.Web.BackOffice.Security
                 _runtimeState,
                 _hostingEnvironment,
                 _globalSettings,
-                _requestCache,
-                _linkGenerator);
+                _requestCache);
             // _explicitPaths); TODO: Implement this once we do OAuth somehow
 
 
@@ -119,7 +118,7 @@ namespace Umbraco.Web.BackOffice.Security
                 // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
                 // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
                 // the defaults work fine with our setup.
-                
+
                 OnValidatePrincipal = async ctx =>
                 {
                     // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
@@ -177,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Security
                     // occurs when sign in is successful and after the ticket is written to the outbound cookie
 
                     // When we are signed in with the cookie, assign the principal to the current HttpContext
-                    ctx.HttpContext.User = ctx.Principal;                    
+                    ctx.HttpContext.User = ctx.Principal;
 
                     return Task.CompletedTask;
                 },
@@ -226,7 +225,7 @@ namespace Umbraco.Web.BackOffice.Security
         private async Task EnsureValidSessionId(CookieValidatePrincipalContext context)
         {
             if (_runtimeState.Level != RuntimeLevel.Run) return;
-            
+
             using var scope = _serviceProvider.CreateScope();
             var validator = scope.ServiceProvider.GetRequiredService<BackOfficeSessionIdValidator>();
             await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
