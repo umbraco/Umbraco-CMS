@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.BackOffice
+﻿using Umbraco.Core.Security;
+
+namespace Umbraco.Core.BackOffice
 {
 
     /// <summary>

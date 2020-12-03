@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.BackOffice
@@ -23,7 +24,7 @@ namespace Umbraco.Core.BackOffice
             IUserLoginStore<BackOfficeIdentityUser>,
             IUserRoleStore<BackOfficeIdentityUser>,
             IUserSecurityStampStore<BackOfficeIdentityUser>,
-            IUserLockoutStore<BackOfficeIdentityUser>,            
+            IUserLockoutStore<BackOfficeIdentityUser>,
             IUserSessionStore<BackOfficeIdentityUser>
 
         // TODO: This would require additional columns/tables and then a lot of extra coding support to make this happen natively within umbraco

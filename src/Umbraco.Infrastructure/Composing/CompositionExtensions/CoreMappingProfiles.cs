@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Builder;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Core.Composing.CompositionExtensions

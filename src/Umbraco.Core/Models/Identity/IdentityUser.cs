@@ -1,26 +1,30 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.Identity
 {
     /// <summary>
-    /// Default IUser implementation
+    /// Abstract class for use in Umbraco Identity
     /// </summary>
-    /// <typeparam name="TKey"/><typeparam name="TLogin"/><typeparam name="TRole"/><typeparam name="TClaim"/>
+    /// <typeparam name="TLogin">The type of user login</typeparam>
+    /// <typeparam name="TRole">The type of user role</typeparam>
+    /// <typeparam name="TClaim">The type of user claims</typeparam>
     /// <remarks>
-    /// This class normally exists inside of the EntityFramework library, not sure why MS chose to explicitly put it there but we don't want
-    /// references to that so we will create our own here
+    /// This class was originally borrowed from the EF implementation in Identity prior to netcore.
+    /// The new IdentityUser in netcore does not have properties such as Claims, Roles and Logins and those are instead
+    /// by default managed with their default user store backed by EF which utilizes EF's change tracking to track these values
+    /// to a user. We will continue using this approach since it works fine for what we need which does the change tracking of
+    /// claims, roles and logins directly on the user model.
     /// </remarks>
-    public class IdentityUser<TKey, TLogin, TRole, TClaim>
+    public abstract class IdentityUser<TLogin, TRole, TClaim>
         where TLogin : IIdentityUserLogin
-        //NOTE: Making our role id a string
-        where TRole : IdentityUserRole<string>
-        where TClaim : IdentityUserClaim<TKey>
+        where TRole : IdentityUserRole
+        where TClaim : IdentityUserClaim
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IdentityUser{TKey, TLogin, TRole, TClaim}"/> class.
+        /// Initializes a new instance of the <see cref="IdentityUser{TLogin, TRole, TClaim}"/> class.
         /// </summary>
-        public IdentityUser()
+        protected IdentityUser()
         {
             Claims = new List<TClaim>();
             Roles = new List<TRole>();
@@ -28,87 +32,96 @@ namespace Umbraco.Core.Models.Identity
         }
 
         /// <summary>
-        /// Last login date
+        /// Gets or sets last login date
         /// </summary>
         public virtual DateTime? LastLoginDateUtc { get; set; }
 
         /// <summary>
-        /// Email
+        /// Gets or sets email
         /// </summary>
         public virtual string Email { get; set; }
 
         /// <summary>
-        /// True if the email is confirmed, default is false
+        /// Gets or sets a value indicating whether the email is confirmed, default is false
         /// </summary>
         public virtual bool EmailConfirmed { get; set; }
 
         /// <summary>
-        /// The salted/hashed form of the user password
+        /// Gets or sets the salted/hashed form of the user password
         /// </summary>
         public virtual string PasswordHash { get; set; }
 
         /// <summary>
-        /// A random value that should change whenever a users credentials have changed (password changed, login removed)
+        /// Gets or sets a random value that should change whenever a users credentials have changed (password changed, login removed)
         /// </summary>
         public virtual string SecurityStamp { get; set; }
 
         /// <summary>
-        /// PhoneNumber for the user
+        /// Gets or sets a phone Number for the user
         /// </summary>
+        /// <remarks>
+        /// This is unused until we or an end-user requires this value for 2FA
+        /// </remarks>
         public virtual string PhoneNumber { get; set; }
 
         /// <summary>
-        /// True if the phone number is confirmed, default is false
+        /// Gets or sets a value indicating whether true if the phone number is confirmed, default is false
         /// </summary>
+        /// <remarks>
+        /// This is unused until we or an end-user requires this value for 2FA
+        /// </remarks>
         public virtual bool PhoneNumberConfirmed { get; set; }
 
         /// <summary>
-        /// Is two factor enabled for the user
+        /// Gets or sets a value indicating whether is two factor enabled for the user
         /// </summary>
+        /// <remarks>
+        /// This is unused until we or an end-user requires this value for 2FA
+        /// </remarks>
         public virtual bool TwoFactorEnabled { get; set; }
 
         /// <summary>
-        /// DateTime in UTC when lockout ends, any time in the past is considered not locked out.
+        /// Gets or sets dateTime in UTC when lockout ends, any time in the past is considered not locked out.
         /// </summary>
         public virtual DateTime? LockoutEndDateUtc { get; set; }
 
         /// <summary>
-        /// DateTime in UTC when the password was last changed.
+        /// Gets or sets dateTime in UTC when the password was last changed.
         /// </summary>
         public virtual DateTime? LastPasswordChangeDateUtc { get; set; }
 
         /// <summary>
-        /// Is lockout enabled for this user
+        /// Gets or sets a value indicating whether is lockout enabled for this user
         /// </summary>
         public virtual bool LockoutEnabled { get; set; }
 
         /// <summary>
-        /// Used to record failures for the purposes of lockout
+        /// Gets or sets the value to record failures for the purposes of lockout
         /// </summary>
         public virtual int AccessFailedCount { get; set; }
 
         /// <summary>
-        /// Navigation property for user roles
+        /// Gets the user roles collection
         /// </summary>
         public virtual ICollection<TRole> Roles { get; }
 
         /// <summary>
-        /// Navigation property for user claims
+        /// Gets navigation the user claims collection
         /// </summary>
         public virtual ICollection<TClaim> Claims { get; }
 
         /// <summary>
-        /// Navigation property for user logins
+        /// Gets the user logins collection
         /// </summary>
         public virtual ICollection<TLogin> Logins { get; }
 
         /// <summary>
-        /// User ID (Primary Key)
+        /// Gets or sets user ID (Primary Key)
         /// </summary>
-        public virtual TKey Id { get; set; }
+        public virtual int Id { get; set; }
 
         /// <summary>
-        /// User name
+        /// Gets or sets user name
         /// </summary>
         public virtual string UserName { get; set; }
     }

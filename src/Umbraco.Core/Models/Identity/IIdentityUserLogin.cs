@@ -1,27 +1,30 @@
-﻿using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity
 {
-
+    /// <summary>
+    /// An external login provider linked to a user
+    /// </summary>
+    /// <typeparam name="TKey">The PK type for the user</typeparam>
     public interface IIdentityUserLogin : IEntity, IRememberBeingDirty
     {
         /// <summary>
-        /// The login provider for the login (i.e. Facebook, Google)
+        /// Gets or sets the login provider for the login (i.e. Facebook, Google)
         /// </summary>
         string LoginProvider { get; set; }
 
         /// <summary>
-        /// Key representing the login for the provider
+        /// Gets or sets key representing the login for the provider
         /// </summary>
         string ProviderKey { get; set; }
 
         /// <summary>
-        /// User Id for the user who owns this login
+        /// Gets or sets user Id for the user who owns this login
         /// </summary>
         int UserId { get; set; }
 
         /// <summary>
-        /// Used to store any arbitrary data for the user and external provider - like user tokens returned from the provider
+        /// Gets or sets any arbitrary data for the user and external provider - like user tokens returned from the provider
         /// </summary>
         string UserData { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity

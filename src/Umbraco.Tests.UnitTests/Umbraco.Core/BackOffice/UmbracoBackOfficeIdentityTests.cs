@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -10,14 +10,13 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
-    public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
+    public class BackOfficeIdentityUser : IdentityUser<IIdentityUserLogin, IdentityUserRole, IdentityUserClaim>, IRememberBeingDirty
     {
         private string _email;
         private string _userName;
         private int _id;
-        private bool _hasIdentity;
         private DateTime? _lastLoginDateUtc;
         private bool _emailConfirmed;
         private string _name;
@@ -36,23 +35,32 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
+        /// <param name="globalSettings"></param>
         /// <param name="username"></param>
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
         /// <param name="culture"></param>
         /// <returns></returns>
         public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string name = null)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            }
+
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            }
 
             var user = new BackOfficeIdentityUser(globalSettings, Array.Empty<IReadOnlyUserGroup>());
             user.DisableChangeTracking();
             user._userName = username;
             user._email = email;
-            //we are setting minvalue here because the default is "0" which is the id of the admin user
-            //which we cannot allow because the admin user will always exist
+
+            // we are setting minvalue here because the default is "0" which is the id of the admin user
+            // which we cannot allow because the admin user will always exist
             user._id = int.MinValue;
-            user._hasIdentity = false;
+            user.HasIdentity = false;
             user._culture = culture;
             user._name = name;
             user.EnableChangeTracking();
@@ -67,7 +75,7 @@ namespace Umbraco.Core.BackOffice
             _culture = globalSettings.DefaultUILanguage;
 
             // must initialize before setting groups
-            _roles = new ObservableCollection<IdentityUserRole<string>>();
+            _roles = new ObservableCollection<IdentityUserRole>();
             _roles.CollectionChanged += _roles_CollectionChanged;
 
             // use the property setters - they do more than just setting a field
@@ -75,7 +83,7 @@ namespace Umbraco.Core.BackOffice
         }
 
         /// <summary>
-        /// Creates an existing user with the specified groups
+        /// Initializes a new instance of the <see cref="BackOfficeIdentityUser"/> class.
         /// </summary>
         /// <param name="globalSettings"></param>
         /// <param name="userId"></param>
@@ -90,7 +98,7 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns true if an Id has been set on this object this will be false if the object is new and not persisted to the database
         /// </summary>
-        public bool HasIdentity => _hasIdentity;
+        public bool HasIdentity { get; private set; }
 
         public int[] CalculatedMediaStartNodeIds { get; set; }
         public int[] CalculatedContentStartNodeIds { get; set; }
@@ -101,7 +109,7 @@ namespace Umbraco.Core.BackOffice
             set
             {
                 _id = value;
-                _hasIdentity = true;
+                HasIdentity = true;
             }
         }
 
@@ -192,7 +200,8 @@ namespace Umbraco.Core.BackOffice
             get => _startContentIds;
             set
             {
-                if (value == null) value = new int[0];
+                if (value == null)
+                    value = new int[0];
                 _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), StartIdsComparer);
             }
         }
@@ -205,7 +214,8 @@ namespace Umbraco.Core.BackOffice
             get => _startMediaIds;
             set
             {
-                if (value == null) value = new int[0];
+                if (value == null)
+                    value = new int[0];
                 _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), StartIdsComparer);
             }
         }
@@ -237,7 +247,7 @@ namespace Umbraco.Core.BackOffice
                 //now clear all roles and re-add them
                 _roles.CollectionChanged -= _roles_CollectionChanged;
                 _roles.Clear();
-                foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole<string>
+                foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole
                 {
                     RoleId = x.Alias,
                     UserId = Id.ToString()
@@ -288,7 +298,8 @@ namespace Umbraco.Core.BackOffice
             get
             {
                 // return if it exists
-                if (_logins != null) return _logins;
+                if (_logins != null)
+                    return _logins;
 
                 _logins = new ObservableCollection<IIdentityUserLogin>();
 
@@ -318,7 +329,7 @@ namespace Umbraco.Core.BackOffice
             _beingDirty.OnPropertyChanged(nameof(Roles));
         }
 
-        private readonly ObservableCollection<IdentityUserRole<string>> _roles;
+        private readonly ObservableCollection<IdentityUserRole> _roles;
 
         /// <summary>
         /// helper method to easily add a role without having to deal with IdentityUserRole{T}
@@ -329,7 +340,7 @@ namespace Umbraco.Core.BackOffice
         /// </remarks>
         public void AddRole(string role)
         {
-            Roles.Add(new IdentityUserRole<string>
+            Roles.Add(new IdentityUserRole
             {
                 UserId = Id.ToString(),
                 RoleId = role
@@ -339,7 +350,7 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Override Roles because the value of these are the user's group aliases
         /// </summary>
-        public override ICollection<IdentityUserRole<string>> Roles => _roles;
+        public override ICollection<IdentityUserRole> Roles => _roles;
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list

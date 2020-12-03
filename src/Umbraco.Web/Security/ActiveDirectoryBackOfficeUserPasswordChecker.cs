@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration.Models;
 namespace Umbraco.Web.Security
 {
     // TODO: This relies on an assembly that is not .NET Standard (at least not at the time of implementation) :(
+    // TODO: This could be ported now, see https://stackoverflow.com/questions/37330705/working-with-directoryservices-in-asp-net-core
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
         private readonly IOptions<ActiveDirectorySettings> _activeDirectorySettings;

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using Umbraco.Core.BackOffice;
 
 namespace Umbraco.Core.Security
 {

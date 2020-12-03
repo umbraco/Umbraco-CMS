@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
@@ -58,7 +58,7 @@ namespace Umbraco.Core.BackOffice
             DateTimeUtc = DateTime.UtcNow;
             Action = action;
             IpAddress = ipAddress;
-            Comment = comment;            
+            Comment = comment;
             PerformingUser = performingUser;
             AffectedUsername = affectedUsername;
             AffectedUser = affectedUser;

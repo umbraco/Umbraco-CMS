@@ -10,6 +10,7 @@ using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

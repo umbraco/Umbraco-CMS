@@ -65,6 +65,7 @@ namespace Umbraco.Web.Common.Security
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
             _httpContextAccessor = httpContextAccessor;
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+
         }
 
         // We don't support an IUserClaimStore and don't need to (at least currently)

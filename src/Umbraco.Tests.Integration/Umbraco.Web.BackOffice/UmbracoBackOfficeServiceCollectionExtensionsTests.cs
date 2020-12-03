@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Extensions;
 using Umbraco.Core.BackOffice;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {

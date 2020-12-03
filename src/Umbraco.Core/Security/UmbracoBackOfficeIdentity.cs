@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
@@ -15,13 +15,12 @@ namespace Umbraco.Core.BackOffice
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
         // values from it. 
-
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
-            //validate that all claims exist
+            // validate that all claims exist
             foreach (var t in RequiredBackOfficeIdentityClaimTypes)
             {
-                //if the identity doesn't have the claim, or the claim value is null
+                // if the identity doesn't have the claim, or the claim value is null
                 if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
                 {
                     backOfficeIdentity = null;
@@ -59,11 +58,16 @@ namespace Umbraco.Core.BackOffice
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
             : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
         {
-            if (allowedApps == null) throw new ArgumentNullException(nameof(allowedApps));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            if (allowedApps == null)
+                throw new ArgumentNullException(nameof(allowedApps));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(securityStamp))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
 
@@ -88,10 +92,14 @@ namespace Umbraco.Core.BackOffice
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(securityStamp))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
 
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
@@ -205,7 +213,7 @@ namespace Umbraco.Core.BackOffice
 
         public string SecurityStamp => this.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
-        public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
+        public string[] Roles => FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 
         /// <summary>
         /// Overridden to remove any temporary claims that shouldn't be copied
