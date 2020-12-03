@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Primitives;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
@@ -11,7 +9,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string
     /// </summary>
@@ -41,15 +38,17 @@ namespace Umbraco.Web.BackOffice.Authorization
             {
                 if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
                 {
-                    // must succeed this requirement since we cannot process it
+                    // Must succeed this requirement since we cannot process it
                     return Task.FromResult(true);
                 }
                 else
                 {
                     var argument = routeVal.ToString();
-                    // if the argument is an int, it will parse and can be assigned to nodeId
-                    // if might be a udi, so check that next
-                    // otherwise treat it as a guid - unlikely we ever get here
+
+                    // If the argument is an int, it will parse and can be assigned to nodeId.
+                    // It might be a udi, so check that next.
+                    // Otherwise treat it as a guid - unlikely we ever get here.
+                    // Failing that, we can't parse it so must succeed this requirement since we cannot process it.
                     if (int.TryParse(argument, out int parsedId))
                     {
                         nodeId = parsedId;
@@ -58,10 +57,13 @@ namespace Umbraco.Web.BackOffice.Authorization
                     {
                         nodeId = _entityService.GetId(udi).Result;
                     }
+                    else if (Guid.TryParse(argument, out var key))
+                    { 
+                        nodeId = _entityService.GetId(key, UmbracoObjectTypes.Document).Result;
+                    }
                     else
                     {
-                        Guid.TryParse(argument, out Guid key);
-                        nodeId = _entityService.GetId(key, UmbracoObjectTypes.Document).Result;
+                        return Task.FromResult(true);
                     }
                 }
             }
@@ -77,7 +79,7 @@ namespace Umbraco.Web.BackOffice.Authorization
 
             if (contentItem != null)
             {
-                //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                // Store the content item in request cache so it can be resolved in the controller without re-looking it up.
                 _httpContextAccessor.HttpContext.Items[typeof(IContent).ToString()] = contentItem;
             }
 
