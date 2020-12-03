@@ -210,7 +210,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         // return IDashboardSlim - we don't need sections nor access rules
         [ValidateAngularAntiForgeryToken]
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
