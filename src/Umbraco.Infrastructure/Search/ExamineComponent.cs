@@ -515,6 +515,7 @@ namespace Umbraco.Web.Search
                 DeferedReIndexForContent.Execute(this, sender, isPublished);
         }
 
+        //TODO: this causes an exception when deleting a member
         private void ReIndexForMember(IMember member)
         {
             var actions = DeferedActions.Get(_scopeProvider);

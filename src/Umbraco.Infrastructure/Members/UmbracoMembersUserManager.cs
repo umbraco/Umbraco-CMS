@@ -3,15 +3,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Members;
 using Umbraco.Core.Security;
 using System.Threading;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.Models.ContentEditing;
 
 
 namespace Umbraco.Infrastructure.Members
@@ -107,7 +104,7 @@ namespace Umbraco.Infrastructure.Members
             return IdentityResult.Success;
         }
 
-        ///TODO: duplicated code from backofficeusermanager
+        ///TODO: duplicated code from backofficeusermanager, could be shared?
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
