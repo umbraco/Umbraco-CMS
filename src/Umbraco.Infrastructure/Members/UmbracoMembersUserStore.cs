@@ -16,14 +16,14 @@ namespace Umbraco.Infrastructure.Members
     /// </summary>
     public class UmbracoMembersUserStore : DisposableObjectSlim,
         IUserStore<UmbracoMembersIdentityUser>,
-    IUserPasswordStore<UmbracoMembersIdentityUser>
-    //IUserEmailStore<UmbracoMembersIdentityUser>
-    //IUserLoginStore<UmbracoMembersIdentityUser>
-    //IUserRoleStore<UmbracoMembersIdentityUser>,
-    //IUserSecurityStampStore<UmbracoMembersIdentityUser>
-    //IUserLockoutStore<UmbracoMembersIdentityUser>
-    //IUserTwoFactorStore<UmbracoMembersIdentityUser>
-    //IUserSessionStore<UmbracoMembersIdentityUser>
+        IUserPasswordStore<UmbracoMembersIdentityUser>
+        //IUserEmailStore<UmbracoMembersIdentityUser>
+        //IUserLoginStore<UmbracoMembersIdentityUser>
+        //IUserRoleStore<UmbracoMembersIdentityUser>,
+        //IUserSecurityStampStore<UmbracoMembersIdentityUser>
+        //IUserLockoutStore<UmbracoMembersIdentityUser>
+        //IUserTwoFactorStore<UmbracoMembersIdentityUser>
+        //IUserSessionStore<UmbracoMembersIdentityUser>
     {
         private bool _disposed = false;
         private readonly IMemberService _memberService;

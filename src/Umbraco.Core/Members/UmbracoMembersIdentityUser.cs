@@ -1,6 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Members
 {
@@ -21,7 +19,6 @@ namespace Umbraco.Core.Members
         public string MemberTypeAlias { get; set; }
         public bool IsLockedOut { get; set; }
         public string RawPasswordValue { get; set; }
-        public DateTime LastPasswordChangeDateUtc { get; set; }
 
         /// <summary>
         /// Returns true if an Id has been set on this object
@@ -45,12 +42,7 @@ namespace Umbraco.Core.Members
         //TODO: config
         public string PasswordConfig { get; set; }
 
-        string Comment;
         internal bool IsApproved;
-        DateTime LastLockoutDate;
-        DateTime CreationDate;
-        DateTime LastLoginDate;
-        DateTime LastActivityDate;
 
         //TODO: needed?
         //public bool LoginsChanged;

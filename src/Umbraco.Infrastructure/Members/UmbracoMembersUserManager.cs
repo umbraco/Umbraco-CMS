@@ -84,7 +84,7 @@ namespace Umbraco.Infrastructure.Members
         ///  </remarks>
         protected override async Task<IdentityResult> UpdatePasswordHash(T memberUser, string newPassword, bool validatePassword)
         {
-            memberUser.LastPasswordChangeDateUtc = DateTime.UtcNow;
+            //memberUser.LastPasswordChangeDateUtc = DateTime.UtcNow;
 
             if (validatePassword)
             {

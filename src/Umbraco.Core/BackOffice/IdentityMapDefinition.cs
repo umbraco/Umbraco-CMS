@@ -95,7 +95,7 @@ namespace Umbraco.Core.BackOffice
         {
             target.Email = source.Email;
             target.UserName = source.Username;
-            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
+            //target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
             //target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
             //target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
