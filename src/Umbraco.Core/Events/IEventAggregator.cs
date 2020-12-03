@@ -1,4 +1,7 @@
-﻿using System.Threading;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Umbraco.Core.Events
@@ -14,7 +17,7 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
         /// <param name="notification">The notification object.</param>
-        /// <param name="cancellationToken">An optional cancellation token</param>
+        /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>A task that represents the publish operation.</returns>
         Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification;
@@ -23,10 +26,12 @@ namespace Umbraco.Core.Events
     /// <summary>
     /// A marker interface to represent a notification.
     /// </summary>
-    public interface INotification { }
+    public interface INotification
+    {
+    }
 
     /// <summary>
-    /// Defines a handler for a notification
+    /// Defines a handler for a notification.
     /// </summary>
     /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
     public interface INotificationHandler<in TNotification>
@@ -36,7 +41,8 @@ namespace Umbraco.Core.Events
         /// Handles a notification
         /// </summary>
         /// <param name="notification">The notification</param>
-        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         Task HandleAsync(TNotification notification, CancellationToken cancellationToken);
     }
 }

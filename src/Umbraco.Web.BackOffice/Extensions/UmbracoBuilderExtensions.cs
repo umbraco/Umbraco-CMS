@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Extensions
 {
@@ -36,7 +34,7 @@ namespace Umbraco.Extensions
 
             builder.Services
                 .AddAuthentication() // This just creates a builder, nothing more
-                // Add our custom schemes which are cookie handlers
+                                     // Add our custom schemes which are cookie handlers
                 .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Core.Constants.Security.BackOfficeExternalAuthenticationType, o =>
                 {

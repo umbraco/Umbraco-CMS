@@ -1,10 +1,21 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Umbraco.Core.Events
 {
+    /// <summary>
+    /// A factory method used to resolve all services.
+    /// For multiple instances, it will resolve against <see cref="IEnumerable{T}" />.
+    /// </summary>
+    /// <param name="serviceType">Type of service to resolve.</param>
+    /// <returns>An instance of type <paramref name="serviceType" />.</returns>
+    public delegate object ServiceFactory(Type serviceType);
+
     /// <inheritdoc/>
     public partial class EventAggregator : IEventAggregator
     {
@@ -30,14 +41,6 @@ namespace Umbraco.Core.Events
             return PublishNotificationAsync(notification, cancellationToken);
         }
     }
-
-    /// <summary>
-    /// A factory method used to resolve all services.
-    /// For multiple instances, it will resolve against <see cref="IEnumerable{T}" />.
-    /// </summary>
-    /// <param name="serviceType">Type of service to resolve.</param>
-    /// <returns>An instance of type <paramref name="serviceType" />.</returns>
-    public delegate object ServiceFactory(Type serviceType);
 
     /// <summary>
     /// Extensions for <see cref="ServiceFactory"/>.

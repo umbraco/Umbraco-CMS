@@ -1,41 +1,35 @@
-﻿using System;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
+using Serilog;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Core.Runtime;
-using Umbraco.Core;
-using Moq;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using System.Data.SqlClient;
-using System.Data.Common;
-using System.Diagnostics;
-using System.IO;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Serilog;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -65,7 +59,8 @@ namespace Umbraco.Tests.Integration.Testing
         [OneTimeTearDown]
         public void FixtureTearDown()
         {
-            foreach (var a in _fixtureTeardown) a();
+            foreach (var a in _fixtureTeardown)
+                a();
         }
 
         [TearDown]
@@ -73,7 +68,8 @@ namespace Umbraco.Tests.Integration.Testing
         {
             if (_testTeardown != null)
             {
-                foreach (var a in _testTeardown) a();
+                foreach (var a in _testTeardown)
+                    a();
             }
             _testTeardown = null;
             FirstTestInFixture = false;
@@ -161,7 +157,7 @@ namespace Umbraco.Tests.Integration.Testing
                 });
             return hostBuilder;
         }
-        
+
         #endregion
 
         #region IStartup
@@ -275,7 +271,8 @@ namespace Umbraco.Tests.Integration.Testing
         {
             lock (_dbLocker)
             {
-                if (_dbInstance != null) return _dbInstance;
+                if (_dbInstance != null)
+                    return _dbInstance;
 
                 var localDb = new LocalDb();
                 if (localDb.IsAvailable == false)

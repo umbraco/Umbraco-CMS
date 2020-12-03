@@ -1,18 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
@@ -128,7 +124,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             //builder.Append<Resolved4>(); // does not compile
             Assert.Throws<InvalidOperationException>(() =>
-                    builder.Append(new[] { typeof (Resolved4) }) // throws
+                    builder.Append(new[] { typeof(Resolved4) }) // throws
             );
         }
 

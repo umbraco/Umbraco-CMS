@@ -1,15 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
-    /// Contains extensions methods for <see cref="IUmbracoBuilder"/>.
+    /// Contains extensions methods for <see cref="IUmbracoBuilder"/> used for registering event handlers.
     /// </summary>
     public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
-        /// Registers a notification handler against the Umbraco service collection. 
+        /// Registers a notification handler against the Umbraco service collection.
         /// </summary>
         /// <typeparam name="TNotification">The type of notification.</typeparam>
         /// <typeparam name="TNotificationHandler">The type of notificiation handler.</typeparam>

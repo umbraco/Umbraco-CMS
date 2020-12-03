@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +15,13 @@ namespace Umbraco.Core.Events
     /// </content>
     public partial class EventAggregator : IEventAggregator
     {
-        private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> NotificationHandlers
+        private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> s_notificationHandlers
             = new ConcurrentDictionary<Type, NotificationHandlerWrapper>();
 
         private Task PublishNotificationAsync(INotification notification, CancellationToken cancellationToken = default)
         {
-            var notificationType = notification.GetType();
-            var handler = NotificationHandlers.GetOrAdd(
+            Type notificationType = notification.GetType();
+            NotificationHandlerWrapper handler = s_notificationHandlers.GetOrAdd(
                 notificationType,
                 t => (NotificationHandlerWrapper)Activator.CreateInstance(typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType)));
 
@@ -27,9 +30,10 @@ namespace Umbraco.Core.Events
 
         private async Task PublishCoreAsync(
             IEnumerable<Func<INotification, CancellationToken, Task>> allHandlers,
-            INotification notification, CancellationToken cancellationToken)
+            INotification notification,
+            CancellationToken cancellationToken)
         {
-            foreach (var handler in allHandlers)
+            foreach (Func<INotification, CancellationToken, Task> handler in allHandlers)
             {
                 await handler(notification, cancellationToken).ConfigureAwait(false);
             }

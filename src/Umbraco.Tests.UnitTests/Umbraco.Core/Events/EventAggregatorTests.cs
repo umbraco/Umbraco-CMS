@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Tests.TestHelpers;
@@ -20,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
         [SetUp]
         public void Setup()
         {
-            var register = TestHelper.GetServiceCollection();
+            IServiceCollection register = TestHelper.GetServiceCollection();
             _builder = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
         }
 
@@ -31,10 +34,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
             _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
             _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
             _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
-            var provider = _builder.Services.BuildServiceProvider();
+            ServiceProvider provider = _builder.Services.BuildServiceProvider();
 
             var notification = new Notification();
-            var aggregator = provider.GetService<IEventAggregator>();
+            IEventAggregator aggregator = provider.GetService<IEventAggregator>();
             await aggregator.PublishAsync(notification);
 
             Assert.AreEqual(A + B + C, notification.SubscriberCount);
@@ -78,10 +81,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 
         public class Adder
         {
-            public int Add(int a, int b)
-            {
-                return a + b;
-            }
+            public int Add(int a, int b) => a + b;
         }
     }
 }

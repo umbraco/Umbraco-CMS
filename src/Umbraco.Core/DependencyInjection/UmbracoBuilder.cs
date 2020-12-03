@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 
