@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading;
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Common.Security
         /// <returns></returns>
         protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
-            //we can use the user aware password hasher (which will be the default and preferred way)
+            // we can use the user aware password hasher (which will be the default and preferred way)
             return new PasswordHasher<T>();
         }
 
@@ -140,16 +140,22 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
+        /// <param name="user">The user</param>
+        /// <returns>True if the user is locked out, else false</returns>
         /// <remarks>
         /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
         /// </remarks>
         public override async Task<bool> IsLockedOutAsync(T user)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
 
-            if (user.IsApproved == false) return true;
+            if (user.IsApproved == false)
+            {
+                return true;
+            }
 
             return await base.IsLockedOutAsync(user);
         }
