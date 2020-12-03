@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
-                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
             services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();

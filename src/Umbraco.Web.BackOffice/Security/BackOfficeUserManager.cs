@@ -67,8 +67,6 @@ namespace Umbraco.Web.Common.Security
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
-        #region What we do not currently support
-
         // We don't support an IUserClaimStore and don't need to (at least currently)
         public override bool SupportsUserClaim => false;
 
@@ -83,8 +81,6 @@ namespace Umbraco.Web.Common.Security
         // We haven't needed to support this yet, though might be necessary for 2FA
         public override bool SupportsUserPhoneNumber => false;
 
-        #endregion
-
         /// <summary>
         /// Replace the underlying options property with our own strongly typed version
         /// </summary>
@@ -97,14 +93,18 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="sessionId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The user id</param>
+        /// <param name="sessionId">The sesion id</param>
+        /// <returns>True if the sesion is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
             var userSessionStore = Store as IUserSessionStore<T>;
-            //if this is not set, for backwards compat (which would be super rare), we'll just approve it
-            if (userSessionStore == null) return true;
+
+            // if this is not set, for backwards compat (which would be super rare), we'll just approve it
+            if (userSessionStore == null)
+            {
+                return true;
+            }
 
             return await userSessionStore.ValidateSessionIdAsync(userId, sessionId);
         }
@@ -112,12 +112,9 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// This will determine which password hasher to use based on what is defined in config
         /// </summary>
-        /// <returns></returns>
-        protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
-        {
-            // we can use the user aware password hasher (which will be the default and preferred way)
-            return new PasswordHasher<T>();
-        }
+        /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
+        /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
+        protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<T>();
 
         /// <summary>
         /// Gets/sets the default back office user password checker
@@ -129,10 +126,14 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The generated password</returns>
         public string GeneratePassword()
         {
-            if (_passwordGenerator == null) _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
+            if (_passwordGenerator == null)
+            {
+                _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
+            }
+
             var password = _passwordGenerator.GeneratePassword();
             return password;
         }
@@ -160,14 +161,10 @@ namespace Umbraco.Web.Common.Security
             return await base.IsLockedOutAsync(user);
         }
 
-        #region Overrides for password logic
-
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         /// <remarks>
         /// By default this uses the standard ASP.Net Identity approach which is:
         /// * Get password store
@@ -186,55 +183,61 @@ namespace Umbraco.Web.Common.Security
         {
             if (BackOfficeUserPasswordChecker != null)
             {
-                var result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+                BackOfficeUserPasswordCheckerResult result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
 
                 if (user.HasIdentity == false)
                 {
                     return false;
                 }
 
-                //if the result indicates to not fallback to the default, then return true if the credentials are valid
+                // if the result indicates to not fallback to the default, then return true if the credentials are valid
                 if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
                 {
                     return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
                 }
             }
 
-            //we cannot proceed if the user passed in does not have an identity
+            // we cannot proceed if the user passed in does not have an identity
             if (user.HasIdentity == false)
+            {
                 return false;
+            }
 
-            //use the default behavior
+            // use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }
 
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="token"></param>
-        /// <param name="newPassword"></param>
-        /// <returns></returns>
+        /// <param name="userId">The userId</param>
+        /// <param name="token">The reset password token</param>
+        /// <param name="newPassword">The new password to set it to</param>
+        /// <returns>The <see cref="IdentityResult"/></returns>
         /// <remarks>
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
         public async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
         {
-            var user = await base.FindByIdAsync(userId.ToString());
-            if (user == null) throw new InvalidOperationException("Could not find user");
+            T user = await FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                throw new InvalidOperationException("Could not find user");
+            }
 
-            var result = await base.ResetPasswordAsync(user, token, newPassword);
+            IdentityResult result = await base.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded)
             {
                 RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, userId);
             }
+
             return result;
         }
 
         public override async Task<IdentityResult> ChangePasswordAsync(T user, string currentPassword, string newPassword)
         {
-            var result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
+            IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
             if (result.Succeeded)
             {
                 RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
@@ -245,20 +248,14 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="newPassword"></param>
-        /// <param name="validatePassword"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This method is called anytime the password needs to be hashed for storage (i.e. including when reset password is used)
-        /// </remarks>
+        /// <inheritdoc/>
         protected override async Task<IdentityResult> UpdatePasswordHash(T user, string newPassword, bool validatePassword)
         {
             user.LastPasswordChangeDateUtc = DateTime.UtcNow;
 
             if (validatePassword)
             {
-                var validate = await ValidatePasswordAsync(user, newPassword);
+                IdentityResult validate = await ValidatePasswordAsync(user, newPassword);
                 if (!validate.Succeeded)
                 {
                     return validate;
@@ -266,7 +263,10 @@ namespace Umbraco.Web.Common.Security
             }
 
             var passwordStore = Store as IUserPasswordStore<T>;
-            if (passwordStore == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            if (passwordStore == null)
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            }
 
             var hash = newPassword != null ? PasswordHasher.HashPassword(user, newPassword) : null;
             await passwordStore.SetPasswordHashAsync(user, hash, CancellationToken);
@@ -277,41 +277,44 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         private async Task UpdateSecurityStampInternal(T user)
         {
-            if (SupportsUserSecurityStamp == false) return;
+            if (SupportsUserSecurityStamp == false)
+            {
+                return;
+            }
+
             await GetSecurityStore().SetSecurityStampAsync(user, NewSecurityStamp(), CancellationToken.None);
         }
 
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <returns></returns>
         private IUserSecurityStampStore<T> GetSecurityStore()
         {
             var store = Store as IUserSecurityStampStore<T>;
-            if (store == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            if (store == null)
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            }
+
             return store;
         }
 
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <returns></returns>
-        private static string NewSecurityStamp()
-        {
-            return Guid.NewGuid().ToString();
-        }
+        private static string NewSecurityStamp() => Guid.NewGuid().ToString();
 
-        #endregion
-
+        /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(T user, DateTimeOffset? lockoutEnd)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
 
-            var result = await base.SetLockoutEndDateAsync(user, lockoutEnd);
+            IdentityResult result = await base.SetLockoutEndDateAsync(user, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
             if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
@@ -321,25 +324,33 @@ namespace Umbraco.Web.Common.Security
             else
             {
                 RaiseAccountUnlockedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-                //Resets the login attempt fails back to 0 when unlock is clicked
+
+                // Resets the login attempt fails back to 0 when unlock is clicked
                 await ResetAccessFailedCountAsync(user);
             }
 
             return result;
         }
 
+        /// <inheritdoc/>
         public override async Task<IdentityResult> ResetAccessFailedCountAsync(T user)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
 
             var lockoutStore = (IUserLockoutStore<T>)Store;
             var accessFailedCount = await GetAccessFailedCountAsync(user);
 
             if (accessFailedCount == 0)
+            {
                 return IdentityResult.Success;
+            }
 
             await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
-            //raise the event now that it's reset
+
+            // raise the event now that it's reset
             RaiseResetAccessFailedCountEvent(_httpContextAccessor.HttpContext?.User, user.Id);
             return await UpdateAsync(user);
         }
@@ -347,33 +358,33 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// Overrides the Microsoft ASP.NET user management method
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns>
-        /// returns a Async Task<IdentityResult />
-        /// </returns>
-        /// <remarks>
-        /// Doesn't set fail attempts back to 0
-        /// </remarks>
+        /// <inheritdoc/>
         public override async Task<IdentityResult> AccessFailedAsync(T user)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
 
             var lockoutStore = Store as IUserLockoutStore<T>;
-            if (lockoutStore == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));
+            if (lockoutStore == null)
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));
+            }
 
             var count = await lockoutStore.IncrementAccessFailedCountAsync(user, CancellationToken.None);
 
             if (count >= Options.Lockout.MaxFailedAccessAttempts)
             {
-                await lockoutStore.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan),
-                    CancellationToken.None);
-                //NOTE: in normal aspnet identity this would do set the number of failed attempts back to 0
-                //here we are persisting the value for the back office
+                await lockoutStore.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan), CancellationToken.None);
+
+                // NOTE: in normal aspnet identity this would do set the number of failed attempts back to 0
+                // here we are persisting the value for the back office
             }
 
-            var result = await UpdateAsync(user);
+            IdentityResult result = await UpdateAsync(user);
 
-            //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
+            // Slightly confusing: this will return a Success if we successfully update the AccessFailed count
             if (result.Succeeded)
             {
                 RaiseLoginFailedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
@@ -384,16 +395,18 @@ namespace Umbraco.Web.Common.Security
 
         private int GetCurrentUserId(IPrincipal currentUser)
         {
-            var umbIdentity = currentUser?.GetUmbracoIdentity();
+            UmbracoBackOfficeIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
             var currentUserId = umbIdentity?.GetUserId<int?>() ?? Core.Constants.Security.SuperUserId;
             return currentUserId;
         }
+
         private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
         {
             var currentUserId = GetCurrentUserId(currentUser);
             var ip = IpResolver.GetCurrentRequestIpAddress();
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
+
         private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, BackOfficeIdentityUser currentUser, int affectedUserId, string affectedUsername)
         {
             var currentUserId = currentUser.Id;
