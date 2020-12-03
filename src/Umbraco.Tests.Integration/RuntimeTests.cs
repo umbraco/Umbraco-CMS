@@ -1,29 +1,17 @@
-﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework;
 using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Tests.Integration
 {
@@ -70,8 +58,8 @@ namespace Umbraco.Tests.Integration
                         AppCaches.NoCache,
                         hostContext.Configuration,
                         testHelper.Profiler);
-                    
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,  testHelper.ConsoleLoggerFactory);
+
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration();
                     builder.AddUmbracoCore();
@@ -109,7 +97,7 @@ namespace Umbraco.Tests.Integration
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
-                    
+
                     // Add it!
 
                     var typeLoader = services.AddTypeLoader(

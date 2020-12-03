@@ -1,5 +1,5 @@
-﻿using System;
-using Umbraco.Core.Builder;
+using System;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Web.BackOffice.Security
 {

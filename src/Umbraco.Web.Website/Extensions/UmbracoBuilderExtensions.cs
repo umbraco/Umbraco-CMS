@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Builder;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.Website.ViewEngines;
 
 namespace Umbraco.Extensions
