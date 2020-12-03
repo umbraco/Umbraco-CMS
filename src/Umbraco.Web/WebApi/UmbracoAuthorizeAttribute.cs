@@ -53,17 +53,17 @@ namespace Umbraco.Web.WebApi
                 return true;
             }
 
-            try
+            // if not configured (install or upgrade) then we can continue
+            // otherwise we need to ensure that a user is logged in
+
+            switch (_runtimeState.Level)
             {
-                // if not configured (install or upgrade) then we can continue
-                // otherwise we need to ensure that a user is logged in
-                return RuntimeState.Level == RuntimeLevel.Install
-                    || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || BackOfficeSecurity.ValidateCurrentUser(false, _requireApproval) == ValidateRequestAttempt.Success;
-            }
-            catch (Exception)
-            {
-                return false;
+                case RuntimeLevel.Install:
+                case RuntimeLevel.Upgrade:
+                    return true;
+                default:
+                    var userApprovalSucceeded = !_requireApproval || (BackOfficeSecurity.CurrentUser?.IsApproved ?? false);
+                    return userApprovalSucceeded;
             }
         }
     }

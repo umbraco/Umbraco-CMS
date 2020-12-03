@@ -11,11 +11,6 @@ namespace Umbraco.Web.Security
     {
         public IUser CurrentUser => throw new NotImplementedException();
 
-        public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
-        {
-            throw new NotImplementedException();
-        }
-
         public Attempt<int> GetUserId()
         {
             throw new NotImplementedException();
@@ -31,14 +26,5 @@ namespace Umbraco.Web.Security
             throw new NotImplementedException();
         }
 
-        public bool ValidateCurrentUser()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

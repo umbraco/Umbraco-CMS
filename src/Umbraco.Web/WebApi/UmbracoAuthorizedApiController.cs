@@ -31,8 +31,6 @@ namespace Umbraco.Web.WebApi
     [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
-        private BackOfficeOwinUserManager _userManager;
-
         protected UmbracoAuthorizedApiController()
         {
         }
@@ -42,10 +40,5 @@ namespace Umbraco.Web.WebApi
         {
         }
 
-        /// <summary>
-        /// Gets the user manager.
-        /// </summary>
-        protected BackOfficeOwinUserManager UserManager
-            => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
     }
 }

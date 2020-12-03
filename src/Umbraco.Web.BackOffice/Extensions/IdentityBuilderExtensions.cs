@@ -7,7 +7,7 @@ namespace Umbraco.Extensions
     public static class IdentityBuilderExtensions
     {
         /// <summary>
-        /// Adds a <see cref="UserManager{TUser}"/> for the <seealso cref="UserType"/>.
+        /// Adds a <see cref="UserManager{TUser}"/> implementation for <seealso cref="BackOfficeIdentityUser"/>
         /// </summary>
         /// <typeparam name="TUserManager">The type of the user manager to add.</typeparam>
         /// <typeparam name="TInterface"></typeparam>
@@ -16,6 +16,20 @@ namespace Umbraco.Extensions
         {
             identityBuilder.AddUserManager<TUserManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
+            return identityBuilder;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="SignInManager{TUser}"/> implementation for <seealso cref="BackOfficeIdentityUser"/>
+        /// </summary>
+        /// <typeparam name="TInterface"></typeparam>
+        /// <typeparam name="TSignInManager"></typeparam>
+        /// <param name="identityBuilder"></param>
+        /// <returns></returns>
+        public static IdentityBuilder AddSignInManager<TInterface, TSignInManager>(this IdentityBuilder identityBuilder) where TSignInManager : SignInManager<BackOfficeIdentityUser>, TInterface
+        {
+            identityBuilder.AddSignInManager<TSignInManager>();
+            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TSignInManager));
             return identityBuilder;
         }
     }

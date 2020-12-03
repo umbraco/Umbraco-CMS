@@ -135,7 +135,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        // TODO: Does this override work? What is best practices for this?
+        // TODO: We need to move this since we are going to delete OverrideAuthorization
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess), OverrideAuthorization]
         public bool AllowsCultureVariation()
         {

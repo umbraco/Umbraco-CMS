@@ -13,38 +13,32 @@ namespace Umbraco.Web.Common.Install
     /// </summary>
     public class InstallAuthorizeAttribute : TypeFilterAttribute
     {
-        // NOTE: This doesn't need to be an authz policy, it's only used for the installer
-
         public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))
         {
         }
 
         private class InstallAuthorizeFilter : IAuthorizationFilter
         {
-            private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
             private readonly IRuntimeState _runtimeState;
             private readonly ILogger<InstallAuthorizeFilter> _logger;
 
             public InstallAuthorizeFilter(
-                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
                 IRuntimeState runtimeState,
                 ILogger<InstallAuthorizeFilter> logger)
             {
-                _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _runtimeState = runtimeState;
                 _logger = logger;
             }
 
             public void OnAuthorization(AuthorizationFilterContext authorizationFilterContext)
             {
-                if (!IsAllowed())
+                if (!IsAllowed(authorizationFilterContext))
                 {
                     authorizationFilterContext.Result = new ForbidResult();
                 }
-
             }
 
-            private bool IsAllowed()
+            private bool IsAllowed(AuthorizationFilterContext authorizationFilterContext)
             {
                 try
                 {
@@ -52,7 +46,7 @@ namespace Umbraco.Web.Common.Install
                     // otherwise we need to ensure that a user is logged in
                     return _runtimeState.Level == RuntimeLevel.Install
                            || _runtimeState.Level == RuntimeLevel.Upgrade
-                           || (_backOfficeSecurityAccessor?.BackOfficeSecurity?.ValidateCurrentUser() ?? false);
+                           || (authorizationFilterContext.HttpContext.User?.Identity?.IsAuthenticated ?? false);
                 }
                 catch (Exception ex)
                 {

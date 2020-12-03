@@ -81,6 +81,7 @@ namespace Umbraco.Web.Common.ApplicationModels
             }
         }
 
-        private bool IsUmbracoApiController(ControllerModel controller) => controller.Attributes.OfType<UmbracoApiControllerAttribute>().Any();
+        private bool IsUmbracoApiController(ControllerModel controller)
+            => controller.Attributes.OfType<UmbracoApiControllerAttribute>().Any();
     }
 }

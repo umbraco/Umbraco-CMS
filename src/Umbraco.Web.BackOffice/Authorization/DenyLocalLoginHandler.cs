@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Authorization

@@ -12,6 +12,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.BackOffice
@@ -22,15 +23,17 @@ namespace Umbraco.Core.BackOffice
             IUserLoginStore<BackOfficeIdentityUser>,
             IUserRoleStore<BackOfficeIdentityUser>,
             IUserSecurityStampStore<BackOfficeIdentityUser>,
-            IUserLockoutStore<BackOfficeIdentityUser>,
-            IUserTwoFactorStore<BackOfficeIdentityUser>,
+            IUserLockoutStore<BackOfficeIdentityUser>,            
             IUserSessionStore<BackOfficeIdentityUser>
 
-    // TODO: This would require additional columns/tables for now people will need to implement this on their own
-    //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
-    // TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
-    //IQueryableUserStore<BackOfficeIdentityUser, int>
+        // TODO: This would require additional columns/tables and then a lot of extra coding support to make this happen natively within umbraco
+        //IUserTwoFactorStore<BackOfficeIdentityUser>,
+        // TODO: This would require additional columns/tables for now people will need to implement this on their own
+        //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
+        // TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
+        //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
+        private readonly IScopeProvider _scopeProvider;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
@@ -38,8 +41,9 @@ namespace Umbraco.Core.BackOffice
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptions<GlobalSettings> globalSettings, UmbracoMapper mapper)
+        public BackOfficeUserStore(IScopeProvider scopeProvider, IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptions<GlobalSettings> globalSettings, UmbracoMapper mapper)
         {
+            _scopeProvider = scopeProvider;
             _userService = userService;
             _entityService = entityService;
             _externalLoginService = externalLoginService;
@@ -156,7 +160,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="user"/>
         /// <param name="cancellationToken"></param>
         /// <returns/>
-        public async Task<IdentityResult> UpdateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IdentityResult> UpdateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -168,31 +172,34 @@ namespace Umbraco.Core.BackOffice
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            // TODO: Wrap this in a scope!
-
-            var found = _userService.GetUserById(asInt.Result);
-            if (found != null)
+            using (var scope = _scopeProvider.CreateScope())
             {
-                // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
-
-                if (UpdateMemberProperties(found, user))
+                var found = _userService.GetUserById(asInt.Result);
+                if (found != null)
                 {
-                    _userService.Save(found);
+                    // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                    var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
+
+                    if (UpdateMemberProperties(found, user))
+                    {
+                        _userService.Save(found);
+                    }
+
+                    if (isLoginsPropertyDirty)
+                    {
+                        _externalLoginService.Save(
+                            found.Id,
+                            user.Logins.Select(x => new ExternalLogin(
+                                x.LoginProvider,
+                                x.ProviderKey,
+                                x.UserData)));
+                    }
                 }
 
-                if (isLoginsPropertyDirty)
-                {
-                    _externalLoginService.Save(
-                        found.Id,
-                        user.Logins.Select(x => new ExternalLogin(
-                            x.LoginProvider,
-                            x.ProviderKey,
-                            x.UserData)));
-                }
+                scope.Complete();
             }
 
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -625,35 +632,6 @@ namespace Umbraco.Core.BackOffice
                             _externalLoginService.GetAll(user.Id)));
             }
             return user;
-        }
-
-        /// <summary>
-        /// Sets whether two factor authentication is enabled for the user
-        /// </summary>
-        /// <param name="user"/>
-        /// <param name="enabled"/>
-        /// <param name="cancellationToken"></param>
-        /// <returns/>
-        public virtual Task SetTwoFactorEnabledAsync(BackOfficeIdentityUser user, bool enabled, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            user.TwoFactorEnabled = false;
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Returns whether two factor authentication is enabled for the user
-        /// </summary>
-        /// <param name="user"/>
-        /// <returns/>
-        public virtual Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            return Task.FromResult(false);
         }
 
         #region IUserLockoutStore

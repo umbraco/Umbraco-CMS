@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -13,8 +12,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
-    using ICookieManager = Microsoft.AspNetCore.Authentication.Cookies.ICookieManager;
-
     /// <summary>
     /// A custom cookie manager that is used to read the cookie from the request.
     /// </summary>
@@ -22,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install, therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
-    public class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
+    public class BackOfficeCookieManager : ChunkingCookieManager, Microsoft.AspNetCore.Authentication.Cookies.ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
@@ -36,9 +33,8 @@ namespace Umbraco.Web.BackOffice.Security
             IRuntimeState runtime,
             IHostingEnvironment hostingEnvironment,
             GlobalSettings globalSettings,
-            IRequestCache requestCache,
-            LinkGenerator linkGenerator)
-            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, linkGenerator, null)
+            IRequestCache requestCache)
+            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, null)
         { }
 
         public BackOfficeCookieManager(
@@ -47,7 +43,6 @@ namespace Umbraco.Web.BackOffice.Security
             IHostingEnvironment hostingEnvironment,
             GlobalSettings globalSettings,
             IRequestCache requestCache,
-            LinkGenerator linkGenerator,
             IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -61,9 +56,9 @@ namespace Umbraco.Web.BackOffice.Security
         /// <summary>
         /// Determines if we should authenticate the request
         /// </summary>
-        /// <param name="requestUri"></param>
-        /// <param name="checkForceAuthTokens"></param>
-        /// <returns></returns>
+        /// <param name="requestUri">The <see cref="Uri"/> to check</param>
+        /// <param name="checkForceAuthTokens">true to check if the <see cref="Constants.Security.ForceReAuthFlag"/> has been assigned in the request.</param>
+        /// <returns>true if the request should be authenticated</returns>
         /// <remarks>
         /// We auth the request when:
         /// * it is a back office request
@@ -79,19 +74,27 @@ namespace Umbraco.Web.BackOffice.Security
             // was: app.IsConfigured == false (equiv to !Run) && dbContext.IsDbConfigured == false (equiv to Install)
             // so, we handle .Install here and NOT .Upgrade
             if (_runtime.Level == RuntimeLevel.Install)
+            {
                 return false;
+            }
 
-            //check the explicit paths
+            // check the explicit paths
             if (_explicitPaths != null)
+            {
                 return _explicitPaths.Any(x => x.InvariantEquals(requestUri.AbsolutePath));
+            }
 
-            if (//check the explicit flag
-                checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null
-                //check back office
+            if (// check the explicit flag
+                (checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null)
+
+                // check back office
                 || requestUri.IsBackOfficeRequest(_globalSettings, _hostingEnvironment)
-                //check installer
+
+                // check installer
                 || requestUri.IsInstallerRequest(_hostingEnvironment))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -99,20 +102,20 @@ namespace Umbraco.Web.BackOffice.Security
         /// <summary>
         /// Explicitly implement this so that we filter the request
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        string ICookieManager.GetRequestCookie(HttpContext context, string key)
+        /// <inheritdoc/>
+        string Microsoft.AspNetCore.Authentication.Cookies.ICookieManager.GetRequestCookie(HttpContext context, string key)
         {
             var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
 
             if (_umbracoContextAccessor.UmbracoContext == null || requestUri.IsClientSideRequest())
+            {
                 return null;
+            }
 
             return ShouldAuthenticateRequest(requestUri) == false
-                //Don't auth request, don't return a cookie
+                // Don't auth request, don't return a cookie
                 ? null
-                //Return the default implementation
+                // Return the default implementation
                 : GetRequestCookie(context, key);
         }
 
