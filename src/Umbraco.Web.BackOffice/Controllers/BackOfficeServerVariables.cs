@@ -17,9 +17,9 @@ using Umbraco.Web.BackOffice.HealthCheck;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Security;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -135,7 +135,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the server variables for authenticated users
         /// </summary>
         /// <returns></returns>
-        internal async Task<Dictionary<string, object>> GetServerVariablesAsync()
+        internal Task<Dictionary<string, object>> GetServerVariablesAsync()
         {
             var globalSettings = _globalSettings;
             var backOfficeControllerName = ControllerExtensions.GetControllerName<BackOfficeController>();
@@ -149,8 +149,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
-                        // {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
-                        // {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
+                        {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         {"gridConfig", _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
@@ -418,11 +418,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
+                            // TODO: It would be nicer to not have to manually translate these properties
+                            // but then needs to be changed in quite a few places in angular
                             "providers", _externalLogins.GetBackOfficeProviders()
                                 .Select(p => new
                                 {
-                                    authType = p.AuthenticationType, caption = p.Name,
-                                    properties = p.Properties
+                                    authType = p.AuthenticationType,
+                                    caption = p.Name,
+                                    properties = p.Options
                                 })
                                 .ToArray()
                         }
@@ -441,7 +444,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 }
             };
-            return defaultVals;
+            return Task.FromResult(defaultVals);
         }
 
         [DataContract]

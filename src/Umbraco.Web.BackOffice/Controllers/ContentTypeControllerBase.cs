@@ -15,6 +15,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    //[PrefixlessBodyModelValidator] //TODO reintroduce
+    [PrefixlessBodyModelValidator]
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {

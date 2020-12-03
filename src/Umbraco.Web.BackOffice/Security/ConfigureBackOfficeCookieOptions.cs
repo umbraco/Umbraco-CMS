@@ -125,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Security
                     // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
                     var securityStampValidator = ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSecurityStampValidator>();
                     // Same goes for the signinmanager
-                    var signInManager = ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSignInManager>();
+                    var signInManager = ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
 
                     var backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
                     if (backOfficeIdentity == null)

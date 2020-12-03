@@ -5,9 +5,8 @@ using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
 using SecurityConstants = Umbraco.Core.Constants.Security;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Web.BackOffice.Security
 {
-
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
@@ -22,10 +21,12 @@ namespace Umbraco.Web.Common.Security
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
             string[] defaultUserGroups = null,
-            string defaultCulture = null)
+            string defaultCulture = null,
+            bool allowManualLinking = true)
         {
             DefaultUserGroups = defaultUserGroups ?? new[] { SecurityConstants.EditorGroupAlias };
             AutoLinkExternalAccount = autoLinkExternalAccount;
+            AllowManualLinking = allowManualLinking;
             _defaultCulture = defaultCulture;
         }
 
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Common.Security
         /// By default this is true which allows the user to manually link and unlink the external provider, if set to false the back office user
         /// will not see and cannot perform manual linking or unlinking of the external provider.
         /// </summary>
-        public bool AllowManualLinking { get; set; } = true;
+        public bool AllowManualLinking { get; }
 
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted

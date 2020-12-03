@@ -17,21 +17,18 @@ using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    // TODO:  We'll need to be careful about the security on this controller, when we start implementing
-    // methods to modify content types we'll need to enforce security on the individual methods, we
-    // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
-
     /// <summary>
-    ///     An API controller used for dealing with content types
+    /// An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
+        // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
+        // It would be possible to have something like a MediaTypeInfoController for the GetById/GetAllowedChildren/etc... actions
+
         private readonly IContentTypeService _contentTypeService;
         private readonly IEntityService _entityService;
         private readonly ILocalizedTextService _localizedTextService;
@@ -142,6 +139,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult DeleteById(int id)
         {
             var foundType = _mediaTypeService.Get(id);
@@ -177,6 +175,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
         {
             var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType,
@@ -197,6 +196,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
             var result =
@@ -208,6 +208,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public MediaTypeDisplay GetEmpty(int parentId)
         {
             IMediaType mt;
@@ -229,19 +230,21 @@ namespace Umbraco.Web.BackOffice.Controllers
 
 
         /// <summary>
-        ///     Returns all media types
+        /// Returns all media types
         /// </summary>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IEnumerable<ContentTypeBasic> GetAll() =>
             _mediaTypeService.GetAll()
                 .Select(_umbracoMapper.Map<IMediaType, ContentTypeBasic>);
 
         /// <summary>
-        ///     Deletes a media type container with a given ID
+        /// Deletes a media type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult DeleteContainer(int id)
         {
             _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -249,6 +252,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostCreateContainer(int parentId, string name)
         {
             var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -258,6 +262,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostRenameContainer(int id, string name)
         {
             var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -267,6 +272,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
@@ -284,10 +290,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        ///     Move the media type
+        /// Move the media type
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostMove(MoveOrCopy move)
         {
             return PerformMove(
@@ -297,10 +304,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        ///     Copy the media type
+        /// Copy the media type
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostCopy(MoveOrCopy copy)
         {
             return PerformCopy(
@@ -313,7 +321,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         #region GetAllowedChildren
 
         /// <summary>
-        ///     Returns the allowed child content type objects for the content item id passed in - based on an INT id
+        /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]

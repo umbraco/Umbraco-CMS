@@ -1,10 +1,29 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 
 namespace Umbraco.Extensions
 {
     public static class ControllerExtensions
     {
+        /// <summary>
+        /// Runs the authentication process 
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <returns></returns>
+        public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this ControllerBase controller)
+        {
+            if (controller.HttpContext == null)
+            {
+                return AuthenticateResult.NoResult();
+            }
+
+            var result = await controller.HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            return result;
+        }
+
         /// <summary>
         /// Return the controller name from the controller type
         /// </summary>

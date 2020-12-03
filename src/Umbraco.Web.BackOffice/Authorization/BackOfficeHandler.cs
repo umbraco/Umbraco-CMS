@@ -22,18 +22,17 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, BackOfficeRequirement requirement)
         {
-            try
+            // if not configured (install or upgrade) then we can continue
+            // otherwise we need to ensure that a user is logged in
+
+            switch (_runtimeState.Level)
             {
-                // if not configured (install or upgrade) then we can continue
-                // otherwise we need to ensure that a user is logged in
-                var isAuth = _runtimeState.Level == RuntimeLevel.Install
-                    || _runtimeState.Level == RuntimeLevel.Upgrade
-                    || _backOfficeSecurity.BackOfficeSecurity?.ValidateCurrentUser(false, requirement.RequireApproval) == ValidateRequestAttempt.Success;
-                return Task.FromResult(isAuth);
-            }
-            catch (Exception)
-            {
-                return Task.FromResult(false);
+                case RuntimeLevel.Install:
+                case RuntimeLevel.Upgrade:
+                    return Task.FromResult(true);
+                default:
+                    var userApprovalSucceeded = !requirement.RequireApproval || (_backOfficeSecurity.BackOfficeSecurity.CurrentUser?.IsApproved ?? false);
+                    return Task.FromResult(userApprovalSucceeded);
             }
         }
 

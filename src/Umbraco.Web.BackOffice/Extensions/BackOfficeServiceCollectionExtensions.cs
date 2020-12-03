@@ -35,7 +35,7 @@ namespace Umbraco.Extensions
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
-                .AddSignInManager<BackOfficeSignInManager>()
+                .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
@@ -66,7 +66,9 @@ namespace Umbraco.Extensions
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
-            services.TryAddSingleton<IBackOfficeExternalLoginProviders, NopBackOfficeExternalLoginProviders>();
+            services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
+            services.TryAddSingleton<IBackOfficeTwoFactorOptions, NoopBackOfficeTwoFactorOptions>();
+            services.TryAddSingleton<BackOfficeUserManagerAuditer>();
 
             /*
              * IdentityBuilderExtensions.AddUserManager adds UserManager<BackOfficeIdentityUser> to service collection

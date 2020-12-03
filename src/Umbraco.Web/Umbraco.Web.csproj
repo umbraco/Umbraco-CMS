@@ -135,9 +135,6 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
-    <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
-    <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
@@ -164,8 +161,6 @@
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
-    <Compile Include="Security\BackOfficeOwinUserManager.cs" />
-    <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComponent.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComposer.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
@@ -181,7 +176,6 @@
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
-    <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\IdentityAuditEventArgs.cs" />
     <Compile Include="UmbracoBuilderExtensions.cs" />
@@ -216,7 +210,6 @@
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
-    <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />

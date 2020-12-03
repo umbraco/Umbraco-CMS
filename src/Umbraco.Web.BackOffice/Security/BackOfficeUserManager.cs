@@ -1,11 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
@@ -14,8 +17,10 @@ using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.BackOffice
+
+namespace Umbraco.Web.Common.Security
 {
+
     public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
     {
         public BackOfficeUserManager(
@@ -28,9 +33,10 @@ namespace Umbraco.Core.BackOffice
             BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger, passwordConfiguration)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, httpContextAccessor, logger, passwordConfiguration)
         {
         }
     }
@@ -39,6 +45,7 @@ namespace Umbraco.Core.BackOffice
         where T : BackOfficeIdentityUser
     {
         private PasswordGenerator _passwordGenerator;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BackOfficeUserManager(
             IIpResolver ipResolver,
@@ -50,11 +57,13 @@ namespace Umbraco.Core.BackOffice
             BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
+            IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<T>> logger,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
+            _httpContextAccessor = httpContextAccessor;
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
@@ -95,7 +104,7 @@ namespace Umbraco.Core.BackOffice
         {
             var userSessionStore = Store as IUserSessionStore<T>;
             //if this is not set, for backwards compat (which would be super rare), we'll just approve it
-            if (userSessionStore == null)  return true;
+            if (userSessionStore == null) return true;
 
             return await userSessionStore.ValidateSessionIdAsync(userId, sessionId);
         }
@@ -140,7 +149,7 @@ namespace Umbraco.Core.BackOffice
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            if (user.IsApproved == false)  return true;
+            if (user.IsApproved == false) return true;
 
             return await base.IsLockedOutAsync(user);
         }
@@ -211,7 +220,9 @@ namespace Umbraco.Core.BackOffice
 
             var result = await base.ResetPasswordAsync(user, token, newPassword);
             if (result.Succeeded)
-                RaisePasswordChangedEvent(null, userId); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+            {
+                RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, userId);
+            }
             return result;
         }
 
@@ -219,7 +230,9 @@ namespace Umbraco.Core.BackOffice
         {
             var result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
             if (result.Succeeded)
-                RaisePasswordChangedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+            {
+                RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
+            }
             return result;
         }
 
@@ -297,11 +310,11 @@ namespace Umbraco.Core.BackOffice
             // The way we unlock is by setting the lockoutEnd date to the current datetime
             if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
             {
-                RaiseAccountLockedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+                RaiseAccountLockedEvent(_httpContextAccessor.HttpContext?.User, user.Id); 
             }
             else
             {
-                RaiseAccountUnlockedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+                RaiseAccountUnlockedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
                 //Resets the login attempt fails back to 0 when unlock is clicked
                 await ResetAccessFailedCountAsync(user);
             }
@@ -321,7 +334,7 @@ namespace Umbraco.Core.BackOffice
 
             await lockoutStore.ResetAccessFailedCountAsync(user, CancellationToken.None);
             //raise the event now that it's reset
-            RaiseResetAccessFailedCountEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+            RaiseResetAccessFailedCountEvent(_httpContextAccessor.HttpContext?.User, user.Id);
             return await UpdateAsync(user);
         }
 
@@ -357,8 +370,7 @@ namespace Umbraco.Core.BackOffice
             //Slightly confusing: this will return a Success if we successfully update the AccessFailed count
             if (result.Succeeded)
             {
-                // TODO: This may no longer be the case in netcore, we'll need to see about that
-                RaiseLoginFailedEvent(null, user.Id); // TODO: How can we get the current user? we have not HttpContext (netstandard), we can make our own IPrincipalAccessor?
+                RaiseLoginFailedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
             }
 
             return result;
@@ -367,7 +379,7 @@ namespace Umbraco.Core.BackOffice
         private int GetCurrentUserId(IPrincipal currentUser)
         {
             var umbIdentity = currentUser?.GetUmbracoIdentity();
-            var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;
+            var currentUserId = umbIdentity?.GetUserId<int?>() ?? Core.Constants.Security.SuperUserId;
             return currentUserId;
         }
         private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
@@ -383,9 +395,9 @@ namespace Umbraco.Core.BackOffice
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
 
-        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager, lastly we'll resort to the authentication controller
-        // In some cases it will be nicer/easier to not pass in IPrincipal
-        public void RaiseAccountLockedEvent(BackOfficeIdentityUser currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
+        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager,
+        // lastly we'll resort to the authentication controller but we should try to remove all instances of that occuring
+        public void RaiseAccountLockedEvent(IPrincipal currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
 
         public void RaiseAccountUnlockedEvent(IPrincipal currentUser, int userId) => OnAccountUnlocked(CreateArgs(AuditEvent.AccountUnlocked, currentUser, userId, string.Empty));
 
@@ -395,11 +407,9 @@ namespace Umbraco.Core.BackOffice
 
         public void RaiseLoginFailedEvent(IPrincipal currentUser, int userId) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, userId, string.Empty));
 
-        public void RaiseInvalidLoginAttemptEvent(IPrincipal currentUser, string username) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, Constants.Security.SuperUserId, username));
-
         public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
 
-        public void RaiseLoginSuccessEvent(BackOfficeIdentityUser currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
+        public void RaiseLoginSuccessEvent(IPrincipal currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
 
         public SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId)
         {
@@ -408,7 +418,7 @@ namespace Umbraco.Core.BackOffice
             OnLogoutSuccess(args);
             return args;
         }
-        
+
         public void RaisePasswordChangedEvent(IPrincipal currentUser, int userId) => OnPasswordChanged(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
 
         public void RaiseResetAccessFailedCountEvent(IPrincipal currentUser, int userId) => OnResetAccessFailedCount(CreateArgs(AuditEvent.ResetAccessFailedCount, currentUser, userId, string.Empty));
@@ -424,6 +434,9 @@ namespace Umbraco.Core.BackOffice
 
         public bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
 
+        // TODO: These static events are problematic. Moving forward we don't want static events at all but we cannot
+        // have non-static events here because the user manager is a Scoped instance not a singleton
+        // so we'll have to deal with this a diff way i.e. refactoring how events are done entirely
         public static event EventHandler<IdentityAuditEventArgs> AccountLocked;
         public static event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
         public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;

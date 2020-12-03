@@ -6,6 +6,8 @@ using Umbraco.Web.Common.Attributes;
 
 namespace Umbraco.Web.Common.ApplicationModels
 {
+    // TODO: This should just exist in the back office project
+
     /// <summary>
     /// An application model provider for all Umbraco Back Office controllers
     /// </summary>
@@ -49,12 +51,7 @@ namespace Umbraco.Web.Common.ApplicationModels
         }
 
         private bool IsBackOfficeController(ControllerModel controller)
-        {
-            var pluginControllerAttribute = controller.Attributes.OfType<PluginControllerAttribute>().FirstOrDefault();
-            return pluginControllerAttribute != null
-                && (pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeArea
-                || pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeApiArea
-                || pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeTreeArea);
-        }
+            => controller.Attributes.OfType<IsBackOfficeAttribute>().Any();
+        
     }
 }

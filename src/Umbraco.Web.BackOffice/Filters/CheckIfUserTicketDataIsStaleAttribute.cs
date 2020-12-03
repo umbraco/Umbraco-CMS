@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IEntityService _entityService;
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IOptions<GlobalSettings> _globalSettings;
-            private readonly BackOfficeSignInManager _backOfficeSignInManager;
+            private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
 
             public CheckIfUserTicketDataIsStaleFilter(
@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IEntityService entityService,
                 ILocalizedTextService localizedTextService,
                 IOptions<GlobalSettings> globalSettings,
-                BackOfficeSignInManager backOfficeSignInManager,
+                IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery)
             {
                 _requestCache = requestCache;
