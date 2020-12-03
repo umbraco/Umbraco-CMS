@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,30 +10,16 @@ using Umbraco.Core;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Migrations.Stubs;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class AlterMigrationTests
     {
-        private ILogger<MigrationContext> _logger;
-        private ISqlSyntaxProvider _sqlSyntax;
-        private IUmbracoDatabase _database;
+        private readonly ILogger<MigrationContext> _logger = Mock.Of<ILogger<MigrationContext>>();
 
-        [SetUp]
-        public void Setup()
-        {
-            _logger = Mock.Of<ILogger<MigrationContext>>();
-            _sqlSyntax = new SqlCeSyntaxProvider();
-
-            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
-            var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, Mock.Of<ILogger<UmbracoDatabase>>(), TestHelper.BulkSqlInsertProvider);
-        }
 
         [Test]
         public void Drop_Foreign_Key()
@@ -52,7 +38,6 @@ namespace Umbraco.Tests.Migrations
             // Assert
             Assert.That(database.Operations.Count, Is.EqualTo(1));
             Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
-
         }
 
         [Test]

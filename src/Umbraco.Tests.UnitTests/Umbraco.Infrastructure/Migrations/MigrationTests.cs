@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class MigrationTests

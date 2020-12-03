@@ -129,16 +129,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
-    <Compile Include="Cache\RefresherTests.cs" />
-    <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
-    <Compile Include="Migrations\MigrationPlanTests.cs" />
-    <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
-    <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
@@ -161,12 +156,10 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="Services\RedirectUrlServiceTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Issues\U9560.cs" />
-    <Compile Include="Migrations\AdvancedMigrationTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
@@ -187,28 +180,19 @@
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
-    <Compile Include="Migrations\PostMigrationTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
-    <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
-    <Compile Include="Cache\DefaultCachePolicyTests.cs" />
-    <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
-    <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
-    <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
-    <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
@@ -220,15 +204,6 @@
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
-    <Compile Include="Migrations\AlterMigrationTests.cs" />
-    <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlResources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
-    <Compile Include="Migrations\Stubs\Dummy.cs" />
-    <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
@@ -338,11 +313,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\SqlScripts\SqlResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
@@ -355,10 +325,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
-    <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
-    <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
-    <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
     <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>

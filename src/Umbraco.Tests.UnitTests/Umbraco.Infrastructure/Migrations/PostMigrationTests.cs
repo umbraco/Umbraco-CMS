@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -10,15 +10,15 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class PostMigrationTests
     {
         private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
+
         [Test]
         public void ExecutesPlanPostMigration()
         {
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Migrations
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
             var plan = new MigrationPlan("Test")
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Migrations
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
             var plan = new MigrationPlan("Test")
