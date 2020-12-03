@@ -12,25 +12,24 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeIdentityUser : IdentityUser<IIdentityUserLogin, IdentityUserRole, IdentityUserClaim>, IRememberBeingDirty
+    public class BackOfficeIdentityUser : IdentityUser
     {
-        private string _email;
-        private string _userName;
-        private int _id;
-        private DateTime? _lastLoginDateUtc;
-        private bool _emailConfirmed;
         private string _name;
-        private int _accessFailedCount;
-        private string _passwordHash;
         private string _passwordConfig;
         private string _culture;
-        private ObservableCollection<IIdentityUserLogin> _logins;
-        private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
         private IReadOnlyUserGroup[] _groups;
         private string[] _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
-        private DateTime? _lastPasswordChangeDateUtc;
+
+        // Custom comparer for enumerables
+        private static readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
+            (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
+            groups => groups.GetHashCode());
+
+        private static readonly DelegateEqualityComparer<int[]> s_startIdsComparer = new DelegateEqualityComparer<int[]>(
+            (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
+            groups => groups.GetHashCode());
 
         /// <summary>
         ///  Used to construct a new instance without an identity
@@ -54,12 +53,12 @@ namespace Umbraco.Core.Security
 
             var user = new BackOfficeIdentityUser(globalSettings, Array.Empty<IReadOnlyUserGroup>());
             user.DisableChangeTracking();
-            user._userName = username;
-            user._email = email;
+            user.UserName = username;
+            user.Email = email;
 
             // we are setting minvalue here because the default is "0" which is the id of the admin user
             // which we cannot allow because the admin user will always exist
-            user._id = int.MinValue;
+            user.Id = int.MinValue;
             user.HasIdentity = false;
             user._culture = culture;
             user._name = name;
@@ -73,10 +72,6 @@ namespace Umbraco.Core.Security
             _startContentIds = Array.Empty<int>();
             _allowedSections = Array.Empty<string>();
             _culture = globalSettings.DefaultUILanguage;
-
-            // must initialize before setting groups
-            _roles = new ObservableCollection<IdentityUserRole>();
-            _roles.CollectionChanged += _roles_CollectionChanged;
 
             // use the property setters - they do more than just setting a field
             Groups = groups;
@@ -95,105 +90,28 @@ namespace Umbraco.Core.Security
             Id = userId;
         }
 
-        /// <summary>
-        /// Returns true if an Id has been set on this object this will be false if the object is new and not persisted to the database
-        /// </summary>
-        public bool HasIdentity { get; private set; }
-
         public int[] CalculatedMediaStartNodeIds { get; set; }
         public int[] CalculatedContentStartNodeIds { get; set; }
 
-        public override int Id
-        {
-            get => _id;
-            set
-            {
-                _id = value;
-                HasIdentity = true;
-            }
-        }
-
         /// <summary>
-        /// Override Email so we can track changes to it
-        /// </summary>
-        public override string Email
-        {
-            get => _email;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
-        }
-
-        /// <summary>
-        /// Override UserName so we can track changes to it
-        /// </summary>
-        public override string UserName
-        {
-            get => _userName;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, nameof(UserName));
-        }
-
-        /// <summary>
-        /// LastPasswordChangeDateUtc so we can track changes to it
-        /// </summary>
-        public override DateTime? LastPasswordChangeDateUtc
-        {
-            get { return _lastPasswordChangeDateUtc; }
-            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, nameof(LastPasswordChangeDateUtc)); }
-        }
-
-        /// <summary>
-        /// Override LastLoginDateUtc so we can track changes to it
-        /// </summary>
-        public override DateTime? LastLoginDateUtc
-        {
-            get => _lastLoginDateUtc;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDateUtc));
-        }
-
-        /// <summary>
-        /// Override EmailConfirmed so we can track changes to it
-        /// </summary>
-        public override bool EmailConfirmed
-        {
-            get => _emailConfirmed;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, nameof(EmailConfirmed));
-        }
-
-        /// <summary>
-        /// Gets/sets the user's real name
+        /// Gets or sets the user's real name
         /// </summary>
         public string Name
         {
             get => _name;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
-        /// <summary>
-        /// Override AccessFailedCount so we can track changes to it
-        /// </summary>
-        public override int AccessFailedCount
-        {
-            get => _accessFailedCount;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, nameof(AccessFailedCount));
-        }
-
-        /// <summary>
-        /// Override PasswordHash so we can track changes to it
-        /// </summary>
-        public override string PasswordHash
-        {
-            get => _passwordHash;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, nameof(PasswordHash));
-        }
 
         public string PasswordConfig
         {
             get => _passwordConfig;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
         }
 
 
         /// <summary>
-        /// Content start nodes assigned to the User (not ones assigned to the user's groups)
+        /// Gets or sets content start nodes assigned to the User (not ones assigned to the user's groups)
         /// </summary>
         public int[] StartContentIds
         {
@@ -201,13 +119,16 @@ namespace Umbraco.Core.Security
             set
             {
                 if (value == null)
+                {
                     value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), StartIdsComparer);
+                }
+
+                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), s_startIdsComparer);
             }
         }
 
         /// <summary>
-        /// Media start nodes assigned to the User (not ones assigned to the user's groups)
+        /// Gets or sets media start nodes assigned to the User (not ones assigned to the user's groups)
         /// </summary>
         public int[] StartMediaIds
         {
@@ -215,23 +136,23 @@ namespace Umbraco.Core.Security
             set
             {
                 if (value == null)
+                {
                     value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), StartIdsComparer);
+                }
+
+                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), s_startIdsComparer);
             }
         }
 
         /// <summary>
-        /// This is a readonly list of the user's allowed sections which are based on it's user groups
+        /// Gets a readonly list of the user's allowed sections which are based on it's user groups
         /// </summary>
-        public string[] AllowedSections
-        {
-            get { return _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray()); }
-        }
+        public string[] AllowedSections => _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray());
 
         public string Culture
         {
             get => _culture;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
         }
 
         public IReadOnlyUserGroup[] Groups
@@ -244,34 +165,23 @@ namespace Umbraco.Core.Security
 
                 _groups = value;
 
-                // now clear all roles and re-add them
-                _roles.CollectionChanged -= _roles_CollectionChanged;
-                _roles.Clear();
-                foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole
+                var roles = new List<IdentityUserRole>();
+                foreach (IdentityUserRole identityUserRole in _groups.Select(x => new IdentityUserRole
                 {
                     RoleId = x.Alias,
                     UserId = Id
                 }))
                 {
-                    _roles.Add(identityUserRole);
+                    roles.Add(identityUserRole);
                 }
-                _roles.CollectionChanged += _roles_CollectionChanged;
 
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), GroupsComparer);
+                // now reset the collection
+                Roles = roles;
+
+                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), s_groupsComparer);
             }
         }
 
-        /// <summary>
-        /// Lockout is always enabled
-        /// </summary>
-        public override bool LockoutEnabled
-        {
-            get { return true; }
-            set
-            {
-                //do nothing
-            }
-        }
 
         /// <summary>
         /// Based on the user's lockout end date, this will determine if they are locked out
@@ -289,172 +199,6 @@ namespace Umbraco.Core.Security
         /// This is a 1:1 mapping with IUser.IsApproved
         /// </summary>
         public bool IsApproved { get; set; }
-
-        /// <summary>
-        /// Overridden to make the retrieval lazy
-        /// </summary>
-        public override ICollection<IIdentityUserLogin> Logins
-        {
-            get
-            {
-                // return if it exists
-                if (_logins != null)
-                    return _logins;
-
-                _logins = new ObservableCollection<IIdentityUserLogin>();
-
-                // if the callback is there and hasn't been created yet then execute it and populate the logins
-                if (_getLogins != null && !_getLogins.IsValueCreated)
-                {
-                    foreach (var l in _getLogins.Value)
-                    {
-                        _logins.Add(l);
-                    }
-                }
-
-                //now assign events
-                _logins.CollectionChanged += Logins_CollectionChanged;
-
-                return _logins;
-            }
-        }
-
-        void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            _beingDirty.OnPropertyChanged(nameof(Logins));
-        }
-
-        private void _roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            _beingDirty.OnPropertyChanged(nameof(Roles));
-        }
-
-        private readonly ObservableCollection<IdentityUserRole> _roles;
-
-        /// <summary>
-        /// helper method to easily add a role without having to deal with IdentityUserRole{T}
-        /// </summary>
-        /// <param name="role"></param>
-        /// <remarks>
-        /// Adding a role this way will not reflect on the user's group's collection or it's allowed sections until the user is persisted
-        /// </remarks>
-        public void AddRole(string role)
-        {
-            Roles.Add(new IdentityUserRole
-            {
-                UserId = Id,
-                RoleId = role
-            });
-        }
-
-        /// <summary>
-        /// Override Roles because the value of these are the user's group aliases
-        /// </summary>
-        public override ICollection<IdentityUserRole> Roles => _roles;
-
-        /// <summary>
-        /// Used to set a lazy call back to populate the user's Login list
-        /// </summary>
-        /// <param name="callback"></param>
-        public void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback)
-        {
-            _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
-        }
-
-        #region BeingDirty
-
-        private readonly BeingDirty _beingDirty = new BeingDirty();
-
-        /// <inheritdoc />
-        public bool IsDirty()
-        {
-            return _beingDirty.IsDirty();
-        }
-
-        /// <inheritdoc />
-        public bool IsPropertyDirty(string propName)
-        {
-            return _beingDirty.IsPropertyDirty(propName);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetDirtyProperties()
-        {
-            return _beingDirty.GetDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public void ResetDirtyProperties()
-        {
-            _beingDirty.ResetDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public bool WasDirty()
-        {
-            return _beingDirty.WasDirty();
-        }
-
-        /// <inheritdoc />
-        public bool WasPropertyDirty(string propertyName)
-        {
-            return _beingDirty.WasPropertyDirty(propertyName);
-        }
-
-        /// <inheritdoc />
-        public void ResetWereDirtyProperties()
-        {
-            _beingDirty.ResetWereDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public void ResetDirtyProperties(bool rememberDirty)
-        {
-            _beingDirty.ResetDirtyProperties(rememberDirty);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetWereDirtyProperties()
-            => _beingDirty.GetWereDirtyProperties();
-
-        /// <summary>
-        /// Disables change tracking.
-        /// </summary>
-        public void DisableChangeTracking()
-        {
-            _beingDirty.DisableChangeTracking();
-        }
-
-        /// <summary>
-        /// Enables change tracking.
-        /// </summary>
-        public void EnableChangeTracking()
-        {
-            _beingDirty.EnableChangeTracking();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged
-        {
-            add
-            {
-                _beingDirty.PropertyChanged += value;
-            }
-            remove
-            {
-                _beingDirty.PropertyChanged -= value;
-            }
-        }
-
-        #endregion
-
-        //Custom comparer for enumerables
-        private static readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> GroupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
-            (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
-            groups => groups.GetHashCode());
-
-        private static readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
-            (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
-            groups => groups.GetHashCode());
 
     }
 }

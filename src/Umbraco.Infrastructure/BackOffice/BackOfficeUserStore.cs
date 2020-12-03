@@ -870,28 +870,28 @@ namespace Umbraco.Core.BackOffice
                 {
                     anythingChanged = true;
 
-                    //clear out the current groups (need to ToArray since we are modifying the iterator)
+                    // clear out the current groups (need to ToArray since we are modifying the iterator)
                     user.ClearGroups();
 
-                    //go lookup all these groups
+                    // go lookup all these groups
                     var groups = _userService.GetUserGroupsByAlias(combinedAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
 
-                    //use all of the ones assigned and add them
+                    // use all of the ones assigned and add them
                     foreach (var group in groups)
                     {
                         user.AddGroup(group);
                     }
 
-                    //re-assign
+                    // re-assign
                     identityUser.Groups = groups;
                 }
             }
 
-            //we should re-set the calculated start nodes
+            // we should re-set the calculated start nodes
             identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
             identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
 
-            //reset all changes
+            // reset all changes
             identityUser.ResetDirtyProperties(false);
 
             return anythingChanged;
