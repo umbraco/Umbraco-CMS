@@ -107,7 +107,7 @@ namespace Umbraco.Infrastructure.Members
             return IdentityResult.Success;
         }
 
-        ///TODO: duplicated code
+        ///TODO: duplicated code from backofficeusermanager
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>

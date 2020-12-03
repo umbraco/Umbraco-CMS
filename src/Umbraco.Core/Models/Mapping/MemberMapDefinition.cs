@@ -24,7 +24,11 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.Username = source.Username;
             target.Id = (int)(long)source.Id;
-            //TODO: map more properties as required
+            target.Comments = source.Comments;
+            target.IsApproved = source.IsApproved;
+
+            //TODO: ensure all properties are mapped as required
+
         }
     }
 }

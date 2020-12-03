@@ -13,14 +13,13 @@ namespace Umbraco.Core.Members
     //: IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, 
     {
         private bool _hasIdentity;
+        private int _id;
 
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
         public string MemberTypeAlias { get; set; }
         public bool IsLockedOut { get; set; }
-
         public string RawPasswordValue { get; set; }
         public DateTime LastPasswordChangeDateUtc { get; set; }
 
@@ -29,6 +28,16 @@ namespace Umbraco.Core.Members
         /// This will be false if the object is new and not persisted to the database
         /// </summary>
         public bool HasIdentity => _hasIdentity;
+
+        public int Id
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                _hasIdentity = true;
+            }
+        }
 
         //TODO: track
         public string PasswordHash { get; set; }
@@ -48,7 +57,11 @@ namespace Umbraco.Core.Members
         //public bool RolesChanged;
 
 
-        public static UmbracoMembersIdentityUser CreateNew(string username, string email, string name = null)
+        public static UmbracoMembersIdentityUser CreateNew(
+            string username,
+            string email,
+            string memberTypeAlias,
+            string name)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
 
@@ -58,7 +71,9 @@ namespace Umbraco.Core.Members
                 UserName = username,
                 Email = email,
                 Name = name,
-                Id = 0,  //TODO
+                MemberTypeAlias = memberTypeAlias,
+                Id = 0,  //TODO: is this meant to be 0 in this circumstance?
+                //false by default unless specifically set
                 _hasIdentity = false
             };
 

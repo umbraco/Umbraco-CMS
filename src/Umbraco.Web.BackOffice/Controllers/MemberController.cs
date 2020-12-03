@@ -11,13 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -38,6 +35,7 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
+using UmbracoMembersIdentityUser = Umbraco.Core.Members.UmbracoMembersIdentityUser;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -213,6 +211,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
         {
+            if (contentItem == null) throw new ArgumentNullException(nameof(contentItem));
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+            }
 
             //If we've reached here it means:
             // * Our model has been bound
@@ -224,7 +228,44 @@ namespace Umbraco.Web.BackOffice.Controllers
             //map the properties to the persisted entity
             MapPropertyValues(contentItem);
 
-            await ValidateMemberDataAsync(contentItem);
+            var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
+            if (memberType == null)
+            {
+                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
+            }
+
+            if (contentItem.Name.IsNullOrWhiteSpace())
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Invalid user name", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+            }
+
+            IMember byUsername = _memberService.GetByUsername(contentItem.Username);
+            if (byUsername != null && byUsername.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Username is already in use", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+            }
+
+            IMember byEmail = _memberService.GetByEmail(contentItem.Email);
+            if (byEmail != null && byEmail.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Email address is already in use", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
+            }
+
+            // Create the member with the MemberManager
+            var identityMember = UmbracoMembersIdentityUser.CreateNew(
+                contentItem.Username,
+                contentItem.Email,
+                memberType.Alias,
+                contentItem.Name);
+
+            //TODO: confirm where to do this
+            identityMember.RawPasswordValue = contentItem.Password.NewPassword;
 
             //Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (ModelState.IsValid == false)
@@ -238,21 +279,21 @@ namespace Umbraco.Web.BackOffice.Controllers
             // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
-            var currRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
+            IEnumerable<string> currRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
 
             //find the ones to remove and remove them
             IEnumerable<string> roles = currRoles.ToList();
             var rolesToRemove = roles.Except(contentItem.Groups).ToArray();
 
-            //Depending on the action we need to first do a create or update using the membership provider
-            // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
+            //Depending on the action we need to first do a create or update using the membership manager
+            //this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
                     UpdateMemberData(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
-                    contentItem.PersistedContent = await CreateMemberData(contentItem);
+                    await CreateMemberAsync(contentItem, identityMember);
                     break;
                 default:
                     //we don't support anything else for members
@@ -261,9 +302,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope
             // but it would be nicer to have this taken care of within the Save method itself
-
-            //TODO: create/save the IMember: this is now saved in CreateAsync, remove once logic is clarified
-            //_memberService.Save(contentItem.PersistedContent);
 
             //Now let's do the role provider stuff - now that we've saved the content item (that is important since
             // if we are changing the username, it must be persisted before looking up the member roles).
@@ -301,12 +339,45 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
+        /// Create the member
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="identityMember"></param>
+        /// <returns></returns>
+
+        private async Task CreateMemberAsync(MemberSave contentItem, UmbracoMembersIdentityUser identityMember)
+        {
+            IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
+            if (created.Succeeded == false)
+            {
+                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+            }
+
+            //now re-look the member back up which will now exist
+            IMember member = _memberService.GetByEmail(contentItem.Email);
+
+            member.CreatorId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+            member.RawPasswordValue = identityMember.RawPasswordValue;
+
+            //since the back office user is creating this member, they will be set to approved
+            member.IsApproved = true;
+
+            //map the save info over onto the user
+            member = _umbracoMapper.Map(contentItem, member);
+            contentItem.PersistedContent = member;
+        }
+
+        /// <summary>
         /// Maps the property values to the persisted entity
         /// </summary>
         /// <param name="contentItem"></param>
         private void MapPropertyValues(MemberSave contentItem)
         {
-            UpdateName(contentItem);
+            //Don't update the name if it is empty
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            {
+                contentItem.PersistedContent.Name = contentItem.Name;
+            }
 
             //map the custom properties - this will already be set for new entities in our member binder
             contentItem.PersistedContent.Email = contentItem.Email;
@@ -321,83 +392,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                 null); // member are all invariant
         }
 
-        /// <summary>
         /// Create a member from the supplied member content data
         /// All member password processing and creation is done via the aspnet identity MemberUserManager
-        /// </summary>
-        /// <param name="memberSave"></param>
-        /// <returns></returns>
-        private async Task<IMember> CreateMemberData(MemberSave memberSave)
-        {
-            if (memberSave == null) throw new ArgumentNullException("memberSave");
 
-            if (ModelState.IsValid == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
-            }
-            //TODO: check if unique
-
-            IMemberType memberType = _memberTypeService.Get(memberSave.ContentTypeAlias);
-            if (memberType == null)
-            {
-                throw new InvalidOperationException($"No member type found with alias {memberSave.ContentTypeAlias}");
-            }
-
-            // Create the member with the UserManager
-            // The 'empty' (special) password format is applied without us having to duplicate that logic
-            UmbracoMembersIdentityUser identityMember = UmbracoMembersIdentityUser.CreateNew(
-                memberSave.Username,
-                memberSave.Email,
-                memberSave.Name);
-
-            //TODO: confirm
-            identityMember.MemberTypeAlias = memberType.Alias;
-
-            IdentityResult created = await _memberManager.CreateAsync(identityMember);
-            if (created.Succeeded == false)
-            {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
-            }
-
-            //string resetPassword;
-            //string password = _memberManager.GeneratePassword();
-
-            //IdentityResult result = await _memberManager.AddPasswordAsync(identityMember, password);
-            //if (result.Succeeded == false)
-            //{
-            //    throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
-            //}
-
-            //resetPassword = password;
-
-            //now re-look the member back up which will now exist
-            IMember member = _memberService.GetByEmail(memberSave.Email);
-
-            //TODO: previous implementation
-            //IMember member = new Member(
-            //    memberSave.Name,
-            //    memberSave.Email,
-            //    memberSave.Username,
-            //    memberType,
-            //    true)
-            //{
-            //    CreatorId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id,
-            //    RawPasswordValue = _memberManager.GeneratePassword(),
-            //    Comments = memberSave.Comments,
-            //    IsApproved = memberSave.IsApproved
-            //};
-
-
-            //since the back office user is creating this member, they will be set to approved
-            member.IsApproved = true;
-            member.CreatorId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
-            member.Comments = memberSave.Comments;
-            member.IsApproved = memberSave.IsApproved;
-
-            //map the save info over onto the user
-            member = _umbracoMapper.Map(memberSave, member);
-            return member;
-        }
 
         /// <summary>
         /// Update the member security data
@@ -406,7 +403,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
         /// </returns>
-        private void UpdateMemberData(MemberSave memberSave)
+        private async void UpdateMemberData(MemberSave memberSave)
         {
             //TODO: optimise based on new member manager
             memberSave.PersistedContent.WriterId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
@@ -452,64 +449,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             //no password changes then exit ?
             if (memberSave.Password == null)
                 return;
+            //TODO: update member password functionality in manager// set the password
 
             // set the password
             memberSave.PersistedContent.RawPasswordValue = _memberManager.GeneratePassword();
-        }
-
-        private static void UpdateName(MemberSave memberSave)
-        {
-            //Don't update the name if it is empty
-            if (memberSave.Name.IsNullOrWhiteSpace() == false)
-            {
-                memberSave.PersistedContent.Name = memberSave.Name;
-            }
-        }
-
-        // TODO: This logic should be pulled into the service layer
-        private async Task<bool> ValidateMemberDataAsync(MemberSave contentItem)
-        {
-            if (contentItem.Name.IsNullOrWhiteSpace())
-            {
-                ModelState.AddPropertyError(
-                    new ValidationResult("Invalid user name", new[] { "value" }),
-                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
-                return false;
-            }
-
-            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
-            {
-                //TODO: implement as per backoffice user
-                //var validPassword = await _memberManager.CheckPasswordAsync(null, contentItem.Password.NewPassword);
-                //if (!validPassword)
-                //{
-                //    ModelState.AddPropertyError(
-                //       new ValidationResult("Invalid password: TODO", new[] { "value" }),
-                //       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-                //    return false;
-                //}
-                return true;
-            }
-
-            var byUsername = _memberService.GetByUsername(contentItem.Username);
-            if (byUsername != null && byUsername.Key != contentItem.Key)
-            {
-                ModelState.AddPropertyError(
-                        new ValidationResult("Username is already in use", new[] { "value" }),
-                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
-                return false;
-            }
-
-            var byEmail = _memberService.GetByEmail(contentItem.Email);
-            if (byEmail != null && byEmail.Key != contentItem.Key)
-            {
-                ModelState.AddPropertyError(
-                        new ValidationResult("Email address is already in use", new[] { "value" }),
-                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

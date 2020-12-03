@@ -52,19 +52,7 @@ namespace Umbraco.Infrastructure.Members
 
             UpdateMemberProperties(member, user);
 
-            if (member.RawPasswordValue.IsNullOrWhiteSpace())
-            {
-                // [Comments from Identity package and BackOfficeUser - can/should we share this functionality]
-                // the password must be 'something' it could be empty if authenticating
-                // with an external provider so we'll just generate one and prefix it, the
-                // prefix will help us determine if the password hasn't actually been specified yet.
-                //this will hash the guid with a salt so should be nicely random
-                var aspHasher = new PasswordHasher<UmbracoMembersIdentityUser>();
-                var emptyPasswordValue =
-                    Constants.Security.EmptyPasswordPrefix +
-                    aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
-                member.RawPasswordValue = emptyPasswordValue;
-            }
+            //TODO: do we want to accept empty passwords here - if thirdparty for example? In other method if so?
 
             _memberService.Save(member);
 

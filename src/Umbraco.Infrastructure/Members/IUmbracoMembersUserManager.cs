@@ -12,15 +12,16 @@ namespace Umbraco.Infrastructure.Members
     public interface IUmbracoMembersUserManager<TUser> : IDisposable where TUser : UmbracoMembersIdentityUser
     {
         /// <summary>
-        /// Creates the specified <paramref name="memberUser"/> in the backing store with no password,
+        /// Creates the specified <paramref name="memberUser"/> in the backing store with a password,
         /// as an asynchronous operation.
         /// </summary>
         /// <param name="memberUser">The member to create.</param>
+        /// <param name="password">The password to add</param>
         /// <returns>
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> CreateAsync(TUser memberUser);
+        Task<IdentityResult> CreateAsync(TUser memberUser, string password);
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
