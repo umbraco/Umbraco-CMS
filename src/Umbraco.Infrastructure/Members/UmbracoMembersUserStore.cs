@@ -15,7 +15,7 @@ namespace Umbraco.Infrastructure.Members
     /// A custom user store that uses Umbraco member data
     /// </summary>
     public class UmbracoMembersUserStore : DisposableObjectSlim,
-        IUserStore<UmbracoMembersIdentityUser>,
+        //IUserStore<UmbracoMembersIdentityUser>,
         IUserPasswordStore<UmbracoMembersIdentityUser>
         //IUserEmailStore<UmbracoMembersIdentityUser>
         //IUserLoginStore<UmbracoMembersIdentityUser>
@@ -52,8 +52,7 @@ namespace Umbraco.Infrastructure.Members
 
             UpdateMemberProperties(member, user);
 
-            //TODO: do we want to accept empty passwords here - if thirdparty for example? In other method if so?
-
+            //TODO: do we want to accept empty passwords here - if third-party for example? In other method if so?
             _memberService.Save(member);
 
             //re-assign id
@@ -106,33 +105,6 @@ namespace Umbraco.Infrastructure.Members
             //[Comments as per BackOfficeUserStore & identity package]
             var anythingChanged = false;
             //don't assign anything if nothing has changed as this will trigger the track changes of the model
-
-            //if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
-            //    || (member.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
-            //    || identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
-            //{
-            //    anythingChanged = true;
-            //    //if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            //    var dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
-            //    member.LastLoginDate = dt;
-            //}
-
-            //if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
-            //    || (member.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            //    || identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value)
-            //{
-            //    anythingChanged = true;
-            //    member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
-            //}
-
-            //if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
-            //    || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
-            //    || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))
-            //{
-            //    anythingChanged = true;
-            //    member.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
-            //}
-
             if (
                 //memberIdentityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Name)) &&
                 member.Name != memberIdentityUser.Name && memberIdentityUser.Name.IsNullOrWhiteSpace() == false)
@@ -147,15 +119,7 @@ namespace Umbraco.Infrastructure.Members
                 anythingChanged = true;
                 member.Email = memberIdentityUser.Email;
             }
-
-            //TODO: AccessFailedCount
-            //if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.AccessFailedCount))
-            //    && member.FailedPasswordAttempts != identityUser.AccessFailedCount)
-            //{
-            //    anythingChanged = true;
-            //    member.FailedPasswordAttempts = identityUser.AccessFailedCount;
-            //}
-
+            
             if (member.IsLockedOut != memberIdentityUser.IsLockedOut)
             {
                 anythingChanged = true;
@@ -175,7 +139,6 @@ namespace Umbraco.Infrastructure.Members
                 member.Username = memberIdentityUser.UserName;
             }
 
-            //TODO: PasswordHash and PasswordConfig
             if (
                 //member.IsPropertyDirty(nameof(BackOfficeIdentityUser.PasswordHash))&&
                 member.RawPasswordValue != memberIdentityUser.PasswordHash
@@ -185,13 +148,6 @@ namespace Umbraco.Infrastructure.Members
                 member.RawPasswordValue = memberIdentityUser.PasswordHash;
                 member.PasswordConfiguration = memberIdentityUser.PasswordConfig;
             }
-
-            //TODO: SecurityStamp
-            //if (member.SecurityStamp != identityUser.SecurityStamp)
-            //{
-            //    anythingChanged = true;
-            //    member.SecurityStamp = identityUser.SecurityStamp;
-            //}
 
             // TODO: Roles
             // [Comment] Same comment as per BackOfficeUserStore: Fix this for Groups too

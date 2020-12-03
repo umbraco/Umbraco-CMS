@@ -19,6 +19,7 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A base membership provider class offering much of the underlying functionality for initializing and password encryption/hashing.
     /// </summary>
+    [Obsolete("Will be replaced by UmbracoMemberUserManager")]
     public abstract class MembershipProviderBase : MembershipProvider
     {
         private readonly IHostingEnvironment _hostingEnvironment;

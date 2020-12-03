@@ -334,8 +334,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         private async Task CreateMemberAsync(MemberSave contentItem, UmbracoMembersIdentityUser identityMember)
         {
-            // TODO: all member password processing and creation needs to be done with a new aspnet identity MemberUserManager that hasn't been created yet.	
-
             //var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);	
             //if (memberType == null)	
             //    throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");	
@@ -349,9 +347,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //return member;
 
-
-
-
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
             if (created.Succeeded == false)
             {
@@ -362,7 +357,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMember member = _memberService.GetByEmail(contentItem.Email);
 
             member.CreatorId = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
-            member.RawPasswordValue = identityMember.RawPasswordValue;
 
             //since the back office user is creating this member, they will be set to approved
             member.IsApproved = true;
@@ -374,7 +368,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private UmbracoMembersIdentityUser ValidateMemberData(MemberSave contentItem)
         {
-
             var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
             if (memberType == null)
             {
@@ -404,13 +397,30 @@ namespace Umbraco.Web.BackOffice.Controllers
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
             }
 
+            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            {
+                //TODO: check password
+                //var validPassword = await _memberManager.CheckPasswordAsync(null, contentItem.Password.NewPassword);
+                //if (!validPassword)
+                //{
+                //    ModelState.AddPropertyError(
+                //       new ValidationResult("Invalid password", new[] { "value" }),
+                //       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+                //}
+            }
+            else
+            {
+                ModelState.AddPropertyError(
+                    new ValidationResult("Password cannot be empty", new[] { "value" }),
+                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+            }
+
             // Create the member with the MemberManager
             var identityMember = UmbracoMembersIdentityUser.CreateNew(
                 contentItem.Username,
                 contentItem.Email,
                 memberType.Alias,
                 contentItem.Name);
-
             //TODO: confirm where to do this
             identityMember.RawPasswordValue = contentItem.Password.NewPassword;
             return identityMember;
