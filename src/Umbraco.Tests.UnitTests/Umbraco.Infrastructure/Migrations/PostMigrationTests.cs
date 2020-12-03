@@ -17,12 +17,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     [TestFixture]
     public class PostMigrationTests
     {
-        private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
+        private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
 
         [Test]
         public void ExecutesPlanPostMigration()
         {
-            var builder = Mock.Of<IMigrationBuilder>();
+            IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
@@ -39,22 +39,30 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 });
 
             var database = new TestDatabase();
-            var scope = Mock.Of<IScope>();
+            IScope scope = Mock.Of<IScope>();
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(
+                new SqlServerSyntaxProvider(),
+                DatabaseType.SQLCe,
+                Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var plan = new MigrationPlan("Test")
+            MigrationPlan plan = new MigrationPlan("Test")
                 .From(string.Empty).To("done");
 
             plan.AddPostMigration<TestPostMigration>();
             TestPostMigration.MigrateCount = 0;
 
             var upgrader = new Upgrader(plan);
-            upgrader.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+            upgrader.Execute(
+                scopeProvider,
+                builder,
+                Mock.Of<IKeyValueService>(),
+                s_loggerFactory.CreateLogger<Upgrader>(),
+                s_loggerFactory);
 
             Assert.AreEqual(1, TestPostMigration.MigrateCount);
         }
@@ -62,7 +70,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         [Test]
         public void MigrationCanAddPostMigration()
         {
-            var builder = Mock.Of<IMigrationBuilder>();
+            IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
@@ -81,24 +89,32 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 });
 
             var database = new TestDatabase();
-            var scope = Mock.Of<IScope>();
+            IScope scope = Mock.Of<IScope>();
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(
+                new SqlServerSyntaxProvider(),
+                DatabaseType.SQLCe,
+                Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var plan = new MigrationPlan("Test")
+            MigrationPlan plan = new MigrationPlan("Test")
                 .From(string.Empty).To<TestMigration>("done");
 
             TestMigration.MigrateCount = 0;
             TestPostMigration.MigrateCount = 0;
 
-            new MigrationContext(database, _loggerFactory.CreateLogger<MigrationContext>());
+            new MigrationContext(database, s_loggerFactory.CreateLogger<MigrationContext>());
 
             var upgrader = new Upgrader(plan);
-            upgrader.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+            upgrader.Execute(
+                scopeProvider,
+                builder,
+                Mock.Of<IKeyValueService>(),
+                s_loggerFactory.CreateLogger<Upgrader>(),
+                s_loggerFactory);
 
             Assert.AreEqual(1, TestMigration.MigrateCount);
             Assert.AreEqual(1, TestPostMigration.MigrateCount);
@@ -108,7 +124,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             public TestMigration(IMigrationContext context)
                 : base(context)
-            { }
+            {
+            }
 
             public static int MigrateCount { get; set; }
 
@@ -124,10 +141,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             public static int MigrateCount { get; set; }
 
-            public void Migrate()
-            {
-                MigrateCount++;
-            }
+            public void Migrate() => MigrateCount++;
         }
     }
 }
