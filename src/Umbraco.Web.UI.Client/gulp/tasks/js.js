@@ -16,17 +16,19 @@ function js() {
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
 
-    stream.add(
-        gulp.src(config.sources.globs.js).pipe(gulp.dest(config.root + config.targets.js))
-    );
-
+    var task = gulp.src(config.sources.globs.js);
+    _.forEach(config.roots, function(root){
+        task = task.pipe( gulp.dest(root + config.targets.js) )
+    })
+    stream.add(task);
+  
     _.forEach(config.sources.js, function (group) {
         stream.add(
             processJs(group.files, group.out)
         );
     });
 
-    return stream;
+     return stream;
 };
 
 module.exports = { js: js };
