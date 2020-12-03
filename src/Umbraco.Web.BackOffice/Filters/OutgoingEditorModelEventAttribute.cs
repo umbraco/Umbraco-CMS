@@ -17,7 +17,7 @@ namespace Umbraco.Web.BackOffice.Filters
         }
 
 
-        private class OutgoingEditorModelEventFilter : IResultFilter
+        private class OutgoingEditorModelEventFilter : IActionFilter
         {
 
             private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Filters
                                               ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             }
 
-            public void OnResultExecuted(ResultExecutedContext context)
+            public void OnActionExecuted(ActionExecutedContext context)
             {
                 if (context.Result == null) return;
 
@@ -54,8 +54,8 @@ namespace Umbraco.Web.BackOffice.Filters
                     }
                 }
             }
-
-            public void OnResultExecuting(ResultExecutingContext context)
+            
+            public void OnActionExecuting(ActionExecutingContext context)
             {
             }
         }
