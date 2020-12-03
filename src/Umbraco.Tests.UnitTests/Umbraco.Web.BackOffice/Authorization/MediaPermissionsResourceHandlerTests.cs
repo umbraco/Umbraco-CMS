@@ -75,7 +75,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         private static IMedia CreateMedia(int nodeId)
         {
             var mediaType = MediaTypeBuilder.CreateSimpleMediaType("image", "Image");
-            return MediaBuilder.CreateSimpleMedia(mediaType, "Test image", -1);
+            return MediaBuilder.CreateSimpleMedia(mediaType, "Test image", -1, nodeId);
         }
 
         private MediaPermissionsResourceHandler CreateHandler(int nodeId, int startMediaId = -1)
