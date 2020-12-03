@@ -18,16 +18,47 @@ namespace Umbraco.Core.BackOffice
     public interface IUmbracoUserManager<TUser> : IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        /// <summary>
+        /// Gets the user id of a user
+        /// </summary>
+        /// <param name="user">The user</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<string> GetUserIdAsync(TUser user);
 
+        /// <summary>
+        /// Get the <see cref="TUser"/> from a <see cref="ClaimsPrincipal"/>
+        /// </summary>
+        /// <param name="principal">The <see cref="ClaimsPrincipal"/></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TUser> GetUserAsync(ClaimsPrincipal principal);
 
+        /// <summary>
+        /// Get the user id from the <see cref="ClaimsPrincipal"/>
+        /// </summary>
+        /// <param name="principal">the <see cref="ClaimsPrincipal"/></param>
+        /// <returns>Returns the user id from the <see cref="ClaimsPrincipal"/></returns>
         string GetUserId(ClaimsPrincipal principal);
 
+        /// <summary>
+        /// Gets the external logins for the user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
 
+        /// <summary>
+        /// Deletes a user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> DeleteAsync(TUser user);
 
+        /// <summary>
+        /// Finds a user by the external login provider
+        /// </summary>
+        /// <param name="loginProvider"></param>
+        /// <param name="providerKey"></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
         /// <summary>
@@ -147,8 +178,7 @@ namespace Umbraco.Core.BackOffice
         /// The <see cref="Task"/> that represents the asynchronous operation, returning true if the <paramref name="token"/>
         /// is valid, otherwise false.
         /// </returns>
-        Task<bool> VerifyUserTokenAsync(TUser user, string tokenProvider, string purpose,
-            string token);
+        Task<bool> VerifyUserTokenAsync(TUser user, string tokenProvider, string purpose, string token);
 
         /// <summary>
         /// Adds the <paramref name="password"/> to the specified <paramref name="user"/> only if the user
@@ -185,15 +215,14 @@ namespace Umbraco.Core.BackOffice
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword,
-            string newPassword);
+        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
 
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="sessionId"></param>
-        /// <returns></returns>
+        /// <returns>Returns true if the session is valid, otherwise false</returns>
         Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
 
         /// <summary>
@@ -208,11 +237,10 @@ namespace Umbraco.Core.BackOffice
         Task<IdentityResult> CreateAsync(TUser user);
 
         /// <summary>
-        /// Helper method to generate a password for a user based on the current password validator
+        /// Generate a password for a user based on the current password validator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A generated password</returns>
         string GeneratePassword();
-
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.
@@ -292,8 +320,19 @@ namespace Umbraco.Core.BackOffice
         /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
         Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
 
+        /// <summary>
+        /// Resets the access failed count for the user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> ResetAccessFailedCountAsync(TUser user);
 
+        /// <summary>
+        /// Generates a two factor token for the user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="tokenProvider"></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<string> GenerateTwoFactorTokenAsync(TUser user, string tokenProvider);
 
         /// <summary>
@@ -316,6 +355,7 @@ namespace Umbraco.Core.BackOffice
         // TODO: These are raised from outside the signinmanager and usermanager in the auth and user controllers,
         // let's see if there's a way to avoid that and only have these called within signinmanager and usermanager
         // which means we can remove these from the interface (things like invite seems like they cannot be moved)
+        // TODO: When we change to not having the crappy static events this will need to be revisited
         void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
         void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
         SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets user Id for the user who owns this login
         /// </summary>
-        int UserId { get; set; }
+        string UserId { get; set; } // TODO: This should be able to be used by both users and members
 
         /// <summary>
         /// Gets or sets any arbitrary data for the user and external provider - like user tokens returned from the provider

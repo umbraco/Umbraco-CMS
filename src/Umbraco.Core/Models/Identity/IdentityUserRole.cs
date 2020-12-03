@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets userId for the user that is in the role
         /// </summary>
-        public virtual string UserId { get; set; }
+        public virtual int UserId { get; set; }
 
         /// <summary>
         /// Gets or sets roleId for the role

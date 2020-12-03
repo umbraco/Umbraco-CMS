@@ -239,18 +239,18 @@ namespace Umbraco.Core.Security
             get => _groups;
             set
             {
-                //so they recalculate
+                // so they recalculate
                 _allowedSections = null;
 
                 _groups = value;
 
-                //now clear all roles and re-add them
+                // now clear all roles and re-add them
                 _roles.CollectionChanged -= _roles_CollectionChanged;
                 _roles.Clear();
                 foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole
                 {
                     RoleId = x.Alias,
-                    UserId = Id.ToString()
+                    UserId = Id
                 }))
                 {
                     _roles.Add(identityUserRole);
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Security
         {
             Roles.Add(new IdentityUserRole
             {
-                UserId = Id.ToString(),
+                UserId = Id,
                 RoleId = role
             });
         }

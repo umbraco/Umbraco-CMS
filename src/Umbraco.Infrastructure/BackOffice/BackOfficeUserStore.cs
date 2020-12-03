@@ -417,7 +417,7 @@ namespace Umbraco.Core.BackOffice
             if (login == null) throw new ArgumentNullException(nameof(login));
 
             var logins = user.Logins;
-            var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id);
+            var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id.ToString());
             var userLogin = instance;
             logins.Add(userLogin);
 
@@ -462,25 +462,29 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Returns the user associated with this login
         /// </summary>
-        /// <returns/>
         public Task<BackOfficeIdentityUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            //get all logins associated with the login id
-            var result = _externalLoginService.Find(loginProvider, providerKey).ToArray();
+            // get all logins associated with the login id
+            IIdentityUserLogin[] result = _externalLoginService.Find(loginProvider, providerKey).ToArray();
             if (result.Any())
             {
-                //return the first user that matches the result
+                // return the first user that matches the result
                 BackOfficeIdentityUser output = null;
-                foreach (var l in result)
+                foreach (IIdentityUserLogin l in result)
                 {
-                    var user = _userService.GetUserById(l.UserId);
-                    if (user != null)
+                    // TODO: This won't be necessary once we add GUID support for users and make the external login
+                    // table uses GUIDs without referential integrity
+                    if (int.TryParse(l.UserId, out int userId))
                     {
-                        output = _mapper.Map<BackOfficeIdentityUser>(user);
-                        break;
+                        IUser user = _userService.GetUserById(userId);
+                        if (user != null)
+                        {
+                            output = _mapper.Map<BackOfficeIdentityUser>(user);
+                            break;
+                        }
                     }
                 }
 

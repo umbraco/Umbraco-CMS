@@ -9,14 +9,14 @@ namespace Umbraco.Core.Models.Identity
     /// </summary>
     public class IdentityUserLogin : EntityBase, IIdentityUserLogin
     {
-        public IdentityUserLogin(string loginProvider, string providerKey, int userId)
+        public IdentityUserLogin(string loginProvider, string providerKey, string userId)
         {
             LoginProvider = loginProvider;
             ProviderKey = providerKey;
             UserId = userId;
         }
 
-        public IdentityUserLogin(int id, string loginProvider, string providerKey, int userId, DateTime createDate)
+        public IdentityUserLogin(int id, string loginProvider, string providerKey, string userId, DateTime createDate)
         {
             Id = id;
             LoginProvider = loginProvider;
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models.Identity
         public string ProviderKey { get; set; }
 
         /// <inheritdoc />
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <inheritdoc />
         public string UserData { get; set; }
