@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         }
 
         [Test]
-        public async Task Non_Validated_User_Is_Not_Authorized()
+        public async Task Unauthenticated_User_Is_Not_Authorized()
         {
             var authHandlerContext = CreateAuthorizationHandlerContext();
             var sut = CreateHandler();
@@ -48,10 +48,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         }
 
         [Test]
-        public async Task Validated_User_Is_Not_Authorized_When_Not_Approved_And_Approval_Required()
+        public async Task Authenticated_User_Is_Not_Authorized_When_Not_Approved_And_Approval_Required()
         {
             var authHandlerContext = CreateAuthorizationHandlerContext(requireApproval: true);
-            var sut = CreateHandler(requireApproval: true, isAuthenticated: true);
+            var sut = CreateHandler(currentUserIsAuthenticated: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -59,10 +59,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         }
 
         [Test]
-        public async Task Validated_User_Is_Authorized_When_Not_Approved_And_Approval_Not_Required()
+        public async Task Authenticated_User_Is_Authorized_When_Not_Approved_And_Approval_Not_Required()
         {
             var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(isAuthenticated: true);
+            var sut = CreateHandler(currentUserIsAuthenticated: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -70,10 +70,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         }
 
         [Test]
-        public async Task Validated_User_Is_Authorized_When_Approved_And_Approval_Required()
+        public async Task Authenticated_User_Is_Authorized_When_Approved_And_Approval_Required()
         {
             var authHandlerContext = CreateAuthorizationHandlerContext(requireApproval: true);
-            var sut = CreateHandler(requireApproval: true, isAuthenticated: true, isApproved: true);
+            var sut = CreateHandler(currentUserIsAuthenticated: true, currentUserIsApproved: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -88,22 +88,26 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
         }
 
-        private BackOfficeHandler CreateHandler(RuntimeLevel runtimeLevel = RuntimeLevel.Run, bool requireApproval = false, bool isAuthenticated = false, bool isApproved = false)
+        private BackOfficeHandler CreateHandler(RuntimeLevel runtimeLevel = RuntimeLevel.Run, bool currentUserIsAuthenticated = false, bool currentUserIsApproved = false)
         {
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(requireApproval, isAuthenticated, isApproved);
+            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(currentUserIsAuthenticated, currentUserIsApproved);
             var mockRuntimeState = CreateMockRuntimeState(runtimeLevel);
             return new BackOfficeHandler(mockBackOfficeSecurityAccessor.Object, mockRuntimeState.Object);
         }
 
-        private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool requireApproval, bool isAuthenticated, bool isApproved)
+        private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool currentUserIsAuthenticated, bool currentUserIsApproved)
         {
             var user = new UserBuilder()
-                .WithIsApproved(isApproved)
+                .WithIsApproved(currentUserIsApproved)
                 .Build();
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
+            mockBackOfficeSecurity.Setup(x => x.IsAuthenticated()).Returns(currentUserIsAuthenticated);
+            if (currentUserIsAuthenticated)
+            {
+                mockBackOfficeSecurity.Setup(x => x.CurrentUser).Returns(user);
+            }
 
-            mockBackOfficeSecurity.Setup(x => x.CurrentUser).Returns(user);
             mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
             mockBackOfficeSecurityAccessor.Setup(x => x.BackOfficeSecurity).Returns(mockBackOfficeSecurity.Object);
             return mockBackOfficeSecurityAccessor;

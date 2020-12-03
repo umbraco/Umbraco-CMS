@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 
@@ -31,6 +30,11 @@ namespace Umbraco.Web.BackOffice.Authorization
                 case RuntimeLevel.Upgrade:
                     return Task.FromResult(true);
                 default:
+                    if (!_backOfficeSecurity.BackOfficeSecurity.IsAuthenticated())
+                    {
+                        return Task.FromResult(false);
+                    }
+
                     var userApprovalSucceeded = !requirement.RequireApproval || (_backOfficeSecurity.BackOfficeSecurity.CurrentUser?.IsApproved ?? false);
                     return Task.FromResult(userApprovalSucceeded);
             }
