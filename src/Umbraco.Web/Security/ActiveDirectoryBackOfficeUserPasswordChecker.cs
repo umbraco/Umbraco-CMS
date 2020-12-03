@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
