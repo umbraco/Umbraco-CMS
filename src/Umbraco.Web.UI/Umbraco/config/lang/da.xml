@@ -1675,13 +1675,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="validationRegExp">Indtast et regulært udtryk</key>
     <key alias="minCount">Du skal tilføje mindst</key>
     <key alias="maxCount">Du kan kun have</key>
+    <key alias="addUpTo">Tilføj op til </key>
     <key alias="items">elementer</key>
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
-    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
-    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
