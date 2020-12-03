@@ -16,11 +16,11 @@ namespace Umbraco.Tests.Integration.TestServerTest
     {
         public const string TestAuthenticationScheme = "Test";
 
-        private readonly BackOfficeSignInManager _backOfficeSignInManager;
+        private readonly IBackOfficeSignInManager _backOfficeSignInManager;
 
         private readonly BackOfficeIdentityUser _fakeUser;
         public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, BackOfficeSignInManager backOfficeSignInManager, IUserService userService, UmbracoMapper umbracoMapper)
+            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IBackOfficeSignInManager backOfficeSignInManager, IUserService userService, UmbracoMapper umbracoMapper)
             : base(options, logger, encoder, clock)
         {
             _backOfficeSignInManager = backOfficeSignInManager;

@@ -18,9 +18,7 @@ using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Security
 {
-    /// <summary>
-    /// A helper class for handling Members
-    /// </summary>
+    // MIGRATED TO NETCORE
     public class MembershipHelper
     {
         private readonly MembersMembershipProvider _membershipProvider;
@@ -678,37 +676,6 @@ namespace Umbraco.Web.Security
             }
 
             return allowAction;
-        }
-
-        /// <summary>
-        /// Changes password for a member/user given the membership provider name and the password change model
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="passwordModel"></param>
-        /// <param name="membershipProviderName"></param>
-        /// <returns></returns>
-        public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, string membershipProviderName)
-        {
-            var provider = Membership.Providers[membershipProviderName];
-            if (provider == null)
-            {
-                throw new InvalidOperationException("Could not find provider with name " + membershipProviderName);
-            }
-
-            return ChangePassword(username, passwordModel, provider);
-        }
-
-        /// <summary>
-        /// Changes password for a member/user given the membership provider and the password change model
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="passwordModel"></param>
-        /// <param name="membershipProvider"></param>
-        /// <returns></returns>
-        public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
-        {
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            return ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 
         /// <summary>

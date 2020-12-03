@@ -33,16 +33,23 @@ namespace Umbraco.Extensions
         {
             builder.Services.AddAntiforgery();
             builder.Services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
+
             builder.Services
-                .AddAuthentication(Core.Constants.Security.BackOfficeAuthenticationType)
+                .AddAuthentication() // This just creates a builder, nothing more
+                // Add our custom schemes which are cookie handlers
                 .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)
                 .AddCookie(Core.Constants.Security.BackOfficeExternalAuthenticationType, o =>
                 {
                     o.Cookie.Name = Core.Constants.Security.BackOfficeExternalAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+                // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
+                // they don't have to worry about manually adding this scheme or modifying the sign in manager
+                .AddCookie(Core.Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+                {
+                    o.Cookie.Name = Core.Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 });
-
-            // TODO: Need to add more cookie options, see https://github.com/dotnet/aspnetcore/blob/3.0/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L45
 
             builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
             return builder;

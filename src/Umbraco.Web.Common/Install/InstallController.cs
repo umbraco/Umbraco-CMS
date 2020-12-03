@@ -15,6 +15,7 @@ using Umbraco.Web.Install;
 using Umbraco.Web.Security;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -73,13 +74,11 @@ namespace Umbraco.Web.Common.Install
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                var result = _backofficeSecurityAccessor.BackOfficeSecurity.ValidateCurrentUser(false);
+                var authResult = await this.AuthenticateBackOfficeAsync();
 
-                switch (result)
+                if (!authResult.Succeeded)
                 {
-                    case ValidateRequestAttempt.FailedNoPrivileges:
-                    case ValidateRequestAttempt.FailedNoContextId:
-                        return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
+                    return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
                 }
             }
 

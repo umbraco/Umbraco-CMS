@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    // TODO: This should probably be deleted, anything requiring this should move to a different controller
     public class OverrideAuthorizationAttribute : ActionFilterAttribute
     {
         /// <summary>
