@@ -11,7 +11,6 @@ using NPoco.DatabaseTypes;
 using NPoco.Linq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Persistance.SqlCe;
 
 namespace Umbraco.Tests.Testing
 {
@@ -33,8 +32,8 @@ namespace Umbraco.Tests.Testing
         /// </remarks>
         public TestDatabase(DatabaseType databaseType = null, ISqlSyntaxProvider syntaxProvider = null)
         {
-            DatabaseType = databaseType ?? new SqlServerCEDatabaseType();
-            SqlContext = new SqlContext(syntaxProvider ?? new SqlCeSyntaxProvider(), DatabaseType, Mock.Of<IPocoDataFactory>());
+            DatabaseType = databaseType ?? new SqlServerDatabaseType();
+            SqlContext = new SqlContext(syntaxProvider ?? new SqlServerSyntaxProvider(), DatabaseType, Mock.Of<IPocoDataFactory>());
         }
 
         /// <summary>

@@ -10,14 +10,14 @@ using Umbraco.Core;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Persistance.SqlCe;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Migrations;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class MigrationPlanTests
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Migrations
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
             var migrationBuilder = Mock.Of<IMigrationBuilder>();

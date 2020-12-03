@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Caching;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class DefaultCachePolicyTests
