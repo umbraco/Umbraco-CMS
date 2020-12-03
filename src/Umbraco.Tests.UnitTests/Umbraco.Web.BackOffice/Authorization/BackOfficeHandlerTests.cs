@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
@@ -97,16 +98,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool requireApproval, bool isAuthenticated, bool isApproved)
         {
             var user = new UserBuilder()
+                .WithIsApproved(isApproved)
                 .Build();
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
-            mockBackOfficeSecurity
-                .Setup(x => x.ValidateCurrentUser(It.Is<bool>(y => y == false), It.Is<bool>(y => y == requireApproval)))
-                .Returns(isAuthenticated
-                    ? !requireApproval || (requireApproval && isApproved)
-                        ? ValidateRequestAttempt.Success
-                        : ValidateRequestAttempt.FailedNoPrivileges
-                    : ValidateRequestAttempt.FailedNoPrivileges);
+
+            mockBackOfficeSecurity.Setup(x => x.CurrentUser).Returns(user);
             mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
             mockBackOfficeSecurityAccessor.Setup(x => x.BackOfficeSecurity).Returns(mockBackOfficeSecurity.Object);
             return mockBackOfficeSecurityAccessor;
