@@ -2,8 +2,6 @@ using System;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 

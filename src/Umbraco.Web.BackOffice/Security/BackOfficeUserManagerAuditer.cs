@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Options;
 using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Compose;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;

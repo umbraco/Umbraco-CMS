@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
@@ -21,7 +17,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Common.Security
 {
-    public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
+    public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, UserPasswordConfigurationSettings>, IBackOfficeUserManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -42,6 +38,11 @@ namespace Umbraco.Web.Common.Security
         {
             _httpContextAccessor = httpContextAccessor;
         }
+
+        /// <summary>
+        /// Gets or sets the default back office user password checker
+        /// </summary>
+        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; } // TODO: This isn't a good way to set this, it needs to be injected
 
         /// <inheritdoc />
         /// <remarks>

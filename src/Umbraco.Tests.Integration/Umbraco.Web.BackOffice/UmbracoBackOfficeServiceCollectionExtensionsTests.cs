@@ -2,10 +2,9 @@ using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Extensions;
-using Umbraco.Core.BackOffice;
-using Umbraco.Tests.Integration.Testing;
 using Umbraco.Core.Security;
+using Umbraco.Extensions;
+using Umbraco.Tests.Integration.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {

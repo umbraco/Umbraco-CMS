@@ -1,15 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
@@ -22,21 +26,16 @@ using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionsResults;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
-using Microsoft.AspNetCore.Authentication;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

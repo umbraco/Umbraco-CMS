@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {

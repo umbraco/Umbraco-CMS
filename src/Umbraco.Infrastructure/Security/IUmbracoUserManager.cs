@@ -8,7 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>

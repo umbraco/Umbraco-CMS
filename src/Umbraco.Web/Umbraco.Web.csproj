@@ -159,7 +159,6 @@
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComponent.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComposer.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
@@ -181,7 +180,6 @@
     <Compile Include="Composing\Current.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
     <Compile Include="OwinExtensions.cs" />
-    <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />

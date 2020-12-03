@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Identity;
@@ -18,27 +17,29 @@ namespace Umbraco.Web.Common.Security
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
     /// </summary>
-    /// <typeparam name="T">The type of user</typeparam>
-    public abstract class UmbracoUserManager<T> : UserManager<T>
-        where T : UmbracoIdentityUser
+    /// <typeparam name="TUser">The type of user</typeparam>
+    /// /// <typeparam name="TPasswordConfig">The type password config</typeparam>
+    public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<TUser>
+        where TUser : UmbracoIdentityUser
+        where TPasswordConfig: class, IPasswordConfiguration, new()
     {
         private PasswordGenerator _passwordGenerator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoUserManager{T}"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoUserManager{T, TPasswordConfig}"/> class.
         /// </summary>
         public UmbracoUserManager(
             IIpResolver ipResolver,
-            IUserStore<T> store,
-            IOptions<BackOfficeIdentityOptions> optionsAccessor,
-            IPasswordHasher<T> passwordHasher,
-            IEnumerable<IUserValidator<T>> userValidators,
-            IEnumerable<IPasswordValidator<T>> passwordValidators,
-            BackOfficeLookupNormalizer keyNormalizer,
-            BackOfficeIdentityErrorDescriber errors,
+            IUserStore<TUser> store,
+            IOptions<IdentityOptions> optionsAccessor,
+            IPasswordHasher<TUser> passwordHasher,
+            IEnumerable<IUserValidator<TUser>> userValidators,
+            IEnumerable<IPasswordValidator<TUser>> passwordValidators,
+            ILookupNormalizer keyNormalizer,
+            IdentityErrorDescriber errors,
             IServiceProvider services,
-            ILogger<UserManager<T>> logger,
-            IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
+            ILogger<UserManager<TUser>> logger,
+            IOptions<TPasswordConfig> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
@@ -67,9 +68,10 @@ namespace Umbraco.Web.Common.Security
         /// <returns>True if the sesion is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore<T>;
+            var userSessionStore = Store as IUserSessionStore<TUser>;
 
             // if this is not set, for backwards compat (which would be super rare), we'll just approve it
+            // TODO: This should be removed after members supports this
             if (userSessionStore == null)
             {
                 return true;
@@ -83,14 +85,9 @@ namespace Umbraco.Web.Common.Security
         /// </summary>
         /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
         /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
-        protected virtual IPasswordHasher<T> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<T>();
+        protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
 
-        /// <summary>
-        /// Gets or sets the default back office user password checker
-        /// </summary>
-        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
-
-        public IPasswordConfiguration PasswordConfiguration { get; protected set; }
+        public IPasswordConfiguration PasswordConfiguration { get; }
 
         public IIpResolver IpResolver { get; }
 
@@ -110,7 +107,7 @@ namespace Umbraco.Web.Common.Security
         }
 
         /// <inheritdoc />
-        public override async Task<bool> CheckPasswordAsync(T user, string password)
+        public override async Task<bool> CheckPasswordAsync(TUser user, string password)
         {
             // we cannot proceed if the user passed in does not have an identity
             if (user.HasIdentity == false)
@@ -135,7 +132,7 @@ namespace Umbraco.Web.Common.Security
         /// </remarks>
         public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
         {
-            T user = await FindByIdAsync(userId.ToString());
+            TUser user = await FindByIdAsync(userId.ToString());
             if (user == null)
             {
                 throw new InvalidOperationException("Could not find user");
@@ -148,9 +145,9 @@ namespace Umbraco.Web.Common.Security
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        private IUserSecurityStampStore<T> GetSecurityStore()
+        private IUserSecurityStampStore<TUser> GetSecurityStore()
         {
-            var store = Store as IUserSecurityStampStore<T>;
+            var store = Store as IUserSecurityStampStore<TUser>;
             if (store == null)
             {
                 throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
@@ -165,7 +162,7 @@ namespace Umbraco.Web.Common.Security
         private static string NewSecurityStamp() => Guid.NewGuid().ToString();
 
         /// <inheritdoc/>
-        public override async Task<IdentityResult> SetLockoutEndDateAsync(T user, DateTimeOffset? lockoutEnd)
+        public override async Task<IdentityResult> SetLockoutEndDateAsync(TUser user, DateTimeOffset? lockoutEnd)
         {
             if (user == null)
             {
@@ -185,14 +182,14 @@ namespace Umbraco.Web.Common.Security
         }
 
         /// <inheritdoc/>
-        public override async Task<IdentityResult> ResetAccessFailedCountAsync(T user)
+        public override async Task<IdentityResult> ResetAccessFailedCountAsync(TUser user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var lockoutStore = (IUserLockoutStore<T>)Store;
+            var lockoutStore = (IUserLockoutStore<TUser>)Store;
             var accessFailedCount = await GetAccessFailedCountAsync(user);
 
             if (accessFailedCount == 0)
@@ -209,14 +206,14 @@ namespace Umbraco.Web.Common.Security
         /// Overrides the Microsoft ASP.NET user management method
         /// </summary>
         /// <inheritdoc/>
-        public override async Task<IdentityResult> AccessFailedAsync(T user)
+        public override async Task<IdentityResult> AccessFailedAsync(TUser user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var lockoutStore = Store as IUserLockoutStore<T>;
+            var lockoutStore = Store as IUserLockoutStore<TUser>;
             if (lockoutStore == null)
             {
                 throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));

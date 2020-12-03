@@ -15,7 +15,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     // TODO: Make this into a base class that can be re-used
 

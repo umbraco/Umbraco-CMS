@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.Models;
 using IUser = Umbraco.Core.Models.Membership.IUser;

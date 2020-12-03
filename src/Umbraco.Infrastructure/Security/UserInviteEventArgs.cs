@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.BackOffice
 
         /// <summary>
         /// The local user that has been created that is pending the invite
-        /// </summary>        
+        /// </summary>
         public IUser User { get; }
 
         /// <summary>

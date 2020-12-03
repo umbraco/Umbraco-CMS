@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.BackOffice;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Builder;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.BackOffice.Mapping;
 

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -26,6 +25,7 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
@@ -33,8 +33,6 @@ using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

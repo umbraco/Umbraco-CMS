@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Security;
+using Umbraco.Core.Security;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
