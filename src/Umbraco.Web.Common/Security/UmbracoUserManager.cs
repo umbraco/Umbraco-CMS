@@ -156,11 +156,6 @@ namespace Umbraco.Web.Common.Security
             return store;
         }
 
-        /// <summary>
-        /// This is copied from the underlying .NET base class since they decided to not expose it
-        /// </summary>
-        private static string NewSecurityStamp() => Guid.NewGuid().ToString();
-
         /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(TUser user, DateTimeOffset? lockoutEnd)
         {
