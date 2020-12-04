@@ -18,6 +18,8 @@
             scope.allowChangeTemplate = false;
             scope.allTemplates = [];
 
+            scope.historyLabelKey = scope.node.variants && scope.node.variants.length === 1 ? "general_history" : "auditTrails_historyIncludingVariants";
+
             function onInit() {
                 entityResource.getAll("Template").then(function (templates) {
                     scope.allTemplates = templates;
@@ -46,8 +48,6 @@
                     "content_notCreated",
                     "prompt_unsavedChanges",
                     "prompt_doctypeChangeWarning",
-                    "general_history",
-                    "auditTrails_historyIncludingVariants",
                     "content_itemNotPublished",
                     "general_choose"
                 ];
@@ -61,10 +61,8 @@
                         labels.notCreated = data[4];
                         labels.unsavedChanges = data[5];
                         labels.doctypeChangeWarning = data[6];
-                        labels.notPublished = data[9];
-
-                        scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
-                        scope.chooseLabel = data[10];
+                        labels.notPublished = data[7];
+                        scope.chooseLabel = data[8];
 
                         setNodePublishStatus();
 

@@ -259,7 +259,7 @@
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
-    <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
+    <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="publishDescendantsHelp"><![CDATA[Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Publish variants and variants of same type underneath and thereby making their content publicly available.]]></key>
@@ -804,7 +804,6 @@
     <key alias="other">Other</key>
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
-    <key alias="clear">Clear</key>
     <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
@@ -1366,7 +1365,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
-    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -2297,9 +2295,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="name">Name</key>
     <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
-      <key alias="hasTranslation">Has translation</key>
-      <key alias="noTranslation">Missing translation</key>
-      <key alias="dictionaryListCaption">Dictionary items</key>
+    <key alias="searchOverlayTitle">Search the Umbraco backoffice</key>
+    <key alias="searchOverlayDescription">Search for content nodes, media nodes etc. across the backoffice.</key>
+    <key alias="searchInputDescription">When autocomplete results are available, press up and down arrows, or use the tab key and use the enter key to select.</key>
+    <key alias="path">Path: </key>
+    <key alias="foundIn">Found in</key>
+    <key alias="hasTranslation">Has translation</key>
+    <key alias="noTranslation">Missing translation</key>
+    <key alias="dictionaryListCaption">Dictionary items</key>
+    <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
+    <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
+    <key alias="addImageCaption">Add image caption</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2488,12 +2494,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Create new block</key>
-    <key alias="headlineAddSettingsElementType">Attach a settings section</key>
+    <key alias="headlineCreateBlock">Pick Element Type</key>
+    <key alias="headlineAddSettingsElementType">Attach a settings Element Type</key>
     <key alias="headlineAddCustomView">Select view</key>
     <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
     <key alias="headlineAddThumbnail">Choose thumbnail</key>
-    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
     <key alias="headlineEditorAppearance">Editor apperance</key>
@@ -2511,8 +2517,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete the content <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete the block configuration <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
@@ -2544,5 +2550,18 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
     <key alias="manageHeadline">How do I manage Content Templates?</key>
     <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">End</key>
+    <key alias="endTitle">End preview mode</key>
+    <key alias="openWebsiteLabel">Preview website</key>
+    <key alias="openWebsiteTitle">Open website in preview mode</key>
+    <key alias="returnToPreviewHeadline">Preview content?</key>
+    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to continue previewing this content?</key>
+    <key alias="returnToPreviewButton">Preview</key>
+    <key alias="viewPublishedContentHeadline">View published version?</key>
+    <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
+    <key alias="viewPublishedContentAcceptButton">View published version</key>
+    <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
   </area>
 </language>
