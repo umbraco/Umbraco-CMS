@@ -100,9 +100,21 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public UserBuilder<TParent> WithStartContentId(int startContentId)
+        {
+            _startContentIds = new[] { startContentId };
+            return this;
+        }
+
         public UserBuilder<TParent> WithStartContentIds(int[] startContentIds)
         {
             _startContentIds = startContentIds;
+            return this;
+        }
+
+        public UserBuilder<TParent> WithStartMediaId(int startMediaId)
+        {
+            _startMediaIds = new[] { startMediaId };
             return this;
         }
 
@@ -151,8 +163,8 @@ namespace Umbraco.Tests.Common.Builders
             var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
             var comments = _comments ?? string.Empty;
             var sessionTimeout = _sessionTimeout ?? 0;
-            var startContentIds = _startContentIds ?? new int[0];
-            var startMediaIds = _startMediaIds ?? new int[0];
+            var startContentIds = _startContentIds ?? new[] { -1 };
+            var startMediaIds = _startMediaIds ?? new[] { -1 };
             var groups = _userGroupBuilders.Select(x => x.Build());
 
             var result = new User(

@@ -175,9 +175,10 @@ namespace Umbraco.Tests.Common.Builders
             return content;
         }
 
-        public static Content CreateBasicContent(IContentType contentType)
+        public static Content CreateBasicContent(IContentType contentType, int id = 0)
         {
             return new ContentBuilder()
+                .WithId(id)
                 .WithContentType(contentType)
                 .WithName("Home")
                 .Build();

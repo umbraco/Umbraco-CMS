@@ -123,9 +123,10 @@ namespace Umbraco.Tests.Common.Builders
             return media;
         }
 
-        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId)
+        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId, int id = 0)
         {
             return new MediaBuilder()
+                .WithId(id)
                 .WithName(name)
                 .WithMediaType(mediaType)
                 .WithParentId(parentId)
