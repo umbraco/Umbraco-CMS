@@ -44,19 +44,30 @@ namespace Umbraco.Core.Security
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
-        // We don't support an IUserClaimStore and don't need to (at least currently)
-        public override bool SupportsUserClaim => false;
+        /// <inheritdoc />
+        public override bool SupportsUserClaim => false; // We don't support an IUserClaimStore and don't need to (at least currently)
 
-        // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
-        public override bool SupportsQueryableUsers => false;
+        /// <inheritdoc />
+        public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
 
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>
+        /// <inheritdoc />
         public override bool SupportsUserTwoFactor => false;
 
-        // We haven't needed to support this yet, though might be necessary for 2FA
-        public override bool SupportsUserPhoneNumber => false;
+        /// <inheritdoc />
+        public override bool SupportsUserPhoneNumber => false; // We haven't needed to support this yet, though might be necessary for 2FA
+
+        /// <summary>
+        /// Gets the password configuration
+        /// </summary>
+        public IPasswordConfiguration PasswordConfiguration { get; }
+
+        /// <summary>
+        /// Gets the IP resolver
+        /// </summary>
+        public IIpResolver IpResolver { get; }
 
         /// <summary>
         /// Used to validate a user's session
@@ -84,16 +95,6 @@ namespace Umbraco.Core.Security
         /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
         /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
         protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
-
-        /// <summary>
-        /// Gets the password configuration
-        /// </summary>
-        public IPasswordConfiguration PasswordConfiguration { get; }
-
-        /// <summary>
-        /// Gets the IP resolver
-        /// </summary>
-        public IIpResolver IpResolver { get; }
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
