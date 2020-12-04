@@ -6,17 +6,17 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Strings
 {
     /// <summary>
-    /// Provides extension methods to IContentBase to get url segments.
+    /// Provides extension methods to IContentBase to get URL segments.
     /// </summary>
     internal static class ContentBaseExtensions
     {
         /// <summary>
-        /// Gets the url segment for a specified content and culture.
+        /// Gets the URL segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <param name="urlSegmentProviders"></param>
-        /// <returns>The url segment.</returns>
+        /// <returns>The URL segment.</returns>
         public static string GetUrlSegment(this IContentBase content, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));

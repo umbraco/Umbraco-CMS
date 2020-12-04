@@ -19,7 +19,7 @@
         yeah so this is a pain, but we must be super specific in targeting the mandatory property labels,
         otherwise all properties within a reqired, nested, nested content property will all appear mandatory
     */
-    > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
+    .umb-property > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
         content: '*';
         color: @red;
     }
@@ -91,9 +91,10 @@
         color:@ui-option-type-hover;
     }
 
-    i {
+    .umb-nested-content__item-icon {
         position: absolute;
-        margin-top: -1px;
+        margin-top: -3px;
+        font-size: 22px;
     }
 
     .umb-nested-content__item-name {
@@ -116,7 +117,7 @@
     transition: opacity 120ms ease-in-out;
     position: absolute;
     right: 0;
-    top: 3px;
+    top: 5px;
     padding: 5px;
     background-color: @white;
 }
@@ -167,7 +168,7 @@
 
 .umb-nested-content__icon .icon {
     display: block;
-    font-size: 16px !important;
+    font-size: 18px !important;
 }
 
 .umb-nested-content__icon--disabled {

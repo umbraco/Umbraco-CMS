@@ -62,7 +62,7 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         private void BeginRequest(HttpContextBase httpContext)
         {
-            // ensure application url is initialized
+            // ensure application URL is initialized
             ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
 
             // do not process if client-side request
@@ -128,7 +128,7 @@ namespace Umbraco.Web
             // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
 
             // instantiate, prepare and process the published content request
-            // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
+            // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
             var request = _publishedRouter.CreateRequest(umbracoContext);
             umbracoContext.PublishedRequest = request;
             _publishedRouter.PrepareRequest(request);
@@ -276,7 +276,7 @@ namespace Umbraco.Web
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
-            // rewritten url, but this is not what we want!
+            // rewritten URL, but this is not what we want!
             // read: http://forums.iis.net/t/1146511.aspx
 
             var query = pcr.Uri.Query.TrimStart('?');
