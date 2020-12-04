@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 
 namespace Umbraco.Web.Media.Exif
@@ -162,16 +161,6 @@ namespace Umbraco.Web.Media.Exif
             }
         }
 
-        /// <summary>
-        /// Converts the <see cref="ImageFile"/> to a <see cref="System.Drawing.Image"/>.
-        /// </summary>
-        /// <returns>Returns a <see cref="System.Drawing.Image"/> containing image data.</returns>
-        public override Image ToImage()
-        {
-            MemoryStream stream = new MemoryStream();
-            Save(stream);
-            return Image.FromStream(stream);
-        }
         #endregion
     }
 }

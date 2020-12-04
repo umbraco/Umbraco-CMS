@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
-    internal class NewInstallStep : InstallSetupStep<UserModel>
+    public class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;

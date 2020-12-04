@@ -1,24 +1,29 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Soundcloud : EmbedProviderBase
+    public class Twitter : EmbedProviderBase
     {
-        public override string ApiEndpoint => "https://soundcloud.com/oembed";
+        public override string ApiEndpoint => "http://publish.twitter.com/oembed";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"soundcloud.com\/*"
+            @"twitter.com/.*/status/.*"
         };
-        
+
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
 
         public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
             var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-            var xmlDocument = base.GetXmlResponse(requestUrl);
+            var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
-            return GetXmlProperty(xmlDocument, "/oembed/html");
+            return oembed.GetHtml();
+        }
+
+        public Twitter(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

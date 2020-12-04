@@ -1,6 +1,7 @@
 ﻿using System;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -9,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -25,6 +27,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -56,11 +59,7 @@ using Umbraco.Web.Sections;
 using Umbraco.Web.Services;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
-using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Runtime
 {
@@ -379,6 +378,7 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique<UserEditorAuthorizationHelper>();
             builder.Services.AddUnique<ContentPermissions>();
             builder.Services.AddUnique<MediaPermissions>();
+            builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
         }
     }
 }

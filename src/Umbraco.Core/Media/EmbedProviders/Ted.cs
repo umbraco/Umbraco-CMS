@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Vimeo : EmbedProviderBase
+    public class Ted : EmbedProviderBase
     {
-        public override string ApiEndpoint => "https://vimeo.com/api/oembed.xml";
+        public override string ApiEndpoint => "http://www.ted.com/talks/oembed.xml";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"vimeo\.com/"
+            @"ted.com\/talks\/*"
         };
-        
+
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
 
         public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var xmlDocument = base.GetXmlResponse(requestUrl);
 
             return GetXmlProperty(xmlDocument, "/oembed/html");
+        }
+
+        public Ted(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

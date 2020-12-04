@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -29,9 +27,5 @@ namespace Umbraco.Web.Media.Exif
         {
         }
 
-        public override Image ToImage()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -26,6 +27,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var imageTitle = GetXmlProperty(xmlDocument, "/oembed/title");
 
             return string.Format("<img src=\"{0}\" width=\"{1}\" height=\"{2}\" alt=\"{3}\" />", imageUrl, imageWidth, imageHeight, WebUtility.HtmlEncode(imageTitle));
+        }
+
+        public Flickr(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

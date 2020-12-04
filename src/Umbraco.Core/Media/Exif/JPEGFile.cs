@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Text;
 
@@ -260,15 +259,6 @@ namespace Umbraco.Web.Media.Exif
             Save(stream, true);
         }
 
-        /// <summary>
-        /// Returns a System.Drawing.Image created with image data.
-        /// </summary>
-        public override Image ToImage()
-        {
-            MemoryStream stream = new MemoryStream();
-            Save(stream);
-            return Image.FromStream(stream);
-        }
         #endregion
 
         #region Private Helper Methods

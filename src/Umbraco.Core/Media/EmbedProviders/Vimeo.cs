@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Slideshare : EmbedProviderBase
+    public class Vimeo : EmbedProviderBase
     {
-        public override string ApiEndpoint => "http://www.slideshare.net/api/oembed/2";
+        public override string ApiEndpoint => "https://vimeo.com/api/oembed.xml";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"slideshare\.net/"
+            @"vimeo\.com/"
         };
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var xmlDocument = base.GetXmlResponse(requestUrl);
 
             return GetXmlProperty(xmlDocument, "/oembed/html");
+        }
+
+        public Vimeo(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

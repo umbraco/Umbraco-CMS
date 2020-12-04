@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Web.Media.EmbedProviders
             @"youtu.be/.*",
             @"youtube.com/watch.*"
         };
-        
+
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>()
         {
             //ApiUrl/?format=json
@@ -24,6 +25,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
             return oembed.GetHtml();
+        }
+
+        public YouTube(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

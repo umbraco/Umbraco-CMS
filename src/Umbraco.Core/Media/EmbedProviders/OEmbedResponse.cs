@@ -1,11 +1,12 @@
 ﻿using System.Net;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
     /// <summary>
     /// Wrapper class for OEmbed response
     /// </summary>
+    [DataContract]
     public class OEmbedResponse
     {
         public string Type { get; set; }
@@ -14,25 +15,25 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public string Title { get; set; }
 
-        [JsonProperty("author_name")]
+        [DataMember(Name ="author_name")]
         public string AuthorName { get; set; }
 
-        [JsonProperty("author_url")]
+        [DataMember(Name ="author_url")]
         public string AuthorUrl { get; set; }
 
-        [JsonProperty("provider_name")]
+        [DataMember(Name ="provider_name")]
         public string ProviderName { get; set; }
 
-        [JsonProperty("provider_url")]
+        [DataMember(Name ="provider_url")]
         public string ProviderUrl { get; set; }
 
-        [JsonProperty("thumbnail_url")]
+        [DataMember(Name ="thumbnail_url")]
         public string ThumbnailUrl { get; set; }
 
-        [JsonProperty("thumbnail_height")]
+        [DataMember(Name ="thumbnail_height")]
         public double? ThumbnailHeight { get; set; }
 
-        [JsonProperty("thumbnail_width")]
+        [DataMember(Name ="thumbnail_width")]
         public double? ThumbnailWidth { get; set; }
 
         public string Html { get; set; }

@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    /// <summary>
-    /// Embed Provider for Giphy.com the popular online GIFs and animated sticker provider.
-    /// </summary>
-    public class Giphy : EmbedProviderBase
+    public class GettyImages : EmbedProviderBase
     {
-        public override string ApiEndpoint => "https://giphy.com/services/oembed?url=";
+        public override string ApiEndpoint => "http://embed.gettyimages.com/oembed";
 
+        //http://gty.im/74917285
+        //http://www.gettyimages.com/detail/74917285
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"giphy\.com/*",
-            @"gph\.is/*"
+            @"gty\.im/*",
+            @"gettyimages.com\/detail\/*"
         };
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
@@ -27,6 +23,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
             return oembed.GetHtml();
+        }
+
+        public GettyImages(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

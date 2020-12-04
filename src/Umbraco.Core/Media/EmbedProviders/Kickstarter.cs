@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Twitter : EmbedProviderBase
+    public class Kickstarter : EmbedProviderBase
     {
-        public override string ApiEndpoint => "http://publish.twitter.com/oembed";
+        public override string ApiEndpoint => "http://www.kickstarter.com/services/oembed";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"twitter.com/.*/status/.*"
+            @"kickstarter\.com/projects/*"
         };
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
             return oembed.GetHtml();
+        }
+
+        public Kickstarter(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

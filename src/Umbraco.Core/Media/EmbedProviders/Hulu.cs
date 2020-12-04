@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Kickstarter : EmbedProviderBase
+    public class Hulu : EmbedProviderBase
     {
-        public override string ApiEndpoint => "http://www.kickstarter.com/services/oembed";
+        public override string ApiEndpoint => "http://www.hulu.com/api/oembed.json";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"kickstarter\.com/projects/*"
+            @"hulu.com/watch/.*"
         };
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
@@ -19,6 +20,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
             return oembed.GetHtml();
+        }
+
+        public Hulu(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

@@ -1,21 +1,18 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class DailyMotion : EmbedProviderBase
+    public class Slideshare : EmbedProviderBase
     {
-        public override string ApiEndpoint => "https://www.dailymotion.com/services/oembed";
+        public override string ApiEndpoint => "http://www.slideshare.net/api/oembed/2";
 
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"dailymotion.com/video/.*"
+            @"slideshare\.net/"
         };
-        
-        public override Dictionary<string, string> RequestParams => new Dictionary<string, string>()
-        {
-            //ApiUrl/?format=xml
-            {"format", "xml"}
-        };
+
+        public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
 
         public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
@@ -23,6 +20,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var xmlDocument = base.GetXmlResponse(requestUrl);
 
             return GetXmlProperty(xmlDocument, "/oembed/html");
+        }
+
+        public Slideshare(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

@@ -1,16 +1,23 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Xml;
 using Umbraco.Core.Media;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
     public abstract class EmbedProviderBase : IEmbedProvider
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
+        protected EmbedProviderBase(IJsonSerializer jsonSerializer)
+        {
+            _jsonSerializer = jsonSerializer;
+        }
+
         private static HttpClient _httpClient;
 
         public abstract string ApiEndpoint { get; }
@@ -58,7 +65,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         public virtual T GetJsonResponse<T>(string url) where T : class
         {
             var response = DownloadResponse(url);
-            return JsonConvert.DeserializeObject<T>(response);
+            return _jsonSerializer.Deserialize<T>(response);
         }
 
         public virtual XmlDocument GetXmlResponse(string url)

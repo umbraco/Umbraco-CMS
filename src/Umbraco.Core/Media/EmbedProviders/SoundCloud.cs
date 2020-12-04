@@ -1,17 +1,15 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class GettyImages : EmbedProviderBase
+    public class Soundcloud : EmbedProviderBase
     {
-        public override string ApiEndpoint => "http://embed.gettyimages.com/oembed";
+        public override string ApiEndpoint => "https://soundcloud.com/oembed";
 
-        //http://gty.im/74917285
-        //http://www.gettyimages.com/detail/74917285
         public override string[] UrlSchemeRegex => new string[]
         {
-            @"gty\.im/*",
-            @"gettyimages.com\/detail\/*"
+            @"soundcloud.com\/*"
         };
 
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
@@ -19,9 +17,13 @@ namespace Umbraco.Web.Media.EmbedProviders
         public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
         {
             var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-            var oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
+            var xmlDocument = base.GetXmlResponse(requestUrl);
 
-            return oembed.GetHtml();
+            return GetXmlProperty(xmlDocument, "/oembed/html");
+        }
+
+        public Soundcloud(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

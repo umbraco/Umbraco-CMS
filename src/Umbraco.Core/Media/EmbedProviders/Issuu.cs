@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         {
             @"issuu.com/.*/docs/.*"
         };
-        
+
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>()
         {
             //ApiUrl/?format=xml
@@ -23,6 +24,10 @@ namespace Umbraco.Web.Media.EmbedProviders
             var xmlDocument = base.GetXmlResponse(requestUrl);
 
             return GetXmlProperty(xmlDocument, "/oembed/html");
+        }
+
+        public Issuu(IJsonSerializer jsonSerializer) : base(jsonSerializer)
+        {
         }
     }
 }

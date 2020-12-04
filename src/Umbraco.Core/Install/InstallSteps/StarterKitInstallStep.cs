@@ -3,10 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core.Security;
-using Umbraco.Net;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

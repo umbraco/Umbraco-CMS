@@ -2,11 +2,11 @@
 using System.Drawing;
 using System.IO;
 using Umbraco.Core;
-using Umbraco.Web.Media.Exif;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media
 {
-    public static class ImageHelper
+    internal class ImageDimensionExtractor : IImageDimensionExtractor
     {
         /// <summary>
         /// Gets the dimensions of an image.
@@ -16,24 +16,14 @@ namespace Umbraco.Web.Media
         /// <remarks>First try with EXIF as it is faster and does not load the entire image
         /// in memory. Fallback to GDI which means loading the image in memory and thus
         /// use potentially large amounts of memory.</remarks>
-        public static Size GetDimensions(Stream stream)
+        public ImageSize GetDimensions(Stream stream)
         {
             //Try to load with exif
             try
             {
-                var jpgInfo = ImageFile.FromStream(stream);
-
-                if (jpgInfo != null
-                    && jpgInfo.Format != ImageFileFormat.Unknown
-                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
-                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
+                if (ExifImageDimensionExtractor.TryGetDimensions(stream, out var width, out var height))
                 {
-                    var height = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelYDimension].Value);
-                    var width = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelXDimension].Value);
-                    if (height > 0 && width > 0)
-                    {
-                        return new Size(width, height);
-                    }
+                    return new ImageSize(width, height);
                 }
             }
             catch
@@ -48,7 +38,7 @@ namespace Umbraco.Web.Media
                 {
                     var fileWidth = image.Width;
                     var fileHeight = image.Height;
-                    return new Size(fileWidth, fileHeight);
+                    return new ImageSize(fileWidth, fileHeight);
                 }
             }
             catch (Exception)
@@ -56,7 +46,7 @@ namespace Umbraco.Web.Media
                 //We will just swallow, just means we can't read via GDI, we don't want to log an error either
             }
 
-            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
+            return new ImageSize(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
         }
     }
 }
