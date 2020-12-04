@@ -9,7 +9,7 @@
             controllerAs: "vm",
             transclude: true,
             bindings: {
-                blockConfigModel: "<",
+                blockConfigModel: "<?",
                 elementTypeModel: "<"
             }
         });
@@ -35,7 +35,7 @@
         }
 
         vm.updateThumbnail = function () {
-            if (vm.blockConfigModel.thumbnail == null || vm.blockConfigModel.thumbnail === "") {
+            if (vm.blockConfigModel == null || vm.blockConfigModel.thumbnail == null || vm.blockConfigModel.thumbnail === "") {
                 vm.styleBackgroundImage = "none";
                 return;
             }
