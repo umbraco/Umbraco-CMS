@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,12 +19,12 @@ using Serilog;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -42,7 +41,7 @@ using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Common.Profiler;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     // TODO: We could add parameters to configure each of these for flexibility
     public static class UmbracoBuilderExtensions
@@ -52,8 +51,10 @@ namespace Umbraco.Web.Common.Builder
             IWebHostEnvironment webHostEnvironment,
             IConfiguration config)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
-            if (config is null) throw new ArgumentNullException(nameof(config));
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+            if (config is null)
+                throw new ArgumentNullException(nameof(config));
 
             var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
@@ -79,7 +80,8 @@ namespace Umbraco.Web.Common.Builder
         /// <remarks>Composes Composers</remarks>
         public static IUmbracoBuilder AddUmbracoCore(this IUmbracoBuilder builder)
         {
-            if (builder is null) throw new ArgumentNullException(nameof(builder));
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
 
             builder.Services.AddLazySupport();
 

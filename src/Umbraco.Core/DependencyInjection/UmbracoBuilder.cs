@@ -1,13 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Events;
 
-namespace Umbraco.Web.Common.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
@@ -28,6 +31,8 @@ namespace Umbraco.Web.Common.Builder
             Config = config;
             BuilderLoggerFactory = loggerFactory;
             TypeLoader = typeLoader;
+
+            AddCoreServices();
         }
 
         /// <summary>
@@ -54,6 +59,13 @@ namespace Umbraco.Web.Common.Builder
                 builder.RegisterWith(Services);
 
             _builders.Clear();
+        }
+
+        private void AddCoreServices()
+        {
+            // Register as singleton to allow injection everywhere.
+            Services.AddSingleton<ServiceFactory>(p => p.GetService);
+            Services.AddSingleton<IEventAggregator, EventAggregator>();
         }
     }
 }

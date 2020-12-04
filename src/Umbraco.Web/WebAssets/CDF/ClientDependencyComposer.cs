@@ -1,5 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.WebAssets;
 

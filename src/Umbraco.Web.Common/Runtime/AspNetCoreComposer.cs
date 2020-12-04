@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Diagnostics;

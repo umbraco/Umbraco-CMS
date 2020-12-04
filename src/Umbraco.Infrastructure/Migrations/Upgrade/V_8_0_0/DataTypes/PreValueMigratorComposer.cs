@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Builder;
+﻿using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes

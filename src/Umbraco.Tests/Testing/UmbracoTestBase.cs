@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Web.Http.Validation;
-using System.Web.Routing;
-using System.Web.Security;
-using System.Xml.Linq;
-using Examine;
+﻿using Examine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,20 +6,28 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Web.Routing;
+using System.Web.Security;
+using System.Xml.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
@@ -52,7 +50,6 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.AspNet;
-using Umbraco.Web.Common.Builder;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Install;
@@ -136,7 +133,7 @@ namespace Umbraco.Tests.Testing
         protected IPasswordHasher PasswordHasher => Factory.GetRequiredService<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetRequiredService<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetRequiredService<ILocalizationService>();
-        protected ILocalizedTextService LocalizedTextService  { get; private set; }
+        protected ILocalizedTextService LocalizedTextService { get; private set; }
         protected IShortStringHelper ShortStringHelper => Factory?.GetRequiredService<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
         protected IImageUrlGenerator ImageUrlGenerator => Factory.GetRequiredService<IImageUrlGenerator>();
         protected UploadAutoFillProperties UploadAutoFillProperties => Factory.GetRequiredService<UploadAutoFillProperties>();
@@ -389,30 +386,30 @@ namespace Umbraco.Tests.Testing
                 .ComposeCoreMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
                 case UmbracoTestOptions.TypeLoader.Default:
-                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment));
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger, hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerFixture:
-                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment));
+                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger, hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerTest:
-                    return CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
+                    return CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger, hostingEnvironment);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(option));
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
+        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IHostingEnvironment hostingEnvironment)
         {
-            return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
+            return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger, hostingEnvironment);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
+        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IHostingEnvironment hostingEnvironment)
         {
-            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, profilingLogger , false, new[]
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, profilingLogger, false, new[]
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
@@ -498,7 +495,7 @@ namespace Umbraco.Tests.Testing
 
             Builder.Services.AddUnique(factory
                 => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<ITypeFinder>(), factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
-            Builder.Services.AddUnique(factory => (IScopeAccessor) factory.GetRequiredService<IScopeProvider>());
+            Builder.Services.AddUnique(factory => (IScopeAccessor)factory.GetRequiredService<IScopeProvider>());
 
             Builder.ComposeServices();
 
