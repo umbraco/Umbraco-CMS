@@ -37,13 +37,11 @@ namespace Umbraco.Core.Security
 
             ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(user);
 
-            // TODO: How to flow claims then? This is most likely built into aspnetcore now and this is not the way
-
             // now we can flow any custom claims that the actual user has currently assigned which could be done in the OnExternalLogin callback
-            //foreach (Models.Identity.IdentityUserClaim<int> claim in user.Claims)
-            //{
-            //    baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
-            //}
+            foreach (IdentityUserClaim<string> claim in user.Claims)
+            {
+                baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
+            }
 
             // TODO: We want to remove UmbracoBackOfficeIdentity and only rely on ClaimsIdentity, once
             // that is done then we'll create a ClaimsIdentity with all of the requirements here instead
