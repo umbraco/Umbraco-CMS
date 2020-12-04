@@ -71,7 +71,7 @@
     <key alias="create">Allow access to create nodes</key>
     <key alias="delete">Allow access to delete nodes</key>
     <key alias="move">Allow access to move a node</key>
-    <key alias="protect">Allow access to set and change Access restrictions for a node</key>
+    <key alias="protect">Allow access to set and change access restrictions for a node</key>
     <key alias="publish">Allow access to publish a node</key>
     <key alias="unpublish">Allow access to unpublish a node</key>
     <key alias="rights">Allow access to change permissions for a node</key>
@@ -2253,7 +2253,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
     <key alias="assignDomainDescription">Setup Culture and Hostnames for %0%</key>
     <key alias="createDescription">Create new node under %0%</key>
-    <key alias="protectDescription">Setup Access restrictions on %0%</key>
+    <key alias="protectDescription">Setup access restrictions on %0%</key>
     <key alias="rightsDescription">Setup Permissions on %0%</key>
     <key alias="sortDescription">Change sort order for %0%</key>
     <key alias="createblueprintDescription">Create Content Template based on %0%</key>
