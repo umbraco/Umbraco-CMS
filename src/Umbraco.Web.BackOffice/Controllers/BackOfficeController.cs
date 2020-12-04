@@ -433,7 +433,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
 
-            }            
+            }
             else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
             {
 

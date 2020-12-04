@@ -390,7 +390,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     await _emailSender.SendAsync(mailMessage);
 
-                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id);
+                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id.ToString());
                 }
             }
 
@@ -554,7 +554,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 }
 
-                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId);
+                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId.ToString());
                 return Ok();
             }
 
@@ -577,7 +577,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = int.Parse(result.Principal.Identity.GetUserId());
+            var userId = result.Principal.Identity.GetUserId();
             var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
@@ -608,10 +608,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             return userDetail;
         }
 
-        private string ConstructCallbackUrl(int userId, string code)
+        private string ConstructCallbackUrl(string userId, string code)
         {
             // Get an mvc helper to get the url
-            var action = _linkGenerator.GetPathByAction(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.ValidatePasswordResetCode),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
                 new
                 {
                     area = Constants.Web.Mvc.BackOfficeArea,

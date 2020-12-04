@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
@@ -16,13 +17,13 @@ namespace Umbraco.Core.Security
         private string _name;
         private string _passwordConfig;
         private string _culture;
-        private IReadOnlyUserGroup[] _groups;
+        private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
         private string[] _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
 
         // Custom comparer for enumerables
-        private static readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
+        private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
             (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
             groups => groups.GetHashCode());
 
@@ -51,9 +52,7 @@ namespace Umbraco.Core.Security
             user.UserName = username;
             user.Email = email;
 
-            // we are setting minvalue here because the default is "0" which is the id of the admin user
-            // which we cannot allow because the admin user will always exist
-            user.Id = int.MinValue;
+            user.Id = null;
             user.HasIdentity = false;
             user._culture = culture;
             user._name = name;
@@ -61,7 +60,7 @@ namespace Umbraco.Core.Security
             return user;
         }
 
-        private BackOfficeIdentityUser(GlobalSettings globalSettings, IReadOnlyUserGroup[] groups)
+        private BackOfficeIdentityUser(GlobalSettings globalSettings, IReadOnlyCollection<IReadOnlyUserGroup> groups)
         {
             _startMediaIds = Array.Empty<int>();
             _startContentIds = Array.Empty<int>();
@@ -79,7 +78,7 @@ namespace Umbraco.Core.Security
             : this(globalSettings, groups.ToArray())
         {
             // use the property setters - they do more than just setting a field
-            Id = userId;
+            Id = UserIdToString(userId);
         }
 
         public int[] CalculatedMediaStartNodeIds { get; set; }
@@ -141,13 +140,19 @@ namespace Umbraco.Core.Security
         /// </summary>
         public string[] AllowedSections => _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray());
 
+        /// <summary>
+        /// Gets or sets the culture
+        /// </summary>
         public string Culture
         {
             get => _culture;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
         }
 
-        public IReadOnlyUserGroup[] Groups
+        /// <summary>
+        /// Gets or sets the user groups
+        /// </summary>
+        public IReadOnlyCollection<IReadOnlyUserGroup> Groups
         {
             get => _groups;
             set
@@ -155,13 +160,13 @@ namespace Umbraco.Core.Security
                 // so they recalculate
                 _allowedSections = null;
 
-                _groups = value;
+                _groups = value.Where(x => x.Alias != null).ToArray();
 
-                var roles = new List<IdentityUserRole>();
-                foreach (IdentityUserRole identityUserRole in _groups.Select(x => new IdentityUserRole
+                var roles = new List<IdentityUserRole<string>>();
+                foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
                 {
                     RoleId = x.Alias,
-                    UserId = Id
+                    UserId = Id?.ToString()
                 }))
                 {
                     roles.Add(identityUserRole);
@@ -174,7 +179,6 @@ namespace Umbraco.Core.Security
             }
         }
 
-
         /// <summary>
         /// Gets a value indicating whether the user is locked out based on the user's lockout end date
         /// </summary>
@@ -182,7 +186,7 @@ namespace Umbraco.Core.Security
         {
             get
             {
-                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now;
+                var isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
                 return isLocked;
             }
         }
@@ -192,5 +196,6 @@ namespace Umbraco.Core.Security
         /// </summary>
         public bool IsApproved { get; set; }
 
+        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
     }
 }

@@ -3,23 +3,33 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity
 {
+
     /// <summary>
     /// Abstract class for use in Umbraco Identity for users and members
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// This uses strings for the ID of the user, claims, roles. This is because aspnetcore identity's base store will
+    /// not support having an INT user PK and a string role PK with the way they've made the generics. So we will just use
+    /// string for both which makes things more flexible anyways for users and members and also if/when we transition to
+    /// GUID support
+    /// </para>
+    /// <para>
     /// This class was originally borrowed from the EF implementation in Identity prior to netcore.
     /// The new IdentityUser in netcore does not have properties such as Claims, Roles and Logins and those are instead
     /// by default managed with their default user store backed by EF which utilizes EF's change tracking to track these values
     /// to a user. We will continue using this approach since it works fine for what we need which does the change tracking of
     /// claims, roles and logins directly on the user model.
+    /// </para>
     /// </remarks>
-    public abstract class UmbracoIdentityUser : IRememberBeingDirty
+    public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
-        private int _id;
+        private string _id;
         private string _email;
         private string _userName;
         private DateTime? _lastLoginDateUtc;
@@ -29,7 +39,7 @@ namespace Umbraco.Core.Models.Identity
         private DateTime? _lastPasswordChangeDateUtc;
         private ObservableCollection<IIdentityUserLogin> _logins;
         private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
-        private ObservableCollection<IdentityUserRole> _roles;
+        private ObservableCollection<IdentityUserRole<string>> _roles;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoIdentityUser"/> class.
@@ -37,9 +47,9 @@ namespace Umbraco.Core.Models.Identity
         public UmbracoIdentityUser()
         {
             // must initialize before setting groups
-            _roles = new ObservableCollection<IdentityUserRole>();
+            _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += Roles_CollectionChanged;
-            Claims = new List<IdentityUserClaim>();
+            Claims = new List<IdentityUserClaim<string>>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged
@@ -67,7 +77,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets email
         /// </summary>
-        public string Email
+        public override string Email
         {
             get => _email;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
@@ -76,7 +86,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets a value indicating whether the email is confirmed, default is false
         /// </summary>
-        public bool EmailConfirmed
+        public override bool EmailConfirmed
         {
             get => _emailConfirmed;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, nameof(EmailConfirmed));
@@ -85,45 +95,11 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets the salted/hashed form of the user password
         /// </summary>
-        public string PasswordHash
+        public override string PasswordHash
         {
             get => _passwordHash;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, nameof(PasswordHash));
         }
-
-        /// <summary>
-        /// Gets or sets a random value that should change whenever a users credentials have changed (password changed, login removed)
-        /// </summary>
-        public virtual string SecurityStamp { get; set; }
-
-        /// <summary>
-        /// Gets or sets a phone Number for the user
-        /// </summary>
-        /// <remarks>
-        /// This is unused until we or an end-user requires this value for 2FA
-        /// </remarks>
-        public virtual string PhoneNumber { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether true if the phone number is confirmed, default is false
-        /// </summary>
-        /// <remarks>
-        /// This is unused until we or an end-user requires this value for 2FA
-        /// </remarks>
-        public virtual bool PhoneNumberConfirmed { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether is two factor enabled for the user
-        /// </summary>
-        /// <remarks>
-        /// This is unused until we or an end-user requires this value for 2FA
-        /// </remarks>
-        public virtual bool TwoFactorEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets dateTime in UTC when lockout ends, any time in the past is considered not locked out.
-        /// </summary>
-        public virtual DateTime? LockoutEndDateUtc { get; set; }
 
         /// <summary>
         /// Gets or sets dateTime in UTC when the password was last changed.
@@ -140,7 +116,7 @@ namespace Umbraco.Core.Models.Identity
         /// <remarks>
         /// Currently this is always true for users and members
         /// </remarks>
-        public bool LockoutEnabled
+        public override bool LockoutEnabled
         {
             get => true;
             set { }
@@ -149,7 +125,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets the value to record failures for the purposes of lockout
         /// </summary>
-        public int AccessFailedCount
+        public override int AccessFailedCount
         {
             get => _accessFailedCount;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, nameof(AccessFailedCount));
@@ -158,13 +134,13 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets the user roles collection
         /// </summary>
-        public ICollection<IdentityUserRole> Roles
+        public ICollection<IdentityUserRole<string>> Roles
         {
             get => _roles;
             set
             {
                 _roles.CollectionChanged -= Roles_CollectionChanged;
-                _roles = new ObservableCollection<IdentityUserRole>(value);
+                _roles = new ObservableCollection<IdentityUserRole<string>>(value);
                 _roles.CollectionChanged += Roles_CollectionChanged;
             }
         }
@@ -172,7 +148,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets navigation the user claims collection
         /// </summary>
-        public ICollection<IdentityUserClaim> Claims { get; }
+        public ICollection<IdentityUserClaim<string>> Claims { get; }
 
         /// <summary>
         /// Gets the user logins collection
@@ -208,7 +184,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets user ID (Primary Key)
         /// </summary>
-        public int Id
+        public override string Id
         {
             get => _id;
             set
@@ -226,7 +202,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Gets or sets user name
         /// </summary>
-        public string UserName
+        public override string UserName
         {
             get => _userName;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, nameof(UserName));
@@ -281,7 +257,7 @@ namespace Umbraco.Core.Models.Identity
         /// <remarks>
         /// Adding a role this way will not reflect on the user's group's collection or it's allowed sections until the user is persisted
         /// </remarks>
-        public void AddRole(string role) => Roles.Add(new IdentityUserRole
+        public void AddRole(string role) => Roles.Add(new IdentityUserRole<string>
         {
             UserId = Id,
             RoleId = role

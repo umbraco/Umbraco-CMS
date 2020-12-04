@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using NUnit.Framework;
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             });
 
             var identity = new UmbracoBackOfficeIdentity(claimsIdentity,
-                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
+                "1234", "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
             Assert.AreEqual(12, identity.Claims.Count());
             Assert.IsNull(identity.Actor);
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var securityStamp = Guid.NewGuid().ToString();
 
             var identity = new UmbracoBackOfficeIdentity(
-                1234, "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
+                "1234", "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
 
             // this will be filtered out during cloning
             identity.AddClaim(new Claim(Constants.Security.TicketExpiresClaimType, "test"));

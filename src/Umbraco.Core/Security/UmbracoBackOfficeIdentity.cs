@@ -53,7 +53,7 @@ namespace Umbraco.Core.Security
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
-        public UmbracoBackOfficeIdentity(int userId, string username, string realName,
+        public UmbracoBackOfficeIdentity(string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
             : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Security
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
         public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
-            int userId, string username, string realName,
+            string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
@@ -126,13 +126,13 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Adds claims based on the ctor data
         /// </summary>
-        private void AddRequiredClaims(int userId, string username, string realName,
+        private void AddRequiredClaims(string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
             //This is the id that 'identity' uses to check for the user id
             if (HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
-                AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == ClaimTypes.Name) == false)
                 AddClaim(new Claim(ClaimTypes.Name, username, ClaimValueTypes.String, Issuer, Issuer, this));

@@ -6,12 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Net;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
@@ -21,7 +19,7 @@ namespace Umbraco.Web.Common.Security
     /// /// <typeparam name="TPasswordConfig">The type password config</typeparam>
     public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<TUser>
         where TUser : UmbracoIdentityUser
-        where TPasswordConfig: class, IPasswordConfiguration, new()
+        where TPasswordConfig : class, IPasswordConfiguration, new()
     {
         private PasswordGenerator _passwordGenerator;
 
@@ -87,8 +85,14 @@ namespace Umbraco.Web.Common.Security
         /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
         protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
 
+        /// <summary>
+        /// Gets the password configuration
+        /// </summary>
         public IPasswordConfiguration PasswordConfiguration { get; }
 
+        /// <summary>
+        /// Gets the IP resolver
+        /// </summary>
         public IIpResolver IpResolver { get; }
 
         /// <summary>
@@ -130,30 +134,16 @@ namespace Umbraco.Web.Common.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
+        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
         {
-            TUser user = await FindByIdAsync(userId.ToString());
+            TUser user = await FindByIdAsync(userId);
             if (user == null)
             {
                 throw new InvalidOperationException("Could not find user");
             }
 
-            IdentityResult result = await base.ResetPasswordAsync(user, token, newPassword);
+            IdentityResult result = await ResetPasswordAsync(user, token, newPassword);
             return result;
-        }
-
-        /// <summary>
-        /// This is copied from the underlying .NET base class since they decided to not expose it
-        /// </summary>
-        private IUserSecurityStampStore<TUser> GetSecurityStore()
-        {
-            var store = Store as IUserSecurityStampStore<TUser>;
-            if (store == null)
-            {
-                throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
-            }
-
-            return store;
         }
 
         /// <inheritdoc/>

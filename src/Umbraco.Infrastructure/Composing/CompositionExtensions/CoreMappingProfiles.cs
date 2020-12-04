@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Builder;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
@@ -19,7 +19,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             builder.Services.AddUnique<UmbracoMapper>();
 
             builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-                .Add<IdentityMapDefinition>()
                 .Add<AuditMapDefinition>()
                 .Add<CodeFileMapDefinition>()
                 .Add<ContentPropertyMapDefinition>()

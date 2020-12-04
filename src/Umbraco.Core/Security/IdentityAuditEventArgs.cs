@@ -27,12 +27,12 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// The user affected by the event raised
         /// </summary>
-        public int AffectedUser { get; private set; }
+        public string AffectedUser { get; private set; }
 
         /// <summary>
         /// If a user is performing an action on a different user, then this will be set. Otherwise it will be -1
         /// </summary>
-        public int PerformingUser { get; private set; }
+        public string PerformingUser { get; private set; }
 
         /// <summary>
         /// An optional comment about the action being logged
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Security
         /// <param name="comment"></param>
         /// <param name="performingUser"></param>
         /// <param name="affectedUser"></param>
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser, string comment, int affectedUser, string affectedUsername)
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment, string affectedUser, string affectedUsername)
         {
             DateTimeUtc = DateTime.UtcNow;
             Action = action;
@@ -64,8 +64,8 @@ namespace Umbraco.Core.Security
             AffectedUser = affectedUser;
         }
 
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser, string comment, string affectedUsername)
-            : this(action, ipAddress, performingUser, comment, -1, affectedUsername)
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment, string affectedUsername)
+            : this(action, ipAddress, performingUser, comment, Constants.Security.SuperUserIdAsString, affectedUsername)
         {
         }
 

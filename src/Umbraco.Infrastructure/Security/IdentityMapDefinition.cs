@@ -65,7 +65,7 @@ namespace Umbraco.Core.Security
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
-            target.LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+            target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
 
             // this was in AutoMapper but does not have a setter anyways
             //target.AllowedSections = source.AllowedSections.ToArray(),

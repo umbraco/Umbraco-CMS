@@ -9,6 +9,9 @@ namespace Umbraco.Core.Models.Identity
     /// </summary>
     public class IdentityUserLogin : EntityBase, IIdentityUserLogin
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdentityUserLogin"/> class.
+        /// </summary>
         public IdentityUserLogin(string loginProvider, string providerKey, string userId)
         {
             LoginProvider = loginProvider;
@@ -16,6 +19,9 @@ namespace Umbraco.Core.Models.Identity
             UserId = userId;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdentityUserLogin"/> class.
+        /// </summary>
         public IdentityUserLogin(int id, string loginProvider, string providerKey, string userId, DateTime createDate)
         {
             Id = id;

@@ -6,8 +6,8 @@ namespace Umbraco.Core.Security
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {
-        public UserInviteEventArgs(string ipAddress, int performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
-            : base(AuditEvent.SendingUserInvite, ipAddress,  performingUser, comment, localUser.Id, localUser.Name)
+        public UserInviteEventArgs(string ipAddress, string performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
+            : base(AuditEvent.SendingUserInvite, ipAddress,  performingUser, comment, string.Intern(localUser.Id.ToString()), localUser.Name)
         {
             InvitedUser = invitedUser ?? throw new System.ArgumentNullException(nameof(invitedUser));
             User = localUser;

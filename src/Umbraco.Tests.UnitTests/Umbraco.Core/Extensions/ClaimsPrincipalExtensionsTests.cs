@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         [Test]
         public void Get_Remaining_Ticket_Seconds()
         {
-            var backOfficeIdentity = new UmbracoBackOfficeIdentity(-1, "test", "test",
+            var backOfficeIdentity = new UmbracoBackOfficeIdentity(Constants.Security.SuperUserIdAsString, "test", "test",
                 Enumerable.Empty<int>(), Enumerable.Empty<int>(), "en-US", Guid.NewGuid().ToString(),
                 Enumerable.Empty<string>(), Enumerable.Empty<string>());
             var principal = new ClaimsPrincipal(backOfficeIdentity);

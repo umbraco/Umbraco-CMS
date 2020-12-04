@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Security
                 //ok, we should be able to reset it
                 var resetToken = await userMgr.GeneratePasswordResetTokenAsync(backOfficeIdentityUser);
 
-                var resetResult = await userMgr.ChangePasswordWithResetAsync(savingUser.Id, resetToken, passwordModel.NewPassword);
+                var resetResult = await userMgr.ChangePasswordWithResetAsync(savingUser.Id.ToString(), resetToken, passwordModel.NewPassword);
 
                 if (resetResult.Succeeded == false)
                 {

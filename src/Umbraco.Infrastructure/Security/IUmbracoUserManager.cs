@@ -42,22 +42,18 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Gets the external logins for the user
         /// </summary>
-        /// <param name="user"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
 
         /// <summary>
         /// Deletes a user
         /// </summary>
-        /// <param name="user"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> DeleteAsync(TUser user);
 
         /// <summary>
         /// Finds a user by the external login provider
         /// </summary>
-        /// <param name="loginProvider"></param>
-        /// <param name="providerKey"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
@@ -82,15 +78,11 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="token"></param>
-        /// <param name="newPassword"></param>
-        /// <returns></returns>
         /// <remarks>
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword);
+        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
 
         /// <summary>
         /// Validates that an email confirmation token matches the specified <paramref name="user"/>.
@@ -130,8 +122,6 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         /// <remarks>
         /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
         /// </remarks>
@@ -192,7 +182,6 @@ namespace Umbraco.Core.Security
         /// </returns>
         Task<IdentityResult> AddPasswordAsync(TUser user, string password);
 
-
         /// <summary>
         /// Returns a flag indicating whether the given <paramref name="password"/> is valid for the
         /// specified <paramref name="user"/>.
@@ -220,8 +209,6 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="sessionId"></param>
         /// <returns>Returns true if the session is valid, otherwise false</returns>
         Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
 
@@ -323,15 +310,12 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Resets the access failed count for the user
         /// </summary>
-        /// <param name="user"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> ResetAccessFailedCountAsync(TUser user);
 
         /// <summary>
         /// Generates a two factor token for the user
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="tokenProvider"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<string> GenerateTwoFactorTokenAsync(TUser user, string tokenProvider);
 
@@ -356,9 +340,9 @@ namespace Umbraco.Core.Security
         // let's see if there's a way to avoid that and only have these called within signinmanager and usermanager
         // which means we can remove these from the interface (things like invite seems like they cannot be moved)
         // TODO: When we change to not having the crappy static events this will need to be revisited
-        void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
-        void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
-        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, string userId);
+        void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, string userId);
+        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, string userId);
         UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
         bool HasSendingUserInviteEventHandler { get; }
 
