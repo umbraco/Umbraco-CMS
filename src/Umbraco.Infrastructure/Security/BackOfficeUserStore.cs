@@ -201,26 +201,26 @@ namespace Umbraco.Core.Security
             IUser user = _userService.GetUserById(UserIdToInt(userId));
             if (user == null)
             {
-                return null;
+                return Task.FromResult((BackOfficeIdentityUser)null);
             }
 
             return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <inheritdoc />
-        public override async Task<BackOfficeIdentityUser> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
+        public override Task<BackOfficeIdentityUser> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             IUser user = _userService.GetByUsername(userName);
             if (user == null)
             {
-                return null;
+                return Task.FromResult((BackOfficeIdentityUser)null);
             }
 
             BackOfficeIdentityUser result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
-            return await Task.FromResult(result);
+            return Task.FromResult(result);
         }
 
         /// <inheritdoc />
