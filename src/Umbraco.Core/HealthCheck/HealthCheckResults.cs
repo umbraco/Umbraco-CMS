@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using HeyRed.MarkdownSharp;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.HealthCheck;
@@ -120,32 +119,8 @@ namespace Umbraco.Infrastructure.HealthCheck
             return sb.ToString();
         }
 
-        public string ResultsAsHtml(HealthCheckNotificationVerbosity verbosity)
-        {
-            var mark = new Markdown();
-            var html = mark.Transform(ResultsAsMarkDown(verbosity));
-            html = ApplyHtmlHighlighting(html);
-            return html;
-        }
 
         internal Dictionary<string, IEnumerable<HealthCheckStatus>> ResultsAsDictionary => _results;
-
-        private string ApplyHtmlHighlighting(string html)
-        {
-            const string SuccessHexColor = "5cb85c";
-            const string WarningHexColor = "f0ad4e";
-            const string ErrorHexColor = "d9534f";
-
-            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, SuccessHexColor);
-            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, WarningHexColor);
-            return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, ErrorHexColor);
-        }
-
-        private string ApplyHtmlHighlightingForStatus(string html, StatusResultType status, string color)
-        {
-            return html
-                .Replace("Result: '" + status + "'", "Result: <span style=\"color: #" + color + "\">" + status + "</span>");
-        }
 
         private string SimpleHtmlToMarkDown(string html)
         {

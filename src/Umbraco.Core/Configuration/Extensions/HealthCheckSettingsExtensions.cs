@@ -1,9 +1,7 @@
 ﻿using System;
-using NCrontab;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
-namespace Umbraco.Infrastructure.Configuration.Extensions
+namespace Umbraco.Core.Configuration.Extensions
 {
     public static class HealthCheckSettingsExtensions
     {

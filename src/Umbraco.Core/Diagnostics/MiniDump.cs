@@ -2,9 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Diagnostics
 {
@@ -12,7 +10,7 @@ namespace Umbraco.Core.Diagnostics
     // and https://blogs.msdn.microsoft.com/dondu/2010/10/31/writing-minidumps-from-exceptions-in-c/
     // which itself got it from http://blog.kalmbach-software.de/2008/12/13/writing-minidumps-in-c/
 
-    internal static class MiniDump
+    public static class MiniDump
     {
         private static readonly object LockO = new object();
 
@@ -92,7 +90,9 @@ namespace Umbraco.Core.Diagnostics
             exp.ExceptionPointers = IntPtr.Zero;
 
             if (withException)
+            {
                 exp.ExceptionPointers = marchal.GetExceptionPointers();
+            }
 
             var bRet = exp.ExceptionPointers == IntPtr.Zero
                 ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)

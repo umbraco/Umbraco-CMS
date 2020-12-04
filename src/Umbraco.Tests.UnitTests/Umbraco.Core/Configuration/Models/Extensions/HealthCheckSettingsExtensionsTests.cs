@@ -1,8 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Extensions;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Infrastructure.Configuration.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
 {

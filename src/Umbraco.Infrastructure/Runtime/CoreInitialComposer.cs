@@ -60,9 +60,6 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.HealthCheck;
-using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Runtime
@@ -303,6 +300,7 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
+            builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
             builder.HealthChecks()
                 .Add(() => builder.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 

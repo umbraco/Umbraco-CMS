@@ -7,6 +7,10 @@ namespace Umbraco.Core.Diagnostics
     /// </summary>
     public interface IMarchal
     {
+        /// <summary>
+        /// Retrieves a computer-independent description of an exception, and information about the state that existed for the thread when the exception occurred.
+        /// </summary>
+        /// <returns>A pointer to an EXCEPTION_POINTERS structure.</returns>
         IntPtr GetExceptionPointers();
     }
 }

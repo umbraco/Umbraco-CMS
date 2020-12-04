@@ -17,6 +17,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
+        private readonly IMarkdownToHtmlConverter _markdownToHtmlConverter;
 
         private readonly ContentSettings _contentSettings;
 
@@ -25,7 +26,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             IRequestAccessor requestAccessor,
             IEmailSender emailSender,
             IOptions<HealthChecksSettings> healthChecksSettings,
-            IOptions<ContentSettings> contentSettings)
+            IOptions<ContentSettings> contentSettings,
+            IMarkdownToHtmlConverter markdownToHtmlConverter)
             : base(healthChecksSettings)
         {
             var recipientEmail = Settings?["RecipientEmail"];
@@ -40,6 +42,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _requestAccessor = requestAccessor;
             _emailSender = emailSender;
+            _markdownToHtmlConverter = markdownToHtmlConverter;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
@@ -61,7 +64,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             {
                 DateTime.Now.ToShortDateString(),
                 DateTime.Now.ToShortTimeString(),
-                results.ResultsAsHtml(Verbosity)
+                _markdownToHtmlConverter.ToHtml(results, Verbosity)
             });
 
             // Include the umbraco Application URL host in the message subject so that
