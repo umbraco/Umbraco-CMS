@@ -40,7 +40,7 @@
                                maxlength="255" />
                     </ng-form>
 
-                    <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">
+                    <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}" aria-haspopup="true" aria-expanded="{{vm.dropdownOpen}}">
                         <span ng-bind="editor.content.displayName"></span>
                         <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
                     </button>
@@ -108,7 +108,8 @@
             <umb-editor-menu
                 data-element="editor-actions"
                 current-node="menu.currentNode"
-                current-section="{{menu.currentSection}}">
+                current-section="{{menu.currentSection}}"
+                is-disabled="disableActionsMenu">
             </umb-editor-menu>
         </div>
 
