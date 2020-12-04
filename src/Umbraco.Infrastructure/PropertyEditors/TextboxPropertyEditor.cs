@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -27,8 +28,15 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
         /// </summary>
-        public TextboxPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper)
+        public TextboxPropertyEditor(
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -38,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc/>
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute, _localizedTextService, _shortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(DataTypeService, LocalizationService, Attribute, LocalizedTextService, ShortStringHelper, JsonSerializer);
 
         /// <inheritdoc/>
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor(_ioHelper);

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Runtime.Serialization;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -12,37 +12,38 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
         public BlockConfiguration[] Blocks { get; set; }
 
+        [DataContract]
         public class BlockConfiguration
         {
 
-            [JsonProperty("backgroundColor")]
+            [DataMember(Name ="backgroundColor")]
             public string BackgroundColor { get; set; }
 
-            [JsonProperty("iconColor")]
+            [DataMember(Name ="iconColor")]
             public string IconColor { get; set; }
 
-            [JsonProperty("thumbnail")]
+            [DataMember(Name ="thumbnail")]
             public string Thumbnail { get; set; }
 
-            [JsonProperty("contentElementTypeKey")]
+            [DataMember(Name ="contentElementTypeKey")]
             public Guid ContentElementTypeKey { get; set; }
 
-            [JsonProperty("settingsElementTypeKey")]
+            [DataMember(Name ="settingsElementTypeKey")]
             public Guid? SettingsElementTypeKey { get; set; }
 
-            [JsonProperty("view")]
+            [DataMember(Name ="view")]
             public string View { get; set; }
 
-            [JsonProperty("stylesheet")]
+            [DataMember(Name ="stylesheet")]
             public string Stylesheet { get; set; }
 
-            [JsonProperty("label")]
+            [DataMember(Name ="label")]
             public string Label { get; set; }
 
-            [JsonProperty("editorSize")]
+            [DataMember(Name ="editorSize")]
             public string EditorSize { get; set; }
 
-            [JsonProperty("forceHideContentEditorInOverlay")]
+            [DataMember(Name ="forceHideContentEditorInOverlay")]
             public bool ForceHideContentEditorInOverlay { get; set; }
         }
 
@@ -51,10 +52,10 @@ namespace Umbraco.Web.PropertyEditors
 
         public class NumberRange
         {
-            [JsonProperty("min")]
+            [DataMember(Name ="min")]
             public int? Min { get; set; }
 
-            [JsonProperty("max")]
+            [DataMember(Name ="max")]
             public int? Max { get; set; }
         }
 

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -19,20 +18,28 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Represents a value editor.
     /// </summary>
+    [DataContract]
     public class DataValueEditor : IDataValueEditor
     {
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _jsonSerializer;
         protected IDataTypeService DataTypeService { get; }
         protected ILocalizationService LocalizationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper) // for tests, and manifest
+        public DataValueEditor(
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer) // for tests, and manifest
         {
             _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
             DataTypeService = dataTypeService;
@@ -42,11 +49,18 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService,  ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+        public DataValueEditor(
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
             _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
 
             var view = attribute.View;
             if (string.IsNullOrWhiteSpace(view))
@@ -72,13 +86,14 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>The view can be three things: (1) the full virtual path, or (2) the relative path to the current Umbraco
         /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
         /// </remarks>
-        [JsonProperty("view", Required = Required.Always)]
+        [Required]
+        [DataMember(Name = "view")]
         public string View { get; set; }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
         /// </summary>
-        [JsonProperty("valueType")]
+        [DataMember(Name = "valueType")]
         public string ValueType { get; set; }
 
         /// <inheritdoc />
@@ -111,7 +126,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A collection of validators for the pre value editor
         /// </summary>
-        [JsonProperty("validation")]
+        [DataMember(Name = "validation")]
         public List<IValueValidator> Validators { get; private set; } = new List<IValueValidator>();
 
         /// <summary>
@@ -127,7 +142,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// If this is true than the editor will be displayed full width without a label
         /// </summary>
-        [JsonProperty("hideLabel")]
+        [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
         /// <summary>
@@ -142,8 +157,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-            if (value is JValue)
-                value = value.ToString();
+            // if (value is JValue)
+            //     value = value.ToString();
 
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             if (value is string s && string.IsNullOrWhiteSpace(s))
@@ -250,7 +265,7 @@ namespace Umbraco.Core.PropertyEditors
                     {
                         try
                         {
-                            var json = JsonConvert.DeserializeObject(asString);
+                            var json = _jsonSerializer.Deserialize<dynamic>(asString);
                             return json;
                         }
                         catch

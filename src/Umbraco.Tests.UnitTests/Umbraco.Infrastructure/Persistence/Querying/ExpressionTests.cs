@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.TestHelpers;
-using System.Linq;
-using Microsoft.Extensions.Logging.Abstractions;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
@@ -25,8 +25,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-            var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+
+            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
             {
                 Id = 12345
             };

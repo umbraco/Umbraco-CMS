@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -30,8 +31,9 @@ namespace Umbraco.Web.PropertyEditors
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
         }

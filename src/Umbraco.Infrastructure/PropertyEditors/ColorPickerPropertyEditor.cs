@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -17,13 +18,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IIOHelper _ioHelper;
 
-        public ColorPickerPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public ColorPickerPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService, IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_ioHelper, JsonSerializer);
     }
 }

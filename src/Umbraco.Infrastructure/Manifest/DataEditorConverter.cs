@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -22,11 +21,19 @@ namespace Umbraco.Core.Manifest
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _textService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditorConverter"/> class.
         /// </summary>
-        public DataEditorConverter(ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService textService, IShortStringHelper shortStringHelper)
+        public DataEditorConverter(
+            ILoggerFactory loggerFactory,
+            IIOHelper ioHelper,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService textService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
         {
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
@@ -34,6 +41,7 @@ namespace Umbraco.Core.Manifest
             _localizationService = localizationService;
             _textService = textService;
             _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
         }
 
         /// <inheritdoc />
@@ -61,7 +69,7 @@ namespace Umbraco.Core.Manifest
                 type = EditorType.MacroParameter;
             }
 
-            return new DataEditor(_loggerFactory, _dataTypeService, _localizationService, _textService, _shortStringHelper, type);
+            return new DataEditor(_loggerFactory, _dataTypeService, _localizationService, _textService, _shortStringHelper, _jsonSerializer, type);
         }
 
         /// <inheritdoc />
@@ -88,7 +96,7 @@ namespace Umbraco.Core.Manifest
             // explicitly assign a value editor of type ValueEditor
             // (else the deserializer will try to read it before setting it)
             // (and besides it's an interface)
-            target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService, _textService, _shortStringHelper);
+            target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService, _textService, _shortStringHelper, _jsonSerializer);
 
             // in the manifest, validators are a simple dictionary eg
             // {
@@ -160,7 +168,7 @@ namespace Umbraco.Core.Manifest
             if (jobject.Property("view") != null)
             {
                 // explicitly assign a value editor of type ParameterValueEditor
-                target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService, _textService, _shortStringHelper);
+                target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService, _textService, _shortStringHelper, _jsonSerializer);
 
                 // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };

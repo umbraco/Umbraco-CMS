@@ -1,27 +1,29 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
     [DataEditor(
-        "propertyTypePickerMultiple",
+        "propertyTypePicker",
         EditorType.MacroParameter,
-        "Multiple Property Type Picker",
+        "Property Type Picker",
         "entitypicker")]
-    public class MultiplePropertyTypeParameterEditor : DataEditor
+    public class PropertyTypeParameterEditor : DataEditor
     {
-        public MultiplePropertyTypeParameterEditor(
+        public PropertyTypeParameterEditor(
             ILoggerFactory loggerFactory,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             // configure
-            DefaultConfiguration.Add("multiple", "1");
+            DefaultConfiguration.Add("multiple", "0");
             DefaultConfiguration.Add("entityType", "PropertyType");
             //don't publish the id for a property type, publish its alias
             DefaultConfiguration.Add("publishBy", "alias");

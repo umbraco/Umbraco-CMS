@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
@@ -19,7 +18,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using File = System.IO.File;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -62,7 +60,9 @@ namespace Umbraco.Tests.Packaging
             Factory.GetRequiredService<IShortStringHelper>(),
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             Factory.GetRequiredService<ILocalizedTextService>(),
-            Factory.GetRequiredService<IConfigurationEditorJsonSerializer>());
+            Factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
+            Factory.GetRequiredService<IJsonSerializer>()
+            );
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

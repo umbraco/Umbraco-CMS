@@ -1,21 +1,19 @@
-﻿using Moq;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 using static Umbraco.Core.Models.Property;
-using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
@@ -27,6 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         ILocalizedTextService LocalizedTextService { get; } = Mock.Of<ILocalizedTextService>();
         ILocalizationService LocalizationService { get; } = Mock.Of<ILocalizationService>();
         IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
+        IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
 
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
@@ -41,7 +40,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 DataTypeService,
                 LocalizedTextService,
                 LocalizationService,
-                ShortStringHelper
+                ShortStringHelper,
+                JsonSerializer
             );
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(labelEditor.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -110,7 +110,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 LocalizationService,
                 IOHelper,
                 ShortStringHelper,
-                LocalizedTextService
+                LocalizedTextService,
+                JsonSerializer
             );
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -179,7 +180,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 LocalizationService,
                 IOHelper,
                 ShortStringHelper,
-                LocalizedTextService
+                LocalizedTextService,
+                JsonSerializer
             );
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();

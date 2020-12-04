@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.PublishedContent
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
                 { Id = 666 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

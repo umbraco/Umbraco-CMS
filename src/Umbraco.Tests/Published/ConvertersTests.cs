@@ -62,10 +62,10 @@ namespace Umbraco.Tests.Published
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
                 { Id = 1 };
             var dataType2 = new DataType(new VoidEditor("2", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
                 { Id = 2 };
 
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new []{dataType1, dataType2 });

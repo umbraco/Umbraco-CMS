@@ -5,31 +5,31 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Moq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Templates;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Media;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -64,12 +64,12 @@ namespace Umbraco.Tests.PublishedContent
             var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper), serializer) { Id = 1 },
-                new DataType(new TrueFalsePropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService), serializer) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(loggerFactory,backOfficeSecurityAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>()), serializer) { Id = 1002 },
-                new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService), serializer) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService), serializer) { Id = 1004 },
-                new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService), serializer) { Id = 1005 });
+                new DataType(new VoidEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper, JsonNetSerializer), serializer) { Id = 1 },
+                new DataType(new TrueFalsePropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(loggerFactory,backOfficeSecurityAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>(), JsonNetSerializer), serializer) { Id = 1002 },
+                new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1003 },
+                new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1004 },
+                new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1005 });
             Builder.Services.AddUnique<IDataTypeService>(f => dataTypeService);
         }
 

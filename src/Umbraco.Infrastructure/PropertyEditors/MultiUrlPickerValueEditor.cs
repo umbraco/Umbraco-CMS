@@ -1,14 +1,15 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
@@ -25,8 +26,19 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger<MultiUrlPickerValueEditor> logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+        public MultiUrlPickerValueEditor(
+            IEntityService entityService,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            ILogger<MultiUrlPickerValueEditor> logger,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            DataEditorAttribute attribute,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedUrlProvider publishedUrlProvider,
+            IJsonSerializer jsonSerializer)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));

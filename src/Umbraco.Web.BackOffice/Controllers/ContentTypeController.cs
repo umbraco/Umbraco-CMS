@@ -7,40 +7,38 @@ using System.Net.Mime;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using ContentType = Umbraco.Core.Models.ContentType;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Serialization;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]    
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
@@ -65,7 +63,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IConfigurationEditorJsonSerializer _jsonSerializer;
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
@@ -91,7 +90,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEntityService entityService,
             IHostingEnvironment hostingEnvironment,
             EditorValidatorCollection editorValidatorCollection,
-            IConfigurationEditorJsonSerializer jsonSerializer)
+            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+            IJsonSerializer jsonSerializer)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -119,6 +119,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _macroService = macroService;
             _entityService = entityService;
             _hostingEnvironment = hostingEnvironment;
+            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -220,7 +221,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Gets all user defined properties.
         /// </summary>
         /// <returns></returns>
-        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]        
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return _contentTypeService.GetAllPropertyTypeAliases();
@@ -626,8 +627,23 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var dataInstaller = new PackageDataInstallation(_loggerFactory.CreateLogger<PackageDataInstallation>(), _loggerFactory, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService, _jsonSerializer);
+            var dataInstaller = new PackageDataInstallation(
+                _loggerFactory.CreateLogger<PackageDataInstallation>(),
+                _loggerFactory,
+                _fileService,
+                _macroService,
+                _LocalizationService,
+                _dataTypeService,
+                _entityService,
+                _contentTypeService,
+                _contentService,
+                _propertyEditors,
+                _scopeProvider,
+                _shortStringHelper,
+                Options.Create(_globalSettings),
+                _localizedTextService,
+                _configurationEditorJsonSerializer,
+                _jsonSerializer);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

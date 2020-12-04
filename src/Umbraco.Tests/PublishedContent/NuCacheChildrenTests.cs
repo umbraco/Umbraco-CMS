@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -19,20 +16,20 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Serialization;
-using Umbraco.Net;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -70,7 +67,7 @@ namespace Umbraco.Tests.PublishedContent
             var serializer = new ConfigurationEditorJsonSerializer();
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer) { Id = 3 };
 
             var dataTypes = new[]
             {

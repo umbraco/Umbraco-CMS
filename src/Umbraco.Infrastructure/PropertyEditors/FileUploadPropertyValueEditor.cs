@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -26,8 +27,9 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentSettings> contentSettings)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+            IOptions<ContentSettings> contentSettings,
+            IJsonSerializer jsonSerializer)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));

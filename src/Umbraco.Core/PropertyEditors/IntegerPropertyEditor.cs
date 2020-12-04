@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -18,8 +19,14 @@ namespace Umbraco.Web.PropertyEditors
         ValueType = ValueTypes.Integer)]
     public class IntegerPropertyEditor : DataEditor
     {
-        public IntegerPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper)
+        public IntegerPropertyEditor(
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
         { }
 
         /// <inheritdoc />

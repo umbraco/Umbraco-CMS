@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -20,20 +21,33 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IIOHelper _ioHelper;
 
-        public MultiNodeTreePickerPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public MultiNodeTreePickerPropertyEditor(
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MultiNodeTreePickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+            public MultiNodeTreePickerPropertyValueEditor(
+                IDataTypeService dataTypeService,
+                ILocalizationService localizationService,
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
 
             }

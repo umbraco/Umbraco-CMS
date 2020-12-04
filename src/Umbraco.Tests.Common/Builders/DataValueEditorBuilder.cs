@@ -1,6 +1,7 @@
 using System;
 using Moq;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -52,7 +53,8 @@ namespace Umbraco.Tests.Common.Builders
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>()
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IJsonSerializer>()
             )
             {
                 Configuration = configuration,

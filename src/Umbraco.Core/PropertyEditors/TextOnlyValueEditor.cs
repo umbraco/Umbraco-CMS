@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -12,8 +13,14 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextOnlyValueEditor : DataValueEditor
     {
-        public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+        public TextOnlyValueEditor(
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
         { }
 
         /// <summary>

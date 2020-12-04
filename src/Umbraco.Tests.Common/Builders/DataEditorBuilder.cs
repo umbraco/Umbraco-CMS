@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -43,7 +43,8 @@ namespace Umbraco.Tests.Common.Builders
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>()
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IJsonSerializer>()
             )
             {
                 DefaultConfiguration = defaultConfiguration,

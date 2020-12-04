@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -14,6 +15,8 @@ namespace Umbraco.Core.PropertyEditors
     [HideFromTypeFinder]
     public class VoidEditor : DataEditor
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.
         /// </summary>
@@ -21,8 +24,15 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="loggerFactory">A logger factory.</param>
         /// <remarks>The default alias of the editor is "Umbraco.Void". When a suffix is provided,
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
-        public VoidEditor(string aliasSuffix, ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public VoidEditor(
+            string aliasSuffix,
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             Alias = "Umbraco.Void";
             if (string.IsNullOrWhiteSpace(aliasSuffix)) return;
@@ -34,8 +44,8 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="loggerFactory">A logger factory.</param>
         /// <remarks>The alias of the editor is "Umbraco.Void".</remarks>
-        public VoidEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService,  ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : this(null, loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public VoidEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService,  ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
+            : this(null, loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         { }
     }
 }
