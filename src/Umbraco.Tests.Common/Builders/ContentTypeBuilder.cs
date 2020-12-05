@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -12,21 +15,23 @@ namespace Umbraco.Tests.Common.Builders
             IWithPropertyTypeIdsIncrementingFrom,
             IBuildPropertyTypes
     {
-        private List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<ContentTypeBuilder>>();
-        private List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new List<PropertyTypeBuilder<ContentTypeBuilder>>();
-        private List<TemplateBuilder> _templateBuilders = new List<TemplateBuilder>();
-        private List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new List<ContentTypeSortBuilder>();
+        private readonly List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<ContentTypeBuilder>>();
+        private readonly List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new List<PropertyTypeBuilder<ContentTypeBuilder>>();
+        private readonly List<TemplateBuilder> _templateBuilders = new List<TemplateBuilder>();
+        private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new List<ContentTypeSortBuilder>();
 
         private int? _propertyTypeIdsIncrementingFrom;
         private int? _defaultTemplateId;
         private ContentVariation? _contentVariation;
         private PropertyTypeCollection _propertyTypeCollection;
 
-        public ContentTypeBuilder() : base(null)
+        public ContentTypeBuilder()
+            : base(null)
         {
         }
 
-        public ContentTypeBuilder(ContentBuilder parentBuilder) : base(parentBuilder)
+        public ContentTypeBuilder(ContentBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -78,10 +83,10 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IContentType Build()
         {
-            var contentVariation = _contentVariation ?? ContentVariation.Nothing;
+            ContentVariation contentVariation = _contentVariation ?? ContentVariation.Nothing;
 
             ContentType contentType;
-            var parent = GetParent();
+            IContentTypeComposition parent = GetParent();
             if (parent != null)
             {
                 contentType = new ContentType(ShortStringHelper, (IContentType)parent, GetAlias());
@@ -113,7 +118,7 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_propertyTypeCollection != null)
             {
-                var propertyGroup = new PropertyGroupBuilder()
+                PropertyGroup propertyGroup = new PropertyGroupBuilder()
                     .WithName("Content")
                     .WithSortOrder(1)
                     .WithPropertyTypeCollection(_propertyTypeCollection)
@@ -153,7 +158,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
-            var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName);
+            ContentTypeBuilder builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName);
 
             builder.AddPropertyType()
                 .WithAlias(RandomAlias("gen", randomizeAliases))
@@ -167,14 +172,12 @@ namespace Umbraco.Tests.Common.Builders
             return (ContentType)builder.Build();
         }
 
-        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
-        {
-            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
-        }
+        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0) =>
+            (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
 
         public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null,  bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
         {
-            var builder = new ContentTypeBuilder()
+            ContentTypeBuilder builder = new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
                 .WithName(name ?? "Simple Page")
                 .WithParentContentType(parent);
@@ -228,9 +231,9 @@ namespace Umbraco.Tests.Common.Builders
 
         public static ContentType CreateSimpleTagsContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
         {
-            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName, defaultTemplateId: defaultTemplateId);
+            ContentType contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName, defaultTemplateId: defaultTemplateId);
 
-            var propertyType = new PropertyTypeBuilder()
+            PropertyType propertyType = new PropertyTypeBuilder()
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Tags)
                 .WithValueStorageType(ValueStorageType.Nvarchar)
                 .WithAlias(RandomAlias("tags", randomizeAliases))

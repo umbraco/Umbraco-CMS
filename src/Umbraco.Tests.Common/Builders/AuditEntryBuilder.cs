@@ -1,5 +1,7 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
-using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -7,7 +9,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class AuditEntryBuilder : AuditEntryBuilder<object>
     {
-        public AuditEntryBuilder() : base(null)
+        public AuditEntryBuilder()
+            : base(null)
         {
         }
     }
@@ -34,8 +37,57 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _eventDateUtc = null;
         private int? _performingUserId = null;
 
-        public AuditEntryBuilder(TParent parentBuilder) : base(parentBuilder)
+        public AuditEntryBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
+        }
+
+        public AuditEntryBuilder<TParent> WithAffectedDetails(string affectedDetails)
+        {
+            _affectedDetails = affectedDetails;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithAffectedUserId(int affectedUserId)
+        {
+            _affectedUserId = affectedUserId;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithEventDetails(string eventDetails)
+        {
+            _eventDetails = eventDetails;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithEventType(string eventType)
+        {
+            _eventType = eventType;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithPerformingDetails(string performingDetails)
+        {
+            _performingDetails = performingDetails;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithPerformingIp(string performingIp)
+        {
+            _performingIp = performingIp;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithEventDate(DateTime eventDateUtc)
+        {
+            _eventDateUtc = eventDateUtc;
+            return this;
+        }
+
+        public AuditEntryBuilder<TParent> WithPerformingUserId(int performingUserId)
+        {
+            _performingUserId = performingUserId;
+            return this;
         }
 
         DateTime? IWithCreateDateBuilder.CreateDate
@@ -68,22 +120,20 @@ namespace Umbraco.Tests.Common.Builders
             set => _updateDate = value;
         }
 
-
-
         public override IAuditEntry Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
             var affectedDetails = _affectedDetails ?? Guid.NewGuid().ToString();
             var affectedUserId = _affectedUserId ?? -1;
             var eventDetails = _eventDetails ?? Guid.NewGuid().ToString();
             var eventType = _eventType ?? "umbraco/user";
             var performingDetails = _performingDetails ?? Guid.NewGuid().ToString();
             var performingIp = _performingIp ?? "127.0.0.1";
-            var eventDateUtc = _eventDateUtc ?? DateTime.UtcNow;
+            DateTime eventDateUtc = _eventDateUtc ?? DateTime.UtcNow;
             var performingUserId = _performingUserId ?? -1;
 
             return new AuditEntry

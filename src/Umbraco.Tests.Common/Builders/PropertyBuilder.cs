@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
@@ -38,16 +41,16 @@ namespace Umbraco.Tests.Common.Builders
         public override IProperty Build()
         {
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
 
             if (_propertyTypeBuilder is null && _propertyType is null)
             {
                 throw new InvalidOperationException("A property cannot be constructed without providing a property type. Use AddPropertyType() or WithPropertyType().");
             }
 
-            var propertyType = _propertyType ?? _propertyTypeBuilder.Build();
+            IPropertyType propertyType = _propertyType ?? _propertyTypeBuilder.Build();
 
             // Needs to be within collection to support publishing.
             var propertyTypeCollection = new PropertyTypeCollection(true, new[] { propertyType });
