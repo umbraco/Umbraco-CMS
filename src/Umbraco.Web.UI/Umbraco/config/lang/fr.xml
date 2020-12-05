@@ -1370,6 +1370,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="validationFailedMessage">Les erreurs de validation doivent être corrigées avant de pouvoir sauvegarder l'élément</key>
     <key alias="operationFailedHeader">Echec</key>
     <key alias="operationSavedHeader">Sauvegardé</key>
+    <key alias="operationSavedHeaderReloadUser">Sauvegardé. Veuillez rafraîchir votre navigateur pour voir les changements</key>
     <key alias="invalidUserPermissionsText">Permissions utilisateur insuffisantes, l'opération n'a pas pu être complétée</key>
     <key alias="operationCancelledHeader">Annulation</key>
     <key alias="operationCancelledText">L'opération a été annulée par une extension tierce</key>

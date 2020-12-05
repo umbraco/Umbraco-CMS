@@ -1247,6 +1247,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="validationFailedMessage">Validatiefouten moeten worden opgelost voor dit item kan worden opgeslagen</key>
     <key alias="operationFailedHeader">Mislukt</key>
     <key alias="operationSavedHeader">Opgeslagen</key>
+    <key alias="operationSavedHeaderReloadUser">Opgeslagen. Gelieve uw browser te herladen om de aanpassingen te zien</key>
     <key alias="invalidUserPermissionsText">Wegens onvoldoende rechten kon deze handeling kon niet worden uitgevoerd </key>
     <key alias="operationCancelledHeader">Geannuleerd</key>
     <key alias="operationCancelledText">Uitvoering is geannuleerd door de plugin van een 3e partij</key>
