@@ -1420,6 +1420,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationFailedMessage">Validation errors must be fixed before the item can be saved</key>
     <key alias="operationFailedHeader">Failed</key>
     <key alias="operationSavedHeader">Saved</key>
+      <key alias="operationSavedHeaderReloadUser">Saved.  To view the changes please reload your browser</key>
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
