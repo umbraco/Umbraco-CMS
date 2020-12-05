@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Builder;
+﻿using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 

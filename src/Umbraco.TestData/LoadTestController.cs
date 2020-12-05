@@ -11,8 +11,8 @@ using System.Diagnostics;
 using Umbraco.Core.Composing;
 using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Builder;
 using Umbraco.Core.Strings;
+using Umbraco.Core.DependencyInjection;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 

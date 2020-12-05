@@ -1,16 +1,13 @@
-﻿using System;
+﻿using Moq;
+using NUnit.Framework;
+using System;
 using System.Linq;
 using System.Threading;
-using Moq;
-using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Builder;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -19,7 +16,6 @@ using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Cache
 {

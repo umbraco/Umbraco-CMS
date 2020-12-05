@@ -49,6 +49,7 @@ function watchTask(cb) {
                             console.log("copying " + group.files + " to " + destPath);
                             task = task.pipe( dest(destPath) );
                         });
+                        return task;
                     },
                     js
                 )

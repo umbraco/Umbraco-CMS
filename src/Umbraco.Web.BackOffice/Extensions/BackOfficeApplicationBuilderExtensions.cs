@@ -2,8 +2,10 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Core.BackOffice;
 using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -29,6 +31,8 @@ namespace Umbraco.Extensions
         public static IApplicationBuilder UseUmbracoBackOffice(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
+
+            app.UseBackOfficeUserManagerAuditing();
 
             // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
             // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
@@ -62,6 +66,13 @@ namespace Umbraco.Extensions
                 previewRoutes.CreateRoutes(endpoints);
             });
 
+            return app;
+        }
+
+        private static IApplicationBuilder UseBackOfficeUserManagerAuditing(this IApplicationBuilder app)
+        {
+            var auditer = app.ApplicationServices.GetRequiredService<BackOfficeUserManagerAuditer>();
+            auditer.Start();
             return app;
         }
     }

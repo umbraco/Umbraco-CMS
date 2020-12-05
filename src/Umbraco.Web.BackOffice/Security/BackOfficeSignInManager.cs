@@ -10,42 +10,49 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Net;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.Common.Security
 {
+
     using Constants = Umbraco.Core.Constants;
 
-    // TODO: There's potential to extract an interface for this for only what we use and put that in Core without aspnetcore refs, but we need to wait till were done with it since there's a bit to implement
-
-    public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
+    public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string LoginProviderKey = "LoginProvider";
+        private const string UmbracoSignInMgrLoginProviderKey = "LoginProvider";
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string XsrfKey = "XsrfId"; // TODO: See BackOfficeController.XsrfKey
+        private const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
         private BackOfficeUserManager _userManager;
+        private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly GlobalSettings _globalSettings;
+
 
         public BackOfficeSignInManager(
             BackOfficeUserManager userManager,
             IHttpContextAccessor contextAccessor,
+            IBackOfficeExternalLoginProviders externalLogins,
             IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
             IOptions<IdentityOptions> optionsAccessor,
+            IOptions<GlobalSettings> globalSettings,
             ILogger<SignInManager<BackOfficeIdentityUser>> logger,
             IAuthenticationSchemeProvider schemes,
             IUserConfirmation<BackOfficeIdentityUser> confirmation)
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
             _userManager = userManager;
+            _externalLogins = externalLogins;
+            _globalSettings = globalSettings.Value;
         }
 
-        // TODO: Need to migrate more from Umbraco.Web.Security.BackOfficeSignInManager
-        // Things like dealing with auto-linking, cookie options, and a ton of other stuff. Some might not need to be ported but it
-        // will be a case by case basis.
-        // Have a look into RefreshSignInAsync since we might be able to use this new functionality for auto-cookie renewal in our middleware, though
+        // TODO: Have a look into RefreshSignInAsync since we might be able to use this new functionality for auto-cookie renewal in our middleware, though
         // i suspect it's taken care of already.
-
 
 
         /// <inheritdoc />
@@ -65,7 +72,7 @@ namespace Umbraco.Web.Common.Security
                 return await HandleSignIn(null, userName, SignInResult.Failed);
             return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }
-        
+
         /// <inheritdoc />
         public override async Task<BackOfficeIdentityUser> GetTwoFactorAuthenticationUserAsync()
         {
@@ -112,7 +119,7 @@ namespace Umbraco.Web.Common.Security
             return await HandleSignIn(user, user?.UserName, SignInResult.Failed);
         }
 
-        
+
         /// <inheritdoc />
         public override bool IsSignedIn(ClaimsPrincipal principal)
         {
@@ -193,7 +200,7 @@ namespace Umbraco.Web.Common.Security
             await Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<bool> IsTwoFactorClientRememberedAsync(BackOfficeIdentityUser user)
         {
@@ -205,7 +212,7 @@ namespace Umbraco.Web.Common.Security
             return (result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task RememberTwoFactorClientAsync(BackOfficeIdentityUser user)
         {
@@ -218,7 +225,7 @@ namespace Umbraco.Web.Common.Security
                 new AuthenticationProperties { IsPersistent = true });
         }
 
-        
+
         /// <inheritdoc />
         public override Task ForgetTwoFactorClientAsync()
         {
@@ -228,7 +235,7 @@ namespace Umbraco.Web.Common.Security
             return Context.SignOutAsync(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType);
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<SignInResult> TwoFactorRecoveryCodeSignInAsync(string recoveryCode)
         {
@@ -257,7 +264,7 @@ namespace Umbraco.Web.Common.Security
             return SignInResult.Failed;
         }
 
-        
+
         /// <inheritdoc />
         public override async Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
         {
@@ -266,18 +273,18 @@ namespace Umbraco.Web.Common.Security
 
             var auth = await Context.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType);
             var items = auth?.Properties?.Items;
-            if (auth?.Principal == null || items == null || !items.ContainsKey(LoginProviderKey))
+            if (auth?.Principal == null || items == null || !items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
             {
                 return null;
             }
 
             if (expectedXsrf != null)
             {
-                if (!items.ContainsKey(XsrfKey))
+                if (!items.ContainsKey(UmbracoSignInMgrXsrfKey))
                 {
                     return null;
                 }
-                var userId = items[XsrfKey] as string;
+                var userId = items[UmbracoSignInMgrXsrfKey];
                 if (userId != expectedXsrf)
                 {
                     return null;
@@ -285,7 +292,7 @@ namespace Umbraco.Web.Common.Security
             }
 
             var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var provider = items[LoginProviderKey] as string;
+            var provider = items[UmbracoSignInMgrLoginProviderKey] as string;
             if (providerKey == null || provider == null)
             {
                 return null;
@@ -299,7 +306,72 @@ namespace Umbraco.Web.Common.Security
             };
         }
 
-        
+        /// <summary>
+        /// Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking
+        /// </summary>
+        /// <param name="loginProvider"></param>
+        /// <param name="providerKey"></param>
+        /// <param name="isPersistent"></param>
+        /// <param name="bypassTwoFactor"></param>
+        /// <returns></returns>
+        public async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false)
+        {
+            // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
+            // to be able to deal with auto-linking and reduce duplicate lookups
+
+            var autoLinkOptions = _externalLogins.Get(loginInfo.LoginProvider)?.Options?.AutoLinkOptions;
+            var user = await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+            if (user == null)
+            {
+                // user doesn't exist so see if we can auto link
+                return await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions);
+            }
+
+            if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
+            {
+                var shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
+                if (shouldSignIn == false)
+                {
+                    Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
+                }
+            }
+
+            var error = await PreSignInCheck(user);
+            if (error != null)
+            {
+                return error;
+            }
+            return await SignInOrTwoFactorAsync(user, isPersistent, loginInfo.LoginProvider, bypassTwoFactor);
+        }
+
+        /// <summary>
+        /// Configures the redirect URL and user identifier for the specified external login <paramref name="provider"/>.
+        /// </summary>
+        /// <param name="provider">The provider to configure.</param>
+        /// <param name="redirectUrl">The external login URL users should be redirected to during the login flow.</param>
+        /// <param name="userId">The current user's identifier, which will be used to provide CSRF protection.</param>
+        /// <returns>A configured <see cref="AuthenticationProperties"/>.</returns>
+        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl, string userId = null)
+        {
+            // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
+            // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/
+
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            properties.Items[UmbracoSignInMgrLoginProviderKey] = provider;
+            if (userId != null)
+            {
+                properties.Items[UmbracoSignInMgrXsrfKey] = userId;
+            }
+            return properties;
+        }
+
+        public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync()
+        {
+            // TODO: We can filter these so that they only include the back office ones.
+            // That can be done by either checking the scheme (maybe) or comparing it to what we have registered in the collection of BackOfficeExternalLoginProvider
+            return base.GetExternalAuthenticationSchemesAsync();
+        }
+
         /// <inheritdoc />
         protected override async Task<SignInResult> SignInOrTwoFactorAsync(BackOfficeIdentityUser user, bool isPersistent, string loginProvider = null, bool bypassTwoFactor = false)
         {
@@ -346,7 +418,7 @@ namespace Umbraco.Web.Common.Security
             if (username.IsNullOrWhiteSpace())
             {
                 username = "UNKNOWN"; // could happen in 2fa or something else weird
-            }   
+            }
 
             if (result.Succeeded)
             {
@@ -356,24 +428,25 @@ namespace Umbraco.Web.Common.Security
                 {
                     //we have successfully logged in, reset the AccessFailedCount
                     user.AccessFailedCount = 0;
-                }   
+                }
                 await UserManager.UpdateAsync(user);
 
                 Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
                 if (user != null)
                 {
-                    _userManager.RaiseLoginSuccessEvent(user, user.Id);
-                }   
+                    _userManager.RaiseLoginSuccessEvent(Context.User, user.Id);
+                }
             }
             else if (result.IsLockedOut)
             {
-                _userManager.RaiseAccountLockedEvent(user, user.Id);
+                _userManager.RaiseAccountLockedEvent(Context.User, user.Id);
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
             }
             else if (result.RequiresTwoFactor)
             {
+                _userManager.RaiseLoginRequiresVerificationEvent(Context.User, user.Id);
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
-            }   
+            }
             else if (!result.Succeeded || result.IsNotAllowed)
             {
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
@@ -469,6 +542,118 @@ namespace Umbraco.Web.Common.Security
         {
             public string UserId { get; set; }
             public string LoginProvider { get; set; }
+        }
+
+
+        /// <summary>
+        /// Used for auto linking/creating user accounts for external logins
+        /// </summary>
+        /// <param name="loginInfo"></param>
+        /// <param name="autoLinkOptions"></param>
+        /// <returns></returns>
+        private async Task<SignInResult> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
+        {
+            // If there are no autolink options then the attempt is failed (user does not exist)
+            if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)
+            {
+                return SignInResult.Failed;
+            }
+
+            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+
+            //we are allowing auto-linking/creating of local accounts
+            if (email.IsNullOrWhiteSpace())
+            {
+                return AutoLinkSignInResult.FailedNoEmail;
+            }
+            else
+            {
+                //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+                var autoLinkUser = await UserManager.FindByEmailAsync(email);
+                if (autoLinkUser != null)
+                {
+                    try
+                    {
+                        //call the callback if one is assigned
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
+                        return AutoLinkSignInResult.FailedException(ex.Message);
+                    }
+
+                    return await LinkUser(autoLinkUser, loginInfo);
+                }
+                else
+                {
+                    var name = loginInfo.Principal?.Identity?.Name;
+                    if (name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
+                    autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
+
+                    foreach (var userGroup in autoLinkOptions.DefaultUserGroups)
+                    {
+                        autoLinkUser.AddRole(userGroup);
+                    }
+
+                    //call the callback if one is assigned
+                    try
+                    {
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
+                        return AutoLinkSignInResult.FailedException(ex.Message);
+                    }
+
+                    var userCreationResult = await _userManager.CreateAsync(autoLinkUser);
+
+                    if (!userCreationResult.Succeeded)
+                    {
+                        return AutoLinkSignInResult.FailedCreatingUser(userCreationResult.Errors.Select(x => x.Description).ToList());
+                    }
+                    else
+                    {
+                        return await LinkUser(autoLinkUser, loginInfo);
+                    }
+                }
+            }
+        }
+
+        private async Task<SignInResult> LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
+        {
+            var existingLogins = await _userManager.GetLoginsAsync(autoLinkUser);
+            var exists = existingLogins.FirstOrDefault(x => x.LoginProvider == loginInfo.LoginProvider && x.ProviderKey == loginInfo.ProviderKey);
+
+            // if it already exists (perhaps it was added in the AutoLink callbak) then we just continue
+            if (exists != null)
+            {
+                //sign in
+                return await SignInOrTwoFactorAsync(autoLinkUser, isPersistent: false, loginInfo.LoginProvider);
+            }
+
+            var linkResult = await _userManager.AddLoginAsync(autoLinkUser, loginInfo);
+            if (linkResult.Succeeded)
+            {
+                //we're good! sign in
+                return await SignInOrTwoFactorAsync(autoLinkUser, isPersistent: false, loginInfo.LoginProvider);
+            }
+
+            //If this fails, we should really delete the user since it will be in an inconsistent state!
+            var deleteResult = await _userManager.DeleteAsync(autoLinkUser);
+            if (deleteResult.Succeeded)
+            {
+                var errors = linkResult.Errors.Select(x => x.Description).ToList();
+                return AutoLinkSignInResult.FailedLinkingUser(errors);
+            }
+            else
+            {
+                //DOH! ... this isn't good, combine all errors to be shown
+                var errors = linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList();
+                return AutoLinkSignInResult.FailedLinkingUser(errors);
+            }
         }
     }
 }

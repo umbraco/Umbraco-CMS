@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Web.UI.NetCore
 {

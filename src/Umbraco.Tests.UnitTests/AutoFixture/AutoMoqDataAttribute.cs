@@ -18,6 +18,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Install;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture

@@ -52,25 +52,6 @@ namespace Umbraco.Web
             return ctx == null ? Attempt<HttpContextBase>.Fail() : Attempt.Succeed(ctx);
         }
 
-
-        /// <summary>
-        /// Gets the back office user manager out of OWIN
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is required because to extract the user manager we need to user a custom service since owin only deals in generics and
-        /// developers could register their own user manager types
-        /// </remarks>
-        public static BackOfficeOwinUserManager GetBackOfficeUserManager(this IOwinContext owinContext)
-        {
-            var marker = owinContext.Get<IBackOfficeUserManagerMarker>(BackOfficeOwinUserManager.OwinMarkerKey)
-                ?? throw new NullReferenceException($"No {typeof (IBackOfficeUserManagerMarker)}, i.e. no Umbraco back-office, has been registered with Owin.");
-
-            return marker.GetManager(owinContext)
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeOwinUserManager)} from the {typeof (IOwinContext)}.");
-        }
-
         /// <summary>
         /// Adapted from Microsoft.AspNet.Identity.Owin.OwinContextExtensions
         /// </summary>

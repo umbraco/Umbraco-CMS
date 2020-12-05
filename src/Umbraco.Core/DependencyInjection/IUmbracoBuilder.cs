@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Core.Builder
+namespace Umbraco.Core.DependencyInjection
 {
     public interface IUmbracoBuilder
     {

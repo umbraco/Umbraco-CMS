@@ -161,7 +161,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
             //TODO: this is not finding the key currently
@@ -178,7 +178,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetEmpty(string contentTypeAlias = null)
         {
             if (contentTypeAlias == null)
@@ -204,7 +204,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [MemberSaveValidation]
         public async Task<ActionResult<MemberDisplay>> PostSave(
             [ModelBinder(typeof(MemberBinder))]

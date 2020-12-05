@@ -2,7 +2,6 @@
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
     /// Authorization requirement for the <see cref="AdminUsersHandler"/>
     /// </summary>

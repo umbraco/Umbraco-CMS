@@ -6,7 +6,7 @@ using System.Text;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {

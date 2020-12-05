@@ -1,21 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
-    /// if the users being edited is an admin then we must ensure that the current user is also an admin
+    /// If the users being edited is an admin then we must ensure that the current user is also an admin.
     /// </summary>
     public class AdminUsersHandler : MustSatisfyRequirementAuthorizationHandler<AdminUsersRequirement>
     {
@@ -38,9 +33,9 @@ namespace Umbraco.Web.BackOffice.Authorization
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, AdminUsersRequirement requirement)
         {
             var queryString = _httpContextAcessor.HttpContext?.Request.Query[requirement.QueryStringName];
-            if (!queryString.HasValue)
+            if (!queryString.HasValue || !queryString.Value.Any())
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
@@ -54,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Authorization
                 var ids = _httpContextAcessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToList();
                 if (ids.Count == 0)
                 {
-                    // must succeed this requirement since we cannot process it
+                    // Must succeed this requirement since we cannot process it.
                     return Task.FromResult(true);
                 }
                 userIds = ids
@@ -64,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Authorization
 
             if (userIds.Length == 0)
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 

@@ -31,23 +31,26 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsPublishBranchRequirement requirement, IContent resource)
         {
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+
             var denied = new List<IUmbracoEntity>();
             var page = 0;
             const int pageSize = 500;
             var total = long.MaxValue;
+
             while (page * pageSize < total)
             {
                 var descendants = _entityService.GetPagedDescendants(resource.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
-                                //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
-                                //early if a permission higher up fails
+                                // Order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
+                                // early if a permission higher up fails.
                                 ordering: Ordering.By("path", Direction.Ascending));
 
                 foreach (var c in descendants)
                 {
-                    //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
+                    // If this item's path has already been denied or if the user doesn't have access to it, add to the deny list.
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (_contentPermissions.CheckPermissions(c,
-                            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+                            currentUser,
                             requirement.Permission) == ContentPermissions.ContentAccess.Denied))
                     {
                         denied.Add(c);

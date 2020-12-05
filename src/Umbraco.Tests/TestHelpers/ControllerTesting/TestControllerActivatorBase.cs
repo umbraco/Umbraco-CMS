@@ -120,8 +120,6 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 .Returns(mockUser.Object);
 
             //mock Validate
-            backofficeSecurity.Setup(x => x.ValidateCurrentUser())
-                .Returns(() => true);
             backofficeSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 

@@ -59,7 +59,7 @@ using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;

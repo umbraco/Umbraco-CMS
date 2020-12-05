@@ -7,7 +7,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Builder;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {

@@ -122,7 +122,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _mediaTypeService.Get(contentTypeAlias);
@@ -170,7 +170,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
@@ -191,7 +191,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
@@ -212,7 +212,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Udi id)
@@ -513,7 +513,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [MediaItemSaveValidation]
-        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [OutgoingEditorModelEvent]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
