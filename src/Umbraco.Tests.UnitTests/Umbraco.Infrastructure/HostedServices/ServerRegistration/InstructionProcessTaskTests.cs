@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -22,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         [TestCase(RuntimeLevel.BootFailed)]
         public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateInstructionProcessTask(runtimeLevel: runtimeLevel);
+            InstructionProcessTask sut = CreateInstructionProcessTask(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyMessengerNotSynced();
         }
@@ -30,7 +33,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         [Test]
         public async Task Executes_And_Touches_Server()
         {
-            var sut = CreateInstructionProcessTask();
+            InstructionProcessTask sut = CreateInstructionProcessTask();
             await sut.PerformExecuteAsync(null);
             VerifyMessengerSynced();
         }
@@ -49,19 +52,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
             return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object, mockLogger.Object, Options.Create(settings));
         }
 
-        private void VerifyMessengerNotSynced()
-        {
-            VerifyMessengerSyncedTimes(Times.Never());
-        }
+        private void VerifyMessengerNotSynced() => VerifyMessengerSyncedTimes(Times.Never());
 
-        private void VerifyMessengerSynced()
-        {
-            VerifyMessengerSyncedTimes(Times.Once());
-        }
+        private void VerifyMessengerSynced() => VerifyMessengerSyncedTimes(Times.Once());
 
-        private void VerifyMessengerSyncedTimes(Times times)
-        {
-            _mockDatabaseServerMessenger.Verify(x => x.Sync(), times);
-        }
+        private void VerifyMessengerSyncedTimes(Times times) => _mockDatabaseServerMessenger.Verify(x => x.Sync(), times);
     }
 }
