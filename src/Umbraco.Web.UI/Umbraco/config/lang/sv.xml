@@ -589,6 +589,11 @@
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
       <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
   </area>
+  <area alias="member">
+        <key alias="createNewMember">Skapa en ny medlem</key>
+        <key alias="allMembers">Alla medlemmar</key>
+        <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
+  </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
     <key alias="copyDone">%0% har kopierats till %1%</key>

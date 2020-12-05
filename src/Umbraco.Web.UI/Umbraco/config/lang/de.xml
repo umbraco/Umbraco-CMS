@@ -709,7 +709,6 @@
     <key alias="off">Aus</key>
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
-    <key alias="options">Optionen</key>
     <key alias="on">An</key>
     <!--???-->
     <key alias="or">oder</key>
@@ -1494,9 +1493,6 @@
     <key alias="addRule">Neuer Stil</key>
     <key alias="editRule">Stil bearbeiten</key>
     <key alias="editorRules">Rich text editor Stile</key>
-    <key alias="editorRulesHelp">
-      Definiere die Stile, die im 'Rich-Text-Editor' verfügbar sein sollen.
-    </key>
     <key alias="editorRulesHelp">Definiere die Styles, die im Rich-Text-Editor dieses Stylesheets verfügbar sein sollen.</key>
     <key alias="editstylesheet">Stylesheet bearbeiten</key>
     <key alias="editstylesheetproperty">Stylesheet-Regel bearbeiten</key>

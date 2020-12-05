@@ -2,8 +2,8 @@
     <umb-drawer-view>
 
         <umb-drawer-header
-            title="{{ vm.title }}"
-            description="{{ vm.subtitle }}">
+            title="{{vm.title}}"
+            description="{{vm.subtitle}}">
         </umb-drawer-header>
 
         <umb-drawer-content>
@@ -14,7 +14,6 @@
 
                 <div class="umb-help-list">
 
-
                     <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
                         <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
                             <div class="umb-help-list-item__content justify-between">
@@ -22,7 +21,7 @@
                                     <span class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
-                                    <umb-button  button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
+                                    <umb-button button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
                                 </div>
                             </div>
                         </div>
@@ -159,6 +158,7 @@
                 <umb-button
                     alias="close"
                     type="button"
+                    shortcut="esc"
                     button-style="link"
                     label-key="general_close"
                     action="vm.closeDrawer()">

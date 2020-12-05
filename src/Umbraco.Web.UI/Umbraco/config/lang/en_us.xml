@@ -259,7 +259,7 @@
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
-    <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
+    <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="publishDescendantsHelp"><![CDATA[Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Publish variants and variants of same type underneath and thereby making their content publicly available.]]></key>
@@ -804,7 +804,6 @@
     <key alias="other">Other</key>
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
-    <key alias="clear">Clear</key>
     <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
@@ -1366,7 +1365,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
-    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -2300,6 +2298,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="hasTranslation">Has translation</key>
       <key alias="noTranslation">Missing translation</key>
       <key alias="dictionaryListCaption">Dictionary items</key>
+      <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2488,12 +2487,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Create new block</key>
-    <key alias="headlineAddSettingsElementType">Attach a settings section</key>
+    <key alias="headlineCreateBlock">Pick Element Type</key>
+    <key alias="headlineAddSettingsElementType">Attach a settings Element Type</key>
     <key alias="headlineAddCustomView">Select view</key>
     <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
     <key alias="headlineAddThumbnail">Choose thumbnail</key>
-    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
     <key alias="headlineEditorAppearance">Editor apperance</key>

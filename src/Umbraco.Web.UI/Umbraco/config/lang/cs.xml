@@ -252,7 +252,7 @@
     <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publikovat</key>
     <key alias="published">Published</key>
-    <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
+    <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Stav publikování</key>
     <key alias="publishDescendantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> and the same languages of content items underneath and thereby making their content publicly available.]]></key>
@@ -768,7 +768,6 @@
     <key alias="other">Další</key>
     <key alias="articles">Články</key>
     <key alias="videos">Videa</key>
-    <key alias="clear">Vyčistit</key>
     <key alias="installing">Instalování</key>
   </area>
   <area alias="colors">
