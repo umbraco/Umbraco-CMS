@@ -7,6 +7,7 @@ using Lucene.Net.Analysis.Standard;
 using Examine.LuceneEngine;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
 {
@@ -15,12 +16,14 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class UmbracoIndexesCreator : LuceneIndexCreator, IUmbracoIndexesCreator
     {
+
         // TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesCreator(IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
-            IMemberService memberService, IUmbracoIndexConfig umbracoIndexConfig)
+            IMemberService memberService, IUmbracoIndexConfig umbracoIndexConfig,
+            IFactory factory) : base(factory)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));

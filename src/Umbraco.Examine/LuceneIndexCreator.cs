@@ -17,6 +17,12 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class LuceneIndexCreator : IIndexCreator
     {
+
+        private readonly IFactory _factory;
+        public LuceneIndexCreator(IFactory factory)
+        {
+            _factory = factory ?? throw new System.ArgumentNullException(nameof(factory));
+        }
         public abstract IEnumerable<IIndex> Create();
 
         /// <summary>
@@ -40,7 +46,7 @@ namespace Umbraco.Examine
                 //this should be a fully qualified type
                 var factoryType = TypeFinder.GetTypeByName(configuredDirectoryFactory);
                 if (factoryType == null) throw new NullReferenceException("No directory type found for value: " + configuredDirectoryFactory);
-                var directoryFactory = (IDirectoryFactory)Activator.CreateInstance(factoryType);
+                var directoryFactory = (IDirectoryFactory)_factory.GetInstance(factoryType);
                 return directoryFactory.CreateDirectory(dirInfo);
             }
 
