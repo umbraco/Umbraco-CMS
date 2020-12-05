@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Members;
@@ -12,11 +13,10 @@ namespace Umbraco.Infrastructure.Members
     public interface IUmbracoMembersUserManager<TUser> : IDisposable where TUser : UmbracoMembersIdentityUser
     {
         /// <summary>
-        /// Creates the specified <paramref name="memberUser"/> in the backing store with a password,
-        /// as an asynchronous operation.
+        /// Creates the specified <paramref name="memberUser"/> user in the backing store with given password, as an asynchronous operation.
         /// </summary>
         /// <param name="memberUser">The member to create.</param>
-        /// <param name="password">The password to add</param>
+        /// <param name="password">The new password</param>
         /// <returns>
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
@@ -26,7 +26,7 @@ namespace Umbraco.Infrastructure.Members
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns the generated password</returns>
         string GeneratePassword();
 
         /// <summary>
@@ -51,5 +51,12 @@ namespace Umbraco.Infrastructure.Members
         /// the specified <paramref name="password" /> matches the one store for the <paramref name="memberUser"/>,
         /// otherwise false.</returns>
         Task<bool> CheckPasswordAsync(TUser memberUser, string password);
+
+        /// <summary>
+        /// Method to validate the password without an identity user
+        /// </summary>
+        /// <param name="password">The password to validate</param>
+        /// <returns>The result of the validation</returns>
+        Task<List<IdentityResult>> ValidatePassword(string password);
     }
 }

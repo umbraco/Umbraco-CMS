@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Members;
 using Umbraco.Core.Security;
-using System.Threading;
-using Umbraco.Core.Configuration.Models;
 
 
 namespace Umbraco.Infrastructure.Members
@@ -18,6 +18,7 @@ namespace Umbraco.Infrastructure.Members
     /// </summary>
     public class UmbracoMembersUserManager : UmbracoMembersUserManager<UmbracoMembersIdentityUser>, IUmbracoMembersUserManager
     {
+        ///<inheritdoc />
         public UmbracoMembersUserManager(
             IUserStore<UmbracoMembersIdentityUser> store,
             IOptions<UmbracoMembersIdentityOptions> optionsAccessor,
@@ -34,13 +35,28 @@ namespace Umbraco.Infrastructure.Members
         }
     }
 
+    /// <summary>
+    /// Manager for the member identity user
+    /// </summary>
+    /// <typeparam name="T">The identity user</typeparam>
     public class UmbracoMembersUserManager<T> : UserManager<T>
        where T : UmbracoMembersIdentityUser
     {
-        public IPasswordConfiguration PasswordConfiguration { get; protected set; }
-
         private PasswordGenerator _passwordGenerator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoMembersUserManager"/> class.
+        /// </summary>
+        /// <param name="store">The members store</param>
+        /// <param name="optionsAccessor">The identity options accessor</param>
+        /// <param name="passwordHasher">The password hasher</param>
+        /// <param name="userValidators">The user validators</param>
+        /// <param name="passwordValidators">The password validators</param>
+        /// <param name="keyNormalizer">The keep lookup normalizer</param>
+        /// <param name="errors">The error display messages</param>
+        /// <param name="services">The service provider</param>
+        /// <param name="logger">The logger</param>
+        /// <param name="passwordConfiguration">The password configuration</param>
         public UmbracoMembersUserManager(
             IUserStore<T> store,
             IOptions<IdentityOptions> optionsAccessor,
@@ -51,14 +67,17 @@ namespace Umbraco.Infrastructure.Members
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger,
-            IOptions<MemberPasswordConfigurationSettings> passwordConfiguration) :
-            base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
-        {
+            IOptions<MemberPasswordConfigurationSettings> passwordConfiguration) : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger) =>
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
-        }
+
 
         /// <summary>
-        /// Replace the underlying options property with our own strongly typed version
+        /// Gets or sets the password configuration
+        /// </summary>
+        public IPasswordConfiguration PasswordConfiguration { get; protected set; }
+
+        /// <summary>
+        /// gets or sets the underlying options property with our own strongly typed version
         /// </summary>
         public new UmbracoMembersIdentityOptions Options
         {
@@ -67,24 +86,24 @@ namespace Umbraco.Infrastructure.Members
         }
 
         /// <summary>
-        /// Gets/sets the default Umbraco member user password checker
+        /// Gets or sets the default Umbraco member user password checker
         /// </summary>
         public IUmbracoMembersUserPasswordChecker UmbracoMembersUserPasswordChecker { get; set; }
 
-        ///  <summary>
-        /// [TODO: from BackOfficeUserManager duplicated, could be shared]
-        ///  Override to determine how to hash the password
-        ///  </summary>
-        ///  <param name="memberUser"></param>
-        ///  <param name="newPassword"></param>
-        ///  <param name="validatePassword"></param>
-        ///  <returns></returns>
-        ///  <remarks>
-        ///  This method is called anytime the password needs to be hashed for storage (i.e. including when reset password is used)
-        ///  </remarks>
+        /// <summary>
+        /// TODO: from BackOfficeUserManager duplicated, could be shared
+        /// Override to determine how to hash the password
+        /// </summary>
+        /// <param name="memberUser">The member to validate</param>
+        /// <param name="newPassword">The new password</param>
+        /// <param name="validatePassword">Whether to validate the password</param>
+        /// <returns>The identity result of updating the password hash</returns>
+        /// <remarks>
+        /// This method is called anytime the password needs to be hashed for storage (i.e. including when reset password is used)
+        /// </remarks>
         protected override async Task<IdentityResult> UpdatePasswordHash(T memberUser, string newPassword, bool validatePassword)
         {
-            //memberUser.LastPasswordChangeDateUtc = DateTime.UtcNow;
+            // memberUser.LastPasswordChangeDateUtc = DateTime.UtcNow;
 
             if (validatePassword)
             {
@@ -95,8 +114,10 @@ namespace Umbraco.Infrastructure.Members
                 }
             }
 
-            var passwordStore = Store as IUserPasswordStore<T>;
-            if (passwordStore == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            if (!(Store is IUserPasswordStore<T> passwordStore))
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            }
 
             var hash = newPassword != null ? PasswordHasher.HashPassword(memberUser, newPassword) : null;
             await passwordStore.SetPasswordHashAsync(memberUser, hash, CancellationToken);
@@ -104,13 +125,13 @@ namespace Umbraco.Infrastructure.Members
             return IdentityResult.Success;
         }
 
-        ///TODO: duplicated code from backofficeusermanager, could be shared?
+        /// TODO: duplicated code from backofficeusermanager, could be shared
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
-        /// <param name="member"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
+        /// <param name="member">The member to validate</param>
+        /// <param name="password">The password to validate</param>
+        /// <returns>Whether the password is the correct password for this member</returns>
         /// <remarks>
         /// By default this uses the standard ASP.Net Identity approach which is:
         /// * Get password store
@@ -136,68 +157,88 @@ namespace Umbraco.Infrastructure.Members
                     return false;
                 }
 
-                //if the result indicates to not fallback to the default, then return true if the credentials are valid
+                // if the result indicates to not fallback to the default, then return true if the credentials are valid
                 if (result != UmbracoMembersUserPasswordCheckerResult.FallbackToDefaultChecker)
                 {
                     return result == UmbracoMembersUserPasswordCheckerResult.ValidCredentials;
                 }
             }
 
-            //we cannot proceed if the user passed in does not have an identity
+            // we cannot proceed if the user passed in does not have an identity
             if (member.HasIdentity == false)
+            {
                 return false;
+            }
 
-            //use the default behavior
+            // use the default behavior
             return await base.CheckPasswordAsync(member, password);
         }
 
-        ///[TODO: from BackOfficeUserManager duplicated, could be shared]
+        /// TODO: from BackOfficeUserManager duplicated, could be shared
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
+        /// <param name="user">The user to update the security stamp for</param>
+        /// <returns>Task returns</returns>
         private async Task UpdateSecurityStampInternal(T user)
         {
-            if (SupportsUserSecurityStamp == false) return;
+            if (SupportsUserSecurityStamp == false)
+            {
+                return;
+            }
+
             await GetSecurityStore().SetSecurityStampAsync(user, NewSecurityStamp(), CancellationToken.None);
         }
 
-        ///[TODO: from BackOfficeUserManager duplicated, could be shared]
+        /// TODO: from BackOfficeUserManager duplicated, could be shared
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Return a user security stamp</returns>
         private IUserSecurityStampStore<T> GetSecurityStore()
         {
-            var store = Store as IUserSecurityStampStore<T>;
-            if (store == null) throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            if (!(Store is IUserSecurityStampStore<T> store))
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserSecurityStampStore<>));
+            }
+
             return store;
         }
 
-        ///[TODO: from BackOfficeUserManager duplicated, could be shared]
+        /// TODO: from BackOfficeUserManager duplicated, could be shared
         /// <summary>
         /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
-        /// <returns></returns>
-        private static string NewSecurityStamp()
-        {
-            return Guid.NewGuid().ToString();
-        }
+        /// <returns>Returns a new security stamp</returns>
+        private static string NewSecurityStamp() => Guid.NewGuid().ToString();
 
-        ///[TODO: from BackOfficeUserManager duplicated, could be shared]
         /// <summary>
+        /// TODO: from BackOfficeUserManager duplicated, could be shared
         /// Helper method to generate a password for a member based on the current password validator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The generated password</returns>
         public string GeneratePassword()
         {
-            if (_passwordGenerator == null)
-            {
-                _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
-            }
+            _passwordGenerator ??= new PasswordGenerator(PasswordConfiguration);
             string password = _passwordGenerator.GeneratePassword();
             return password;
+        }
+
+        /// <summary>
+        /// Helper method to validate a password based on the current password validator
+        /// </summary>
+        /// <param name="password">The password to update</param>
+        /// <returns>The validated password</returns>
+        public async Task<List<IdentityResult>> ValidatePassword(string password)
+        {
+            var passwordValidators = new List<IdentityResult>();
+            foreach(IPasswordValidator<T> validator in PasswordValidators)
+            {
+                IdentityResult result = await validator.ValidateAsync(this, null, password);
+                passwordValidators.Add(result);
+            }
+
+            return passwordValidators;
         }
     }
 }

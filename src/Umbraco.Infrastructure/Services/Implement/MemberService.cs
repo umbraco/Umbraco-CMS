@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -109,19 +109,20 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="email">Email of the Member to create</param>
         /// <param name="name">Name of the Member to create</param>
         /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+        /// <exception cref="ArgumentException">Thrown when a member type for the given alias isn't found</exception>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMember(string username, string email, string name, string memberTypeAlias)
         {
-            var memberType = GetMemberType(memberTypeAlias);
+            IMemberType memberType = GetMemberType(memberTypeAlias);
             if (memberType == null)
+            {
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
+            }
 
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMember(scope, member, 0, false);
-                scope.Complete();
-            }
+            using IScope scope = ScopeProvider.CreateScope();
+            CreateMember(scope, member, 0, false);
+            scope.Complete();
 
             return member;
         }
@@ -312,7 +313,9 @@ namespace Umbraco.Core.Services.Implement
                 // if saving is cancelled, media remains without an identity
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                {
                     return;
+                }
 
                 _memberRepository.Save(member);
 
@@ -321,7 +324,9 @@ namespace Umbraco.Core.Services.Implement
             }
 
             if (withIdentity == false)
+            {
                 return;
+            }
 
             Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }

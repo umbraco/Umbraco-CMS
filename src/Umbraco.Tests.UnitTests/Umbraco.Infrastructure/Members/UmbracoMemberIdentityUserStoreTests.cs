@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Members;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.Members;
 using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
@@ -26,7 +27,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
             _mockMemberService = new Mock<IMemberService>();
             return new UmbracoMembersUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())));
+                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
+                new Mock<IScopeProvider>().Object);
         }
 
         [Test]
