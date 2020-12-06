@@ -5,12 +5,15 @@
 
         vm.add = add;
         vm.remove = remove;
+        vm.edit = edit;
+        vm.cancel = cancel;
 
         vm.show = show;
         vm.hide = hide;
         vm.change = change;
 
         vm.labelEnabled = false;
+        vm.editItem = null;
 
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
@@ -105,14 +108,21 @@
 
             if ($scope.newColor) {
                 var newLabel = validLabel($scope.newLabel) ? $scope.newLabel : $scope.newColor;
-                var exists = _.find($scope.model.value, function(item) {
-                    return item.value.toUpperCase() === $scope.newColor.toUpperCase() || item.label.toUpperCase() === newLabel.toUpperCase();
+                var exists = _.find($scope.model.value, function (item) {
+                    return item != vm.editItem && (item.value.toUpperCase() === $scope.newColor.toUpperCase() || item.label.toUpperCase() === newLabel.toUpperCase());
                 });
                 if (!exists) {
-                    $scope.model.value.push({
-                        value: $scope.newColor,
-                        label: newLabel
-                    });
+                    if (vm.editItem == null) {
+                        $scope.model.value.push({
+                            value: $scope.newColor,
+                            label: newLabel
+                        });
+                    } else {
+                        vm.editItem.value = $scope.newColor;
+                        vm.editItem.label = newLabel;
+                        vm.editItem = null;
+                    }
+                    
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
@@ -123,6 +133,23 @@
                 // there was an error, do the highlight (will be set back by the directive)
                 $scope.hasError = true;
             }
+        }
+
+        function edit(item, evt) {
+            evt.preventDefault();
+
+            vm.editItem = item;
+
+            $scope.newColor = item.value;
+            $scope.newLabel = item.label;
+        }
+
+        function cancel(evt) {
+            evt.preventDefault();
+
+            vm.editItem = null;
+            $scope.newColor = defaultColor;
+            $scope.newLabel = defaultLabel;
         }
 
         $scope.sortableOptions = {

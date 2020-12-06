@@ -1,16 +1,19 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.MediaController">
-
-    <div class="umb-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
+    <button type="button" class="btn-reset umb-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
         <i class="icon icon-picture"></i>
-        <div ng-id="!control.$inserted" class="help-text"><localize key="grid_clickToInsertImage">Click to insert image</localize></div>
-    </div>
+        <span ng-id="!control.$inserted" class="help-text">
+            <localize key="grid_clickToInsertImage">Click to insert image</localize>
+        </span>
+    </button>
 
     <div ng-if="thumbnailUrl !== null">
-        <img
-             ng-click="setImage()"
-             ng-src="{{thumbnailUrl}}"
-             class="fullSizeImage" />
-        <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
+        <button type="button" class="btn-reset" ng-click="setImage()">
+            <img ng-src="{{thumbnailUrl}}" class="fullSizeImage" alt="" />
+        </button>
+        <label class="sr-only" for="grid-media-{{control.value.id}}">
+            <localize key="visuallyHiddenTexts_addImageCaption">Add image caption</localize>
+        </label>
+        <input id="grid-media-{{control.value.id}}" type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
     </div>
 
 </div>

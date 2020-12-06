@@ -6,7 +6,7 @@
             element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
             ng-repeat="block in model.value"
             ng-class="{'--isOpen':vm.openBlock === block}"
-            ng-click="vm.openBlockOverlay(block)">
+            ng-click="vm.openBlockOverlay($event, block)">
             <div class="__actions">
                 <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($event, $index)">
                     <i class="icon icon-trash" aria-hidden="true"></i>

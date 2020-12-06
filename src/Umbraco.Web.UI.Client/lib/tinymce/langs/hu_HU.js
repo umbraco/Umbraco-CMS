@@ -150,7 +150,7 @@ tinymce.addI18n('hu_HU',{
 "Insert link": "Hivatkoz\u00e1s beilleszt\u00e9se",
 "Insert\/edit link": "Hivatkoz\u00e1s beilleszt\u00e9se\/szerkeszt\u00e9se",
 "Text to display": "Megjelen\u0151 sz\u00f6veg",
-"Url": "Url",
+"Url": "URL",
 "Target": "C\u00e9l",
 "None": "Nincs",
 "New window": "\u00daj ablak",
