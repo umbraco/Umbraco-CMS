@@ -107,8 +107,7 @@ namespace Umbraco.Core.Members
             string username,
             string email,
             string memberTypeAlias,
-            string name,
-            string password = null)
+            string name)
         {
             if (string.IsNullOrWhiteSpace(username))
             {

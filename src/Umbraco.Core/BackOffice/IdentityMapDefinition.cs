@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -43,14 +43,14 @@ namespace Umbraco.Core.BackOffice
                 (source, context) =>
                 {
                     var target = new UmbracoMembersIdentityUser();
-                    //target.DisableChangeTracking();
+                    target.DisableChangeTracking();
                     return target;
                 },
                 (source, target, context) =>
                 {
                     Map(source, target);
-                    //target.ResetDirtyProperties(true);
-                    //target.EnableChangeTracking();
+                    target.ResetDirtyProperties(true);
+                    target.EnableChangeTracking();
                 });
         }
 

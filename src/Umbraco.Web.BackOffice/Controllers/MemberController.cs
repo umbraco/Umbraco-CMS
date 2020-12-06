@@ -192,7 +192,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
-            // TODO: this is not finding the key currently
+            // TODO: this is not finding the key currently after member creation
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
@@ -441,12 +441,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
                 }
             }
-            else
-            {
-                ModelState.AddPropertyError(
-                    new ValidationResult("Password cannot be empty", new[] { "value" }),
-                    $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-            }
         }
 
         private string MapErrors(List<IdentityResult> result)
@@ -512,7 +506,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // no password changes then exit ?
             if (memberSave.Password != null)
             {
-                // set the password
+                // TODO: set the password
                 memberSave.PersistedContent.RawPasswordValue = _memberManager.GeneratePassword();
             }
         }

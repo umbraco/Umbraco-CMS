@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using AutoFixture;
@@ -64,6 +64,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()));
 
