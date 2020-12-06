@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.Options;
+using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
 
@@ -12,7 +16,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         {
             var validator = new RequestHandlerSettingsValidator();
             var options = new RequestHandlerSettings();
-            var result = validator.Validate("settings", options);
+            ValidateOptionsResult result = validator.Validate("settings", options);
             Assert.True(result.Succeeded);
         }
 
@@ -21,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         {
             var validator = new RequestHandlerSettingsValidator();
             var options = new RequestHandlerSettings { ConvertUrlsToAscii = "invalid" };
-            var result = validator.Validate("settings", options);
+            ValidateOptionsResult result = validator.Validate("settings", options);
             Assert.False(result.Succeeded);
         }
     }
