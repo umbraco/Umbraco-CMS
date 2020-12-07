@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+namespace Umbraco.Core
 {
     public static partial class Constants
     {
@@ -8,7 +8,7 @@
 
             public const string Config = "~/config";
 
-            public const string Data = "~/App_Data";
+            public const string Data = "~/Umbraco/Data";
 
             public const string TempData = Data + "/TEMP";
 
@@ -17,8 +17,6 @@
             public const string TempImageUploads = TempFileUploads + "/rte";
 
             public const string Install = "~/install";
-
-            public const string AppCode = "~/App_Code";
 
             public const string AppPlugins = "/App_Plugins";
 
@@ -32,6 +30,7 @@
 
             public const string Preview = Data + "/preview";
 
+            // TODO: This doesn't seem right?
             public const string LogFiles= "~/Logs";
         }
     }

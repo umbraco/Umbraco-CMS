@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -462,7 +462,7 @@ namespace Umbraco.Core.Migrations.Install
             {
                 Message =
                     "The database configuration failed with the following message: " + ex.Message +
-                    "\n Please check log file for additional information (can be found in '/App_Data/Logs/')",
+                    $"\n Please check log file for additional information (can be found in '{Constants.SystemDirectories.LogFiles}')",
                 Success = false,
                 Percentage = "90"
             };
