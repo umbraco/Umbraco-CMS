@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -26,6 +25,7 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
@@ -33,8 +33,6 @@ using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -392,7 +390,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     await _emailSender.SendAsync(mailMessage);
 
-                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id);
+                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id.ToString());
                 }
             }
 
@@ -556,7 +554,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 }
 
-                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId);
+                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId.ToString());
                 return Ok();
             }
 
@@ -579,7 +577,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = int.Parse(result.Principal.Identity.GetUserId());
+            var userId = result.Principal.Identity.GetUserId();
             var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
@@ -610,10 +608,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             return userDetail;
         }
 
-        private string ConstructCallbackUrl(int userId, string code)
+        private string ConstructCallbackUrl(string userId, string code)
         {
             // Get an mvc helper to get the url
-            var action = _linkGenerator.GetPathByAction(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.ValidatePasswordResetCode),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
                 new
                 {
                     area = Constants.Web.Mvc.BackOfficeArea,

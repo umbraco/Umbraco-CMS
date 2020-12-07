@@ -1,4 +1,8 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -32,9 +36,9 @@ namespace Umbraco.Tests.Common.Builders
         public override MemberGroup Build()
         {
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
 
@@ -50,8 +54,8 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_additionalDataBuilder != null)
             {
-                var additionalData = _additionalDataBuilder.Build();
-                foreach (var kvp in additionalData)
+                IDictionary<string, object> additionalData = _additionalDataBuilder.Build();
+                foreach (KeyValuePair<string, object> kvp in additionalData)
                 {
                     memberGroup.AdditionalData.Add(kvp.Key, kvp.Value);
                 }

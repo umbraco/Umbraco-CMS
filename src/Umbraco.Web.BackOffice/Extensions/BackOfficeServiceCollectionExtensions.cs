@@ -1,18 +1,13 @@
-﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
-using Umbraco.Infrastructure.BackOffice;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Authorization;
@@ -36,7 +31,7 @@ namespace Umbraco.Extensions
                 .AddUserStore<BackOfficeUserStore>()
                 .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
-                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>();
 
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
             services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();

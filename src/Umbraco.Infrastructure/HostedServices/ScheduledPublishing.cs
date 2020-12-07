@@ -1,8 +1,13 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web;
@@ -19,18 +24,35 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly IContentService _contentService;
         private readonly ILogger<ScheduledPublishing> _logger;
         private readonly IMainDom _mainDom;
-        private readonly IRuntimeState _runtime;
+        private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.
+        /// </summary>
+        /// <param name="runtimeState">Representation of the state of the Umbraco runtime.</param>
+        /// <param name="mainDom">Representation of the main application domain.</param>
+        /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
+        /// <param name="contentService">Service for handling content operations.</param>
+        /// <param name="umbracoContextFactory">Service for creating and managing Umbraco context.</param>
+        /// <param name="logger">The typed logger.</param>
+        /// <param name="serverMessenger">Service broadcasting cache notifications to registered servers.</param>
+        /// <param name="backofficeSecurityFactory">Creates and manages <see cref="IBackOfficeSecurity"/> instances.</param>
         public ScheduledPublishing(
-            IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory, ILogger<ScheduledPublishing> logger, IServerMessenger serverMessenger, IBackOfficeSecurityFactory backofficeSecurityFactory)
+            IRuntimeState runtimeState,
+            IMainDom mainDom,
+            IServerRegistrar serverRegistrar,
+            IContentService contentService,
+            IUmbracoContextFactory umbracoContextFactory,
+            ILogger<ScheduledPublishing> logger,
+            IServerMessenger serverMessenger,
+            IBackOfficeSecurityFactory backofficeSecurityFactory)
             : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
-            _runtime = runtime;
+            _runtimeState = runtimeState;
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _contentService = contentService;
@@ -40,35 +62,35 @@ namespace Umbraco.Infrastructure.HostedServices
             _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        internal override Task PerformExecuteAsync(object state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");
-                    return;
+                    return Task.CompletedTask;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");
-                    return;
+                    return Task.CompletedTask;
             }
 
             // Ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
                 _logger.LogDebug("Does not run if not MainDom.");
-                return;
+                return Task.CompletedTask;
             }
 
             // Do NOT run publishing if not properly running
-            if (_runtime.Level != RuntimeLevel.Run)
+            if (_runtimeState.Level != RuntimeLevel.Run)
             {
                 _logger.LogDebug("Does not run if run level is not Run.");
-                return;
+                return Task.CompletedTask;
             }
 
             try
@@ -85,16 +107,17 @@ namespace Umbraco.Infrastructure.HostedServices
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
                 _backofficeSecurityFactory.EnsureBackOfficeSecurity();
-                using var contextReference = _umbracoContextFactory.EnsureUmbracoContext();
+                using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
                 try
                 {
                     // Run
-                    var result = _contentService.PerformScheduledPublish(DateTime.Now);
-                    foreach (var grouped in result.GroupBy(x => x.Result))
+                    IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(DateTime.Now);
+                    foreach (IGrouping<PublishResultType, PublishResult> grouped in result.GroupBy(x => x.Result))
                     {
                         _logger.LogInformation(
                             "Scheduled publishing result: '{StatusCount}' items with status {Status}",
-                            grouped.Count(), grouped.Key);
+                            grouped.Count(),
+                            grouped.Key);
                     }
                 }
                 finally
@@ -112,7 +135,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 _logger.LogError(ex, "Failed.");
             }
 
-            return;
+            return Task.CompletedTask;
         }
     }
 }

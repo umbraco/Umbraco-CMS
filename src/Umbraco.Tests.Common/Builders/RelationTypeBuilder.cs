@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -25,11 +28,13 @@ namespace Umbraco.Tests.Common.Builders
         private Guid? _parentObjectType;
         private DateTime? _updateDate;
 
-        public RelationTypeBuilder() : base(null)
+        public RelationTypeBuilder()
+            : base(null)
         {
         }
 
-        public RelationTypeBuilder(RelationBuilder parentBuilder) : base(parentBuilder)
+        public RelationTypeBuilder(RelationBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -55,14 +60,14 @@ namespace Umbraco.Tests.Common.Builders
         {
             var alias = _alias ?? Guid.NewGuid().ToString();
             var name = _name ?? Guid.NewGuid().ToString();
-            var parentObjectType = _parentObjectType ?? null;
-            var childObjectType = _childObjectType ?? null;
+            Guid? parentObjectType = _parentObjectType ?? null;
+            Guid? childObjectType = _childObjectType ?? null;
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var isBidirectional = _isBidirectional ?? false;
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
 
             return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType)
             {

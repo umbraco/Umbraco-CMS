@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
@@ -28,11 +31,13 @@ namespace Umbraco.Tests.Common.Builders
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
-        public TemplateBuilder() : base(null)
+        public TemplateBuilder()
+            : base(null)
         {
         }
 
-        public TemplateBuilder(ContentTypeBuilder parentBuilder) : base(parentBuilder)
+        public TemplateBuilder(ContentTypeBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -53,16 +58,16 @@ namespace Umbraco.Tests.Common.Builders
         public override ITemplate Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var name = _name ?? Guid.NewGuid().ToString();
             var alias = _alias ?? name.ToCamelCase();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var path = _path ?? $"-1,{id}";
             var content = _content;
             var isMasterTemplate = _isMasterTemplate ?? false;
             var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;
-            var masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
+            Lazy<int> masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -82,13 +87,11 @@ namespace Umbraco.Tests.Common.Builders
             return template;
         }
 
-        public static Template CreateTextPageTemplate(string alias = "textPage")
-        {
-            return (Template)new TemplateBuilder()
+        public static Template CreateTextPageTemplate(string alias = "textPage") =>
+            (Template)new TemplateBuilder()
                 .WithAlias(alias)
                 .WithName("Text page")
                 .Build();
-        }
 
         int? IWithIdBuilder.Id
         {

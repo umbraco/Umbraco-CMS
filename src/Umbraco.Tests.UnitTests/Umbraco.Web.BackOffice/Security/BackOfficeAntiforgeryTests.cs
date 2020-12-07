@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
@@ -25,8 +21,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
         {
             var httpContext = new DefaultHttpContext()
             {
-                User = new ClaimsPrincipal(new UmbracoBackOfficeIdentity(-1, "test", "test", Enumerable.Empty<int>(), Enumerable.Empty<int>(), "en-US",
-                    Guid.NewGuid().ToString(), Enumerable.Empty<string>(), Enumerable.Empty<string>()))
+                User = new ClaimsPrincipal(new UmbracoBackOfficeIdentity(
+                    Constants.Security.SuperUserIdAsString,
+                    "test",
+                    "test",
+                    Enumerable.Empty<int>(),
+                    Enumerable.Empty<int>(),
+                    "en-US",
+                    Guid.NewGuid().ToString(),
+                    Enumerable.Empty<string>(),
+                    Enumerable.Empty<string>()))
             };
             httpContext.Request.IsHttps = true;
             return httpContext;

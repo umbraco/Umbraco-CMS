@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
@@ -9,10 +12,14 @@ namespace Umbraco.Web.BackOffice.Authorization
     public class SectionRequirement : IAuthorizationRequirement
     {
         /// <summary>
-        /// The aliases for sections that the user will need access to
+        /// Initializes a new instance of the <see cref="SectionRequirement"/> class.
+        /// </summary>
+        /// <param name="aliases">Aliases for sections that the user will need access to.</param>
+        public SectionRequirement(params string[] aliases) => SectionAliases = aliases;
+
+        /// <summary>
+        /// Gets the aliases for sections that the user will need access to.
         /// </summary>
         public IReadOnlyCollection<string> SectionAliases { get; }
-
-        public SectionRequirement(params string[] aliases) => SectionAliases = aliases;
     }
 }

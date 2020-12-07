@@ -1,9 +1,7 @@
-﻿using System.Threading;
 using AutoFixture.NUnit3;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Exceptions;

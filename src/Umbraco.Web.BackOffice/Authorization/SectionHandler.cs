@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
     /// Ensures that the current user has access to the section
     /// </summary>
@@ -14,18 +16,21 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </remarks>
     public class SectionHandler : MustSatisfyRequirementAuthorizationHandler<SectionRequirement>
     {
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public SectionHandler(IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        {
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SectionHandler"/> class.
+        /// </summary>
+        /// <param name="backOfficeSecurityAccessor">Accessor for back-office security.</param>
+        public SectionHandler(IBackOfficeSecurityAccessor backOfficeSecurityAccessor) => _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
 
+        /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, SectionRequirement requirement)
         {
-            var authorized = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
-                             && requirement.SectionAliases.Any(app => _backofficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
-                                 app, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
+            var authorized = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null &&
+                requirement.SectionAliases
+                    .Any(app => _backOfficeSecurityAccessor.BackOfficeSecurity.UserHasSectionAccess(
+                        app, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser));
 
             return Task.FromResult(authorized);
         }

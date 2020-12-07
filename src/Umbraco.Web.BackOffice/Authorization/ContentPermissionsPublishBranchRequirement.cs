@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
@@ -7,11 +10,15 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </summary>
     public class ContentPermissionsPublishBranchRequirement : IAuthorizationRequirement
     {
-        public ContentPermissionsPublishBranchRequirement(char permission)
-        {
-            Permission = permission;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentPermissionsPublishBranchRequirement"/> class.
+        /// </summary>
+        /// <param name="permission">Permission to check.</param>
+        public ContentPermissionsPublishBranchRequirement(char permission) => Permission = permission;
 
+        /// <summary>
+        /// Gets a value for the permission to check.
+        /// </summary>
         public char Permission { get; }
     }
 }

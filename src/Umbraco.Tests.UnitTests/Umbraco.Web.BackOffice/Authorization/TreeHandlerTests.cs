@@ -1,0 +1,112 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
+
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+{
+    public class TreeHandlerTests
+    {
+        private const string Tree1Alias = "Tree1";
+        private const string Tree2Alias = "Tree2";
+
+        [Test]
+        public async Task Unauthorized_User_Is_Not_Authorized()
+        {
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            TreeHandler sut = CreateHandler();
+
+            await sut.HandleAsync(authHandlerContext);
+
+            Assert.IsFalse(authHandlerContext.HasSucceeded);
+        }
+
+        [Test]
+        public async Task User_With_Access_To_Tree_Section_Is_Authorized()
+        {
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            TreeHandler sut = CreateHandler(userIsAuthorized: true, userCanAccessContentSection: true);
+
+            await sut.HandleAsync(authHandlerContext);
+
+            Assert.IsTrue(authHandlerContext.HasSucceeded);
+        }
+
+        [Test]
+        public async Task User_Without_Access_To_Tree_Section_Is_Not_Authorized()
+        {
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            TreeHandler sut = CreateHandler(userIsAuthorized: true);
+
+            await sut.HandleAsync(authHandlerContext);
+
+            Assert.IsFalse(authHandlerContext.HasSucceeded);
+        }
+
+        private static AuthorizationHandlerContext CreateAuthorizationHandlerContext()
+        {
+            var requirement = new TreeRequirement(Tree1Alias, Tree2Alias);
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
+            object resource = new object();
+            return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
+        }
+
+        private TreeHandler CreateHandler(bool userIsAuthorized = false, bool userCanAccessContentSection = false)
+        {
+            Mock<ITreeService> mockTreeService = CreateMockTreeService();
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(userIsAuthorized, userCanAccessContentSection);
+
+            return new TreeHandler(mockTreeService.Object, mockBackOfficeSecurityAccessor.Object);
+        }
+
+        private static Mock<ITreeService> CreateMockTreeService()
+        {
+            var mockTreeService = new Mock<ITreeService>();
+            mockTreeService
+                .Setup(x => x.GetByAlias(It.Is<string>(y => y == Tree1Alias)))
+                .Returns(CreateTree(Tree1Alias, Constants.Applications.Content));
+            mockTreeService
+                .Setup(x => x.GetByAlias(It.Is<string>(y => y == Tree2Alias)))
+                .Returns(CreateTree(Tree2Alias, Constants.Applications.Media));
+            return mockTreeService;
+        }
+
+        private static Tree CreateTree(string alias, string sectionAlias) =>
+            new TreeBuilder()
+                .WithAlias(alias)
+                .WithSectionAlias(sectionAlias)
+                .Build();
+
+        private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool userIsAuthorized, bool userCanAccessContentSection)
+        {
+            User user = CreateUser();
+            var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
+            mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(userIsAuthorized ? user : null);
+            mockBackOfficeSecurity
+                .Setup(x => x.UserHasSectionAccess(Constants.Applications.Content, It.Is<IUser>(y => y.Username == user.Username)))
+                .Returns(userCanAccessContentSection);
+            mockBackOfficeSecurity
+                .Setup(x => x.UserHasSectionAccess(Constants.Applications.Media, It.Is<IUser>(y => y.Username == user.Username)))
+                .Returns(false);
+            var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
+            mockBackOfficeSecurityAccessor.Setup(x => x.BackOfficeSecurity).Returns(mockBackOfficeSecurity.Object);
+            return mockBackOfficeSecurityAccessor;
+        }
+
+        private static User CreateUser() => new UserBuilder()
+                .Build();
+    }
+}

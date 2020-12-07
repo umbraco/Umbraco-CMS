@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
@@ -14,43 +20,54 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </summary>
     public class UserGroupHandler : MustSatisfyRequirementAuthorizationHandler<UserGroupRequirement>
     {
-        private readonly IHttpContextAccessor _httpContextAcessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public UserGroupHandler(IHttpContextAccessor httpContextAcessor,
-                IUserService userService,
-                IContentService contentService,
-                IMediaService mediaService,
-                IEntityService entityService,
-                IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserGroupHandler"/> class.
+        /// </summary>
+        /// <param name="httpContextAccessor">Accessor for the HTTP context of the current request.</param>
+        /// <param name="userService">Service for user related operations.</param>
+        /// <param name="contentService">Service for content related operations.</param>
+        /// <param name="mediaService">Service for media related operations.</param>
+        /// <param name="entityService">Service for entity related operations.</param>
+        /// <param name="backOfficeSecurityAccessor">Accessor for back-office security.</param>
+        public UserGroupHandler(
+            IHttpContextAccessor httpContextAccessor,
+            IUserService userService,
+            IContentService contentService,
+            IMediaService mediaService,
+            IEntityService entityService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
-            _httpContextAcessor = httpContextAcessor;
+            _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _contentService = contentService;
             _mediaService = mediaService;
             _entityService = entityService;
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         }
 
+        /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, UserGroupRequirement requirement)
         {
-            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
-            var queryString = _httpContextAcessor.HttpContext?.Request.Query;
+            IQueryCollection queryString = _httpContextAccessor.HttpContext?.Request.Query;
             if (queryString == null)
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
-            }   
+            }
 
-            var ids = queryString.Where(x => x.Key == requirement.QueryStringName).ToArray();
+            KeyValuePair<string, StringValues>[] ids = queryString.Where(x => x.Key == requirement.QueryStringName).ToArray();
             if (ids.Length == 0)
             {
-                // must succeed this requirement since we cannot process it
+                // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
@@ -64,10 +81,9 @@ namespace Umbraco.Web.BackOffice.Authorization
                 _mediaService,
                 _entityService);
 
-            var isAuth = authHelper.AuthorizeGroupAccess(currentUser, intIds);
+            Attempt<string> isAuth = authHelper.AuthorizeGroupAccess(currentUser, intIds);
 
             return Task.FromResult(isAuth.Success);
         }
-
     }
 }

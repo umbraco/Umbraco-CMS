@@ -1,4 +1,8 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -75,9 +79,9 @@ namespace Umbraco.Tests.Common.Builders
         public override DocumentEntitySlim Build()
         {
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 1;
             var level = _level ?? 1;
@@ -111,8 +115,8 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_additionalDataBuilder != null)
             {
-                var additionalData = _additionalDataBuilder.Build();
-                foreach (var kvp in additionalData)
+                IDictionary<string, object> additionalData = _additionalDataBuilder.Build();
+                foreach (KeyValuePair<string, object> kvp in additionalData)
                 {
                     documentEntitySlim.AdditionalData.Add(kvp.Key, kvp.Value);
                 }

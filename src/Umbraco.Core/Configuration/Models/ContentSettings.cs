@@ -1,10 +1,15 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
-using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models
 {
+    /// <summary>
+    /// Typed configuration options for content settings.
+    /// </summary>
     public class ContentSettings
     {
         private const string DefaultPreviewBadge =
@@ -142,26 +147,54 @@ namespace Umbraco.Core.Configuration.Models
             </style>
             <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.js""></script>";
 
+        /// <summary>
+        /// Gets or sets a value for the content notification settings.
+        /// </summary>
         public ContentNotificationSettings Notifications { get; set; } = new ContentNotificationSettings();
 
+        /// <summary>
+        /// Gets or sets a value for the content imaging settings.
+        /// </summary>
         public ContentImagingSettings Imaging { get; set; } = new ContentImagingSettings();
 
+        /// <summary>
+        /// Gets or sets a value indicating whether URLs should be resolved from text strings.
+        /// </summary>
         public bool ResolveUrlsFromTextString { get; set; } = false;
 
+        /// <summary>
+        /// Gets or sets a value for the collection of error pages.
+        /// </summary>
         public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
 
+        /// <summary>
+        /// Gets or sets a value for the preview badge mark-up.
+        /// </summary>
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
+        /// <summary>
+        /// Gets or sets a value for the macro error behaviour.
+        /// </summary>
         public MacroErrorBehaviour MacroErrors { get; set; } = MacroErrorBehaviour.Inline;
 
+        /// <summary>
+        /// Gets or sets a value for the collection of file extensions that are disallowed for upload.
+        /// </summary>
         public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };
 
+        /// <summary>
+        /// Gets or sets a value for the collection of file extensions that are allowed for upload.
+        /// </summary>
         public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
 
+        /// <summary>
+        /// Gets or sets a value indicating whether deprecated property editors should be shown.
+        /// </summary>
         public bool ShowDeprecatedPropertyEditors { get; set; } = false;
 
+        /// <summary>
+        /// Gets or sets a value for the pate to the login screen background image.
+        /// </summary>
         public string LoginBackgroundImage { get; set; } = "assets/img/login.jpg";
-
-
     }
 }

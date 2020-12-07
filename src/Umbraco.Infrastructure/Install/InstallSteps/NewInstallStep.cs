@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Install.Models;

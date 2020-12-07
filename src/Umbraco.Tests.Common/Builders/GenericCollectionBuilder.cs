@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,14 +11,12 @@ namespace Umbraco.Tests.Common.Builders
     {
         private readonly IList<T> _collection;
 
-        public GenericCollectionBuilder(TBuilder parentBuilder) : base(parentBuilder)
-        {
-            _collection = new List<T>();
-        }        
+        public GenericCollectionBuilder(TBuilder parentBuilder)
+            : base(parentBuilder) => _collection = new List<T>();
 
         public override IEnumerable<T> Build()
         {
-            var collection = _collection?.ToList() ?? Enumerable.Empty<T>();
+            IEnumerable<T> collection = _collection?.ToList() ?? Enumerable.Empty<T>();
             return collection;
         }
 

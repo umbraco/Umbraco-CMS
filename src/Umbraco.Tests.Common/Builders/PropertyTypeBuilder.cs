@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -9,7 +12,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class PropertyTypeBuilder : PropertyTypeBuilder<NullPropertyTypeBuilderParent>
     {
-        public PropertyTypeBuilder() : base(null)
+        public PropertyTypeBuilder()
+            : base(null)
         {
         }
     }
@@ -28,7 +32,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithUpdateDateBuilder,
             IWithSortOrderBuilder,
             IWithDescriptionBuilder,
-            IWithSupportsPublishing where TParent : IBuildPropertyTypes
+            IWithSupportsPublishing
+        where TParent : IBuildPropertyTypes
     {
         private int? _id;
         private Guid? _key;
@@ -43,13 +48,15 @@ namespace Umbraco.Tests.Common.Builders
         private int? _dataTypeId;
         private Lazy<int> _propertyGroupId;
         private bool? _mandatory;
+        private bool? _labelOnTop;
         private string _mandatoryMessage;
         private string _validationRegExp;
         private string _validationRegExpMessage;
         private bool? _supportsPublishing;
         private ContentVariation? _variations;
 
-        public PropertyTypeBuilder(TParent parentBuilder) : base(parentBuilder)
+        public PropertyTypeBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -84,6 +91,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public PropertyTypeBuilder<TParent> WithLabelOnTop(bool labelOnTop)
+        {
+            _labelOnTop = labelOnTop;
+            return this;
+        }
+
         public PropertyTypeBuilder<TParent> WithValidationRegExp(string validationRegExp, string validationRegExpMessage = "")
         {
             _validationRegExp = validationRegExp;
@@ -100,23 +113,24 @@ namespace Umbraco.Tests.Common.Builders
         public override PropertyType Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var propertyEditorAlias = _propertyEditorAlias ?? Constants.PropertyEditors.Aliases.TextBox;
-            var valueStorageType = _valueStorageType ?? ValueStorageType.Nvarchar;
+            ValueStorageType valueStorageType = _valueStorageType ?? ValueStorageType.Nvarchar;
             var name = _name ?? Guid.NewGuid().ToString();
             var alias = _alias ?? name.ToCamelCase();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var sortOrder = _sortOrder ?? 0;
             var dataTypeId = _dataTypeId ?? -88;
             var description = _description ?? string.Empty;
-            var propertyGroupId = _propertyGroupId ?? null;
+            Lazy<int> propertyGroupId = _propertyGroupId ?? null;
             var mandatory = _mandatory ?? false;
             var mandatoryMessage = _mandatoryMessage ?? string.Empty;
             var validationRegExp = _validationRegExp ?? string.Empty;
             var validationRegExpMessage = _validationRegExpMessage ?? string.Empty;
             var supportsPublishing = _supportsPublishing ?? false;
-            var variations = _variations ?? ContentVariation.Nothing;
+            var labelOnTop = _labelOnTop ?? false;
+            ContentVariation variations = _variations ?? ContentVariation.Nothing;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -138,11 +152,12 @@ namespace Umbraco.Tests.Common.Builders
                 ValidationRegExpMessage = validationRegExpMessage,
                 SupportsPublishing = supportsPublishing,
                 Variations = variations,
+                LabelOnTop = labelOnTop,
             };
 
             return propertyType;
         }
-        
+
         int? IWithIdBuilder.Id
         {
             get => _id;

@@ -1,8 +1,11 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Tests.Common.Builders.Extensions;
 using System.Collections.Generic;
+using Umbraco.Core.Models;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -95,9 +98,9 @@ namespace Umbraco.Tests.Common.Builders
         public override Member Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
@@ -110,16 +113,16 @@ namespace Umbraco.Tests.Common.Builders
             var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
             var isApproved = _isApproved ?? false;
             var isLockedOut = _isLockedOut ?? false;
-            var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
-            var lastLoginDate = _lastLoginDate ?? DateTime.Now;
-            var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+            DateTime lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
+            DateTime lastLoginDate = _lastLoginDate ?? DateTime.Now;
+            DateTime lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
 
             if (_memberTypeBuilder is null && _memberType is null)
             {
                 throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMemberType() or WithMemberType().");
             }
 
-            var memberType = _memberType ?? _memberTypeBuilder.Build();
+            IMemberType memberType = _memberType ?? _memberTypeBuilder.Build();
 
             var member = new Member(name, email, username, rawPasswordValue, memberType)
             {
@@ -137,7 +140,7 @@ namespace Umbraco.Tests.Common.Builders
             if (_propertyIdsIncrementingFrom.HasValue)
             {
                 var i = _propertyIdsIncrementingFrom.Value;
-                foreach (var property in member.Properties)
+                foreach (IProperty property in member.Properties)
                 {
                     property.Id = ++i;
                 }
@@ -157,8 +160,8 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_additionalDataBuilder != null)
             {
-                var additionalData = _additionalDataBuilder.Build();
-                foreach (var kvp in additionalData)
+                IDictionary<string, object> additionalData = _additionalDataBuilder.Build();
+                foreach (KeyValuePair<string, object> kvp in additionalData)
                 {
                     member.AdditionalData.Add(kvp.Key, kvp.Value);
                 }
@@ -166,8 +169,8 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_propertyDataBuilder != null)
             {
-                var propertyData = _propertyDataBuilder.Build();
-                foreach (var kvp in propertyData)
+                IDictionary<string, object> propertyData = _propertyDataBuilder.Build();
+                foreach (KeyValuePair<string, object> kvp in propertyData)
                 {
                     member.SetValue(kvp.Key, kvp.Value);
                 }
@@ -178,7 +181,7 @@ namespace Umbraco.Tests.Common.Builders
             return member;
         }
 
-        public static IEnumerable<IMember> CreateSimpleMembers(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
+        public static IEnumerable<IMember> CreateSimpleMembers(IMemberType memberType, int amount)
         {
             var list = new List<IMember>();
 
@@ -186,12 +189,11 @@ namespace Umbraco.Tests.Common.Builders
             {
                 var name = "Member No-" + i;
 
-                var builder = new MemberBuilder()
+                MemberBuilder builder = new MemberBuilder()
                     .WithMemberType(memberType)
                     .WithName(name)
                     .WithEmail("test" + i + "@test.com")
                     .WithLogin("test" + i, "test" + i);
-
 
                 builder = builder
                     .AddPropertyData()
@@ -205,9 +207,10 @@ namespace Umbraco.Tests.Common.Builders
 
             return list;
         }
+
         public static Member CreateSimpleMember(IMemberType memberType, string name, string email, string password, string username, Guid? key = null)
         {
-            var builder = new MemberBuilder()
+            MemberBuilder builder = new MemberBuilder()
                 .WithMemberType(memberType)
                 .WithName(name)
                 .WithEmail(email)
@@ -236,7 +239,7 @@ namespace Umbraco.Tests.Common.Builders
             for (var i = 0; i < amount; i++)
             {
                 var name = "Member No-" + i;
-                var member = new MemberBuilder()
+                Member member = new MemberBuilder()
                     .WithMemberType(memberType)
                     .WithName(name)
                     .WithEmail("test" + i + "@test.com")

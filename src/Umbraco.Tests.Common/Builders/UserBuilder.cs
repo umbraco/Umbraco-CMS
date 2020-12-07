@@ -1,16 +1,20 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
     public class UserBuilder : UserBuilder<object>
     {
-        public UserBuilder() : base(null)
+        public UserBuilder()
+            : base(null)
         {
         }
     }
@@ -48,7 +52,8 @@ namespace Umbraco.Tests.Common.Builders
         private int[] _startMediaIds;
         private readonly List<UserGroupBuilder<UserBuilder<TParent>>> _userGroupBuilders = new List<UserGroupBuilder<UserBuilder<TParent>>>();
 
-        public UserBuilder(TParent parentBuilder) : base(parentBuilder)
+        public UserBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -100,9 +105,21 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public UserBuilder<TParent> WithStartContentId(int startContentId)
+        {
+            _startContentIds = new[] { startContentId };
+            return this;
+        }
+
         public UserBuilder<TParent> WithStartContentIds(int[] startContentIds)
         {
             _startContentIds = startContentIds;
+            return this;
+        }
+
+        public UserBuilder<TParent> WithStartMediaId(int startMediaId)
+        {
+            _startMediaIds = new[] { startMediaId };
             return this;
         }
 
@@ -112,11 +129,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        /// <summary>
-        /// Will suffix the name, email and username for testing
-        /// </summary>
-        /// <param name="suffix"></param>
-        /// <returns></returns>
         public UserBuilder<TParent> WithSuffix(string suffix)
         {
             _suffix = suffix;
@@ -135,9 +147,9 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 0;
             var defaultLang = _defaultLang ?? "en";
             var globalSettings = new GlobalSettings { DefaultUILanguage = defaultLang };
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? "TestUser" + _suffix;
             var language = _language ?? globalSettings.DefaultUILanguage;
             var username = _username ?? "TestUser" + _suffix;
@@ -146,14 +158,14 @@ namespace Umbraco.Tests.Common.Builders
             var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
             var isApproved = _isApproved ?? false;
             var isLockedOut = _isLockedOut ?? false;
-            var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
-            var lastLoginDate = _lastLoginDate ?? DateTime.Now;
-            var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+            DateTime lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
+            DateTime lastLoginDate = _lastLoginDate ?? DateTime.Now;
+            DateTime lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
             var comments = _comments ?? string.Empty;
             var sessionTimeout = _sessionTimeout ?? 0;
-            var startContentIds = _startContentIds ?? new int[0];
-            var startMediaIds = _startMediaIds ?? new int[0];
-            var groups = _userGroupBuilders.Select(x => x.Build());
+            var startContentIds = _startContentIds ?? new[] { -1 };
+            var startMediaIds = _startMediaIds ?? new[] { -1 };
+            IEnumerable<IUserGroup> groups = _userGroupBuilders.Select(x => x.Build());
 
             var result = new User(
                 globalSettings,
@@ -178,7 +190,7 @@ namespace Umbraco.Tests.Common.Builders
                 StartContentIds = startContentIds,
                 StartMediaIds = startMediaIds,
             };
-            foreach (var readOnlyUserGroup in groups)
+            foreach (IUserGroup readOnlyUserGroup in groups)
             {
                 result.AddGroup(readOnlyUserGroup.ToReadOnlyGroup());
             }
@@ -193,7 +205,7 @@ namespace Umbraco.Tests.Common.Builders
             for (var i = 0; i < amount; i++)
             {
                 var name = "User No-" + i;
-                var user = new UserBuilder()
+                User user = new UserBuilder()
                     .WithName(name)
                     .WithEmail("test" + i + "@test.com")
                     .WithLogin("test" + i, "test" + i)
@@ -209,15 +221,13 @@ namespace Umbraco.Tests.Common.Builders
             return list;
         }
 
-        public static User CreateUser(string suffix = "")
-        {
-            return new UserBuilder()
+        public static User CreateUser(string suffix = "") =>
+            new UserBuilder()
                 .WithIsApproved(true)
                 .WithName("TestUser" + suffix)
                 .WithLogin("TestUser" + suffix, "testing")
                 .WithEmail("test" + suffix + "@test.com")
                 .Build();
-        }
 
         int? IWithIdBuilder.Id
         {

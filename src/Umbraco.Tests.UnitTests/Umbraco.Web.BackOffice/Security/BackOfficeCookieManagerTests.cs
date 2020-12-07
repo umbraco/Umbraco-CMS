@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -27,8 +27,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
@@ -45,8 +44,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
@@ -60,13 +58,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
-            GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath);
+            GenerateAuthPaths(out var remainingTimeoutSecondsPath, out var isAuthPath);
+
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost{remainingTimeoutSecondsPath}"));
             Assert.IsTrue(result);
@@ -75,23 +73,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             Assert.IsTrue(result);
         }
 
-        [Test]
-        public void ShouldAuthenticateRequest_Force_Auth()
-        {
-            var globalSettings = new GlobalSettings();
-
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
-
-            var mgr = new BackOfficeCookieManager(
-                Mock.Of<IUmbracoContextAccessor>(),
-                runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>(x => x.IsAvailable == true && x.Get(Constants.Security.ForceReAuthFlag) == "not null"));
-
-            var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
-            Assert.IsTrue(result);
-        }
 
         [Test]
         public void ShouldAuthenticateRequest_Not_Back_Office()
@@ -104,8 +85,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
             Assert.IsFalse(result);
@@ -115,7 +95,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             Assert.IsFalse(result);
         }
 
-        private LinkGenerator GetMockLinkGenerator(out string remainingTimeoutSecondsPath, out string isAuthPath)
+        private void GenerateAuthPaths(out string remainingTimeoutSecondsPath, out string isAuthPath)
         {
             var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
 
@@ -125,24 +105,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             // this is on the same controller but is considered a back office request
             var aPath = isAuthPath = $"/umbraco/{Constants.Web.Mvc.BackOfficePathSegment}/{Constants.Web.Mvc.BackOfficeApiArea}/{controllerName}/{nameof(AuthenticationController.IsAuthenticated)}".ToLower();
 
-            var linkGenerator = new Mock<LinkGenerator>();
-            linkGenerator.Setup(x => x.GetPathByAddress(
-                //It.IsAny<HttpContext>(),
-                It.IsAny<RouteValuesAddress>(),
-                //It.IsAny<RouteValueDictionary>(),
-                It.IsAny<RouteValueDictionary>(),
-                It.IsAny<PathString>(),
-                It.IsAny<FragmentString>(),
-                It.IsAny<LinkOptions>())).Returns((RouteValuesAddress address, RouteValueDictionary routeVals1, PathString path, FragmentString fragment, LinkOptions options) =>
-                {
-                    if (routeVals1["action"].ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
-                        return rPath;
-                    if (routeVals1["action"].ToString() == nameof(AuthenticationController.IsAuthenticated).ToLower())
-                        return aPath;
-                    return null;
-                });
-
-            return linkGenerator.Object;
         }
     }
 }

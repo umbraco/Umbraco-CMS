@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity
@@ -9,14 +9,20 @@ namespace Umbraco.Core.Models.Identity
     /// </summary>
     public class IdentityUserLogin : EntityBase, IIdentityUserLogin
     {
-        public IdentityUserLogin(string loginProvider, string providerKey, int userId)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdentityUserLogin"/> class.
+        /// </summary>
+        public IdentityUserLogin(string loginProvider, string providerKey, string userId)
         {
             LoginProvider = loginProvider;
             ProviderKey = providerKey;
             UserId = userId;
         }
 
-        public IdentityUserLogin(int id, string loginProvider, string providerKey, int userId, DateTime createDate)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdentityUserLogin"/> class.
+        /// </summary>
+        public IdentityUserLogin(int id, string loginProvider, string providerKey, string userId, DateTime createDate)
         {
             Id = id;
             LoginProvider = loginProvider;
@@ -32,7 +38,7 @@ namespace Umbraco.Core.Models.Identity
         public string ProviderKey { get; set; }
 
         /// <inheritdoc />
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <inheritdoc />
         public string UserData { get; set; }

@@ -32,6 +32,7 @@ namespace Umbraco.Core.Models
         private string _validationRegExp;
         private string _validationRegExpMessage;
         private ContentVariation _variations;
+        private bool _labelOnTop;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
@@ -194,6 +195,14 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
+        public bool LabelOnTop
+        {
+            get => _labelOnTop;
+            set => SetPropertyValueAndDetectChanges(value, ref _labelOnTop, nameof(LabelOnTop));
+        }
+
+        /// <inheritdoc />
+        [DataMember]
         public int SortOrder
         {
             get => _sortOrder;
@@ -274,7 +283,6 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyType) clone;
-
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {

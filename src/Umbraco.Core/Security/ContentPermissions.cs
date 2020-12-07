@@ -59,7 +59,7 @@ namespace Umbraco.Core.Security
                 return ContentAccess.Granted;
 
             //get the implicit/inherited permissions for the user for this path
-            return CheckPermissionsPath(content.Path, user)
+            return CheckPermissionsPath(content.Path, user, permissionsToCheck)
                 ? ContentAccess.Granted
                 : ContentAccess.Denied;
         }
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Security
                 return ContentAccess.Granted;
 
             //get the implicit/inherited permissions for the user for this path
-            return CheckPermissionsPath(entity.Path, user)
+            return CheckPermissionsPath(entity.Path, user, permissionsToCheck)
                 ? ContentAccess.Granted
                 : ContentAccess.Denied;
         }

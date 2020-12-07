@@ -224,6 +224,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = p.Id,
                     Alias = p.Alias,
                     Description = p.Description,
+                    LabelOnTop = p.LabelOnTop,
                     Editor = p.PropertyEditorAlias,
                     Validation = new PropertyTypeValidation
                     {
