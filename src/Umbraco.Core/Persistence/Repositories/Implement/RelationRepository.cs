@@ -288,20 +288,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (relationTypeAliases.Length > 0)
             {
-                var query = Sql().Delete<RelationDto>()
-                 .From<RelationDto>()
-                .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                .Where<RelationDto>(x => x.ParentId == parentId);
-                Database.Execute(query);
+                var template = SqlContext.Templates.Get(Constants.SqlTemplates.RelationRepository.DeleteByParentIn, tsql => Sql().Delete<RelationDto>()
+                  .From<RelationDto>()
+                 .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                 .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>(nameof(parentId)))
+                 .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>(nameof(relationTypeAliases))));
+                Database.Execute(template.Sql(new { parentId, relationTypeAliases }));
             }
             else
             {
-                var query = Sql().Delete<RelationDto>()
+                
+                var template = SqlContext.Templates.Get(Constants.SqlTemplates.RelationRepository.DeleteByParentAll, tsql => Sql().Delete<RelationDto>()
                  .From<RelationDto>()
                 .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                .Where<RelationDto>(x => x.ParentId == parentId)
-                .WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
-                Database.Execute(query);
+                .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>(nameof(parentId))));
+                Database.Execute(template.Sql(new { parentId }));
             }
         }
 
