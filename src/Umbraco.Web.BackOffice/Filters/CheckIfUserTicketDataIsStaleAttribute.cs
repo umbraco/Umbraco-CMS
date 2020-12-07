@@ -106,7 +106,8 @@ namespace Umbraco.Web.BackOffice.Filters
                     return;
                 }
 
-                if (actionContext.HttpContext.User.Identity is not UmbracoBackOfficeIdentity identity)
+                var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
+                if (identity == null)
                 {
                     return;
                 }
