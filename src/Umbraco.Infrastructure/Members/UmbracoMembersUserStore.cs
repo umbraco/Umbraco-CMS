@@ -4,11 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Members;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
@@ -319,7 +317,7 @@ namespace Umbraco.Infrastructure.Members
                 if (found != null)
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                    var isLoginsPropertyDirty = member.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
+                    // var isLoginsPropertyDirty = member.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.Logins));
 
                     if (UpdateMemberProperties(found, member))
                     {
