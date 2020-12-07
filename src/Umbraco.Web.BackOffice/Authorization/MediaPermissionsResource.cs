@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Models;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {

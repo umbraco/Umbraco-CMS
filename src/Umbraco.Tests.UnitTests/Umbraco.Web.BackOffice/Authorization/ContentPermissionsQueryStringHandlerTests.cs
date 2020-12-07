@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,15 +24,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
     {
         private const string QueryStringName = "id";
         private const int NodeId = 1000;
-        private static readonly Guid NodeGuid = Guid.NewGuid();
-        private static readonly Udi NodeUdi = UdiParser.Parse($"umb://document/{NodeGuid.ToString().ToLowerInvariant().Replace("-", string.Empty)}");
+        private static readonly Guid s_nodeGuid = Guid.NewGuid();
+        private static readonly Udi s_nodeUdi = UdiParser.Parse($"umb://document/{s_nodeGuid.ToString().ToLowerInvariant().Replace("-", string.Empty)}");
 
         [Test]
         public async Task Node_Id_From_Requirement_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor();
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor();
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -39,9 +42,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Id_From_Requirement_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor();
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor();
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -52,9 +55,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Id_Missing_From_Requirement_And_QueryString_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringName: "xxx");
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringName: "xxx");
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -64,9 +67,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Integer_Id_From_QueryString_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -77,9 +80,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Integer_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -90,9 +93,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Udi_Id_From_QueryString_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeUdi.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -103,9 +106,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Udi_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeUdi.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -116,9 +119,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Guid_Id_From_QueryString_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeGuid.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -129,9 +132,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Guid_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeGuid.ToString());
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -142,9 +145,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Node_Invalid_Id_From_QueryString_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: "invalid");
-            var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: "invalid");
+            ContentPermissionsQueryStringHandler sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -154,11 +157,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         private static AuthorizationHandlerContext CreateAuthorizationHandlerContext(int? nodeId = null)
         {
             const char Permission = 'A';
-            var requirement = nodeId.HasValue
+            ContentPermissionsQueryStringRequirement requirement = nodeId.HasValue
                 ? new ContentPermissionsQueryStringRequirement(nodeId.Value, Permission)
                 : new ContentPermissionsQueryStringRequirement(Permission, QueryStringName);
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var resource = new object();
+            object resource = new object();
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
         }
 
@@ -180,9 +183,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private ContentPermissionsQueryStringHandler CreateHandler(IHttpContextAccessor httpContextAccessor, int nodeId, string[] permissionsForPath)
         {
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();            
-            var mockEntityService = CreateMockEntityService();
-            var contentPermissions = CreateContentPermissions(mockEntityService.Object, nodeId, permissionsForPath);
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
+            Mock<IEntityService> mockEntityService = CreateMockEntityService();
+            ContentPermissions contentPermissions = CreateContentPermissions(mockEntityService.Object, nodeId, permissionsForPath);
             return new ContentPermissionsQueryStringHandler(mockBackOfficeSecurityAccessor.Object, httpContextAccessor, mockEntityService.Object, contentPermissions);
         }
 
@@ -190,17 +193,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var mockEntityService = new Mock<IEntityService>();
             mockEntityService
-                .Setup(x => x.GetId(It.Is<Udi>(y => y == NodeUdi)))
+                .Setup(x => x.GetId(It.Is<Udi>(y => y == s_nodeUdi)))
                 .Returns(Attempt<int>.Succeed(NodeId));
             mockEntityService
-                .Setup(x => x.GetId(It.Is<Guid>(y => y == NodeGuid), It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document)))
+                .Setup(x => x.GetId(It.Is<Guid>(y => y == s_nodeGuid), It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document)))
                 .Returns(Attempt<int>.Succeed(NodeId));
             return mockEntityService;
         }
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor()
         {
-            var user = CreateUser();
+            User user = CreateUser();
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
             mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user);
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
@@ -208,11 +211,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return mockBackOfficeSecurityAccessor;
         }
 
-        private static User CreateUser()
-        {
-            return new UserBuilder()
+        private static User CreateUser() =>
+            new UserBuilder()
                 .Build();
-        }
 
         private static ContentPermissions CreateContentPermissions(IEntityService entityService, int nodeId, string[] permissionsForPath)
         {
@@ -232,13 +233,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static IContent CreateContent(int nodeId)
         {
-            var contentType = ContentTypeBuilder.CreateBasicContentType();
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             return ContentBuilder.CreateBasicContent(contentType, nodeId);
         }
 
-        private static void AssertContentCached(Mock<IHttpContextAccessor> mockHttpContextAccessor)
-        {
+        private static void AssertContentCached(Mock<IHttpContextAccessor> mockHttpContextAccessor) =>
             Assert.AreEqual(NodeId, ((IContent)mockHttpContextAccessor.Object.HttpContext.Items[typeof(IContent).ToString()]).Id);
-        }
     }
 }

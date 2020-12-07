@@ -1,8 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Core;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -10,28 +12,33 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.BackOffice.Authorization
 {
     /// <summary>
-    /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string
+    /// Used to authorize if the user has the correct permission access to the content for the content id specified in a query string.
     /// </summary>
     public class ContentPermissionsQueryStringHandler : PermissionsQueryStringHandler<ContentPermissionsQueryStringRequirement>
     {
         private readonly ContentPermissions _contentPermissions;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentPermissionsQueryStringHandler"/> class.
+        /// </summary>
+        /// <param name="backOfficeSecurityAccessor">Accessor for back-office security.</param>
+        /// <param name="httpContextAccessor">Accessor for the HTTP context of the current request.</param>
+        /// <param name="entityService">Service for entity operations.</param>
+        /// <param name="contentPermissions">Helper for content authorization checks.</param>
         public ContentPermissionsQueryStringHandler(
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IHttpContextAccessor httpContextAccessor, 
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IHttpContextAccessor httpContextAccessor,
             IEntityService entityService,
             ContentPermissions contentPermissions)
-            : base(backofficeSecurityAccessor, httpContextAccessor, entityService)
-        {
-            _contentPermissions = contentPermissions;
-        }
+            : base(backOfficeSecurityAccessor, httpContextAccessor, entityService) => _contentPermissions = contentPermissions;
 
+        /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsQueryStringRequirement requirement)
         {
             int nodeId;
             if (requirement.NodeId.HasValue == false)
             {
-                if (!HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out var routeVal))
+                if (!HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
                 {
                     // Must succeed this requirement since we cannot process it
                     return Task.FromResult(true);
@@ -52,8 +59,9 @@ namespace Umbraco.Web.BackOffice.Authorization
                 nodeId = requirement.NodeId.Value;
             }
 
-            var permissionResult = _contentPermissions.CheckPermissions(nodeId,
-                BackofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+            ContentPermissions.ContentAccess permissionResult = _contentPermissions.CheckPermissions(
+                nodeId,
+                BackOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 out IContent contentItem,
                 new[] { requirement.PermissionToCheck });
 

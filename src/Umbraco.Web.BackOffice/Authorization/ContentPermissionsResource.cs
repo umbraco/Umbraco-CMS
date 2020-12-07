@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.BackOffice.Authorization
@@ -8,27 +11,54 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </summary>
     public class ContentPermissionsResource
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentPermissionsResource"/> class.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="permissionToCheck">The permission to authorize.</param>
         public ContentPermissionsResource(IContent content, char permissionToCheck)
         {
             PermissionsToCheck = new List<char> { permissionToCheck };
             Content = content;
         }
 
-        public ContentPermissionsResource(IContent content, IReadOnlyList<char> permissionToCheck)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentPermissionsResource"/> class.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+        public ContentPermissionsResource(IContent content, IReadOnlyList<char> permissionsToCheck)
         {
             Content = content;
-            PermissionsToCheck = permissionToCheck;
+            PermissionsToCheck = permissionsToCheck;
         }
 
-        public ContentPermissionsResource(IContent content, int nodeId, IReadOnlyList<char> permissionToCheck)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentPermissionsResource"/> class.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="nodeId">The node Id.</param>
+        /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
+        public ContentPermissionsResource(IContent content, int nodeId, IReadOnlyList<char> permissionsToCheck)
         {
             Content = content;
             NodeId = nodeId;
-            PermissionsToCheck = permissionToCheck;
+            PermissionsToCheck = permissionsToCheck;
         }
 
-        public int? NodeId { get; } 
+        /// <summary>
+        /// Gets the node Id.
+        /// </summary>
+        public int? NodeId { get; }
+
+        /// <summary>
+        /// Gets the collection of permissions to authorize.
+        /// </summary>
         public IReadOnlyList<char> PermissionsToCheck { get; }
+
+        /// <summary>
+        /// Gets the content.
+        /// </summary>
         public IContent Content { get; }
     }
 }
