@@ -39,6 +39,7 @@ using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Common.Profiler;
+using Umbraco.Web.Telemetry;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Core.DependencyInjection
@@ -201,6 +202,7 @@ namespace Umbraco.Core.DependencyInjection
             builder.Services.AddHostedService<TempFileCleanup>();
             builder.Services.AddHostedService<InstructionProcessTask>();
             builder.Services.AddHostedService<TouchServerTask>();
+            builder.Services.AddHostedService<ReportSiteTask>();
             return builder;
         }
 

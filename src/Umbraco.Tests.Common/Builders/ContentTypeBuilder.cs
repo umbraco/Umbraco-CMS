@@ -167,6 +167,7 @@ namespace Umbraco.Tests.Common.Builders
                 .WithDataTypeId(-88)
                 .WithMandatory(false)
                 .WithDescription(string.Empty)
+                .WithLabelOnTop(true)
                 .Done();
 
             return (ContentType)builder.Build();
@@ -199,6 +200,7 @@ namespace Umbraco.Tests.Common.Builders
                             .WithName("Title")
                             .WithSortOrder(1)
                             .WithMandatory(mandatoryProperties)
+                            .WithLabelOnTop(true)
                             .Done()
                         .AddPropertyType()
                             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
@@ -208,12 +210,14 @@ namespace Umbraco.Tests.Common.Builders
                             .WithSortOrder(2)
                             .WithDataTypeId(Constants.DataTypes.RichtextEditor)
                             .WithMandatory(mandatoryProperties)
+                            .WithLabelOnTop(true)
                             .Done()
                         .AddPropertyType()
                             .WithAlias(RandomAlias("author", randomizeAliases))
                             .WithName("Author")
                             .WithSortOrder(3)
                             .WithMandatory(mandatoryProperties)
+                            .WithLabelOnTop(true)
                             .Done()
                         .Done();
             }

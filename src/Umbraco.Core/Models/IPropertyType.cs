@@ -51,6 +51,11 @@ namespace Umbraco.Core.Models
         bool Mandatory { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the label of this property type should be displayed on top.
+        /// </summary>
+        bool LabelOnTop  { get; set; }
+
+        /// <summary>
         /// Gets of sets the sort order of the property type.
         /// </summary>
         int SortOrder { get; set; }

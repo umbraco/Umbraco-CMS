@@ -48,6 +48,7 @@ namespace Umbraco.Tests.Common.Builders
         private int? _dataTypeId;
         private Lazy<int> _propertyGroupId;
         private bool? _mandatory;
+        private bool? _labelOnTop;
         private string _mandatoryMessage;
         private string _validationRegExp;
         private string _validationRegExpMessage;
@@ -90,6 +91,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public PropertyTypeBuilder<TParent> WithLabelOnTop(bool labelOnTop)
+        {
+            _labelOnTop = labelOnTop;
+            return this;
+        }
+
         public PropertyTypeBuilder<TParent> WithValidationRegExp(string validationRegExp, string validationRegExpMessage = "")
         {
             _validationRegExp = validationRegExp;
@@ -122,6 +129,7 @@ namespace Umbraco.Tests.Common.Builders
             var validationRegExp = _validationRegExp ?? string.Empty;
             var validationRegExpMessage = _validationRegExpMessage ?? string.Empty;
             var supportsPublishing = _supportsPublishing ?? false;
+            var labelOnTop = _labelOnTop ?? false;
             ContentVariation variations = _variations ?? ContentVariation.Nothing;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
@@ -144,6 +152,7 @@ namespace Umbraco.Tests.Common.Builders
                 ValidationRegExpMessage = validationRegExpMessage,
                 SupportsPublishing = supportsPublishing,
                 Variations = variations,
+                LabelOnTop = labelOnTop,
             };
 
             return propertyType;

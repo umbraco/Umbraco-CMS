@@ -380,6 +380,7 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
             builder.Services.AddUnique<UserEditorAuthorizationHelper>();
             builder.Services.AddUnique<ContentPermissions>();
+
             builder.Services.AddUnique<MediaPermissions>();
         }
     }
