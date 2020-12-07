@@ -10,7 +10,7 @@ namespace Umbraco.Web.Migrations.PostMigrations
     {
         private readonly ICookieManager _cookieManager;
 
-        public ClearCsrfCookies(ICookieManager cookieManager)
+        public ClearCsrfCookies(IMigrationContext context, ICookieManager cookieManager)
         {
             _cookieManager = cookieManager;
         }

@@ -27,6 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Description = property.PropertyType.Description;
             dest.Label = property.PropertyType.Name;
             dest.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            dest.LabelOnTop = property.PropertyType.LabelOnTop;
         }
     }
 }
