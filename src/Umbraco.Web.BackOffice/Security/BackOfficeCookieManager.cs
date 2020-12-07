@@ -25,31 +25,33 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IRuntimeState _runtime;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly GlobalSettings _globalSettings;
-        private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeCookieManager"/> class.
+        /// </summary>
         public BackOfficeCookieManager(
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             IHostingEnvironment hostingEnvironment,
-            GlobalSettings globalSettings,
-            IRequestCache requestCache)
-            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, null)
+            GlobalSettings globalSettings)
+            : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, null)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeCookieManager"/> class.
+        /// </summary>
         public BackOfficeCookieManager(
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             IHostingEnvironment hostingEnvironment,
             GlobalSettings globalSettings,
-            IRequestCache requestCache,
             IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
             _hostingEnvironment = hostingEnvironment;
             _globalSettings = globalSettings;
-            _requestCache = requestCache;
             _explicitPaths = explicitPaths?.ToArray();
         }
 
@@ -57,7 +59,6 @@ namespace Umbraco.Web.BackOffice.Security
         /// Determines if we should authenticate the request
         /// </summary>
         /// <param name="requestUri">The <see cref="Uri"/> to check</param>
-        /// <param name="checkForceAuthTokens">true to check if the <see cref="Constants.Security.ForceReAuthFlag"/> has been assigned in the request.</param>
         /// <returns>true if the request should be authenticated</returns>
         /// <remarks>
         /// We auth the request when:
@@ -65,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// * it is an installer request
         /// * it is a preview request
         /// </remarks>
-        public bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
+        public bool ShouldAuthenticateRequest(Uri requestUri)
         {
             // Do not authenticate the request if we are not running (don't have a db, are not configured) - since we will never need
             // to know a current user in this scenario - we treat it as a new install. Without this we can have some issues
@@ -84,11 +85,8 @@ namespace Umbraco.Web.BackOffice.Security
                 return _explicitPaths.Any(x => x.InvariantEquals(requestUri.AbsolutePath));
             }
 
-            if (// check the explicit flag
-                (checkForceAuthTokens && _requestCache.IsAvailable && _requestCache.Get(Constants.Security.ForceReAuthFlag) != null)
-
-                // check back office
-                || requestUri.IsBackOfficeRequest(_globalSettings, _hostingEnvironment)
+            if (// check back office
+                requestUri.IsBackOfficeRequest(_globalSettings, _hostingEnvironment)
 
                 // check installer
                 || requestUri.IsInstallerRequest(_hostingEnvironment))

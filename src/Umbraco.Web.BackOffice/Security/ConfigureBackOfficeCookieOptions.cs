@@ -33,7 +33,6 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly IDataProtectionProvider _dataProtection;
-        private readonly IRequestCache _requestCache;
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
@@ -48,7 +47,6 @@ namespace Umbraco.Web.BackOffice.Security
         /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/></param>
         /// <param name="runtimeState">The <see cref="IRuntimeState"/></param>
         /// <param name="dataProtection">The <see cref="IDataProtectionProvider"/></param>
-        /// <param name="requestCache">The <see cref="IRequestCache"/></param>
         /// <param name="userService">The <see cref="IUserService"/></param>
         /// <param name="ipResolver">The <see cref="IIpResolver"/></param>
         /// <param name="systemClock">The <see cref="ISystemClock"/></param>
@@ -60,7 +58,6 @@ namespace Umbraco.Web.BackOffice.Security
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IDataProtectionProvider dataProtection,
-            IRequestCache requestCache,
             IUserService userService,
             IIpResolver ipResolver,
             ISystemClock systemClock)
@@ -72,7 +69,6 @@ namespace Umbraco.Web.BackOffice.Security
             _hostingEnvironment = hostingEnvironment;
             _runtimeState = runtimeState;
             _dataProtection = dataProtection;
-            _requestCache = requestCache;
             _userService = userService;
             _ipResolver = ipResolver;
             _systemClock = systemClock;
@@ -120,8 +116,7 @@ namespace Umbraco.Web.BackOffice.Security
                 _umbracoContextAccessor,
                 _runtimeState,
                 _hostingEnvironment,
-                _globalSettings,
-                _requestCache); // _explicitPaths); TODO: Implement this once we do OAuth somehow
+                _globalSettings); // _explicitPaths); TODO: Implement this once we do OAuth somehow
 
             options.Events = new CookieAuthenticationEvents
             {

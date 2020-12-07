@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web;
 using System.Web.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -124,16 +124,6 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         public IBackOfficeSecurity Security => BackOfficeSecurityAccessor.BackOfficeSecurity;
 
-        /// <summary>
-        /// Tries to get the current HttpContext.
-        /// </summary>
-        protected Attempt<HttpContextBase> TryGetHttpContext()
-            => Request.TryGetHttpContext();
 
-        /// <summary>
-        /// Tries to get the current OWIN context.
-        /// </summary>
-        protected Attempt<IOwinContext> TryGetOwinContext()
-            => Request.TryGetOwinContext();
     }
 }

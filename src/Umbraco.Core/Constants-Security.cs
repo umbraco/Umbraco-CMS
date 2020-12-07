@@ -40,7 +40,6 @@ namespace Umbraco.Core
             public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
-            public const string ForceReAuthFlag = "umbraco-force-auth";
 
             /// <summary>
             /// The prefix used for external identity providers for their authentication type

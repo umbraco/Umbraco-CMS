@@ -126,7 +126,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
     <Compile Include="AspNet\AspNetRequestAccessor.cs" />
@@ -141,14 +140,10 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
-    <Compile Include="Security\IdentityFactoryMiddleware.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
-    <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
-    <Compile Include="Logging\OwinLogger.cs" />
-    <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
@@ -159,11 +154,8 @@
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="WebAssets\CDF\ClientDependencyComponent.cs" />
-    <Compile Include="WebAssets\CDF\ClientDependencyComposer.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
-    <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -175,12 +167,8 @@
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
-    <Compile Include="Security\IdentityAuditEventArgs.cs" />
     <Compile Include="UmbracoBuilderExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
-    <Compile Include="ImageProcessorLogger.cs" />
-    <Compile Include="OwinExtensions.cs" />
-    <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
@@ -190,9 +178,6 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
-    <Compile Include="Security\AuthenticationExtensions.cs" />
-    <Compile Include="Security\UmbracoSecureDataFormat.cs" />
-    <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
@@ -201,29 +186,15 @@
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
-    <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
-    <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
-    <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
-    <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
-    <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
-    <Compile Include="Security\WebAuthExtensions.cs" />
-    <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
-    <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
-    <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
-    <Compile Include="WebAssets\CDF\DependencyPathRenderer.cs" />
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
-    <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
-    <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
@@ -233,7 +204,6 @@
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
-    <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />

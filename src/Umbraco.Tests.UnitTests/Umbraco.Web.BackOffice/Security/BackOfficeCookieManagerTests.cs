@@ -27,8 +27,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
@@ -45,8 +44,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
 
@@ -66,8 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost{remainingTimeoutSecondsPath}"));
             Assert.IsTrue(result);
@@ -76,23 +73,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             Assert.IsTrue(result);
         }
 
-        [Test]
-        public void ShouldAuthenticateRequest_Force_Auth()
-        {
-            var globalSettings = new GlobalSettings();
-
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
-
-            var mgr = new BackOfficeCookieManager(
-                Mock.Of<IUmbracoContextAccessor>(),
-                runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>(x => x.IsAvailable == true && x.Get(Constants.Security.ForceReAuthFlag) == "not null"));
-
-            var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
-            Assert.IsTrue(result);
-        }
 
         [Test]
         public void ShouldAuthenticateRequest_Not_Back_Office()
@@ -105,8 +85,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
                 Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings,
-                Mock.Of<IRequestCache>());
+                globalSettings);
 
             var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
             Assert.IsFalse(result);

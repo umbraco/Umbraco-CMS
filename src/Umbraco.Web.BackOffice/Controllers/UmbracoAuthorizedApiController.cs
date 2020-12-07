@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -16,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// is logged in using forms authentication which indicates the seconds remaining
     /// before their timeout expires.
     /// </remarks>
-    [IsBackOffice] 
+    [IsBackOffice]
     [UmbracoUserTimeoutFilter]
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     [DisableBrowserCache]

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -20,9 +21,13 @@ using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribute
     {
-        public CheckIfUserTicketDataIsStaleAttribute() : base(typeof(CheckIfUserTicketDataIsStaleFilter))
+        public CheckIfUserTicketDataIsStaleAttribute()
+            : base(typeof(CheckIfUserTicketDataIsStaleFilter))
         {
         }
 
@@ -66,9 +71,11 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 await CheckStaleData(actionContext);
 
-                //return if nothing is updated
+                // return if nothing is updated
                 if (_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null)
+                {
                     return;
+                }
 
                 await UpdateTokensAndAppendCustomHeaders(actionContext);
             }
@@ -81,7 +88,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 await tokenFilter.OnActionExecutionAsync(actionContext,
                     () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
 
-                //add the header
+                // add the header
                 AppendUserModifiedHeaderAttribute.AppendHeader(actionContext);
             }
 
@@ -93,26 +100,36 @@ namespace Umbraco.Web.BackOffice.Filters
                     return;
                 }
 
-                //don't execute if it's already been done
+                // don't execute if it's already been done
                 if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
+                {
                     return;
+                }
 
-                var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
-                if (identity == null) return;
+                if (actionContext.HttpContext.User.Identity is not UmbracoBackOfficeIdentity identity)
+                {
+                    return;
+                }
 
-                var userId = identity.Id.TryConvertTo<int>();
-                if (userId == false) return;
+                Attempt<int> userId = identity.Id.TryConvertTo<int>();
+                if (userId == false)
+                {
+                    return;
+                }
 
-                var user = _userService.GetUserById(userId.Result);
-                if (user == null) return;
+                IUser user = _userService.GetUserById(userId.Result);
+                if (user == null)
+                {
+                    return;
+                }
 
-                //a list of checks to execute, if any of them pass then we resync
+                // a list of checks to execute, if any of them pass then we resync
                 var checks = new Func<bool>[]
                 {
                     () => user.Username != identity.Username,
                     () =>
                     {
-                        var culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
+                        CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
                         return culture != null && culture.ToString() != identity.Culture;
                     },
                     () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
@@ -138,18 +155,15 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <summary>
             /// This will update the current request IPrincipal to be correct and re-create the auth ticket
             /// </summary>
-            /// <param name="user"></param>
-            /// <param name="actionContext"></param>
-            /// <returns></returns>
             private async Task ReSync(IUser user, ActionExecutingContext actionContext)
             {
-                var backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
+                BackOfficeIdentityUser backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
                 await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
 
-                //ensure the remainder of the request has the correct principal set
+                // ensure the remainder of the request has the correct principal set
                 actionContext.HttpContext.SetPrincipalForRequest(ClaimsPrincipal.Current);
 
-                //flag that we've made changes
+                // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);
             }
         }
