@@ -1,7 +1,8 @@
 using System;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.BackOffice.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Extensions
 {
     public static class AuthenticationBuilderExtensions
     {

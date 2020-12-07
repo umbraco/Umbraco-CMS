@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -60,7 +60,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
-            GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath);
+            GenerateAuthPaths(out var remainingTimeoutSecondsPath, out var isAuthPath);
+
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             Assert.IsFalse(result);
         }
 
-        private LinkGenerator GetMockLinkGenerator(out string remainingTimeoutSecondsPath, out string isAuthPath)
+        private void GenerateAuthPaths(out string remainingTimeoutSecondsPath, out string isAuthPath)
         {
             var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
 
@@ -125,24 +126,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             // this is on the same controller but is considered a back office request
             var aPath = isAuthPath = $"/umbraco/{Constants.Web.Mvc.BackOfficePathSegment}/{Constants.Web.Mvc.BackOfficeApiArea}/{controllerName}/{nameof(AuthenticationController.IsAuthenticated)}".ToLower();
 
-            var linkGenerator = new Mock<LinkGenerator>();
-            linkGenerator.Setup(x => x.GetPathByAddress(
-                //It.IsAny<HttpContext>(),
-                It.IsAny<RouteValuesAddress>(),
-                //It.IsAny<RouteValueDictionary>(),
-                It.IsAny<RouteValueDictionary>(),
-                It.IsAny<PathString>(),
-                It.IsAny<FragmentString>(),
-                It.IsAny<LinkOptions>())).Returns((RouteValuesAddress address, RouteValueDictionary routeVals1, PathString path, FragmentString fragment, LinkOptions options) =>
-                {
-                    if (routeVals1["action"].ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
-                        return rPath;
-                    if (routeVals1["action"].ToString() == nameof(AuthenticationController.IsAuthenticated).ToLower())
-                        return aPath;
-                    return null;
-                });
-
-            return linkGenerator.Object;
         }
     }
 }

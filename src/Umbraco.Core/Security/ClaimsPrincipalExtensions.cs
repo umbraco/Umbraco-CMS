@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Extensions
 {

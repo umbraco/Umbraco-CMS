@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Owin.Security;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

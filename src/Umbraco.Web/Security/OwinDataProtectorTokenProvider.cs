@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security.DataProtection;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

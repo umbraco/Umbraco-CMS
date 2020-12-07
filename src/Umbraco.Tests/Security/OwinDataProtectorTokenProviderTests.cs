@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security.DataProtection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Security;
 

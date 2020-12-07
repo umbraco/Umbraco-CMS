@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// Identity options specifically for the back office identity implementation

@@ -4,7 +4,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

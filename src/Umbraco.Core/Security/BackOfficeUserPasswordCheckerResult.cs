@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// The result returned from the IBackOfficeUserPasswordChecker

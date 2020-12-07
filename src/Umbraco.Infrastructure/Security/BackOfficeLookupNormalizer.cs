@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
@@ -8,6 +8,8 @@ namespace Umbraco.Core.BackOffice
     /// </summary>
     public class BackOfficeLookupNormalizer : ILookupNormalizer
     {
+        // TODO: Do we need this?
+
         public string NormalizeName(string name) => name;
 
         public string NormalizeEmail(string email) => email;

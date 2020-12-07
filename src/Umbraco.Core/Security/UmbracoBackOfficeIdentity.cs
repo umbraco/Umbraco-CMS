@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
 
     /// <summary>
@@ -15,13 +15,12 @@ namespace Umbraco.Core.BackOffice
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
         // values from it. 
-
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
-            //validate that all claims exist
+            // validate that all claims exist
             foreach (var t in RequiredBackOfficeIdentityClaimTypes)
             {
-                //if the identity doesn't have the claim, or the claim value is null
+                // if the identity doesn't have the claim, or the claim value is null
                 if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
                 {
                     backOfficeIdentity = null;
@@ -54,16 +53,21 @@ namespace Umbraco.Core.BackOffice
         /// <param name="securityStamp"></param>
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
-        public UmbracoBackOfficeIdentity(int userId, string username, string realName,
+        public UmbracoBackOfficeIdentity(string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
             : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
         {
-            if (allowedApps == null) throw new ArgumentNullException(nameof(allowedApps));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            if (allowedApps == null)
+                throw new ArgumentNullException(nameof(allowedApps));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(securityStamp))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
 
@@ -83,15 +87,19 @@ namespace Umbraco.Core.BackOffice
         /// <param name="allowedApps"></param>
         /// <param name="roles"></param>
         public UmbracoBackOfficeIdentity(ClaimsIdentity childIdentity,
-            int userId, string username, string realName,
+            string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
-            if (string.IsNullOrWhiteSpace(securityStamp)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
+            if (string.IsNullOrWhiteSpace(realName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
+            if (string.IsNullOrWhiteSpace(culture))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(securityStamp))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(securityStamp));
 
             AddRequiredClaims(userId, username, realName, startContentNodes, startMediaNodes, culture, securityStamp, allowedApps, roles);
         }
@@ -118,13 +126,13 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Adds claims based on the ctor data
         /// </summary>
-        private void AddRequiredClaims(int userId, string username, string realName,
+        private void AddRequiredClaims(string userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
             //This is the id that 'identity' uses to check for the user id
             if (HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
-                AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == ClaimTypes.Name) == false)
                 AddClaim(new Claim(ClaimTypes.Name, username, ClaimValueTypes.String, Issuer, Issuer, this));
@@ -205,7 +213,7 @@ namespace Umbraco.Core.BackOffice
 
         public string SecurityStamp => this.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
-        public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
+        public string[] Roles => FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
 
         /// <summary>
         /// Overridden to remove any temporary claims that shouldn't be copied

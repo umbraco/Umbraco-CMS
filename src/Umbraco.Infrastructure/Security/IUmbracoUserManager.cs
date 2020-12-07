@@ -5,27 +5,56 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
-    public interface IBackOfficeUserManager : IBackOfficeUserManager<BackOfficeIdentityUser>
-    {
 
-    }
-    public interface  IBackOfficeUserManager<TUser>: IDisposable
+    /// <summary>
+    /// A user manager for Umbraco (either back office users or front-end members)
+    /// </summary>
+    /// <typeparam name="TUser">The type of user</typeparam>
+    public interface IUmbracoUserManager<TUser> : IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        /// <summary>
+        /// Gets the user id of a user
+        /// </summary>
+        /// <param name="user">The user</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<string> GetUserIdAsync(TUser user);
 
+        /// <summary>
+        /// Get the <see cref="TUser"/> from a <see cref="ClaimsPrincipal"/>
+        /// </summary>
+        /// <param name="principal">The <see cref="ClaimsPrincipal"/></param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TUser> GetUserAsync(ClaimsPrincipal principal);
 
+        /// <summary>
+        /// Get the user id from the <see cref="ClaimsPrincipal"/>
+        /// </summary>
+        /// <param name="principal">the <see cref="ClaimsPrincipal"/></param>
+        /// <returns>Returns the user id from the <see cref="ClaimsPrincipal"/></returns>
         string GetUserId(ClaimsPrincipal principal);
 
+        /// <summary>
+        /// Gets the external logins for the user
+        /// </summary>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
 
+        /// <summary>
+        /// Deletes a user
+        /// </summary>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> DeleteAsync(TUser user);
 
+        /// <summary>
+        /// Finds a user by the external login provider
+        /// </summary>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
         /// <summary>
@@ -49,15 +78,11 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="token"></param>
-        /// <param name="newPassword"></param>
-        /// <returns></returns>
         /// <remarks>
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword);
+        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
 
         /// <summary>
         /// Validates that an email confirmation token matches the specified <paramref name="user"/>.
@@ -97,8 +122,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         /// <remarks>
         /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
         /// </remarks>
@@ -145,8 +168,7 @@ namespace Umbraco.Core.BackOffice
         /// The <see cref="Task"/> that represents the asynchronous operation, returning true if the <paramref name="token"/>
         /// is valid, otherwise false.
         /// </returns>
-        Task<bool> VerifyUserTokenAsync(TUser user, string tokenProvider, string purpose,
-            string token);
+        Task<bool> VerifyUserTokenAsync(TUser user, string tokenProvider, string purpose, string token);
 
         /// <summary>
         /// Adds the <paramref name="password"/> to the specified <paramref name="user"/> only if the user
@@ -159,7 +181,6 @@ namespace Umbraco.Core.BackOffice
         /// of the operation.
         /// </returns>
         Task<IdentityResult> AddPasswordAsync(TUser user, string password);
-
 
         /// <summary>
         /// Returns a flag indicating whether the given <paramref name="password"/> is valid for the
@@ -183,15 +204,12 @@ namespace Umbraco.Core.BackOffice
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword,
-            string newPassword);
+        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
 
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="sessionId"></param>
-        /// <returns></returns>
+        /// <returns>Returns true if the session is valid, otherwise false</returns>
         Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
 
         /// <summary>
@@ -206,11 +224,10 @@ namespace Umbraco.Core.BackOffice
         Task<IdentityResult> CreateAsync(TUser user);
 
         /// <summary>
-        /// Helper method to generate a password for a user based on the current password validator
+        /// Generate a password for a user based on the current password validator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A generated password</returns>
         string GeneratePassword();
-
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.
@@ -290,8 +307,16 @@ namespace Umbraco.Core.BackOffice
         /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
         Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
 
+        /// <summary>
+        /// Resets the access failed count for the user
+        /// </summary>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<IdentityResult> ResetAccessFailedCountAsync(TUser user);
 
+        /// <summary>
+        /// Generates a two factor token for the user
+        /// </summary>
+        /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<string> GenerateTwoFactorTokenAsync(TUser user, string tokenProvider);
 
         /// <summary>
@@ -314,9 +339,10 @@ namespace Umbraco.Core.BackOffice
         // TODO: These are raised from outside the signinmanager and usermanager in the auth and user controllers,
         // let's see if there's a way to avoid that and only have these called within signinmanager and usermanager
         // which means we can remove these from the interface (things like invite seems like they cannot be moved)
-        void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, int userId);
-        void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, int userId);
-        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId);
+        // TODO: When we change to not having the crappy static events this will need to be revisited
+        void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, string userId);
+        void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, string userId);
+        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, string userId);
         UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
         bool HasSendingUserInviteEventHandler { get; }
 

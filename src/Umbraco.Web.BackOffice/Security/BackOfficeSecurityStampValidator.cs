@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Security

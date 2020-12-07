@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// Used by the BackOfficeUserManager to check the username/password which allows for developers to more easily
@@ -11,9 +11,6 @@ namespace Umbraco.Core.BackOffice
         /// <summary>
         /// Checks a password for a user
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
         /// <remarks>
         /// This will allow a developer to auto-link a local account which is required if the user queried doesn't exist locally.
         /// The user parameter will always contain the username, if the user doesn't exist locally, the other properties will not be filled in.

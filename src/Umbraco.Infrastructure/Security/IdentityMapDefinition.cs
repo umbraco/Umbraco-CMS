@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -7,7 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {
@@ -65,7 +65,7 @@ namespace Umbraco.Core.BackOffice
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
-            target.LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?) null;
+            target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
 
             // this was in AutoMapper but does not have a setter anyways
             //target.AllowedSections = source.AllowedSections.ToArray(),

@@ -15,7 +15,7 @@ namespace Umbraco.Web.UI.NetCore
         private readonly IConfiguration _config;
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="webHostEnvironment">The Web Host Environment</param>
         /// <param name="config">The Configuration</param>
@@ -30,15 +30,22 @@ namespace Umbraco.Web.UI.NetCore
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        /// <summary>
+        /// Configures the services
+        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+#pragma warning disable IDE0022 // Use expression body for methods
             services.AddUmbraco(_env, _config)
                 .AddAllBackOfficeComponents()
                 .AddUmbracoWebsite()
                 .Build();
+#pragma warning restore IDE0022 // Use expression body for methods
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// Configures the application
+        /// </summary>
         public void Configure(IApplicationBuilder app)
         {
             if (_env.IsDevelopment())

@@ -1,18 +1,25 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.BackOffice;
 
-namespace Umbraco.Infrastructure.BackOffice
+namespace Umbraco.Core.Security
 {
     public class BackOfficeIdentityBuilder : IdentityBuilder
     {
-        public BackOfficeIdentityBuilder(IServiceCollection services) : base(typeof(BackOfficeIdentityUser), services)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeIdentityBuilder"/> class.
+        /// </summary>
+        public BackOfficeIdentityBuilder(IServiceCollection services)
+            : base(typeof(BackOfficeIdentityUser), services)
         {
         }
 
-        public BackOfficeIdentityBuilder(Type role, IServiceCollection services) : base(typeof(BackOfficeIdentityUser), role, services)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeIdentityBuilder"/> class.
+        /// </summary>
+        public BackOfficeIdentityBuilder(Type role, IServiceCollection services)
+            : base(typeof(BackOfficeIdentityUser), role, services)
         {
         }
 
@@ -28,10 +35,8 @@ namespace Umbraco.Infrastructure.BackOffice
             {
                 throw new InvalidOperationException($"Invalid Type for TokenProvider: {provider.FullName}");
             }
-            Services.Configure<BackOfficeIdentityOptions>(options =>
-            {
-                options.Tokens.ProviderMap[providerName] = new TokenProviderDescriptor(provider);
-            });
+
+            Services.Configure<BackOfficeIdentityOptions>(options => options.Tokens.ProviderMap[providerName] = new TokenProviderDescriptor(provider));
             Services.AddTransient(provider);
             return this;
         }
