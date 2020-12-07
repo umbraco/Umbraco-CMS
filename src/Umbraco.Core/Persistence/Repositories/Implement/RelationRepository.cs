@@ -289,6 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (relationTypeAliases.Length > 0)
             {
                 var query = Sql().Delete<RelationDto>()
+                 .From<RelationDto>()
                 .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
                 .Where<RelationDto>(x => x.ParentId == parentId);
                 Database.Execute(query);
@@ -296,6 +297,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else
             {
                 var query = Sql().Delete<RelationDto>()
+                 .From<RelationDto>()
                 .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
                 .Where<RelationDto>(x => x.ParentId == parentId)
                 .WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
