@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Core.Models.Identity
 {
     /// <inheritdoc />
     public class ExternalLogin : IExternalLogin
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExternalLogin"/> class.
+        /// </summary>
         public ExternalLogin(string loginProvider, string providerKey, string userData = null)
         {
             LoginProvider = loginProvider ?? throw new ArgumentNullException(nameof(loginProvider));

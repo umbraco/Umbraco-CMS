@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id)
+            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id.ToString())
             {
                 UserData = "hello"
             };
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id)
+            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id.ToString())
             {
                 UserData = "hello"
             };
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Services
             var logins = ExternalLoginService.GetAll(user.Id).OrderBy(x => x.LoginProvider).ToList();
 
             logins.RemoveAt(0); // remove the first one
-            logins.Add(new IdentityUserLogin("test5", Guid.NewGuid().ToString("N"), user.Id)); // add a new one
+            logins.Add(new IdentityUserLogin("test5", Guid.NewGuid().ToString("N"), user.Id.ToString())); // add a new one
 
             // save new list
             ExternalLoginService.Save(user.Id, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));

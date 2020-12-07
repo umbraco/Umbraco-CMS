@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -23,12 +26,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     {
         private Mock<HttpMessageHandler> _mockHttpMessageHandler;
 
-        private const string _applicationUrl = "https://mysite.com";
+        private const string ApplicationUrl = "https://mysite.com";
 
         [Test]
         public async Task Does_Not_Execute_When_Not_Enabled()
         {
-            var sut = CreateKeepAlive(enabled: false);
+            KeepAlive sut = CreateKeepAlive(enabled: false);
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
@@ -36,7 +39,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            var sut = CreateKeepAlive(serverRole: ServerRole.Replica);
+            KeepAlive sut = CreateKeepAlive(serverRole: ServerRole.Replica);
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
@@ -44,7 +47,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
-            var sut = CreateKeepAlive(serverRole: ServerRole.Unknown);
+            KeepAlive sut = CreateKeepAlive(serverRole: ServerRole.Unknown);
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
@@ -52,7 +55,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
-            var sut = CreateKeepAlive(isMainDom: false);
+            KeepAlive sut = CreateKeepAlive(isMainDom: false);
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
@@ -60,7 +63,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Executes_And_Calls_Ping_Url()
         {
-            var sut = CreateKeepAlive();
+            KeepAlive sut = CreateKeepAlive();
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestSent();
         }
@@ -76,7 +79,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             };
 
             var mockRequestAccessor = new Mock<IRequestAccessor>();
-            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(new Uri(_applicationUrl));
+            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(new Uri(ApplicationUrl));
 
             var mockServerRegistrar = new Mock<IServerRegistrar>();
             mockServerRegistrar.Setup(x => x.GetCurrentServerRole()).Returns(serverRole);
@@ -99,26 +102,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockHttpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
             mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-            return new KeepAlive(mockRequestAccessor.Object, mockMainDom.Object, Options.Create(settings),
-                mockLogger.Object, mockProfilingLogger.Object, mockServerRegistrar.Object, mockHttpClientFactory.Object);
+            return new KeepAlive(
+                mockRequestAccessor.Object,
+                mockMainDom.Object,
+                Options.Create(settings),
+                mockLogger.Object,
+                mockProfilingLogger.Object,
+                mockServerRegistrar.Object,
+                mockHttpClientFactory.Object);
         }
 
-        private void VerifyKeepAliveRequestNotSent()
-        {
-            VerifyKeepAliveRequestSentTimes(Times.Never());
-        }
+        private void VerifyKeepAliveRequestNotSent() => VerifyKeepAliveRequestSentTimes(Times.Never());
 
-        private void VerifyKeepAliveRequestSent()
-        {
-            VerifyKeepAliveRequestSentTimes(Times.Once());
-        }
+        private void VerifyKeepAliveRequestSent() => VerifyKeepAliveRequestSentTimes(Times.Once());
 
-        private void VerifyKeepAliveRequestSentTimes(Times times)
-        {
-            _mockHttpMessageHandler.Protected().Verify("SendAsync",
+        private void VerifyKeepAliveRequestSentTimes(Times times) => _mockHttpMessageHandler.Protected()
+            .Verify(
+                "SendAsync",
                 times,
-                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == $"{_applicationUrl}/api/keepalive/ping"),
+                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == $"{ApplicationUrl}/api/keepalive/ping"),
                 ItExpr.IsAny<CancellationToken>());
-        }
     }
 }

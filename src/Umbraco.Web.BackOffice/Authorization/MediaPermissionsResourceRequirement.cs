@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
     /// An authorization requirement for <see cref="MediaPermissionsResourceHandler"/>
     /// </summary>
     public class MediaPermissionsResourceRequirement : IAuthorizationRequirement
     {
-        
     }
 }

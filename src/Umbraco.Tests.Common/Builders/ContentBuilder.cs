@@ -1,11 +1,14 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Testing;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -44,7 +47,7 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _trashed;
         private CultureInfo _cultureInfo;
         private IContentType _contentType;
-        private IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
+        private readonly IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
         private object _propertyValues;
         private string _propertyValuesCulture;
         private string _propertyValuesSegment;
@@ -105,11 +108,11 @@ namespace Umbraco.Tests.Common.Builders
         {
             var id = _id ?? 0;
             var versionId = _versionId ?? 0;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
-            var parent = _parent ?? null;
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            IContent parent = _parent ?? null;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
@@ -126,7 +129,7 @@ namespace Umbraco.Tests.Common.Builders
                 throw new InvalidOperationException("A content item cannot be constructed without providing a content type. Use AddContentType() or WithContentType().");
             }
 
-            var contentType = _contentType ?? _contentTypeBuilder.Build();
+            IContentType contentType = _contentType ?? _contentTypeBuilder.Build();
 
             Content content;
             if (parent != null)
@@ -149,7 +152,7 @@ namespace Umbraco.Tests.Common.Builders
             content.SortOrder = sortOrder;
             content.Trashed = trashed;
 
-            foreach (var cultureName in _cultureNames)
+            foreach (KeyValuePair<string, string> cultureName in _cultureNames)
             {
                 content.SetCultureName(cultureName.Value, cultureName.Key);
             }
@@ -158,8 +161,8 @@ namespace Umbraco.Tests.Common.Builders
             {
                 if (_propertyDataBuilder != null)
                 {
-                    var propertyData = _propertyDataBuilder.Build();
-                    foreach (var keyValuePair in propertyData)
+                    IDictionary<string, object> propertyData = _propertyDataBuilder.Build();
+                    foreach (KeyValuePair<string, object> keyValuePair in propertyData)
                     {
                         content.SetValue(keyValuePair.Key, keyValuePair.Value);
                     }
@@ -175,47 +178,44 @@ namespace Umbraco.Tests.Common.Builders
             return content;
         }
 
-        public static Content CreateBasicContent(IContentType contentType, int id = 0)
-        {
-            return new ContentBuilder()
+        public static Content CreateBasicContent(IContentType contentType, int id = 0) =>
+            new ContentBuilder()
                 .WithId(id)
                 .WithContentType(contentType)
                 .WithName("Home")
                 .Build();
-        }
 
-        public static Content CreateSimpleContent(IContentType contentType)
-        {
-            return new ContentBuilder()
+        public static Content CreateSimpleContent(IContentType contentType) =>
+            new ContentBuilder()
                 .WithContentType(contentType)
                 .WithName("Home")
                 .WithPropertyValues(new
-                    {
-                        title = "Welcome to our Home page",
-                        bodyText = "This is the welcome message on the first page",
-                        author = "John Doe"
-                    })
+                {
+                    title = "Welcome to our Home page",
+                    bodyText = "This is the welcome message on the first page",
+                    author = "John Doe"
+                })
                 .Build();
-        }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null)
-        {
-            return new ContentBuilder()
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null) =>
+            new ContentBuilder()
                 .WithContentType(contentType)
                 .WithName(name)
                 .WithParentId(parentId)
-                .WithPropertyValues(new
+                .WithPropertyValues(
+                    new
                     {
                         title = "Welcome to our Home page",
                         bodyText = "This is the welcome message on the first page",
                         author = "John Doe"
-                    }, culture, segment)
+                    },
+                    culture,
+                    segment)
                 .Build();
-        }
 
         public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null, bool setPropertyValues = true)
         {
-            var builder = new ContentBuilder()
+            ContentBuilder builder = new ContentBuilder()
                 .WithContentType(contentType)
                 .WithName(name)
                 .WithParent(parent);
@@ -228,15 +228,18 @@ namespace Umbraco.Tests.Common.Builders
 
             if (setPropertyValues)
             {
-                builder = builder.WithPropertyValues(new
-                {
-                    title = name + " Subpage",
-                    bodyText = "This is a subpage",
-                    author = "John Doe"
-                }, culture, segment);
+                builder = builder.WithPropertyValues(
+                    new
+                    {
+                        title = name + " Subpage",
+                        bodyText = "This is a subpage",
+                        author = "John Doe"
+                    },
+                    culture,
+                    segment);
             }
 
-            var content = builder.Build();
+            Content content = builder.Build();
 
             content.ResetDirtyProperties(false);
 
@@ -247,7 +250,7 @@ namespace Umbraco.Tests.Common.Builders
         {
             var list = new List<Content>();
 
-            for (int i = 0; i < amount; i++)
+            for (var i = 0; i < amount; i++)
             {
                 var name = "Textpage No-" + i;
                 var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
@@ -269,14 +272,15 @@ namespace Umbraco.Tests.Common.Builders
 
             return list;
         }
-        public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
-        {
-            return new ContentBuilder()
+
+        public static Content CreateTextpageContent(IContentType contentType, string name, int parentId) =>
+            new ContentBuilder()
                 .WithId(0)
                 .WithContentType(contentType)
                 .WithName(name)
                 .WithParentId(parentId)
-                .WithPropertyValues(new
+                .WithPropertyValues(
+                    new
                     {
                         title = name + " textpage",
                         bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
@@ -284,7 +288,6 @@ namespace Umbraco.Tests.Common.Builders
                         description = "This is the meta description for a textpage"
                     })
                 .Build();
-        }
 
         public static IEnumerable<Content> CreateMultipleTextpageContent(IContentType contentType, int parentId, int amount)
         {
@@ -293,7 +296,7 @@ namespace Umbraco.Tests.Common.Builders
             for (var i = 0; i < amount; i++)
             {
                 var name = "Textpage No-" + i;
-                var content = new ContentBuilder()
+                Content content = new ContentBuilder()
                     .WithName(name)
                     .WithParentId(parentId)
                     .WithContentType(contentType)
@@ -314,7 +317,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
         {
-            var content = new ContentBuilder()
+            Content content = new ContentBuilder()
                 .WithName(name)
                 .WithParentId(parentId)
                 .WithContentType(contentType)

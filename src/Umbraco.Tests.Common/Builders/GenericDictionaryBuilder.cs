@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 
 namespace Umbraco.Tests.Common.Builders
@@ -7,17 +10,12 @@ namespace Umbraco.Tests.Common.Builders
     {
         private readonly IDictionary<TKey, TValue> _dictionary;
 
-        public GenericDictionaryBuilder(TBuilder parentBuilder) : base(parentBuilder)
-        {
-            _dictionary = new Dictionary<TKey, TValue>();
-        }        
+        public GenericDictionaryBuilder(TBuilder parentBuilder)
+            : base(parentBuilder) => _dictionary = new Dictionary<TKey, TValue>();
 
-        public override IDictionary<TKey, TValue> Build()
-        {
-            return _dictionary == null
+        public override IDictionary<TKey, TValue> Build() => _dictionary == null
                 ? new Dictionary<TKey, TValue>()
                 : new Dictionary<TKey, TValue>(_dictionary);
-        }
 
         public GenericDictionaryBuilder<TBuilder, TKey, TValue> WithKeyValue(TKey key, TValue value)
         {

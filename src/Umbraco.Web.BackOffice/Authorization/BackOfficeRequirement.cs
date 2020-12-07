@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
@@ -7,11 +10,15 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </summary>
     public class BackOfficeRequirement : IAuthorizationRequirement
     {
-        public BackOfficeRequirement(bool requireApproval = true)
-        {
-            RequireApproval = requireApproval;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeRequirement"/> class.
+        /// </summary>
+        /// <param name="requireApproval">Flag for whether back-office user approval is required.</param>
+        public BackOfficeRequirement(bool requireApproval = true) => RequireApproval = requireApproval;
 
+        /// <summary>
+        /// Gets a value indicating whether back-office user approval is required.
+        /// </summary>
         public bool RequireApproval { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -18,6 +18,8 @@ namespace Umbraco.Core.Persistence.Dtos
             UserGroupDtos = new List<UserGroupDto>();
             UserStartNodeDtos = new HashSet<UserStartNodeDto>();
         }
+
+        // TODO: We need to add a GUID for users and track external logins with that instead of the INT
 
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_user")]

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.IsActive = true;
             target.Label = source.Name;
-}
+        }
 
         private void Map(IProperty source, ContentPropertyBasic target, MapperContext context)
         {

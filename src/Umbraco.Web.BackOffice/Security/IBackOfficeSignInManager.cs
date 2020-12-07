@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Common.Security
 {

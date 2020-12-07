@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders.Interfaces;
 

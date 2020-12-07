@@ -1,26 +1,27 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
-
     /// <summary>
-    /// Ensures the resource cannot be accessed if <see cref="IBackOfficeExternalLoginProviders.HasDenyLocalLogin"/> returns true
+    /// Ensures the resource cannot be accessed if <see cref="IBackOfficeExternalLoginProviders.HasDenyLocalLogin"/> returns true.
     /// </summary>
     public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<DenyLocalLoginRequirement>
     {
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
 
-        public DenyLocalLoginHandler(IBackOfficeExternalLoginProviders externalLogins)
-        {
-            _externalLogins = externalLogins;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DenyLocalLoginHandler"/> class.
+        /// </summary>
+        /// <param name="externalLogins">Provides access to <see cref="BackOfficeExternalLoginProvider" /> instances.</param>
+        public DenyLocalLoginHandler(IBackOfficeExternalLoginProviders externalLogins) => _externalLogins = externalLogins;
 
-        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, DenyLocalLoginRequirement requirement)
-        {
-            return Task.FromResult(!_externalLogins.HasDenyLocalLogin());
-        }
+        /// <inheritdoc/>
+        protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, DenyLocalLoginRequirement requirement) =>
+            Task.FromResult(!_externalLogins.HasDenyLocalLogin());
     }
 }

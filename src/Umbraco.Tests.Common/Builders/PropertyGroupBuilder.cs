@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +11,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class PropertyGroupBuilder : PropertyGroupBuilder<NullPropertyGroupBuilderParent>
     {
-        public PropertyGroupBuilder() : base(null)
+        public PropertyGroupBuilder()
+            : base(null)
         {
         }
     }
@@ -26,7 +30,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithUpdateDateBuilder,
             IWithNameBuilder,
             IWithSortOrderBuilder,
-            IWithSupportsPublishing where TParent: IBuildPropertyGroups
+            IWithSupportsPublishing
+        where TParent : IBuildPropertyGroups
     {
         private readonly List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>> _propertyTypeBuilders = new List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>>();
 
@@ -39,7 +44,8 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _supportsPublishing;
         private PropertyTypeCollection _propertyTypeCollection;
 
-        public PropertyGroupBuilder(TParent parentBuilder) : base(parentBuilder)
+        public PropertyGroupBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -59,9 +65,9 @@ namespace Umbraco.Tests.Common.Builders
         public override PropertyGroup Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var sortOrder = _sortOrder ?? 0;
             var supportsPublishing = _supportsPublishing ?? false;
@@ -74,7 +80,7 @@ namespace Umbraco.Tests.Common.Builders
             else
             {
                 propertyTypeCollection = new PropertyTypeCollection(supportsPublishing);
-                foreach (var propertyType in _propertyTypeBuilders.Select(x => x.Build()))
+                foreach (PropertyType propertyType in _propertyTypeBuilders.Select(x => x.Build()))
                 {
                     propertyTypeCollection.Add(propertyType);
                 }

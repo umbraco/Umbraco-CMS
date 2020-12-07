@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -11,22 +14,24 @@ namespace Umbraco.Tests.Common.Builders
         : ContentTypeBaseBuilder<MemberBuilder, IMemberType>,
             IWithPropertyTypeIdsIncrementingFrom
     {
-        private List<PropertyGroupBuilder<MemberTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MemberTypeBuilder>>();
-        private Dictionary<string, bool> _memberCanEditProperties = new Dictionary<string, bool>();
-        private Dictionary<string, bool> _memberCanViewProperties = new Dictionary<string, bool>();
+        private readonly List<PropertyGroupBuilder<MemberTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MemberTypeBuilder>>();
+        private readonly Dictionary<string, bool> _memberCanEditProperties = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> _memberCanViewProperties = new Dictionary<string, bool>();
         private int? _propertyTypeIdsIncrementingFrom;
 
-        public MemberTypeBuilder() : base(null)
+        public MemberTypeBuilder()
+            : base(null)
         {
         }
 
-        public MemberTypeBuilder(MemberBuilder parentBuilder) : base(parentBuilder)
+        public MemberTypeBuilder(MemberBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
         public MemberTypeBuilder WithMembershipPropertyGroup()
         {
-            var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this)
+            PropertyGroupBuilder<MemberTypeBuilder> builder = new PropertyGroupBuilder<MemberTypeBuilder>(this)
                 .WithId(99)
                 .WithName(Constants.Conventions.Member.StandardPropertiesGroupName)
                 .AddPropertyType()
@@ -118,12 +123,12 @@ namespace Umbraco.Tests.Common.Builders
             BuildPropertyGroups(memberType, _propertyGroupBuilders.Select(x => x.Build()));
             BuildPropertyTypeIds(memberType, _propertyTypeIdsIncrementingFrom);
 
-            foreach (var kvp in _memberCanEditProperties)
+            foreach (KeyValuePair<string, bool> kvp in _memberCanEditProperties)
             {
                 memberType.SetMemberCanEditProperty(kvp.Key, kvp.Value);
             }
 
-            foreach (var kvp in _memberCanViewProperties)
+            foreach (KeyValuePair<string, bool> kvp in _memberCanViewProperties)
             {
                 memberType.SetMemberCanViewProperty(kvp.Key, kvp.Value);
             }
@@ -136,7 +141,7 @@ namespace Umbraco.Tests.Common.Builders
         public static MemberType CreateSimpleMemberType(string alias = null, string name = null)
         {
             var builder = new MemberTypeBuilder();
-            var memberType = builder
+            IMemberType memberType = builder
                 .WithAlias(alias)
                 .WithName(name)
                 .AddPropertyGroup()
@@ -160,8 +165,8 @@ namespace Umbraco.Tests.Common.Builders
                         .Done()
                     .Done()
                 .Build();
-  
-            // Ensure that nothing is marked as dirty
+
+            // Ensure that nothing is marked as dirty.
             memberType.ResetDirtyProperties(false);
 
             return (MemberType)memberType;

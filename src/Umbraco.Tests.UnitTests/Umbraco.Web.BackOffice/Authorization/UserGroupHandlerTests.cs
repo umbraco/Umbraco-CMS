@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -30,8 +33,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Missing_QueryString_Value_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler();
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler();
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -41,8 +44,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Admin_User_Is_Authorised()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: Group1Id.ToString(), userIsAdmin: true);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler(queryStringValue: Group1Id.ToString(), userIsAdmin: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -52,8 +55,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Matching_Single_Requested_Group_Id_Is_Authorised()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: Group1Id.ToString());
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler(queryStringValue: Group1Id.ToString());
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -63,8 +66,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Matching_One_Of_Requested_Group_Ids_Is_Authorised()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: $"{Group1Id},{Group2Id}");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler(queryStringValue: $"{Group1Id},{Group2Id}");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -74,8 +77,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Not_Matching_Single_Requested_Group_Id_Is_Not_Authorised()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: Group2Id.ToString());
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler(queryStringValue: Group2Id.ToString());
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -85,8 +88,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Not_Matching_Any_Of_Requested_Group_Ids_Is_Not_Authorised()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: $"{Group2Id},{Group3Id}");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            UserGroupHandler sut = CreateHandler(queryStringValue: $"{Group2Id},{Group3Id}");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -97,21 +100,21 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var requirement = new UserGroupRequirement(QueryStringName);
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var resource = new object();
+            object resource = new object();
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
         }
 
         private UserGroupHandler CreateHandler(string queryStringValue = "", bool userIsAdmin = false)
         {
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue);
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue);
 
-            var mockUserService = CreateMockUserService();
+            Mock<IUserService> mockUserService = CreateMockUserService();
 
             var mockContentService = new Mock<IContentService>();
             var mockMediaService = new Mock<IMediaService>();
             var mockEntityService = new Mock<IEntityService>();
 
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(userIsAdmin);
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(userIsAdmin);
 
             return new UserGroupHandler(mockHttpContextAccessor.Object, mockUserService.Object, mockContentService.Object, mockMediaService.Object, mockEntityService.Object, mockBackOfficeSecurityAccessor.Object);
         }
@@ -151,7 +154,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool userIsAdmin)
         {
-            var user = CreateUser(userIsAdmin);
+            User user = CreateUser(userIsAdmin);
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
             mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user);
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
@@ -159,21 +162,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return mockBackOfficeSecurityAccessor;
         }
 
-        private static User CreateUser(bool isAdmin = false)
-        {
-            return new UserBuilder()
+        private static User CreateUser(bool isAdmin = false) =>
+            new UserBuilder()
                 .AddUserGroup()
                     .WithAlias(isAdmin ? Constants.Security.AdminGroupAlias : Group1Alias)
                     .Done()
                 .Build();
-        }
 
-        private IUserGroup CreateUserGroup(int id, string alias)
-        {
-            return new UserGroupBuilder()
+        private IUserGroup CreateUserGroup(int id, string alias) =>
+            new UserGroupBuilder()
                 .WithId(id)
                 .WithAlias(alias)
                 .Build();
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,8 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    // TODO: We should update this to support both users and members. It means we would remove referential integrity from users
+    // and the user/member key would be a GUID (we also need to add a GUID to users)
     internal class ExternalLoginRepository : NPocoRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
     {
         public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ExternalLoginRepository> logger)

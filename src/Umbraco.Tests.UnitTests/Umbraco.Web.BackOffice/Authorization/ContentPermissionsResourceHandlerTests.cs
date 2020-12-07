@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -21,8 +24,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Node_Id_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
-            var sut = CreateHandler(NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
+            ContentPermissionsResourceHandler sut = CreateHandler(NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -32,8 +35,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Content_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var sut = CreateHandler(NodeId, new string[] { "A" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            ContentPermissionsResourceHandler sut = CreateHandler(NodeId, new string[] { "A" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -43,8 +46,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Node_Id_Withou_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
-            var sut = CreateHandler(NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
+            ContentPermissionsResourceHandler sut = CreateHandler(NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -54,8 +57,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Content_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var sut = CreateHandler(NodeId, new string[] { "B" });
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            ContentPermissionsResourceHandler sut = CreateHandler(NodeId, new string[] { "B" });
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -66,9 +69,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var requirement = new ContentPermissionsResourceRequirement();
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var content = CreateContent(nodeId);
-            var permissions = new List<char> { 'A' }.AsReadOnly();
-            var resource = createWithNodeId
+            IContent content = CreateContent(nodeId);
+            System.Collections.ObjectModel.ReadOnlyCollection<char> permissions = new List<char> { 'A' }.AsReadOnly();
+            ContentPermissionsResource resource = createWithNodeId
                 ? new ContentPermissionsResource(content, nodeId, permissions)
                 : new ContentPermissionsResource(content, permissions);
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
@@ -76,20 +79,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static IContent CreateContent(int nodeId)
         {
-            var contentType = ContentTypeBuilder.CreateBasicContentType();
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             return ContentBuilder.CreateBasicContent(contentType, nodeId);
         }
 
         private ContentPermissionsResourceHandler CreateHandler(int nodeId, string[] permissionsForPath)
         {
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
-            var contentPermissions = CreateContentPermissions(nodeId, permissionsForPath);
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
+            ContentPermissions contentPermissions = CreateContentPermissions(nodeId, permissionsForPath);
             return new ContentPermissionsResourceHandler(mockBackOfficeSecurityAccessor.Object, contentPermissions);
         }
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor()
         {
-            var user = CreateUser();
+            User user = CreateUser();
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
             mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user);
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
@@ -97,11 +100,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return mockBackOfficeSecurityAccessor;
         }
 
-        private static User CreateUser()
-        {
-            return new UserBuilder()
+        private static User CreateUser() =>
+            new UserBuilder()
                 .Build();
-        }
 
         private static ContentPermissions CreateContentPermissions(int nodeId, string[] permissionsForPath)
         {

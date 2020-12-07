@@ -1,8 +1,12 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Tests.Common.Builders.Extensions;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
@@ -68,10 +72,10 @@ namespace Umbraco.Tests.Common.Builders
         public override Media Build()
         {
             var id = _id ?? 0;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
@@ -87,7 +91,7 @@ namespace Umbraco.Tests.Common.Builders
                 throw new InvalidOperationException("A media item cannot be constructed without providing a media type. Use AddMediaType() or WithMediaType().");
             }
 
-            var mediaType = _mediaType ?? _mediaTypeBuilder.Build();
+            IMediaType mediaType = _mediaType ?? _mediaTypeBuilder.Build();
 
             var media = new Media(name, parentId, mediaType)
             {
@@ -106,8 +110,8 @@ namespace Umbraco.Tests.Common.Builders
             {
                 if (_propertyDataBuilder != null)
                 {
-                    var propertyData = _propertyDataBuilder.Build();
-                    foreach (var keyValuePair in propertyData)
+                    IDictionary<string, object> propertyData = _propertyDataBuilder.Build();
+                    foreach (KeyValuePair<string, object> keyValuePair in propertyData)
                     {
                         media.SetValue(keyValuePair.Key, keyValuePair.Value);
                     }
@@ -123,35 +127,27 @@ namespace Umbraco.Tests.Common.Builders
             return media;
         }
 
-        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId, int id = 0)
-        {
-            return new MediaBuilder()
+        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId, int id = 0) =>
+            new MediaBuilder()
                 .WithId(id)
                 .WithName(name)
                 .WithMediaType(mediaType)
                 .WithParentId(parentId)
                 .WithPropertyValues(new
-                    {
-                        title = name + " Subpage",
-                        bodyText = "This is a subpage",
-                        author = "John Doe"
-                    })
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                })
                 .Build();
-        }
 
-        public static Media CreateMediaImage(IMediaType mediaType, int parentId)
-        {
-            return CreateMediaImage(mediaType, parentId, "/media/test-image.png");
-        }
+        public static Media CreateMediaImage(IMediaType mediaType, int parentId) =>
+            CreateMediaImage(mediaType, parentId, "/media/test-image.png");
 
-        public static Media CreateMediaImageWithCrop(IMediaType mediaType, int parentId)
-        {
-            return CreateMediaImage(mediaType, parentId, "{src: '/media/test-image.png', crops: []}");
-        }
+        public static Media CreateMediaImageWithCrop(IMediaType mediaType, int parentId) =>
+            CreateMediaImage(mediaType, parentId, "{src: '/media/test-image.png', crops: []}");
 
-        private static Media CreateMediaImage(IMediaType mediaType, int parentId, string fileValue)
-        {
-            return new MediaBuilder()
+        private static Media CreateMediaImage(IMediaType mediaType, int parentId, string fileValue) => new MediaBuilder()
                 .WithMediaType(mediaType)
                 .WithName("Test Image")
                 .WithParentId(parentId)
@@ -163,20 +159,14 @@ namespace Umbraco.Tests.Common.Builders
                     .WithKeyValue(Constants.Conventions.Media.Extension, "png")
                     .Done()
                 .Build();
-        }
 
-        public static Media CreateMediaFolder(IMediaType mediaType, int parentId)
-        {
-            return new MediaBuilder()
+        public static Media CreateMediaFolder(IMediaType mediaType, int parentId) => new MediaBuilder()
                 .WithMediaType(mediaType)
                 .WithName("Test Folder")
                 .WithParentId(parentId)
                 .Build();
-        }
 
-        public static Media CreateMediaFile(IMediaType mediaType, int parentId)
-        {
-            return new MediaBuilder()
+        public static Media CreateMediaFile(IMediaType mediaType, int parentId) => new MediaBuilder()
                 .WithMediaType(mediaType)
                 .WithName("Test File")
                 .WithParentId(parentId)
@@ -186,7 +176,6 @@ namespace Umbraco.Tests.Common.Builders
                     .WithKeyValue(Constants.Conventions.Media.Extension, "png")
                     .Done()
                 .Build();
-        }
 
         int? IWithIdBuilder.Id
         {
@@ -247,6 +236,7 @@ namespace Umbraco.Tests.Common.Builders
             get => _sortOrder;
             set => _sortOrder = value;
         }
+
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;

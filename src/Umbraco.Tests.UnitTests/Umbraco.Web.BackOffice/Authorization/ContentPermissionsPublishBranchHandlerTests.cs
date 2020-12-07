@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,13 +28,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_With_Access_To_All_Descendent_Nodes_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IUserService> mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
             {
                 { DescendentNodeId1, new string[] { "A" } },
                 { DescendentNodeId2, new string[] { "A" } }
             });
-            var sut = CreateHandler(mockUserService.Object, NodeId);
+            ContentPermissionsPublishBranchHandler sut = CreateHandler(mockUserService.Object, NodeId);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -42,13 +45,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Without_Access_To_One_Descendent_Node_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IUserService> mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
             {
                 { DescendentNodeId1, new string[] { "A" } },
                 { DescendentNodeId2, new string[] { "B" } }
             });
-            var sut = CreateHandler(mockUserService.Object, NodeId);
+            ContentPermissionsPublishBranchHandler sut = CreateHandler(mockUserService.Object, NodeId);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -59,13 +62,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task User_Without_Access_To_First_Descendent_Node_Is_Not_Authorized_And_Checks_Exit_Early()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            Mock<IUserService> mockUserService = CreateMockUserService(NodeId, new Dictionary<int, string[]>
             {
                 { DescendentNodeId1, new string[] { "B" } },
                 { DescendentNodeId2, new string[] { "A" } }
             });
-            var sut = CreateHandler(mockUserService.Object, NodeId);
+            ContentPermissionsPublishBranchHandler sut = CreateHandler(mockUserService.Object, NodeId);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -77,7 +80,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var requirement = new ContentPermissionsPublishBranchRequirement('A');
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var resource = CreateContent(NodeId);
+            IContent resource = CreateContent(NodeId);
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
         }
 
@@ -97,9 +100,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private ContentPermissionsPublishBranchHandler CreateHandler(IUserService userService, int nodeId)
         {
-            var mockEntityService = CreateMockEntityService();
-            var contentPermissions = CreateContentPermissions(mockEntityService.Object, userService, nodeId);
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
+            Mock<IEntityService> mockEntityService = CreateMockEntityService();
+            ContentPermissions contentPermissions = CreateContentPermissions(mockEntityService.Object, userService, nodeId);
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
             return new ContentPermissionsPublishBranchHandler(mockEntityService.Object, contentPermissions, mockBackOfficeSecurityAccessor.Object);
         }
 
@@ -129,13 +132,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static IContent CreateContent(int nodeId)
         {
-            var contentType = ContentTypeBuilder.CreateBasicContentType();
+            ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             return ContentBuilder.CreateBasicContent(contentType, nodeId);
         }
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor()
         {
-            var user = CreateUser();
+            User user = CreateUser();
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
             mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user);
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
@@ -143,10 +146,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return mockBackOfficeSecurityAccessor;
         }
 
-        private static User CreateUser()
-        {
-            return new UserBuilder()
+        private static User CreateUser() =>
+            new UserBuilder()
                 .Build();
-        }
     }
 }

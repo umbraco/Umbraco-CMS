@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,14 +28,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     {
         private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
 
-        private const string _check1Id = "00000000-0000-0000-0000-000000000001";
-        private const string _check2Id = "00000000-0000-0000-0000-000000000002";
-        private const string _check3Id = "00000000-0000-0000-0000-000000000003";
+        private const string Check1Id = "00000000-0000-0000-0000-000000000001";
+        private const string Check2Id = "00000000-0000-0000-0000-000000000002";
+        private const string Check3Id = "00000000-0000-0000-0000-000000000003";
 
         [Test]
         public async Task Does_Not_Execute_When_Not_Enabled()
         {
-            var sut = CreateHealthCheckNotifier(enabled: false);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(enabled: false);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -44,7 +47,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [TestCase(RuntimeLevel.BootFailed)]
         public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateHealthCheckNotifier(runtimeLevel: runtimeLevel);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -52,7 +55,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Replica);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(serverRole: ServerRole.Replica);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -60,7 +63,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
-            var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Unknown);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(serverRole: ServerRole.Unknown);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -68,7 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
-            var sut = CreateHealthCheckNotifier(isMainDom: false);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(isMainDom: false);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -76,7 +79,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
         {
-            var sut = CreateHealthCheckNotifier(notificationEnabled: false);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(notificationEnabled: false);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }
@@ -84,7 +87,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Executes_With_Enabled_Notification_Methods()
         {
-            var sut = CreateHealthCheckNotifier();
+            HealthCheckNotifier sut = CreateHealthCheckNotifier();
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsSent();
         }
@@ -92,10 +95,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Executes_Only_Enabled_Checks()
         {
-            var sut = CreateHealthCheckNotifier();
+            HealthCheckNotifier sut = CreateHealthCheckNotifier();
             await sut.PerformExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.Is<HealthCheckResults>(
-                y => y.ResultsAsDictionary.Count == 1 && y.ResultsAsDictionary.ContainsKey("Check1"))), Times.Once);
+            _mockNotificationMethod.Verify(
+                x => x.SendAsync(
+                    It.Is<HealthCheckResults>(y => y.ResultsAsDictionary.Count == 1 && y.ResultsAsDictionary.ContainsKey("Check1"))), Times.Once);
         }
 
         private HealthCheckNotifier CreateHealthCheckNotifier(
@@ -112,12 +116,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                     Enabled = enabled,
                     DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check3Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check3Id) }
                 }
                 },
                 DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check2Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check2Id) }
                 }
             };
             var checks = new HealthCheckCollection(new List<HealthCheck>
@@ -144,52 +148,45 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockLogger = new Mock<ILogger<HealthCheckNotifier>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 
-            return new HealthCheckNotifier(Options.Create(settings), checks, notifications,
-                mockRunTimeState.Object, mockServerRegistrar.Object, mockMainDom.Object, mockScopeProvider.Object,
-                mockLogger.Object, mockProfilingLogger.Object, Mock.Of<ICronTabParser>());
+            return new HealthCheckNotifier(
+                Options.Create(settings),
+                checks,
+                notifications,
+                mockRunTimeState.Object,
+                mockServerRegistrar.Object,
+                mockMainDom.Object,
+                mockScopeProvider.Object,
+                mockLogger.Object,
+                mockProfilingLogger.Object,
+                Mock.Of<ICronTabParser>());
         }
 
-        private void VerifyNotificationsNotSent()
-        {
-            VerifyNotificationsSentTimes(Times.Never());
-        }
+        private void VerifyNotificationsNotSent() => VerifyNotificationsSentTimes(Times.Never());
 
-        private void VerifyNotificationsSent()
-        {
-            VerifyNotificationsSentTimes(Times.Once());
-        }
+        private void VerifyNotificationsSent() => VerifyNotificationsSentTimes(Times.Once());
 
-        private void VerifyNotificationsSentTimes(Times times)
-        {
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), times);
-        }
+        private void VerifyNotificationsSentTimes(Times times) => _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), times);
 
-        [HealthCheck(_check1Id, "Check1")]
+        [HealthCheck(Check1Id, "Check1")]
         private class TestHealthCheck1 : TestHealthCheck
         {
         }
 
-        [HealthCheck(_check2Id, "Check2")]
+        [HealthCheck(Check2Id, "Check2")]
         private class TestHealthCheck2 : TestHealthCheck
         {
         }
 
-        [HealthCheck(_check3Id, "Check3")]
+        [HealthCheck(Check3Id, "Check3")]
         private class TestHealthCheck3 : TestHealthCheck
         {
         }
 
         private class TestHealthCheck : HealthCheck
         {
-            public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-            {
-                return new HealthCheckStatus("Check message");
-            }
+            public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new HealthCheckStatus("Check message");
 
-            public override IEnumerable<HealthCheckStatus> GetStatus()
-            {
-                return Enumerable.Empty<HealthCheckStatus>();
-            }
+            public override IEnumerable<HealthCheckStatus> GetStatus() => Enumerable.Empty<HealthCheckStatus>();
         }
     }
 }

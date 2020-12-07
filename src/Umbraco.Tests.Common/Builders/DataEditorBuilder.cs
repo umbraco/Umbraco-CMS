@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -10,11 +13,12 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class DataEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataEditor>
     {
-        private ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
-        private DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
+        private readonly ConfigurationEditorBuilder<DataEditorBuilder<TParent>> _explicitConfigurationEditorBuilder;
+        private readonly DataValueEditorBuilder<DataEditorBuilder<TParent>> _explicitValueEditorBuilder;
         private IDictionary<string, object> _defaultConfiguration;
 
-        public DataEditorBuilder(TParent parentBuilder) : base(parentBuilder)
+        public DataEditorBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
             _explicitConfigurationEditorBuilder = new ConfigurationEditorBuilder<DataEditorBuilder<TParent>>(this);
             _explicitValueEditorBuilder = new DataValueEditorBuilder<DataEditorBuilder<TParent>>(this);
@@ -34,9 +38,9 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IDataEditor Build()
         {
-            var defaultConfiguration = _defaultConfiguration ?? new Dictionary<string, object>();
-            var explicitConfigurationEditor = _explicitConfigurationEditorBuilder.Build();
-            var explicitValueEditor = _explicitValueEditorBuilder.Build();
+            IDictionary<string, object> defaultConfiguration = _defaultConfiguration ?? new Dictionary<string, object>();
+            IConfigurationEditor explicitConfigurationEditor = _explicitConfigurationEditorBuilder.Build();
+            IDataValueEditor explicitValueEditor = _explicitValueEditorBuilder.Build();
 
             return new DataEditor(
                 NullLoggerFactory.Instance,

@@ -1,4 +1,7 @@
-﻿using Umbraco.Tests.Common.Builders.Interfaces;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Common.Builders
@@ -31,9 +34,9 @@ namespace Umbraco.Tests.Common.Builders
         public ContentPropertyBasicBuilder<TParent> WithValue(object value)
         {
             _value = value;
-
             return this;
         }
+
         int? IWithIdBuilder.Id
         {
             get => _id;

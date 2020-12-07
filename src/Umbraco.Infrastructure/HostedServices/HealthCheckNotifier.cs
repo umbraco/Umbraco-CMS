@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -13,6 +17,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.NotificationMethods;
 
 namespace Umbraco.Infrastructure.HostedServices
 {
@@ -31,6 +36,19 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly ILogger<HealthCheckNotifier> _logger;
         private readonly IProfilingLogger _profilingLogger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HealthCheckNotifier"/> class.
+        /// </summary>
+        /// <param name="healthChecksSettings">The configuration for health check settings.</param>
+        /// <param name="healthChecks">The collection of healthchecks.</param>
+        /// <param name="notifications">The collection of healthcheck notification methods.</param>
+        /// <param name="runtimeState">Representation of the state of the Umbraco runtime.</param>
+        /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
+        /// <param name="mainDom">Representation of the main application domain.</param>
+        /// <param name="scopeProvider">Provides scopes for database operations.</param>
+        /// <param name="logger">The typed logger.</param>
+        /// <param name="profilingLogger">The profiling logger.</param>
+        /// <param name="cronTabParser">Parser of crontab expressions.</param>
         public HealthCheckNotifier(
             IOptions<HealthChecksSettings> healthChecksSettings,
             HealthCheckCollection healthChecks,
@@ -42,8 +60,9 @@ namespace Umbraco.Infrastructure.HostedServices
             ILogger<HealthCheckNotifier> logger,
             IProfilingLogger profilingLogger,
             ICronTabParser cronTabParser)
-            : base(healthChecksSettings.Value.Notification.Period,
-                   healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
+            : base(
+                healthChecksSettings.Value.Notification.Period,
+                healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
         {
             _healthChecksSettings = healthChecksSettings.Value;
             _healthChecks = healthChecks;
@@ -88,25 +107,25 @@ namespace Umbraco.Infrastructure.HostedServices
             // Ensure we use an explicit scope since we are running on a background thread and plugin health
             // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
             // isn't used since that can be problematic.
-            using (var scope = _scopeProvider.CreateScope())
+            using (IScope scope = _scopeProvider.CreateScope())
             using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
-                var disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
+                Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
                         .Select(x => x.Id)
                     .Union(_healthChecksSettings.DisabledChecks
                         .Select(x => x.Id))
                     .Distinct()
                     .ToArray();
 
-                var checks = _healthChecks
+                IEnumerable<Core.HealthCheck.HealthCheck> checks = _healthChecks
                     .Where(x => disabledCheckIds.Contains(x.Id) == false);
 
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
                 // Send using registered notification methods that are enabled.
-                foreach (var notificationMethod in _notifications.Where(x => x.Enabled))
+                foreach (IHealthCheckNotificationMethod notificationMethod in _notifications.Where(x => x.Enabled))
                 {
                     await notificationMethod.SendAsync(results);
                 }

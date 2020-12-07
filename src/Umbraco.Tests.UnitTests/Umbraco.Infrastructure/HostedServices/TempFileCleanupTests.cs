@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -15,12 +18,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     public class TempFileCleanupTests
     {
         private Mock<IIOHelper> _mockIOHelper;
-        private string _testPath = Path.Combine(TestContext.CurrentContext.TestDirectory.Split("bin")[0], "App_Data", "TEMP");
+        private readonly string _testPath = Path.Combine(TestContext.CurrentContext.TestDirectory.Split("bin")[0], "App_Data", "TEMP");
 
         [Test]
         public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
-            var sut = CreateTempFileCleanup(isMainDom: false);
+            TempFileCleanup sut = CreateTempFileCleanup(isMainDom: false);
             await sut.PerformExecuteAsync(null);
             VerifyFilesNotCleaned();
         }
@@ -28,7 +31,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Executes_And_Cleans_Files()
         {
-            var sut = CreateTempFileCleanup();
+            TempFileCleanup sut = CreateTempFileCleanup();
             await sut.PerformExecuteAsync(null);
             VerifyFilesCleaned();
         }
@@ -50,19 +53,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             return new TempFileCleanup(_mockIOHelper.Object, mockMainDom.Object, mockLogger.Object);
         }
 
-        private void VerifyFilesNotCleaned()
-        {
-            VerifyFilesCleaned(Times.Never());
-        }
+        private void VerifyFilesNotCleaned() => VerifyFilesCleaned(Times.Never());
 
-        private void VerifyFilesCleaned()
-        {
-            VerifyFilesCleaned(Times.Once());
-        }
+        private void VerifyFilesCleaned() => VerifyFilesCleaned(Times.Once());
 
-        private void VerifyFilesCleaned(Times times)
-        {
-            _mockIOHelper.Verify(x => x.CleanFolder(It.Is<DirectoryInfo>(y => y.FullName == _testPath), It.IsAny<TimeSpan>()), times);
-        }
+        private void VerifyFilesCleaned(Times times) => _mockIOHelper.Verify(x => x.CleanFolder(It.Is<DirectoryInfo>(y => y.FullName == _testPath), It.IsAny<TimeSpan>()), times);
     }
 }

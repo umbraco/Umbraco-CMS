@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Core.BackOffice;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
             var principalFactory = Services.GetService<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             Assert.IsNotNull(principalFactory);
-            Assert.AreEqual(typeof(BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>), principalFactory.GetType());
+            Assert.AreEqual(typeof(BackOfficeClaimsPrincipalFactory), principalFactory.GetType());
         }
 
         [Test]

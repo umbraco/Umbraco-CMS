@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
@@ -55,9 +58,9 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 0;
             var parentId = _parentId ?? 0;
             var childId = _childId ?? 0;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
             var comment = _comment ?? string.Empty;
 
             if (_relationTypeBuilder == null && _relationType == null)
@@ -65,7 +68,7 @@ namespace Umbraco.Tests.Common.Builders
                 throw new InvalidOperationException("Cannot construct a Relation without a RelationType.  Use AddRelationType() or WithRelationType().");
             }
 
-            var relationType = _relationType ?? _relationTypeBuilder.Build();
+            IRelationType relationType = _relationType ?? _relationTypeBuilder.Build();
 
             return new Relation(parentId, childId, relationType)
                 {

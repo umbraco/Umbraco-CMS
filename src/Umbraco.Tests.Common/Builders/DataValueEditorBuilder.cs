@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Moq;
 using Umbraco.Core.PropertyEditors;
@@ -14,7 +17,8 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _hideLabel;
         private string _valueType;
 
-        public DataValueEditorBuilder(TParent parentBuilder) : base(parentBuilder)
+        public DataValueEditorBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
