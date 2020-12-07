@@ -20,6 +20,9 @@ using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribute
     {
         public CheckIfUserTicketDataIsStaleAttribute() : base(typeof(CheckIfUserTicketDataIsStaleFilter))

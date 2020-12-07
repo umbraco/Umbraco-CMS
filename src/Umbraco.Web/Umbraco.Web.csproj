@@ -190,7 +190,6 @@
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
-    <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
     <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
     <Compile Include="UmbracoModule.cs" />
@@ -203,9 +202,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
-    <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
-    <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
