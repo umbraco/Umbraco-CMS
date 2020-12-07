@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -26,9 +26,7 @@ namespace Umbraco.Web
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
         private readonly GlobalSettings _globalSettings;
-        private readonly IUserService _userService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -43,23 +41,19 @@ namespace Umbraco.Web
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
             IOptions<GlobalSettings> globalSettings,
-            IUserService userService,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
-            IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor,
-             IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
             _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _uriUtility = uriUtility ?? throw new ArgumentNullException(nameof(uriUtility));
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
@@ -92,11 +86,13 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public UmbracoContextReference EnsureUmbracoContext()
         {
-            var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
+            IUmbracoContext currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
+            {
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
+            }
 
-            var umbracoContext = CreateUmbracoContext();
+            IUmbracoContext umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
