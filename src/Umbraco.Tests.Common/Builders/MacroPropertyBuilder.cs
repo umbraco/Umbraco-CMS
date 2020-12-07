@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -20,7 +23,8 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sortOrder;
         private string _editorAlias;
 
-        public MacroPropertyBuilder(MacroBuilder parentBuilder) : base(parentBuilder)
+        public MacroPropertyBuilder(MacroBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -28,20 +32,20 @@ namespace Umbraco.Tests.Common.Builders
         {
             _editorAlias = editorAlias;
             return this;
-        }        
+        }
 
         public override IMacroProperty Build()
         {
             var id = _id ?? 1;
             var name = _name ?? Guid.NewGuid().ToString();
             var alias = _alias ?? name.ToCamelCase();
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var sortOrder = _sortOrder ?? 0;
             var editorAlias = _editorAlias ?? string.Empty;
 
             return new MacroProperty(id, key, alias, name, sortOrder, editorAlias);
         }
-        
+
         int? IWithIdBuilder.Id
         {
             get => _id;

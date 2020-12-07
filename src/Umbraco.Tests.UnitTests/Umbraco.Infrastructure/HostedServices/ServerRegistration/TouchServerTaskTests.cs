@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,8 +20,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
     {
         private Mock<IServerRegistrationService> _mockServerRegistrationService;
 
-        private const string _applicationUrl = "https://mysite.com/";
-        private const string _serverIdentity = "Test/1";
+        private const string ApplicationUrl = "https://mysite.com/";
+        private const string ServerIdentity = "Test/1";
         private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
 
         [TestCase(RuntimeLevel.Boot)]
@@ -28,7 +31,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         [TestCase(RuntimeLevel.BootFailed)]
         public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
         {
-            var sut = CreateTouchServerTask(runtimeLevel: runtimeLevel);
+            TouchServerTask sut = CreateTouchServerTask(runtimeLevel: runtimeLevel);
             await sut.PerformExecuteAsync(null);
             VerifyServerNotTouched();
         }
@@ -36,7 +39,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         [Test]
         public async Task Does_Not_Execute_When_Application_Url_Is_Not_Available()
         {
-            var sut = CreateTouchServerTask(applicationUrl: string.Empty);
+            TouchServerTask sut = CreateTouchServerTask(applicationUrl: string.Empty);
             await sut.PerformExecuteAsync(null);
             VerifyServerNotTouched();
         }
@@ -44,15 +47,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         [Test]
         public async Task Executes_And_Touches_Server()
         {
-            var sut = CreateTouchServerTask();
+            TouchServerTask sut = CreateTouchServerTask();
             await sut.PerformExecuteAsync(null);
             VerifyServerTouched();
         }
 
-        private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run, string applicationUrl = _applicationUrl)
+        private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run, string applicationUrl = ApplicationUrl)
         {
             var mockRequestAccessor = new Mock<IRequestAccessor>();
-            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(!string.IsNullOrEmpty(applicationUrl) ? new Uri(_applicationUrl) : null);
+            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(!string.IsNullOrEmpty(applicationUrl) ? new Uri(ApplicationUrl) : null);
 
             var mockRunTimeState = new Mock<IRuntimeState>();
             mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
@@ -60,7 +63,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
             var mockLogger = new Mock<ILogger<TouchServerTask>>();
 
             _mockServerRegistrationService = new Mock<IServerRegistrationService>();
-            _mockServerRegistrationService.SetupGet(x => x.CurrentServerIdentity).Returns(_serverIdentity);
+            _mockServerRegistrationService.SetupGet(x => x.CurrentServerIdentity).Returns(ServerIdentity);
 
             var settings = new GlobalSettings
             {
@@ -70,28 +73,24 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
                 }
             };
 
-            return new TouchServerTask(mockRunTimeState.Object, _mockServerRegistrationService.Object, mockRequestAccessor.Object,
-                mockLogger.Object, Options.Create(settings));
+            return new TouchServerTask(
+                mockRunTimeState.Object,
+                _mockServerRegistrationService.Object,
+                mockRequestAccessor.Object,
+                mockLogger.Object,
+                Options.Create(settings));
         }
 
-        private void VerifyServerNotTouched()
-        {
-            VerifyServerTouchedTimes(Times.Never());
-        }
+        private void VerifyServerNotTouched() => VerifyServerTouchedTimes(Times.Never());
 
-        private void VerifyServerTouched()
-        {
-            VerifyServerTouchedTimes(Times.Once());
-        }
+        private void VerifyServerTouched() => VerifyServerTouchedTimes(Times.Once());
 
-        private void VerifyServerTouchedTimes(Times times)
-        {
-            _mockServerRegistrationService
-                .Verify(x => x.TouchServer(
-                    It.Is<string>(y => y == _applicationUrl),
-                    It.Is<string>(y => y == _serverIdentity),
-                    It.Is<TimeSpan>(y => y == _staleServerTimeout)),
-                times);
-        }
+        private void VerifyServerTouchedTimes(Times times) => _mockServerRegistrationService
+                .Verify(
+                    x => x.TouchServer(
+                        It.Is<string>(y => y == ApplicationUrl),
+                        It.Is<string>(y => y == ServerIdentity),
+                        It.Is<TimeSpan>(y => y == _staleServerTimeout)),
+                    times);
     }
 }

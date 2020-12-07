@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
@@ -26,7 +29,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithIconBuilder,
             IWithThumbnailBuilder,
             IWithTrashedBuilder,
-            IWithIsContainerBuilder where TParent : IBuildContentTypes
+            IWithIsContainerBuilder
+        where TParent : IBuildContentTypes
     {
         private int? _id;
         private Guid? _key;
@@ -48,7 +52,8 @@ namespace Umbraco.Tests.Common.Builders
 
         protected IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-        public ContentTypeBaseBuilder(TParent parentBuilder) : base(parentBuilder)
+        public ContentTypeBaseBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -88,7 +93,7 @@ namespace Umbraco.Tests.Common.Builders
 
         protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
         {
-            foreach (var propertyGroup in propertyGroups)
+            foreach (PropertyGroup propertyGroup in propertyGroups)
             {
                 contentType.PropertyGroups.Add(propertyGroup);
             }
@@ -99,7 +104,7 @@ namespace Umbraco.Tests.Common.Builders
             if (propertyTypeIdsIncrementingFrom.HasValue)
             {
                 var i = propertyTypeIdsIncrementingFrom.Value;
-                foreach (var propertyType in contentType.PropertyTypes)
+                foreach (IPropertyType propertyType in contentType.PropertyTypes)
                 {
                     propertyType.Id = ++i;
                 }
@@ -112,12 +117,12 @@ namespace Umbraco.Tests.Common.Builders
             // and ensure there are no clashes).
             contentType.Id = seedId;
             var itemid = seedId + 1;
-            foreach (var propertyGroup in contentType.PropertyGroups)
+            foreach (PropertyGroup propertyGroup in contentType.PropertyGroups)
             {
                 propertyGroup.Id = itemid++;
             }
 
-            foreach (var propertyType in contentType.PropertyTypes)
+            foreach (IPropertyType propertyType in contentType.PropertyTypes)
             {
                 propertyType.Id = itemid++;
             }

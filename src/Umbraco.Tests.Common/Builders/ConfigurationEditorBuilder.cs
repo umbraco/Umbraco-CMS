@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
+using System.Collections.Generic;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -9,7 +10,8 @@ namespace Umbraco.Tests.Common.Builders
     {
         private IDictionary<string, object> _defaultConfiguration;
 
-        public ConfigurationEditorBuilder(TParent parentBuilder) : base(parentBuilder)
+        public ConfigurationEditorBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -21,7 +23,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IConfigurationEditor Build()
         {
-            var defaultConfiguration  = _defaultConfiguration ?? new Dictionary<string, object>();
+            IDictionary<string, object> defaultConfiguration  = _defaultConfiguration ?? new Dictionary<string, object>();
 
             return new ConfigurationEditor()
             {

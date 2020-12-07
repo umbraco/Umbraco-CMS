@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -20,7 +23,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithPathBuilder,
             IWithSortOrderBuilder
     {
-        private DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
+        private readonly DataEditorBuilder<DataTypeBuilder> _dataEditorBuilder;
         private int? _id;
         private int? _parentId;
         private Guid? _key;
@@ -35,10 +38,7 @@ namespace Umbraco.Tests.Common.Builders
         private ValueStorageType? _databaseType;
         private int? _sortOrder;
 
-        public DataTypeBuilder()
-        {
-            _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
-        }
+        public DataTypeBuilder() => _dataEditorBuilder = new DataEditorBuilder<DataTypeBuilder>(this);
 
         public DataTypeBuilder WithDatabaseType(ValueStorageType databaseType)
         {
@@ -46,25 +46,22 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public DataEditorBuilder<DataTypeBuilder> AddEditor()
-        {
-            return _dataEditorBuilder;
-        }
+        public DataEditorBuilder<DataTypeBuilder> AddEditor() => _dataEditorBuilder;
 
         public override DataType Build()
         {
-            var editor = _dataEditorBuilder.Build();
+            Core.PropertyEditors.IDataEditor editor = _dataEditorBuilder.Build();
             var parentId = _parentId ?? -1;
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
             var name = _name ?? Guid.NewGuid().ToString();
             var level = _level ?? 0;
             var path = _path ?? $"-1,{id}";
             var creatorId = _creatorId ?? 1;
-            var databaseType = _databaseType ?? ValueStorageType.Ntext;
+            ValueStorageType databaseType = _databaseType ?? ValueStorageType.Ntext;
             var sortOrder = _sortOrder ?? 0;
             var serializer = new ConfigurationEditorJsonSerializer();
 

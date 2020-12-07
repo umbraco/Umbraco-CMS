@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -11,20 +14,22 @@ namespace Umbraco.Tests.Common.Builders
         : ContentTypeBaseBuilder<MediaBuilder, IMediaType>,
             IWithPropertyTypeIdsIncrementingFrom
     {
-        private List<PropertyGroupBuilder<MediaTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MediaTypeBuilder>>();
+        private readonly List<PropertyGroupBuilder<MediaTypeBuilder>> _propertyGroupBuilders = new List<PropertyGroupBuilder<MediaTypeBuilder>>();
         private int? _propertyTypeIdsIncrementingFrom;
 
-        public MediaTypeBuilder() : base(null)
+        public MediaTypeBuilder()
+            : base(null)
         {
         }
 
-        public MediaTypeBuilder(MediaBuilder parentBuilder) : base(parentBuilder)
+        public MediaTypeBuilder(MediaBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 
         public MediaTypeBuilder WithMediaPropertyGroup()
         {
-            var builder = new PropertyGroupBuilder<MediaTypeBuilder>(this)
+            PropertyGroupBuilder<MediaTypeBuilder> builder = new PropertyGroupBuilder<MediaTypeBuilder>(this)
                 .WithId(99)
                 .WithName("Media")
                 .WithSortOrder(1)
@@ -82,7 +87,7 @@ namespace Umbraco.Tests.Common.Builders
         public override IMediaType Build()
         {
             MediaType mediaType;
-            var parent = GetParent();
+            IContentTypeComposition parent = GetParent();
             if (parent != null)
             {
                 mediaType = new MediaType(ShortStringHelper, (IMediaType)parent, GetAlias());
@@ -122,7 +127,7 @@ namespace Umbraco.Tests.Common.Builders
         public static MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
             var builder = new MediaTypeBuilder();
-            var mediaType = builder
+            IMediaType mediaType = builder
                 .WithAlias(alias)
                 .WithName(name)
                 .WithParentContentType(parent)
@@ -156,20 +161,16 @@ namespace Umbraco.Tests.Common.Builders
             return (MediaType)mediaType;
         }
 
-        public static MediaType CreateImageMediaType(string alias = Constants.Conventions.MediaTypes.Image)
-        {
-            return CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.UploadField, -90);
-        }
+        public static MediaType CreateImageMediaType(string alias = Constants.Conventions.MediaTypes.Image) =>
+            CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.UploadField, -90);
 
-        public static MediaType CreateImageMediaTypeWithCrop(string alias = Constants.Conventions.MediaTypes.Image)
-        {
-            return CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.ImageCropper, 1043);
-        }
+        public static MediaType CreateImageMediaTypeWithCrop(string alias = Constants.Conventions.MediaTypes.Image) =>
+            CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.ImageCropper, 1043);
 
         private static MediaType CreateImageMediaType(string alias, string imageFieldPropertyEditorAlias, int imageFieldDataTypeId)
         {
             var builder = new MediaTypeBuilder();
-            var mediaType = builder
+            IMediaType mediaType = builder
                 .WithAlias(alias)
                 .WithName("Image")
                 .AddPropertyGroup()
@@ -222,7 +223,7 @@ namespace Umbraco.Tests.Common.Builders
         public static MediaType CreateVideoMediaType()
         {
             var builder = new MediaTypeBuilder();
-            var mediaType = builder
+            IMediaType mediaType = builder
                 .WithAlias("video")
                 .WithName("Video")
                 .AddPropertyGroup()
@@ -237,7 +238,7 @@ namespace Umbraco.Tests.Common.Builders
                         .WithAlias("videoFile")
                         .WithName("Video file")
                         .WithSortOrder(1)
-                        .Done()                   
+                        .Done()
                     .Done()
                 .Build();
 

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -23,6 +26,12 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly DirectoryInfo[] _tempFolders;
         private readonly TimeSpan _age = TimeSpan.FromDays(1);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TempFileCleanup"/> class.
+        /// </summary>
+        /// <param name="ioHelper">Helper service for IO operations.</param>
+        /// <param name="mainDom">Representation of the main application domain.</param>
+        /// <param name="logger">The typed logger.</param>
         public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger)
             : base(TimeSpan.FromMinutes(60), DefaultDelay)
         {
@@ -33,33 +42,33 @@ namespace Umbraco.Infrastructure.HostedServices
             _tempFolders = _ioHelper.GetTempFolders();
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        internal override Task PerformExecuteAsync(object state)
         {
             // Ensure we do not run if not main domain
             if (_mainDom.IsMainDom == false)
             {
                 _logger.LogDebug("Does not run if not MainDom.");
-                return;
+                return Task.CompletedTask;
             }
 
-            foreach (var folder in _tempFolders)
+            foreach (DirectoryInfo folder in _tempFolders)
             {
                 CleanupFolder(folder);
             }
 
-            return;
+            return Task.CompletedTask;
         }
 
         private void CleanupFolder(DirectoryInfo folder)
         {
-            var result = _ioHelper.CleanFolder(folder, _age);
+            CleanFolderResult result = _ioHelper.CleanFolder(folder, _age);
             switch (result.Status)
             {
                 case CleanFolderResultStatus.FailedAsDoesNotExist:
                     _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
                     break;
                 case CleanFolderResultStatus.FailedWithException:
-                    foreach (var error in result.Errors)
+                    foreach (CleanFolderResult.Error error in result.Errors)
                     {
                         _logger.LogError(error.Exception, "Could not delete temp file {FileName}", error.ErroringFile.FullName);
                     }
@@ -74,8 +83,8 @@ namespace Umbraco.Infrastructure.HostedServices
                 return;
             }
 
-            var files = folder.GetFiles("*.*", SearchOption.AllDirectories);
-            foreach (var file in files)
+            FileInfo[] files = folder.GetFiles("*.*", SearchOption.AllDirectories);
+            foreach (FileInfo file in files)
             {
                 if (DateTime.UtcNow - file.LastWriteTimeUtc > _age)
                 {

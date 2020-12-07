@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Tests.Common.Builders.Interfaces;
@@ -10,16 +13,28 @@ namespace Umbraco.Tests.Common.Builders
         IWithNameBuilder,
         IWithCultureInfoBuilder
     {
-        private List<ContentPropertyBasicBuilder<ContentVariantSaveBuilder<TParent>>> _propertyBuilders = new List<ContentPropertyBasicBuilder<ContentVariantSaveBuilder<TParent>>>();
-
+        private readonly List<ContentPropertyBasicBuilder<ContentVariantSaveBuilder<TParent>>> _propertyBuilders = new List<ContentPropertyBasicBuilder<ContentVariantSaveBuilder<TParent>>>();
 
         private string _name;
         private CultureInfo _cultureInfo;
         private bool? _save = null;
         private bool? _publish = null;
 
-        public ContentVariantSaveBuilder(TParent parentBuilder) : base(parentBuilder)
+        public ContentVariantSaveBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
+        }
+
+        public ContentVariantSaveBuilder<TParent> WithSave(bool save)
+        {
+            _save = save;
+            return this;
+        }
+
+        public ContentVariantSaveBuilder<TParent> WithPublish(bool publish)
+        {
+            _publish = publish;
+            return this;
         }
 
         public ContentPropertyBasicBuilder<ContentVariantSaveBuilder<TParent>> AddProperty()
@@ -35,7 +50,7 @@ namespace Umbraco.Tests.Common.Builders
             var culture = _cultureInfo?.Name ?? null;
             var save = _save ?? true;
             var publish = _publish ?? true;
-            var properties = _propertyBuilders.Select(x => x.Build());
+            IEnumerable<ContentPropertyBasic> properties = _propertyBuilders.Select(x => x.Build());
 
             return new ContentVariantSave()
             {

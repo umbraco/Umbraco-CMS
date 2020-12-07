@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -24,7 +27,24 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public KeepAlive(IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar, IHttpClientFactory httpClientFactory)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeepAlive"/> class.
+        /// </summary>
+        /// <param name="requestAccessor">Accessor for the current request.</param>
+        /// <param name="mainDom">Representation of the main application domain.</param>
+        /// <param name="keepAliveSettings">The configuration for keep alive settings.</param>
+        /// <param name="logger">The typed logger.</param>
+        /// <param name="profilingLogger">The profiling logger.</param>
+        /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
+        /// <param name="httpClientFactory">Factory for <see cref="HttpClient" /> instances.</param>
+        public KeepAlive(
+            IRequestAccessor requestAccessor,
+            IMainDom mainDom,
+            IOptions<KeepAliveSettings> keepAliveSettings,
+            ILogger<KeepAlive> logger,
+            IProfilingLogger profilingLogger,
+            IServerRegistrar serverRegistrar,
+            IHttpClientFactory httpClientFactory)
             : base(TimeSpan.FromMinutes(5), DefaultDelay)
         {
             _requestAccessor = requestAccessor;
@@ -79,8 +99,8 @@ namespace Umbraco.Infrastructure.HostedServices
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
-                    var httpClient = _httpClientFactory.CreateClient();
-                    await httpClient.SendAsync(request);
+                    HttpClient httpClient = _httpClientFactory.CreateClient();
+                    _ = await httpClient.SendAsync(request);
                 }
                 catch (Exception ex)
                 {

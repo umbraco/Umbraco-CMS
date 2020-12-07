@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Core;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Web.Trees;
@@ -54,7 +57,7 @@ namespace Umbraco.Tests.Common.Builders
             var sectionAlias = _sectionAlias ?? Constants.Applications.Content;
             var group = _group ?? string.Empty;
             var title = _title ?? string.Empty;
-            var treeUse = _treeUse ?? TreeUse.Main;
+            TreeUse treeUse = _treeUse ?? TreeUse.Main;
             var isSingleNode = _isSingleNode ?? false;
 
             return new Tree(sortOrder, sectionAlias, group, alias, title, treeUse, typeof(SampleTreeController), isSingleNode);

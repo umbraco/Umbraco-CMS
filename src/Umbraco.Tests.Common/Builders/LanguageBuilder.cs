@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Globalization;
 using Umbraco.Core.Configuration.Models;
@@ -8,7 +11,8 @@ namespace Umbraco.Tests.Common.Builders
 {
     public class LanguageBuilder : LanguageBuilder<object>
     {
-        public LanguageBuilder() : base(null)
+        public LanguageBuilder()
+            : base(null)
         {
         }
     }
@@ -33,7 +37,8 @@ namespace Umbraco.Tests.Common.Builders
         private Guid? _key;
         private DateTime? _updateDate;
 
-        public LanguageBuilder(TParent parentBuilder) : base(parentBuilder)
+        public LanguageBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
@@ -63,13 +68,13 @@ namespace Umbraco.Tests.Common.Builders
 
         public override ILanguage Build()
         {
-            var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
+            CultureInfo cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
             var cultureName = _cultureName ?? cultureInfo.EnglishName;
             var globalSettings = new GlobalSettings { DefaultUILanguage = cultureInfo.Name };
-            var key = _key ?? Guid.NewGuid();
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            Guid key = _key ?? Guid.NewGuid();
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
             var fallbackLanguageId = _fallbackLanguageId ?? null;
             var isDefault = _isDefault ?? false;
             var isMandatory = _isMandatory ?? false;
