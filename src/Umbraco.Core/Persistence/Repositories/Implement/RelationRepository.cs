@@ -286,23 +286,41 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
-            if (relationTypeAliases.Length > 0)
+            if (Database.DatabaseType.IsSqlCe())
             {
-                var template = SqlContext.Templates.Get(Constants.SqlTemplates.RelationRepository.DeleteByParentIn, tsql => Sql().Delete<RelationDto>()
-                  .From<RelationDto>()
-                 .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                 .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
-                 .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
-                Database.Execute(template.Sql(new { parentId, relationTypeAliases }));
+                var subQuery = Sql().Select<RelationDto>(x => x.Id)
+               .From<RelationDto>()
+               .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+               .Where<RelationDto>(x => x.ParentId == parentId);
+
+                if (relationTypeAliases.Length > 0)
+                {
+                    subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                }
+
+                Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
+
             }
             else
             {
-                
-                var template = SqlContext.Templates.Get(Constants.SqlTemplates.RelationRepository.DeleteByParentAll, tsql => Sql().Delete<RelationDto>()
-                 .From<RelationDto>()
-                .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
-                Database.Execute(template.Sql(new { parentId }));
+                if (relationTypeAliases.Length > 0)
+                {
+                    var sql = Sql().Delete<RelationDto>()
+                      .From<RelationDto>()
+                     .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                     .Where<RelationDto>(x => x.ParentId == parentId)
+                     .WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                    Database.Execute(sql);
+                }
+                else
+                {
+
+                    var sql = Sql().Delete<RelationDto>()
+                     .From<RelationDto>()
+                    .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                    .Where<RelationDto>(x => x.ParentId == parentId);
+                    Database.Execute(sql);
+                }
             }
         }
 
