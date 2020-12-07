@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate)
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId.ToString(), dto.CreateDate)
             {
                 UserData = dto.UserData
             };
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = entity.UserId,
+                UserId = int.Parse(entity.UserId), // TODO: This is temp until we change the ext logins to use GUIDs
                 UserData = entity.UserData
             };
 

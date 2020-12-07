@@ -2,7 +2,6 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Umbraco.Core.BackOffice;
 using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Security;

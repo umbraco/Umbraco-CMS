@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +18,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithAliasBuilder,
             IWithNameBuilder
     {
-        private List<MacroPropertyBuilder> _propertyBuilders = new List<MacroPropertyBuilder>();
+        private readonly List<MacroPropertyBuilder> _propertyBuilders = new List<MacroPropertyBuilder>();
 
         private int? _id;
         private Guid? _key;
@@ -78,7 +81,7 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 1;
             var name = _name ?? Guid.NewGuid().ToString();
             var alias = _alias ?? name.ToCamelCase();
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
             var useInEditor = _useInEditor ?? false;
             var cacheDuration = _cacheDuration ?? 0;
             var cacheByPage = _cacheByPage ?? false;
@@ -90,7 +93,7 @@ namespace Umbraco.Tests.Common.Builders
 
             var macro = new Macro(shortStringHelper, id, key, useInEditor, cacheDuration, alias, name, cacheByPage, cacheByMember, dontRender, macroSource);
 
-            foreach (var property in _propertyBuilders.Select(x => x.Build()))
+            foreach (IMacroProperty property in _propertyBuilders.Select(x => x.Build()))
             {
                 macro.Properties.Add(property);
             }

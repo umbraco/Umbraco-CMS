@@ -496,7 +496,7 @@ namespace Umbraco.Core.Scoping
         // caching config
         // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
         private bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = _coreDebugSettings.LogUncompletedScopes)).Value;
+            ?? (_logUncompletedScopes = _coreDebugSettings.LogIncompletedScopes)).Value;
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);

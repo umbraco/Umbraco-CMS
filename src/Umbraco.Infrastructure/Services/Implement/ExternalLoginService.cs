@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -25,7 +25,8 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
+                var asString = userId.ToString(); // TODO: This is temp until we update the external service to support guids for both users and members
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == asString))
                     .ToList();
             }
         }

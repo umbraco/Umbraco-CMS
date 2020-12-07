@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Tests.Common.Builders.Interfaces
+namespace Umbraco.Tests.Common.Builders.Interfaces
 {
     public interface IWithLoginBuilder
     {

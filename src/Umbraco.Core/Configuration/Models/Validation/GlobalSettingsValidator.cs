@@ -1,10 +1,17 @@
-﻿using Microsoft.Extensions.Options;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
+    /// <summary>
+    /// Validator for configuration representated as <see cref="GlobalSettings"/>.
+    /// </summary>
     public class GlobalSettingsValidator
         : ConfigurationValidatorBase, IValidateOptions<GlobalSettings>
     {
+        /// <inheritdoc/>
         public ValidateOptionsResult Validate(string name, GlobalSettings options)
         {
             if (!ValidateSmtpSetting(options.Smtp, out var message))
@@ -15,9 +22,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
             return ValidateOptionsResult.Success;
         }
 
-        private bool ValidateSmtpSetting(SmtpSettings value, out string message)
-        {
-            return ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message);
-        }
+        private bool ValidateSmtpSetting(SmtpSettings value, out string message) =>
+            ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message);
     }
 }

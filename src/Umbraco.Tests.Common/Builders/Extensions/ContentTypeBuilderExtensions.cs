@@ -1,13 +1,15 @@
-﻿using Umbraco.Core;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Common.Builders.Extensions
 {
     public static class ContentTypeBuilderExtensions
     {
-        public static ContentType BuildSimpleContentType(this ContentTypeBuilder builder)
-        {
-            return (ContentType)builder
+        public static ContentType BuildSimpleContentType(this ContentTypeBuilder builder) =>
+            (ContentType)builder
                 .WithId(10)
                 .WithAlias("textPage")
                 .WithName("Text Page")
@@ -64,11 +66,9 @@ namespace Umbraco.Tests.Common.Builders.Extensions
                     .WithSortOrder(9)
                     .Done()
                 .Build();
-        }
 
-        public static MediaType BuildImageMediaType(this MediaTypeBuilder builder)
-        {
-            return (MediaType)builder
+        public static MediaType BuildImageMediaType(this MediaTypeBuilder builder) =>
+            (MediaType)builder
                 .WithId(10)
                 .WithAlias(Constants.Conventions.MediaTypes.Image)
                 .WithName("Image")
@@ -77,11 +77,9 @@ namespace Umbraco.Tests.Common.Builders.Extensions
                 .WithPropertyTypeIdsIncrementingFrom(200)
                 .WithMediaPropertyGroup()
                 .Build();
-        }
 
-        public static MemberType BuildSimpleMemberType(this MemberTypeBuilder builder)
-        {
-            return (MemberType)builder
+        public static MemberType BuildSimpleMemberType(this MemberTypeBuilder builder) =>
+            (MemberType)builder
                 .WithId(10)
                 .WithAlias("memberType")
                 .WithName("Member type")
@@ -105,6 +103,5 @@ namespace Umbraco.Tests.Common.Builders.Extensions
                 .WithMemberCanEditProperty("title", true)
                 .WithMemberCanViewProperty("bodyText", true)
                 .Build();
-        }
     }
 }

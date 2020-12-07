@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -20,8 +23,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Node_Id_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
-            var sut = CreateHandler(NodeId);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
+            MediaPermissionsResourceHandler sut = CreateHandler(NodeId);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -31,8 +34,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Media_With_Permission_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var sut = CreateHandler(NodeId);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            MediaPermissionsResourceHandler sut = CreateHandler(NodeId);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -42,8 +45,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Node_Id_Withou_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
-            var sut = CreateHandler(NodeId, startMediaId: 1001);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId, createWithNodeId: true);
+            MediaPermissionsResourceHandler sut = CreateHandler(NodeId, startMediaId: 1001);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -53,8 +56,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Resource_With_Media_Without_Permission_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-            var sut = CreateHandler(NodeId, startMediaId: 1001);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
+            MediaPermissionsResourceHandler sut = CreateHandler(NodeId, startMediaId: 1001);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -65,8 +68,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var requirement = new MediaPermissionsResourceRequirement();
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var media = CreateMedia(nodeId);
-            var resource = createWithNodeId
+            IMedia media = CreateMedia(nodeId);
+            MediaPermissionsResource resource = createWithNodeId
                 ? new MediaPermissionsResource(nodeId)
                 : new MediaPermissionsResource(media);
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
@@ -74,20 +77,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static IMedia CreateMedia(int nodeId)
         {
-            var mediaType = MediaTypeBuilder.CreateSimpleMediaType("image", "Image");
+            MediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("image", "Image");
             return MediaBuilder.CreateSimpleMedia(mediaType, "Test image", -1, nodeId);
         }
 
         private MediaPermissionsResourceHandler CreateHandler(int nodeId, int startMediaId = -1)
         {
-            var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(startMediaId);
-            var contentPermissions = CreateMediaPermissions(nodeId, new string[0]);
+            Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(startMediaId);
+            MediaPermissions contentPermissions = CreateMediaPermissions(nodeId);
             return new MediaPermissionsResourceHandler(mockBackOfficeSecurityAccessor.Object, contentPermissions);
         }
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(int startMediaId)
         {
-            var user = CreateUser(startMediaId);
+            User user = CreateUser(startMediaId);
             var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
             mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(user);
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
@@ -95,14 +98,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             return mockBackOfficeSecurityAccessor;
         }
 
-        private static User CreateUser(int startMediaId)
-        {
-            return new UserBuilder()
+        private static User CreateUser(int startMediaId) =>
+            new UserBuilder()
                 .WithStartMediaId(startMediaId)
                 .Build();
-        }
 
-        private static MediaPermissions CreateMediaPermissions(int nodeId, string[] permissionsForPath)
+        private static MediaPermissions CreateMediaPermissions(int nodeId)
         {
             var mockMediaService = new Mock<IMediaService>();
             mockMediaService

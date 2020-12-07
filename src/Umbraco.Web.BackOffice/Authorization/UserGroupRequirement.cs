@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
@@ -7,11 +10,15 @@ namespace Umbraco.Web.BackOffice.Authorization
     /// </summary>
     public class UserGroupRequirement : IAuthorizationRequirement
     {
-        public UserGroupRequirement(string queryStringName = "id")
-        {
-            QueryStringName = queryStringName;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserGroupRequirement"/> class.
+        /// </summary>
+        /// <param name="queryStringName">Query string name from which to authorize values.</param>
+        public UserGroupRequirement(string queryStringName = "id") => QueryStringName = queryStringName;
 
+        /// <summary>
+        /// Gets the query string name from which to authorize values.
+        /// </summary>
         public string QueryStringName { get; }
     }
 }

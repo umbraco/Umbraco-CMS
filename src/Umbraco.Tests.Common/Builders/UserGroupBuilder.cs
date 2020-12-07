@@ -1,16 +1,20 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders
 {
     public class UserGroupBuilder : UserGroupBuilder<object>
     {
-        public UserGroupBuilder() : base(null)
+        public UserGroupBuilder()
+            : base(null)
         {
         }
     }
@@ -33,15 +37,16 @@ namespace Umbraco.Tests.Common.Builders
         private int? _startMediaId;
         private int? _userCount;
 
-        public UserGroupBuilder(TParent parentBuilder) : base(parentBuilder)
+        public UserGroupBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 
         /// <summary>
-        /// Will suffix the name and alias for testing
+        /// Will suffix the name, email and username for testing.
         /// </summary>
-        /// <param name="suffix"></param>
-        /// <returns></returns>
+        /// <param name="suffix">Suffix to add to user group properties.</param>
+        /// <returns>Current builder instance.</returns>
         public UserGroupBuilder<TParent> WithSuffix(string suffix)
         {
             _suffix = suffix;
@@ -84,9 +89,8 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public IReadOnlyUserGroup BuildReadOnly(IUserGroup userGroup)
-        {
-            return Mock.Of<IReadOnlyUserGroup>(x =>
+        public IReadOnlyUserGroup BuildReadOnly(IUserGroup userGroup) =>
+            Mock.Of<IReadOnlyUserGroup>(x =>
                 x.Permissions == userGroup.Permissions &&
                 x.Alias == userGroup.Alias &&
                 x.Icon == userGroup.Icon &&
@@ -95,7 +99,6 @@ namespace Umbraco.Tests.Common.Builders
                 x.StartMediaId == userGroup.StartMediaId &&
                 x.AllowedSections == userGroup.AllowedSections &&
                 x.Id == userGroup.Id);
-        }
 
         public override IUserGroup Build()
         {
@@ -109,10 +112,12 @@ namespace Umbraco.Tests.Common.Builders
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-            var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon);
-            userGroup.Id = id;
-            userGroup.StartContentId = startContentId;
-            userGroup.StartMediaId = startMediaId;
+            var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon)
+            {
+                Id = id,
+                StartContentId = startContentId,
+                StartMediaId = startMediaId
+            };
 
             foreach (var section in _allowedSections)
             {
@@ -122,15 +127,13 @@ namespace Umbraco.Tests.Common.Builders
             return userGroup;
         }
 
-        public static UserGroup CreateUserGroup(string alias = "testGroup", string name = "Test Group", string suffix = "", string[] permissions = null, string[] allowedSections = null)
-        {
-            return (UserGroup)new UserGroupBuilder()
+        public static UserGroup CreateUserGroup(string alias = "testGroup", string name = "Test Group", string suffix = "", string[] permissions = null, string[] allowedSections = null) =>
+            (UserGroup)new UserGroupBuilder()
                 .WithAlias(alias + suffix)
                 .WithName(name + suffix)
                 .WithPermissions(permissions ?? new[] { "A", "B", "C" })
                 .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
                 .Build();
-        }
 
         int? IWithIdBuilder.Id
         {

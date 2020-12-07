@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,7 +30,24 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
 
-        public LogScrubber(IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, ILogger<LogScrubber> logger, IProfilingLogger profilingLogger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogScrubber"/> class.
+        /// </summary>
+        /// <param name="mainDom">Representation of the main application domain.</param>
+        /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
+        /// <param name="auditService">Service for handling audit operations.</param>
+        /// <param name="settings">The configuration for logging settings.</param>
+        /// <param name="scopeProvider">Provides scopes for database operations.</param>
+        /// <param name="logger">The typed logger.</param>
+        /// <param name="profilingLogger">The profiling logger.</param>
+        public LogScrubber(
+            IMainDom mainDom,
+            IServerRegistrar serverRegistrar,
+            IAuditService auditService,
+            IOptions<LoggingSettings> settings,
+            IScopeProvider scopeProvider,
+            ILogger<LogScrubber> logger,
+            IProfilingLogger profilingLogger)
             : base(TimeSpan.FromHours(4), DefaultDelay)
         {
             _mainDom = mainDom;
@@ -39,32 +59,34 @@ namespace Umbraco.Infrastructure.HostedServices
             _profilingLogger = profilingLogger;
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        internal override Task PerformExecuteAsync(object state)
         {
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");
-                    return;
+                    return Task.CompletedTask;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");
-                    return;
+                    return Task.CompletedTask;
             }
 
             // Ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
                 _logger.LogDebug("Does not run if not MainDom.");
-                return;
+                return Task.CompletedTask;
             }
 
             // Ensure we use an explicit scope since we are running on a background thread.
-            using (var scope = _scopeProvider.CreateScope())
+            using (IScope scope = _scopeProvider.CreateScope())
             using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);
-                scope.Complete();
+                _ = scope.Complete();
             }
+
+            return Task.CompletedTask;
         }
     }
 }

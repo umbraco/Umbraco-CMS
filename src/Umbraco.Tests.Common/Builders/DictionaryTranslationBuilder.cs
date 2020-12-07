@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
@@ -12,7 +15,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithDeleteDateBuilder,
             IWithKeyBuilder
     {
-        private LanguageBuilder<DictionaryTranslationBuilder> _languageBuilder;
+        private readonly LanguageBuilder<DictionaryTranslationBuilder> _languageBuilder;
         private DateTime? _createDate;
         private DateTime? _deleteDate;
         private int? _id;
@@ -20,15 +23,11 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _updateDate;
         private string _value;
 
-        public DictionaryTranslationBuilder() : base(null)
-        {
-            _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
-        }
+        public DictionaryTranslationBuilder()
+            : base(null) => _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
 
-        public DictionaryTranslationBuilder(DictionaryItemBuilder parentBuilder) : base(parentBuilder)
-        {
-            _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
-        }
+        public DictionaryTranslationBuilder(DictionaryItemBuilder parentBuilder)
+            : base(parentBuilder) => _languageBuilder = new LanguageBuilder<DictionaryTranslationBuilder>(this);
 
         public LanguageBuilder<DictionaryTranslationBuilder> AddLanguage() => _languageBuilder;
 
@@ -40,11 +39,11 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IDictionaryTranslation Build()
         {
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
+            Guid key = _key ?? Guid.NewGuid();
 
             var result = new DictionaryTranslation(
                 _languageBuilder.Build(),

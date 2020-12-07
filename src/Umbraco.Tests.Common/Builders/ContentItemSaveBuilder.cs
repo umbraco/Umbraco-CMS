@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -29,8 +31,8 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 0;
             var parentId = _parentId ?? -1;
             var contentTypeAlias = _contentTypeAlias ?? null;
-            var action = _action ?? ContentSaveAction.Save;
-            var variants = _variantBuilders.Select(x => x.Build());
+            ContentSaveAction action = _action ?? ContentSaveAction.Save;
+            IEnumerable<ContentVariantSave> variants = _variantBuilders.Select(x => x.Build());
 
             return new TestContentItemSave()
             {
@@ -47,6 +49,7 @@ namespace Umbraco.Tests.Common.Builders
             get => _id;
             set => _id = value;
         }
+
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;

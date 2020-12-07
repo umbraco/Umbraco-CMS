@@ -1,11 +1,12 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Common.Builders.Extensions
 {
     public static class ContentItemSaveBuilderExtensions
     {
-
         public static ContentItemSaveBuilder WithContent(this ContentItemSaveBuilder builder, IContent content)
         {
             builder.WithId(content.Id);
@@ -13,43 +14,39 @@ namespace Umbraco.Tests.Common.Builders.Extensions
 
             if (content.CultureInfos.Count == 0)
             {
-                var variantBuilder = builder.AddVariant();
+                ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder = builder.AddVariant();
                 variantBuilder.WithName(content.Name);
 
-                foreach (var contentProperty in content.Properties)
+                foreach (IProperty contentProperty in content.Properties)
                 {
                     AddInvariantProperty(variantBuilder, contentProperty);
                 }
             }
             else
             {
-                foreach (var contentCultureInfos in content.CultureInfos)
+                foreach (ContentCultureInfos contentCultureInfos in content.CultureInfos)
                 {
-                    var variantBuilder = builder.AddVariant();
+                    ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder = builder.AddVariant();
 
                     variantBuilder.WithName(contentCultureInfos.Name);
                     variantBuilder.WithCultureInfo(contentCultureInfos.Culture);
 
-                    foreach (var contentProperty in content.Properties)
+                    foreach (IProperty contentProperty in content.Properties)
                     {
                         AddInvariantProperty(variantBuilder, contentProperty);
                     }
                 }
             }
 
-
-
             return builder;
         }
 
-        private static void AddInvariantProperty(ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder, IProperty contentProperty)
-        {
+        private static void AddInvariantProperty(ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder, IProperty contentProperty) =>
             variantBuilder
                 .AddProperty()
                 .WithId(contentProperty.Id)
                 .WithAlias(contentProperty.Alias)
                 .WithValue(contentProperty.GetValue())
                 .Done();
-        }
     }
 }

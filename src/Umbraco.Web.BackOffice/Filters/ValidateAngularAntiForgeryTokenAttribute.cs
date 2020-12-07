@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,7 +23,8 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </remarks>
     public sealed class ValidateAngularAntiForgeryTokenAttribute : TypeFilterAttribute
     {
-        public ValidateAngularAntiForgeryTokenAttribute() : base(typeof(ValidateAngularAntiForgeryTokenFilter))
+        public ValidateAngularAntiForgeryTokenAttribute()
+            : base(typeof(ValidateAngularAntiForgeryTokenFilter))
         {
         }
 
@@ -44,12 +45,13 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 if (context.Controller is ControllerBase controller && controller.User.Identity is ClaimsIdentity userIdentity)
                 {
-                    //if there is not CookiePath claim, then exit
+                    // if there is not CookiePath claim, then exit
                     if (userIdentity.HasClaim(x => x.Type == ClaimTypes.CookiePath) == false)
                     {
                         await next();
                     }
                 }
+
                 var cookieToken = _cookieManager.GetCookieValue(Constants.Web.CsrfValidationCookieName);
                 var httpContext = context.HttpContext;
 

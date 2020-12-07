@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+namespace Umbraco.Core
 {
     public static partial class Constants
     {
@@ -11,6 +11,8 @@
             /// </summary>
             public const int SuperUserId = -1;
 
+            public const string SuperUserIdAsString = "-1";
+
             /// <summary>
             /// The id for the 'unknown' user.
             /// </summary>
@@ -22,7 +24,7 @@
             /// <summary>
             /// The name of the 'unknown' user.
             /// </summary>
-            public const string UnknownUserName = "SYTEM";
+            public const string UnknownUserName = "SYSTEM";
 
             public const string AdminGroupAlias = "admin";
             public const string EditorGroupAlias = "editor";
@@ -38,7 +40,6 @@
             public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
-            public const string ForceReAuthFlag = "umbraco-force-auth";
 
             public const string DefaultMemberTypeAlias = "Member";
 

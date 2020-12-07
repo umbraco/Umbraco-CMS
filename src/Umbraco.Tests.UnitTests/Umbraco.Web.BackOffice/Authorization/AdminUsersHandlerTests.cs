@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -32,8 +35,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Missing_QueryString_Value_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringName: "xxx");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            AdminUsersHandler sut = CreateHandler(queryStringName: "xxx");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -43,8 +46,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Non_Integer_QueryString_Value_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: "xxx");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            AdminUsersHandler sut = CreateHandler(queryStringValue: "xxx");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -54,8 +57,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Single_Admin_User_By_Admin_User_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: Admin2UserId.ToString(), editingWithAdmin: true);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString(), editingWithAdmin: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -65,8 +68,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Single_Admin_User_By_Non_Admin_User_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: Admin2UserId.ToString());
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString());
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -76,8 +79,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Single_Non_Admin_User_By_Non_Admin_User_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext();
-            var sut = CreateHandler(queryStringValue: NonAdmin2UserId.ToString());
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
+            AdminUsersHandler sut = CreateHandler(queryStringValue: NonAdmin2UserId.ToString());
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -87,8 +90,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Multiple_Users_Including_Admins_By_Admin_User_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
-            var sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{Admin2UserId},{NonAdmin2UserId}", editingWithAdmin: true);
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
+            AdminUsersHandler sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{Admin2UserId},{NonAdmin2UserId}", editingWithAdmin: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -98,8 +101,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Multiple_Users_Including_Admins_By_Non_Admin_User_Is_Not_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
-            var sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{Admin2UserId},{NonAdmin2UserId}");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
+            AdminUsersHandler sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{Admin2UserId},{NonAdmin2UserId}");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -109,8 +112,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         [Test]
         public async Task Editing_Multiple_Users_Not_Including_Admins_By_Non_Admin_User_Is_Authorized()
         {
-            var authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
-            var sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{NonAdmin2UserId},{NonAdmin3UserId}");
+            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext(queryStringName: MultipleUserEditQueryStringName);
+            AdminUsersHandler sut = CreateHandler(queryStringName: MultipleUserEditQueryStringName, queryStringValue: $"{NonAdmin2UserId},{NonAdmin3UserId}");
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -121,15 +124,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             var requirement = new AdminUsersRequirement(queryStringName);
             var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            var resource = new object();
+            object resource = new object();
             return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
         }
 
         private AdminUsersHandler CreateHandler(string queryStringName = SingleUserEditQueryStringName, string queryStringValue = "", bool editingWithAdmin = false)
         {
-            var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringName, queryStringValue);
-            CreateMockUserServiceAndSecurityAccessor(editingWithAdmin, out var mockUserService, out var mockBackOfficeSecurityAccessor);
-            var userEditorAuthorizationHelper = CreateUserEditorAuthorizationHelper();
+            Mock<IHttpContextAccessor> mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringName, queryStringValue);
+            CreateMockUserServiceAndSecurityAccessor(editingWithAdmin, out Mock<IUserService> mockUserService, out Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor);
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper = CreateUserEditorAuthorizationHelper();
             return new AdminUsersHandler(mockHttpContextAccessor.Object, mockUserService.Object, mockBackOfficeSecurityAccessor.Object, userEditorAuthorizationHelper);
         }
 
@@ -152,11 +155,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         {
             mockUserService = new Mock<IUserService>();
             var globalSettings = new GlobalSettings();
-            var adminUser1 = CreateUser(Admin1UserId, mockUserService, true);
-            var adminUser2 = CreateUser(Admin2UserId, mockUserService, true);
-            var nonAdminUser1 = CreateUser(NonAdmin1UserId, mockUserService);
-            var nonAdminUser2 = CreateUser(NonAdmin2UserId, mockUserService);
-            var nonAdminUser3 = CreateUser(NonAdmin3UserId, mockUserService);
+            User adminUser1 = CreateUser(Admin1UserId, mockUserService, true);
+            User adminUser2 = CreateUser(Admin2UserId, mockUserService, true);
+            User nonAdminUser1 = CreateUser(NonAdmin1UserId, mockUserService);
+            User nonAdminUser2 = CreateUser(NonAdmin2UserId, mockUserService);
+            User nonAdminUser3 = CreateUser(NonAdmin3UserId, mockUserService);
 
             // Single user requests have been setup in the create user operations, but
             // we also need to mock the responses when multiple users are being editing.
@@ -175,7 +178,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static User CreateUser(int id, Mock<IUserService> mockUserService, bool isAdmin = false)
         {
-            var user = new UserBuilder()
+            User user = new UserBuilder()
                 .WithId(id)
                 .AddUserGroup()
                     .WithAlias(isAdmin ? Constants.Security.AdminGroupAlias : Constants.Security.EditorGroupAlias)

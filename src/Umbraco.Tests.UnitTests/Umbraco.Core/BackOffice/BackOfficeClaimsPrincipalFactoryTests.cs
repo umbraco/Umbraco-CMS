@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,51 +7,42 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests
     {
-        private const int _testUserId = 2;
-        private const string _testUserName = "bob";
-        private const string _testUserGivenName = "Bob";
-        private const string _testUserCulture = "en-US";
-        private const string _testUserSecurityStamp = "B6937738-9C17-4C7D-A25A-628A875F5177";
+        private const int TestUserId = 2;
+        private const string TestUserName = "bob";
+        private const string TestUserGivenName = "Bob";
+        private const string TestUserCulture = "en-US";
+        private const string TestUserSecurityStamp = "B6937738-9C17-4C7D-A25A-628A875F5177";
         private BackOfficeIdentityUser _testUser;
         private Mock<UserManager<BackOfficeIdentityUser>> _mockUserManager;
 
+        private static Mock<UserManager<BackOfficeIdentityUser>> GetMockedUserManager()
+            => new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object, null, null, null, null, null, null, null, null);
+
         [Test]
         public void Ctor_When_UserManager_Is_Null_Expect_ArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(
-                null,
-                new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions())));
-        }
+            => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
+                                                            null,
+                                                            new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions())));
 
         [Test]
         public void Ctor_When_Options_Are_Null_Expect_ArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(
-                new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
-                    null, null, null, null, null, null, null, null).Object,
-                null));
-        }
+            => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null));
 
         [Test]
         public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(
-                new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
-                    null, null, null, null, null, null, null, null).Object,
-                new OptionsWrapper<BackOfficeIdentityOptions>(null)));
-        }
+            => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
+                                                            GetMockedUserManager().Object,
+                                                            new OptionsWrapper<BackOfficeIdentityOptions>(null)));
 
         [Test]
         public void CreateAsync_When_User_Is_Null_Expect_ArgumentNullException()
@@ -72,8 +63,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             Assert.IsNotNull(umbracoBackOfficeIdentity);
         }
 
-        [TestCase(ClaimTypes.NameIdentifier, _testUserId)]
-        [TestCase(ClaimTypes.Name, _testUserName)]
+        [TestCase(ClaimTypes.NameIdentifier, TestUserId)]
+        [TestCase(ClaimTypes.Name, TestUserName)]
         public async Task CreateAsync_Should_Include_Claim(string expectedClaimType, object expectedClaimValue)
         {
             var sut = CreateSut();
@@ -107,7 +98,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             const string expectedClaimType = ClaimTypes.Role;
             const string expectedClaimValue = "b87309fb-4caf-48dc-b45a-2b752d051508";
 
-            _testUser.Roles.Add(new global::Umbraco.Core.Models.Identity.IdentityUserRole<string>{RoleId = expectedClaimValue});
+            _testUser.Roles.Add(new IdentityUserRole<string> { RoleId = expectedClaimValue });
             _mockUserManager.Setup(x => x.SupportsUserRole).Returns(true);
             _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] {expectedClaimValue});
 
@@ -124,7 +115,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             const string expectedClaimType = "custom";
             const string expectedClaimValue = "val";
 
-            _testUser.Claims.Add(new global::Umbraco.Core.Models.Identity.IdentityUserClaim<int> {ClaimType = expectedClaimType, ClaimValue = expectedClaimValue});
+            _testUser.Claims.Add(new IdentityUserClaim<string> { ClaimType = expectedClaimType, ClaimValue = expectedClaimValue});
             _mockUserManager.Setup(x => x.SupportsUserClaim).Returns(true);
             _mockUserManager.Setup(x => x.GetClaimsAsync(_testUser)).ReturnsAsync(
                 new List<Claim> {new Claim(expectedClaimType, expectedClaimValue)});
@@ -141,17 +132,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         {
             var globalSettings = new GlobalSettings { DefaultUILanguage = "test" };
 
-            _testUser = new BackOfficeIdentityUser(globalSettings, _testUserId, new List<IReadOnlyUserGroup>())
+            _testUser = new BackOfficeIdentityUser(globalSettings, TestUserId, new List<IReadOnlyUserGroup>())
             {
-                UserName = _testUserName,
-                Name = _testUserGivenName,
+                UserName = TestUserName,
+                Name = TestUserGivenName,
                 Email = "bob@umbraco.test",
-                SecurityStamp = _testUserSecurityStamp,
-                Culture = _testUserCulture
+                SecurityStamp = TestUserSecurityStamp,
+                Culture = TestUserCulture
             };
 
-            _mockUserManager = new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
-                null, null, null, null, null, null, null, null);
+            _mockUserManager = GetMockedUserManager();
             _mockUserManager.Setup(x => x.GetUserIdAsync(_testUser)).ReturnsAsync(_testUser.Id.ToString);
             _mockUserManager.Setup(x => x.GetUserNameAsync(_testUser)).ReturnsAsync(_testUser.UserName);
             _mockUserManager.Setup(x => x.SupportsUserSecurityStamp).Returns(false);
@@ -159,10 +149,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             _mockUserManager.Setup(x => x.SupportsUserRole).Returns(false);
         }
 
-        private BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser> CreateSut()
-        {
-            return new BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>(_mockUserManager.Object,
+        private BackOfficeClaimsPrincipalFactory CreateSut() => new BackOfficeClaimsPrincipalFactory(
+                _mockUserManager.Object,
                 new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()));
-        }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
-using Umbraco.Core.BackOffice;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -29,9 +29,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var securityStamp = Guid.NewGuid().ToString();
                 var identity = new UmbracoBackOfficeIdentity(
-                    -1, "admin", "Admin", new []{-1}, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
+                    Umbraco.Core.Constants.Security.SuperUserIdAsString, "admin", "Admin", new[] { -1 }, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
 
-                return Task.FromResult(new AuthenticationTicket(identity,
+                return Task.FromResult(new AuthenticationTicket(
+                    identity,
                     new AuthenticationProperties()
                     {
                         ExpiresUtc = DateTime.Now.AddDays(1)

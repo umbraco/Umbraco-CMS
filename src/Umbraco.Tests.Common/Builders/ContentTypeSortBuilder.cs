@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -15,7 +18,8 @@ namespace Umbraco.Tests.Common.Builders
         private string _alias;
         private int? _sortOrder;
 
-        public ContentTypeSortBuilder() : base(null)
+        public ContentTypeSortBuilder()
+            : base(null)
         {
         }
 
@@ -44,7 +48,7 @@ namespace Umbraco.Tests.Common.Builders
             set => _alias = value;
         }
 
-        int? IWithSortOrderBuilder.SortOrder   
+        int? IWithSortOrderBuilder.SortOrder
         {
             get => _sortOrder;
             set => _sortOrder = value;

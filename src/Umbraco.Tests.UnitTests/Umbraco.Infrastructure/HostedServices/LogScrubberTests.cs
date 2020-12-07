@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -21,12 +24,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     {
         private Mock<IAuditService> _mockAuditService;
 
-        const int _maxLogAgeInMinutes = 60;
+        private const int MaxLogAgeInMinutes = 60;
 
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            var sut = CreateLogScrubber(serverRole: ServerRole.Replica);
+            LogScrubber sut = CreateLogScrubber(serverRole: ServerRole.Replica);
             await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
@@ -34,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
-            var sut = CreateLogScrubber(serverRole: ServerRole.Unknown);
+            LogScrubber sut = CreateLogScrubber(serverRole: ServerRole.Unknown);
             await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
@@ -42,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
-            var sut = CreateLogScrubber(isMainDom: false);
+            LogScrubber sut = CreateLogScrubber(isMainDom: false);
             await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
@@ -50,7 +53,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Executes_And_Scrubs_Logs()
         {
-            var sut = CreateLogScrubber();
+            LogScrubber sut = CreateLogScrubber();
             await sut.PerformExecuteAsync(null);
             VerifyLogsScrubbed();
         }
@@ -61,7 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var settings = new LoggingSettings
             {
-                MaxLogAge = TimeSpan.FromMinutes(_maxLogAgeInMinutes),
+                MaxLogAge = TimeSpan.FromMinutes(MaxLogAgeInMinutes),
             };
 
             var mockServerRegistrar = new Mock<IServerRegistrar>();
@@ -80,23 +83,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             _mockAuditService = new Mock<IAuditService>();
 
-            return new LogScrubber(mockMainDom.Object, mockServerRegistrar.Object, _mockAuditService.Object,
-                Options.Create(settings), mockScopeProvider.Object, mockLogger.Object, mockProfilingLogger.Object);
+            return new LogScrubber(
+                mockMainDom.Object,
+                mockServerRegistrar.Object,
+                _mockAuditService.Object,
+                Options.Create(settings),
+                mockScopeProvider.Object,
+                mockLogger.Object,
+                mockProfilingLogger.Object);
         }
 
-        private void VerifyLogsNotScrubbed()
-        {
-            VerifyLogsScrubbed(Times.Never());
-        }
+        private void VerifyLogsNotScrubbed() => VerifyLogsScrubbed(Times.Never());
 
-        private void VerifyLogsScrubbed()
-        {
-            VerifyLogsScrubbed(Times.Once());
-        }
+        private void VerifyLogsScrubbed() => VerifyLogsScrubbed(Times.Once());
 
-        private void VerifyLogsScrubbed(Times times)
-        {
-            _mockAuditService.Verify(x => x.CleanLogs(It.Is<int>(y => y == _maxLogAgeInMinutes)), times);
-        }
+        private void VerifyLogsScrubbed(Times times) => _mockAuditService.Verify(x => x.CleanLogs(It.Is<int>(y => y == MaxLogAgeInMinutes)), times);
     }
 }

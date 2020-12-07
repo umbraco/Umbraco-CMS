@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,12 +60,12 @@ namespace Umbraco.Tests.Common.Builders
 
         public override DictionaryItem Build()
         {
-            var createDate = _createDate ?? DateTime.Now;
-            var updateDate = _updateDate ?? DateTime.Now;
-            var deleteDate = _deleteDate ?? null;
+            DateTime createDate = _createDate ?? DateTime.Now;
+            DateTime updateDate = _updateDate ?? DateTime.Now;
+            DateTime? deleteDate = _deleteDate ?? null;
             var id = _id ?? 1;
-            var key = _key ?? Guid.NewGuid();
-            var parentId = _parentId ?? null;
+            Guid key = _key ?? Guid.NewGuid();
+            Guid? parentId = _parentId ?? null;
             var itemKey = _itemKey ?? Guid.NewGuid().ToString();
 
             var result = new DictionaryItem(itemKey)

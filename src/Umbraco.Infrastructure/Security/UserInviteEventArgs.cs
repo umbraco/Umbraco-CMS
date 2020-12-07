@@ -1,12 +1,13 @@
-﻿using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.BackOffice
+namespace Umbraco.Core.Security
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {
-        public UserInviteEventArgs(string ipAddress, int performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
-            : base(AuditEvent.SendingUserInvite, ipAddress,  performingUser, comment, localUser.Id, localUser.Name)
+        public UserInviteEventArgs(string ipAddress, string performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
+            : base(AuditEvent.SendingUserInvite, ipAddress,  performingUser, comment, string.Intern(localUser.Id.ToString()), localUser.Name)
         {
             InvitedUser = invitedUser ?? throw new System.ArgumentNullException(nameof(invitedUser));
             User = localUser;
@@ -24,7 +25,7 @@ namespace Umbraco.Core.BackOffice
 
         /// <summary>
         /// The local user that has been created that is pending the invite
-        /// </summary>        
+        /// </summary>
         public IUser User { get; }
 
         /// <summary>
