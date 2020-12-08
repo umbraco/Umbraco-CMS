@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
             var logger = new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
             var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
-                new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
+                new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.TempData)),
                 Mock.Of<ILogger<TypeLoader>>(),
                 logger,
                 false);

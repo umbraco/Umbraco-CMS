@@ -196,3 +196,4 @@ src/Umbraco.Tests.Integration/umbraco/logs/
 src/Umbraco.Tests.Integration/Views/
 
 src/Umbraco.Tests/TEMP/
+/src/Umbraco.Web.UI.NetCore/Umbraco/Data/*
