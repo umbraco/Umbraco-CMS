@@ -63,7 +63,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <returns></returns>
         public ActionResult<TreeNode> GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            //TODO: this is currently throwing an exception
+            //TODO: this is currently throwing an exception when loading a member
             var node = GetSingleTreeNode(id, queryStrings);
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)

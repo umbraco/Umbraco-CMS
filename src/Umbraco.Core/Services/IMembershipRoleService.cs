@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Services
     {
         void AddRole(string roleName);
         IEnumerable<string> GetAllRoles();
+        IEnumerable<IMemberGroup> GetAllRolesTyped();
         IEnumerable<string> GetAllRoles(int memberId);
         IEnumerable<string> GetAllRoles(string username);
         IEnumerable<int> GetAllRolesIds();

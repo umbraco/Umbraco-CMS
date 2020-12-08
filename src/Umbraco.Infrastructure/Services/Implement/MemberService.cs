@@ -938,6 +938,20 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        /// <summary>
+        /// Returns a strongly typed list of all member groups
+        /// </summary>
+        /// <returns></returns>
+
+        public IEnumerable<IMemberGroup> GetAllRolesTyped()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                return _memberGroupRepository.GetMany().Select(x=>x).Distinct();
+            }
+        }
+
         public IEnumerable<string> GetAllRoles(int memberId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

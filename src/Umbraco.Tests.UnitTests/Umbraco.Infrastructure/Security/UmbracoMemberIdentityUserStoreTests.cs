@@ -26,7 +26,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
             return new MembersUserStore(
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
-                new Mock<IScopeProvider>().Object);
+                new Mock<IScopeProvider>().Object,
+                new IdentityErrorDescriber());
         }
 
         [Test]

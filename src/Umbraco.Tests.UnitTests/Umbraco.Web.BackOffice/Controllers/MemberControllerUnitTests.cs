@@ -81,7 +81,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurity backOfficeSecurity)
         {
             // arrange
-            Member member = SetupMemberTestData(umbracoMembersUserManager, memberTypeService, memberMapDefinition, backOfficeSecurityAccessor, backOfficeSecurity, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
 
             Mock.Get(memberService).SetupSequence(
                 x => x.GetByEmail(It.IsAny<string>()))
@@ -110,7 +115,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurity backOfficeSecurity)
         {
             // arrange
-            Member member = SetupMemberTestData(umbracoMembersUserManager, memberTypeService, memberMapDefinition, backOfficeSecurityAccessor, backOfficeSecurity, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
+            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => new MembersIdentityUser());
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.UpdateAsync(new MembersIdentityUser()));
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
 
             Mock.Get(memberService).SetupSequence(
                     x => x.GetByEmail(It.IsAny<string>()))
@@ -139,7 +151,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurity backOfficeSecurity)
         {
             // arrange
-            Member member = SetupMemberTestData(umbracoMembersUserManager, memberTypeService, memberMapDefinition, backOfficeSecurityAccessor, backOfficeSecurity, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
 
             Mock.Get(memberService).SetupSequence(
                     x => x.GetByEmail(It.IsAny<string>()))
@@ -158,22 +175,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Setup all standard member data for test
         /// </summary>
-        private Member SetupMemberTestData(IMembersUserManager umbracoMembersUserManager,
-            IMemberTypeService memberTypeService,
+        private Member SetupMemberTestData(
             MapDefinitionCollection memberMapDefinition,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IBackOfficeSecurity backOfficeSecurity,
             out UmbracoMapper mapper,
             out MemberSave fakeMemberData,
             out MemberDisplay memberDisplay,
             ContentSaveAction contentAction)
         {
-            Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
-                .ReturnsAsync(() => IdentityResult.Success);
-            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
-            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
-
             var memberType = new MemberType(new DefaultShortStringHelper(new DefaultShortStringHelperConfig()), int.MinValue);
             IMemberType testContentType = memberType;
 

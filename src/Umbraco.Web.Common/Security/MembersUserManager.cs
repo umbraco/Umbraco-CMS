@@ -40,50 +40,7 @@ namespace Umbraco.Web.Common.Security
         {
             _httpContextAccessor = httpContextAccessor;
         }
-
-        /// <summary>
-        /// Gets or sets the default members user password checker
-        /// </summary>
-        public IMembersUserPasswordChecker MembersUserPasswordChecker { get; set; }
-        // TODO: as per backoffice: This isn't a good way to set this, it needs to be injected
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// By default this uses the standard ASP.Net Identity approach which is:
-        /// * Get password store
-        /// * Call VerifyPasswordAsync with the password store + user + password
-        /// * Uses the PasswordHasher.VerifyHashedPassword to compare the stored password
-        ///
-        /// In some cases people want simple custom control over the username/password check, for simplicity
-        /// sake, developers would like the users to simply validate against an LDAP directory but the user
-        /// data remains stored inside of Umbraco.
-        /// See: http://issues.umbraco.org/issue/U4-7032 for the use cases.
-        ///
-        /// We've allowed this check to be overridden with a simple callback so that developers don't actually
-        /// have to implement/override this class.
-        /// </remarks>
-        public override async Task<bool> CheckPasswordAsync(MembersIdentityUser user, string password)
-        {
-            if (MembersUserPasswordChecker != null)
-            {
-                MembersUserPasswordCheckerResult result = await MembersUserPasswordChecker.CheckPasswordAsync(user, password);
-
-                if (user.HasIdentity == false)
-                {
-                    return false;
-                }
-
-                // if the result indicates to not fallback to the default, then return true if the credentials are valid
-                if (result != MembersUserPasswordCheckerResult.FallbackToDefaultChecker)
-                {
-                    return result == MembersUserPasswordCheckerResult.ValidCredentials;
-                }
-            }
-
-            // use the default behavior
-            return await base.CheckPasswordAsync(user, password);
-        }
-
+        
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
         /// </summary>

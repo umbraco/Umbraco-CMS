@@ -242,11 +242,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new ArgumentNullException(nameof(contentItem));
             }
 
-            // TODO: this causes an issue when trying to correct an invalid model 
-            //if (ModelState.IsValid == false)
-            //{
-            //    throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
-            //}
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+            }
 
             // If we've reached here it means:
             // * Our model has been bound
@@ -380,6 +379,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                 contentItem.Email,
                 memberType.Alias,
                 contentItem.Name);
+           
+            //if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            //{
+            //    // TODO: should we show the password rules?
+            //    Task<bool> isPasswordValid = _memberManager.ValidatePasswordAsync(identityMember, contentItem.Password.NewPassword);
+            //    if (isPasswordValid.Result == false)
+            //    {
+            //        ModelState.AddPropertyError(
+            //            new ValidationResult($"Invalid password", new[] { "value" }),
+            //            $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+            //    }
+            //}
 
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
 
@@ -413,7 +424,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentItem">The member to save</param>
         private async Task UpdateMemberDataAsync(MemberSave contentItem)
         {
-            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(((int)contentItem.Id).ToString());
+            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
             }
@@ -496,18 +507,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddPropertyError(
                     new ValidationResult("Email address is already in use", new[] { "value" }),
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
-            }
-
-            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
-            {
-                //TODO: should we validate the password here, in advance? or when saving the identity user
-                //Task<List<IdentityResult>> result = _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
-                //if (result.Result.Exists(x => x.Succeeded == false))
-                //{
-                //    ModelState.AddPropertyError(
-                //       new ValidationResult($"Invalid password: {MapErrors(result.Result)}", new[] { "value" }),
-                //       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-                //}
             }
         }
 

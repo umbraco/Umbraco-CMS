@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -208,6 +208,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(3, found.Count());
         }
+
+        [Test]
+        public void Can_Get_All_Roles_Typed()
+        {
+            MemberService.AddRole("MyTestRole1");
+            MemberService.AddRole("MyTestRole2");
+            MemberService.AddRole("MyTestRole3");
+
+            var found = MemberService.GetAllRolesTyped();
+
+            Assert.AreEqual(3, found.Count());
+        }
+
         [Test]
         public void Can_Get_All_Roles_IDs()
         {
