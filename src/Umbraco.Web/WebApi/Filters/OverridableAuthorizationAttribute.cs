@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.WebApi.Filters
             //if the controller is allowing authorization to be overridden at the action level and there are action level authorization attributes
             // then exit and let the action level auth attribute(s) execute.
 
-            if (actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<EnableOverrideAuthorizationAttribute>().Any()
+            if (actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<OverrideAuthorizationAttribute>().Any()
                 && actionAttributes.Any())
             {
                 return;
