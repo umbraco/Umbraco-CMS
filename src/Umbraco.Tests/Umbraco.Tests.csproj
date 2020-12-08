@@ -185,11 +185,6 @@
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
-    <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
-    <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
-    <Compile Include="Cache\DefaultCachePolicyTests.cs" />
-    <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
-    <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
