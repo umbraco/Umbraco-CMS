@@ -1,10 +1,10 @@
-﻿namespace Umbraco.Core.Logging
+namespace Umbraco.Core.Logging
 {
 
     public interface ILoggingConfiguration
     {
         /// <summary>
-        /// The physical path where logs are stored
+        /// Gets the physical path where logs are stored
         /// </summary>
         string LogDirectory { get; }
     }

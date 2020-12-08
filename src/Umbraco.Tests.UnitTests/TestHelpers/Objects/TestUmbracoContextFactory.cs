@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Core.Configuration.Models;
@@ -48,10 +48,8 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
                 Options.Create<GlobalSettings>(globalSettings),
-                Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
-                httpContextAccessor,
                 new AspNetCoreCookieManager(httpContextAccessor),
                 Mock.Of<IRequestAccessor>(),
                 backofficeSecurityAccessorMock.Object

@@ -53,13 +53,20 @@ namespace Umbraco.Core.DependencyInjection
             IConfiguration config)
         {
             if (services is null)
+            {
                 throw new ArgumentNullException(nameof(services));
+            }
+
             if (config is null)
+            {
                 throw new ArgumentNullException(nameof(config));
+            }
 
-            var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
+            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            var loggingConfig = new LoggingConfiguration(loggingDir);
+
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
@@ -69,11 +76,11 @@ namespace Umbraco.Core.DependencyInjection
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique<AppCaches>(appCaches);
 
-            var profiler = GetWebProfiler(config);
+            IProfiler profiler = GetWebProfiler(config);
             services.AddUnique<IProfiler>(profiler);
 
-            var loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
-            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
+            ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }

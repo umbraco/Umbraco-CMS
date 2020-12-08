@@ -5,6 +5,7 @@ namespace Umbraco.Core.Hosting
     public interface IHostingEnvironment
     {
         string SiteName { get; }
+
         string ApplicationId { get; }
 
         /// <summary>
@@ -35,8 +36,6 @@ namespace Umbraco.Core.Hosting
         /// <summary>
         /// Maps a virtual path to a physical path to the application's web root
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         /// <remarks>
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
@@ -46,8 +45,6 @@ namespace Umbraco.Core.Hosting
         /// <summary>
         /// Maps a virtual path to a physical path to the application's root (not always equal to the web root)
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
         /// <remarks>
         /// Depending on the runtime 'web root', this result can vary. For example in Net Framework the web root and the content root are the same, however
         /// in netcore the web root is /www therefore this will Map to a physical path within www.
@@ -58,7 +55,6 @@ namespace Umbraco.Core.Hosting
         /// Converts a virtual path to an absolute URL path based on the application's web root
         /// </summary>
         /// <param name="virtualPath">The virtual path. Must start with either ~/ or / else an exception is thrown.</param>
-        /// <returns></returns>
         /// <remarks>
         /// This maps the virtual path syntax to the web root. For example when hosting in a virtual directory called "site" and the value "~/pages/test" is passed in, it will
         /// map to "/site/pages/test" where "/site" is the value of <see cref="ApplicationVirtualPath"/>.

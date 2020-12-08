@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             // this ensures it's reset
             var typeFinder = TestHelper.GetTypeFinder();
             _typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
-                new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot("~/App_Data/TEMP")),
+                new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
                 Mock.Of<ILogger<TypeLoader>>(), new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()), false,
 
                 // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

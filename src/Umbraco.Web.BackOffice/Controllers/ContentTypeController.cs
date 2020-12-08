@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -643,7 +643,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                _logger.LogError(ex, "Error cleaning up temporary udt file in {File}", filePath);
             }
 
             return Ok();

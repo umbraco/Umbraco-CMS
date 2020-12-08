@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -71,7 +71,6 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
             //so these need to be tested differently
             var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
             {
-                { Constants.SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
                 { Constants.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
             };
 

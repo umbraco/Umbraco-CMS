@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
+
     /// <summary>
     /// Creates and manages <see cref="IPublishedSnapshot"/> instances.
     /// </summary>

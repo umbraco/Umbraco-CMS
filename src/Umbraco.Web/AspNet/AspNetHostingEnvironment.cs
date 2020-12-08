@@ -11,6 +11,7 @@ using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Hosting
 {
+    // TODO: This has been migrated to netcore
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
 
@@ -67,9 +68,6 @@ namespace Umbraco.Web.Hosting
 
                 switch (_hostingSettings.LocalTempStorageLocation)
                 {
-                    case LocalTempStorage.AspNetTemp:
-                        return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
-
                     case LocalTempStorage.EnvironmentTemp:
 
                         // environment temp is unique, we need a folder per site
@@ -88,10 +86,8 @@ namespace Umbraco.Web.Hosting
 
                         return _localTempPath = siteTemp;
 
-                    //case LocalTempStorage.Default:
-                    //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = MapPathContentRoot("~/App_Data/TEMP");
+                        return _localTempPath = MapPathContentRoot(Constants.SystemDirectories.TempData);
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -38,7 +38,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
         [Test]
         public void Can_Construct_And_Get_Result()
         {
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
@@ -50,10 +49,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
-                Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
-                httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
                 backofficeSecurityAccessor);
@@ -74,7 +71,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
         public void Umbraco_Context_Not_Null()
         {
             var globalSettings = new GlobalSettings();
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
@@ -84,10 +80,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
-                Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
-                httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
                 backofficeSecurityAccessor);
@@ -112,7 +106,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var globalSettings = new GlobalSettings();
 
@@ -122,10 +115,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
-                Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
-                httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
                 backofficeSecurityAccessor);
@@ -150,7 +141,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
         public void Mock_Current_Page()
         {
             var globalSettings = new GlobalSettings();
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
@@ -160,10 +150,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
-                Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
-                httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
                 backofficeSecurityAccessor);
