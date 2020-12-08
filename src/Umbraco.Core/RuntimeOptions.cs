@@ -21,6 +21,7 @@ namespace Umbraco.Core
         private static List<Action<Composition, AppCaches, TypeLoader, IUmbracoDatabaseFactory>> _onEssentials;
         private static bool? _installMissingDatabase;
         private static bool? _installEmptyDatabase;
+        private static bool? _installUnattended;
 
         // reads a boolean appSetting
         private static bool BoolSetting(string key, bool missing) => ConfigurationManager.AppSettings[key]?.InvariantEquals("true") ?? missing;
@@ -37,8 +38,8 @@ namespace Umbraco.Core
         /// </remarks>
         public static bool InstallMissingDatabase
         {
-            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallMissingDatabase", false);
-            set => _installEmptyDatabase = value;
+            get => _installMissingDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallMissingDatabase", false);
+            set => _installMissingDatabase = value;
         }
 
         /// <summary>
@@ -53,8 +54,22 @@ namespace Umbraco.Core
         /// </remarks>
         public static bool InstallEmptyDatabase
         {
-            get => _installMissingDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false);
-            set => _installMissingDatabase = value;
+            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false);
+            set => _installEmptyDatabase  = value;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether unattended installs are enabled.
+        /// </summary>
+        /// <remarks>
+        /// <para>By default, when a database connection string is configured and it is possible to connect to
+        /// the database, but the database is empty, an unattended install will be performed. If this options
+        /// is set to <c>false</c>, it enters the Install level instead.</para>
+        /// </remarks>
+        public static bool InstallUnattended
+        {
+            get => _installUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.InstallUnattended", true);
+            set => _installUnattended = value;
         }
 
         /// <summary>
