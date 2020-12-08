@@ -6,28 +6,41 @@ using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// <see cref="IApplicationBuilder"/> extensions for the umbraco front-end website
+    /// </summary>
     public static class UmbracoWebsiteApplicationBuilderExtensions
     {
+        /// <summary>
+        /// Sets up services and routes for the front-end umbraco website
+        /// </summary>
         public static IApplicationBuilder UseUmbracoWebsite(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
 
-            if (!app.UmbracoCanBoot()) return app;
+            if (!app.UmbracoCanBoot())
+            {
+                return app;
+            }
 
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
-            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
-            app.UseImageSharp();
-            app.UseStaticFiles();
-            app.UseUmbracoNoContentPage();
+            app.UseUmbracoRoutes();
 
             return app;
         }
 
-        public static IApplicationBuilder UseUmbracoNoContentPage(this IApplicationBuilder app)
+        /// <summary>
+        /// Sets up routes for the umbraco front-end
+        /// </summary>
+        public static IApplicationBuilder UseUmbracoRoutes(this IApplicationBuilder app)
         {
             app.UseEndpoints(endpoints =>
             {
-                var noContentRoutes = app.ApplicationServices.GetRequiredService<NoContentRoutes>();
+                endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
+
+                NoContentRoutes noContentRoutes = app.ApplicationServices.GetRequiredService<NoContentRoutes>();
                 noContentRoutes.CreateRoutes(endpoints);
             });
 

@@ -16,6 +16,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
@@ -118,48 +119,48 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             public ActionDescriptorCollection ActionDescriptors { get; }
         }
 
-        private class MatchesDefaultIndexController : RenderMvcController
+        private class MatchesDefaultIndexController : RenderController
         {
-            public MatchesDefaultIndexController(ILogger<RenderMvcController> logger,
+            public MatchesDefaultIndexController(ILogger<RenderController> logger,
                 ICompositeViewEngine compositeViewEngine) : base(logger, compositeViewEngine)
             {
             }
         }
 
-        private class MatchesOverriddenIndexController : RenderMvcController
+        private class MatchesOverriddenIndexController : RenderController
         {
             public override IActionResult Index(ContentModel model)
             {
                 return base.Index(model);
             }
 
-            public MatchesOverriddenIndexController(ILogger<RenderMvcController> logger,
+            public MatchesOverriddenIndexController(ILogger<RenderController> logger,
                 ICompositeViewEngine compositeViewEngine) : base(logger, compositeViewEngine)
             {
             }
         }
 
-        private class MatchesCustomIndexController : RenderMvcController
+        private class MatchesCustomIndexController : RenderController
         {
             public IActionResult Index(ContentModel model, int page)
             {
                 return base.Index(model);
             }
 
-            public MatchesCustomIndexController(ILogger<RenderMvcController> logger,
+            public MatchesCustomIndexController(ILogger<RenderController> logger,
                 ICompositeViewEngine compositeViewEngine) : base(logger, compositeViewEngine)
             {
             }
         }
 
-        private class MatchesAsyncIndexController : RenderMvcController
+        private class MatchesAsyncIndexController : RenderController
         {
             public new async Task<IActionResult> Index(ContentModel model)
             {
                 return await Task.FromResult(base.Index(model));
             }
 
-            public MatchesAsyncIndexController(ILogger<RenderMvcController> logger,
+            public MatchesAsyncIndexController(ILogger<RenderController> logger,
                 ICompositeViewEngine compositeViewEngine) : base(logger, compositeViewEngine)
             {
             }

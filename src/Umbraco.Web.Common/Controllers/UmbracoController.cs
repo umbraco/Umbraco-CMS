@@ -1,14 +1,7 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Security;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for Umbraco controllers.

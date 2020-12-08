@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Website
+namespace Umbraco.Web.Website.Routing
 {
     /// <summary>
     /// Represents the data required to route to a specific controller/action during an Umbraco request

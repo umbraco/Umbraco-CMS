@@ -19,6 +19,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.Routing;
 using CoreConstants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers

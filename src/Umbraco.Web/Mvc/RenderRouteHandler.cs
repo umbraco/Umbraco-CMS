@@ -338,10 +338,10 @@ namespace Umbraco.Web.Mvc
             }
 
 
-            //Here we need to check if there is no hijacked route and no template assigned,
-            //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            //We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
-            //for example for json rendering in headless.
+            // Here we need to check if there is no hijacked route and no template assigned,
+            // if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
+            // We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
+            // for example for json rendering in headless.
             if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
                 && routeDef.HasHijackedRoute == false)
             {
@@ -370,7 +370,7 @@ namespace Umbraco.Web.Mvc
                 routeDef = GetUmbracoRouteDefinition(requestContext, request);
             }
 
-            //no post values, just route to the controller/action required (local)
+            // no post values, just route to the controller/action required (local)
 
             requestContext.RouteData.Values["controller"] = routeDef.ControllerName;
             if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)

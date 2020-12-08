@@ -1,15 +1,13 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using System.Threading;
 using Umbraco.Core.Cache;
-using System.Collections.Generic;
-using Umbraco.Core.Security;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -28,6 +26,9 @@ namespace Umbraco.Web.Common.Middleware
         private readonly IRequestCache _requestCache;
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
+        /// </summary>
         public UmbracoRequestMiddleware(
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
@@ -42,6 +43,7 @@ namespace Umbraco.Web.Common.Middleware
             _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
+        /// <inheritdoc/>
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
@@ -52,16 +54,16 @@ namespace Umbraco.Web.Common.Middleware
                 await next(context);
                 return;
             }
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext
-            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
+            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext
+            UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             try
             {
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                   _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }
 
                 try

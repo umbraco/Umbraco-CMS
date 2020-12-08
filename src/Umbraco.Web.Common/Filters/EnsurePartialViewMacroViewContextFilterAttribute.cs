@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Web.Common.Constants;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Common.Filters
 {
@@ -35,13 +34,18 @@ namespace Umbraco.Web.Common.Filters
         /// this ensures that any calls to GetPropertyValue with regards to RTE or Grid editors can still
         /// render any PartialViewMacro with a form and maintain ModelState
         /// </summary>
-        /// <param name="context"></param>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!(context.Controller is Controller controller)) return;
+            if (!(context.Controller is Controller controller))
+            {
+                return;
+            }
 
-            //ignore anything that is not IRenderController
-            if (!(controller is IRenderController)) return;
+            // ignore anything that is not IRenderController
+            if (!(controller is IRenderController))
+            {
+                return;
+            }
 
             SetViewContext(context, controller);
         }
@@ -54,10 +58,16 @@ namespace Umbraco.Web.Common.Filters
         /// <param name="context">The filter context.</param>
         public override void OnResultExecuting(ResultExecutingContext context)
         {
-            if (!(context.Controller is Controller controller)) return;
+            if (!(context.Controller is Controller controller))
+            {
+                return;
+            }
 
-            //ignore anything that is not IRenderController
-            if (!(controller is RenderController)) return;
+            // ignore anything that is not IRenderController
+            if (!(controller is IRenderController))
+            {
+                return;
+            }
 
             SetViewContext(context, controller);
         }
@@ -72,16 +82,13 @@ namespace Umbraco.Web.Common.Filters
                 new StringWriter(),
                 new HtmlHelperOptions());
 
-            //set the special data token
+            // set the special data token
             context.RouteData.DataTokens[ViewConstants.DataTokenCurrentViewContext] = viewCtx;
         }
 
         private class DummyView : IView
         {
-            public Task RenderAsync(ViewContext context)
-            {
-                return Task.CompletedTask;
-            }
+            public Task RenderAsync(ViewContext context) => Task.CompletedTask;
 
             public string Path { get; }
         }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
+using SixLabors.ImageSharp.Web.DependencyInjection;
 using Smidge;
 using Smidge.Nuglify;
 using StackExchange.Profiling;
@@ -14,16 +15,61 @@ using Umbraco.Web.Common.Middleware;
 namespace Umbraco.Extensions
 {
 
+    /// <summary>
+    /// <see cref="IApplicationBuilder"/> extensions for Umbraco
+    /// </summary>
     public static class ApplicationBuilderExtensions
     {
         /// <summary>
+        /// Configures and use services required for using Umbraco
+        /// </summary>
+        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            app.UseUmbracoCore();
+            app.UseUmbracoRequestLogging();
+
+            // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
+            // before endpoint routing middleware.
+            app.UseUmbracoRouting();
+
+            app.UseStatusCodePages();
+
+            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
+            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
+            app.UseImageSharp();
+            app.UseStaticFiles();
+
+            // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one
+            // will execute after endpoint routing. The ordering of everything is quite important here, see
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-5.0
+            // where we need to have UseAuthentication and UseAuthorization proceeding this call but before
+            // endpoints are defined.
+            app.UseRouting();
+            app.UseRequestLocalization();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            // Must be called after UseRouting and before UseEndpoints
+            app.UseSession();
+
+            // Must come after the above!
+            app.UseUmbracoInstaller();
+
+            return app;
+        }
+
+        /// <summary>
         /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
         public static bool UmbracoCanBoot(this IApplicationBuilder app)
         {
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            IRuntime runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+
             // can't continue if boot failed
             return runtime.State.Level > RuntimeLevel.BootFailed;
         }
@@ -31,26 +77,30 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Start Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
         public static IApplicationBuilder UseUmbracoCore(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
 
-            if (!app.UmbracoCanBoot()) return app;
+            if (!app.UmbracoCanBoot())
+            {
+                return app;
+            }
 
-            var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
+            IHostingEnvironment hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
-            var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            IRuntime runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
 
             // Register a listener for application shutdown in order to terminate the runtime
-            var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
+            IApplicationShutdownRegistry hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
             var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
             hostLifetime.RegisterObject(runtimeShutdown);
 
             // Register our global threadabort enricher for logging
-            var threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
+            ThreadAbortExceptionEnricher threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
             LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
 
             StaticApplicationLogging.Initialize(app.ApplicationServices.GetRequiredService<ILoggerFactory>());
@@ -64,12 +114,16 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Enables middlewares required to run Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
-        // TODO: Could be internal or part of another call - this is a required system so should't be 'opt-in'
+        /// <remarks>
+        /// Must occur before UseRouting
+        /// </remarks>
         public static IApplicationBuilder UseUmbracoRouting(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            // TODO: This method could be internal or part of another call - this is a required system so should't be 'opt-in'
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
 
             if (!app.UmbracoCanBoot())
             {
@@ -79,11 +133,6 @@ namespace Umbraco.Extensions
             {
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
-
-                // TODO: Both of these need to be done before any endpoints but after UmbracoRequestMiddleware
-                // because they rely on an UmbracoContext. But should they be here?
-                app.UseAuthentication();
-                app.UseAuthorization();
             }
 
             return app;
@@ -92,11 +141,12 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds request based serilog enrichers to the LogContext for each request
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
         public static IApplicationBuilder UseUmbracoRequestLogging(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
 
             if (!app.UmbracoCanBoot()) return app;
 
@@ -108,13 +158,17 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Enables runtime minification for Umbraco
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
         public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
 
-            if (!app.UmbracoCanBoot()) return app;
+            if (!app.UmbracoCanBoot())
+            {
+                return app;
+            }
 
             app.UseSmidge();
             app.UseSmidgeNuglify();

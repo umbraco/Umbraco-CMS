@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Website.Controllers
 {
     /// <summary>
     /// A custom ActionMethodSelector which will ensure that the RenderMvcController.Index(ContentModel model) action will be executed
@@ -35,17 +35,18 @@ namespace Umbraco.Web.Mvc
                 var baseType = controllerAction.ControllerTypeInfo.BaseType;
 
                 //It's the same type, so this must be the Index action to use
-                if (currType == baseType) return true;
+                if (currType == baseType)
+                    return true;
 
-                 var actions = _controllerActionsCache.GetOrAdd(currType, type =>
-                 {
-                     var actionDescriptors = routeContext.HttpContext.RequestServices
-                         .GetRequiredService<IActionDescriptorCollectionProvider>().ActionDescriptors.Items
-                         .Where(x=>x is ControllerActionDescriptor).Cast<ControllerActionDescriptor>()
-                         .Where(x => x.ControllerTypeInfo == controllerAction.ControllerTypeInfo);
+                var actions = _controllerActionsCache.GetOrAdd(currType, type =>
+                {
+                    var actionDescriptors = routeContext.HttpContext.RequestServices
+                        .GetRequiredService<IActionDescriptorCollectionProvider>().ActionDescriptors.Items
+                        .Where(x => x is ControllerActionDescriptor).Cast<ControllerActionDescriptor>()
+                        .Where(x => x.ControllerTypeInfo == controllerAction.ControllerTypeInfo);
 
-                     return actionDescriptors;
-                 });
+                    return actionDescriptors;
+                });
 
                 //If there are more than one Index action for this controller, then
                 // this base class one should not be matched
