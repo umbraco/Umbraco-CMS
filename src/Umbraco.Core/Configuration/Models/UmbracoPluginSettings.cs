@@ -19,7 +19,9 @@ namespace Umbraco.Core.Configuration.Models
             ".css", // styles
             ".js", // scripts
             ".jpg", ".jpeg", ".gif", ".png", ".svg", // images
-            ".eot", ".ttf", ".woff" // fonts
+            ".eot", ".ttf", ".woff", // fonts
+            ".xml", ".json", ".config", // configurations
+            ".lic" // license
         });
     }
 }
