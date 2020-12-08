@@ -379,18 +379,18 @@ namespace Umbraco.Web.BackOffice.Controllers
                 contentItem.Email,
                 memberType.Alias,
                 contentItem.Name);
-           
-            //if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
-            //{
-            //    // TODO: should we show the password rules?
-            //    Task<bool> isPasswordValid = _memberManager.ValidatePasswordAsync(identityMember, contentItem.Password.NewPassword);
-            //    if (isPasswordValid.Result == false)
-            //    {
-            //        ModelState.AddPropertyError(
-            //            new ValidationResult($"Invalid password", new[] { "value" }),
-            //            $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-            //    }
-            //}
+
+            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            {
+                // TODO: should we show the password rules?
+                Task<bool> isPasswordValid = _memberManager.CheckPasswordAsync(identityMember, contentItem.Password.NewPassword);
+                if (isPasswordValid.Result == false)
+                {
+                    ModelState.AddPropertyError(
+                        new ValidationResult($"Invalid password", new[] { "value" }),
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+                }
+            }
 
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
 
