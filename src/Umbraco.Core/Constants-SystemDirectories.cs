@@ -4,12 +4,30 @@ namespace Umbraco.Core
     {
         public static class SystemDirectories
         {
+            /// <summary>
+            /// The aspnet bin folder
+            /// </summary>
             public const string Bin = "~/bin";
 
+            // TODO: Shouldn't this exist underneath /Umbraco in the content root?
             public const string Config = "~/config";
 
-            public const string Data = "~/Umbraco/Data";
+            /// <summary>
+            /// The Umbraco folder that exists at the content root.
+            /// </summary>
+            /// <remarks>
+            /// This is not the same as the Umbraco web folder which is configurable for serving front-end files.
+            /// </remarks>
+            public const string Umbraco = "~/Umbraco";
 
+            /// <summary>
+            /// The Umbraco data folder in the content root
+            /// </summary>
+            public const string Data = Umbraco + "/Data";
+
+            /// <summary>
+            /// The Umbraco temp data folder in the content root
+            /// </summary>
             public const string TempData = Data + "/TEMP";
 
             public const string TempFileUploads = TempData + "/FileUploads";
@@ -30,8 +48,10 @@ namespace Umbraco.Core
 
             public const string Preview = Data + "/preview";
 
-            // TODO: This doesn't seem right?
-            public const string LogFiles= "~/Logs";
+            /// <summary>
+            /// The default folder where Umbraco log files are stored
+            /// </summary>
+            public const string LogFiles = Umbraco + "/Logs";
         }
     }
 }
