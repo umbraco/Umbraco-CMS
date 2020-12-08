@@ -1,39 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Data.Common;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Migrations.Stubs;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class AlterMigrationTests
     {
-        private ILogger<MigrationContext> _logger;
-        private ISqlSyntaxProvider _sqlSyntax;
-        private IUmbracoDatabase _database;
+        private readonly ILogger<MigrationContext> _logger = Mock.Of<ILogger<MigrationContext>>();
 
-        [SetUp]
-        public void Setup()
-        {
-            _logger = Mock.Of<ILogger<MigrationContext>>();
-            _sqlSyntax = new SqlCeSyntaxProvider();
-
-            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
-            var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, Mock.Of<ILogger<UmbracoDatabase>>(), TestHelper.BulkSqlInsertProvider);
-        }
 
         [Test]
         public void Drop_Foreign_Key()
@@ -46,13 +27,15 @@ namespace Umbraco.Tests.Migrations
             // Act
             stub.Migrate();
 
-            foreach (var op in database.Operations)
+            foreach (TestDatabase.Operation op in database.Operations)
+            {
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+            }
 
             // Assert
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
-
+            Assert.That(database.Operations[0].Sql,
+                Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
         }
 
         [Test]
@@ -64,23 +47,24 @@ namespace Umbraco.Tests.Migrations
 
             migration.Migrate();
 
-            foreach (var op in database.Operations)
+            foreach (TestDatabase.Operation op in database.Operations)
+            {
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+            }
 
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations[0].Sql,
+                Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
         public class CreateColumnMigration : MigrationBase
         {
             public CreateColumnMigration(IMigrationContext context)
                 : base(context)
-            { }
-
-            public override void Migrate()
             {
-                Alter.Table("bar").AddColumn("foo").AsGuid().Do();
             }
+
+            public override void Migrate() => Alter.Table("bar").AddColumn("foo").AsGuid().Do();
         }
 
         [Test]
@@ -92,28 +76,30 @@ namespace Umbraco.Tests.Migrations
 
             migration.Migrate();
 
-            foreach (var op in database.Operations)
+            foreach (TestDatabase.Operation op in database.Operations)
+            {
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+            }
 
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations[0].Sql,
+                Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
         public class AlterColumnMigration : MigrationBase
         {
             public AlterColumnMigration(IMigrationContext context)
                 : base(context)
-            { }
-
-            public override void Migrate()
             {
+            }
+
+            public override void Migrate() =>
                 // bad/good syntax...
                 //Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
                 Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
-            }
         }
 
-        [NUnit.Framework.Ignore("this doesn't actually test anything")]
+        [Ignore("this doesn't actually test anything")]
         [Test]
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
@@ -131,7 +117,7 @@ namespace Umbraco.Tests.Migrations
             //Console output
             Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
             Debug.Print("");
-            foreach (var expression in database.Operations)
+            foreach (TestDatabase.Operation expression in database.Operations)
             {
                 Debug.Print(expression.ToString());
             }

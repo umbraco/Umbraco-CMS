@@ -204,6 +204,7 @@
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
+    <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />

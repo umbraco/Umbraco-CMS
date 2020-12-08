@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.Migrations
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class MigrationTests
@@ -21,35 +17,30 @@ namespace Umbraco.Tests.Migrations
         {
             private readonly IScope _scope;
 
-            public TestScopeProvider(IScope scope)
-            {
-                _scope = scope;
-            }
+            public TestScopeProvider(IScope scope) => _scope = scope;
 
-            public IScope CreateScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, IEventDispatcher eventDispatcher = null, bool? scopeFileSystems = null, bool callContext = false, bool autoComplete = false)
-            {
-                return _scope;
-            }
+            public IScope CreateScope(
+                IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+                RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+                IEventDispatcher eventDispatcher = null,
+                bool? scopeFileSystems = null,
+                bool callContext = false,
+                bool autoComplete = false) => _scope;
 
-            public IScope CreateDetachedScope(IsolationLevel isolationLevel = IsolationLevel.Unspecified, RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, IEventDispatcher eventDispatcher = null, bool? scopeFileSystems = null)
-            {
-                throw new NotImplementedException();
-            }
+            public IScope CreateDetachedScope(
+                IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+                RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+                IEventDispatcher eventDispatcher = null,
+                bool? scopeFileSystems = null) => throw new NotImplementedException();
 
-            public void AttachScope(IScope scope, bool callContext = false)
-            {
-                throw new NotImplementedException();
-            }
+            public void AttachScope(IScope scope, bool callContext = false) => throw new NotImplementedException();
 
-            public IScope DetachScope()
-            {
-                throw new NotImplementedException();
-            }
-
+            public IScope DetachScope() => throw new NotImplementedException();
 
 
             public IScopeContext Context { get; set; }
-            public ISqlContext SqlContext { get; set;  }
+
+            public ISqlContext SqlContext { get; set; }
 
 #if DEBUG_SCOPES
             public ScopeInfo GetScopeInfo(IScope scope)
@@ -63,7 +54,8 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void RunGoodMigration()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext =
+                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new GoodMigration(migrationContext);
             migration.Migrate();
         }
@@ -71,7 +63,8 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void DetectBadMigration1()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext =
+                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new BadMigration1(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
         }
@@ -79,7 +72,8 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void DetectBadMigration2()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext =
+                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new BadMigration2(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
         }
@@ -88,31 +82,28 @@ namespace Umbraco.Tests.Migrations
         {
             public GoodMigration(IMigrationContext context)
                 : base(context)
-            { }
-
-            public override void Migrate()
             {
-                Execute.Sql("").Do();
             }
+
+            public override void Migrate() => Execute.Sql("").Do();
         }
 
         public class BadMigration1 : MigrationBase
         {
             public BadMigration1(IMigrationContext context)
                 : base(context)
-            { }
-
-            public override void Migrate()
             {
-                Alter.Table("foo"); // stop here, don't Do it
             }
+
+            public override void Migrate() => Alter.Table("foo"); // stop here, don't Do it
         }
 
         public class BadMigration2 : MigrationBase
         {
             public BadMigration2(IMigrationContext context)
                 : base(context)
-            { }
+            {
+            }
 
             public override void Migrate()
             {
