@@ -15,7 +15,11 @@ namespace Umbraco.Core.Configuration.Models
         /// </summary>
         public ISet<string> BrowsableFileExtensions { get; set; } = new HashSet<string>(new[]
         {
-            ".html", ".css", ".js", ".jpg", ".jpeg", ".gif", ".png", ".svg"
+            ".html", // markup
+            ".css", // styles
+            ".js", // scripts
+            ".jpg", ".jpeg", ".gif", ".png", ".svg", // images
+            ".eot", ".ttf", ".woff" // fonts
         });
     }
 }
