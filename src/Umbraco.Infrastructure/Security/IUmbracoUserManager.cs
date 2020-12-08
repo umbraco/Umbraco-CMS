@@ -4,11 +4,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
 
     /// <summary>
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     /// <typeparam name="TUser">The type of user</typeparam>
     public interface IUmbracoUserManager<TUser> : IDisposable
-        where TUser : BackOfficeIdentityUser
+        where TUser : UmbracoIdentityUser
     {
         /// <summary>
         /// Gets the user id of a user
@@ -222,6 +223,19 @@ namespace Umbraco.Core.Security
         /// of the operation.
         /// </returns>
         Task<IdentityResult> CreateAsync(TUser user);
+
+
+        /// <summary>
+        /// Creates the specified <paramref name="user"/> in the backing store with a password,
+        /// as an asynchronous operation.
+        /// </summary>
+        /// <param name="user">The user to create.</param>
+        /// <param name="password">The password to add to the user.</param>
+        /// <returns>
+        /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
+        /// of the operation.
+        /// </returns>
+        Task<IdentityResult> CreateAsync(TUser user, string password);
 
         /// <summary>
         /// Generate a password for a user based on the current password validator

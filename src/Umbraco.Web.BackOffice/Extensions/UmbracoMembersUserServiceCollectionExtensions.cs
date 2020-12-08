@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core.Members;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -19,17 +19,17 @@ namespace Umbraco.Extensions
         {
             services.BuildUmbracoMembersIdentity()
                 .AddDefaultTokenProviders()
-                .AddUserStore<UmbracoMembersUserStore>()
-                .AddUserManager<IUmbracoMembersUserManager, UmbracoMembersUserManager>();
+                .AddUserStore<MembersUserStore>()
+                .AddUserManager<IMembersUserManager, MembersUserManager>();
         }
 
-        private static UmbracoMembersIdentityBuilder BuildUmbracoMembersIdentity(this IServiceCollection services)
+        private static MembersIdentityBuilder BuildUmbracoMembersIdentity(this IServiceCollection services)
         {
             // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<UmbracoMembersIdentityUser>, UserValidator<UmbracoMembersIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<UmbracoMembersIdentityUser>, PasswordValidator<UmbracoMembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<UmbracoMembersIdentityUser>, PasswordHasher<UmbracoMembersIdentityUser>>();
-            return new UmbracoMembersIdentityBuilder(services);
+            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
+            return new MembersIdentityBuilder(services);
         }
     }
 }

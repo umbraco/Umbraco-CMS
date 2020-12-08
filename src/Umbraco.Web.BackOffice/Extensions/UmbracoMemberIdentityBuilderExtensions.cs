@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Members;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Extensions
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="TUserManager">The type of the user manager to add.</typeparam>
         /// <typeparam name="TInterface"></typeparam>
         /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
-        public static IdentityBuilder AddUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder) where TUserManager : UserManager<UmbracoMembersIdentityUser>, TInterface
+        public static IdentityBuilder AddUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder) where TUserManager : UserManager<MembersIdentityUser>, TInterface
         {
             identityBuilder.AddUserManager<TUserManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));

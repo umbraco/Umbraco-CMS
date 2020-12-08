@@ -25,7 +25,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.Attributes;
@@ -35,7 +35,6 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
-using UmbracoMembersIdentityUser = Umbraco.Core.Members.UmbracoMembersIdentityUser;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -52,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IUmbracoMembersUserManager _memberManager;
+        private readonly IMembersUserManager _memberManager;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -84,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IUmbracoMembersUserManager memberManager,
+            IMembersUserManager memberManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
@@ -243,10 +242,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new ArgumentNullException(nameof(contentItem));
             }
 
-            if (ModelState.IsValid == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
-            }
+            // TODO: this causes an issue when trying to correct an invalid model 
+            //if (ModelState.IsValid == false)
+            //{
+            //    throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+            //}
 
             // If we've reached here it means:
             // * Our model has been bound
@@ -268,19 +268,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
             }
 
-            IMemberType memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
-            if (memberType == null)
-            {
-                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
-            }
-
-            // Create the member with the MemberManager
-            var identityMember = UmbracoMembersIdentityUser.CreateNew(
-                contentItem.Username,
-                contentItem.Email,
-                memberType.Alias,
-                contentItem.Name);
-
             // We're gonna look up the current roles now because the below code can cause
             // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
@@ -296,10 +283,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    UpdateMemberData(contentItem);
+                    await UpdateMemberDataAsync(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
-                    IdentityResult identityResult = await CreateMemberAsync(contentItem, identityMember);
+                    await CreateMemberAsync(contentItem);
                     break;
                 default:
                     // we don't support anything else for members
@@ -378,11 +365,24 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// All member password processing and creation is done via the identity manager
         /// </summary>
         /// <param name="contentItem">Member content data</param>
-        /// <param name="identityMember">The identity member to update</param>
         /// <returns>The identity result of the created member</returns>
-        private async Task<IdentityResult> CreateMemberAsync(MemberSave contentItem, UmbracoMembersIdentityUser identityMember)
+        private async Task<IdentityResult> CreateMemberAsync(MemberSave contentItem)
         {
+            IMemberType memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
+            if (memberType == null)
+            {
+                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
+            }
+
+            // Create the member with the MemberManager
+            var identityMember = MembersIdentityUser.CreateNew(
+                contentItem.Username,
+                contentItem.Email,
+                memberType.Alias,
+                contentItem.Name);
+
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
+
             if (created.Succeeded == false)
             {
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
@@ -404,6 +404,73 @@ namespace Umbraco.Web.BackOffice.Controllers
             member = _umbracoMapper.Map(contentItem, member);
             contentItem.PersistedContent = member;
             return created;
+        }
+
+        /// <summary>
+        /// Update the member security data
+        /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
+        /// </summary>
+        /// <param name="contentItem">The member to save</param>
+        private async Task UpdateMemberDataAsync(MemberSave contentItem)
+        {
+            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(((int)contentItem.Id).ToString());
+            if (identityMember == null)
+            {
+            }
+
+            IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
+
+            if (updatedResult.Succeeded == false)
+            {
+                throw HttpResponseException.CreateNotificationValidationErrorResponse(updatedResult.Errors.ToErrorMessage());
+            }
+
+            contentItem.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+
+            // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
+            // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
+            // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
+            // but we will take care of this in a generic way below so that it works for all props.
+            if (!_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
+            {
+                IMemberType memberType = _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+                var sensitiveProperties = memberType
+                    .PropertyTypes.Where(x => memberType.IsSensitiveProperty(x.Alias))
+                    .ToList();
+
+                foreach (IPropertyType sensitiveProperty in sensitiveProperties)
+                {
+                    ContentPropertyBasic destProp = contentItem.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+                    if (destProp != null)
+                    {
+                        // if found, change the value of the contentItem model to the persisted value so it remains unchanged
+                        object origValue = contentItem.PersistedContent.GetValue(sensitiveProperty.Alias);
+                        destProp.Value = origValue;
+                    }
+                }
+            }
+
+            bool isLockedOut = contentItem.IsLockedOut;
+
+            // if they were locked but now they are trying to be unlocked
+            if (contentItem.PersistedContent.IsLockedOut && isLockedOut == false)
+            {
+                contentItem.PersistedContent.IsLockedOut = false;
+                contentItem.PersistedContent.FailedPasswordAttempts = 0;
+            }
+            else if (!contentItem.PersistedContent.IsLockedOut && isLockedOut)
+            {
+                // NOTE: This should not ever happen unless someone is mucking around with the request data.
+                // An admin cannot simply lock a user, they get locked out by password attempts, but an admin can un-approve them
+                ModelState.AddModelError("custom", "An admin cannot lock a user");
+            }
+
+            // no password changes then exit ?
+            if (contentItem.Password != null)
+            {
+                // TODO: set the password using Identity core
+                contentItem.PersistedContent.RawPasswordValue = _memberManager.GeneratePassword();
+            }
         }
 
         private void ValidateMemberData(MemberSave contentItem)
@@ -433,13 +500,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
             {
-                Task<List<IdentityResult>> result = _memberManager.ValidatePassword(contentItem.Password.NewPassword);
-                if (result.Result.Exists(x => x.Succeeded == false))
-                {
-                    ModelState.AddPropertyError(
-                       new ValidationResult($"Invalid password: {MapErrors(result.Result)}", new[] { "value" }),
-                       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-                }
+                //TODO: should we validate the password here, in advance? or when saving the identity user
+                //Task<List<IdentityResult>> result = _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
+                //if (result.Result.Exists(x => x.Succeeded == false))
+                //{
+                //    ModelState.AddPropertyError(
+                //       new ValidationResult($"Invalid password: {MapErrors(result.Result)}", new[] { "value" }),
+                //       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+                //}
             }
         }
 
@@ -454,61 +522,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Update the member security data
-        /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
-        /// </summary>
-        /// <param name="memberSave">The member to save</param>
-        private void UpdateMemberData(MemberSave memberSave)
-        {
-            memberSave.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
-
-            // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
-            // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
-            // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
-            // but we will take care of this in a generic way below so that it works for all props.
-            if (!_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
-            {
-                IMemberType memberType = _memberTypeService.Get(memberSave.PersistedContent.ContentTypeId);
-                var sensitiveProperties = memberType
-                    .PropertyTypes.Where(x => memberType.IsSensitiveProperty(x.Alias))
-                    .ToList();
-
-                foreach (IPropertyType sensitiveProperty in sensitiveProperties)
-                {
-                    ContentPropertyBasic destProp = memberSave.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
-                    if (destProp != null)
-                    {
-                        // if found, change the value of the contentItem model to the persisted value so it remains unchanged
-                        object origValue = memberSave.PersistedContent.GetValue(sensitiveProperty.Alias);
-                        destProp.Value = origValue;
-                    }
-                }
-            }
-
-            var isLockedOut = memberSave.IsLockedOut;
-
-            // if they were locked but now they are trying to be unlocked
-            if (memberSave.PersistedContent.IsLockedOut && isLockedOut == false)
-            {
-                memberSave.PersistedContent.IsLockedOut = false;
-                memberSave.PersistedContent.FailedPasswordAttempts = 0;
-            }
-            else if (!memberSave.PersistedContent.IsLockedOut && isLockedOut)
-            {
-                // NOTE: This should not ever happen unless someone is mucking around with the request data.
-                // An admin cannot simply lock a user, they get locked out by password attempts, but an admin can un-approve them
-                ModelState.AddModelError("custom", "An admin cannot lock a user");
-            }
-
-            // no password changes then exit ?
-            if (memberSave.Password != null)
-            {
-                // TODO: set the password
-                memberSave.PersistedContent.RawPasswordValue = _memberManager.GeneratePassword();
-            }
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,11 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
@@ -22,10 +20,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
     {
         private Mock<IMemberService> _mockMemberService;
 
-        public UmbracoMembersUserStore CreateSut()
+        public MembersUserStore CreateSut()
         {
             _mockMemberService = new Mock<IMemberService>();
-            return new UmbracoMembersUserStore(
+            return new MembersUserStore(
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
                 new Mock<IScopeProvider>().Object);
@@ -35,7 +33,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public void GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
         {
             //arrange
-            UmbracoMembersUserStore sut = CreateSut();
+            MembersUserStore sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken(){};
 
             //act
@@ -50,8 +48,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             //arrange
-            UmbracoMembersUserStore sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser() { };
+            MembersUserStore sut = CreateSut();
+            MembersIdentityUser fakeUser = new MembersIdentityUser() { };
             CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);

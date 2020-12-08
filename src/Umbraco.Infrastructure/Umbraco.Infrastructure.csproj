@@ -102,4 +102,8 @@
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Members\" />
+    </ItemGroup>
+
 </Project>

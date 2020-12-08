@@ -3,10 +3,10 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Core.Security
 {
@@ -39,10 +39,10 @@ namespace Umbraco.Core.Security
                     target.EnableChangeTracking();
                 });
 
-            mapper.Define<IMember, UmbracoMembersIdentityUser>(
+            mapper.Define<IMember, MembersIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new UmbracoMembersIdentityUser();
+                    var target = new MembersIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -91,20 +91,20 @@ namespace Umbraco.Core.Security
             //target.Roles =;
         }
 
-        private void Map(IMember source, UmbracoMembersIdentityUser target)
+        private void Map(IMember source, MembersIdentityUser target)
         {
             target.Email = source.Email;
             target.UserName = source.Username;
-            //target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
-            //target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
             //target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
-            //target.AccessFailedCount = source.FailedPasswordAttempts;
+            target.AccessFailedCount = source.FailedPasswordAttempts;
             target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
             target.PasswordConfig = source.PasswordConfiguration;
             target.IsApproved = source.IsApproved;
             //target.SecurityStamp = source.SecurityStamp;
-            //target.LockoutEndDateUtc = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+            target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
         }
 
         private static string GetPasswordHash(string storedPass)

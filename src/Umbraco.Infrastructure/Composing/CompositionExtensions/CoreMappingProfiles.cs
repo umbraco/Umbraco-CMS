@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Mapping;
 

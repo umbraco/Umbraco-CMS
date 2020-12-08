@@ -1,52 +1,55 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Members;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
+using Umbraco.Net;
+using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
     public class UmbracoMemberIdentityUserManagerTests
     {
-        private Mock<IUserStore<UmbracoMembersIdentityUser>> _mockMemberStore;
-        private Mock<IOptions<UmbracoMembersIdentityOptions>> _mockIdentityOptions;
-        private Mock<IPasswordHasher<UmbracoMembersIdentityUser>> _mockPasswordHasher;
-        private Mock<IUserValidator<UmbracoMembersIdentityUser>> _mockUserValidators;
-        private Mock<IEnumerable<IPasswordValidator<UmbracoMembersIdentityUser>>> _mockPasswordValidators;
+        private Mock<IUserStore<MembersIdentityUser>> _mockMemberStore;
+        private Mock<IOptions<MembersIdentityOptions>> _mockIdentityOptions;
+        private Mock<IPasswordHasher<MembersIdentityUser>> _mockPasswordHasher;
+        private Mock<IUserValidator<MembersIdentityUser>> _mockUserValidators;
+        private Mock<IEnumerable<IPasswordValidator<MembersIdentityUser>>> _mockPasswordValidators;
         private Mock<ILookupNormalizer> _mockNormalizer;
         private IdentityErrorDescriber _mockErrorDescriber;
         private Mock<IServiceProvider> _mockServiceProviders;
-        private Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>> _mockLogger;
+        private Mock<ILogger<UserManager<MembersIdentityUser>>> _mockLogger;
         private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
-        public UmbracoMembersUserManager<UmbracoMembersIdentityUser> CreateSut()
+        public MembersUserManager CreateSut()
         {
-            _mockMemberStore = new Mock<IUserStore<UmbracoMembersIdentityUser>>();
-            _mockIdentityOptions = new Mock<IOptions<UmbracoMembersIdentityOptions>>();
+            _mockMemberStore = new Mock<IUserStore<MembersIdentityUser>>();
+            _mockIdentityOptions = new Mock<IOptions<MembersIdentityOptions>>();
 
-            var idOptions = new UmbracoMembersIdentityOptions { Lockout = { AllowedForNewUsers = false } };
+            var idOptions = new MembersIdentityOptions { Lockout = { AllowedForNewUsers = false } };
             _mockIdentityOptions.Setup(o => o.Value).Returns(idOptions);
-            _mockPasswordHasher = new Mock<IPasswordHasher<UmbracoMembersIdentityUser>>();
+            _mockPasswordHasher = new Mock<IPasswordHasher<MembersIdentityUser>>();
 
-            var userValidators = new List<IUserValidator<UmbracoMembersIdentityUser>>();
-            _mockUserValidators = new Mock<IUserValidator<UmbracoMembersIdentityUser>>();
-            var validator = new Mock<IUserValidator<UmbracoMembersIdentityUser>>();
+            var userValidators = new List<IUserValidator<MembersIdentityUser>>();
+            _mockUserValidators = new Mock<IUserValidator<MembersIdentityUser>>();
+            var validator = new Mock<IUserValidator<MembersIdentityUser>>();
             userValidators.Add(validator.Object);
 
-            _mockPasswordValidators = new Mock<IEnumerable<IPasswordValidator<UmbracoMembersIdentityUser>>>();
+            _mockPasswordValidators = new Mock<IEnumerable<IPasswordValidator<MembersIdentityUser>>>();
             _mockNormalizer = new Mock<ILookupNormalizer>();
             _mockErrorDescriber = new IdentityErrorDescriber();
             _mockServiceProviders = new Mock<IServiceProvider>();
-            _mockLogger = new Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>>();
+            _mockLogger = new Mock<ILogger<UserManager<MembersIdentityUser>>>();
             _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()
@@ -54,26 +57,28 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
                     
                 });
 
-            var pwdValidators = new List<PasswordValidator<UmbracoMembersIdentityUser>>
+            var pwdValidators = new List<PasswordValidator<MembersIdentityUser>>
             {
-                new PasswordValidator<UmbracoMembersIdentityUser>()
+                new PasswordValidator<MembersIdentityUser>()
             };
 
-            var userManager = new UmbracoMembersUserManager<UmbracoMembersIdentityUser>(
+            var userManager = new MembersUserManager(
+                new Mock<IIpResolver>().Object,
                 _mockMemberStore.Object,
                 _mockIdentityOptions.Object,
                 _mockPasswordHasher.Object,
                 userValidators,
                 pwdValidators,
-                new UpperInvariantLookupNormalizer(),
-                new IdentityErrorDescriber(),
+                new BackOfficeLookupNormalizer(),
+                new BackOfficeIdentityErrorDescriber(),
                 _mockServiceProviders.Object,
-                new Mock<ILogger<UserManager<UmbracoMembersIdentityUser>>>().Object,
+                new Mock<IHttpContextAccessor>().Object,
+                new Mock<ILogger<UserManager<MembersIdentityUser>>>().Object,
                 _mockPasswordConfiguration.Object);
 
             validator.Setup(v => v.ValidateAsync(
                     userManager,
-                    It.IsAny<UmbracoMembersIdentityUser>()))
+                    It.IsAny<MembersIdentityUser>()))
                 .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
             return userManager;
@@ -83,8 +88,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public async Task GivenICreateUser_AndTheIdentityResultFailed_ThenIShouldGetAFailedResultAsync()
         {
             //arrange
-            UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser()
+            MembersUserManager sut = CreateSut();
+            MembersIdentityUser fakeUser = new MembersIdentityUser()
             {
                 PasswordConfig = "testConfig"
             };
@@ -116,7 +121,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
         {
             //arrange
-            UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
+            MembersUserManager sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken() { };
             IdentityError[] identityErrors =
             {
@@ -144,8 +149,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
         public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             //arrange
-            UmbracoMembersUserManager<UmbracoMembersIdentityUser> sut = CreateSut();
-            UmbracoMembersIdentityUser fakeUser = new UmbracoMembersIdentityUser()
+            MembersUserManager sut = CreateSut();
+            MembersIdentityUser fakeUser = new MembersIdentityUser()
             {
                 PasswordConfig = "testConfig"
             };

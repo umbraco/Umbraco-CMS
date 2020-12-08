@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Core.Members;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.Integration.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
@@ -13,27 +12,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
     public class UmbracoMembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
         [Test]
-        public void AddUmbracoMembersIdentity_ExpectUmbracoMembersUserStoreResolvable()
+        public void AddUmbracoMembersIdentity_ExpectMembersUserStoreResolvable()
         {
-            var userStore = Services.GetService<IUserStore<UmbracoMembersIdentityUser>>();
+            IUserStore<MembersIdentityUser> userStore = Services.GetService<IUserStore<MembersIdentityUser>>();
 
             Assert.IsNotNull(userStore);
-            Assert.AreEqual(typeof(UmbracoMembersUserStore), userStore.GetType());
+            Assert.AreEqual(typeof(MembersUserStore), userStore.GetType());
         }
 
-        //[Test]
-        //public void AddUmbracoMembersIdentity_ExpectUmbracoMembersClaimsPrincipalFactoryResolvable()
-        //{
-        //    var principalFactory = Services.GetService<IUserClaimsPrincipalFactory<UmbracoMembersIdentityUser>>();
-
-        //    Assert.IsNotNull(principalFactory);
-        //    Assert.AreEqual(typeof(UmbracoMembersClaimsPrincipalFactory<UmbracoMembersIdentityUser>), principalFactory.GetType());
-        //}
-
         [Test]
-        public void AddUmbracoMembersIdentity_ExpectUmbracomMembersUserManagerResolvable()
+        public void AddUmbracoMembersIdentity_ExpectUmbracoMembersUserManagerResolvable()
         {
-            var userManager = Services.GetService<IUmbracoMembersUserManager>();
+            IMembersUserManager userManager = Services.GetService<IMembersUserManager>();
 
             Assert.NotNull(userManager);
         }

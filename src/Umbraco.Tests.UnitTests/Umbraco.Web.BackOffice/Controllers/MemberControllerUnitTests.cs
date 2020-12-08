@@ -11,14 +11,13 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Members;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 using Umbraco.Web;
@@ -72,7 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveNew_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IUmbracoMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
             IMemberService memberService,
@@ -101,7 +100,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_Save_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IUmbracoMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
             IMemberService memberService,
@@ -130,7 +129,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectSuccessResponse(
-            [Frozen] IUmbracoMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
             IMemberService memberService,
@@ -159,7 +158,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Setup all standard member data for test
         /// </summary>
-        private Member SetupMemberTestData(IUmbracoMembersUserManager umbracoMembersUserManager,
+        private Member SetupMemberTestData(IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             MapDefinitionCollection memberMapDefinition,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -170,7 +169,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             ContentSaveAction contentAction)
         {
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<UmbracoMembersIdentityUser>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
@@ -205,7 +204,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             UmbracoMapper mapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IUmbracoMembersUserManager membersUserManager,
+            IMembersUserManager membersUserManager,
             IDataTypeService dataTypeService,
             PropertyEditorCollection propertyEditorCollection,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor) =>

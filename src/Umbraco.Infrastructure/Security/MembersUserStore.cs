@@ -5,26 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Members;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Infrastructure.Members
+namespace Umbraco.Infrastructure.Security
 {
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class UmbracoMembersUserStore : DisposableObjectSlim,
+    public class MembersUserStore : DisposableObjectSlim,
         //IUserStore<UmbracoMembersIdentityUser>,
-        IUserPasswordStore<UmbracoMembersIdentityUser>
-        //IUserEmailStore<UmbracoMembersIdentityUser>
-        //IUserLoginStore<UmbracoMembersIdentityUser>
-        //IUserRoleStore<UmbracoMembersIdentityUser>,
-        //IUserSecurityStampStore<UmbracoMembersIdentityUser>
-        //IUserLockoutStore<UmbracoMembersIdentityUser>
-        //IUserTwoFactorStore<UmbracoMembersIdentityUser>
-        //IUserSessionStore<UmbracoMembersIdentityUser>
+        IUserPasswordStore<MembersIdentityUser>
+    //IUserEmailStore<UmbracoMembersIdentityUser>
+    //IUserLoginStore<UmbracoMembersIdentityUser>
+    //IUserRoleStore<UmbracoMembersIdentityUser>,
+    //IUserSecurityStampStore<UmbracoMembersIdentityUser>
+    //IUserLockoutStore<UmbracoMembersIdentityUser>
+    //IUserTwoFactorStore<UmbracoMembersIdentityUser>
+    //IUserSessionStore<UmbracoMembersIdentityUser>
     {
         private readonly bool _disposed = false;
         private readonly IMemberService _memberService;
@@ -32,12 +31,12 @@ namespace Umbraco.Infrastructure.Members
         private readonly IScopeProvider _scopeProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoMembersUserStore"/> class for the members identity store
+        /// Initializes a new instance of the <see cref="MembersUserStore"/> class for the members identity store
         /// </summary>
         /// <param name="memberService">The member service</param>
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
-        public UmbracoMembersUserStore(IMemberService memberService, UmbracoMapper mapper, IScopeProvider scopeProvider)
+        public MembersUserStore(IMemberService memberService, UmbracoMapper mapper, IScopeProvider scopeProvider)
         {
             _memberService = memberService;
             _mapper = mapper;
@@ -47,10 +46,10 @@ namespace Umbraco.Infrastructure.Members
         /// <summary>
         /// Create the member as an identity user
         /// </summary>
-        /// <param name="user">The identity user` for a member</param>
+        /// <param name="user">The identity user for a member</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The identity result</returns>
-        public Task<IdentityResult> CreateAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
+        public Task<IdentityResult> CreateAsync(MembersIdentityUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -62,23 +61,23 @@ namespace Umbraco.Infrastructure.Members
             // create member
             // TODO: are we keeping this method, e.g. the Member Service?
             // The user service creates it directly, but this way we get the member type by alias first
-            IMember member = _memberService.CreateMember(
+            IMember memberEntity = _memberService.CreateMember(
                 user.UserName,
                 user.Email,
                 user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
                 user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
 
-            UpdateMemberProperties(member, user);
+            UpdateMemberProperties(memberEntity, user);
 
             // TODO: do we want to accept empty passwords here - if third-party for example?
             // In other method if so?
-            _memberService.Save(member);
+            _memberService.Save(memberEntity);
 
             // re-assign id
-            user.Id = member.Id;
+            user.Id = UserIdToString(memberEntity.Id);
 
-            // TODO: [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-            //bool isLoginsPropertyDirty = member.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.Logins));
+            // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+            bool isLoginsPropertyDirty = memberEntity.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
 
             //if (isLoginsPropertyDirty)
             //{
@@ -90,7 +89,7 @@ namespace Umbraco.Infrastructure.Members
             //            x.UserData)));
             //}
 
-            if (!member.HasIdentity)
+            if (!memberEntity.HasIdentity)
             {
                 throw new DataException("Could not create the member, check logs for details");
             }
@@ -121,19 +120,19 @@ namespace Umbraco.Infrastructure.Members
             //}
         }
 
-        private bool UpdateMemberProperties(IMember member, UmbracoMembersIdentityUser memberIdentityUser)
+        private bool UpdateMemberProperties(IMember member, MembersIdentityUser memberIdentityUser)
         {
             var anythingChanged = false;
 
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
-            if (memberIdentityUser.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.Name)) &&
+            if (memberIdentityUser.IsPropertyDirty(nameof(MembersIdentityUser.Name)) &&
                 member.Name != memberIdentityUser.Name && memberIdentityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 member.Name = memberIdentityUser.Name;
             }
 
-            if (memberIdentityUser.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.Email)) &&
+            if (memberIdentityUser.IsPropertyDirty(nameof(MembersIdentityUser.Email)) &&
                 member.Email != memberIdentityUser.Email && memberIdentityUser.Email.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
@@ -152,14 +151,14 @@ namespace Umbraco.Infrastructure.Members
                 }
             }
 
-            if (memberIdentityUser.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.UserName)) &&
+            if (memberIdentityUser.IsPropertyDirty(nameof(MembersIdentityUser.UserName)) &&
                 member.Username != memberIdentityUser.UserName && memberIdentityUser.UserName.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 member.Username = memberIdentityUser.UserName;
             }
-           
-            if (memberIdentityUser.IsPropertyDirty(nameof(UmbracoMembersIdentityUser.PasswordHash))
+
+            if (memberIdentityUser.IsPropertyDirty(nameof(MembersIdentityUser.PasswordHash))
                 && member.RawPasswordValue != memberIdentityUser.PasswordHash && memberIdentityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
@@ -204,17 +203,17 @@ namespace Umbraco.Infrastructure.Members
             return anythingChanged;
         }
 
-        public Task<IdentityResult> DeleteAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
+        public Task<IdentityResult> DeleteAsync(MembersIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<UmbracoMembersIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public Task<MembersIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<UmbracoMembersIdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<MembersIdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             // TODO: confirm logic
             cancellationToken.ThrowIfCancellationRequested();
@@ -226,17 +225,17 @@ namespace Umbraco.Infrastructure.Members
                 return null;
             }
 
-            UmbracoMembersIdentityUser result = _mapper.Map<UmbracoMembersIdentityUser>(member);
+            MembersIdentityUser result = _mapper.Map<MembersIdentityUser>(member);
 
             return await Task.FromResult(result);
         }
 
-        public Task<string> GetNormalizedUserNameAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedUserNameAsync(MembersIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetUserIdAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(MembersIdentityUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -248,7 +247,7 @@ namespace Umbraco.Infrastructure.Members
             return Task.FromResult(user.Id.ToString());
         }
 
-        public Task<string> GetUserNameAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserNameAsync(MembersIdentityUser user, CancellationToken cancellationToken)
         {
             // TODO: unit tests for and implement all bodies  
             cancellationToken.ThrowIfCancellationRequested();
@@ -268,7 +267,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="normalizedName">The normalized member name</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>A task once complete</returns>
-        public Task SetNormalizedUserNameAsync(UmbracoMembersIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
+        public Task SetNormalizedUserNameAsync(MembersIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <summary>
         /// Sets the user name as an async operation
@@ -277,7 +276,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="userName">The member user name</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>A task once complete</returns>
-        public Task SetUserNameAsync(UmbracoMembersIdentityUser user, string userName, CancellationToken cancellationToken)
+        public Task SetUserNameAsync(MembersIdentityUser user, string userName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -296,7 +295,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="member">The member identity user</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>An identity result task</returns>
-        public Task<IdentityResult> UpdateAsync(UmbracoMembersIdentityUser member, CancellationToken cancellationToken)
+        public Task<IdentityResult> UpdateAsync(MembersIdentityUser member, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -358,7 +357,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="cancellationToken">The cancellation token</param>
         /// <exception cref="ArgumentException">Throws if the properties are null</exception>
         /// <returns>Returns asynchronously</returns>
-        public Task SetPasswordHashAsync(UmbracoMembersIdentityUser user, string passwordHash, CancellationToken cancellationToken = default(CancellationToken))
+        public Task SetPasswordHashAsync(MembersIdentityUser user, string passwordHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -392,7 +391,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="cancellationToken"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns/>
-        public Task<string> GetPasswordHashAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<string> GetPasswordHashAsync(MembersIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -410,7 +409,7 @@ namespace Umbraco.Infrastructure.Members
         /// <param name="user">The identity user</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the user has a password</returns>
-        public Task<bool> HasPasswordAsync(UmbracoMembersIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> HasPasswordAsync(MembersIdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -421,5 +420,6 @@ namespace Umbraco.Infrastructure.Members
 
             return Task.FromResult(string.IsNullOrEmpty(user.PasswordHash) == false);
         }
+        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
     }
 }
