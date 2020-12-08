@@ -392,7 +392,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMember member = _memberService.GetByEmail(contentItem.Email);
 
             member.CreatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
-            // should this be removed since we've moved passwords out?
+            // TODO: should this be removed since we've moved passwords out?
 
             member.RawPasswordValue = identityMember.PasswordHash;
             member.Comments = contentItem.Comments;

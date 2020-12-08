@@ -28,6 +28,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
             Assert.NotNull(userManager);
         }
 
-        protected override Action<IServiceCollection> CustomTestSetup => (services) => services.AddUmbracoMembersIdentity();
+        protected override Action<IServiceCollection> CustomTestSetup => (services) => services.AddMembersIdentity();
     }
 }

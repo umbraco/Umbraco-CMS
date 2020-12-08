@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddRuntimeMinifier()
                 .AddBackOffice()
                 .AddBackOfficeIdentity()
-                .AddUmbracoMembersIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
                 //.WithMiniProfiler() // we don't want this running in tests
