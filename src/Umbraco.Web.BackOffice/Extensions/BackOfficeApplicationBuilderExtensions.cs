@@ -1,8 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Middleware;
+using Umbraco.Web.BackOffice.Plugins;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Security;
 
@@ -21,6 +26,7 @@ namespace Umbraco.Extensions
             app.UseRequestLocalization();
             app.UseUmbracoRequestLogging();
             app.UseUmbracoBackOffice();
+            app.UseUmbracoPlugins();
             app.UseUmbracoPreview();
             app.UseUmbracoInstaller();
 
@@ -57,6 +63,20 @@ namespace Umbraco.Extensions
             return app;
         }
 
+        public static IApplicationBuilder UseUmbracoPlugins(this IApplicationBuilder app)
+        {
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new UmbracoPluginPhysicalFileProvider(
+                    app.ApplicationServices.GetRequiredService<IHostingEnvironment>().MapPathContentRoot(Constants.SystemDirectories.AppPlugins),
+                    app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>()),
+                RequestPath = Constants.SystemDirectories.AppPlugins
+            });
+
+            return app;
+        }
+
+
         public static IApplicationBuilder UseUmbracoPreview(this IApplicationBuilder app)
         {
             app.UseEndpoints(endpoints =>
@@ -67,7 +87,6 @@ namespace Umbraco.Extensions
 
             return app;
         }
-
         private static IApplicationBuilder UseBackOfficeUserManagerAuditing(this IApplicationBuilder app)
         {
             var auditer = app.ApplicationServices.GetRequiredService<BackOfficeUserManagerAuditer>();

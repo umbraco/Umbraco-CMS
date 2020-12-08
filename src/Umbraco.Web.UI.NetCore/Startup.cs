@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Extensions;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.UI.NetCore
 {
@@ -28,11 +28,14 @@ namespace Umbraco.Web.UI.NetCore
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
         /// <summary>
         /// Configures the services
         /// </summary>
+        /// <remarks>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        /// </remarks>
         public void ConfigureServices(IServiceCollection services)
         {
 #pragma warning disable IDE0022 // Use expression body for methods
