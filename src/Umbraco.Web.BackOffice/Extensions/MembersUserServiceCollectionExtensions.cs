@@ -1,29 +1,26 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
 using Umbraco.Infrastructure.Security;
-using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
-    public static class UmbracoMembersUserServiceCollectionExtensions
+    public static class MembersUserServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds the services required for using Umbraco Members Identity
+        /// Adds the services required for using Members Identity
         /// </summary>
         /// <param name="services"></param>
-        public static void AddUmbracoMembersIdentity(this IServiceCollection services)
+        public static void AddMembersIdentity(this IServiceCollection services)
         {
-            services.BuildUmbracoMembersIdentity()
+            services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<MembersUserStore>()
                 .AddUserManager<IMembersUserManager, MembersUserManager>();
         }
 
-        private static MembersIdentityBuilder BuildUmbracoMembersIdentity(this IServiceCollection services)
+        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
             // Services used by Umbraco members identity
             services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();

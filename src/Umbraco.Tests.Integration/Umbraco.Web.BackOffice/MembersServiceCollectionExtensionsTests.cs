@@ -9,10 +9,10 @@ using Umbraco.Tests.Integration.Testing;
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {
     [TestFixture]
-    public class UmbracoMembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
+    public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
         [Test]
-        public void AddUmbracoMembersIdentity_ExpectMembersUserStoreResolvable()
+        public void AddXMembersIdentity_ExpectMembersUserStoreResolvable()
         {
             IUserStore<MembersIdentityUser> userStore = Services.GetService<IUserStore<MembersIdentityUser>>();
 
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
         }
 
         [Test]
-        public void AddUmbracoMembersIdentity_ExpectUmbracoMembersUserManagerResolvable()
+        public void AddMembersIdentity_ExpectMembersUserManagerResolvable()
         {
             IMembersUserManager userManager = Services.GetService<IMembersUserManager>();
 

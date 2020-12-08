@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
                 .AddRuntimeMinifier()
                 .AddBackOffice()
                 .AddBackOfficeIdentity()
-                .AddUmbracoMembersIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies()
                 .AddMiniProfiler()
                 .AddMvcAndRazor()
@@ -54,9 +54,9 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        public static IUmbracoBuilder AddUmbracoMembersIdentity(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddMembersIdentity(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUmbracoMembersIdentity();
+            builder.Services.AddMembersIdentity();
 
             return builder;
         }
