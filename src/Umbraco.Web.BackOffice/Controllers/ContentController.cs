@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -127,20 +127,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _logger = loggerFactory.CreateLogger<ContentController>();
 
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
-
-        }
-
-        /// <summary>
-        /// Returns true if any content types have culture variation enabled
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        // TODO: We need to move this since we are going to delete OverrideAuthorization
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess), OverrideAuthorization]
-        public bool AllowsCultureVariation()
-        {
-            var contentTypes = _contentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.VariesByCulture());
         }
 
         /// <summary>
