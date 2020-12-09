@@ -373,7 +373,7 @@
   <area alias="dashboard">
     <key alias="browser">Prohlédnout svůj web</key>
     <key alias="dontShowAgain">- Skrýt</key>
-    <key alias="nothinghappens">Jestli se umbraco neotevírá, možná budete muset povolit na tomto webu vyskakovací okna</key>
+    <key alias="nothinghappens">Jestli se Umbraco neotevírá, možná budete muset povolit na tomto webu vyskakovací okna</key>
     <key alias="openinnew">byl otevřený v novém okně</key>
     <key alias="restart">Restart</key>
     <key alias="visit">Navštívit</key>
@@ -837,29 +837,29 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
-    <key alias="licenseText">Kliknutím na tlačítko následující (nebo modifikováním umbracoConfigurationStatus v souboru web.config) přijímáte licenci tohoto software tak, jak je uvedena v poli níže. Upozorňujeme, že tato distribuce Umbraca se skládá ze dvou různých licencí, open source MIT licence pro framework a umbraco freeware licence, která pokrývá UI.</key>
+    <key alias="licenseText">Kliknutím na tlačítko následující (nebo modifikováním umbracoConfigurationStatus v souboru web.config) přijímáte licenci tohoto software tak, jak je uvedena v poli níže. Upozorňujeme, že tato distribuce Umbraca se skládá ze dvou různých licencí, open source MIT licence pro framework a Umbraco freeware licence, která pokrývá UI.</key>
     <key alias="None">Není nainstalováno.</key>
     <key alias="permissionsAffectedFolders">Dotčené soubory a složky</key>
-    <key alias="permissionsAffectedFoldersMoreInfo">Další informace o nastavování oprávnění pro umbraco zde</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Další informace o nastavování oprávnění pro Umbraco zde</key>
     <key alias="permissionsAffectedFoldersText">Musíte udělit ASP.NET oprávnění měnit následující soubory/složky</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Vaše nastavení oprávnění je téměř dokonalé!</strong><br /><br />
-        Můžete provozovat umbraco bez potíží, ale nebudete smět instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
+        Můžete provozovat Umbraco bez potíží, ale nebudete smět instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
     <key alias="permissionsHowtoResolve">Jak to vyřešit</key>
     <key alias="permissionsHowtoResolveLink">Klikněte zde, chcete-li číst textovou verzi</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Shlédněte naše <strong>výukové video</strong> o nastavovaní oprávnění pro složky umbraca, nebo si přečtěte textovou verzi.]]></key>
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Vaše nastavení oprávnění může být problém!</strong>
       <br/><br />
-      Můžete provozovat umbraco bez potíží, ale nebudete smět vytvářet složky a instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
+      Můžete provozovat Umbraco bez potíží, ale nebudete smět vytvářet složky a instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
     <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro umbraco!</strong>
           <br /><br />
-          Abyste mohli umbraco provozovat, budete muset aktualizovat Vaše nastavení oprávnění.]]></key>
+          Abyste mohli Umbraco provozovat, budete muset aktualizovat Vaše nastavení oprávnění.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Vaše nastavení oprávnění je dokonalé!</strong><br /><br />
-              Jste připraveni provozovat umbraco a instalovat balíčky!]]></key>
+              Jste připraveni provozovat Umbraco a instalovat balíčky!]]></key>
     <key alias="permissionsResolveFolderIssues">Řešení potíží se složkami</key>
     <key alias="permissionsResolveFolderIssuesLink">Následujte tento odkaz pro další informace o potížích s ASP.NET a vytvářením složek.</key>
     <key alias="permissionsSettingUpPermissions">Nastavování oprávnění pro složky</key>
     <key alias="permissionsText"><![CDATA[
-      umbraco potřebuje oprávnění pro zápis/změnu k některým složkám, aby mohlo ukládat soubory jako například obrázky a PDF.
+      Umbraco potřebuje oprávnění pro zápis/změnu k některým složkám, aby mohlo ukládat soubory jako například obrázky a PDF.
       Také ukládá dočasná data (čili mezipaměť) pro zvýšení výkonu Vašeho webu.
     ]]></key>
     <key alias="runwayFromScratch">Chci začít od nuly</key>
@@ -898,7 +898,7 @@
     Abyste získali pomoc od naší oceňované komunity, projděte si dokumentaci, nebo si pusťte některá videa zdarma o tom, jak vytvořit jednoduchý web, jak používat balíčky a rychlý úvod do terminologie umbraca]]></key>
     <key alias="theEndHeader">Umbraco %0% je nainstalováno a připraveno k použití</key>
     <key alias="theEndInstallFailed"><![CDATA[Pro dokončení instalace budete muset ručně změnit <strong>soubor /web.config</strong> a upravit klíč AppSetting <strong>umbracoConfigurationStatus</strong> dole na hodnotu <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Můžete <strong>ihned začít</strong> kliknutím na tlačítko "Spustit Umbraco" níže. <br />Jestliže <strong>je pro Vás umbraco nové</strong>,
+    <key alias="theEndInstallSuccess"><![CDATA[Můžete <strong>ihned začít</strong> kliknutím na tlačítko "Spustit Umbraco" níže. <br />Jestliže <strong>je pro Vás Umbraco nové</strong>,
     spoustu zdrojů naleznete na naších stránkách "začínáme".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Spustit Umbraco</h3>
     Chcete-li spravovat Váš web, jednoduše přejděte do administrace umbraca a začněte přidávat obsah, upravovat šablony a stylopisy, nebo přidávat nové funkce]]></key>
@@ -1055,7 +1055,7 @@
 
       Mějte hezký den!
 
-      Zdraví umbraco robot
+      Zdraví Umbraco robot
     ]]></key>
     <key alias="mailBodyVariantSummary">Následující jazyky byly změněny %0%</key>
     <key alias="mailBodyHtml"><![CDATA[<p>Ahoj %0%</p>
@@ -1083,7 +1083,7 @@
 		  </div>
 
 		  <p>Mějte hezký den!<br /><br />
-			  Zdraví umbraco robot
+			  Zdraví Umbraco robot
 		  </p>]]></key>
     <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>Byly změněny následující jazyky:</p>
         %0%
@@ -1097,7 +1097,7 @@
     <key alias="createPackage">Vytvořit balíček</key>
     <key alias="chooseLocalPackageText"><![CDATA[
       Vyberte balíček ve svém počítači kliknutím na tlačítko Procházet<br />
-         a výběrem balíčku. Balíčky umbraco mají obvykle přípony ".umb" nebo ".zip".
+         a výběrem balíčku. Balíčky Umbraco mají obvykle přípony ".umb" nebo ".zip".
       ]]></key>
     <key alias="deletewarning">Tím se balíček odstraní</key>
     <key alias="dropHere">Přetáhněte sem pro nahrání</key>

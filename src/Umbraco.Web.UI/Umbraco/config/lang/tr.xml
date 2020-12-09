@@ -561,7 +561,7 @@
     <key alias="toolsDescription">Dizini yönetmek için araçlar</key>
     <key alias="fields">alanlar</key>
     <key alias="indexCannotRead">Dizin okunamıyor ve yeniden oluşturulması gerekecek</key>
-    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için umbraco günlüğünü kontrol edin</key>
+    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin</key>
     <key alias="indexCannotRebuild">Bu dizin, atanmış olmadığı için yeniden oluşturulamaz</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>

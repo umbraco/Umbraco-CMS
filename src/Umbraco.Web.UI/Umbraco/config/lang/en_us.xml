@@ -561,7 +561,7 @@
     <key alias="toolsDescription">Tools to manage the index</key>
     <key alias="fields">fields</key>
     <key alias="indexCannotRead">The index cannot be read and will need to be rebuilt</key>
-    <key alias="processIsTakingLonger">The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation</key>
+    <key alias="processIsTakingLonger">The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation</key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>

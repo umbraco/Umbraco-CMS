@@ -589,7 +589,7 @@
         <key alias="toolsDescription">Offer i reoli'r mynegai</key>
         <key alias="fields">meysydd</key>
         <key alias="indexCannotRead">Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu</key>
-        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
+        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
         <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
         <key alias="iIndexPopulator">IIndexPopulator</key>
     </area>
