@@ -55,6 +55,9 @@ namespace Umbraco.Core.Manifest
         [JsonProperty("contentApps")]
         public ManifestContentAppDefinition[] ContentApps { get; set; } = Array.Empty<ManifestContentAppDefinition>();
 
+        [JsonProperty("headerApps")]
+        public ManifestHeaderAppDefinition[] HeaderApps { get; set; } = Array.Empty<ManifestHeaderAppDefinition>();
+
         /// <summary>
         /// Gets or sets the dashboards listed in the manifest.
         /// </summary>

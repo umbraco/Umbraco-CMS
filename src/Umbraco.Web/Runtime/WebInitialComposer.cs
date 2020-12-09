@@ -40,6 +40,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.HeaderApps;
 
 namespace Umbraco.Web.Runtime
 {
@@ -244,6 +245,11 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>();
+
+            // register known content apps
+            composition.HeaderApps()
+                .Append<HelpHeaderAppFactory>()
+                .Append<SearchHeaderAppFactory>();
 
             // register back office sections in the order we want them rendered
             composition.Sections()
