@@ -190,7 +190,7 @@ namespace Umbraco.Web.Website.Routing
         {
             ControllerActionDescriptor descriptor = _actionDescriptorCollectionProvider.ActionDescriptors.Items
                 .Cast<ControllerActionDescriptor>()
-                .First(x =>
+                .FirstOrDefault(x =>
                     x.ControllerName.Equals(controllerName));
 
             return descriptor?.ControllerTypeInfo;

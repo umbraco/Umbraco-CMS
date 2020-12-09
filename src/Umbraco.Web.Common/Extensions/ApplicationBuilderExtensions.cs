@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Extensions
 {
@@ -36,6 +37,7 @@ namespace Umbraco.Extensions
             // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
             // before endpoint routing middleware.
             app.UseUmbracoRouting();
+            app.UseUmbracoContentCache();
 
             app.UseStatusCodePages();
 
@@ -173,6 +175,16 @@ namespace Umbraco.Extensions
             app.UseSmidge();
             app.UseSmidgeNuglify();
 
+            return app;
+        }
+
+        /// <summary>
+        /// Enables the Umbraco content cache
+        /// </summary>
+        public static IApplicationBuilder UseUmbracoContentCache(this IApplicationBuilder app)
+        {
+            PublishedSnapshotServiceEventHandler publishedContentEvents = app.ApplicationServices.GetRequiredService<PublishedSnapshotServiceEventHandler>();
+            publishedContentEvents.Start();
             return app;
         }
 

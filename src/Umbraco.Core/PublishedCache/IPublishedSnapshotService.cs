@@ -11,8 +11,6 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     public interface IPublishedSnapshotService : IDisposable
     {
-        #region PublishedSnapshot
-
         /* Various places (such as Node) want to access the XML content, today as an XmlDocument
          * but to migrate to a new cache, they're migrating to an XPathNavigator. Still, they need
          * to find out how to get that navigator.
@@ -24,6 +22,8 @@ namespace Umbraco.Web.PublishedCache
          * snapshot". This is provided by the IPublishedSnapshotAccessor.
          *
          */
+
+        void LoadCachesOnStartup();
 
         /// <summary>
         /// Creates a published snapshot.
@@ -47,20 +47,26 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>A value indicating whether the published snapshot has the proper environment to run.</returns>
         bool EnsureEnvironment(out IEnumerable<string> errors);
 
-        #endregion
-
         #region Rebuild
 
         /// <summary>
         /// Rebuilds internal caches (but does not reload).
         /// </summary>
+        /// <param name="groupSize">The operation batch size to process the items</param>
+        /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>
+        /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
+        /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
         /// <remarks>
         /// <para>Forces the snapshot service to rebuild its internal caches. For instance, some caches
         /// may rely on a database table to store pre-serialized version of documents.</para>
         /// <para>This does *not* reload the caches. Caches need to be reloaded, for instance via
         /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
         /// </remarks>
-        void Rebuild();
+        void Rebuild(
+            int groupSize = 5000,
+            IReadOnlyCollection<int> contentTypeIds = null,
+            IReadOnlyCollection<int> mediaTypeIds = null,
+            IReadOnlyCollection<int> memberTypeIds = null);
 
         #endregion
 
@@ -84,11 +90,11 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>A preview token.</returns>
         /// <remarks>
         /// <para>Tells the caches that they should prepare any data that they would be keeping
-        /// in order to provide preview to a give user. In the Xml cache this means creating the Xml
+        /// in order to provide preview to a given user. In the Xml cache this means creating the Xml
         /// file, though other caches may do things differently.</para>
         /// <para>Does not handle the preview token storage (cookie, etc) that must be handled separately.</para>
         /// </remarks>
-        string EnterPreview(IUser user, int contentId);
+        string EnterPreview(IUser user, int contentId); // TODO: Remove this, it is not needed and is legacy from the XML cache
 
         /// <summary>
         /// Refreshes preview for a specified content.
@@ -98,7 +104,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>Tells the caches that they should update any data that they would be keeping
         /// in order to provide preview to a given user. In the Xml cache this means updating the Xml
         /// file, though other caches may do things differently.</remarks>
-        void RefreshPreview(string previewToken, int contentId);
+        void RefreshPreview(string previewToken, int contentId); // TODO: Remove this, it is not needed and is legacy from the XML cache
 
         /// <summary>
         /// Exits preview for a specified preview token.
@@ -110,7 +116,7 @@ namespace Umbraco.Web.PublishedCache
         /// though other caches may do things differently.</para>
         /// <para>Does not handle the preview token storage (cookie, etc) that must be handled separately.</para>
         /// </remarks>
-        void ExitPreview(string previewToken);
+        void ExitPreview(string previewToken); // TODO: Remove this, it is not needed and is legacy from the XML cache
 
         #endregion
 
@@ -162,13 +168,11 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
-        #region Status
-
+        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
         string GetStatus();
 
+        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
         string StatusUrl { get; }
-
-        #endregion
 
         void Collect();
     }

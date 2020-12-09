@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 

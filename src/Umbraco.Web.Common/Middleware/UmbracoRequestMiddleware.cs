@@ -55,7 +55,7 @@ namespace Umbraco.Web.Common.Middleware
                 return;
             }
 
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext
+            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext, TODO: Why?
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             try
