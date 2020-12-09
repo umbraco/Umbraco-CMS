@@ -9,7 +9,7 @@
             <div ng-repeat="layout in vm.layout track by layout.$block.key">
 
                 <button type="button"
-                        class="btn-reset umb-block-list__block--create-button"
+                        class="btn-reset umb-block-list__block-create-button"
                         ng-click="vm.showCreateDialog($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
@@ -60,6 +60,5 @@
         view="vm.blockTypePicker.view"
         model="vm.blockTypePicker">
     </umb-overlay>
-
 
 </div>
