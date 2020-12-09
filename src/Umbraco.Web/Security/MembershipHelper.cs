@@ -119,7 +119,7 @@ namespace Umbraco.Web.Security
             {
                 pathsWithAccess.TryGetValue(path, out var hasAccess);
                 // if it's not found it's false anyways
-                result[path] = hasAccess;
+                result[path] = !pathsWithProtection.Contains(path) || hasAccess;
             }
             return result;
         }
