@@ -18,13 +18,11 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -195,6 +193,7 @@ namespace Umbraco.Core.DependencyInjection
             builder.Services.Configure<TypeFinderSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigTypeFinder));
             builder.Services.Configure<UserPasswordConfigurationSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigUserPassword));
             builder.Services.Configure<WebRoutingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigWebRouting));
+            builder.Services.Configure<UmbracoPluginSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigPlugins));
 
             return builder;
         }
