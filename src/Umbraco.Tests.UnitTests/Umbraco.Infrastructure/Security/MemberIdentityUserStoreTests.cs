@@ -13,10 +13,10 @@ using Umbraco.Core.Services;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Members
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
-    public class UmbracoMemberIdentityUserStoreTests
+    public class MemberIdentityUserStoreTests
     {
         private Mock<IMemberService> _mockMemberService;
 
