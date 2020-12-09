@@ -818,8 +818,8 @@
     <key alias="databaseNotFound"><![CDATA[<p>Databáze nenalezena! Zkontrolujte, prosím, že informace v "připojovacím řetězci" souboru "web.config" jsou správné.</p>
               <p>Pro pokračování otevřete, prosím, soubor "web.config" (za pužití Visual Studia nebo Vašeho oblíbeného tedtového editoru), přejděte na jeho konec, přidejte připojovací řetězec pro Vaši databázi v klíčí nazvaném "umbracoDbDSN" a soubor uložte. </p>
               <p>
-              Klikněte na tlačítko <strong>zopakovat</strong>, až budete hotovi.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
-			              Další informace o editování souboru web.config zde.</a></p>]]></key>
+              Klikněte na tlačítko <strong>zopakovat</strong>, až budete hotovi.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Další informace o editování souboru web.config zde</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Pro dokončení tohoto kroku potřebujete znát některé informace týkající se Vašeho databázového serveru ("připojovací řetězec").<br />
         Pokud je to nezbytné, kontaktujte vašeho poskytovatele hostingu.
         Jestliže instalujete na místní počítač nebo server, budete potřebovat informace od Vašeho systémového administrátora.]]></key>
@@ -865,7 +865,7 @@
     <key alias="runwayFromScratch">Chci začít od nuly</key>
     <key alias="runwayFromScratchText"><![CDATA[
         V tuto chíli je Váš web úplně prázdný, takže je ideální chvíle začít od nuly a vytvořit si vlastní typy dokumentu a šablon.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">zjistěte jak</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">zjistěte jak</a>)
         Stále se můžete později rozhodnout nainstalovat Runway. Za tím účelem navštivte Vývojářskou sekci a zvolte Balíčky.
       ]]></key>
     <key alias="runwayHeader">Právě jste vytvořili čistou platformu Umbraco. Co chcete dělat dále?</key>
@@ -929,7 +929,7 @@
     <key alias="instruction">přihlašte se níže</key>
     <key alias="signInWith">Přihlásit se pomocí</key>
     <key alias="timeout">Relace vypršela</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
     <key alias="forgottenPassword">Zapomenuté heslo?</key>
     <key alias="forgottenPasswordInstruction">Na uvedenou adresu bude zaslán e-mail s odkazem pro obnovení hesla</key>
     <key alias="requestPasswordResetConfirmation">Pokud odpovídá našim záznamům, bude na zadanou adresu zaslán e-mail s pokyny k obnovení hesla</key>
@@ -2104,7 +2104,7 @@
     <key alias="checkGroup">Zkontrolovat skupinu</key>
     <key alias="helpText">
         <![CDATA[
-        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
+        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
         ]]>
     </key>
   </area>
@@ -2309,7 +2309,7 @@
     <key alias="trainingHeadline">Hodiny tréninkových videí Umbraco jsou blíž než si myslíte</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p> Chcete ovládnout Umbraco? Stačí strávit pár minut sledování jednoho z těchto videí o používání Umbraco. Nebo navštivte <a href="http://umbraco.tv" target="_blank"> umbraco.tv </a>, kde najdete ještě více videí o Umbraco </p>
+        <p> Chcete ovládnout Umbraco? Stačí strávit pár minut sledování jednoho z těchto videí o používání Umbraco. Nebo navštivte <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a>, kde najdete ještě více videí o Umbraco </p>
     ]]>
     </key>
     <key alias="getStarted">Chcete-li začít</key>
@@ -2320,27 +2320,27 @@
     <key alias="more">Zjistit více</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank"> v sekci Dokumentace </a> v Our Umbraco
+            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Zeptejte se na <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank"> fóru komunity </a>
+            Zeptejte se na <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">fóru komunity</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Podívejte se na naše <a class="btn-link -underline" href="https://umbraco.tv" target="_blank"> výuková videa </a> (některá jsou zdarma, jiná vyžadují předplatné)
+            Podívejte se na naše <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">výuková videa</a> (některá jsou zdarma, jiná vyžadují předplatné)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Další informace o našich <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank"> nástrojích zvyšujících produktivitu a komerční podpoře </a>
+            Další informace o našich <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">nástrojích zvyšujících produktivitu a komerční podpoře</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Zjistěte více o možnostech <a class="btn-link -underline" href="https://umbraco.com/training" target="_blank">školení a certifikace</a>
+            Zjistěte více o možnostech <a class="btn-link -underline" href="https://umbraco.com/training" target="_blank" rel="noopener">školení a certifikace</a>
         ]]>
     </key>
   </area>
