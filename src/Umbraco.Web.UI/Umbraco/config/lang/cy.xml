@@ -2761,7 +2761,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="blockHasChanges">Rydych chi wedi gwneud newidiadau i'r cynnwys hwn. Wyt ti'n siŵr eich bod chi am eu taflu ei fwrdd?</key>
         <key alias="confirmCancelBlockCreationHeadline">Gwaredu cread?</key>
         <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ydych chi'n siŵr eich bod chi'n am ganslo'r cread?]]></key>
-        <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn Mathau o Elfen.</key>
+        <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn blociau.</key>
     </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>

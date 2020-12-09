@@ -2360,7 +2360,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ben je zeker dat je deze wijzigingen wil verwerpen?]]></key>
       <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
       <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
-      <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in Element Types.</key>
+      <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in blokken.</key>
     </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Wat zijn Inhoudssjablonen?</key>
