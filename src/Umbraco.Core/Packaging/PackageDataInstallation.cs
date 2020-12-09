@@ -358,6 +358,16 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
+
+            // Handle Culture Specific NodeNames
+            // https://github.com/umbraco/Umbraco.Cloud.Issues/issues/135
+            const string nodeNamePrefix = "nodeName-";
+            foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.StartsWith(nodeNamePrefix)))
+            {
+                var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
+                content.SetCultureName(localizedNodeName.Value, newCulture);
+            }
+
             //Here we make sure that we take composition properties in account as well
             //otherwise we would skip them and end up losing content
             var propTypes = contentType.CompositionPropertyTypes.Any()
@@ -371,10 +381,13 @@ namespace Umbraco.Core.Packaging
                 {
                     var propertyValue = property.Value;
 
+                    // Handle properties language attributes
+                    var propertyLang = property.Attribute(XName.Get("lang"))?.Value;
+
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
                         //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);
+                        content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                     }
                 }
             }
