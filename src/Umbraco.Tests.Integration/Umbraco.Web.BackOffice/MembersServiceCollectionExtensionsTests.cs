@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
     public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
         [Test]
-        public void AddXMembersIdentity_ExpectMembersUserStoreResolvable()
+        public void AddMembersIdentity_ExpectMembersUserStoreResolvable()
         {
             IUserStore<MembersIdentityUser> userStore = Services.GetService<IUserStore<MembersIdentityUser>>();
 
