@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using Serilog;
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// Outputs a CLEF format JSON log at /App_Data/Logs/
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="loggingConfiguration"></param>
+        /// <param name="loggingConfiguration">The logging configuration</param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
         /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
         public static LoggerConfiguration OutputDefaultJsonFile(
@@ -135,13 +135,13 @@ namespace Umbraco.Core.Logging.Serilog
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration, LogEventLevel minimumLevel = LogEventLevel.Verbose, int? retainedFileCount = null)
         {
-            //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
-            //Ends with ..txt as Date is inserted before file extension substring
+            // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
+            // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(new CompactJsonFormatter(),
                 Path.Combine(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
-                rollingInterval: RollingInterval.Day, //Create a new JSON file every day
-                retainedFileCountLimit: retainedFileCount, //Setting to null means we keep all files - default is 31 days
+                rollingInterval: RollingInterval.Day, // Create a new JSON file every day
+                retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days
                 restrictedToMinimumLevel: minimumLevel);
 
             return logConfig;

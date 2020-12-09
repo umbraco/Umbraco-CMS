@@ -4,7 +4,6 @@ namespace Umbraco.Core.Configuration
     {
         Unknown = 0,
         Default,
-        AspNetTemp,
         EnvironmentTemp
     }
 }

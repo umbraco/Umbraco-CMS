@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
@@ -21,7 +21,7 @@ namespace Umbraco.Web
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
-        private IBackOfficeSecurity _backofficeSecurity;
+        private readonly IBackOfficeSecurity _backofficeSecurity;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -37,7 +37,11 @@ namespace Umbraco.Web
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor)
         {
-            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            if (publishedSnapshotService == null)
+            {
+                throw new ArgumentNullException(nameof(publishedSnapshotService));
+            }
+
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 

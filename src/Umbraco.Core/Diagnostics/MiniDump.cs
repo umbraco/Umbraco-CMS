@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -111,11 +111,14 @@ namespace Umbraco.Core.Diagnostics
                 // filter everywhere in our code = not!
                 var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-                var filepath = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data/MiniDump");
-                if (Directory.Exists(filepath) == false)
-                    Directory.CreateDirectory(filepath);
+                var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
 
-                var filename = Path.Combine(filepath, $"{DateTime.UtcNow:yyyyMMddTHHmmss}.{Guid.NewGuid().ToString("N").Substring(0, 4)}.dmp");
+                if (Directory.Exists(directory) == false)
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var filename = Path.Combine(directory, $"{DateTime.UtcNow:yyyyMMddTHHmmss}.{Guid.NewGuid().ToString("N").Substring(0, 4)}.dmp");
                 using (var stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
                 {
                     return Write(marchal, stream.SafeFileHandle, options, withException);
@@ -127,9 +130,12 @@ namespace Umbraco.Core.Diagnostics
         {
             lock (LockO)
             {
-                var filepath = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data/MiniDump");
-                if (Directory.Exists(filepath) == false) return true;
-                var count = Directory.GetFiles(filepath, "*.dmp").Length;
+                var directory = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data + "/MiniDump");
+                if (Directory.Exists(directory) == false)
+                {
+                    return true;
+                }
+                var count = Directory.GetFiles(directory, "*.dmp").Length;
                 return count < 8;
             }
         }

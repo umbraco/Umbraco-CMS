@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Moq;
@@ -6,7 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 {
     [TestFixture]
     public class SnapDictionaryTests

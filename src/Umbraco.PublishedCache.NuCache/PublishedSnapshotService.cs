@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -81,8 +81,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        //private static int _singletonCheck;
-
         public PublishedSnapshotService(
             PublishedSnapshotServiceOptions options,
             IMainDom mainDom,
@@ -110,9 +108,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IOptions<NuCacheSettings> config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
-            //if (Interlocked.Increment(ref _singletonCheck) > 1)
-            //    throw new Exception("Singleton must be instantiated only once!");
-
             _options = options;
             _mainDom = mainDom;
             _lifeTime = lifeTime;
