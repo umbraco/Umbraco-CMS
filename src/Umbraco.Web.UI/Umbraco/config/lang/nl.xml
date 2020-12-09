@@ -650,7 +650,6 @@
     <key alias="tableColMergeLeft">Plaats de cursor links van de twee cellen die je wilt samenvoegen</key>
     <key alias="tableSplitNotSplittable">Je kunt een cel die is samengevoegd niet delen</key>
     <key alias="propertyHasErrors">Deze eigenschap is ongeldig</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="options">Opties</key>
@@ -2361,6 +2360,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ben je zeker dat je deze wijzigingen wil verwerpen?]]></key>
       <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
       <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
+      <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in Element Types.</key>
     </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Wat zijn Inhoudssjablonen?</key>

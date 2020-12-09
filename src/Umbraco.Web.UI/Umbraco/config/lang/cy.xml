@@ -700,7 +700,6 @@
         <key alias="tableColMergeLeft">Symudwch y cyrchwr ar ochr chwith y ddwy gell yr ydych eisiau cyfuno</key>
         <key alias="tableSplitNotSplittable">Ni allwch hollti cell sydd heb ei gyfuno.</key>
         <key alias="propertyHasErrors">Mae gan briodwedd hon gwallau</key>
-        <key alias="errorPropertyEditorNotSupportedInElementTypes">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn Mathau o Elfen.</key>
         <key alias="xsltErrorHeader">Gwall yn y ffynhonnell XSLT</key>
         <key alias="xsltErrorText">Nid yw'r XSLTwedi'i achub gan ei fod yn cynnwys gwall(au)</key>
         <key alias="missingPropertyEditorErrorMessage">Mae gwall ffurfwedd gyda'r math o ddata sy'n cael ei ddefnyddio ar gyfer y priodwedd yma, gwiriwch y fath o ddata</key>
@@ -2762,6 +2761,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="blockHasChanges">Rydych chi wedi gwneud newidiadau i'r cynnwys hwn. Wyt ti'n siŵr eich bod chi am eu taflu ei fwrdd?</key>
         <key alias="confirmCancelBlockCreationHeadline">Gwaredu cread?</key>
         <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ydych chi'n siŵr eich bod chi'n am ganslo'r cread?]]></key>
+        <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn Mathau o Elfen.</key>
     </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>

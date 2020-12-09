@@ -648,7 +648,6 @@
     <key alias="tableColMergeLeft">Lütfen imleci birleştirmek istediğiniz iki hücrenin soluna yerleştirin</key>
     <key alias="tableSplitNotSplittable">Birleştirilmemiş bir hücreyi bölemezsiniz.</key>
     <key alias="propertyHasErrors">Bu özellik geçersiz</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="general">
     <key alias="about">Hakkında</key>
@@ -2575,6 +2574,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Oluşturmayı iptal etmek istediğinizden emin misiniz.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Hata!</key>
     <key alias="elementTypeDoesNotExistDescription">Bu bloğun ElementType'ı artık mevcut değil</key>
+    <key alias="propertyEditorNotSupported">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">İçerik Şablonları Nedir?</key>
