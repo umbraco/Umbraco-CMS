@@ -40,8 +40,6 @@ namespace Umbraco.Infrastructure.Security
             user.UserName = username;
             user.Email = email;
             user.MemberTypeAlias = memberTypeAlias;
-            // TODO: confirm if should be approved
-            user.IsApproved = true;
             user.Id = null;
             user.HasIdentity = false;
             user._name = name;

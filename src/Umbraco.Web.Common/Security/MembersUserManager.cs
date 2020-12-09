@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -40,102 +41,6 @@ namespace Umbraco.Web.Common.Security
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        
-        /// <summary>
-        /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
-        /// </summary>
-        /// <param name="user">The user</param>
-        /// <returns>True if the user is locked out, else false</returns>
-        /// <remarks>
-        /// In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking this for Umbraco we need to check both values
-        /// </remarks>
-        public override async Task<bool> IsLockedOutAsync(MembersIdentityUser user)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (user.IsApproved == false)
-            {
-                return true;
-            }
-
-            return await base.IsLockedOutAsync(user);
-        }
-
-        public override async Task<IdentityResult> AccessFailedAsync(MembersIdentityUser user)
-        {
-            IdentityResult result = await base.AccessFailedAsync(user);
-
-            // Slightly confusing: this will return a Success if we successfully update the AccessFailed count
-            if (result.Succeeded)
-            {
-                RaiseLoginFailedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-            }
-
-            return result;
-        }
-
-        public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
-        {
-            IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
-            if (result.Succeeded)
-            {
-                RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, userId);
-            }
-
-            return result;
-        }
-
-        public override async Task<IdentityResult> ChangePasswordAsync(MembersIdentityUser user, string currentPassword, string newPassword)
-        {
-            IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
-            if (result.Succeeded)
-            {
-                RaisePasswordChangedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-            }
-
-            return result;
-        }
-
-        /// <inheritdoc/>
-        public override async Task<IdentityResult> SetLockoutEndDateAsync(MembersIdentityUser user, DateTimeOffset? lockoutEnd)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            IdentityResult result = await base.SetLockoutEndDateAsync(user, lockoutEnd);
-
-            // The way we unlock is by setting the lockoutEnd date to the current datetime
-            if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
-            {
-                RaiseAccountLockedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-            }
-            else
-            {
-                RaiseAccountUnlockedEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-
-                // Resets the login attempt fails back to 0 when unlock is clicked
-                await ResetAccessFailedCountAsync(user);
-            }
-
-            return result;
-        }
-
-        /// <inheritdoc/>
-        public override async Task<IdentityResult> ResetAccessFailedCountAsync(MembersIdentityUser user)
-        {
-            IdentityResult result = await base.ResetAccessFailedCountAsync(user);
-
-            // raise the event now that it's reset
-            RaiseResetAccessFailedCountEvent(_httpContextAccessor.HttpContext?.User, user.Id);
-
-            return result;
-        }
-
         private string GetCurrentUserId(IPrincipal currentUser)
         {
             UmbracoBackOfficeIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
@@ -150,14 +55,8 @@ namespace Umbraco.Web.Common.Security
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
 
-        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, BackOfficeIdentityUser currentUser, string affectedUserId, string affectedUsername)
-        {
-            var currentUserId = currentUser.Id;
-            var ip = IpResolver.GetCurrentRequestIpAddress();
-            return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
-        }
 
-        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager,
+        // TODO: As per backoffice, review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager,
         // lastly we'll resort to the authentication controller but we should try to remove all instances of that occuring
         public void RaiseAccountLockedEvent(IPrincipal currentUser, string userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
 
@@ -181,10 +80,6 @@ namespace Umbraco.Web.Common.Security
             return args;
         }
 
-        public void RaisePasswordChangedEvent(IPrincipal currentUser, string userId) => OnPasswordChanged(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
-
-        public void RaiseResetAccessFailedCountEvent(IPrincipal currentUser, string userId) => OnResetAccessFailedCount(CreateArgs(AuditEvent.ResetAccessFailedCount, currentUser, userId, string.Empty));
-
         public UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser)
         {
             var currentUserId = GetCurrentUserId(currentUser);
@@ -196,9 +91,7 @@ namespace Umbraco.Web.Common.Security
 
         public bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
 
-        // TODO: These static events are problematic. Moving forward we don't want static events at all but we cannot
-        // have non-static events here because the user manager is a Scoped instance not a singleton
-        // so we'll have to deal with this a diff way i.e. refactoring how events are done entirely
+        // TODO: Comments re static events as per backofficeusermanager
         public static event EventHandler<IdentityAuditEventArgs> AccountLocked;
         public static event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
         public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;

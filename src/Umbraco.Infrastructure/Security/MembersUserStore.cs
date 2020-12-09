@@ -65,21 +65,18 @@ namespace Umbraco.Infrastructure.Security
             }
 
             // create member
-            // TODO: are we keeping this method, e.g. the Member Service?
-            // The user service creates it directly, but this way we get the member type by alias first
+            // TODO: are we keeping this method? The user service creates the member directly
+            // but this way we get the member type by alias first
             IMember memberEntity = _memberService.CreateMember(
                 user.UserName,
                 user.Email,
                 user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
                 user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
 
-            // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-            var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
 
             UpdateMemberProperties(memberEntity, user);
 
-            // TODO: do we want to accept empty passwords here - if third-party for example?
-            // In other method if so?
+            // create the member
             _memberService.Save(memberEntity);
 
             if (!memberEntity.HasIdentity)
@@ -90,7 +87,9 @@ namespace Umbraco.Infrastructure.Security
             // re-assign id
             user.Id = UserIdToString(memberEntity.Id);
 
-            //TODO: confirm re externallogins implementation
+            // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+            // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
+            // TODO: confirm re externallogins implementation
             //if (isLoginsPropertyDirty)
             //{
             //    _externalLoginService.Save(
@@ -101,9 +100,9 @@ namespace Umbraco.Infrastructure.Security
             //            x.UserData)));
             //}
 
-            return Task.FromResult(IdentityResult.Success);
-
             // TODO: confirm re roles implementations
+
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <inheritdoc />
@@ -230,7 +229,7 @@ namespace Umbraco.Infrastructure.Security
                 return string.IsNullOrEmpty(user.PasswordHash) == false;
             }
 
-            return result;
+            return false;
         }
 
         /// <inheritdoc />

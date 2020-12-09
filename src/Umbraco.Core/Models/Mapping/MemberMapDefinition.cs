@@ -9,7 +9,8 @@ namespace Umbraco.Core.Models.Mapping
         /// <inheritdoc />
         public void DefineMaps(UmbracoMapper mapper) => mapper.Define<MemberSave, IMember>(Map);
 
-        // mappers
+        //TODO: put this here instead of a new mapper definition (like user). Can move
+
         private static void Map(MemberSave source, IMember target, MapperContext context)
         {
             // TODO: ensure all properties are mapped as required
@@ -18,8 +19,8 @@ namespace Umbraco.Core.Models.Mapping
             target.Email = source.Email;
             target.Key = source.Key;
             target.Username = source.Username;
-            target.Id = (int)(long)source.Id;
             target.Comments = source.Comments;
+            //TODO: add groups as required
         }
     }
 }

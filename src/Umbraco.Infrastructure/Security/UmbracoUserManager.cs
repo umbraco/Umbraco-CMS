@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -109,6 +110,54 @@ namespace Umbraco.Core.Security
 
             var password = _passwordGenerator.GeneratePassword();
             return password;
+        }
+
+        /// <summary>
+        /// Generates a hashed password based on the default password hasher
+        /// No existing identity user is required and this does not validate the password
+        /// </summary>
+        /// <param name="password">The password to hash</param>
+        /// <returns>The hashed password</returns>
+        public string GeneratePassword(string password)
+        {
+            IPasswordHasher<TUser> passwordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
+
+            string hashedPassword = passwordHasher.HashPassword(null, password);
+            return hashedPassword;
+        }
+
+        /// <summary>
+        /// Used to validate the password without an identity user
+        /// Validation code is based on the default ValidatePasswordAsync code
+        /// Should return <see cref="IdentityResult.Success"/> if validation is successful
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
+        public async Task<IdentityResult> ValidatePasswordAsync(string password)
+        {
+            var errors = new List<IdentityError>();
+            var isValid = true;
+            foreach (IPasswordValidator<TUser> v in PasswordValidators)
+            {
+                IdentityResult result = await v.ValidateAsync(this, null, password);
+                if (!result.Succeeded)
+                {
+                    if (result.Errors.Any())
+                    {
+                        errors.AddRange(result.Errors);
+                    }
+
+                    isValid = false;
+                }
+            }
+
+            if (!isValid)
+            {
+                Logger.LogWarning(14, "Password validation failed: {errors}.", string.Join(";", errors.Select(e => e.Code)));
+                return IdentityResult.Failed(errors.ToArray());
+            }
+
+            return IdentityResult.Success;
         }
 
         /// <inheritdoc />

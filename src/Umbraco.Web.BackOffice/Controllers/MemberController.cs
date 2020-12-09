@@ -237,16 +237,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         [MemberSaveValidation]
         public async Task<ActionResult<MemberDisplay>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)
         {
-            if (contentItem == null)
-            {
-                throw new ArgumentNullException(nameof(contentItem));
-            }
-
-            if (ModelState.IsValid == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
-            }
-
             // If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -257,7 +247,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // map the properties to the persisted entity
             MapPropertyValues(contentItem);
 
-            ValidateMemberData(contentItem);
+            await ValidateMemberDataAsync(contentItem);
 
             // Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (ModelState.IsValid == false)
@@ -266,23 +256,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
             }
-
-            // We're gonna look up the current roles now because the below code can cause
-            // events to be raised and developers could be manually adding roles to members in
-            // their handlers. If we don't look this up now there's a chance we'll just end up
-            // removing the roles they've assigned.
-            IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
-
-            // find the ones to remove and remove them
-            IEnumerable<string> roles = currentRoles.ToList();
-            string[] rolesToRemove = roles.Except(contentItem.Groups).ToArray();
-
+            
             // Depending on the action we need to first do a create or update using the membership manager
             // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
+
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    await UpdateMemberDataAsync(contentItem);
+                    await UpdateMemberAsync(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
                     await CreateMemberAsync(contentItem);
@@ -295,22 +276,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // TODO: There's 3 things saved here and we should do this all in one transaction,
             // which we can do here by wrapping in a scope
             // but it would be nicer to have this taken care of within the Save method itself
-
-            // Now let's do the role provider stuff - now that we've saved the content item (that is important since
-            // if we are changing the username, it must be persisted before looking up the member roles).
-            if (rolesToRemove.Any())
-            {
-                _memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
-            }
-
-            // find the ones to add and add them
-            string[] toAdd = contentItem.Groups.Except(roles).ToArray();
-            if (toAdd.Any())
-            {
-                // add the ones submitted
-                _memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
-            }
-
+            
             // return the updated model
             MemberDisplay display = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
 
@@ -365,7 +331,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem">Member content data</param>
         /// <returns>The identity result of the created member</returns>
-        private async Task<IdentityResult> CreateMemberAsync(MemberSave contentItem)
+        private async Task CreateMemberAsync(MemberSave contentItem)
         {
             IMemberType memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
             if (memberType == null)
@@ -373,25 +339,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
             }
 
-            // Create the member with the MemberManager
             var identityMember = MembersIdentityUser.CreateNew(
                 contentItem.Username,
                 contentItem.Email,
                 memberType.Alias,
                 contentItem.Name);
 
-            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
-            {
-                // TODO: should we show the password rules?
-                Task<bool> isPasswordValid = _memberManager.CheckPasswordAsync(identityMember, contentItem.Password.NewPassword);
-                if (isPasswordValid.Result == false)
-                {
-                    ModelState.AddPropertyError(
-                        new ValidationResult($"Invalid password", new[] { "value" }),
-                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
-                }
-            }
-
+            // TODO: may not need to add password like this
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
 
             if (created.Succeeded == false)
@@ -402,19 +356,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             // now re-look the member back up which will now exist
             IMember member = _memberService.GetByEmail(contentItem.Email);
 
-            member.CreatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
-            // TODO: should this be removed since we've moved passwords out?
-
-            member.RawPasswordValue = identityMember.PasswordHash;
-            member.Comments = contentItem.Comments;
-
-            // since the back office user is creating this member, they will be set to approved
-            member.IsApproved = true;
+            var creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+            member.CreatorId = creatorId;
 
             // map the save info over onto the user
-            member = _umbracoMapper.Map(contentItem, member);
+            member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
+
+            // now the member has been saved via identity, resave the member with mapped content properties
+            _memberService.Save(member);
             contentItem.PersistedContent = member;
-            return created;
+
+            AddOrUpdateRoles(contentItem);
         }
 
         /// <summary>
@@ -422,20 +374,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
         /// </summary>
         /// <param name="contentItem">The member to save</param>
-        private async Task UpdateMemberDataAsync(MemberSave contentItem)
+        private async Task UpdateMemberAsync(MemberSave contentItem)
         {
-            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
-            if (identityMember == null)
-            {
-            }
-
-            IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
-
-            if (updatedResult.Succeeded == false)
-            {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(updatedResult.Errors.ToErrorMessage());
-            }
-
             contentItem.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
 
             // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
@@ -476,21 +416,59 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError("custom", "An admin cannot lock a user");
             }
 
-            // no password changes then exit ?
+            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+            if (identityMember == null)
+            {
+                throw HttpResponseException.CreateNotificationValidationErrorResponse("Member was not found");
+            }
+
             if (contentItem.Password != null)
             {
-                // TODO: set the password using Identity core
-                contentItem.PersistedContent.RawPasswordValue = _memberManager.GeneratePassword();
+                IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
+                if (validatePassword.Succeeded == false)
+                {
+                    throw HttpResponseException.CreateNotificationValidationErrorResponse(validatePassword.Errors.ToErrorMessage());
+                }
+
+                string newPassword = _memberManager.GeneratePassword(contentItem.Password.NewPassword);
+                identityMember.PasswordHash = newPassword;
             }
+
+            IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
+
+            if (updatedResult.Succeeded == false)
+            {
+                throw HttpResponseException.CreateNotificationValidationErrorResponse(updatedResult.Errors.ToErrorMessage());
+            }
+
+            contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
+
+            _memberService.Save(contentItem.PersistedContent);
+
+            AddOrUpdateRoles(contentItem);
         }
 
-        private void ValidateMemberData(MemberSave contentItem)
+        private async Task<bool> ValidateMemberDataAsync(MemberSave contentItem)
         {
             if (contentItem.Name.IsNullOrWhiteSpace())
             {
                 ModelState.AddPropertyError(
                     new ValidationResult("Invalid user name", new[] { "value" }),
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+                return false;
+            }
+
+            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            {
+                // TODO: this currently stops the user interacting with the client-side when invalid
+                IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
+                if (!validPassword.Succeeded)
+                {
+                    ModelState.AddPropertyError(
+                       new ValidationResult("Invalid password: " + MapErrors(validPassword.Errors), new[] { "value" }),
+                       $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
+                    return false;
+                }
             }
 
             IMember byUsername = _memberService.GetByUsername(contentItem.Username);
@@ -499,6 +477,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddPropertyError(
                     new ValidationResult("Username is already in use", new[] { "value" }),
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
+                return false;
             }
 
             IMember byEmail = _memberService.GetByEmail(contentItem.Email);
@@ -507,20 +486,55 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddPropertyError(
                     new ValidationResult("Email address is already in use", new[] { "value" }),
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
+                return false;
             }
+
+            return true;
         }
 
-        private string MapErrors(List<IdentityResult> result)
+        private string MapErrors(IEnumerable<IdentityError> result)
         {
             var sb = new StringBuilder();
-            IEnumerable<IdentityResult> errors = result.Where(x => x.Succeeded == false);
-
-            foreach (IdentityResult error in errors)
+            IEnumerable<IdentityError> identityErrors = result.ToList();
+            foreach (IdentityError error in identityErrors)
             {
-                sb.AppendLine(error.Errors.ToErrorMessage());
+                string errorString = $"{error.Description}";
+                sb.AppendLine(errorString);
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// TODO: refactor using identity roles
+        /// </summary>
+        /// <param name="contentItem"></param>
+        private void AddOrUpdateRoles(MemberSave contentItem)
+        {
+            // We're gonna look up the current roles now because the below code can cause
+            // events to be raised and developers could be manually adding roles to members in
+            // their handlers. If we don't look this up now there's a chance we'll just end up
+            // removing the roles they've assigned.
+            IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
+
+            // find the ones to remove and remove them
+            IEnumerable<string> roles = currentRoles.ToList();
+            string[] rolesToRemove = roles.Except(contentItem.Groups).ToArray();
+
+            // Now let's do the role provider stuff - now that we've saved the content item (that is important since
+            // if we are changing the username, it must be persisted before looking up the member roles).
+            if (rolesToRemove.Any())
+            {
+                _memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
+            }
+
+            // find the ones to add and add them
+            string[] toAdd = contentItem.Groups.Except(roles).ToArray();
+            if (toAdd.Any())
+            {
+                // add the ones submitted
+                _memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
+            }
         }
 
         /// <summary>

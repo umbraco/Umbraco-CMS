@@ -196,6 +196,8 @@ namespace Umbraco.Tests.Integration.Testing
             builder.AddRuntimeMinifier();
             builder.AddBackOffice();
             builder.AddBackOfficeIdentity();
+            builder.AddMembersIdentity();
+
 
             services.AddMvc();
 

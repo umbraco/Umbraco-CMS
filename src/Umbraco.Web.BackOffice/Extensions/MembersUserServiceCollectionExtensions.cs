@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Web.BackOffice.Extensions
 {
     public static class MembersUserServiceCollectionExtensions
     {

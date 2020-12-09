@@ -244,6 +244,23 @@ namespace Umbraco.Infrastructure.Security
         string GeneratePassword();
 
         /// <summary>
+        /// Generates a hashed password for a null user based on the default password hasher
+        /// </summary>
+        /// <param name="password">The password to hash</param>
+        /// <returns>The hashed password</returns>
+        string GeneratePassword(string password);
+
+        /// <summary>
+        /// Used to validate the password without an identity user
+        /// Validation code is based on the default ValidatePasswordAsync code
+        /// Should return <see cref="IdentityResult.Success"/> if validation is successful
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
+
+        Task<IdentityResult> ValidatePasswordAsync(string password);
+
+        /// <summary>
         /// Generates an email confirmation token for the specified user.
         /// </summary>
         /// <param name="user">The user to generate an email confirmation token for.</param>
