@@ -30,8 +30,10 @@
                                       ng-keyup="vm.change(translation)"
                                       ng-trim="false"></textarea>
                             <div class="help" ng-if="translation.nearMaxLimit">
-                                <p class="sr-only" tabindex="0">{{translation.displayName}} <localize key="textbox_characters_left" tokens="[vm.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize></p>
-                                <p aria-hidden="true"><localize key="textbox_characters_left" tokens="[vm.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize></p>
+                                <p tabindex="0">
+                                    <span class="sr-only">{{ translation.displayName }} </span>
+                                    <localize key="textbox_characters_left" tokens="[vm.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize>
+                                </p>
                             </div>
                         </umb-property>
                     </umb-box-content>
