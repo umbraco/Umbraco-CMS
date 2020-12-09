@@ -625,7 +625,6 @@
     <key alias="errorMandatoryWithoutTab">%0% is a mandatory field</key>
     <key alias="errorRegExp">%0% at %1% is not in a correct format</key>
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Received an error from the server</key>
@@ -643,6 +642,7 @@
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="propertyHasErrors">This property is invalid</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>

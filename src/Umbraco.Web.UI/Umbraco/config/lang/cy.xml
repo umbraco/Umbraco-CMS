@@ -676,7 +676,6 @@
         <key alias="errorMandatoryWithoutTab">%0% yn faes ofynnol</key>
         <key alias="errorRegExp">%0% yn %1% mewn fformat annilys</key>
         <key alias="errorRegExpWithoutTab">%0% mewn fformat annilys</key>
-        <key alias="errorPropertyEditorNotSupportedInElementTypes">Briodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim wedi ei chynnal yn y teipiau elfen.</key>
     </area>
     <area alias="errors">
         <key alias="receivedErrorFromServer">Derbynwyd gwall o'r gweinydd</key>

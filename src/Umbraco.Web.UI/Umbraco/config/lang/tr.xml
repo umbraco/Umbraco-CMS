@@ -631,7 +631,6 @@
     <key alias="errorMandatoryWithoutTab">%0% zorunlu bir alandır</key>
     <key alias="errorRegExp">%1% konumunda %0% doğru biçimde değil</key>
     <key alias="errorRegExpWithoutTab">%0% doğru biçimde değil</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Sunucudan bir hata aldı</key>
@@ -649,6 +648,7 @@
     <key alias="tableColMergeLeft">Lütfen imleci birleştirmek istediğiniz iki hücrenin soluna yerleştirin</key>
     <key alias="tableSplitNotSplittable">Birleştirilmemiş bir hücreyi bölemezsiniz.</key>
     <key alias="propertyHasErrors">Bu özellik geçersiz</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="general">
     <key alias="about">Hakkında</key>
