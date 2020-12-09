@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
         {
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
             //   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-            //   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
+            //   "directory URLs" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
             //   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
             //
             //   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors

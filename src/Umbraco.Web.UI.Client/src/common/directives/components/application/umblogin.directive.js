@@ -13,7 +13,10 @@
             }
         });
 
-    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
+    function UmbLoginController($scope, $location, currentUserResource, formHelper,
+        mediaHelper, umbRequestHelper, Upload, localizationService,
+        userService, externalLoginInfo, externalLoginInfoService,
+        resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
 
         const vm = this;
 
@@ -43,7 +46,15 @@
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
-        vm.externalLoginProviders = externalLoginInfo.providers;
+        vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
+        vm.externalLoginProviders.forEach(x => {
+            x.customView = externalLoginInfoService.getLoginProviderView(x);
+            // if there are errors set for this specific provider than assign them directly to the model
+            if (externalLoginInfo.errorProvider === x.authType) {
+                x.errors = externalLoginInfo.errors;
+            }
+        });
+        vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.logoImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImage;
@@ -63,7 +74,7 @@
         vm.setPasswordSubmit = setPasswordSubmit;
         vm.labels = {};
         localizationService.localizeMany([
-            vm.usernameIsEmail ? "general_email" : "general_username", 
+            vm.usernameIsEmail ? "general_email" : "general_username",
             vm.usernameIsEmail ? "placeholders_email" : "placeholders_usernameHint",
             vm.usernameIsEmail ? "placeholders_emptyEmail" : "placeholders_emptyUsername",
             "placeholders_emptyPassword"]
@@ -73,8 +84,10 @@
             vm.labels.usernameError = data[2];
             vm.labels.passwordError = data[3];
         });
-        
+
         vm.twoFactor = {};
+
+        vm.loginSuccess = loginSuccess;
 
         function onInit() {
 
@@ -99,11 +112,11 @@
 
                         //localize the text
                         localizationService.localize("errorHandling_errorInPasswordFormat", [
-                                vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
-                                vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
-                            ]).then(function (data) {
-                                vm.invitedUserPasswordModel.passwordPolicyText = data;
-                            });
+                            vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
+                            vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
+                        ]).then(function (data) {
+                            vm.invitedUserPasswordModel.passwordPolicyText = data;
+                        });
                     })
                 ]).then(function () {
                     vm.inviteStep = Number(inviteVal);
@@ -145,14 +158,14 @@
 
         function getStarted() {
             $location.search('invite', null);
-            if(vm.onLogin) {
+            if (vm.onLogin) {
                 vm.onLogin();
             }
         }
 
-        function inviteSavePassword () {
+        function inviteSavePassword() {
 
-            if (formHelper.submitForm({ scope: $scope })) {
+            if (formHelper.submitForm({ scope: $scope, formCtrl: vm.inviteUserPasswordForm })) {
 
                 vm.invitedUserPasswordModel.buttonState = "busy";
 
@@ -160,7 +173,7 @@
                     .then(function (data) {
 
                         //success
-                        formHelper.resetForm({ scope: $scope });
+                        formHelper.resetForm({ scope: $scope, formCtrl: vm.inviteUserPasswordForm });
                         vm.invitedUserPasswordModel.buttonState = "success";
                         //set the user and set them as logged in
                         vm.invitedUser = data;
@@ -169,7 +182,7 @@
                         vm.inviteStep = 2;
 
                     }, function (err) {
-                        formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        formHelper.resetForm({ scope: $scope, hasErrors: true, formCtrl: vm.inviteUserPasswordForm });
                         formHelper.handleError(err);
                         vm.invitedUserPasswordModel.buttonState = "error";
                     });
@@ -198,37 +211,41 @@
             SetTitle();
         }
 
+        function loginSuccess() {
+            vm.loginStates.submitButton = "success";
+            userService._retryRequestQueue(true);
+            if (vm.onLogin) {
+                vm.onLogin();
+            }
+        }
+
         function loginSubmit() {
-                       
-            if (formHelper.submitForm({ scope: $scope })) {
+
+            if (formHelper.submitForm({ scope: $scope, formCtrl: vm.loginForm })) {
                 //if the login and password are not empty we need to automatically
                 // validate them - this is because if there are validation errors on the server	
                 // then the user has to change both username & password to resubmit which isn't ideal,	            
                 // so if they're not empty, we'll just make sure to set them to valid.
-                if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {	
+                if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {
                     vm.loginForm.username.$setValidity('auth', true);
                     vm.loginForm.password.$setValidity('auth', true);
                 }
-                
+
                 if (vm.loginForm.$invalid) {
                     SetTitle();
                     return;
                 }
-                
+
                 // make sure that we are returning to the login view.
                 vm.view = "login";
 
                 vm.loginStates.submitButton = "busy";
 
                 userService.authenticate(vm.login, vm.password)
-                    .then(function(data) {
-                            vm.loginStates.submitButton = "success";
-                            userService._retryRequestQueue(true);
-                            if (vm.onLogin) {
-                                vm.onLogin();
-                            }
-                        },
-                        function(reason) {
+                    .then(function (data) {
+                        loginSuccess();
+                    },
+                        function (reason) {
 
                             //is Two Factor required?
                             if (reason.status === 402) {
@@ -250,13 +267,13 @@
                 //setup a watch for both of the model values changing, if they change
                 // while the form is invalid, then revalidate them so that the form can
                 // be submitted again.
-                vm.loginForm.username.$viewChangeListeners.push(function() {
+                vm.loginForm.username.$viewChangeListeners.push(function () {
                     if (vm.loginForm.$invalid) {
                         vm.loginForm.username.$setValidity('auth', true);
                         vm.loginForm.password.$setValidity('auth', true);
                     }
                 });
-                vm.loginForm.password.$viewChangeListeners.push(function() {
+                vm.loginForm.password.$viewChangeListeners.push(function () {
                     if (vm.loginForm.$invalid) {
                         vm.loginForm.username.$setValidity('auth', true);
                         vm.loginForm.password.$setValidity('auth', true);
@@ -461,7 +478,7 @@
                 case "2fa-login":
                     title = "Two Factor Authentication";
                     break;
-            } 
+            }
 
             $scope.$emit("$changeTitle", title);
         }
