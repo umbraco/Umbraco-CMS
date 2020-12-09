@@ -1229,7 +1229,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tabs">Tabs</key>
     <key alias="contentTypeEnabled">Basis inhoudstype ingeschakeld</key>
     <key alias="contentTypeUses">Dit inhoudstype gebruikt</key>
-    <key alias="asAContentMasterType">als basis inhoudstype. Tabs van basis inhoudstypes worden niet getoond en kunnen alleen worden aangepast op het basis inhoudstype zelf</key>
     <key alias="noPropertiesDefinedOnTab">Geen eigenschappen gedefinieerd op dit tabblad. Klik op de link "voeg een nieuwe eigenschap" aan de bovenkant om een ​​nieuwe eigenschap te creëren.</key>
     <key alias="createMatchingTemplate">Maak een bijpassende sjabloon</key>
     <key alias="addIcon">Icoon toevoegen</key>

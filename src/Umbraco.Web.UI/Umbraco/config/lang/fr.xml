@@ -1352,7 +1352,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tabs">Onglets</key>
     <key alias="contentTypeEnabled">Type de contenu de base activé</key>
     <key alias="contentTypeUses">Ce type de contenu utilise</key>
-    <key alias="asAContentMasterType">en tant que type de contenu de base. Les onglets du type de contenu de base ne sont pas affichés et peuvent seulement être modifiés à partir du type de contenu de base lui-même.</key>
     <key alias="noPropertiesDefinedOnTab">Aucune propriété définie dans cet onglet. Cliquez sur le lien "Ajouter une nouvelle propriété" en-haut pour créer une nouvelle propriété.</key>
     <key alias="createMatchingTemplate">Créer le template correspondant</key>
     <key alias="addIcon">Ajouter une icône</key>

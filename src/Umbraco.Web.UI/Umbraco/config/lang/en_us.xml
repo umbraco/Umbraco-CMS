@@ -1402,7 +1402,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabs">Tabs</key>
     <key alias="contentTypeEnabled">Master Content Type enabled</key>
     <key alias="contentTypeUses">This Content Type uses</key>
-    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
     <key alias="createMatchingTemplate">Create matching template</key>
     <key alias="addIcon">Add icon</key>

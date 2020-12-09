@@ -725,7 +725,6 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>

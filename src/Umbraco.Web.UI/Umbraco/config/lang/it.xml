@@ -603,7 +603,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="users">Utenti</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType"><![CDATA[come tipo di contenuto master. Le tab del tipo di contenuto master non sono mostrate e possono essere modificate solo direttamente dal tipo di contenuto master.]]></key>
     <key alias="contentTypeEnabled">Tipo di contenuto master abilitato</key>
     <key alias="contentTypeUses">Questo tipo di contenuto usa</key>
     <key alias="defaulttemplate"><![CDATA[Template di base]]></key>

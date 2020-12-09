@@ -1328,7 +1328,6 @@
     <key alias="tabs">Záložky</key>
     <key alias="contentTypeEnabled">Nadřazený typ obsahu povolen</key>
     <key alias="contentTypeUses">Tento typ obsahu používá</key>
-    <key alias="asAContentMasterType">jako nadřazený typ obsahu. Záložky z nadřazených typů obsahu nejsou zobrazeny a mohou byt editovány pouze na nadřazených typech obsahu samotných</key>
     <key alias="noPropertiesDefinedOnTab">Na této záložce nejsou definovány žádné vlastnosti. Pro vytvoření nové vlastnosti klikněte na odkaz "přidat novou vlastnost" nahoře.</key>
     <key alias="createMatchingTemplate">Vytvořit odpovídající šablonu</key>
     <key alias="addIcon">Přidat ikonu</key>

@@ -981,7 +981,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="tabs">Zakładki</key>
     <key alias="contentTypeEnabled">Włączono Główny Typ Treści</key>
     <key alias="contentTypeUses">Ten Typ Treści używa</key>
-    <key alias="asAContentMasterType">jako Główny Typ Treści. Zakładki Głównego Typu Treści nie są wyświetlone i mogą być edytowane jedynie w samym Głównym Typie Treści</key>
     <key alias="noPropertiesDefinedOnTab">Żadne właściwości nie zostały zdefiniowane dla tej zakładki. Kliknij w link "dodaj nową właściwość", który znajduje się na górze strony, aby stworzyć nową właściwość.</key>
     <key alias="addIcon">Dodaj ikonę</key>
   </area>
