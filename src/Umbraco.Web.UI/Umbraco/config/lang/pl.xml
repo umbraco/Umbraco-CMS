@@ -737,7 +737,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="setPasswordConfirmation">Twoje hasło zostało zmienione</key>
     <key alias="resetCodeExpired">Link, na który kliknąłeś jest niewłaściwy lub wygasł</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Resetowanie hasła</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco back-office to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]></key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>Twoja nazwa użytkownika do zalogowania się w Umbraco backoffice to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Panel zarządzania</key>
@@ -1321,7 +1321,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="changePassword">Zmień hasło!</key>
     <key alias="newPassword">Nowe hasło</key>
     <key alias="confirmNewPassword">Potwierdź nowe hasło</key>
-    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco Back Office przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
+    <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco backoffice przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
     <key alias="contentChannel">Kanał zawartości</key>
     <key alias="descriptionField">Opis</key>
     <key alias="disabled">Wyłącz użytkownika</key>

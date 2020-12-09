@@ -671,7 +671,7 @@
     <key alias="theEndHeader">Umbraco %0% ha sido instalado y está listo para ser usado</key>
     <key alias="theEndInstallFailed"><![CDATA[Para completar la instalación, necesitaras editar de forma manual el <strong>archivo /web.config</strong> y actualizar la clave del AppSetting <strong>UmbracoConfigurationStatus</strong> del final al valor <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puedes <strong>empezar inmediatamente</strong> pulsando el botón "Lanzar Umbraco" de debajo. <br />Si eres <strong>nuevo con Umbraco</strong>, puedes encontrar cantidad de recursos en nuestras páginas de cómo empezar.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el back office de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el backoffice de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
     <key alias="Unavailable">No se ha podido establecer la conexión con la base de datos</key>
     <key alias="Version3">Umbraco versión 3</key>
     <key alias="Version4">Umbraco versión 4</key>

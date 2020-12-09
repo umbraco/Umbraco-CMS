@@ -422,7 +422,7 @@ Fatti aiutare dalla nostra community, consulta la documentazione o guarda alcuni
     <key alias="theEndInstallFailed"><![CDATA[Per terminare l'installazione, dovrai modificare manualmente il file <strong>/web.config</strong> e aggiornare la chiave AppSetting <strong>UmbracoConfigurationStatus</strong> impostando il valore <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puoi <strong>iniziare immediatamente</strong> cliccando sul bottone "Avvia Umbraco". <br />Se sei <strong>nuovo a Umbraco</strong>, si possono trovare un sacco di risorse sulle nostre pagine Getting Started.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Avvia Umbraco</h3>
-Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e iniziare ad aggiungere i contenuti, aggiornando i modelli e i fogli di stile o aggiungere nuove funzionalità]]></key>
+Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e iniziare ad aggiungere i contenuti, aggiornando i modelli e i fogli di stile o aggiungere nuove funzionalità]]></key>
     <key alias="Unavailable">Connessione al database non riuscita.</key>
     <key alias="Version3">Umbraco Versione 3</key>
     <key alias="Version4">Umbraco Versione 4</key>
@@ -820,7 +820,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="administrators">Amministratore</key>
     <key alias="categoryField">Campo Categoria</key>
     <key alias="changePassword">Cambia la tua password</key>
-    <key alias="changePasswordDescription"><![CDATA[È possibile modificare la password di accesso al Back Office Umbraco compilando il modulo sottostante e clicca sul pulsante 'Modifica password']]></key>
+    <key alias="changePasswordDescription"><![CDATA[È possibile modificare la password di accesso al backoffice Umbraco compilando il modulo sottostante e clicca sul pulsante 'Modifica password']]></key>
     <key alias="confirmNewPassword">Conferma la nuova password</key>
     <key alias="contentChannel">Contenuto del canale</key>
     <key alias="descriptionField">Campo Descrizione</key>

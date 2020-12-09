@@ -1575,7 +1575,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLockouts">er ikke blevet låst ude</key>
     <key alias="noPasswordChange">Kodeordet er ikke blevet ændret</key>
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
-    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
+    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
     <key alias="createAnotherUser">Opret endnu en bruger</key>
     <key alias="createUserHelp">Opret nye brugere for at give dem adgang til Umbraco. Når en ny bruger oprettes, genereres der en adgangskode, som du kan dele med brugeren.</key>
@@ -1838,7 +1838,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Speciel visning</key>
     <key alias="labelCustomViewInfoTitle">Vis speciel visning beskrivelsen</key>
-    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i BackOffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
+    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i backoffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
     <key alias="labelSettingsElementType">Indstillings model</key>
     <key alias="labelEditorSize">Rederings lagets størrelse</key>
     <key alias="addCustomView">Tilføj speciel visning</key>
