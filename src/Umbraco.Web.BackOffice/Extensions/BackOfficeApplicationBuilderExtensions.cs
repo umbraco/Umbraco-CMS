@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -65,11 +66,21 @@ namespace Umbraco.Extensions
 
         public static IApplicationBuilder UseUmbracoPlugins(this IApplicationBuilder app)
         {
+            var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
+
+            var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
+
+            // Ensure the plugin folder exists
+            Directory.CreateDirectory(pluginFolder);
+
+            var fileProvider = new UmbracoPluginPhysicalFileProvider(
+                pluginFolder,
+                umbracoPluginSettings);
+
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new UmbracoPluginPhysicalFileProvider(
-                    app.ApplicationServices.GetRequiredService<IHostingEnvironment>().MapPathContentRoot(Constants.SystemDirectories.AppPlugins),
-                    app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>()),
+                FileProvider = fileProvider,
                 RequestPath = Constants.SystemDirectories.AppPlugins
             });
 
