@@ -1,5 +1,6 @@
 using Moq;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -16,6 +17,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
+                new JsonNetSerializer(),
                 new DataEditorAttribute(name, name, name)
                 {
                     ValueType = valueType

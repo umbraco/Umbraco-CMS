@@ -5,7 +5,6 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -30,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -63,7 +62,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
             {
                 Configuration = new ValueListConfiguration
                 {

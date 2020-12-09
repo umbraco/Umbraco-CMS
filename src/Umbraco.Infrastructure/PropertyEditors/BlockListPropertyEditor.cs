@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -34,8 +31,9 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizedTextService localizedTextService,
             IIOHelper ioHelper,
             ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, propertyEditors, dataTypeService, contentTypeService, localizedTextService, localizationService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, propertyEditors, dataTypeService, contentTypeService, localizedTextService, localizationService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
         }

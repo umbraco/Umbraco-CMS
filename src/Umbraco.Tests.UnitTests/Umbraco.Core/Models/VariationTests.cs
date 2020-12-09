@@ -585,6 +585,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             var localizedTextService = Mock.Of<ILocalizedTextService>();
             var localizationService = Mock.Of<ILocalizationService>();
             var shortStringHelper = Mock.Of<IShortStringHelper>();
+            var jsonSerializer = Mock.Of<IJsonSerializer>();
 
             var textBoxEditor = new TextboxPropertyEditor(
                 NullLoggerFactory.Instance,
@@ -592,7 +593,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 localizationService,
                 ioHelper,
                 shortStringHelper,
-                localizedTextService
+                localizedTextService,
+                jsonSerializer
             );
 
             var serializer = new ConfigurationEditorJsonSerializer();

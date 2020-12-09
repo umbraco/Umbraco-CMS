@@ -5,7 +5,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -32,10 +31,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 converter,
             });
 
-            var serializer = new ConfigurationEditorJsonSerializer();
+            var configurationEditorJsonSerializer = new ConfigurationEditorJsonSerializer();
+            var jsonSerializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), jsonSerializer), configurationEditorJsonSerializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -118,10 +118,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 converter,
             });
 
-            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -199,10 +198,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 converter,
             });
 
-            var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer)
+            var dataType = new DataType(
+                    new VoidEditor(
+                        NullLoggerFactory.Instance,
+                        dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                        Mock.Of<ILocalizedTextService>(),
+                        Mock.Of<IShortStringHelper>(),
+                        new JsonNetSerializer()),
+                    new ConfigurationEditorJsonSerializer())
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

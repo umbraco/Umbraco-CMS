@@ -8,7 +8,6 @@ using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -17,7 +16,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Packaging
@@ -36,6 +34,7 @@ namespace Umbraco.Core.Packaging
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IConfigurationEditorJsonSerializer _serializer;
+        private readonly IJsonSerializer _jsonSerializer;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -43,7 +42,7 @@ namespace Umbraco.Core.Packaging
         public PackageDataInstallation(ILogger<PackageDataInstallation> logger, ILoggerFactory loggerFactory, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
             IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            ILocalizedTextService localizedTextService, IConfigurationEditorJsonSerializer serializer)
+            ILocalizedTextService localizedTextService, IConfigurationEditorJsonSerializer serializer, IJsonSerializer jsonSerializer)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
@@ -57,6 +56,7 @@ namespace Umbraco.Core.Packaging
             _globalSettings = globalSettings.Value;
             _localizedTextService = localizedTextService;
             _serializer = serializer;
+            _jsonSerializer = jsonSerializer;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -916,7 +916,7 @@ namespace Umbraco.Core.Packaging
 
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
-                        editor = new VoidEditor(_loggerFactory, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper) { Alias = editorAlias };
+                        editor = new VoidEditor(_loggerFactory, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, _jsonSerializer) { Alias = editorAlias };
 
                     var dataType = new DataType(editor, _serializer)
                     {

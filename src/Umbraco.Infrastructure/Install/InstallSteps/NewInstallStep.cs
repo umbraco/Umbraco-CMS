@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
-    internal class NewInstallStep : InstallSetupStep<UserModel>
+    public class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;

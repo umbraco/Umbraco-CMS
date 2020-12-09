@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -28,8 +29,15 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
         /// </summary>
-        public TextAreaPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService,shortStringHelper)
+        public TextAreaPropertyEditor(
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IIOHelper ioHelper,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -39,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute, _localizedTextService, _shortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute, _localizedTextService, _shortStringHelper, JsonSerializer);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor(_ioHelper);

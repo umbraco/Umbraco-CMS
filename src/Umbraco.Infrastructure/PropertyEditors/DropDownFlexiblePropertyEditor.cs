@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -21,8 +22,15 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
 
-        public DropDownFlexiblePropertyEditor(ILocalizedTextService textService, ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper,  IIOHelper ioHelper)
-            : base(loggerFactory, dataTypeService, localizationService, textService, shortStringHelper)
+        public DropDownFlexiblePropertyEditor(
+            ILocalizedTextService textService,
+            ILoggerFactory loggerFactory,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IShortStringHelper shortStringHelper,
+            IIOHelper ioHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, textService, shortStringHelper, jsonSerializer)
         {
             _textService = textService;
             _dataTypeService = dataTypeService;
@@ -33,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor()
         {
-            return new MultipleValueEditor(LoggerFactory.CreateLogger<MultipleValueEditor>(), _dataTypeService, _localizationService, _textService, _shortStringHelper, Attribute);
+            return new MultipleValueEditor(LoggerFactory.CreateLogger<MultipleValueEditor>(), _dataTypeService, _localizationService, _textService, _shortStringHelper, JsonSerializer, Attribute);
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor(_textService, _ioHelper);

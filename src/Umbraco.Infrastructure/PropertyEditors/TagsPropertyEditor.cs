@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -34,21 +35,22 @@ namespace Umbraco.Web.PropertyEditors
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _validators = validators;
             _ioHelper = ioHelper;
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, LocalizedTextService);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {
-            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, attribute)
+            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer, attribute)
             { }
 
             /// <inheritdoc />

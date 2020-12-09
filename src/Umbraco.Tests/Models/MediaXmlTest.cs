@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -36,7 +35,7 @@ namespace Umbraco.Tests.Models
             var contentSettings = new ContentSettings();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, loggerFactory.CreateLogger<MediaFileSystem>(), ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties);
+            var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties, JsonNetSerializer);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

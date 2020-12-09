@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Media;
@@ -50,8 +50,9 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService,
-            UploadAutoFillProperties uploadAutoFillProperties)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            UploadAutoFillProperties uploadAutoFillProperties,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -76,7 +77,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings, JsonSerializer);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
