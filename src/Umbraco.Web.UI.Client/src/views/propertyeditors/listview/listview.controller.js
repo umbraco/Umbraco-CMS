@@ -706,7 +706,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                 resolveExpression(e, result, expression, alias, smelliness);
             }, smelliness * 1000);
         }
-        if (newValue && (newValue = $.trim(newValue))) {
+        if (newValue && (newValue = newValue.trim())) {
             result[alias] = newValue;
         }
         return newValue;
