@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Web.Mvc
             };
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
+            routeData.Values.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>());
             ctrl.ControllerContext = new ControllerContext(Mock.Of<HttpContextBase>(), routeData, ctrl);

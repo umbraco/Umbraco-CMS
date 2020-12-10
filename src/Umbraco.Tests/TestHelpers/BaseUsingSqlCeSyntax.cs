@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ISqlContext SqlContext { get; private set; }
 
-        internal TestObjects TestObjects = new TestObjects(null);
+        internal TestObjects TestObjects = new TestObjects();
 
         protected Sql<ISqlContext> Sql()
         {

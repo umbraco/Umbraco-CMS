@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -9,7 +9,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
+using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
@@ -20,7 +22,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Does_Not_Bind_Model_When_UmbracoDataToken_Not_In_Route_Data()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), withUmbracoDataToken: false);
+            IPublishedContent pc = CreatePublishedContent();
+            var bindingContext = CreateBindingContext(typeof(ContentModel), pc, withUmbracoDataToken: false);
             var binder = new ContentModelBinder();
 
             // Act
@@ -34,7 +37,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Does_Not_Bind_Model_When_Source_Not_Of_Expected_Type()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: new NonContentModel());
+            IPublishedContent pc = CreatePublishedContent();
+            var bindingContext = CreateBindingContext(typeof(ContentModel), pc, source: new NonContentModel());
             var binder = new ContentModelBinder();
 
             // Act
@@ -48,8 +52,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void BindModel_Returns_If_Same_Type()
         {
             // Arrange
-            var content = new ContentModel(CreatePublishedContent());
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: content);
+            IPublishedContent pc = CreatePublishedContent();
+            var content = new ContentModel(pc);
+            var bindingContext = CreateBindingContext(typeof(ContentModel), pc, source: content);
             var binder = new ContentModelBinder();
 
             // Act
@@ -63,7 +68,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Binds_From_IPublishedContent_To_Content_Model()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: CreatePublishedContent());
+            IPublishedContent pc = CreatePublishedContent();
+            var bindingContext = CreateBindingContext(typeof(ContentModel), pc, source: pc);
             var binder = new ContentModelBinder();
 
             // Act
@@ -77,7 +83,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Binds_From_IPublishedContent_To_Content_Model_Of_T()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel<ContentType1>), source: new ContentModel<ContentType2>(new ContentType2(CreatePublishedContent())));
+            IPublishedContent pc = CreatePublishedContent();
+            var bindingContext = CreateBindingContext(typeof(ContentModel<ContentType1>), pc, source: new ContentModel<ContentType2>(new ContentType2(pc)));
             var binder = new ContentModelBinder();
 
             // Act
@@ -87,12 +94,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             Assert.True(bindingContext.Result.IsModelSet);
         }
 
-        private ModelBindingContext CreateBindingContext(Type modelType, bool withUmbracoDataToken = true, object source = null)
+        private ModelBindingContext CreateBindingContext(Type modelType, IPublishedContent publishedContent, bool withUmbracoDataToken = true, object source = null)
         {
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             if (withUmbracoDataToken)
-                routeData.DataTokens.Add(Constants.Web.UmbracoDataToken, source);
+            {
+                routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedContent));
+            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();

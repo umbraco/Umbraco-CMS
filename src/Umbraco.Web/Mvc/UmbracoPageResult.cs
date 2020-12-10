@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Mvc
 
             ValidateRouteData(context.RouteData);
 
-            var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
+            var routeDef = (RouteDefinition)context.RouteData.Values[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
             var factory = ControllerBuilder.Current.GetControllerFactory();
             context.RouteData.Values["action"] = routeDef.ActionName;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private static void ValidateRouteData(RouteData routeData)
         {
-            if (routeData.DataTokens.ContainsKey(Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken) == false)
+            if (routeData.Values.ContainsKey(Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken) == false)
             {
                 throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
                                                     " in the context of an Http POST when using a SurfaceController form");

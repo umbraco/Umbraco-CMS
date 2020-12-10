@@ -8,9 +8,9 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.ActionResults;
-using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Web.Website.Controllers
 {
@@ -39,18 +39,18 @@ namespace Umbraco.Web.Website.Controllers
             {
                 var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
                 if (routeDefAttempt.Success == false)
+                {
                     throw routeDefAttempt.Exception;
+                }
 
                 var routeDef = routeDefAttempt.Result;
-                return routeDef.PublishedRequest.PublishedContent;
+                return routeDef.PublishedContent;
             }
         }
 
         /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
-        /// <param name="contentKey"></param>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey)
         {
             return new RedirectToUmbracoPageResult(contentKey, PublishedUrlProvider, UmbracoContextAccessor);
@@ -59,9 +59,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the Umbraco page with the given id and passes provided querystring
         /// </summary>
-        /// <param name="contentKey"></param>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey, QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(contentKey, queryString, PublishedUrlProvider, UmbracoContextAccessor);
@@ -70,8 +67,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the Umbraco page with the given published content
         /// </summary>
-        /// <param name="publishedContent"></param>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
         {
             return new RedirectToUmbracoPageResult(publishedContent, PublishedUrlProvider, UmbracoContextAccessor);
@@ -80,9 +75,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the Umbraco page with the given published content and passes provided querystring
         /// </summary>
-        /// <param name="publishedContent"></param>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(publishedContent, queryString, PublishedUrlProvider, UmbracoContextAccessor);
@@ -91,7 +83,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the currently rendered Umbraco page
         /// </summary>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
         {
             return new RedirectToUmbracoPageResult(CurrentPage, PublishedUrlProvider, UmbracoContextAccessor);
@@ -100,8 +91,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the currently rendered Umbraco page and passes provided querystring
         /// </summary>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(CurrentPage, queryString, PublishedUrlProvider, UmbracoContextAccessor);
@@ -110,7 +99,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the currently rendered Umbraco URL
         /// </summary>
-        /// <returns></returns>
         /// <remarks>
         /// This is useful if you need to redirect
         /// to the current page but the current page is actually a rewritten URL normally done with something like
@@ -124,7 +112,6 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Returns the currently rendered Umbraco page
         /// </summary>
-        /// <returns></returns>
         protected UmbracoPageResult CurrentUmbracoPage()
         {
             return new UmbracoPageResult(ProfilingLogger);
@@ -133,18 +120,19 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// we need to recursively find the route definition based on the parent view context
         /// </summary>
-        /// <returns></returns>
-        private Attempt<RouteDefinition> TryGetRouteDefinitionFromAncestorViewContexts()
+        private Attempt<UmbracoRouteValues> TryGetRouteDefinitionFromAncestorViewContexts()
         {
             var currentContext = ControllerContext;
             while (!(currentContext is null))
             {
                 var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
-                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                if (currentRouteData.Values.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
+                {
+                    return Attempt.Succeed((UmbracoRouteValues)currentRouteData.Values[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                }
             }
 
-            return Attempt<RouteDefinition>.Fail(
+            return Attempt<UmbracoRouteValues>.Fail(
                 new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));
         }
     }

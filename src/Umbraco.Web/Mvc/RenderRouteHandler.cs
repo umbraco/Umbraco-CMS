@@ -56,8 +56,6 @@ namespace Umbraco.Web.Mvc
         /// Assigns the correct controller based on the Umbraco request and returns a standard MvcHandler to process the response,
         /// this also stores the render model into the data tokens for the current RouteData.
         /// </summary>
-        /// <param name="requestContext"></param>
-        /// <returns></returns>
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
             if (UmbracoContext == null)
@@ -70,37 +68,18 @@ namespace Umbraco.Web.Mvc
                 throw new NullReferenceException("There is no current PublishedRequest, it must be initialized before the RenderRouteHandler executes");
             }
 
-            SetupRouteDataForRequest(
-                new ContentModel(request.PublishedContent),
-                requestContext,
-                request);
-
             return GetHandlerForRoute(requestContext, request);
 
         }
 
         #endregion
 
-        /// <summary>
-        /// Ensures that all of the correct DataTokens are added to the route values which are all required for rendering front-end umbraco views
-        /// </summary>
-        /// <param name="contentModel"></param>
-        /// <param name="requestContext"></param>
-        /// <param name="frequest"></param>
-        internal void SetupRouteDataForRequest(ContentModel contentModel, RequestContext requestContext, IPublishedRequest frequest)
-        {
-            //put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, contentModel); //required for the ContentModelBinder and view engine
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, frequest); //required for RenderMvcController
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, UmbracoContext); //required for UmbracoViewPage
-        }
-
         private void UpdateRouteDataForRequest(ContentModel contentModel, RequestContext requestContext)
         {
             if (contentModel == null) throw new ArgumentNullException(nameof(contentModel));
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
 
-            requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoDataToken] = contentModel;
+            // requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoDataToken] = contentModel;
             // the rest should not change -- it's only the published content that has changed
         }
 
@@ -293,7 +272,7 @@ namespace Umbraco.Web.Mvc
             }
 
             //store the route definition
-            requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
+            requestContext.RouteData.Values[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
             return def;
         }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var domainCache = new DomainCache(_domainService, _defaultCultureAccessor);
 
             return new PublishedSnapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache,_variationContextAccessor, previewToken),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, _variationContextAccessor, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor, _variationContextAccessor),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
                 domainCache);
@@ -278,5 +278,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             return "Test status";
         }
+
+        public override void LoadCachesOnStartup() { }
     }
 }

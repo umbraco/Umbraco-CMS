@@ -2,13 +2,14 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Website.Controllers
+namespace Umbraco.Web.Common.Controllers
 {
 
     /// <summary>
@@ -17,9 +18,9 @@ namespace Umbraco.Web.Website.Controllers
     [TypeFilter(typeof(ModelBindingExceptionFilter))]
     public class RenderController : UmbracoController, IRenderController
     {
-        private IPublishedRequest _publishedRequest;
         private readonly ILogger<RenderController> _logger;
         private readonly ICompositeViewEngine _compositeViewEngine;
+        private UmbracoRouteValues _routeValues;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderController"/> class.
@@ -33,27 +34,27 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Gets the current content item.
         /// </summary>
-        protected IPublishedContent CurrentPage => PublishedRequest.PublishedContent;
+        protected IPublishedContent CurrentPage => UmbracoRouteValues.PublishedContent;
 
         /// <summary>
-        /// Gets the current published content request.
+        /// Gets the <see cref="UmbracoRouteValues"/>
         /// </summary>
-        protected internal virtual IPublishedRequest PublishedRequest
+        protected UmbracoRouteValues UmbracoRouteValues
         {
             get
             {
-                if (_publishedRequest != null)
+                if (_routeValues != null)
                 {
-                    return _publishedRequest;
+                    return _routeValues;
                 }
 
-                if (RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken) == false)
+                if (!ControllerContext.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var def))
                 {
-                    throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedRequest object");
+                    throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
                 }
 
-                _publishedRequest = (IPublishedRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
-                return _publishedRequest;
+                _routeValues = (UmbracoRouteValues)def;
+                return _routeValues;
             }
         }
 
@@ -79,22 +80,20 @@ namespace Umbraco.Web.Website.Controllers
         /// <typeparam name="T">The type of the model.</typeparam>
         /// <param name="model">The model.</param>
         /// <returns>The action result.</returns>
-        /// <remarks>If the template found in the route values doesn't physically exist, then an empty ContentResult will be returned.</remarks>
+        /// <exception cref="InvalidOperationException">If the template found in the route values doesn't physically exist and exception is thrown</exception>
         protected IActionResult CurrentTemplate<T>(T model)
         {
-            var template = ControllerContext.RouteData.Values["action"].ToString();
-            if (EnsurePhsyicalViewExists(template) == false)
+            if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
             {
-                throw new InvalidOperationException("No physical template file was found for template " + template);
+                throw new InvalidOperationException("No physical template file was found for template " + UmbracoRouteValues.TemplateName);
             }
 
-            return View(template, model);
+            return View(UmbracoRouteValues.TemplateName, model);
         }
 
         /// <summary>
         /// The default action to render the front-end view.
         /// </summary>
-        [RenderIndexActionSelector]
-        public virtual IActionResult Index(ContentModel model) => CurrentTemplate(model);
+        public virtual IActionResult Index() => CurrentTemplate(new ContentModel(CurrentPage));
     }
 }

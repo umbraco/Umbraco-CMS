@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
@@ -19,6 +19,7 @@ using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
+    // TODO: Should be in Views namespace?
 
     public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
     {
@@ -92,6 +93,8 @@ namespace Umbraco.Web.Common.AspNetCore
             base.WriteLiteral(value);
         }
 
+        // TODO: This trick doesn't work anymore, this method used to be an override.
+        // Now the model is bound in a different place
         // maps model
         protected async Task SetViewDataAsync(ViewDataDictionary viewData)
         {
@@ -110,8 +113,6 @@ namespace Umbraco.Web.Common.AspNetCore
             // set the view data
             ViewData = (ViewDataDictionary<TModel>) viewData;
         }
-
-
 
         // viewData is the ViewDataDictionary (maybe <TModel>) that we have
         // modelType is the type of the model that we need to bind to

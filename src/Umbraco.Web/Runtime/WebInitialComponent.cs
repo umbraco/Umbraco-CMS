@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -171,7 +171,9 @@ namespace Umbraco.Web.Runtime
                 new[] { meta.ControllerNamespace });
             if (route.DataTokens == null) // web api routes don't set the data tokens object
                 route.DataTokens = new RouteValueDictionary();
-            route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "api"); //ensure the umbraco token is set
+
+            // TODO: Pretty sure this is not necessary, we'll see
+            //route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "api"); //ensure the umbraco token is set
         }
 
         private static void RouteLocalSurfaceController(Type controller, string umbracoPath)
@@ -183,7 +185,10 @@ namespace Umbraco.Web.Runtime
                 url, // URL to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); // look in this namespace to create the controller
-            route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); // ensure the umbraco token is set
+
+            // TODO: Pretty sure this is not necessary, we'll see
+            //route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); // ensure the umbraco token is set
+
             route.DataTokens.Add("UseNamespaceFallback", false); // don't look anywhere else except this namespace!
             // make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();

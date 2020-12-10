@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
@@ -23,6 +27,12 @@ namespace Umbraco.Web.Website.Routing
     /// <summary>
     /// The route value transformer for Umbraco front-end routes
     /// </summary>
+    /// <remarks>
+    /// NOTE: In aspnet 5 DynamicRouteValueTransformer has been improved, see https://github.com/dotnet/aspnetcore/issues/21471
+    /// It seems as though with the "State" parameter we could more easily assign the IPublishedRequest or IPublishedContent
+    /// or UmbracoContext more easily that way. In the meantime we will rely on assigning the IPublishedRequest to the
+    /// route values along with the IPublishedContent to the umbraco context
+    /// </remarks>
     public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     {
         private readonly ILogger<UmbracoRouteValueTransformer> _logger;
@@ -59,20 +69,13 @@ namespace Umbraco.Web.Website.Routing
                 throw new InvalidOperationException($"There is no current UmbracoContext, it must be initialized before the {nameof(UmbracoRouteValueTransformer)} executes, ensure that {nameof(UmbracoRequestMiddleware)} is registered prior to 'UseRouting'");
             }
 
-            bool routed = RouteRequest(_umbracoContextAccessor.UmbracoContext);
+            bool routed = RouteRequest(_umbracoContextAccessor.UmbracoContext, out IPublishedRequest publishedRequest);
             if (!routed)
             {
                 // TODO: Deal with it not being routable, perhaps this should be an enum result?
             }
 
-            IPublishedRequest request = _umbracoContextAccessor.UmbracoContext.PublishedRequest; // This cannot be null here
-
-            SetupRouteDataForRequest(
-                new ContentModel(request.PublishedContent),
-                request,
-                values);
-
-            RouteDefinition routeDef = GetUmbracoRouteDefinition(httpContext, values, request);
+            UmbracoRouteValues routeDef = GetUmbracoRouteDefinition(httpContext, values, publishedRequest);
             values["controller"] = routeDef.ControllerName;
             if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
             {
@@ -83,29 +86,9 @@ namespace Umbraco.Web.Website.Routing
         }
 
         /// <summary>
-        /// Ensures that all of the correct DataTokens are added to the route values which are all required for rendering front-end umbraco views
+        /// Returns a <see cref="UmbracoRouteValues"/> object based on the current content request
         /// </summary>
-        private void SetupRouteDataForRequest(ContentModel contentModel, IPublishedRequest frequest, RouteValueDictionary values)
-        {
-            // put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
-
-            // required for the ContentModelBinder and view engine.
-            // TODO: Are we sure, seems strange to need this in netcore
-            values.TryAdd(Constants.Web.UmbracoDataToken, contentModel);
-
-            // required for RenderMvcController
-            // TODO: Are we sure, seems strange to need this in netcore
-            values.TryAdd(Constants.Web.PublishedDocumentRequestDataToken, frequest);
-
-            // required for UmbracoViewPage
-            // TODO: Are we sure, seems strange to need this in netcore
-            values.TryAdd(Constants.Web.UmbracoContextDataToken, _umbracoContextAccessor.UmbracoContext);
-        }
-
-        /// <summary>
-        /// Returns a <see cref="RouteDefinition"/> object based on the current content request
-        /// </summary>
-        private RouteDefinition GetUmbracoRouteDefinition(HttpContext httpContext, RouteValueDictionary values, IPublishedRequest request)
+        private UmbracoRouteValues GetUmbracoRouteDefinition(HttpContext httpContext, RouteValueDictionary values, IPublishedRequest request)
         {
             if (httpContext is null)
             {
@@ -125,17 +108,8 @@ namespace Umbraco.Web.Website.Routing
             Type defaultControllerType = _renderingDefaults.DefaultControllerType;
             var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
 
-            // creates the default route definition which maps to the 'UmbracoController' controller
-            var def = new RouteDefinition
-            {
-                ControllerName = defaultControllerName,
-                ControllerType = defaultControllerType,
-                PublishedRequest = request,
-
-                // ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
-                ActionName = "Index",
-                HasHijackedRoute = false
-            };
+            string customActionName = null;
+            var customControllerName = request.PublishedContent.ContentType.Alias; // never null
 
             // check that a template is defined), if it doesn't and there is a hijacked route it will just route
             // to the index Action
@@ -144,34 +118,47 @@ namespace Umbraco.Web.Website.Routing
                 // the template Alias should always be already saved with a safe name.
                 // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias(_shortStringHelper);
-                def.ActionName = templateName;
+                customActionName = request.TemplateAlias.Split('.')[0].ToSafeAlias(_shortStringHelper);
             }
 
-            // check if there's a custom controller assigned, base on the document type alias.
-            Type controllerType = FindControllerType(request.PublishedContent.ContentType.Alias);
+            // creates the default route definition which maps to the 'UmbracoController' controller
+            var def = new UmbracoRouteValues(
+                request.PublishedContent,
+                defaultControllerName,
+                defaultControllerType,
+                templateName: customActionName);
 
-            // check if that controller exists
-            if (controllerType != null)
+            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates(customControllerName, customActionName, def.ActionName);
+
+            // check if there's a custom controller assigned, base on the document type alias.
+            var customControllerCandidates = candidates.Where(x => x.ControllerName.InvariantEquals(customControllerName)).ToList();
+
+            // check if that custom controller exists
+            if (customControllerCandidates.Count > 0)
             {
+                ControllerActionDescriptor controllerDescriptor = customControllerCandidates[0];
+
                 // ensure the controller is of type IRenderController and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType)
-                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
+                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerDescriptor.ControllerTypeInfo)
+                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerDescriptor.ControllerTypeInfo))
                 {
-                    // set the controller and name to the custom one
-                    def.ControllerType = controllerType;
-                    def.ControllerName = ControllerExtensions.GetControllerName(controllerType);
-                    if (def.ControllerName != defaultControllerName)
-                    {
-                        def.HasHijackedRoute = true;
-                    }
+                    // now check if the custom action matches
+                    var customActionExists = customActionName != null && customControllerCandidates.Any(x => x.ActionName.InvariantEquals(customActionName));
+
+                    def = new UmbracoRouteValues(
+                        request.PublishedContent,
+                        controllerDescriptor.ControllerName,
+                        controllerDescriptor.ControllerTypeInfo,
+                        customActionExists ? customActionName : def.ActionName,
+                        customActionName,
+                        true); // Hijacked = true
                 }
                 else
                 {
                     _logger.LogWarning(
                         "The current Document Type {ContentTypeAlias} matches a locally declared controller of type {ControllerName}. Custom Controllers for Umbraco routing must implement '{UmbracoRenderController}' and inherit from '{UmbracoControllerBase}'.",
                         request.PublishedContent.ContentType.Alias,
-                        controllerType.FullName,
+                        controllerDescriptor.ControllerTypeInfo.FullName,
                         typeof(IRenderController).FullName,
                         typeof(ControllerBase).FullName);
 
@@ -186,17 +173,21 @@ namespace Umbraco.Web.Website.Routing
             return def;
         }
 
-        private Type FindControllerType(string controllerName)
+        /// <summary>
+        /// Return a list of controller candidates that match the custom controller and action names
+        /// </summary>
+        private IReadOnlyList<ControllerActionDescriptor> FindControllerCandidates(string customControllerName, string customActionName, string defaultActionName)
         {
-            ControllerActionDescriptor descriptor = _actionDescriptorCollectionProvider.ActionDescriptors.Items
+            var descriptors = _actionDescriptorCollectionProvider.ActionDescriptors.Items
                 .Cast<ControllerActionDescriptor>()
-                .FirstOrDefault(x =>
-                    x.ControllerName.Equals(controllerName));
+                .Where(x => x.ControllerName.InvariantEquals(customControllerName)
+                        && (x.ActionName.InvariantEquals(defaultActionName) || (customActionName != null && x.ActionName.InvariantEquals(customActionName))))
+                .ToList();
 
-            return descriptor?.ControllerTypeInfo;
+            return descriptors;
         }
 
-        private bool RouteRequest(IUmbracoContext umbracoContext)
+        private bool RouteRequest(IUmbracoContext umbracoContext, out IPublishedRequest publishedRequest)
         {
             // TODO: I suspect one day this will be async
 
@@ -209,7 +200,9 @@ namespace Umbraco.Web.Website.Routing
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
             IPublishedRequest request = _publishedRouter.CreateRequest(umbracoContext);
-            umbracoContext.PublishedRequest = request; // TODO: This is ugly
+
+            // TODO: This is ugly with the re-assignment to umbraco context also because IPublishedRequest is mutable
+            publishedRequest = umbracoContext.PublishedRequest = request;
             bool prepared = _publishedRouter.PrepareRequest(request);
             return prepared && request.HasPublishedContent;
 

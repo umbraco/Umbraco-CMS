@@ -23,6 +23,13 @@ namespace Umbraco.Web.PublishedCache
          *
          */
 
+        /// <summary>
+        /// Loads the caches on startup - called once during startup
+        /// TODO: Temporary, this is temporal coupling, we cannot use IUmbracoApplicationLifetime.ApplicationInit (which we want to delete)
+        /// handler because that is executed with netcore's IHostApplicationLifetime.ApplicationStarted mechanism which fires async
+        /// which we don't want since this will not have initialized before our endpoints execute. So for now this is explicitly
+        /// called on UseUmbracoContentCaching on startup. 
+        /// </summary>
         void LoadCachesOnStartup();
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -9,7 +9,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
+using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
@@ -106,8 +108,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void No_DataToken_Returns_Null()
         {
-            var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bindingContext = CreateBindingContext(typeof(ContentModel), false, content);
+            IPublishedContent pc = Mock.Of<IPublishedContent>();
+            var content = new MyContent(pc);
+            var bindingContext = CreateBindingContext(typeof(ContentModel), pc, false, content);
 
             _contentModelBinder.BindModelAsync(bindingContext);
 
@@ -117,7 +120,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void Invalid_DataToken_Model_Type_Returns_Null()
         {
-            var bindingContext = CreateBindingContext(typeof(IPublishedContent), source: "Hello");
+            IPublishedContent pc = Mock.Of<IPublishedContent>();
+            var bindingContext = CreateBindingContext(typeof(IPublishedContent), pc, source: "Hello");
             _contentModelBinder.BindModelAsync(bindingContext);
             Assert.IsNull(bindingContext.Result.Model);
         }
@@ -125,20 +129,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void IPublishedContent_DataToken_Model_Type_Uses_DefaultImplementation()
         {
-            var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bindingContext = CreateBindingContext(typeof(MyContent), source: content);
+            IPublishedContent pc = Mock.Of<IPublishedContent>();
+            var content = new MyContent(pc);
+            var bindingContext = CreateBindingContext(typeof(MyContent), pc, source: content);
 
             _contentModelBinder.BindModelAsync(bindingContext);
 
             Assert.AreEqual(content, bindingContext.Result.Model);
         }
 
-        private ModelBindingContext CreateBindingContext(Type modelType, bool withUmbracoDataToken = true, object source = null)
+        private ModelBindingContext CreateBindingContext(Type modelType, IPublishedContent publishedContent, bool withUmbracoDataToken = true, object source = null)
         {
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             if (withUmbracoDataToken)
-                routeData.DataTokens.Add(Constants.Web.UmbracoDataToken, source);
+            {
+                routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedContent));
+            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();
