@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,6 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -32,17 +32,15 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -702,7 +700,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound("The passed id doesn't exist");
             }
             var tempFiles = new PostedFiles();
-            
+
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (!string.IsNullOrEmpty(path))
@@ -882,7 +880,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (validatePermissions)
             {
                 var requirement = new MediaPermissionsResourceRequirement();
-                var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(intParentId), requirement);
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, new MediaPermissionsResource(_mediaService.GetById(intParentId)), requirement);
                 if (!authorizationResult.Succeeded)
                 {
                     throw new HttpResponseException(
@@ -893,7 +891,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         NotificationStyle.Warning)));
                 }
             }
-           
+
             return intParentId;
         }
 
@@ -909,7 +907,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            
+
             var toMove = _mediaService.GetById(model.Id);
             if (toMove == null)
             {
@@ -957,7 +955,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return toMove;
         }
 
-        
+
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
