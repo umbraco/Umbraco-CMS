@@ -61,6 +61,8 @@ namespace Umbraco.Tests.Packaging
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             Factory.GetRequiredService<ILocalizedTextService>(),
             Factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
+            Factory.GetRequiredService<IMediaService>(),
+            Factory.GetRequiredService<IMediaTypeService>(),
             Factory.GetRequiredService<IJsonSerializer>()
             );
 
@@ -71,7 +73,7 @@ namespace Umbraco.Tests.Packaging
             //we don't want to extract package files to the real root, so extract to a test folder
             Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == _testBaseFolder.FullName));
 
-        private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
+        private const string DocumentTypePickerPackage = "Berg_1.0.0.umb";
         private const string HelloPackage = "Hello_1.0.0.zip";
 
         [Test]

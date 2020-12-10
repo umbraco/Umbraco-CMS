@@ -16,6 +16,7 @@
         vm.filesOpen = true;
         vm.actionsOpen = true;
         vm.loading = true;
+        vm.mediaNodeDisplayModels = [];
         vm.back = back;
         vm.createOrUpdatePackage = createOrUpdatePackage;
         vm.removeContentItem = removeContentItem;
@@ -28,6 +29,7 @@
         vm.contributorsEditor = null;
 
         vm.selectDocumentType = selectDocumentType;
+        vm.selectMediaType = selectMediaType;
         vm.selectTemplate = selectTemplate;
         vm.selectStyleSheet = selectStyleSheet;
         vm.selectMacro = selectMacro;
@@ -35,6 +37,15 @@
         vm.selectDictionaryItem = selectDictionaryItem;
         vm.selectDataType = selectDataType;
 
+        vm.mediaPickerModel = {
+          hideLabel: true,
+          view: "mediapicker",
+          value: "",
+          config: {
+            multiPicker: true,
+            allowEdit:false
+          }
+        }
         vm.labels = {};
 
         vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
@@ -76,6 +87,7 @@
                             });
                     }
 
+                    vm.mediaPickerModel.value = vm.package.mediaUdis.join(',');
                 });
 
 
@@ -88,20 +100,31 @@
 
         function loadResources() {
 
-            // Get all document types
-            entityResource.getAll("DocumentType").then(documentTypes => {
-                // a package stores the id as a string so we 
-                // need to convert all ids to string for comparison
-                documentTypes.forEach(documentType => {
-                    documentType.id = documentType.id.toString();
-                    documentType.selected = vm.package.documentTypes.indexOf(documentType.id) !== -1;
-                });
-                vm.documentTypes = documentTypes;
+          // Get all document types
+          entityResource.getAll("DocumentType").then(documentTypes => {
+            // a package stores the id as a string so we
+            // need to convert all ids to string for comparison
+            documentTypes.forEach(documentType => {
+              documentType.id = documentType.id.toString();
+              documentType.selected = vm.package.documentTypes.indexOf(documentType.id) !== -1;
             });
+            vm.documentTypes = documentTypes;
+          });
+
+          // Get all media types
+          entityResource.getAll("MediaType").then(mediaTypes => {
+            // a package stores the id as a string so we
+            // need to convert all ids to string for comparison
+            mediaTypes.forEach(mediaType => {
+              mediaType.id = mediaType.id.toString();
+              mediaType.selected = vm.package.mediaTypes.indexOf(mediaType.id) !== -1;
+            });
+            vm.mediaTypes = mediaTypes;
+          });
 
             // Get all templates
             entityResource.getAll("Template").then(templates => {
-                // a package stores the id as a string so we 
+                // a package stores the id as a string so we
                 // need to convert all ids to string for comparison
                 templates.forEach(template => {
                     template.id = template.id.toString();
@@ -120,7 +143,7 @@
 
             // Get all macros
             entityResource.getAll("Macro").then(macros => {
-                // a package stores the id as a string so we 
+                // a package stores the id as a string so we
                 // need to convert all ids to string for comparison
                 macros.forEach(macro => {
                     macro.id = macro.id.toString();
@@ -131,7 +154,7 @@
 
             // Get all languages
             entityResource.getAll("Language").then(languages => {
-                // a package stores the id as a string so we 
+                // a package stores the id as a string so we
                 // need to convert all ids to string for comparison
                 languages.forEach(language => {
                     language.id = language.id.toString();
@@ -142,7 +165,7 @@
 
             // Get all dictionary items
             entityResource.getAll("DictionaryItem").then(dictionaryItems => {
-                // a package stores the id as a string so we 
+                // a package stores the id as a string so we
                 // need to convert all ids to string for comparison
                 dictionaryItems.forEach(dictionaryItem => {
                     dictionaryItem.id = dictionaryItem.id.toString();
@@ -153,7 +176,7 @@
 
             // Get all data types
             entityResource.getAll("DataType").then(dataTypes => {
-                // a package stores the id as a string so we 
+                // a package stores the id as a string so we
                 // need to convert all ids to string for comparison
                 dataTypes.forEach(dataType => {
                     dataType.id = dataType.id.toString();
@@ -181,10 +204,12 @@
 
         function createOrUpdatePackage(editPackageForm) {
 
-            let contributors = vm.contributorsEditor.value.map(o => o.value);
+            let contributors = vm.contributorsEditor.value.map(o => o.value)
 
             vm.package.contributors = contributors;
 
+            // Split by comma and remove empty entries
+            vm.package.mediaUdis = vm.mediaPickerModel.value.split(",").filter(i => i);
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
                 vm.buttonState = "busy";
@@ -215,23 +240,23 @@
             vm.package.contentNodeId = null;
         }
 
-        function openContentPicker() {
-            const contentPicker = {
-                submit: function (model) {
-                    if (model.selection && model.selection.length > 0) {
-                        vm.package.contentNodeId = model.selection[0].id.toString();
-                        vm.contentNodeDisplayModel = model.selection[0];
-                    }
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.contentPicker(contentPicker);
-        }
+      function openContentPicker() {
+        const contentPicker = {
+          submit: function (model) {
+            if (model.selection && model.selection.length > 0) {
+              vm.package.contentNodeId = model.selection[0].id.toString();
+              vm.contentNodeDisplayModel = model.selection[0];
+            }
+            editorService.close();
+          },
+          close: function () {
+            editorService.close();
+          }
+        };
+        editorService.contentPicker(contentPicker);
+      }
 
-        function openFilePicker() {
+      function openFilePicker() {
 
             let selection = Utilities.copy(vm.package.files);
 
@@ -311,6 +336,18 @@
             } else {
                 vm.package.documentTypes.splice(index, 1);
             }
+        }
+
+        function selectMediaType(mediatype) {
+
+          // Check if the document type is already selected.
+          var index = vm.package.mediaTypes.indexOf(mediatype.id);
+
+          if (index === -1) {
+            vm.package.mediaTypes.push(mediatype.id);
+          } else {
+            vm.package.mediaTypes.splice(index, 1);
+          }
         }
 
         function selectTemplate(template) {

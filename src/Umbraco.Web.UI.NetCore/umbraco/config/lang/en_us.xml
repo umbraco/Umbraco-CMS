@@ -730,6 +730,7 @@
     <key alias="logout">Logout</key>
     <key alias="macro">Macro</key>
     <key alias="mandatory">Mandatory</key>
+    <key alias="media">Media</key>
     <key alias="message">Message</key>
     <key alias="move">Move</key>
     <key alias="name">Name</key>
