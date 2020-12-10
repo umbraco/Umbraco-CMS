@@ -18,7 +18,7 @@ namespace Umbraco.Core
             /// <remarks>
             /// This is not the same as the Umbraco web folder which is configurable for serving front-end files.
             /// </remarks>
-            public const string Umbraco = "~/Umbraco";
+            public const string Umbraco = "~/umbraco";
 
             /// <summary>
             /// The Umbraco data folder in the content root

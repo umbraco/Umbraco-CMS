@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 
 namespace Umbraco.Core.Models.Packaging
@@ -40,6 +39,8 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<XElement> Languages { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> DictionaryItems { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> DocumentTypes { get; set; } // TODO: make strongly typed
-        public IEnumerable<CompiledPackageDocument> Documents { get; set; }
+        public IEnumerable<XElement> MediaTypes { get; set; } // TODO: make strongly typed
+        public IEnumerable<CompiledPackageContentBase> Documents { get; set; }
+        public IEnumerable<CompiledPackageContentBase> Media { get; set; }
     }
 }

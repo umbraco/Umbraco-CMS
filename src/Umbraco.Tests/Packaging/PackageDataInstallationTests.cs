@@ -75,6 +75,8 @@ namespace Umbraco.Tests.Packaging
         }
 
         private PackageDataInstallation PackageDataInstallation => Factory.GetRequiredService<PackageDataInstallation>();
+        private IContentService ContentService => Factory.GetRequiredService<IContentService>();
+        private IContentTypeService ContentTypeService => Factory.GetRequiredService<IContentTypeService>();
 
         [Test]
         public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
@@ -322,13 +324,13 @@ namespace Umbraco.Tests.Packaging
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
             var element = xml.Descendants("DocumentSet").First();
-            var packageDocument = CompiledPackageDocument.Create(element);
+            var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
             var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
             var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            var contents = PackageDataInstallation.ImportContent(packageDocument, -1, importedContentTypes, 0);
+            var contents = PackageDataInstallation.ImportContent(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
             var numberOfDocs = (from doc in element.Descendants()
                                 where (string) doc.Attribute("isDoc") == ""
                                 select doc).Count();
@@ -356,13 +358,13 @@ namespace Umbraco.Tests.Packaging
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
             var element = xml.Descendants("DocumentSet").First();
-            var packageDocument = CompiledPackageDocument.Create(element);
+            var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
             var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
             var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            var contents = PackageDataInstallation.ImportContent(packageDocument, -1, importedContentTypes, 0);
+            var contents = PackageDataInstallation.ImportContent(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
             var numberOfDocs = (from doc in element.Descendants()
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();

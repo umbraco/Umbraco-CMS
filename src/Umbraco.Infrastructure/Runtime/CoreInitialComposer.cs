@@ -22,6 +22,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
@@ -380,6 +381,8 @@ namespace Umbraco.Core.Runtime
 
             builder.Services.AddUnique<MediaPermissions>();
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
+
+            builder.Services.AddUnique<PackageDataInstallation>();
         }
     }
 }

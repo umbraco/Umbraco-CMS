@@ -45,6 +45,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
         private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ContentService, ContentTypeService, DataTypeService,
@@ -53,6 +55,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
             EntityXmlSerializer, LoggerFactory,
             UmbracoVersion,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
+            MediaService,
+            MediaTypeService,
             "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",

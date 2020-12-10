@@ -2,15 +2,14 @@
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Routing;
 using Umbraco.Core.Services;
@@ -99,6 +98,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IUmbracoVersion>(),
                 factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                factory.GetRequiredService<IMediaService>(),
+                factory.GetRequiredService<IMediaTypeService>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)

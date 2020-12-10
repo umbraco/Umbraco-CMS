@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.Packaging
 {
@@ -114,6 +113,9 @@ namespace Umbraco.Core.Models.Packaging
         [DataMember(Name = "documentTypes")]
         public IList<string> DocumentTypes { get; set; } = new List<string>();
 
+        [DataMember(Name = "mediaTypes")]
+        public IList<string> MediaTypes { get; set; } = new List<string>();
+
         [DataMember(Name = "stylesheets")]
         public IList<string> Stylesheets { get; set; } = new List<string>();
 
@@ -132,6 +134,12 @@ namespace Umbraco.Core.Models.Packaging
 
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; } = string.Empty;
+
+        [DataMember(Name = "mediaUdis")]
+        public IList<GuidUdi> MediaUdis { get; set; } = Array.Empty<GuidUdi>();
+
+        [DataMember(Name = "mediaLoadChildNodes")]
+        public bool MediaLoadChildNodes { get; set; }
 
 
     }

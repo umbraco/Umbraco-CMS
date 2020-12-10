@@ -137,6 +137,30 @@
 
                         </umb-control-group>
 
+
+
+                      <umb-control-group label="@general_media">
+
+
+
+                        <umb-property property="vm.mediaPickerModel">
+
+                          <umb-node-preview
+                            ng-repeat="node in vm.mediaNodeDisplayModels"
+                            icon="node.icon"
+                            name="node.name"
+                            allow-edit="false"
+                            allow-remove="true">
+                          </umb-node-preview>
+                          <umb-property-editor model="vm.mediaPickerModel" is-pre-value="true"></umb-property-editor>
+                        </umb-property>
+
+                        <umb-checkbox model="vm.package.mediaLoadChildNodes"
+                                      disabled="vm.mediaPickerModel.value.length === 0"
+                                      text="{{vm.labels.includeAllChildNodes}}">
+                        </umb-checkbox>
+                      </umb-control-group>
+
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
                                 <umb-checkbox model="doctype.selected"
@@ -146,11 +170,20 @@
                             </div>
                         </umb-control-group>
 
+                      <umb-control-group label="@treeHeaders_mediaTypes">
+                        <div ng-repeat="mediatype in ::vm.mediaTypes | orderBy:'name'">
+                          <umb-checkbox model="mediatype.selected"
+                                        on-change="vm.selectMediaType(mediatype)"
+                                        text="{{mediatype.name}}">
+                          </umb-checkbox>
+                        </div>
+                      </umb-control-group>
+
                         <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
                                 <umb-checkbox model="template.selected"
                                               on-change="vm.selectTemplate(template)"
-                                                  text="{{template.name}}">
+                                                  text="{{template.name}}">umb-expansion-panel__content
                                     </umb-checkbox>
                             </div>
                         </umb-control-group>

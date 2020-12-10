@@ -11,18 +11,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Common.Attributes;
@@ -45,9 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         // It would be possible to have something like a ContentTypeInfoController for the GetAllPropertyTypeAliases/GetCount/GetAllowedChildren/etc... actions
 
         private readonly IEntityXmlSerializer _serializer;
-        private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IScopeProvider _scopeProvider;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -56,15 +50,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IFileService _fileService;
         private readonly ILogger<ContentTypeController> _logger;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IContentService _contentService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly ILocalizationService _LocalizationService;
-        private readonly IMacroService _macroService;
-        private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly PackageDataInstallation _packageDataInstallation;
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
@@ -74,24 +63,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
-            IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
             IFileService fileService,
             ILogger<ContentTypeController> logger,
-            ILoggerFactory loggerFactory,
             IContentService contentService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            ILocalizationService localizationService,
-            IMacroService macroService,
-            IEntityService entityService,
             IHostingEnvironment hostingEnvironment,
             EditorValidatorCollection editorValidatorCollection,
-            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
-            IJsonSerializer jsonSerializer)
+            PackageDataInstallation packageDataInstallation)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -101,9 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService)
         {
             _serializer = serializer;
-            _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
-            _scopeProvider = scopeProvider;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -112,15 +92,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _fileService = fileService;
             _logger = logger;
-            _loggerFactory = loggerFactory;
             _contentService = contentService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _LocalizationService = localizationService;
-            _macroService = macroService;
-            _entityService = entityService;
             _hostingEnvironment = hostingEnvironment;
-            _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
-            _jsonSerializer = jsonSerializer;
+            _packageDataInstallation = packageDataInstallation;
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -627,30 +602,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var dataInstaller = new PackageDataInstallation(
-                _loggerFactory.CreateLogger<PackageDataInstallation>(),
-                _loggerFactory,
-                _fileService,
-                _macroService,
-                _LocalizationService,
-                _dataTypeService,
-                _entityService,
-                _contentTypeService,
-                _contentService,
-                _propertyEditors,
-                _scopeProvider,
-                _shortStringHelper,
-                Options.Create(_globalSettings),
-                _localizedTextService,
-                _configurationEditorJsonSerializer,
-                _jsonSerializer);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
             var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            dataInstaller.ImportDocumentType(element, userId);
+            _packageDataInstallation.ImportDocumentType(element, userId);
 
             // Try to clean up the temporary file.
             try

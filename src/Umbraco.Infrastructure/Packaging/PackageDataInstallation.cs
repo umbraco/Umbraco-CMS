@@ -34,15 +34,32 @@ namespace Umbraco.Core.Packaging
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IConfigurationEditorJsonSerializer _serializer;
+        private readonly IMediaService _mediaService;
+        private readonly IMediaTypeService _mediaTypeService;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
-        public PackageDataInstallation(ILogger<PackageDataInstallation> logger, ILoggerFactory loggerFactory, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
-            IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            ILocalizedTextService localizedTextService, IConfigurationEditorJsonSerializer serializer, IJsonSerializer jsonSerializer)
+        public PackageDataInstallation(
+            ILogger<PackageDataInstallation> logger,
+            ILoggerFactory loggerFactory,
+            IFileService fileService,
+            IMacroService macroService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IOptions<GlobalSettings> globalSettings,
+            ILocalizedTextService localizedTextService,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            IJsonSerializer jsonSerializer)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
@@ -57,6 +74,8 @@ namespace Umbraco.Core.Packaging
             _localizedTextService = localizedTextService;
             _serializer = serializer;
             _jsonSerializer = jsonSerializer;
+            _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -197,29 +216,58 @@ namespace Umbraco.Core.Packaging
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
                     MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
-                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId)
+                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId),
+                    MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId),
                 };
 
                 //we need a reference to the imported doc types to continue
                 var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
+                var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
                 installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
-                installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId);
+                installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
+                installationSummary.MediaInstalled = ImportContent(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
 
                 scope.Complete();
 
                 return installationSummary;
             }
         }
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="docTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
+        {
+            return ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService);
+        }
+
+
 
         #endregion
+
 
         #region Content
 
 
-        public IReadOnlyList<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IReadOnlyList<T> ImportContent<T, S>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, S> importedDocumentTypes,
+            int userId,
+            IContentTypeBaseService<S> typeService,
+            IContentServiceBase<T> service)
+        where T: class, IContentBase
+        where S: IContentTypeComposition
         {
-            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId)).ToList();
+            return docs.SelectMany(x => ImportContent<T, S>(
+                x.XmlData.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty),
+                -1,
+                importedDocumentTypes,
+                userId,
+                typeService,
+                service)).ToList();
         }
 
         /// <summary>
@@ -230,17 +278,20 @@ namespace Umbraco.Core.Packaging
         /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <returns>An enumerable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(CompiledPackageDocument packageDocument, int parentId, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IEnumerable<T> ImportContent<T, S>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, S> importedDocumentTypes,
+            int userId,
+            IContentTypeBaseService<S> typeService,
+            IContentServiceBase<T> service)
+            where T: class, IContentBase
+            where S: IContentTypeComposition
         {
-            var element = packageDocument.XmlData;
 
-            var roots = from doc in element.Elements()
-                        where (string)doc.Attribute("isDoc") == ""
-                        select doc;
-
-            var contents = ParseDocumentRootXml(roots, parentId, importedDocumentTypes).ToList();
+            var contents = ParseDocumentRootXml<T, S>(roots, parentId, importedDocumentTypes, typeService, service).ToList();
             if (contents.Any())
-                _contentService.Save(contents, userId);
+                service.Save(contents, userId);
 
             return contents;
 
@@ -261,50 +312,64 @@ namespace Umbraco.Core.Packaging
             //    "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
-        private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots, int parentId, IDictionary<string, IContentType> importedContentTypes)
+        private IEnumerable<T> ParseDocumentRootXml<T, S>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, S> importedContentTypes,
+            IContentTypeBaseService<S> typeService,
+            IContentServiceBase<T> service)
+            where T: class, IContentBase
+            where S: IContentTypeComposition
         {
-            var contents = new List<IContent>();
+            var contents = new List<T>();
             foreach (var root in roots)
             {
                 var contentTypeAlias = root.Name.LocalName;
 
                 if (!importedContentTypes.ContainsKey(contentTypeAlias))
                 {
-                    var contentType = FindContentTypeByAlias(contentTypeAlias);
+                    var contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId);
+                var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default(T), parentId, service);
                 if (content == null) continue;
 
                 contents.Add(content);
 
-                var children = (from child in root.Elements()
-                                where (string)child.Attribute("isDoc") == ""
-                                select child)
+                var children = root.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty)
                     .ToList();
 
                 if (children.Count > 0)
-                    contents.AddRange(CreateContentFromXml(children, content, importedContentTypes).WhereNotNull());
+                {
+                    contents.AddRange(CreateContentFromXml<T, S>(children, content, importedContentTypes, typeService, service).WhereNotNull());
+                }
             }
             return contents;
         }
 
-        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, IDictionary<string, IContentType> importedContentTypes)
+        private IEnumerable<T> CreateContentFromXml<T, S>(
+            IEnumerable<XElement> children,
+            T parent,
+            IDictionary<string, S> importedContentTypes,
+            IContentTypeBaseService<S> typeService,
+            IContentServiceBase<T> service)
+            where T: class, IContentBase
+            where S: IContentTypeComposition
         {
-            var list = new List<IContent>();
+            var list = new List<T>();
             foreach (var child in children)
             {
                 string contentTypeAlias = child.Name.LocalName;
 
                 if (importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
-                    var contentType = FindContentTypeByAlias(contentTypeAlias);
+                    var contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default);
+                var content = CreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service);
                 list.Add(content);
 
                 //Recursive call
@@ -314,19 +379,26 @@ namespace Umbraco.Core.Packaging
                                      select grand).ToList();
 
                 if (grandChildren.Any())
-                    list.AddRange(CreateContentFromXml(grandChildren, content, importedContentTypes));
+                    list.AddRange(CreateContentFromXml(grandChildren, content,importedContentTypes, typeService, service));
             }
 
             return list;
         }
 
-        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId)
+        private T CreateContentFromXml<T, S>(
+            XElement element,
+            S contentType,
+            T parent,
+            int parentId,
+            IContentServiceBase<T> service)
+            where T: class, IContentBase
+            where S: IContentTypeComposition
         {
             var key = Guid.Empty;
             if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
             {
                 //if a Key is supplied, then we need to check if the content already exists and if so we ignore the installation for this item
-                if (_contentService.GetById(key) != null)
+                if (service.GetById(key) != null)
                     return null;
             }
 
@@ -346,9 +418,9 @@ namespace Umbraco.Core.Packaging
             var template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
-            if (template != null)
+            if (template != null && contentType is IContentType contentTypex)
             {
-                if (!contentType.IsAllowedTemplate(template.Alias))
+                if (!contentTypex.IsAllowedTemplate(template.Alias))
                 {
                     //well this is awkward, we'll set the template to null and it will be wired up to the default template
                     // when it's persisted in the document repository
@@ -356,21 +428,15 @@ namespace Umbraco.Core.Packaging
                 }
             }
 
-            IContent content = parent == null
-                ? new Content(nodeName, parentId, contentType)
-                {
-                    Level = int.Parse(level),
-                    SortOrder = int.Parse(sortOrder),
-                    TemplateId = template?.Id,
-                    Key = key
-                }
-                : new Content(nodeName, parent, contentType)
-                {
-                    Level = int.Parse(level),
-                    SortOrder = int.Parse(sortOrder),
-                    TemplateId = template?.Id,
-                    Key = key
-                };
+            T content = CreateContent<T, S>(
+                nodeName,
+                parent,
+                parentId,
+                contentType,
+                key,
+                int.Parse(level),
+                int.Parse(sortOrder),
+                template?.Id);
 
             //Here we make sure that we take composition properties in account as well
             //otherwise we would skip them and end up losing content
@@ -396,6 +462,37 @@ namespace Umbraco.Core.Packaging
             return content;
         }
 
+        private T CreateContent<T, S>(string name, T parent, int parentId, S contentType, Guid key, int level, int sortOrder, int? templateId)
+            where T : class, IContentBase
+            where S : IContentTypeComposition
+        {
+            switch (contentType)
+            {
+                case IContentType c:
+                    if (parent is null)
+                    {
+                        return new Content(name, parentId, c) { Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId, } as T;
+                    }
+                    else
+                    {
+                        return new Content(name, (IContent)parent, c) { Key = key, Level = level, SortOrder = sortOrder, TemplateId = templateId, } as T;
+                    }
+
+                case IMediaType m:
+                    if (parent is null)
+                    {
+                        return new Umbraco.Core.Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                    }
+                    else
+                    {
+                        return new Umbraco.Core.Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                    }
+
+                default:
+                    throw new NotSupportedException($"Type {typeof(S)} is not supported");
+            }
+        }
+
         #endregion
 
         #region DocumentTypes
@@ -413,7 +510,7 @@ namespace Umbraco.Core.Packaging
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
         {
-            return ImportDocumentTypes(docTypeElements.ToList(), true, userId);
+            return ImportDocumentTypes<IContentType>(docTypeElements.ToList(), true, userId, _contentTypeService);
         }
 
         /// <summary>
@@ -423,9 +520,10 @@ namespace Umbraco.Core.Packaging
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IReadOnlyList<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
+        public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
+        where T: class, IContentTypeComposition
         {
-            var importedContentTypes = new Dictionary<string, IContentType>();
+            var importedContentTypes = new Dictionary<string, T>();
 
             //When you are importing a single doc type we have to assume that the dependencies are already there.
             //Otherwise something like uSync won't work.
@@ -479,10 +577,10 @@ namespace Umbraco.Core.Packaging
                 var alias = documentType.Element("Info").Element("Alias").Value;
                 if (importedContentTypes.ContainsKey(alias) == false)
                 {
-                    var contentType = _contentTypeService.Get(alias);
+                    var contentType = service.Get(alias);
                     importedContentTypes.Add(alias, contentType == null
-                        ? CreateContentTypeFromXml(documentType, importedContentTypes)
-                        : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes));
+                        ? CreateContentTypeFromXml(documentType, importedContentTypes, service)
+                        : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service));
                 }
             }
 
@@ -497,13 +595,13 @@ namespace Umbraco.Core.Packaging
 
             //Save the newly created/updated IContentType objects
             var list = importedContentTypes.Select(x => x.Value).ToList();
-            _contentTypeService.Save(list, userId);
+            service.Save(list, userId);
 
             //Now we can finish the import by updating the 'structure',
             //which requires the doc types to be saved/available in the db
             if (importStructure)
             {
-                var updatedContentTypes = new List<IContentType>();
+                var updatedContentTypes = new List<T>();
                 //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (var documentType in documentTypes)
                 {
@@ -512,12 +610,12 @@ namespace Umbraco.Core.Packaging
                     //Ensure that we only update ContentTypes which has actual structure-elements
                     if (structureElement == null || structureElement.Elements("DocumentType").Any() == false) continue;
 
-                    var updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement, importedContentTypes);
+                    var updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement, importedContentTypes, service);
                     updatedContentTypes.Add(updated);
                 }
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
-                    _contentTypeService.Save(updatedContentTypes, userId);
+                    service.Save(updatedContentTypes, userId);
             }
 
             return list;
@@ -586,33 +684,51 @@ namespace Umbraco.Core.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
         }
 
-        private IContentType CreateContentTypeFromXml(XElement documentType, IReadOnlyDictionary<string, IContentType> importedContentTypes)
+        private T CreateContentTypeFromXml<T>(XElement documentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
+         where T : class, IContentTypeComposition
         {
             var infoElement = documentType.Element("Info");
 
             //Name of the master corresponds to the parent
             var masterElement = infoElement.Element("Master");
-            IContentType parent = null;
+            T parent = default;
             if (masterElement != null)
             {
                 var masterAlias = masterElement.Value;
                 parent = importedContentTypes.ContainsKey(masterAlias)
                              ? importedContentTypes[masterAlias]
-                             : _contentTypeService.Get(masterAlias);
+                             : service.Get(masterAlias);
             }
 
             var alias = infoElement.Element("Alias").Value;
-            var contentType = parent == null
-                                  ? new ContentType(_shortStringHelper, -1) { Alias = alias }
-                                  : new ContentType(_shortStringHelper, parent, alias);
+            T contentType = CreateContentType<T>(parent, alias);
 
             if (parent != null)
                 contentType.AddContentType(parent);
 
-            return UpdateContentTypeFromXml(documentType, contentType, importedContentTypes);
+            return UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service);
         }
 
-        private IContentType UpdateContentTypeFromXml(XElement documentType, IContentType contentType, IReadOnlyDictionary<string, IContentType> importedContentTypes)
+        private T CreateContentType<T>(T parent, string alias)
+            where T : class, IContentTypeComposition
+        {
+            var parentId = parent?.Id ?? -1;
+
+            if (typeof(T) == typeof(IContentType))
+            {
+                return new ContentType(_shortStringHelper, parentId) { Alias = alias } as T;
+            }
+
+            if (typeof(T) == typeof(IMediaType))
+            {
+                return new MediaType(_shortStringHelper, parentId) { Alias = alias } as T;
+            }
+
+            throw new NotSupportedException($"Type {typeof(T)} is not supported");
+        }
+
+        private T UpdateContentTypeFromXml<T>(XElement documentType, T contentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
+        where T : IContentTypeComposition
         {
             var infoElement = documentType.Element("Info");
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
@@ -646,9 +762,9 @@ namespace Umbraco.Core.Packaging
             if (masterElement != null)
             {
                 var masterAlias = masterElement.Value;
-                IContentType parent = importedContentTypes.ContainsKey(masterAlias)
+                T parent = importedContentTypes.ContainsKey(masterAlias)
                     ? importedContentTypes[masterAlias]
-                    : _contentTypeService.Get(masterAlias);
+                    : service.Get(masterAlias);
 
                 contentType.SetParent(parent);
             }
@@ -665,13 +781,17 @@ namespace Umbraco.Core.Packaging
                         var compositionAlias = composition.Value;
                         var compositionContentType = importedContentTypes.ContainsKey(compositionAlias)
                             ? importedContentTypes[compositionAlias]
-                            : _contentTypeService.Get(compositionAlias);
+                            : service.Get(compositionAlias);
                         contentType.AddContentType(compositionContentType);
                     }
                 }
             }
 
-            UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
+            if (contentType is IContentType contentTypex)
+            {
+                UpdateContentTypesAllowedTemplates(contentTypex, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
+            }
+
             UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
@@ -716,7 +836,8 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        private void UpdateContentTypesTabs(IContentType contentType, XElement tabElement)
+        private void UpdateContentTypesTabs<T>(T contentType, XElement tabElement)
+            where T: IContentTypeComposition
         {
             if (tabElement == null)
                 return;
@@ -742,7 +863,8 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        private void UpdateContentTypesProperties(IContentType contentType, XElement genericPropertiesElement)
+        private void UpdateContentTypesProperties<T>(T contentType, XElement genericPropertiesElement)
+            where T: IContentTypeComposition
         {
             var properties = genericPropertiesElement.Elements("GenericProperty");
             foreach (var property in properties)
@@ -834,7 +956,8 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        private IContentType UpdateContentTypesStructure(IContentType contentType, XElement structureElement, IReadOnlyDictionary<string, IContentType> importedContentTypes)
+        private T UpdateContentTypesStructure<T>(T contentType, XElement structureElement, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
+        where T: IContentTypeComposition
         {
             var allowedChildren = contentType.AllowedContentTypes.ToList();
             int sortOrder = allowedChildren.Any() ? allowedChildren.Last().SortOrder : 0;
@@ -842,7 +965,7 @@ namespace Umbraco.Core.Packaging
             {
                 var alias = element.Value;
 
-                var allowedChild = importedContentTypes.ContainsKey(alias) ? importedContentTypes[alias] : _contentTypeService.Get(alias);
+                var allowedChild = importedContentTypes.ContainsKey(alias) ? importedContentTypes[alias] : service.Get(alias);
                 if (allowedChild == null)
                 {
                     _logger.LogWarning(
@@ -866,9 +989,10 @@ namespace Umbraco.Core.Packaging
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
-        private IContentType FindContentTypeByAlias(string contentTypeAlias)
+        private S FindContentTypeByAlias<S>(string contentTypeAlias, IContentTypeBaseService<S> typeService)
+            where S: IContentTypeComposition
         {
-            var contentType = _contentTypeService.Get(contentTypeAlias);
+            var contentType = typeService.Get(contentTypeAlias);
 
             if (contentType == null)
                 throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
