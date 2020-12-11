@@ -92,7 +92,7 @@
 
                                    <div class="cell-tools-edit row-tool" ng-if="hasSettings">
                                        <button type="button" class="btn-icon" ng-click="editGridItemSettings(row, 'row')" localize="title" title="@grid_settings">
-                                           <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                           <umb-icon icon="icon-settings"></umb-icon>
                                            <span class="sr-only">
                                                <localize key="grid_settings">Settings</localize>
                                            </span>
@@ -100,10 +100,10 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
+                                        <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
                                         <umb-confirm-action
-                                            show="row.deletePrompt"
+                                            ng-if="row.deletePrompt"
                                             direction="left"
-                                            on-delete="togglePrompt(row)"
                                             on-confirm="removeRow(section, $index)"
                                             on-cancel="hidePrompt(row)">
                                         </umb-confirm-action>
@@ -161,7 +161,7 @@
 
                                                       <div class="cell-tools" ng-if="(area === active || area === currentCellWithActiveChild) && !sortMode">
                                                           <button type="button" aria-haspopup="true" class="btn-icon cell-tool" ng-click="editGridItemSettings(area, 'cell')">
-                                                              <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                                              <umb-icon icon="icon-settings"></umb-icon>
                                                               <span class="sr-only">Open column settings</span>
                                                           </button>
                                                       </div>
@@ -207,7 +207,7 @@
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
                                                                               <button type="button" class="umb-control-tool-icon btn-icon" ng-click="editGridItemSettings(control, 'control')">
-                                                                                  <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                                                                  <umb-icon icon="icon-settings"></umb-icon>
                                                                                   <span class="sr-only">
                                                                                       <localize key="general_edit">Edit</localize>
                                                                                   </span>
@@ -215,9 +215,9 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <umb-confirm-action show="control.deletePrompt"
+                                                                              <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
+                                                                              <umb-confirm-action ng-if="control.deletePrompt"
                                                                                                   direction="left"
-                                                                                                  on-delete="togglePrompt(control)"
                                                                                                   on-confirm="removeControl(area, $index)"
                                                                                                   on-cancel="hidePrompt(control)">
                                                                               </umb-confirm-action>

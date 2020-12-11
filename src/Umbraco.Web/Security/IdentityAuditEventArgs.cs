@@ -4,6 +4,7 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// This class is used by events raised from the BackofficeUserManager
     /// </summary>
@@ -126,6 +127,7 @@ namespace Umbraco.Web.Security
         LogoutSuccess,
         PasswordChanged,
         PasswordReset,
-        ResetAccessFailedCount
+        ResetAccessFailedCount,
+        SendingUserInvite
     }
 }

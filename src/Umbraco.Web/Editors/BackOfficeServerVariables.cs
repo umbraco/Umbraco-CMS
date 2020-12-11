@@ -22,6 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 
@@ -59,7 +60,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Editors
                     {
                         // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
-                        // having each url defined here explicitly - we can do that in v8! for now
+                        // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
@@ -355,6 +356,7 @@ namespace Umbraco.Web.Editors
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
@@ -379,8 +381,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _owinContext.Authentication.GetExternalAuthenticationTypes()
-                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                            "providers", _owinContext.Authentication.GetBackOfficeExternalLoginProviders()
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,

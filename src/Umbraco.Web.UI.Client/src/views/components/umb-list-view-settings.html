@@ -15,21 +15,19 @@
             <i class="umb-list-view-settings__list-view-icon icon-list"></i>
             <div>
                 <div class="umb-list-view-settings__name">
-                    {{ dataType.name }} 
+                    {{dataType.name}} 
                     <em ng-if="!customListViewCreated">(<localize key="general_default">default</localize>)</em>
                 </div>
-                <button 
-                    type="button" 
-                    class="btn-link umb-list-view-settings__create-new" 
-                    ng-if="!customListViewCreated" 
-                    ng-click="createCustomListViewDataType()">
+                <button type="button"
+                        class="btn-link umb-list-view-settings__create-new"
+                        ng-if="!customListViewCreated"
+                        ng-click="createCustomListViewDataType()">
                     <localize key="editcontenttype_createListView">Create custom list view</localize>
                 </button>
-                <button 
-                   type="button" 
-                   class="btn-link umb-list-view-settings__remove-new" 
-                   ng-if="customListViewCreated" 
-                   ng-click="removeCustomListDataType()">
+                <button type="button"
+                        class="btn-link umb-list-view-settings__remove-new"
+                        ng-if="customListViewCreated"
+                        ng-click="removeCustomListDataType()">
                     <localize key="editcontenttype_removeListView">Remove custom list view</localize>
                 </button>
             </div>
@@ -39,12 +37,12 @@
     <div class="umb-group-builder__property-actions">
         <div class="umb-group-builder__property-action">
             <button type="button"
-                    class="btn-reset"
+                    class="btn-icon"
                     ng-click="showSettingsOverlay()"
                     aria-label="Edit"
                     localize="title"
                     title="@general_edit">
-                <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                <umb-icon icon="icon-settings"></umb-icon>
             </button>
         </div>
     </div>

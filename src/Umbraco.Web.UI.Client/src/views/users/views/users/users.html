@@ -110,7 +110,6 @@
             </div>
 
             <div class="flex ml-auto">
-
                 <!-- State filter -->
                 <div class="umb-filter" ng-if="vm.userStatesFilter.length > 0">
                     <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('state')">
@@ -120,10 +119,16 @@
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
                         <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ key: '!All'}" ng-show="userState.count > 0" style="padding: 8px 20px 8px 16px;">
-                            <umb-checkbox model="userState.selected"
-                                          on-change="vm.setUserStatesFilter(userState)"
-                                          text="{{ userState.name }} ({{userState.count}})">
-                            </umb-checkbox>
+                            <div class="flex items-center">
+                                <umb-checkbox input-id="userstate-{{$index}}"
+                                              name="userstate"
+                                              model="userState.selected"
+                                              on-change="vm.setUserStatesFilter(userState)">
+                                </umb-checkbox>
+                                <label for="userstate-{{$index}}">
+                                    <umb-badge size="s" color="{{userState.color}}">{{userState.name}} <span class="ml1 umb-badge__count">{{userState.count}}</span></umb-badge>
+                                </label>
+                            </div>
                         </umb-dropdown-item>
                     </umb-dropdown>
                 </div>
@@ -137,10 +142,19 @@
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
                         <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
-                            <umb-checkbox model="userGroup.selected"
-                                          on-change="vm.setUserGroupFilter(userGroup)"
-                                          text="{{ userGroup.name }}">
-                            </umb-checkbox>
+                            <div class="flex items-center">
+                                <umb-checkbox input-id="usergroup-{{$index}}"
+                                              name="usergroup"
+                                              model="userGroup.selected"
+                                              on-change="vm.setUserGroupFilter(userGroup)">
+                                </umb-checkbox>
+                                <label for="usergroup-{{$index}}">
+                                    <span class="flex items-center">
+                                        <i class="{{userGroup.icon}}" aria-hidden="true"></i>
+                                        <span class="ml1">{{userGroup.name}}</span>
+                                    </span>
+                                </label>
+                            </div>
                         </umb-dropdown-item>
                     </umb-dropdown>
                 </div>
@@ -502,7 +516,7 @@
                     </umb-checkmark>
                     <h3 class="bold" style="margin: 0 0 0 10px;">
                         {{vm.newUser.name | umbWordLimit:1}}
-                        <localize key="user_userInvited">has been created</localize>
+                        <localize key="user_userInvited">has been invited</localize>
                     </h3>
                 </div>
 
@@ -517,6 +531,7 @@
                         size="m">
                     </umb-button>
                     <umb-button
+                        ng-if="vm.newUser.id"
                         type="button"
                         button-style="action"
                         label-key="user_goToProfile"
