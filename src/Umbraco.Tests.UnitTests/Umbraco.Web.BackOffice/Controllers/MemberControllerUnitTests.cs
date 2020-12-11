@@ -59,19 +59,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         {
             // arrange
             Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
-            //Mock.Get(umbracoMembersUserManager)
-            //    .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
-            //    .ReturnsAsync(() => IdentityResult.Success);
-            //Mock.Get(umbracoMembersUserManager)
-            //    .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
-            //    .ReturnsAsync(() => IdentityResult.Success);
-            //Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
-            //Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
-            ////Mock.Get(memberService).SetupSequence(
-            //        x => x.GetByEmail(It.IsAny<string>()))
-            //    .Returns(() => null)
-            //    .Returns(() => member);
-
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
             sut.ModelState.AddModelError("key", "Invalid model state");
 
