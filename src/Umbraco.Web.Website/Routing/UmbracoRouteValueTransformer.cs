@@ -32,6 +32,7 @@ namespace Umbraco.Web.Website.Routing
     /// It seems as though with the "State" parameter we could more easily assign the IPublishedRequest or IPublishedContent
     /// or UmbracoContext more easily that way. In the meantime we will rely on assigning the IPublishedRequest to the
     /// route values along with the IPublishedContent to the umbraco context
+    /// have created a GH discussion here https://github.com/dotnet/aspnetcore/discussions/28562 we'll see if anyone responds
     /// </remarks>
     public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     {

@@ -42,10 +42,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [SetUp]
         public void SetupTestData()
         {
-            // This is super nasty, but this lets us initialize the cache while it is empty.
-            // var publishedSnapshotService = GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;
-            // publishedSnapshotService?.OnApplicationInit(null, EventArgs.Empty);
-
             if (_langFr == null && _langEs == null)
             {
                 var globalSettings = new GlobalSettings();

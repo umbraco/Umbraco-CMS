@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services.Implement
         /// The purpose of this event being raised within the transaction is so that listeners can perform database
         /// operations from within the same transaction and guarantee data consistency so that if anything goes wrong
         /// the entire transaction can be rolled back. This is used by Nucache.
-        /// TODO: See remarks in ContentRepositoryBase about these types of events. Not sure we need/want them.
+        /// TODO: See remarks in ContentRepositoryBase about these types of events.
         /// </remarks>
         public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> ScopedRefreshedEntity;
 

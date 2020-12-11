@@ -183,6 +183,8 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IApplicationBuilder UseUmbracoContentCache(this IApplicationBuilder app)
         {
+            // TODO: This should install middleware to initialize instead of eagerly doing the initialize here
+
             PublishedSnapshotServiceEventHandler publishedContentEvents = app.ApplicationServices.GetRequiredService<PublishedSnapshotServiceEventHandler>();
             publishedContentEvents.Start();
             return app;

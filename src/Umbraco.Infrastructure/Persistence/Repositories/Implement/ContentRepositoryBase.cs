@@ -772,11 +772,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
          * level now since we can fire these events within the transaction...
          * The reason these events 'need' to fire in the transaction is to ensure data consistency with Nucache (currently
          * the only thing that uses them). For example, if the transaction succeeds and NuCache listened to ContentService.Saved
-         * and then NuCache failed at persisting data after the trans completed, then NuCache would be out of sync. This way 
-         * the entire trans is rolled back if NuCache files. That said, I'm unsure this is really required because there
-         * are other systems that rely on the "ed" (i.e. Saved) events like Examine which would be inconsistent if it failed
-         * too. I'm just not sure this is totally necessary especially.
-         * So these events can be moved to the service level. However, see the notes below, it seems the only event we
+         * and then NuCache failed at persisting data after the trans completed, then NuCache would be out of sync. This way
+         * the entire trans is rolled back if NuCache files. This is part of the discussion about removing the static events,
+         * possibly there's 3 levels of eventing, "ing", "scoped" (in trans) and "ed" (after trans).
+         * These particular events can be moved to the service level. However, see the notes below, it seems the only event we
          * really need is the ScopedEntityRefresh. The only tricky part with moving that to the service level is that the
          * handlers of that event will need to deal with the data a little differently because it seems that the
          * "Published" flag on the content item matters and this event is raised before that flag is switched. Weird.
