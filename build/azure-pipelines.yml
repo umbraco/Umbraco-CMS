@@ -8,6 +8,19 @@
 # Variables & their default values
 variables:
   buildConfiguration: 'Release'
+  SA_PASSWORD: UmbracoIntegration123!
+
+resources:
+  containers:
+  - container: mssql
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    env:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: $(SA_PASSWORD)
+      MSSQL_PID: Developer
+    ports: 
+      - 1433:1433
+    options: --name mssql
 
 stages:
 - stage: Linux
@@ -31,6 +44,28 @@ stages:
         command: test
         projects: '**/*.Tests.UnitTests.csproj'
 
+  - job: Integration_Tests
+    services:
+      mssql: mssql
+    timeoutInMinutes: 120
+    displayName: 'Integration Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.x'
+      inputs:
+        version: 3.1.x
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**/Umbraco.Tests.Integration.csproj'
+      env:
+        UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+
 - stage: macOS_X
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
@@ -52,7 +87,6 @@ stages:
                   command: test
                   projects: '**/*.Tests.UnitTests.csproj'
 
-
 - stage: Windows
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
@@ -73,7 +107,6 @@ stages:
       inputs:
         command: test
         projects: '**\*.Tests.UnitTests.csproj'
-
 
   - job: Integration_Tests
     timeoutInMinutes: 120
@@ -101,7 +134,6 @@ stages:
         command: test
         projects: '**\Umbraco.Tests.Integration.csproj'
         arguments: '--no-build'
-
 
   - job: Build_Artifacts
     displayName: 'Build Artifacts'
