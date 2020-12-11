@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration.Testing
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IDictionary<int, TestDbMeta> _testDatabases;
         private UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands;
-        
+
         private BlockingCollection<TestDbMeta> _prepareQueue;
         private BlockingCollection<TestDbMeta> _readySchemaQueue;
         private BlockingCollection<TestDbMeta> _readyEmptyQueue;
@@ -54,7 +54,6 @@ namespace Umbraco.Tests.Integration.Testing
                 new TestDbMeta(2, false, masterConnectionString),
 
                 new TestDbMeta(3, true, masterConnectionString),
-                new TestDbMeta(4, true, masterConnectionString),
             }.ToDictionary(x => x.Id);
 
             Instance = this; // For GlobalSetupTeardown.cs

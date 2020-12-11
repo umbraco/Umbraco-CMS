@@ -7,11 +7,11 @@ namespace Umbraco.Tests.Integration.Testing
 {
     public class TestDatabaseFactory
     {
-        public static ITestDatabase Create(string filesPath, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory dbFactory)
+        public static ITestDatabase Create(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? CreateLocalDb(filesPath, loggerFactory, dbFactory)
-                : CreateSqlDeveloper(loggerFactory, dbFactory);
+                ? CreateLocalDb(filesPath, loggerFactory, dbFactory.Create())
+                : CreateSqlDeveloper(loggerFactory, dbFactory.Create());
         }
 
         private static ITestDatabase CreateLocalDb(string filesPath, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory dbFactory)

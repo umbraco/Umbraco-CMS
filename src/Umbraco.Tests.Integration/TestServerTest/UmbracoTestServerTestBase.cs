@@ -132,11 +132,12 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
             var typeLoader = services.AddTypeLoader(GetType().Assembly, TestHelper.GetWebHostEnvironment(), TestHelper.GetHostingEnvironment(),
                 TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration, TestHelper.Profiler);
 
             var builder = new UmbracoBuilder(services, Configuration, typeLoader);
-    
+
             builder
                 .AddConfiguration()
                 .AddTestCore(TestHelper) // This is the important one!
