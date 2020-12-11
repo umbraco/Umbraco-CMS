@@ -237,6 +237,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         [MemberSaveValidation]
         public async Task<ActionResult<MemberDisplay>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)
         {
+            if (contentItem == null)
+            {
+                throw new ArgumentNullException("The member content item was null");
+            }
+
             // If we've reached here it means:
             // * Our model has been bound
             // * and validated

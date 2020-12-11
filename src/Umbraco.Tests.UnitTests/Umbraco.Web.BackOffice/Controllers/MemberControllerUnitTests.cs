@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
@@ -41,30 +42,55 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             ArgumentNullException exception = Assert.ThrowsAsync<ArgumentNullException>(() => sut.PostSave(null));
 
             // assert
-            //Assert.That(exception.Message, Is.EqualTo("Exception of type 'Umbraco.Web.Common.Exceptions.HttpResponse..."));
-            //Assert.That(exception.HResult, Is.EqualTo(42));
+            Assert.That(exception.Message, Is.EqualTo("Value cannot be null. (Parameter 'The member content item was null')"));
         }
 
         [Test]
         [AutoMoqData]
         public void PostSaveMember_WhenModelStateIsNotValid_ExpectFailureResponse(
-            MemberController sut)
+            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            IMemberTypeService memberTypeService,
+            IDataTypeService dataTypeService,
+            IMemberService memberService,
+            MapDefinitionCollection memberMapDefinition,
+            PropertyEditorCollection propertyEditorCollection,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IBackOfficeSecurity backOfficeSecurity)
         {
             // arrange
+            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            //Mock.Get(umbracoMembersUserManager)
+            //    .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+            //    .ReturnsAsync(() => IdentityResult.Success);
+            //Mock.Get(umbracoMembersUserManager)
+            //    .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+            //    .ReturnsAsync(() => IdentityResult.Success);
+            //Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            //Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            ////Mock.Get(memberService).SetupSequence(
+            //        x => x.GetByEmail(It.IsAny<string>()))
+            //    .Returns(() => null)
+            //    .Returns(() => member);
+
+            MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
             sut.ModelState.AddModelError("key", "Invalid model state");
-            var fakeMemberData = new MemberSave()
-            {
-                Password = new ChangingPasswordModel()
-                {
-                    Id = 123,
-                    NewPassword = "i2ruf38vrba8^&T^",
-                    OldPassword = null
-                }
-            };
+
+
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+
+            var value = new MemberDisplay();
+            string reason = "Validation failed";
 
             // act
+            HttpResponseException exception = Assert.ThrowsAsync<HttpResponseException>(() => sut.PostSave(fakeMemberData));
+
             // assert
-            Assert.ThrowsAsync<HttpResponseException>(() => sut.PostSave(fakeMemberData));
+            AssertExpectedException(exception, value, reason);
         }
 
 
@@ -83,11 +109,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             // arrange
             Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
-
             Mock.Get(memberService).SetupSequence(
                 x => x.GetByEmail(It.IsAny<string>()))
                 .Returns(() => null)
@@ -115,12 +143,21 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurity backOfficeSecurity)
         {
             // arrange
-            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => new MembersIdentityUser());
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.UpdateAsync(new MembersIdentityUser()));
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+
+            string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.GeneratePassword(It.IsAny<string>()))
+                .Returns(password);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
 
@@ -140,7 +177,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
         [Test]
         [AutoMoqData]
-        public async Task PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectSuccessResponse(
+        public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectSuccessResponse(
             [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
@@ -163,13 +200,29 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Returns(() => member);
 
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
+            var value = new MemberDisplay();
+            string reason = "Validation failed";
 
             // act
             HttpResponseException exception = Assert.ThrowsAsync<HttpResponseException>(() => sut.PostSave(fakeMemberData));
 
             // assert
-            //Assert.That(exception.Message, Is.EqualTo("Exception of type 'Umbraco.Web.Common.Exceptions.HttpResponse..."));
-            //Assert.That(exception.Value, Is.EqualTo(42));
+            AssertExpectedException(exception, value, reason);
+        }
+
+        private void AssertExpectedException(HttpResponseException exception, object value, string reason)
+        {
+            var expectedException = new HttpResponseException(HttpStatusCode.BadRequest, value)
+            {
+                AdditionalHeaders =
+                {
+                    ["X-Status-Reason"] = reason
+                }
+            };
+
+            Assert.That(exception.AdditionalHeaders, Is.EqualTo(expectedException.AdditionalHeaders));
+            Assert.That(exception.Value, Is.EqualTo(expectedException.Value));
+            Assert.That(exception.Status, Is.EqualTo(expectedException.Status));
         }
 
         /// <summary>
@@ -190,7 +243,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var testEmail = "test@umbraco.com";
             var testUser = "TestUser";
 
-            var member = new Member(testName, testEmail, testUser, testContentType) {RawPasswordValue = fakePassword};
+            var member = new Member(testName, testEmail, testUser, testContentType) { RawPasswordValue = fakePassword };
             mapper = new UmbracoMapper(memberMapDefinition);
 
             // TODO: reuse maps
@@ -238,6 +291,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         {
             var fakeMemberData = new MemberSave()
             {
+                Id = 123,
                 Password = new ChangingPasswordModel()
                 {
                     Id = 123,
