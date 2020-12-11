@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -103,8 +103,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (settingGuidUdi != null)
                         settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
 
-                    if (!contentData.ContentType.TryGetKey(out var contentTypeKey))
-                        throw new InvalidOperationException("The content type was not of type " + typeof(IPublishedContentType2));
+                    var contentTypeKey = contentData.ContentType.Key;
 
                     if (!blockConfigMap.TryGetValue(contentTypeKey, out var blockConfig))
                         continue;
@@ -113,8 +112,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     // we also ensure that the content type's match since maybe the settings type has been changed after this has been persisted.
                     if (settingsData != null)
                     {
-                        if (!settingsData.ContentType.TryGetKey(out var settingsElementTypeKey))
-                            throw new InvalidOperationException("The settings element type was not of type " + typeof(IPublishedContentType2));
+                        var settingsElementTypeKey = settingsData.ContentType.Key;
 
                         if (!blockConfig.SettingsElementTypeKey.HasValue || settingsElementTypeKey != blockConfig.SettingsElementTypeKey)
                             settingsData = null;

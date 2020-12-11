@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -33,19 +33,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         /// <returns></returns>
         private IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
         {
-            var test1ContentType = Mock.Of<IPublishedContentType2>(x =>
+            var test1ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == ContentKey1
                 && x.Alias == ContentAlias1);
-            var test2ContentType = Mock.Of<IPublishedContentType2>(x =>
+            var test2ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == ContentKey2
                 && x.Alias == ContentAlias2);
-            var test3ContentType = Mock.Of<IPublishedContentType2>(x =>
+            var test3ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == SettingKey1
                 && x.Alias == SettingAlias1);
-            var test4ContentType = Mock.Of<IPublishedContentType2>(x =>
+            var test4ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == SettingKey2
                 && x.Alias == SettingAlias2);

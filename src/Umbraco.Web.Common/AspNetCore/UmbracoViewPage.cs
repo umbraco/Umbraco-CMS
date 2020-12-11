@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
@@ -28,23 +30,44 @@ namespace Umbraco.Web.Common.AspNetCore
 
     public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     {
-
         private IUmbracoContext _umbracoContext;
+
         private IUmbracoContextAccessor UmbracoContextAccessor => Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+
         private GlobalSettings GlobalSettings => Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
         private ContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
+
         private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
+
         private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
+
         private ContentModelBinder ContentModelBinder => new ContentModelBinder();
 
+        /// <summary>
+        /// Gets the <see cref="IUmbracoContext"/>
+        /// </summary>
         protected IUmbracoContext UmbracoContext => _umbracoContext ??= UmbracoContextAccessor.UmbracoContext;
 
+        /// <inheritdoc/>
+        public override ViewContext ViewContext
+        {
+            get => base.ViewContext;
+            set
+            {
+                // Here we do the magic model swap
+                ViewContext ctx = value;
+                ctx.ViewData = BindViewData(ctx.ViewData);
+                base.ViewContext = ctx;
+            }
+        }
 
+        /// <inheritdoc/>
         public override void Write(object value)
         {
             if (value is IHtmlEncodedString htmlEncodedString)
             {
-                base.WriteLiteral(htmlEncodedString.ToHtmlString());
+                WriteLiteral(htmlEncodedString.ToHtmlString());
             }
             else
             {
@@ -52,10 +75,12 @@ namespace Umbraco.Web.Common.AspNetCore
             }
         }
 
+        /// <inheritdoc/>
         public override void WriteLiteral(object value)
         {
             // filter / add preview banner
-            if (Context.Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
+            // ASP.NET default value is text/html
+            if (Context.Response.ContentType.InvariantEquals("text/html"))
             {
                 if (UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
                 {
@@ -70,7 +95,8 @@ namespace Umbraco.Web.Common.AspNetCore
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                string.Format(ContentSettings.PreviewBadge,
+                                string.Format(
+                                    ContentSettings.PreviewBadge,
                                     IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
                                     Context.Request.GetEncodedUrl(),
                                     UmbracoContext.PublishedRequest.PublishedContent.Id);
@@ -84,7 +110,7 @@ namespace Umbraco.Web.Common.AspNetCore
                         var sb = new StringBuilder(text);
                         sb.Insert(pos, markupToInject);
 
-                        base.WriteLiteral(sb.ToString());
+                        WriteLiteral(sb.ToString());
                         return;
                     }
                 }
@@ -93,70 +119,93 @@ namespace Umbraco.Web.Common.AspNetCore
             base.WriteLiteral(value);
         }
 
-        // TODO: This trick doesn't work anymore, this method used to be an override.
-        // Now the model is bound in a different place
-        // maps model
-        protected async Task SetViewDataAsync(ViewDataDictionary viewData)
+        /// <summary>
+        /// Dynamically binds the incoming <see cref="ViewDataDictionary"/> to the required <see cref="ViewDataDictionary{TModel}"/>
+        /// </summary>
+        /// <remarks>
+        /// This is used in order to provide the ability for an Umbraco view to either have a model of type
+        /// <see cref="IContentModel"/> or <see cref="IPublishedContent"/>. This will use the <see cref="ContentModelBinder"/> to bind the models
+        /// to the correct output type.
+        /// </remarks>
+        protected ViewDataDictionary BindViewData(ViewDataDictionary viewData)
         {
+            // check if it's already the correct type and continue if it is
+            if (viewData is ViewDataDictionary<TModel> vdd)
+            {
+                return vdd;
+            }
+
+            // Here we hand the default case where we know the incoming model is ContentModel and the
+            // outgoing model is IPublishedContent. This is a fast conversion that doesn't require doing the full
+            // model binding, allocating classes, etc...
+            if (viewData.ModelMetadata.ModelType == typeof(ContentModel)
+                && typeof(TModel) == typeof(IPublishedContent))
+            {
+                var contentModel = (ContentModel)viewData.Model;
+                viewData.Model = contentModel.Content;
+                return viewData;
+            }
+
             // capture the model before we tinker with the viewData
             var viewDataModel = viewData.Model;
 
             // map the view data (may change its type, may set model to null)
-            viewData = MapViewDataDictionary(viewData, typeof (TModel));
+            viewData = MapViewDataDictionary(viewData, typeof(TModel));
 
             // bind the model
             var bindingContext = new DefaultModelBindingContext();
-            await ContentModelBinder.BindModelAsync(bindingContext, viewDataModel, typeof (TModel));
+            ContentModelBinder.BindModel(bindingContext, viewDataModel, typeof(TModel));
 
             viewData.Model = bindingContext.Result.Model;
 
-            // set the view data
-            ViewData = (ViewDataDictionary<TModel>) viewData;
+            // return the new view data
+            return (ViewDataDictionary<TModel>)viewData;
         }
 
         // viewData is the ViewDataDictionary (maybe <TModel>) that we have
         // modelType is the type of the model that we need to bind to
-        //
         // figure out whether viewData can accept modelType else replace it
-        //
         private static ViewDataDictionary MapViewDataDictionary(ViewDataDictionary viewData, Type modelType)
         {
-            var viewDataType = viewData.GetType();
-
+            Type viewDataType = viewData.GetType();
 
             if (viewDataType.IsGenericType)
             {
                 // ensure it is the proper generic type
-                var def = viewDataType.GetGenericTypeDefinition();
+                Type def = viewDataType.GetGenericTypeDefinition();
                 if (def != typeof(ViewDataDictionary<>))
+                {
                     throw new Exception("Could not map viewData of type \"" + viewDataType.FullName + "\".");
+                }
 
                 // get the viewData model type and compare with the actual view model type:
                 // viewData is ViewDataDictionary<viewDataModelType> and we will want to assign an
                 // object of type modelType to the Model property of type viewDataModelType, we
                 // need to check whether that is possible
-                var viewDataModelType = viewDataType.GenericTypeArguments[0];
+                Type viewDataModelType = viewDataType.GenericTypeArguments[0];
 
                 if (viewDataModelType.IsAssignableFrom(modelType))
+                {
                     return viewData;
+                }
             }
 
             // if not possible or it is not generic then we need to create a new ViewDataDictionary
-            var nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
+            Type nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
             var tViewData = new ViewDataDictionary(viewData) { Model = null }; // temp view data to copy values
             var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
             return nViewData;
         }
 
-        public HtmlString RenderSection(string name, HtmlString defaultContents)
-        {
-            return RazorPageExtensions.RenderSection(this, name, defaultContents);
-        }
+        /// <summary>
+        /// Renders a section with default content if the section isn't defined
+        /// </summary>
+        public HtmlString RenderSection(string name, HtmlString defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
 
-        public HtmlString RenderSection(string name, string defaultContents)
-        {
-            return RazorPageExtensions.RenderSection(this, name, defaultContents);
-        }
+        /// <summary>
+        /// Renders a section with default content if the section isn't defined
+        /// </summary>
+        public HtmlString RenderSection(string name, string defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
 
     }
 }
