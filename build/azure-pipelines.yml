@@ -66,26 +66,26 @@ stages:
       env:
         UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
 
-- stage: macOS_X
+- stage: MacOS
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
 
-      - job: Unit_Tests
-        displayName: 'Unit Tests'
-        pool:
-            vmImage: 'macOS-latest'
-        steps:
+  - job: Unit_Tests
+    displayName: 'Unit Tests'
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
 
-            - task: UseDotNet@2
-              displayName: 'Use .Net Core sdk 3.1.x'
-              inputs:
-                  version: 3.1.x
+    - task: UseDotNet@2
+      displayName: 'Use .Net Core sdk 3.1.x'
+      inputs:
+        version: 3.1.x
 
-            - task: DotNetCoreCLI@2
-              displayName: 'dotnet test'
-              inputs:
-                  command: test
-                  projects: '**/*.Tests.UnitTests.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: '**/*.Tests.UnitTests.csproj'
 
 - stage: Windows
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
@@ -120,11 +120,6 @@ stages:
       inputs:
         version: 3.1.x
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
-        projects: '**\Umbraco.Tests.Integration.csproj'
-
     - powershell: 'sqllocaldb start mssqllocaldb'
       displayName: 'Start MSSQL LocalDb'
 
@@ -133,7 +128,6 @@ stages:
       inputs:
         command: test
         projects: '**\Umbraco.Tests.Integration.csproj'
-        arguments: '--no-build'
 
   - job: Build_Artifacts
     displayName: 'Build Artifacts'
