@@ -244,6 +244,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         private static readonly object _dbLocker = new object();
         private static ITestDatabase _dbInstance;
+        private static TestDbMeta _fixtureDbMeta;
 
         protected void UseTestLocalDb(IServiceProvider serviceProvider)
         {
@@ -253,8 +254,6 @@ namespace Umbraco.Tests.Integration.Testing
 
             // This will create a db, install the schema and ensure the app is configured to run
             InstallTestLocalDb(testDatabaseFactoryProvider, databaseFactory, serviceProvider.GetRequiredService<ILoggerFactory>(), state, TestHelper.WorkingDirectory);
-            TestDBConnectionString = databaseFactory.ConnectionString;
-            InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
 
         /// <summary>
@@ -312,15 +311,15 @@ namespace Umbraco.Tests.Integration.Testing
                 case UmbracoTestOptions.Database.NewSchemaPerTest:
 
                     // New DB + Schema
-                    var newSchemaDbId = db.AttachSchema();
+                    var newSchemaDbMeta = db.AttachSchema();
 
                     // Add teardown callback
-                    OnTestTearDown(() => db.Detach(newSchemaDbId));
+                    OnTestTearDown(() => db.Detach(newSchemaDbMeta));
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
                     {
-                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                        databaseFactory.Configure(newSchemaDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
                     }
 
                     // re-run the runtime level check
@@ -330,15 +329,15 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerTest:
-                    var newEmptyDbId = db.AttachEmpty();
+                    var newEmptyDbMeta = db.AttachEmpty();
 
                     // Add teardown callback
-                    OnTestTearDown(() => db.Detach(newEmptyDbId));
+                    OnTestTearDown(() => db.Detach(newEmptyDbMeta));
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
                     {
-                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                        databaseFactory.Configure(newEmptyDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
                     }
 
                     // re-run the runtime level check
@@ -354,16 +353,17 @@ namespace Umbraco.Tests.Integration.Testing
                     if (FirstTestInFixture)
                     {
                         // New DB + Schema
-                        var newSchemaFixtureDbId = db.AttachSchema();
+                        var newSchemaFixtureDbMeta = db.AttachSchema();
+                        _fixtureDbMeta = newSchemaFixtureDbMeta;
 
                         // Add teardown callback
-                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
+                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
                     }
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
                     {
-                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                        databaseFactory.Configure(_fixtureDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
                     }
 
                     // re-run the runtime level check
@@ -377,16 +377,17 @@ namespace Umbraco.Tests.Integration.Testing
                     if (FirstTestInFixture)
                     {
                         // New DB + Schema
-                        var newEmptyFixtureDbId = db.AttachEmpty();
+                        var newEmptyFixtureDbMeta = db.AttachEmpty();
+                        _fixtureDbMeta = newEmptyFixtureDbMeta;
 
                         // Add teardown callback
-                        OnFixtureTearDown(() => db.Detach(newEmptyFixtureDbId));
+                        OnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
                     }
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
                     {
-                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                        databaseFactory.Configure(_fixtureDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
                     }
 
                     break;
@@ -406,8 +407,6 @@ namespace Umbraco.Tests.Integration.Testing
         public IConfiguration Configuration { get; protected set; }
 
         public TestHelper TestHelper = new TestHelper();
-
-        protected virtual string TestDBConnectionString { get; private set; }
 
         protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 

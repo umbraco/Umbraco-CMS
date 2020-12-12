@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -23,7 +23,7 @@ public class TestsSetup
     [OneTimeTearDown]
     public void TearDown()
     {
-        LocalDbTestDatabase.KillLocalDb();
+        LocalDbTestDatabase.Instance?.Finish();
         SqlDeveloperTestDatabase.Instance?.Finish();
         Console.WriteLine("TOTAL TESTS DURATION: {0}", _stopwatch.Elapsed);
     }

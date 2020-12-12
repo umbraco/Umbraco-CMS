@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Tests.Integration.Testing
 {
     public interface ITestDatabase
     {
-        string ConnectionString { get; }
-        int AttachEmpty();
-        int AttachSchema();
-        void Detach(int id);
+        TestDbMeta AttachEmpty();
+        TestDbMeta AttachSchema();
+        void Detach(TestDbMeta id);
     }
 }

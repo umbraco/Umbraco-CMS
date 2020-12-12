@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
 
@@ -9,7 +8,7 @@ namespace Umbraco.Tests.Integration.Testing
     {
         public static ITestDatabase Create(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            return string.IsNullOrEmpty(Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString"))
                 ? CreateLocalDb(filesPath, loggerFactory, dbFactory.Create())
                 : CreateSqlDeveloper(loggerFactory, dbFactory.Create());
         }
