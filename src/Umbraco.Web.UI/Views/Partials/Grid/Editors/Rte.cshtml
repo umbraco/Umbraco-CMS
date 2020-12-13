@@ -2,8 +2,12 @@
 @using Umbraco.Web.Composing
 @using Umbraco.Web.Templates
 @{
-    var value = TemplateUtilities.ParseInternalLinks(Model.value.ToString(), Current.UmbracoContext.UrlProvider);
-    value = TemplateUtilities.ResolveUrlsFromTextString(value);
-    value = TemplateUtilities.ResolveMediaFromTextString(value);
+    var htmlLocalLinkParser = Current.Factory.GetInstance<HtmlLocalLinkParser>();
+    var htmlUrlParser = Current.Factory.GetInstance<HtmlUrlParser>();
+    var htmlImageSourceParser = Current.Factory.GetInstance<HtmlImageSourceParser>();
+
+    var value = htmlLocalLinkParser.EnsureInternalLinks(Model.value.ToString());
+    value = htmlUrlParser.EnsureUrls(value);
+    value = htmlImageSourceParser.EnsureImageSources(value);
 }
 @Html.Raw(value)

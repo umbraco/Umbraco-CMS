@@ -101,10 +101,10 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
+                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
                         <umb-confirm-action
-                            show="tab.deletePrompt"
+                            ng-if="tab.deletePrompt"
                             direction="left"
-                            on-delete="togglePrompt(tab)"
                             on-confirm="removeGroup($index)"
                             on-cancel="hidePrompt(tab)">
                         </umb-confirm-action>
@@ -228,13 +228,13 @@
                                 <div class="umb-group-builder__property-tags -right">
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.inherited">
-                                        <umb-icon icon="icon-merge" class="icon-merge"></umb-icon>
+                                        <umb-icon icon="icon-merge"></umb-icon>
                                         <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
                                         {{property.contentTypeName}}
                                     </div>
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.locked">
-                                        <umb-icon icon="icon-lock" class="icon-lock"></umb-icon>
+                                        <umb-icon icon="icon-lock"></umb-icon>
                                         <localize key="general_locked"></localize>
                                     </div>
 
@@ -260,16 +260,18 @@
                                     <!-- settings for property -->
                                     <div class="umb-group-builder__property-action">
                                         <button aria-label="Open settings" class="btn-icon" ng-click="editPropertyTypeSettings(property, tab)" localize="title" title="@general_edit">
-                                            <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+                                            <umb-icon icon="icon-settings"></umb-icon>
                                         </button>
                                     </div>
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
+                                        <button aria-label="Delete property" class="btn-icon" ng-click="togglePrompt(property)">
+                                            <umb-icon icon="icon-trash"></umb-icon>
+                                        </button>
                                         <umb-confirm-action
-                                            show="property.deletePrompt"
+                                            ng-if="property.deletePrompt"
                                             direction="left"
-                                            on-delete="togglePrompt(property)"
                                             on-confirm="deleteProperty(tab, $index)"
                                             on-cancel="hidePrompt(property)">
                                         </umb-confirm-action>

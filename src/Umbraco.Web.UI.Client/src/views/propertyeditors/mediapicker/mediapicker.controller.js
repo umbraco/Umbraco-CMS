@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService) {
 
         var vm = this;
 
@@ -242,10 +242,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function removeAllEntries() {
-            $scope.mediaItems.length = 0;// AngularJS way to empty the array.
-            $scope.ids.length = 0;// AngularJS way to empty the array.
-            sync();
-            setDirty();
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        $scope.mediaItems.length = 0;// AngularJS way to empty the array.
+                        $scope.ids.length = 0;// AngularJS way to empty the array.
+                        sync();
+                        setDirty();
+                        overlayService.close();
+                    }
+                });
+            });
         }
 
         var removeAllEntriesAction = {

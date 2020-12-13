@@ -358,6 +358,7 @@ namespace Umbraco.Web.Editors
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
