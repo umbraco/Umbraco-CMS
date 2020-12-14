@@ -1717,7 +1717,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
-    <key alias="displaySettingsLabelOnTop">Display label on top of editor.</key>
+    <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2556,9 +2556,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="endTitle">End preview mode</key>
     <key alias="openWebsiteLabel">Preview website</key>
     <key alias="openWebsiteTitle">Open website in preview mode</key>
-    <key alias="returnToPreviewHeadline">Preview content?</key>
-    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to continue previewing this content?</key>
-    <key alias="returnToPreviewButton">Preview</key>
+    <key alias="returnToPreviewHeadline">Preview website?</key>
+    <key alias="returnToPreviewDescription">ou have ended preview mode, do you want to enable it again to view the latest saved version of your website?</key>
+    <key alias="returnToPreviewAcceptButton">Preview latest version</key>
+    <key alias="returnToPreviewDeclineButton">View published version</key>
     <key alias="viewPublishedContentHeadline">View published version?</key>
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>

@@ -157,7 +157,15 @@ namespace Umbraco.Core.Runtime
             _logger.LogInformation("Acquiring.");
 
             // Get the lock
-            var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+            var acquired = false;
+            try
+            {
+                acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while acquiring");
+            }
 
             if (!acquired)
             {
