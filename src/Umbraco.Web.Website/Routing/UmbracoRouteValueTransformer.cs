@@ -4,14 +4,18 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
@@ -42,6 +46,8 @@ namespace Umbraco.Web.Website.Routing
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
         private readonly IPublishedRouter _publishedRouter;
+        private readonly GlobalSettings _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -52,7 +58,9 @@ namespace Umbraco.Web.Website.Routing
             IUmbracoRenderingDefaults renderingDefaults,
             IShortStringHelper shortStringHelper,
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
-            IPublishedRouter publishedRouter)
+            IPublishedRouter publishedRouter,
+            IOptions<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -60,19 +68,32 @@ namespace Umbraco.Web.Website.Routing
             _shortStringHelper = shortStringHelper;
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             _publishedRouter = publishedRouter;
+            _globalSettings = globalSettings.Value;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <inheritdoc/>
         public override async ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary values)
         {
+            // will be null for any client side requests like JS, etc...
             if (_umbracoContextAccessor.UmbracoContext == null)
             {
-                throw new InvalidOperationException($"There is no current UmbracoContext, it must be initialized before the {nameof(UmbracoRouteValueTransformer)} executes, ensure that {nameof(UmbracoRequestMiddleware)} is registered prior to 'UseRouting'");
+                return values;
+                // throw new InvalidOperationException($"There is no current UmbracoContext, it must be initialized before the {nameof(UmbracoRouteValueTransformer)} executes, ensure that {nameof(UmbracoRequestMiddleware)} is registered prior to 'UseRouting'");
+            }
+
+            // Check for back office request
+            // TODO: This is how the module was doing it before but could just as easily be part of the RoutableDocumentFilter
+            // which still needs to be migrated.
+            if (httpContext.Request.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
+            {
+                return values;
             }
 
             bool routed = RouteRequest(_umbracoContextAccessor.UmbracoContext, out IPublishedRequest publishedRequest);
             if (!routed)
             {
+                return values;
                 // TODO: Deal with it not being routable, perhaps this should be an enum result?
             }
 

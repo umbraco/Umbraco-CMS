@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -18,27 +18,20 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Check if a preview cookie exist
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
         public static bool HasPreviewCookie(this HttpRequest request)
-        {
-            return request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
-        }
+            => request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
 
         public static bool IsBackOfficeRequest(this HttpRequest request, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        {
-            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);
-        }
+            => new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);
 
         public static bool IsClientSideRequest(this HttpRequest request)
-        {
-            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest();
-        }
+            => new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest();
+
+        public static bool IsDefaultBackOfficeRequest(this HttpRequest request, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+            => new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsDefaultBackOfficeRequest(globalSettings, hostingEnvironment);
 
         public static string ClientCulture(this HttpRequest request)
-        {
-            return request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
-        }
+            => request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
 
         /// <summary>
         /// Determines if a request is local.

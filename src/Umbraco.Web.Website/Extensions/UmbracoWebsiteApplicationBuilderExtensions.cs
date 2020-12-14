@@ -38,10 +38,10 @@ namespace Umbraco.Extensions
         {
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
-
                 NoContentRoutes noContentRoutes = app.ApplicationServices.GetRequiredService<NoContentRoutes>();
                 noContentRoutes.CreateRoutes(endpoints);
+
+                endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
             });
 
             return app;
