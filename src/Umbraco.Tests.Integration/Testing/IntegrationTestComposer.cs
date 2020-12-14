@@ -49,8 +49,10 @@ namespace Umbraco.Tests.Integration.Testing
             // we don't want persisted nucache files in tests
             builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
+            #if IS_WINDOWS
             // ensure all lucene indexes are using RAM directory (no file system)
             builder.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
+            #endif
 
             // replace this service so that it can lookup the correct file locations
             builder.Services.AddUnique<ILocalizedTextService>(GetLocalizedTextService);
