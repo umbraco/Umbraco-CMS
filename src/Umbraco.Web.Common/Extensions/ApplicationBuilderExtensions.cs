@@ -37,7 +37,6 @@ namespace Umbraco.Extensions
             // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
             // before endpoint routing middleware.
             app.UseUmbracoRouting();
-            app.UseUmbracoContentCache();
 
             app.UseStatusCodePages();
 
@@ -175,18 +174,6 @@ namespace Umbraco.Extensions
             app.UseSmidge();
             app.UseSmidgeNuglify();
 
-            return app;
-        }
-
-        /// <summary>
-        /// Enables the Umbraco content cache
-        /// </summary>
-        public static IApplicationBuilder UseUmbracoContentCache(this IApplicationBuilder app)
-        {
-            // TODO: This should install middleware to initialize instead of eagerly doing the initialize here
-
-            PublishedSnapshotServiceEventHandler publishedContentEvents = app.ApplicationServices.GetRequiredService<PublishedSnapshotServiceEventHandler>();
-            publishedContentEvents.Start();
             return app;
         }
 
