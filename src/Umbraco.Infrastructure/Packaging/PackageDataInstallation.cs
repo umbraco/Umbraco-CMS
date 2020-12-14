@@ -225,8 +225,8 @@ namespace Umbraco.Core.Packaging
                 var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
                 installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
-                installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
-                installationSummary.MediaInstalled = ImportContent(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
+                installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
+                installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
 
                 scope.Complete();
 
@@ -252,7 +252,7 @@ namespace Umbraco.Core.Packaging
         #region Content
 
 
-        public IReadOnlyList<T> ImportContent<T, S>(
+        public IReadOnlyList<T> ImportContentBase<T, S>(
             IEnumerable<CompiledPackageContentBase> docs,
             IDictionary<string, S> importedDocumentTypes,
             int userId,
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Packaging
         where T: class, IContentBase
         where S: IContentTypeComposition
         {
-            return docs.SelectMany(x => ImportContent<T, S>(
+            return docs.SelectMany(x => ImportContentBase<T, S>(
                 x.XmlData.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty),
                 -1,
                 importedDocumentTypes,
@@ -278,7 +278,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <returns>An enumerable list of generated content</returns>
-        public IEnumerable<T> ImportContent<T, S>(
+        public IEnumerable<T> ImportContentBase<T, S>(
             IEnumerable<XElement> roots,
             int parentId,
             IDictionary<string, S> importedDocumentTypes,
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Packaging
             where S: IContentTypeComposition
         {
 
-            var contents = ParseDocumentRootXml<T, S>(roots, parentId, importedDocumentTypes, typeService, service).ToList();
+            var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, typeService, service).ToList();
             if (contents.Any())
                 service.Save(contents, userId);
 
@@ -300,7 +300,7 @@ namespace Umbraco.Core.Packaging
             //{
             //    //This is a single doc import
             //    var elements = new List<XElement> { element };
-            //    var contents = ParseDocumentRootXml(elements, parentId, importedDocumentTypes).ToList();
+            //    var contents = ParseContentBaseRootXml(elements, parentId, importedDocumentTypes).ToList();
             //    if (contents.Any())
             //        _contentService.Save(contents, userId);
 
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Packaging
             //    "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
-        private IEnumerable<T> ParseDocumentRootXml<T, S>(
+        private IEnumerable<T> ParseContentBaseRootXml<T, S>(
             IEnumerable<XElement> roots,
             int parentId,
             IDictionary<string, S> importedContentTypes,
@@ -428,7 +428,7 @@ namespace Umbraco.Core.Packaging
                 }
             }
 
-            T content = CreateContent<T, S>(
+            T content = CreateContent(
                 nodeName,
                 parent,
                 parentId,
