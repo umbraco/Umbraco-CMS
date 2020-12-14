@@ -228,9 +228,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 // Ask to re-enter preview mode?
 
                 const localizeVarsFallback = {
-                    "returnToPreviewHeadline": "Preview content?",
-                    "returnToPreviewDescription":"You have ended preview mode, do you want to continue previewing this content?",
-                    "returnToPreviewButton":"Preview"
+                    "returnToPreviewHeadline": "Preview website?",
+                    "returnToPreviewDescription":"You have ended preview mode, do you want to enable it again to view the latest saved version of your website?",
+                    "returnToPreviewAcceptButton":"Preview latest version",
+                    "returnToPreviewDeclineButton":"View published version"
                 };
                 const umbLocalizedVars = Object.assign(localizeVarsFallback, $window.umbLocalizedVars);
 
@@ -333,10 +334,20 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                     <div class="umbraco-preview-dialog__question">${umbLocalizedVars.returnToPreviewDescription}</div>`;
                 con.appendChild(modal);
 
+                var declineButton = document.createElement("button");
+                declineButton.type = "button";
+                declineButton.innerHTML = umbLocalizedVars.returnToPreviewDeclineButton;
+                declineButton.addEventListener("click", () => {
+                    bodyEl.removeChild(fragment);
+                    $scope.exitPreview();
+                    hasPreviewDialog = false;
+                });
+                modal.appendChild(declineButton);
+
                 var continueButton = document.createElement("button");
                 continueButton.type = "button";
                 continueButton.className = "umbraco-preview-dialog__continue";
-                continueButton.innerHTML = umbLocalizedVars.returnToPreviewButton;
+                continueButton.innerHTML = umbLocalizedVars.returnToPreviewAcceptButton;
                 continueButton.addEventListener("click", () => {
                     bodyEl.removeChild(fragment);
                     reenterPreviewMode();
