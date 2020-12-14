@@ -4,11 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -28,7 +28,6 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
@@ -761,7 +760,7 @@ AND (umbracoNode.id=@id)";
             // The indenting resumes once the mixed content element is closed." - says MSDN
             // about XmlWriterSettings.Indent
 
-            // so ImportContent must also make sure of ignoring whitespaces!
+            // so ImportContentBase must also make sure of ignoring whitespaces!
 
             var sb = new StringBuilder();
             using (var xmlWriter = XmlWriter.Create(sb, new XmlWriterSettings
