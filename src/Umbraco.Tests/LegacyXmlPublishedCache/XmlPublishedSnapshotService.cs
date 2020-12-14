@@ -169,32 +169,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #endregion
 
-        #region Preview
-
-        public override string EnterPreview(IUser user, int contentId)
-        {
-            var previewContent = new PreviewContent(_xmlStore, user.Id);
-            previewContent.CreatePreviewSet(contentId, true); // preview branch below that content
-            return previewContent.Token;
-            //previewContent.ActivatePreviewCookie();
-        }
-
-        public override void RefreshPreview(string previewToken, int contentId)
-        {
-            if (previewToken.IsNullOrWhiteSpace()) return;
-            var previewContent = new PreviewContent(_xmlStore, previewToken);
-            previewContent.CreatePreviewSet(contentId, true); // preview branch below that content
-        }
-
-        public override void ExitPreview(string previewToken)
-        {
-            if (previewToken.IsNullOrWhiteSpace()) return;
-            var previewContent = new PreviewContent(_xmlStore, previewToken);
-            previewContent.ClearPreviewSet();
-        }
-
-        #endregion
-
         #region Xml specific
 
         /// <summary>

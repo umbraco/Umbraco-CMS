@@ -77,56 +77,6 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
-        #region Preview
-
-        /* Later on we can imagine that EnterPreview would handle a "level" that would be either
-         * the content only, or the content's branch, or the whole tree + it could be possible
-         * to register filters against the factory to filter out which nodes should be preview
-         * vs non preview.
-         *
-         * EnterPreview() returns the previewToken. It is up to callers to store that token
-         * wherever they want, most probably in a cookie.
-         *
-         */
-
-        /// <summary>
-        /// Enters preview for specified user and content.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="contentId">The content identifier.</param>
-        /// <returns>A preview token.</returns>
-        /// <remarks>
-        /// <para>Tells the caches that they should prepare any data that they would be keeping
-        /// in order to provide preview to a given user. In the Xml cache this means creating the Xml
-        /// file, though other caches may do things differently.</para>
-        /// <para>Does not handle the preview token storage (cookie, etc) that must be handled separately.</para>
-        /// </remarks>
-        string EnterPreview(IUser user, int contentId); // TODO: Remove this, it is not needed and is legacy from the XML cache
-
-        /// <summary>
-        /// Refreshes preview for a specified content.
-        /// </summary>
-        /// <param name="previewToken">The preview token.</param>
-        /// <param name="contentId">The content identifier.</param>
-        /// <remarks>Tells the caches that they should update any data that they would be keeping
-        /// in order to provide preview to a given user. In the Xml cache this means updating the Xml
-        /// file, though other caches may do things differently.</remarks>
-        void RefreshPreview(string previewToken, int contentId); // TODO: Remove this, it is not needed and is legacy from the XML cache
-
-        /// <summary>
-        /// Exits preview for a specified preview token.
-        /// </summary>
-        /// <param name="previewToken">The preview token.</param>
-        /// <remarks>
-        /// <para>Tells the caches that they can dispose of any data that they would be keeping
-        /// in order to provide preview to a given user. In the Xml cache this means deleting the Xml file,
-        /// though other caches may do things differently.</para>
-        /// <para>Does not handle the preview token storage (cookie, etc) that must be handled separately.</para>
-        /// </remarks>
-        void ExitPreview(string previewToken); // TODO: Remove this, it is not needed and is legacy from the XML cache
-
-        #endregion
-
         #region Changes
 
         /* An IPublishedCachesService implementation can rely on transaction-level events to update

@@ -1131,27 +1131,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
-        #region Preview
-
-        // TODO: Delete this all
-        public override string EnterPreview(IUser user, int contentId)
-        {
-            return "preview"; // anything
-        }
-
-        public override void RefreshPreview(string previewToken, int contentId)
-        {
-            // nothing
-        }
-
-        public override void ExitPreview(string previewToken)
-        {
-            // nothing
-        }
-
-        #endregion
-
-
         #region Rebuild Database PreCache
 
         public override void Rebuild(

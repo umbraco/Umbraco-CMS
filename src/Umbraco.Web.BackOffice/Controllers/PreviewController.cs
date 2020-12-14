@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Options;
@@ -108,7 +108,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// The endpoint that is loaded within the preview iframe
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public ActionResult Frame(int id, string culture)
         {
@@ -119,22 +118,17 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return RedirectPermanent($"../../{id}.aspx{query}");
         }
+
         public ActionResult EnterPreview(int id)
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-
-            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
-
-            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, previewToken);
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
 
             return null;
         }
+
         public ActionResult End(string redir = null)
         {
-            var previewToken = _cookieManager.GetPreviewCookieValue();
-
-            _publishedSnapshotService.ExitPreview(previewToken);
-
             _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
 
             // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.

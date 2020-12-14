@@ -37,15 +37,6 @@ namespace Umbraco.Web.PublishedCache
         public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
 
         /// <inheritdoc/>
-        public abstract string EnterPreview(IUser user, int contentId);
-
-        /// <inheritdoc/>
-        public abstract void RefreshPreview(string previewToken, int contentId);
-
-        /// <inheritdoc/>
-        public abstract void ExitPreview(string previewToken);
-
-        /// <inheritdoc/>
         public abstract void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged);
 
         /// <inheritdoc/>
