@@ -701,7 +701,7 @@ namespace Umbraco.Core.Packaging
             }
 
             var alias = infoElement.Element("Alias").Value;
-            T contentType = CreateContentType<T>(parent, alias);
+            T contentType = CreateContentType(parent, -1, alias);
 
             if (parent != null)
                 contentType.AddContentType(parent);
@@ -709,19 +709,33 @@ namespace Umbraco.Core.Packaging
             return UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service);
         }
 
-        private T CreateContentType<T>(T parent, string alias)
+        private T CreateContentType<T>(T parent, int parentId, string alias)
             where T : class, IContentTypeComposition
         {
-            var parentId = parent?.Id ?? -1;
-
             if (typeof(T) == typeof(IContentType))
             {
-                return new ContentType(_shortStringHelper, parentId) { Alias = alias } as T;
+                if (parent is null)
+                {
+                    return new ContentType(_shortStringHelper, parentId) { Alias = alias } as T;
+                }
+                else
+                {
+                    return new ContentType(_shortStringHelper, (IContentType) parent, alias) as T;
+                }
+
             }
 
             if (typeof(T) == typeof(IMediaType))
             {
-                return new MediaType(_shortStringHelper, parentId) { Alias = alias } as T;
+                if (parent is null)
+                {
+                    return new MediaType(_shortStringHelper, parentId) { Alias = alias } as T;
+                }
+                else
+                {
+                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) as T;
+                }
+
             }
 
             throw new NotSupportedException($"Type {typeof(T)} is not supported");
