@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.Threading;
@@ -91,7 +91,6 @@ namespace Umbraco.Tests.TestHelpers
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>);
                 var factory = new UmbracoDatabaseFactory(f.GetRequiredService<ILogger<UmbracoDatabaseFactory>>(), f.GetRequiredService<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
-                factory.ResetForTests();
                 return factory;
             });
         }

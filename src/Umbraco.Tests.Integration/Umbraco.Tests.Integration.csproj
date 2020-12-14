@@ -7,6 +7,10 @@
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+        <DefineConstants>IS_WINDOWS</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="TEMP\**" />
       <EmbeddedResource Remove="TEMP\**" />

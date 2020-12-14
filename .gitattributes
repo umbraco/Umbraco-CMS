@@ -43,6 +43,7 @@
 *.hs text=auto
 *.json text=auto
 *.xml text=auto
+*.resx text=auto
 
 *.csproj text=auto merge=union
 *.vbproj text=auto merge=union

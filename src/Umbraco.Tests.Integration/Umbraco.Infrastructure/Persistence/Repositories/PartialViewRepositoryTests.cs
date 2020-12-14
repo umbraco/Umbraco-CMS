@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.Testing;
 using System;
+using System.IO;
 using Umbraco.Core.Hosting;
 using Umbraco.Tests.Integration.Testing;
 
@@ -55,28 +56,28 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 partialView = new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
-                Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
                 Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
 
                 partialView = (PartialView) repository.Get("path-2/test-path-2.cshtml");
                 Assert.IsNotNull(partialView);
-                Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path);
+                Assert.AreEqual("path-2\\test-path-2.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
 
                 partialView = new PartialView(PartialViewType.PartialView, "path-2\\test-path-3.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
-                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
                 partialView = (PartialView) repository.Get("path-2/test-path-3.cshtml");
                 Assert.IsNotNull(partialView);
-                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
                 partialView = (PartialView) repository.Get("path-2\\test-path-3.cshtml");
                 Assert.IsNotNull(partialView);
-                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
                 partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
