@@ -223,6 +223,32 @@ namespace Umbraco.Tests.Services.Importing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;Package With MediaTypes And Media + Folder&lt;/name&gt;
+        ///      &lt;version&gt;1.0.0&lt;/version&gt;
+        ///      &lt;iconUrl&gt;&lt;/iconUrl&gt;
+        ///      &lt;license url=&quot;http://opensource.org/licenses/MIT&quot;&gt;MIT License&lt;/license&gt;
+        ///      &lt;url&gt;http://www.umbraco.com&lt;/url&gt;
+        ///      &lt;requirements type=&quot;Strict&quot;&gt;
+        ///        &lt;major&gt;0&lt;/major&gt;
+        ///        &lt;minor&gt;5&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MediaTypesAndMedia_Package_xml {
+            get {
+                return ResourceManager.GetString("MediaTypesAndMedia_Package.xml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;DocumentType&gt;
         ///  &lt;Info&gt;

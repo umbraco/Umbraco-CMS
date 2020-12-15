@@ -154,4 +154,7 @@
   <data name="Fanoe_Package" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Fanoe-Package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="MediaTypesAndMedia_Package.xml" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>MediaTypesAndMedia-Package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

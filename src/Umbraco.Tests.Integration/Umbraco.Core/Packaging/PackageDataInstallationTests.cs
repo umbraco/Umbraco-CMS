@@ -79,6 +79,9 @@ namespace Umbraco.Tests.Packaging
         private IContentService ContentService => GetRequiredService<IContentService>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
         [Test]
         public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
         {
@@ -333,8 +336,8 @@ namespace Umbraco.Tests.Packaging
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
             var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
             var numberOfDocs = (from doc in element.Descendants()
-                                where (string) doc.Attribute("isDoc") == ""
-                                select doc).Count();
+                where (string) doc.Attribute("isDoc") == ""
+                select doc).Count();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -342,6 +345,31 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
+        }
+
+        [Test]
+        public void Can_Import_Media_Package_Xml()
+        {
+            // Arrange
+            string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
+            var xml = XElement.Parse(strXml);
+            var mediaTypesElement = xml.Descendants("MediaTypes").First();
+            var element = xml.Descendants("MediaSet").First();
+            var packageMedia = CompiledPackageContentBase.Create(element);
+
+            // Act
+            var mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
+            var importedMediaTypes = mediaTypes.ToDictionary(x => x.Alias, x => x);
+            var medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(),  importedMediaTypes, 0, MediaTypeService, MediaService);
+            var numberOfDocs = (from doc in element.Descendants()
+                where (string) doc.Attribute("isDoc") == ""
+                select doc).Count();
+
+            // Assert
+            Assert.That(medias, Is.Not.Null);
+            Assert.That(mediaTypes.Any(), Is.True);
+            Assert.That(medias.Any(), Is.True);
+            Assert.That(medias.Count(), Is.EqualTo(numberOfDocs));
         }
 
         [Test]
