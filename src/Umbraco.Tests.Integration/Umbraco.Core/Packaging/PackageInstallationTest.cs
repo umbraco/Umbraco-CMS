@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Packaging
             Assert.IsNotNull(preInstallWarnings);
 
             Assert.AreEqual(1, preInstallWarnings.FilesReplaced.Count());
-            Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", preInstallWarnings.FilesReplaced.First());
+            Assert.AreEqual(Path.Combine("bin", "Auros.DocumentTypePicker.dll"), preInstallWarnings.FilesReplaced.First());
 
             // TODO: More Asserts
         }
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Packaging
             var result = PackageInstallation.InstallPackageFiles(def, package, -1).ToList();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", result[0]);
+            Assert.AreEqual(Path.Combine("bin", "Auros.DocumentTypePicker.dll"), result[0]);
             Assert.IsTrue(File.Exists(Path.Combine(TestContext.CurrentContext.TestDirectory, result[0])));
 
             //make sure the def is updated too
