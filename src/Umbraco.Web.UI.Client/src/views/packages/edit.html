@@ -143,15 +143,7 @@
 
 
 
-                        <umb-property property="vm.mediaPickerModel">
-
-                          <umb-node-preview
-                            ng-repeat="node in vm.mediaNodeDisplayModels"
-                            icon="node.icon"
-                            name="node.name"
-                            allow-edit="false"
-                            allow-remove="true">
-                          </umb-node-preview>
+                        <umb-property property="vm.mediaPickerModel" ng-if="vm.loading === false">
                           <umb-property-editor model="vm.mediaPickerModel" is-pre-value="true"></umb-property-editor>
                         </umb-property>
 
