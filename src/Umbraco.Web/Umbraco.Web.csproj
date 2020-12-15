@@ -342,6 +342,7 @@
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />
+    <Compile Include="Security\Identity\MachineKeyEncryptedFormsAuthSecureDataFormat.cs" />
     <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProvider.cs" />
     <Compile Include="TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />

@@ -17,6 +17,7 @@ namespace Umbraco.Core.Security
 {
     public class BackOfficeCookieAuthenticationProvider : CookieAuthenticationProvider
     {
+        public const string EncryptionPurpose = "UmbracoAuthTicket";
         private readonly ApplicationContext _appCtx;
 
         [Obsolete("Use the ctor specifying all dependencies")]
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Security
                     : Guid.NewGuid();
 
                 backOfficeIdentity.UserData.SessionId = session.ToString();
-            }            
+            }
 
             base.ResponseSignIn(context);
         }
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Security
                 return;
             }
             await base.ValidateIdentity(context);
-        }        
+        }
 
         /// <summary>
         /// Ensures that the user has a valid session id

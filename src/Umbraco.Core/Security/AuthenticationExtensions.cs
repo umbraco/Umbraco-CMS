@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
@@ -16,6 +18,7 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using AutoMapper;
 using Microsoft.Owin;
+using Microsoft.Owin.Infrastructure;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
@@ -44,14 +47,14 @@ namespace Umbraco.Core.Security
             {
                 try
                 {
-                    //create the Umbraco user identity 
+                    //create the Umbraco user identity
                     var identity = new UmbracoBackOfficeIdentity(ticket);
 
                     //set the principal object
                     var principal = new GenericPrincipal(identity, identity.Roles);
 
                     //It is actually not good enough to set this on the current app Context and the thread, it also needs
-                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
+                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually
                     // an underlying fault of asp.net not propogating the User correctly.
                     if (HttpContext.Current != null)
                     {
@@ -104,7 +107,7 @@ namespace Umbraco.Core.Security
                 if (backOfficeIdentity != null) return backOfficeIdentity;
             }
 
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session
             var claimsIdentity = user.Identity as ClaimsIdentity;
             if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
             {
@@ -113,7 +116,7 @@ namespace Umbraco.Core.Security
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
                 }
                 catch (InvalidOperationException)
-                {                    
+                {
                 }
             }
 
@@ -121,11 +124,11 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This will return the current back office identity. 
+        /// This will return the current back office identity.
         /// </summary>
         /// <param name="http"></param>
-        /// <param name="authenticateRequestIfNotFound"> 
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
+        /// <param name="authenticateRequestIfNotFound">
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
         /// request just as is done in the Umbraco module and then set the current identity if it is valid.
         /// Just like in the UmbracoModule, if this is true then the user's culture will be assigned to the request.
         /// </param>
@@ -139,21 +142,21 @@ namespace Umbraco.Core.Security
 
             //If it's already a UmbracoBackOfficeIdentity
             var backOfficeIdentity = GetUmbracoIdentity(http.User);
-            if (backOfficeIdentity != null) return backOfficeIdentity;            
+            if (backOfficeIdentity != null) return backOfficeIdentity;
 
             if (authenticateRequestIfNotFound == false) return null;
 
-            //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated 
+            //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated
             // which would mean something strange is going on that it is not an umbraco identity.
             if (http.User.Identity.IsAuthenticated) return null;
 
             //So the user is not authed but we've been asked to do the auth if authenticateRequestIfNotFound = true,
             // which might occur in old webforms style things or for routes that aren't included as a back office request.
             // in this case, we are just reverting to authing using the cookie.
-            
-            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on 
+
+            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on
             // how the Module will eventually do it (by calling in to any registered authenticators).
-            
+
             var ticket = http.GetUmbracoAuthTicket();
             if (http.AuthenticateCurrentRequest(ticket, true))
             {
@@ -164,11 +167,11 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This will return the current back office identity. 
+        /// This will return the current back office identity.
         /// </summary>
         /// <param name="http"></param>
         /// <param name="authenticateRequestIfNotFound">
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
         /// request just as is done in the Umbraco module and then set the current identity if it is valid
         /// </param>
         /// <returns>
@@ -201,7 +204,7 @@ namespace Umbraco.Core.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
         {
-            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");            
+            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");
         }
 
         /// <summary>
@@ -213,7 +216,7 @@ namespace Umbraco.Core.Security
             if (http == null) throw new ArgumentNullException("http");
             new HttpContextWrapper(http).UmbracoLogout();
         }
-        
+
         /// <summary>
         /// This will force ticket renewal in the OWIN pipeline
         /// </summary>
@@ -249,19 +252,19 @@ namespace Umbraco.Core.Security
 
             if (http == null) throw new ArgumentNullException("http");
             if (userdata == null) throw new ArgumentNullException("userdata");
-            
+
             var userDataString = JsonConvert.SerializeObject(userdata);
             return CreateAuthTicketAndCookie(
-                http, 
-                userdata.Username, 
-                userDataString, 
+                http,
+                userdata.Username,
+                userDataString,
                 //use the configuration timeout - this is the same timeout that will be used when renewing the ticket.
-                GlobalSettings.TimeOutInMinutes, 
+                GlobalSettings.TimeOutInMinutes,
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
-                1440, 
+                1440,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
-        }        
+        }
 
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
@@ -292,37 +295,93 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Gets the umbraco auth ticket
+        /// Gets Umbraco's main authentication ticket
         /// </summary>
-        /// <param name="http"></param>
-        /// <returns></returns>
+        /// <param name="http">Http Context</param>
+        /// <returns>FormsAuthenticationTicket saved in the cookie. If there are issues reading the cookie it will force a log off.</returns>
         public static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
-            if (http == null) throw new ArgumentNullException("http");
-            return GetAuthTicket(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            if (http == null) throw new ArgumentNullException(nameof(http));
+            var owinContext = http.ApplicationInstance.Context.GetOwinContext();
+            return GetUmbracoAuthTicket(owinContext);
         }
 
+        /// <summary>
+        /// Gets Umbraco's main authentication ticket
+        /// </summary>
+        /// <param name="http">Http Context</param>
+        /// <returns>FormsAuthenticationTicket saved in the cookie. If there are issues reading the cookie it will force a log off.</returns>
         internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)
         {
-            if (http == null) throw new ArgumentNullException("http");
+            if (http == null) throw new ArgumentNullException(nameof(http));
             return new HttpContextWrapper(http).GetUmbracoAuthTicket();
         }
 
-        internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
+        /// <summary>
+        /// Gets Umbraco's main authentication ticket
+        /// </summary>
+        /// <param name="http">Http Context</param>
+        /// <returns>FormsAuthenticationTicket saved in the cookie. If there are issues reading the cookie it will force a log off.</returns>
+        internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this IOwinContext owinContext)
         {
-            if (ctx == null) throw new ArgumentNullException("ctx");
-            //get the ticket
-            try
-            {
-                return GetAuthTicket(ctx.Request.Cookies.ToDictionary(x => x.Key, x => x.Value), UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            if (owinContext == null) throw new ArgumentNullException(nameof(owinContext));
+            try {
+                return GetAuthTicket(owinContext, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
             }
             catch (Exception)
             {
-                ctx.Authentication.SignOut(
+                owinContext.Authentication.SignOut(
                     Constants.Security.BackOfficeAuthenticationType,
                     Constants.Security.BackOfficeExternalAuthenticationType);
                 return null;
             }
+        }
+
+        private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
+        {
+            var owinContext = http.ApplicationInstance.Context.GetOwinContext();
+            return GetAuthTicket(owinContext, cookieName);
+        }
+
+        private static FormsAuthenticationTicket GetAuthTicket(this IOwinContext owinContext, string cookieName)
+        {
+            var cookie = CookieManager.GetRequestCookie(owinContext, cookieName);
+            if (cookie == null)
+                return null;
+
+            return DecryptFormsAuthTicketWithMachineKey(cookie);
+        }
+
+        /// <summary>
+        /// Encrypts a FormsAuthenticationTicket with the machine key.
+        /// </summary>
+        /// <param name="authTicket">The authentication ticket to encrypt</param>
+        /// <param name="purpose">A custom encryption purpose. Same purpose must be provided during deserialization, otherwise it fails.</param>
+        /// <returns>Encrypted Base64 string representation of the auth ticket.</returns>
+        public static string EncryptFormsAuthTicketWithMachineKey(FormsAuthenticationTicket authTicket, string purpose = BackOfficeCookieAuthenticationProvider.EncryptionPurpose)
+        {
+            using var memoryStream = new MemoryStream();
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, authTicket);
+            var protectedBytes = MachineKey.Protect(memoryStream.ToArray(), purpose);
+            return Convert.ToBase64String(protectedBytes);
+        }
+
+        /// <summary>
+        /// Decrypts a string holding a FormsAuthenticationTicket with the machine key.
+        /// </summary>
+        /// <param name="encryptedText">The encrypted text (a Base64 string)</param>
+        /// <param name="purpose">A custom encryption purpose. This must match the purpose passed in during encryption.</param>
+        /// <returns>A FormsAuthenticationTicket stored in the encrypted string if valid. Otherwise an exception is throw.</returns>
+        public static FormsAuthenticationTicket DecryptFormsAuthTicketWithMachineKey(string encryptedText, string purpose = BackOfficeCookieAuthenticationProvider.EncryptionPurpose)
+        {
+            using var memStream = new MemoryStream();
+            var protectedBytes = Convert.FromBase64String(encryptedText);
+            var unprotectedBytes = MachineKey.Unprotect(protectedBytes, purpose);
+            memStream.Write(unprotectedBytes, 0, unprotectedBytes.Length);
+            memStream.Seek(0, SeekOrigin.Begin);
+            var formatter = new BinaryFormatter();
+            return formatter.Deserialize(memStream) as FormsAuthenticationTicket;
         }
 
         /// <summary>
@@ -367,46 +426,8 @@ namespace Umbraco.Core.Security
                 {
                     //ensure there's def an expired cookie
                     http.Response.Cookies.Add(new HttpCookie(c) { Expires = DateTime.Now.AddYears(-1) });
-                }               
+                }
             }
-        }
-
-        private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
-        {
-            var asDictionary = new Dictionary<string, string>();
-            for (var i = 0; i < http.Request.Cookies.Keys.Count; i++)
-            {
-                var key = http.Request.Cookies.Keys.Get(i);
-                asDictionary[key] = http.Request.Cookies[key].Value;
-            }
-
-            //get the ticket
-            try
-            {
-
-                return GetAuthTicket(asDictionary, cookieName);
-            }
-            catch (Exception)
-            {
-                //occurs when decryption fails
-                http.Logout(cookieName);
-                return null;
-            }
-        }
-
-        private static FormsAuthenticationTicket GetAuthTicket(IDictionary<string, string> cookies, string cookieName)
-        {
-            if (cookies == null) throw new ArgumentNullException("cookies");
-
-            if (cookies.ContainsKey(cookieName) == false) return null;
-
-            var formsCookie = cookies[cookieName];
-            if (formsCookie == null)
-            {
-                return null;
-            }
-            //get the ticket
-            return FormsAuthentication.Decrypt(formsCookie);
         }
 
         /// <summary>
@@ -438,9 +459,9 @@ namespace Umbraco.Core.Security
                 userData,
                 "/"
                 );
-	
+
             // Encrypt the cookie using the machine key for secure transport
-            var hash = FormsAuthentication.Encrypt(ticket);
+            var hash = EncryptFormsAuthTicketWithMachineKey(ticket);
             var cookie = new HttpCookie(
                 cookieName,
                 hash)
@@ -455,7 +476,7 @@ namespace Umbraco.Core.Security
 
             //ensure http only, this should only be able to be accessed via the server
             cookie.HttpOnly = true;
-				
+
             http.Response.Cookies.Set(cookie);
 
             return ticket;
@@ -478,5 +499,11 @@ namespace Umbraco.Core.Security
         /// Used so that we aren't creating a new CultureInfo object for every single request
         /// </summary>
         private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
+
+        /// <summary>
+        /// Used to read cookies from the request. Umbraco's cookie manager inherits from this class.
+        /// Cookies might be chunked if the value is long for a single cookie, this deals with it.
+        /// </summary>
+        private static readonly ChunkingCookieManager CookieManager = new ChunkingCookieManager();
     }
 }
