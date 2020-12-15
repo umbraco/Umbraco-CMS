@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -16,7 +15,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Packaging

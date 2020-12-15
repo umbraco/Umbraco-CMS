@@ -2,13 +2,11 @@
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -18,8 +16,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Services;
-using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Packaging
