@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Scheduling;
 
@@ -7,11 +8,13 @@ namespace Umbraco.Web.Telemetry
     public class TelemetryComponent : IComponent
     {
         private IProfilingLogger _logger;
+        private IUmbracoSettingsSection _settings;
         private BackgroundTaskRunner<IBackgroundTask> _telemetryReporterRunner;
 
-        public TelemetryComponent(IProfilingLogger logger)
+        public TelemetryComponent(IProfilingLogger logger, IUmbracoSettingsSection settings)
         {
             _logger = logger;
+            _settings = settings;
         }
 
         public void Initialize()
@@ -23,7 +26,7 @@ namespace Umbraco.Web.Telemetry
             int howOftenWeRepeat = 60 * 1000 * 60 * 24; // 60 * 1000 * 60 * 24 = 24hrs (86400000)
 
             // As soon as we add our task to the runner it will start to run (after its delay period)
-            var task = new ReportSiteTask(_telemetryReporterRunner, delayBeforeWeStart, howOftenWeRepeat, _logger);
+            var task = new ReportSiteTask(_telemetryReporterRunner, delayBeforeWeStart, howOftenWeRepeat, _logger, _settings);
             _telemetryReporterRunner.TryAdd(task);
         }
 
