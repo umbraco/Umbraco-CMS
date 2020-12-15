@@ -71,9 +71,14 @@ namespace Umbraco.Tests.Integration.Testing
                 foreach (var a in _testTeardown)
                     a();
             }
+
             _testTeardown = null;
             FirstTestInFixture = false;
             FirstTestInSession = false;
+
+            // Ensure CoreRuntime stopped (now it's a HostedService)
+            IHost host = Services.GetRequiredService<IHost>();
+            host.StopAsync().GetAwaiter().GetResult();
         }
 
         [TearDown]
@@ -100,8 +105,6 @@ namespace Umbraco.Tests.Integration.Testing
             var app = new ApplicationBuilder(host.Services);
 
             Configure(app);
-
-            OnFixtureTearDown(() => host.Dispose());
         }
 
         #region Generic Host Builder and Runtime
@@ -135,6 +138,8 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         public virtual IHostBuilder CreateHostBuilder()
         {
+
+            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
@@ -154,6 +159,12 @@ namespace Umbraco.Tests.Integration.Testing
                 {
                     services.AddTransient(_ => CreateLoggerFactory());
                     ConfigureServices(services);
+
+                    if (!testOptions.Boot)
+                    {
+                        // If boot is false, we don't want the CoreRuntime hosted service to start
+                        services.AddUnique(Mock.Of<IRuntime>());
+                    }
                 });
             return hostBuilder;
         }
@@ -215,27 +226,9 @@ namespace Umbraco.Tests.Integration.Testing
         {
             UseTestLocalDb(app.ApplicationServices);
 
-            //get the currently set options
-            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
-            if (testOptions.Boot)
-            {
-                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
-                Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-                app.UseUmbracoCore(); // Takes 200 ms
-
-                OnTestTearDown(TerminateCoreRuntime);
-            }
-        }
-
-        /// <remarks>
-        /// Some IComponents hook onto static events (e.g. Published in ContentService)
-        /// If these fire after the components host has been shutdown, errors can occur.
-        /// If CoreRuntime.Start() is called We also need to de-register the events.
-        /// </remarks>
-        protected void TerminateCoreRuntime()
-        {
-            Services.GetRequiredService<IRuntime>().Terminate();
-            StaticApplicationLogging.Initialize(null);
+            Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
+            Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
+            app.UseUmbracoCore();
         }
 
         #endregion

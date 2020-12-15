@@ -143,10 +143,12 @@ namespace Umbraco.Core.DependencyInjection
             builder.Services.AddUnique<IUmbracoDatabase>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
             builder.Services.AddUnique<IMainDom, MainDom>();
+
+            builder.Services.AddUnique<IRuntime, CoreRuntime>();
+            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             builder.AddComposers();
 

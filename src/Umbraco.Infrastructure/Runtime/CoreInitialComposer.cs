@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,6 +38,7 @@ using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
+using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -66,11 +67,12 @@ namespace Umbraco.Core.Runtime
 {
     // core's initial composer composes before all core composers
     [ComposeBefore(typeof(ICoreComposer))]
-    public class CoreInitialComposer : ComponentComposer<CoreInitialComponent>
+    public class CoreInitialComposer : IComposer
     {
-        public override void Compose(IUmbracoBuilder builder)
+        /// <inheritdoc/>
+        public void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(builder);
+            builder.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
 
             // composers
             builder
