@@ -7,8 +7,8 @@ namespace Umbraco.Web.Telemetry
 {
     public class TelemetryComponent : IComponent
     {
-        private IProfilingLogger _logger;
-        private IUmbracoSettingsSection _settings;
+        private readonly IProfilingLogger _logger;
+        private readonly IUmbracoSettingsSection _settings;
         private BackgroundTaskRunner<IBackgroundTask> _telemetryReporterRunner;
 
         public TelemetryComponent(IProfilingLogger logger, IUmbracoSettingsSection settings)
@@ -22,8 +22,8 @@ namespace Umbraco.Web.Telemetry
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
             _telemetryReporterRunner = new BackgroundTaskRunner<IBackgroundTask>("TelemetryReporter", _logger);
 
-            int delayBeforeWeStart = 60 * 1000; // 60 * 1000ms = 1min (60,000)
-            int howOftenWeRepeat = 60 * 1000 * 60 * 24; // 60 * 1000 * 60 * 24 = 24hrs (86400000)
+            const int delayBeforeWeStart = 60 * 1000; // 60 * 1000ms = 1min (60,000)
+            const int howOftenWeRepeat = 60 * 1000 * 60 * 24; // 60 * 1000 * 60 * 24 = 24hrs (86400000)
 
             // As soon as we add our task to the runner it will start to run (after its delay period)
             var task = new ReportSiteTask(_telemetryReporterRunner, delayBeforeWeStart, howOftenWeRepeat, _logger, _settings);
