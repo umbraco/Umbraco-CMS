@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
+using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
