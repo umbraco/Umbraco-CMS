@@ -2554,7 +2554,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openWebsiteLabel">Preview website</key>
     <key alias="openWebsiteTitle">Open website in preview mode</key>
     <key alias="returnToPreviewHeadline">Preview website?</key>
-    <key alias="returnToPreviewDescription">ou have ended preview mode, do you want to enable it again to view the latest saved version of your website?</key>
+    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to enable it again to view the latest saved version of your website?</key>
     <key alias="returnToPreviewAcceptButton">Preview latest version</key>
     <key alias="returnToPreviewDeclineButton">View published version</key>
     <key alias="viewPublishedContentHeadline">View published version?</key>
