@@ -360,11 +360,13 @@ namespace Umbraco.Core.Security
         /// <returns>Encrypted Base64 string representation of the auth ticket.</returns>
         public static string EncryptFormsAuthTicketWithMachineKey(FormsAuthenticationTicket authTicket, string purpose = BackOfficeCookieAuthenticationProvider.EncryptionPurpose)
         {
-            using var memoryStream = new MemoryStream();
-            var formatter = new BinaryFormatter();
-            formatter.Serialize(memoryStream, authTicket);
-            var protectedBytes = MachineKey.Protect(memoryStream.ToArray(), purpose);
-            return Convert.ToBase64String(protectedBytes);
+            using (var memoryStream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(memoryStream, authTicket);
+                var protectedBytes = MachineKey.Protect(memoryStream.ToArray(), purpose);
+                return Convert.ToBase64String(protectedBytes);
+            }
         }
 
         /// <summary>
@@ -375,13 +377,15 @@ namespace Umbraco.Core.Security
         /// <returns>A FormsAuthenticationTicket stored in the encrypted string if valid. Otherwise an exception is throw.</returns>
         public static FormsAuthenticationTicket DecryptFormsAuthTicketWithMachineKey(string encryptedText, string purpose = BackOfficeCookieAuthenticationProvider.EncryptionPurpose)
         {
-            using var memStream = new MemoryStream();
-            var protectedBytes = Convert.FromBase64String(encryptedText);
-            var unprotectedBytes = MachineKey.Unprotect(protectedBytes, purpose);
-            memStream.Write(unprotectedBytes, 0, unprotectedBytes.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            var formatter = new BinaryFormatter();
-            return formatter.Deserialize(memStream) as FormsAuthenticationTicket;
+            using (var memStream = new MemoryStream())
+            {
+                var protectedBytes = Convert.FromBase64String(encryptedText);
+                var unprotectedBytes = MachineKey.Unprotect(protectedBytes, purpose);
+                memStream.Write(unprotectedBytes, 0, unprotectedBytes.Length);
+                memStream.Seek(0, SeekOrigin.Begin);
+                var formatter = new BinaryFormatter();
+                return formatter.Deserialize(memStream) as FormsAuthenticationTicket;
+            }
         }
 
         /// <summary>
