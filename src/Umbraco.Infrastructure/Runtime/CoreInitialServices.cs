@@ -3,8 +3,8 @@ using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
@@ -38,7 +38,6 @@ using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
-using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -63,16 +62,17 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Infrastructure.Runtime
 {
-    // core's initial composer composes before all core composers
-    [ComposeBefore(typeof(ICoreComposer))]
-    public class CoreInitialComposer : IComposer
+    public static class CoreInitialServices
     {
-        /// <inheritdoc/>
-        public void Compose(IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
         {
             builder.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+
+            builder.Services.AddSingleton<ManifestWatcher>();
+            builder.AddNotificationHandler<UmbracoApplicationStarting, ManifestWatcher>(factory => factory.GetRequiredService<ManifestWatcher>());
+            builder.AddNotificationHandler<UmbracoApplicationStopping, ManifestWatcher>(factory => factory.GetRequiredService<ManifestWatcher>());
 
             // composers
             builder
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Runtime
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
             builder.HealthChecks()
-                .Add(() => builder.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
+                .Add(() => builder.TypeLoader.GetTypes<Core.HealthCheck.HealthCheck>());
 
             builder.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
                 .Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
@@ -384,7 +384,10 @@ namespace Umbraco.Core.Runtime
             builder.Services.AddUnique<MediaPermissions>();
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
 
+
             builder.Services.AddUnique<PackageDataInstallation>();
+
+            return builder;
         }
     }
 }

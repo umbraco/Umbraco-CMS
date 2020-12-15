@@ -7,7 +7,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Net;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Infrastructure.Runtime
 {
     public sealed class ManifestWatcher :
         INotificationHandler<UmbracoApplicationStarting>,

@@ -1,26 +1,19 @@
-﻿using System.Web.Mvc;
 using System.Web.Security;
-using Microsoft.AspNet.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Templates;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Macros;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Runtime
 {
-    // web's initial composer composes after core's, and before all core composers
-    [ComposeAfter(typeof(CoreInitialComposer))]
     [ComposeBefore(typeof(ICoreComposer))]
     public sealed class WebInitialComposer : ComponentComposer<WebInitialComponent>
     {
