@@ -125,7 +125,12 @@ namespace Umbraco.Core.Runtime
 
             // Create a long running task (dedicated thread)
             // to poll to check if we are still the MainDom registered in the DB
-            return Task.Factory.StartNew(ListeningLoop, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            return Task.Factory.StartNew(
+                ListeningLoop,
+                _cancellationTokenSource.Token,
+                TaskCreationOptions.LongRunning,
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default); 
 
         }
 
@@ -166,7 +171,11 @@ namespace Umbraco.Core.Runtime
                     // the other MainDom is taking to startup. In this case the db row will just be deleted and the
                     // new MainDom will just take over.
                     if (_cancellationTokenSource.IsCancellationRequested)
+                    {
+                        _logger.Debug<SqlMainDomLock>("Task canceled, exiting loop");
                         return;
+                    }
+                        
                     IUmbracoDatabase db = null;
                     try
                     {
@@ -190,8 +199,10 @@ namespace Umbraco.Core.Runtime
                         // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
                         // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
                         if (_cancellationTokenSource.IsCancellationRequested)
+                        {
+                            _logger.Debug<SqlMainDomLock>("Task canceled, exiting loop");
                             return;
-
+                        }
                     }
                     finally
                     {
@@ -396,6 +407,8 @@ namespace Umbraco.Core.Runtime
                 {
                     lock (_locker)
                     {
+                        _logger.Debug<SqlMainDomLock>($"{nameof(SqlMainDomLock)} Disposing...");
+
                         // immediately cancel all sub-tasks, we don't want them to keep querying
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
