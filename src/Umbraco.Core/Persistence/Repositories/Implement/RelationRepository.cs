@@ -311,7 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                             .From<RelationDto>()
                             .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
                             .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
-                            .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<int>("relationTypeAliases")));
+                            .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
 
                     var sql = template.Sql(parentId, relationTypeAliases);
 
