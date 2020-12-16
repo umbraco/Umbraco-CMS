@@ -33,10 +33,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 throw new InvalidOperationException("The bytes have already been expanded");
             return _bytes;
         }
-        public bool IsDecompressed()
-        {
-            return _isDecompressed;
-        }
+        /// <summary>
+        /// Whether the bytes have been decompressed to a string. If true calling GetBytes() will throw InvalidOperationException.
+        /// </summary>
+        public bool IsDecompressed => _isDecompressed;
+        
 
         public override string ToString()
         {

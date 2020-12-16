@@ -4,7 +4,7 @@ using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public abstract class SerializerBase
+    internal abstract class SerializerBase
     {
         private const char PrefixNull = 'N';
         private const char PrefixString = 'S';
