@@ -479,7 +479,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             // Authorize...
             var requirement = new MediaPermissionsResourceRequirement();
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(move.Id), requirement);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, new MediaPermissionsResource(_mediaService.GetById(move.Id)), requirement);
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();
