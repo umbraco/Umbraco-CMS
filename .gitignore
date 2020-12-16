@@ -175,3 +175,4 @@ cypress.env.json
 /src/Umbraco.Tests.AcceptanceTest/package-lock.json
 /src/Umbraco.Tests.AcceptanceTest/cypress/videos/
 /src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb

@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService; 
+            private readonly IDataTypeService _dataTypeService;
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 

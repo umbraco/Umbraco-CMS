@@ -202,7 +202,6 @@
     <Compile Include="Media\EmbedProviders\Twitter.cs" />
     <Compile Include="Media\EmbedProviders\Kickstarter.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
-    <Compile Include="Media\EmbedProviders\Instagram.cs" />
     <Compile Include="Media\EmbedProviders\Slideshare.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -312,6 +311,11 @@
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Telemetry\ReportSiteTask.cs" />
+    <Compile Include="Telemetry\TelemetryMarkerComponent.cs" />
+    <Compile Include="Telemetry\TelemetryComponent.cs" />
+    <Compile Include="Telemetry\TelemetryComposer.cs" />
+    <Compile Include="Telemetry\TelemetryMarkerComposer.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
     <Compile Include="Templates\HtmlUrlParser.cs" />

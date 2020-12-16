@@ -52,7 +52,8 @@
             link: link,
             scope: {
                 currentNode: "=",
-                currentSection: "@"
+                currentSection: "@",
+                isDisabled: "<?"
             }
         };
 
