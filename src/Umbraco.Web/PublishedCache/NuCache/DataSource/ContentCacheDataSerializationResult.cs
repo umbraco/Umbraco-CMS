@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+    /// <summary>
+    /// The serialization result from <see cref="IContentCacheDataSerializer"/> for which the serialized value
+    /// will be either a string or a byte[]
+    /// </summary>
     public struct ContentCacheDataSerializationResult : IEquatable<ContentCacheDataSerializationResult>
     {
         public ContentCacheDataSerializationResult(string stringData, byte[] byteData)
