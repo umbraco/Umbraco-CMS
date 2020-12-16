@@ -1,14 +1,13 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.IO;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 
-namespace Umbraco.Web.BackOffice.Plugins
+namespace Umbraco.Web.Common.Plugins
 {
     /// <summary>
     /// Looks up files using the on-disk file system and check file extensions are on a allow list
@@ -41,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Plugins
         public new IFileInfo GetFileInfo(string subpath)
         {
             var extension = Path.GetExtension(subpath);
-            var subPathInclAppPluginsFolder = Path.Combine(Constants.SystemDirectories.AppPlugins, subpath);
+            var subPathInclAppPluginsFolder = Path.Combine(Core.Constants.SystemDirectories.AppPlugins, subpath);
             if (!_options.Value.BrowsableFileExtensions.Contains(extension))
             {
                 return new NotFoundFileInfo(subPathInclAppPluginsFolder);

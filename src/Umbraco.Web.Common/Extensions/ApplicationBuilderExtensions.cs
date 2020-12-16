@@ -1,16 +1,20 @@
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog.Context;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Smidge;
 using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
+using Umbraco.Web.Common.Plugins;
 using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Extensions
@@ -44,6 +48,7 @@ namespace Umbraco.Extensions
             // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
             app.UseImageSharp();
             app.UseStaticFiles();
+            app.UseUmbracoPlugins();
 
             // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one
             // will execute after endpoint routing. The ordering of everything is quite important here, see
@@ -173,6 +178,29 @@ namespace Umbraco.Extensions
 
             app.UseSmidge();
             app.UseSmidgeNuglify();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseUmbracoPlugins(this IApplicationBuilder app)
+        {
+            var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
+
+            var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
+
+            // Ensure the plugin folder exists
+            Directory.CreateDirectory(pluginFolder);
+
+            var fileProvider = new UmbracoPluginPhysicalFileProvider(
+                pluginFolder,
+                umbracoPluginSettings);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = fileProvider,
+                RequestPath = Constants.SystemDirectories.AppPlugins
+            });
 
             return app;
         }
