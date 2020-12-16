@@ -280,36 +280,36 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(script);
 
                 Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
-                Assert.AreEqual("scripts\\path-2\\test-path-2.js", script.Path);
+                Assert.AreEqual("scripts\\path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
 
                 script = new Script("path-2/test-path-2.js") { Content = "// script" };
                 repository.Save(script);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
-                Assert.AreEqual("path-2\\test-path-2.js", script.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);// fixed in 7.3 - 7.2.8 does not update the path
                 Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
 
                 script = repository.Get("path-2/test-path-2.js");
                 Assert.IsNotNull(script);
-                Assert.AreEqual("path-2\\test-path-2.js", script.Path);
+                Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
 
                 script = new Script("path-2\\test-path-3.js") { Content = "// script" };
                 repository.Save(script);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
-                Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+                Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
                 script = repository.Get("path-2/test-path-3.js");
                 Assert.IsNotNull(script);
-                Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+                Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
                 script = repository.Get("path-2\\test-path-3.js");
                 Assert.IsNotNull(script);
-                Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+                Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
                 script = new Script("\\test-path-4.js") { Content = "// script" };

@@ -15,6 +15,7 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Services;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Packaging
         public class Editor1 : DataEditor
         {
             public Editor1(ILoggerFactory loggerFactory)
-                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())
+                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
             {
             }
         }
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Packaging
         public class Editor2 : DataEditor
         {
             public Editor2(ILoggerFactory loggerFactory)
-                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>())
+                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
             {
             }
         }

@@ -67,7 +67,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
         private static TypeLoader MockTypeLoader()
         {
             var ioHelper = IOHelper;
-            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot("~/App_Data/TEMP")), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
         }
 
 
@@ -389,7 +389,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
         public void AllComposers()
         {
             var typeFinder = TestHelper.GetTypeFinder();
-            var typeLoader = new TypeLoader(typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot("~/App_Data/TEMP")), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
+            var typeLoader = new TypeLoader(typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();
             var builder = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());

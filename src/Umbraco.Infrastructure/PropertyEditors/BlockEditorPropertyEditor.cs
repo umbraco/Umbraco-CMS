@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using static Umbraco.Core.Models.Blocks.BlockItemData;
@@ -35,8 +36,9 @@ namespace Umbraco.Web.PropertyEditors
             IContentTypeService contentTypeService,
             ILocalizedTextService localizedTextService,
             ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper, jsonSerializer)
         {
             _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;
@@ -49,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, LoggerFactory.CreateLogger<BlockEditorPropertyValueEditor>(), LocalizationService,ShortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, LoggerFactory.CreateLogger<BlockEditorPropertyValueEditor>(), LocalizationService,ShortStringHelper, JsonSerializer);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -58,8 +60,8 @@ namespace Umbraco.Web.PropertyEditors
             private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger<BlockEditorPropertyValueEditor> logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
-                : base(dataTypeService, localizationService, textService, shortStringHelper, attribute)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger<BlockEditorPropertyValueEditor> logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
+                : base(dataTypeService, localizationService, textService, shortStringHelper, jsonSerializer, attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;

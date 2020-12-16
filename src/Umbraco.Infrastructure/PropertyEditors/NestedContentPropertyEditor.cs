@@ -9,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -42,8 +43,9 @@ namespace Umbraco.Web.PropertyEditors
             IContentTypeService contentTypeService,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService)
-            : base (loggerFactory, dataTypeService, localizationService, localizedTextService,  shortStringHelper)
+            ILocalizedTextService localizedTextService,
+            IJsonSerializer jsonSerializer)
+            : base (loggerFactory, dataTypeService, localizationService, localizedTextService,  shortStringHelper, jsonSerializer)
         {
             _propertyEditors = propertyEditors;
             _contentTypeService = contentTypeService;
@@ -62,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors, LoggerFactory.CreateLogger<NestedContentPropertyEditor>());
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors, LoggerFactory.CreateLogger<NestedContentPropertyEditor>(), JsonSerializer);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -82,8 +84,9 @@ namespace Umbraco.Web.PropertyEditors
                 IShortStringHelper shortStringHelper,
                 DataEditorAttribute attribute,
                 PropertyEditorCollection propertyEditors,
-                ILogger<NestedContentPropertyEditor> logger)
-                : base(dataTypeService, localizationService,  localizedTextService, shortStringHelper, attribute)
+                ILogger<NestedContentPropertyEditor> logger,
+                IJsonSerializer jsonSerializer)
+                : base(dataTypeService, localizationService,  localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
                 _propertyEditors = propertyEditors;
                 _contentTypeService = contentTypeService;

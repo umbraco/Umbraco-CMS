@@ -39,6 +39,7 @@
             public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
             public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
             public const string ConfigNuCache = ConfigPrefix + "NuCache";
+            public const string ConfigPlugins = ConfigPrefix + "Plugins";
             public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
             public const string ConfigRuntime = ConfigPrefix + "Runtime";
             public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";

@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 stylesheet = repository.Get(stylesheet.Name);
 
                 //Assert
-                Assert.That(stylesheet.Content, Is.EqualTo("body { color:#000; } .bold {font-weight:bold;}\r\n\r\n/**umb_name:Test*/\r\np {\r\n\tfont-size:2em;\r\n}"));
+                Assert.That(stylesheet.Content, Is.EqualTo("body { color:#000; } .bold {font-weight:bold;}\r\n\r\n/**umb_name:Test*/\r\np {\r\n\tfont-size:2em;\r\n}".Replace("\r\n", Environment.NewLine)));
                 Assert.AreEqual(1, stylesheet.Properties.Count());
             }
         }
@@ -281,29 +281,29 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(stylesheet);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
-                Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);// fixed in 7.3 - 7.2.8 does not update the path
                 Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
 
                 stylesheet = repository.Get("path-2/test-path-2.css");
                 Assert.IsNotNull(stylesheet);
-                Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path);
+                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
 
                 stylesheet = new Stylesheet("path-2\\test-path-3.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.css"));
-                Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+                Assert.AreEqual("path-2\\test-path-3.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
                 stylesheet = repository.Get("path-2/test-path-3.css");
                 Assert.IsNotNull(stylesheet);
-                Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+                Assert.AreEqual("path-2\\test-path-3.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
                 stylesheet = repository.Get("path-2\\test-path-3.css");
                 Assert.IsNotNull(stylesheet);
-                Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+                Assert.AreEqual("path-2\\test-path-3.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
                 stylesheet = new Stylesheet("\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };

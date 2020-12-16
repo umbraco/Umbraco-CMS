@@ -21,6 +21,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
         private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
+        private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         /// <summary>
         /// This tests validates that with the new scope changes that the underlying cache policies work - in this case it tests that the cache policy
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void DataTypeService_Can_Get_All()
         {
-            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper), ConfigurationEditorJsonSerializer) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             DataTypeService.Save(dataType);
 
             //Get all the first time (no cache)

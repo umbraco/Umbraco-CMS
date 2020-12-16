@@ -18,13 +18,11 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -53,13 +51,20 @@ namespace Umbraco.Core.DependencyInjection
             IConfiguration config)
         {
             if (services is null)
+            {
                 throw new ArgumentNullException(nameof(services));
+            }
+
             if (config is null)
+            {
                 throw new ArgumentNullException(nameof(config));
+            }
 
-            var loggingConfig = new LoggingConfiguration(Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
+            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            var loggingConfig = new LoggingConfiguration(loggingDir);
+
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
@@ -69,11 +74,11 @@ namespace Umbraco.Core.DependencyInjection
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique<AppCaches>(appCaches);
 
-            var profiler = GetWebProfiler(config);
+            IProfiler profiler = GetWebProfiler(config);
             services.AddUnique<IProfiler>(profiler);
 
-            var loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
-            var typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
+            ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
+            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -188,6 +193,7 @@ namespace Umbraco.Core.DependencyInjection
             builder.Services.Configure<TypeFinderSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigTypeFinder));
             builder.Services.Configure<UserPasswordConfigurationSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigUserPassword));
             builder.Services.Configure<WebRoutingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigWebRouting));
+            builder.Services.Configure<UmbracoPluginSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigPlugins));
 
             return builder;
         }

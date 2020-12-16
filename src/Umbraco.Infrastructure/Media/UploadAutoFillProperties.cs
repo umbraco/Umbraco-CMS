@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -18,15 +17,18 @@ namespace Umbraco.Web.Media
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger<UploadAutoFillProperties> _logger;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly IImageDimensionExtractor _imageDimensionExtractor;
 
         public UploadAutoFillProperties(
             IMediaFileSystem mediaFileSystem,
             ILogger<UploadAutoFillProperties> logger,
-            IImageUrlGenerator imageUrlGenerator)
+            IImageUrlGenerator imageUrlGenerator,
+            IImageDimensionExtractor imageDimensionExtractor)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
+            _imageDimensionExtractor = imageDimensionExtractor ?? throw new ArgumentNullException(nameof(imageDimensionExtractor));
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Media
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                        var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                        var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
                 }
@@ -105,12 +107,12 @@ namespace Umbraco.Web.Media
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }
         }
 
-        private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension, string culture, string segment)
+        private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, ImageSize? size, long length, string extension, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));

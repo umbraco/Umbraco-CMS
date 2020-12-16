@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -33,8 +34,9 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            ILocalizedTextService localizedTextService,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
         }
@@ -42,12 +44,18 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
         public class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService,localizationService, localizedTextService, shortStringHelper,attribute)
+            public MediaPickerPropertyValueEditor(
+                IDataTypeService dataTypeService,
+                ILocalizationService localizationService,
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                DataEditorAttribute attribute)
+                : base(dataTypeService,localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
             }
 

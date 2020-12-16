@@ -937,7 +937,7 @@ namespace Umbraco.Core.Persistence
         /// This is a C# implementation of T-SQL QUOTEDNAME.
         /// <paramref name="quote"/> is optional, it can be '[' (default), ']', '\'' or '"'.
         /// </remarks>
-        private static string QuotedName(string name, char quote = '[')
+        internal static string QuotedName(string name, char quote = '[')
         {
             switch (quote)
             {

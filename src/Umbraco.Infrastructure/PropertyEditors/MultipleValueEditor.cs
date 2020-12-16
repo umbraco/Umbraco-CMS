@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -20,8 +21,16 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger<MultipleValueEditor> _logger;
 
-        public MultipleValueEditor(ILogger<MultipleValueEditor> logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+        public MultipleValueEditor(
+            ILogger<MultipleValueEditor> logger,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            DataEditorAttribute attribute
+            )
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
         {
             _logger = logger;
         }

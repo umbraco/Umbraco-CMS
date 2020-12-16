@@ -1,19 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {
-        public ColorPickerConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        private readonly IJsonSerializer _jsonSerializer;
+
+        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer) : base(ioHelper)
         {
+            _jsonSerializer = jsonSerializer;
             var items = Fields.First(x => x.Key == "items");
 
             // customize the items field
@@ -67,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 try
                 {
-                    var o = JsonConvert.DeserializeObject<ItemValue>(item.Value);
+                    var o = _jsonSerializer.Deserialize<ItemValue>(item.Value);
                     o.SortOrder = sortOrder;
                     return o;
                 }
@@ -82,15 +86,16 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         // represents an item we are exchanging with the editor
+        [DataContract]
         private class ItemValue
         {
-            [JsonProperty("value")]
+            [DataMember(Name ="value")]
             public string Color { get; set; }
 
-            [JsonProperty("label")]
+            [DataMember(Name ="label")]
             public string Label { get; set; }
 
-            [JsonProperty("sortOrder")]
+            [DataMember(Name ="sortOrder")]
             public int SortOrder { get; set; }
         }
 
@@ -131,7 +136,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (id >= nextId) nextId = id + 1;
 
                 var label = item.Property("label")?.Value?.Value<string>();
-                value = JsonConvert.SerializeObject(new { value, label });
+                value = _jsonSerializer.Serialize(new { value, label });
 
                 output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
             }
