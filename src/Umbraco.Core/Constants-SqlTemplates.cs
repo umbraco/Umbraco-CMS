@@ -19,6 +19,11 @@
                 public const string DeleteByParentAll = "Umbraco.Core.RelationRepository.DeleteByParent";
                 public const string DeleteByParentIn = "Umbraco.Core.RelationRepository.DeleteByParentIn";
             }
+
+            public static class DataTypeRepository
+            {
+                public const string EnsureUniqueNodeName = "Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName";
+            }
         }
     }
 }
