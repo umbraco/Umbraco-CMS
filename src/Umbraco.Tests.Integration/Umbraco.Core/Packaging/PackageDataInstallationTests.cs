@@ -19,6 +19,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -350,6 +351,9 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Import_Media_Package_Xml()
         {
+            //Hack to avoid the IPublishedSnapshotService to fail on events when Media Types are saved
+            var _ = GetRequiredService<IPublishedSnapshotService>();
+
             // Arrange
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
