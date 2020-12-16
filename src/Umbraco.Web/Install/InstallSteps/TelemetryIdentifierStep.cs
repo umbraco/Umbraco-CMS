@@ -1,43 +1,30 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Install;
+using Umbraco.Web.Install.Models;
 
-namespace Umbraco.Web.Telemetry
+namespace Umbraco.Web.Install.InstallSteps
 {
-    public class TelemetryMarkerComponent : IComponent
+    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
+        "TelemetryIdConfiguration", 0, "",
+        PerformsAppRestart = false)]
+    internal class TelemetryIdentifierStep : InstallSetupStep<object>
     {
         private readonly IProfilingLogger _logger;
-        private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
 
-        public TelemetryMarkerComponent(IProfilingLogger logger, IRuntimeState runtime, IUmbracoSettingsSection settings)
+        public TelemetryIdentifierStep(IProfilingLogger logger, IUmbracoSettingsSection settings)
         {
             _logger = logger;
-            _runtime = runtime;
             _settings = settings;
         }
 
-        public void Initialize()
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            // Verify that XML attribute is not empty string
-            // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
-            var backofficeIdentifierRaw = _settings.BackOffice.Id;
-
-            if ((_runtime.Level == RuntimeLevel.Upgrade || _runtime.Level == RuntimeLevel.Install)
-                && string.IsNullOrEmpty(backofficeIdentifierRaw) == false)
-            {
-                // No need to add Id again if already found during upgrade or install
-                return;
-            }
-
-            // We are a clean install or an upgrade without the Id
-
             // Generate GUID
             var telemetrySiteIdentifier = Guid.NewGuid();
 
@@ -49,8 +36,8 @@ namespace Umbraco.Web.Telemetry
                 if(File.Exists(umbracoSettingsPath) == false)
                 {
                     // Log an error
-                    _logger.Error<TelemetryMarkerComponent>("Unable to find umbracoSettings.config file to add telemetry site identifier");
-                    return;
+                    _logger.Error<TelemetryIdentifierStep>("Unable to find umbracoSettings.config file to add telemetry site identifier");
+                    return Task.FromResult<InstallSetupResult>(null);
                 }
 
                 try
@@ -60,7 +47,7 @@ namespace Umbraco.Web.Telemetry
                     {
                         var backofficeElement = umbracoConfigXml.Root.Element("backOffice");
                         if (backofficeElement == null)
-                            return;
+                            return Task.FromResult<InstallSetupResult>(null);
 
                         // Will add ID attribute if it does not exist
                         backofficeElement.SetAttributeValue("id", telemetrySiteIdentifier.ToString());
@@ -71,13 +58,21 @@ namespace Umbraco.Web.Telemetry
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<TelemetryMarkerComponent>(ex, "Couldn't update UmbracoSettings.config with a backoffice with a telemetry site identifier");
+                    _logger.Error<TelemetryIdentifierStep>(ex, "Couldn't update umbracoSettings.config with a backoffice with a telemetry site identifier");
                 }
             }
+
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
-        public void Terminate()
+        public override bool RequiresExecution(object model)
         {
+            // Verify that XML attribute is not empty string
+            // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
+            var backofficeIdentifierRaw = _settings.BackOffice.Id;
+
+            // No need to add Id again if already found
+            return string.IsNullOrEmpty(backofficeIdentifierRaw);
         }
     }
 }
