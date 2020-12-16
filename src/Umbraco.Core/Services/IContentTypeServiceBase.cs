@@ -58,7 +58,6 @@ namespace Umbraco.Core.Services
 
         void Save(TItem item, int userId = Constants.Security.SuperUserId);
         void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
-
         void Delete(TItem item, int userId = Constants.Security.SuperUserId);
         void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId);
 
