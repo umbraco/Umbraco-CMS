@@ -1,19 +1,29 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Extends the <see cref="IHostBuilder"/> to enable Umbraco to be used as the service container.
+    /// Extends the <see cref="IHostBuilder"/> to add CoreRuntime as a HostedService
     /// </summary>
     public static class HostBuilderExtensions
     {
         /// <summary>
-        /// Assigns a custom service provider factory to use Umbraco's container
+        /// Adds CoreRuntime as HostedService
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// <para>When running the site should be called before ConfigureWebDefaults.</para>
+        ///
+        /// <para>
+        /// When testing should be called after ConfigureWebDefaults to ensure UseTestDatabase is called before CoreRuntime
+        /// starts or we initialize components with incorrect run level.
+        /// </para>
+        /// </remarks>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder)
         {
+            _ = builder.ConfigureServices((context, services) =>
+                  services.AddSingleton<IHostedService>(factory => factory.GetRequiredService<IRuntime>()));
+
             return builder;
         }
     }

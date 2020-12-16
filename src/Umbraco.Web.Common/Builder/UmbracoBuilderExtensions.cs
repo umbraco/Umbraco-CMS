@@ -146,9 +146,7 @@ namespace Umbraco.Core.DependencyInjection
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
             builder.Services.AddUnique<IMainDom, MainDom>();
-
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
-            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             builder.AddCoreInitialServices();
             builder.AddComposers();

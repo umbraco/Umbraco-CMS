@@ -97,10 +97,10 @@ namespace Umbraco.Tests.Integration.Testing
         public virtual void Setup()
         {
             InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallEmptyDatabase)] = "true";
-            var hostBuilder = CreateHostBuilder();
+            var hostBuilder = CreateHostBuilder()
+                .UseUmbraco(); // This ensures CoreRuntime.StartAsync will be called (however it's a mock if boot = false)
 
             var host = hostBuilder.Start();
-
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
 
@@ -113,8 +113,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             try
             {
-                var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
-                switch (testOptions.Logger)
+                switch (TestOptions.Logger)
                 {
                     case UmbracoTestOptions.Logger.Mock:
                         return NullLoggerFactory.Instance;
@@ -138,15 +137,13 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         public virtual IHostBuilder CreateHostBuilder()
         {
-
-            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
                 // create separate Host instances. So instead of UseStartup, we just call ConfigureServices/Configure ourselves,
                 // and in the case of the UmbracoTestServerTestBase it will use the ConfigureWebHost to Configure the IApplicationBuilder directly.
                 //.ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup(GetType()); })
-                .UseUmbraco()
+
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
@@ -157,12 +154,13 @@ namespace Umbraco.Tests.Integration.Testing
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddTransient(_ => CreateLoggerFactory());
                     ConfigureServices(services);
+                    services.AddUnique(CreateLoggerFactory());
 
-                    if (!testOptions.Boot)
+                    if (!TestOptions.Boot)
                     {
                         // If boot is false, we don't want the CoreRuntime hosted service to start
+                        // So we replace it with a Mock
                         services.AddUnique(Mock.Of<IRuntime>());
                     }
                 });
@@ -224,11 +222,15 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            UseTestLocalDb(app.ApplicationServices);
+            UseTestDatabase(app.ApplicationServices);
 
-            Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
-            Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-            app.UseUmbracoCore();
+            if (TestOptions.Boot)
+            {
+                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
+                Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
+            }
+
+            app.UseUmbracoCore(); // This no longer starts CoreRuntime, it's very fast
         }
 
         #endregion
@@ -239,25 +241,20 @@ namespace Umbraco.Tests.Integration.Testing
         private static ITestDatabase _dbInstance;
         private static TestDbMeta _fixtureDbMeta;
 
-        protected void UseTestLocalDb(IServiceProvider serviceProvider)
+        protected void UseTestDatabase(IServiceProvider serviceProvider)
         {
             var state = serviceProvider.GetRequiredService<IRuntimeState>();
             var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
             var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(testDatabaseFactoryProvider, databaseFactory, serviceProvider.GetRequiredService<ILoggerFactory>(), state, TestHelper.WorkingDirectory);
+            SetupTestDatabase(testDatabaseFactoryProvider, databaseFactory, loggerFactory, state, TestHelper.WorkingDirectory);
         }
 
         /// <summary>
-        /// Get or create an instance of <see cref="LocalDbTestDatabase"/>
+        /// Get or create an instance of <see cref="ITestDatabase"/>
         /// </summary>
-        /// <param name="filesPath"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="dbFactory"></param>
-        /// <returns></returns>
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
@@ -266,9 +263,12 @@ namespace Umbraco.Tests.Integration.Testing
             lock (_dbLocker)
             {
                 if (_dbInstance != null)
+                {
                     return _dbInstance;
+                }
 
                 _dbInstance = TestDatabaseFactory.Create(filesPath, loggerFactory, dbFactory);
+
                 return _dbInstance;
             }
         }
@@ -276,30 +276,26 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a LocalDb instance to use for the test
         /// </summary>
-        private void InstallTestLocalDb(
+        private void SetupTestDatabase(
             TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
             IUmbracoDatabaseFactory databaseFactory,
             ILoggerFactory loggerFactory,
             IRuntimeState runtimeState,
             string workingDirectory)
         {
-            var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
-
-            // get the currently set db options
-            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
-
-            if (testOptions.Database == UmbracoTestOptions.Database.None)
+            if (TestOptions.Database == UmbracoTestOptions.Database.None)
+            {
                 return;
+            }
 
             // need to manually register this factory
             DbProviderFactories.RegisterFactory(Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
-            if (!Directory.Exists(dbFilePath))
-                Directory.CreateDirectory(dbFilePath);
+            var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
             var db = GetOrCreateDatabase(dbFilePath, loggerFactory, testUmbracoDatabaseFactoryProvider);
 
-            switch (testOptions.Database)
+            switch (TestOptions.Database)
             {
                 case UmbracoTestOptions.Database.NewSchemaPerTest:
 
@@ -385,13 +381,15 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(testOptions), testOptions, null);
+                    throw new ArgumentOutOfRangeException(nameof(TestOptions), TestOptions, null);
             }
         }
 
         #endregion
 
         #region Common services
+
+        protected UmbracoTestAttribute TestOptions => TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
 

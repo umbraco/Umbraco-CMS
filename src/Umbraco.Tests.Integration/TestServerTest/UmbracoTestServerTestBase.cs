@@ -1,8 +1,6 @@
-
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Extensions;
@@ -22,8 +19,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.Composing;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -75,11 +71,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
-                     UseTestLocalDb(app.ApplicationServices);
+                     UseTestDatabase(app.ApplicationServices);
                      Services = app.ApplicationServices;
                      Configure(app);
                  });
-             }).UseEnvironment(Environments.Development);
+
+            }).UseEnvironment(Environments.Development);
+
+            builder.UseUmbraco(); // Ensures CoreRuntime.StartAsync is called, must be after ConfigureWebHost
 
             return builder;
         }
