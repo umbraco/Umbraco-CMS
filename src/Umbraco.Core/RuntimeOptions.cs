@@ -47,14 +47,12 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>
         /// <para>By default, when a database connection string is configured and it is possible to connect to
-        /// the database, but the database is empty, the runtime enters the BootFailed level. If this options
-        /// is set to true, it enters the Install level instead.</para>
-        /// <para>It is then up to the implementor, that is setting this value, to take over the installation
-        /// sequence.</para>
+        /// the database, but the database is empty, the runtime enters the <c>Install</c> level. If this options
+        /// is set to <c>false</c>, it enters the <c>BootFailed</c> level instead.</para>
         /// </remarks>
         public static bool InstallEmptyDatabase
         {
-            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false);
+            get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", true);
             set => _installEmptyDatabase  = value;
         }
 
@@ -63,12 +61,13 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>
         /// <para>By default, when a database connection string is configured and it is possible to connect to
-        /// the database, but the database is empty, an unattended install will be performed. If this options
-        /// is set to <c>false</c>, it enters the Install level instead.</para>
+        /// the database, but the database is empty, the runtime enters the <c>Install</c> level.
+        /// If this option is set to <c>true</c> an unattended install will be performed and the runtime enters
+        /// the <c>Run</c> level.</para>
         /// </remarks>
         public static bool InstallUnattended
         {
-            get => _installUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.InstallUnattended", true);
+            get => _installUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.InstallUnattended", false);
             set => _installUnattended = value;
         }
 

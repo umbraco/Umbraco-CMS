@@ -89,6 +89,29 @@ namespace Umbraco.Core.Migrations.Install
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
         }
 
+        internal bool HasSomeNonDefaultUser()
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                // look for the super user with default password
+                var sql = scope.Database.SqlContext.Sql()
+                    .SelectCount()
+                    .From<UserDto>()
+                    .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
+                var result = scope.Database.ExecuteScalar<int>(sql);
+                var has = result != 1;
+                if (has == false)
+                {
+                    // found only 1 user == the default user with default password
+                    // however this always exists on uCloud, also need to check if there are other users too
+                    result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    has = result != 1;
+                }
+                scope.Complete();
+                return has;
+            }
+        }
+
         internal bool IsUmbracoInstalled()
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))

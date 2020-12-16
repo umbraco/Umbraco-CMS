@@ -141,14 +141,15 @@ namespace Umbraco.Web.Install.InstallSteps
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
             if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
-            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
-                return _databaseBuilder.IsUmbracoInstalled() == false;
+            // if Umbraco is already installed there's already users in the database, skip this step
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured && _databaseBuilder.IsUmbracoInstalled())
+                return _databaseBuilder.HasSomeNonDefaultUser() == false;
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
             _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
 
-                return true;
+            return true;
         }
     }
 }
