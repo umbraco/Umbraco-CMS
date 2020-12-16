@@ -143,7 +143,7 @@ namespace Umbraco.Core.Migrations.Install
 
         internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
         {
-            var result = new DatabaseSchemaResult(SqlSyntax);
+            var result = new DatabaseSchemaResult();
 
             result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition(x)));

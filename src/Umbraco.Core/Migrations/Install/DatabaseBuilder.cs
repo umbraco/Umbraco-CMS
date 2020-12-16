@@ -89,26 +89,11 @@ namespace Umbraco.Core.Migrations.Install
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
         }
 
-        internal bool HasSomeNonDefaultUser()
+        internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                // look for the super user with default password
-                var sql = scope.Database.SqlContext.Sql()
-                    .SelectCount()
-                    .From<UserDto>()
-                    .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
-                var result = scope.Database.ExecuteScalar<int>(sql);
-                var has = result != 1;
-                if (has == false)
-                {
-                    // found only 1 user == the default user with default password
-                    // however this always exists on uCloud, also need to check if there are other users too
-                    result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
-                    has = result != 1;
-                }
-                scope.Complete();
-                return has;
+                return scope.Database.IsUmbracoInstalled(_logger);
             }
         }
 
@@ -391,15 +376,15 @@ namespace Umbraco.Core.Migrations.Install
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Initialized == false)
-                return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
+                return new DatabaseSchemaResult();
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger);
-            _databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            _databaseSchemaValidationResult = scope.Database.ValidateSchema(_logger);
+
             scope.Complete();
+
             return _databaseSchemaValidationResult;
         }
 

@@ -174,6 +174,7 @@ namespace Umbraco.Core.Runtime
                 // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
+
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
 
@@ -260,16 +261,17 @@ namespace Umbraco.Core.Runtime
 
             using (var database = databaseFactory.CreateDatabase())
             {
-                var isDatabaseEmpty = databaseFactory.SqlContext.SqlSyntax.GetTablesInSchema(database).Any() == false;
+                var hasUmbracoTables = database.IsUmbracoInstalled(Logger);
 
-                // database is not empty, assume Umbraco is already installed
-                if (isDatabaseEmpty == false) return;
+                // database has umbraco tables, assume Umbraco is already installed
+                if (hasUmbracoTables) return;
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-                database.BeginTransaction();
+                
                 try
                 {
+                    database.BeginTransaction();
                     var creator = new DatabaseSchemaCreator(database, Logger);
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();

@@ -142,7 +142,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
-                return _databaseBuilder.HasSomeNonDefaultUser() == false;
+                return _databaseBuilder.IsUmbracoInstalled() == false;
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
