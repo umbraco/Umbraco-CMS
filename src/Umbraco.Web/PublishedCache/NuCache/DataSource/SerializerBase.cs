@@ -172,7 +172,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
             else if (value is LazyCompressedString lazyCompressedString)
             {
-                if (lazyCompressedString.IsDecompressed())
+                if (lazyCompressedString.IsDecompressed)
                 {
                     PrimitiveSerializer.Char.WriteTo(PrefixString, stream);
                     PrimitiveSerializer.String.WriteTo(lazyCompressedString, stream);
