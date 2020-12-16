@@ -17,7 +17,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex2
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }

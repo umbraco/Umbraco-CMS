@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -104,8 +104,8 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
-                return blockObject.labelInterpolator(blockObject.data);
+                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                return blockObject.labelInterpolator(labelVars);
             }
             return blockObject.content.contentTypeName;
         }
@@ -770,6 +770,57 @@
                 }
 
                 mapToPropertyModel(elementTypeDataModel, dataModel);
+
+                return layoutEntry;
+
+            },
+            /**
+             * @ngdoc method
+             * @name createFromBlockData
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Insert data from raw models
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
+             */
+            createFromBlockData: function (blockData) {
+
+                blockData = clipboardService.parseContentForPaste(blockData, clipboardService.TYPES.BLOCK);
+
+                // As the blockData is a cloned object we can use its layout part for our layout entry.
+                var layoutEntry = blockData.layout;
+                if (layoutEntry === null) {
+                    return null;
+                }
+
+                var blockConfiguration;
+
+                if (blockData.data) {
+                    // Ensure that we support the alias:
+                    blockConfiguration = this.getBlockConfiguration(blockData.data.contentTypeKey);
+                    if(blockConfiguration === null) {
+                        return null;
+                    }
+
+                    this.value.contentData.push(blockData.data);
+                } else {
+                    // We do not have data, this cannot be succesful paste.
+                    return null;
+                }
+
+                if (blockData.settingsData) {
+                    // Ensure that we support the alias:
+                    if(blockConfiguration.settingsElementTypeKey) {
+                        // If we have settings for this Block Configuration, we need to check that they align, if we dont we do not want to fail.
+                        if(blockConfiguration.settingsElementTypeKey === blockData.settingsData.contentTypeKey) {
+                            this.value.settingsData.push(blockData.settingsData);
+                        } else {
+                            notificationsService.error("Clipboard", "Couldn't paste because settings-data is not compatible.");
+                            return null;
+                        }
+                    } else {
+                        // We do not have settings currently, so lets get rid of the settings part and move on with the paste.
+                        delete layoutEntry.settingUdi;
+                    }
+                }
 
                 return layoutEntry;
 

@@ -45,6 +45,7 @@
 .date-wrapper-mini {
     display: flex;
     flex-direction: row;
+    align-items:center;
 }
 
 .date-wrapper-mini--checkbox{
@@ -54,7 +55,7 @@
 .date-wrapper-mini__date {
     display: flex;
     
-    margin-left: 5px;
+    margin-left: 15px;
     margin-top: 5px;
     margin-bottom: 10px;
     
@@ -64,6 +65,17 @@
     .flatpickr-input > button:first-of-type {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+    }
+
+    .flatpickr-label {
+        margin-right:5px;
+        display:flex;
+        align-items: center;
+        line-height: 1;
+    }
+
+    .btn-reset {
+        font-size: 14px;
     }
 }
 
@@ -119,7 +131,9 @@
 }
 
 .history-item__date {
-    font-size: 13px;
+    font-size: 12px;
+    margin-top: -4px;
+    display: block;
     color: @gray-5;
 }
 
@@ -131,7 +145,10 @@
 }
 
 .history-item__badge {
-    margin-right: 5px;
+    margin-right: 10px;
+}
+.history-item__description {
+    color: @gray-5;
 }
 
 /*  RESPONSIVE  */

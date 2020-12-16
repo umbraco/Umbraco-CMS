@@ -493,7 +493,7 @@
               <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
               <p>
               <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              続けます。<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
@@ -541,7 +541,7 @@
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
         ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
     <key alias="runwayHeader">Umbracoプラットフォームのクリーンセットアップが完了しました。この後はどうしますか？</key>
@@ -608,7 +608,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="greeting6">ハッピー土曜日</key>
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">ダッシュボード</key>

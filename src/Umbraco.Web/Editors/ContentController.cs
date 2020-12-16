@@ -699,7 +699,7 @@ namespace Umbraco.Web.Editors
 
             //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
             // not marked to be saved, it will be the first culture in the list marked for saving.
-            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.CultureName;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),

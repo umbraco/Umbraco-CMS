@@ -890,7 +890,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
+            );
 
             var sql = template.Sql(NodeObjectTypeId, parentId);
             var names = Database.Fetch<SimilarNodeName>(sql);
@@ -900,28 +901,43 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
+                .Select("MAX(sortOrder)")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.ExecuteScalar<int>(template.Sql(new { parentId })) + 1;
+            var sql = template.Sql(NodeObjectTypeId, parentId);
+            var sortOrder = Database.ExecuteScalar<int?>(sql);
+
+            return (sortOrder + 1) ?? first;
         }
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql =>
-                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.Fetch<NodeDto>(template.Sql(parentId)).First();
+            var sql = template.Sql(parentId);
+            var nodeDto = Database.First<NodeDto>(sql);
+
+            return nodeDto;
         }
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql => tsql
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
-            var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
+
+            var sql = template.Sql(new { uniqueId });
+            var id = Database.ExecuteScalar<int?>(sql);
+
             return id ?? 0;
         }
 
@@ -977,6 +993,81 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // Save bulk relations
             RelationRepository.Save(toSave);
+
+        }
+
+        /// <summary>
+        /// Inserts property values for the content entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedVersionId"></param>
+        /// <param name="edited"></param>
+        /// <param name="editedCultures"></param>
+        /// <remarks>
+        /// Used when creating a new entity
+        /// </remarks>
+        protected void InsertPropertyValues(TEntity entity, int publishedVersionId, out bool edited, out HashSet<string> editedCultures)
+        {
+            // persist the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+                Database.Insert(propertyDataDto);
+            }
+            // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
+            // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
+        }
+
+        /// <summary>
+        /// Used to atomically replace the property values for the entity version specified
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="versionId"></param>
+        /// <param name="publishedVersionId"></param>
+        /// <param name="edited"></param>
+        /// <param name="editedCultures"></param>
+
+        protected void ReplacePropertyValues(TEntity entity, int versionId, int publishedVersionId, out bool edited, out HashSet<string> editedCultures)
+        {
+            // Replace the property data.
+            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we need to be atomic
+            // and handle DB concurrency. Doing a clear and then re-insert is prone to concurrency issues.
+
+            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId).ForUpdate();
+            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql);
+            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId, int? languageId, string segment), PropertyDataDto>();
+            var existingPropDataIds = new List<int>();
+            foreach (var p in existingPropData)
+            {
+                existingPropDataIds.Add(p.Id);
+                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
+            }
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+
+                // Check if this already exists and update, else insert a new one
+                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out var propData))
+                {
+                    propertyDataDto.Id = propData.Id;
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
+                    // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
+                    Database.Insert(propertyDataDto);
+                }
+
+                // track which ones have been processed
+                existingPropDataIds.Remove(propertyDataDto.Id);
+            }
+            // For any remaining that haven't been processed they need to be deleted
+            if (existingPropDataIds.Count > 0)
+            {
+                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
+            }
 
         }
 
