@@ -3,7 +3,7 @@ using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_9_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_11_0
 {
     public class UpgradedIncludeIndexes : MigrationBase
     {
@@ -44,13 +44,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_9_0
             var tableDef = DefinitionFactory.GetTableDefinition(typeof(T), Context.SqlContext.SqlSyntax);
 
             foreach (var i in toDelete)
-            {
                 if (IndexExists(i))
-                {
                     Delete.Index(i).OnTable(tableDef.Name).Do();
-                }
-            }
-                
+
         }
 
         private void CreateIndexes<T>(params string[] toCreate)
