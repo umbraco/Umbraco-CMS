@@ -608,7 +608,7 @@ namespace Umbraco.Core.Packaging
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
-                    if (structureElement == null || structureElement.Elements("DocumentType").Any() == false) continue;
+                    if (structureElement == null || structureElement.Elements().Any() == false) continue;
 
                     var updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement, importedContentTypes, service);
                     updatedContentTypes.Add(updated);
@@ -975,7 +975,7 @@ namespace Umbraco.Core.Packaging
         {
             var allowedChildren = contentType.AllowedContentTypes.ToList();
             int sortOrder = allowedChildren.Any() ? allowedChildren.Last().SortOrder : 0;
-            foreach (var element in structureElement.Elements("DocumentType"))
+            foreach (var element in structureElement.Elements())
             {
                 var alias = element.Value;
 
