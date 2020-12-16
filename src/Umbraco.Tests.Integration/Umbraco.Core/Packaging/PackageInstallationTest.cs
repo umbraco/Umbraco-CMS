@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Packaging
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
 
-            var filePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "bin", "Auros.DocumentTypePicker.dll");
+            var filePath = Path.Combine(HostingEnvironment.MapPathContentRoot("~/"), "bin", "Auros.DocumentTypePicker.dll");
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, "test");
 
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Packaging
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(Path.Combine("bin", "Auros.DocumentTypePicker.dll"), result[0]);
-            Assert.IsTrue(File.Exists(Path.Combine(TestContext.CurrentContext.TestDirectory, result[0])));
+            Assert.IsTrue(File.Exists(Path.Combine(HostingEnvironment.MapPathContentRoot("~/"), result[0])));
 
             //make sure the def is updated too
             Assert.AreEqual(result.Count, def.Files.Count);
