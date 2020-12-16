@@ -256,6 +256,19 @@ namespace Umbraco.Web.BackOffice.Controllers
                 });
             return Ok(result);
         }
+
+        /// <summary>
+        /// Returns true if any content types have culture variation enabled
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        public bool AllowsCultureVariation()
+        {
+            IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll();
+            return contentTypes.Any(contentType => contentType.VariesByCulture());
+        }
+
         /// <summary>
         /// Returns where a particular composition has been used
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body

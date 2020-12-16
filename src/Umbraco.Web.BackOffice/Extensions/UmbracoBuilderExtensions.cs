@@ -30,7 +30,6 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder)
         {
             builder.Services.AddAntiforgery();
-            builder.Services.AddSingleton<IFilterProvider, OverrideAuthorizationFilterProvider>();
 
             builder.Services
                 .AddAuthentication() // This just creates a builder, nothing more
