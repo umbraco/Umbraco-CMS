@@ -203,13 +203,13 @@ namespace Umbraco.Core.Packaging
 
                 //Files
                 foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml, true);
+                    AppendFileToPackage(fileName, temporaryPath, filesXml);
 
                 //Load view on install...
                 if (!string.IsNullOrEmpty(definition.PackageView))
                 {
                     var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml, true);
+                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
                     root.Add(control);
                 }
 
@@ -319,7 +319,7 @@ namespace Umbraco.Core.Packaging
                 macros.Add(macroXml);
                 //if the macro has a file copy it to the xml
                 if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml, false);
+                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml);
             }
             root.Add(macros);
         }
@@ -499,12 +499,12 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="filesXml">The files xml node</param>
         /// <param name="isWebFile">true if it's a web file, false if it's a content file</param>
-        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml, bool isWebFile)
+        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml)
         {
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
 
-            var serverPath = isWebFile ? _hostingEnvironment.MapPathWebRoot(path) : _hostingEnvironment.MapPathContentRoot(path);
+            var serverPath = _hostingEnvironment.MapPathContentRoot(path);
 
             if (File.Exists(serverPath))
                 AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
