@@ -286,17 +286,42 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
-            var subQuery = Sql().Select<RelationDto>(x => x.Id)
-                .From<RelationDto>()
-                .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                .Where<RelationDto>(x => x.ParentId == parentId);
-
-            if (relationTypeAliases.Length > 0)
+            if (Database.DatabaseType.IsSqlCe())
             {
-                subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
-            }
+                var subQuery = Sql().Select<RelationDto>(x => x.Id)
+               .From<RelationDto>()
+               .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+               .Where<RelationDto>(x => x.ParentId == parentId);
 
-            Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
+                if (relationTypeAliases.Length > 0)
+                {
+                    subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                }
+
+                Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
+
+            }
+            else
+            {
+                if (relationTypeAliases.Length > 0)
+                {
+                    var sql = Sql().Delete<RelationDto>()
+                      .From<RelationDto>()
+                     .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                     .Where<RelationDto>(x => x.ParentId == parentId)
+                     .WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                    Database.Execute(sql);
+                }
+                else
+                {
+
+                    var sql = Sql().Delete<RelationDto>()
+                     .From<RelationDto>()
+                    .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                    .Where<RelationDto>(x => x.ParentId == parentId);
+                    Database.Execute(sql);
+                }
+            }
         }
 
         /// <summary>
