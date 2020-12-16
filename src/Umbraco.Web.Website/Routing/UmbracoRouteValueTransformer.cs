@@ -48,6 +48,7 @@ namespace Umbraco.Web.Website.Routing
         private readonly IPublishedRouter _publishedRouter;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IRuntimeState _runtime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -60,7 +61,8 @@ namespace Umbraco.Web.Website.Routing
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
             IPublishedRouter publishedRouter,
             IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeState runtime)
         {
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -70,16 +72,22 @@ namespace Umbraco.Web.Website.Routing
             _publishedRouter = publishedRouter;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+            _runtime = runtime;
         }
 
         /// <inheritdoc/>
         public override async ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary values)
         {
+            // If we aren't running, then we have nothing to route
+            if (_runtime.Level != RuntimeLevel.Run)
+            {
+                return values;
+            }
+
             // will be null for any client side requests like JS, etc...
             if (_umbracoContextAccessor.UmbracoContext == null)
             {
                 return values;
-                // throw new InvalidOperationException($"There is no current UmbracoContext, it must be initialized before the {nameof(UmbracoRouteValueTransformer)} executes, ensure that {nameof(UmbracoRequestMiddleware)} is registered prior to 'UseRouting'");
             }
 
             // Check for back office request
