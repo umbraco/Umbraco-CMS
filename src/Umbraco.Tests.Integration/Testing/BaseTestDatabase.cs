@@ -17,8 +17,8 @@ namespace Umbraco.Tests.Integration.Testing
     {
         protected ILoggerFactory _loggerFactory;
         protected IUmbracoDatabaseFactory _databaseFactory;
-        protected IEnumerable<TestDbMeta> _testDatabases;
-        
+        protected IList<TestDbMeta> _testDatabases;
+
         protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands;
 
         protected BlockingCollection<TestDbMeta> _prepareQueue;

@@ -100,8 +100,10 @@ namespace Umbraco.Tests.Integration.Testing
             var hostBuilder = CreateHostBuilder()
                 .UseUmbraco(); // This ensures CoreRuntime.StartAsync will be called (however it's a mock if boot = false)
 
-            var host = hostBuilder.Start();
+            IHost host = hostBuilder.Build();
             Services = host.Services;
+            host.Start();
+
             var app = new ApplicationBuilder(host.Services);
 
             Configure(app);
@@ -118,7 +120,16 @@ namespace Umbraco.Tests.Integration.Testing
                     case UmbracoTestOptions.Logger.Mock:
                         return NullLoggerFactory.Instance;
                     case UmbracoTestOptions.Logger.Serilog:
-                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+                        {
+                            var path = Path.Combine(TestHelper.WorkingDirectory, "logs", "umbraco_integration_tests_.txt");
+
+                            Log.Logger = new LoggerConfiguration()
+                                .WriteTo.File(path, rollingInterval: RollingInterval.Day)
+                                .CreateLogger();
+
+                            builder.AddSerilog(Log.Logger);
+                        });
                     case UmbracoTestOptions.Logger.Console:
                         return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
                 }
@@ -300,37 +311,23 @@ namespace Umbraco.Tests.Integration.Testing
                 case UmbracoTestOptions.Database.NewSchemaPerTest:
 
                     // New DB + Schema
-                    var newSchemaDbMeta = db.AttachSchema();
+                    TestDbMeta newSchemaDbMeta = db.AttachSchema();
 
                     // Add teardown callback
                     OnTestTearDown(() => db.Detach(newSchemaDbMeta));
 
-                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
-                    if (!databaseFactory.Configured)
-                    {
-                        databaseFactory.Configure(newSchemaDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
-                    }
-
-                    // re-run the runtime level check
-                    runtimeState.DetermineRuntimeLevel();
+                    ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState);
 
                     Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerTest:
-                    var newEmptyDbMeta = db.AttachEmpty();
+                    TestDbMeta newEmptyDbMeta = db.AttachEmpty();
 
                     // Add teardown callback
                     OnTestTearDown(() => db.Detach(newEmptyDbMeta));
 
-                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
-                    if (!databaseFactory.Configured)
-                    {
-                        databaseFactory.Configure(newEmptyDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
-                    }
-
-                    // re-run the runtime level check
-                    runtimeState.DetermineRuntimeLevel();
+                    ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState);
 
                     Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
 
@@ -342,21 +339,14 @@ namespace Umbraco.Tests.Integration.Testing
                     if (FirstTestInFixture)
                     {
                         // New DB + Schema
-                        var newSchemaFixtureDbMeta = db.AttachSchema();
+                        TestDbMeta newSchemaFixtureDbMeta = db.AttachSchema();
                         _fixtureDbMeta = newSchemaFixtureDbMeta;
 
                         // Add teardown callback
                         OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
                     }
 
-                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
-                    if (!databaseFactory.Configured)
-                    {
-                        databaseFactory.Configure(_fixtureDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
-                    }
-
-                    // re-run the runtime level check
-                    runtimeState.DetermineRuntimeLevel();
+                    ConfigureTestDatabaseFactory(_fixtureDbMeta, databaseFactory, runtimeState);
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
@@ -366,23 +356,32 @@ namespace Umbraco.Tests.Integration.Testing
                     if (FirstTestInFixture)
                     {
                         // New DB + Schema
-                        var newEmptyFixtureDbMeta = db.AttachEmpty();
+                        TestDbMeta newEmptyFixtureDbMeta = db.AttachEmpty();
                         _fixtureDbMeta = newEmptyFixtureDbMeta;
 
                         // Add teardown callback
                         OnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
                     }
 
-                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
-                    if (!databaseFactory.Configured)
-                    {
-                        databaseFactory.Configure(_fixtureDbMeta.ConnectionString, Constants.DatabaseProviders.SqlServer);
-                    }
+                    ConfigureTestDatabaseFactory(_fixtureDbMeta, databaseFactory, runtimeState);
 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(TestOptions), TestOptions, null);
             }
+        }
+
+        private void ConfigureTestDatabaseFactory(TestDbMeta meta, IUmbracoDatabaseFactory factory, IRuntimeState state)
+        {
+            ILogger<UmbracoIntegrationTest> log = Services.GetRequiredService<ILogger<UmbracoIntegrationTest>>();
+            log.LogInformation($"ConfigureTestDatabaseFactory - Using test database: [{meta.Name}] - IsEmpty: [{meta.IsEmpty}]");
+
+            // It's just been pulled from container and wasn't used to create test database
+            Assert.IsFalse(factory.Configured);
+
+            factory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SqlServer);
+            state.DetermineRuntimeLevel();
+            log.LogInformation($"ConfigureTestDatabaseFactory - Determined RuntimeLevel: [{state.Level}]");
         }
 
         #endregion
@@ -420,7 +419,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// Returns the <see cref="ILoggerFactory"/>
         /// </summary>
         protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
-
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
         protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();

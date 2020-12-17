@@ -64,13 +64,17 @@ namespace Umbraco.Tests.Integration.Testing
             var tempName = Guid.NewGuid().ToString("N");
             _localDbInstance.CreateDatabase(tempName, _filesPath);
             _localDbInstance.DetachDatabase(tempName);
+
             _prepareQueue = new BlockingCollection<TestDbMeta>();
             _readySchemaQueue = new BlockingCollection<TestDbMeta>();
             _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
 
-            foreach (var meta in _testDatabases)
+            for (var i = 0; i < _testDatabases.Count; i++)
             {
-                _localDb.CopyDatabaseFiles(tempName, _filesPath, targetDatabaseName: meta.Name, overwrite: true, delete: false);
+                var meta = _testDatabases[i];
+                var isLast = i == _testDatabases.Count - 1;
+
+                _localDb.CopyDatabaseFiles(tempName, _filesPath, targetDatabaseName: meta.Name, overwrite: true, delete: isLast);
                 meta.ConnectionString = _localDbInstance.GetAttachedConnectionString(meta.Name, _filesPath);
                 _prepareQueue.Add(meta);
             }
@@ -85,7 +89,9 @@ namespace Umbraco.Tests.Integration.Testing
         public void Finish()
         {
             if (_prepareQueue == null)
+            {
                 return;
+            }
 
             _prepareQueue.CompleteAdding();
             while (_prepareQueue.TryTake(out _))
@@ -100,14 +106,18 @@ namespace Umbraco.Tests.Integration.Testing
             { }
 
             if (_filesPath == null)
+            {
                 return;
+            }
 
             var filename = Path.Combine(_filesPath, DatabaseName).ToUpper();
 
             foreach (var database in _localDbInstance.GetDatabases())
             {
                 if (database.StartsWith(filename))
+                {
                     _localDbInstance.DropDatabase(database);
+                }
             }
 
             foreach (var file in Directory.EnumerateFiles(_filesPath))
