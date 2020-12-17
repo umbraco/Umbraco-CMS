@@ -71,5 +71,11 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             return GetEnumerator();
         }
+
+        public const int DisplayFallBackLanguage = 4;
+        /// <summary>
+        /// Gets the fallback to tree ancestors policy.
+        /// </summary>
+        public static Fallback ToDisplayFallBackLanguage => new Fallback(new[] { DisplayFallBackLanguage });
     }
 }

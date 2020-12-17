@@ -235,7 +235,13 @@ namespace Umbraco.Tests.PublishedContent
             var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
             Assert.AreEqual("Welcome", value);
         }
-
+        [Test]
+        public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_And_Language_Change()
+        {
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
+            var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.DisplayFallBackLanguage));
+            Assert.AreEqual("<span lang=\"en-US\">Welcome</span>", value);
+        }
         [Test]
         public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
         {
