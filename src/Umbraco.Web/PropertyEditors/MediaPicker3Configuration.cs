@@ -54,9 +54,10 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("height")]
             public int Height { get; set; }
-
+            /*
             [JsonProperty("mandatory")]
             public bool Mandatory { get; set; }
+            */
         }
     }
 }
