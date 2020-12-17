@@ -304,6 +304,11 @@
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Telemetry\ReportSiteTask.cs" />
+    <Compile Include="Telemetry\TelemetryMarkerComponent.cs" />
+    <Compile Include="Telemetry\TelemetryComponent.cs" />
+    <Compile Include="Telemetry\TelemetryComposer.cs" />
+    <Compile Include="Telemetry\TelemetryMarkerComposer.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
     <Compile Include="Templates\HtmlUrlParser.cs" />

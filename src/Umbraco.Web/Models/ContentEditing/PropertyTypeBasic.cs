@@ -65,5 +65,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "allowSegmentVariant")]
         public bool AllowSegmentVariant { get; set; }
+
+        [DataMember(Name = "labelOnTop")]
+        public bool LabelOnTop { get; set; }
     }
 }

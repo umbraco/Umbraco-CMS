@@ -1447,6 +1447,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
+    <key alias="displaySettingsHeadline">Visning</key>
+    <key alias="displaySettingsLabelOnTop">Label hen over (fuld brede)</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>
@@ -1880,8 +1882,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="openWebsiteLabel">Vis i nyt vindue</key>
     <key alias="openWebsiteTitle">Åben forhåndsvisning i nyt vindue</key>
     <key alias="returnToPreviewHeadline">Forhåndsvisning af indholdet?</key>
-    <key alias="returnToPreviewDescription">Du har afslutet forhåndsvisning, vil du se dette indhold i forhåndsvisning?</key>
-    <key alias="returnToPreviewButton">Fortsæt</key>
+    <key alias="returnToPreviewDescription">Du har afslutet forhåndsvisning, vil du starte forhåndsvisning igen for at se seneste gemte version af indholdet?</key>
+    <key alias="returnToPreviewButton">Start forhåndsvisning</key>
+    <key alias="returnToPreviewDeclineButton">Se udgivet indhold</key>
     <key alias="viewPublishedContentHeadline">Se udgivet indhold?</key>
     <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
     <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
