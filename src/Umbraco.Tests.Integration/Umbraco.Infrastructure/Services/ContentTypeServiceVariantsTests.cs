@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,10 +10,12 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -510,7 +512,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change it to invariant and back
-            GetRequiredService<IPublishedSnapshotService>(); //hack to ensure events are initialized
+
+            //hack to ensure events are initialized
+            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var contentType = CreateContentType(ContentVariation.Culture);
@@ -599,7 +603,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // one simple content type, invariant
             // can change it to variant and back
             // can then switch one property to variant
-            GetRequiredService<IPublishedSnapshotService>(); //hack to ensure events are initialized
+
+            //hack to ensure events are initialized
+            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
 
             var globalSettings = new GlobalSettings();
 
@@ -690,7 +696,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change an invariant property to variant and back
-            GetRequiredService<IPublishedSnapshotService>(); //hack to ensure events are initialized
+
+            //hack to ensure events are initialized
+            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var contentType = CreateContentType(ContentVariation.Culture);
@@ -967,8 +975,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // can change the composing content type to invariant and back
             // can change the composed content type to invariant and back
 
-
-            GetRequiredService<IPublishedSnapshotService>(); //hack to ensure events are initialized
+            //hack to ensure events are initialized
+            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var composing = CreateContentType(ContentVariation.Culture, "composing");
@@ -1064,7 +1072,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // can change the composing content type to invariant and back
             // can change the variant composed content type to invariant and back
 
-            GetRequiredService<IPublishedSnapshotService>(); //hack to ensure events are initialized
+            //hack to ensure events are initialized
+            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var composing = CreateContentType(ContentVariation.Culture, "composing");
