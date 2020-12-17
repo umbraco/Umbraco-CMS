@@ -43,6 +43,7 @@ namespace Umbraco.Tests.Integration
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
+                .UseUmbraco()
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
@@ -68,8 +69,7 @@ namespace Umbraco.Tests.Integration
                         .Build();
 
                     services.AddRouting(); // LinkGenerator
-                })
-                .UseUmbraco();
+                });
 
             var host = await hostBuilder.StartAsync();
             var app = new ApplicationBuilder(host.Services);

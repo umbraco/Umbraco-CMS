@@ -97,16 +97,20 @@ namespace Umbraco.Tests.Integration.Testing
         public virtual void Setup()
         {
             InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallEmptyDatabase)] = "true";
-            var hostBuilder = CreateHostBuilder()
-                .UseUmbraco(); // This ensures CoreRuntime.StartAsync will be called (however it's a mock if boot = false)
+            var hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();
-            Services = host.Services;
+            BeforeHostStart(host);
             host.Start();
 
             var app = new ApplicationBuilder(host.Services);
-
             Configure(app);
+        }
+
+        protected void BeforeHostStart(IHost host)
+        {
+            Services = host.Services;
+            UseTestDatabase(Services);
         }
 
         #region Generic Host Builder and Runtime
@@ -149,12 +153,12 @@ namespace Umbraco.Tests.Integration.Testing
         public virtual IHostBuilder CreateHostBuilder()
         {
             var hostBuilder = Host.CreateDefaultBuilder()
+                .UseUmbraco()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
                 // create separate Host instances. So instead of UseStartup, we just call ConfigureServices/Configure ourselves,
                 // and in the case of the UmbracoTestServerTestBase it will use the ConfigureWebHost to Configure the IApplicationBuilder directly.
                 //.ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup(GetType()); })
-
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
@@ -233,8 +237,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            UseTestDatabase(app.ApplicationServices);
-
             if (TestOptions.Boot)
             {
                 Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();

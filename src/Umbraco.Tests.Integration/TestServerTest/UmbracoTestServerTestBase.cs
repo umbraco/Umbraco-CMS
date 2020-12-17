@@ -19,7 +19,6 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -35,7 +34,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
 
             // create new WebApplicationFactory specifying 'this' as the IStartup instance
-            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder, BeforeHostStart);
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
@@ -71,14 +70,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
-                     Services = app.ApplicationServices;
-                     UseTestDatabase(app.ApplicationServices);
                      Configure(app);
                  });
 
             }).UseEnvironment(Environments.Development);
-
-            builder.UseUmbraco(); // Ensures CoreRuntime.StartAsync is called, must be after ConfigureWebHost
 
             return builder;
         }

@@ -12,12 +12,7 @@ namespace Umbraco.Core.Composing
         /// Adds CoreRuntime as HostedService
         /// </summary>
         /// <remarks>
-        /// <para>When running the site should be called before ConfigureWebDefaults.</para>
-        ///
-        /// <para>
-        /// When testing should be called after ConfigureWebDefaults to ensure UseTestDatabase is called before CoreRuntime
-        /// starts or we initialize components with incorrect run level.
-        /// </para>
+        /// Should be called before ConfigureWebDefaults.
         /// </remarks>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder)
         {
