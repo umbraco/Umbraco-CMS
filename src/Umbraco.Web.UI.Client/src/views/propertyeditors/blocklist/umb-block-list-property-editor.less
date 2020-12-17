@@ -236,30 +236,43 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         }
     }
 }
-.umb-block-list__create-button {
-    position: relative;
+
+.umb-block-list__actions {
     display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed @ui-action-discreet-border;
-    color: @ui-action-discreet-type;
-    font-weight: bold;
-    margin: 2px 0;
-    padding: 5px 15px;
-    box-sizing: border-box;
-    border-radius: @baseBorderRadius;
-}
+    > button {
+        position: relative;
+        display: flex;
+        //width: 100%;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed @ui-action-discreet-border;
+        color: @ui-action-discreet-type;
+        font-weight: bold;
+        margin: 2px 0;
+        padding: 5px 15px;
+        box-sizing: border-box;
+        border-radius: @baseBorderRadius;
 
-.umb-block-list__create-button:hover {
-    color: @ui-action-discreet-type-hover;
-    border-color: @ui-action-discreet-border-hover;
-    text-decoration: none;
-}
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            border-color: @ui-action-discreet-border-hover;
+            text-decoration: none;
+        }
 
-.umb-block-list__create-button.--disabled,
-.umb-block-list__create-button.--disabled:hover {
-    color: @gray-7;
-    border-color: @gray-7;
-    cursor: default;
+        &.--disabled,
+        &.--disabled:hover {
+            color: @gray-7;
+            border-color: @gray-7;
+            cursor: default;
+        }
+
+        &.umb-block-list__create-button {
+            flex-grow: 1;
+        }
+    
+        &.umb-block-list__clipboard-button {
+            margin-left: 5px;
+            padding: 5px 10px;
+        }
+    }
 }
