@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -46,7 +47,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly NuCacheSettings _config;
 
         // volatile because we read it with no lock
-        private volatile bool _isReady;
+        private bool _isReady;
+        private bool _isReadSet;
+        private object _isReadyLock;
 
         private readonly ContentStore _contentStore;
         private readonly ContentStore _mediaStore;
@@ -139,20 +142,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        #region Id <-> Key methods
-
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.
-        // TODO: Does this need to be here? 
-
+        // TODO: Does this need to be here?
         internal int GetDocumentId(Guid udi) => GetId(_contentStore, udi);
-        internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
-        internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
-        internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
-        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? 0;
-        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? Guid.Empty;
 
-        #endregion
+        internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
+
+        internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
+
+        internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
+
+        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? 0;
+
+        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? Guid.Empty;
 
         /// <summary>
         /// Install phase of <see cref="IMainDom"/>
@@ -204,66 +207,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        /// <summary>
-        /// Populates the stores
-        /// </summary>
-        public override void LoadCachesOnStartup()
-        {
-            lock (_storesLock)
-            {
-                if (_isReady)
-                {
-                    throw new InvalidOperationException("The caches can only be loaded on startup one time");
-                }
-
-                var okContent = false;
-                var okMedia = false;
-
-                try
-                {
-                    if (_localContentDbExists)
-                    {
-                        okContent = LockAndLoadContent(() => LoadContentFromLocalDbLocked(true));
-                        if (!okContent)
-                        {
-                            _logger.LogWarning("Loading content from local db raised warnings, will reload from database.");
-                        }
-                    }
-
-                    if (_localMediaDbExists)
-                    {
-                        okMedia = LockAndLoadMedia(() => LoadMediaFromLocalDbLocked(true));
-                        if (!okMedia)
-                        {
-                            _logger.LogWarning("Loading media from local db raised warnings, will reload from database.");
-                        }
-                    }
-
-                    if (!okContent)
-                    {
-                        LockAndLoadContent(() => LoadContentFromDatabaseLocked(true));
-                    }
-
-                    if (!okMedia)
-                    {
-                        LockAndLoadMedia(() => LoadMediaFromDatabaseLocked(true));
-                    }
-
-                    LockAndLoadDomains();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogCritical(ex, "Panic, exception while loading cache data.");
-                    throw;
-                }
-
-                // finally, cache is ready!
-                _isReady = true;
-            }
-        }
-
-        #region Local files
-
         private string GetLocalFilesPath()
         {
             var path = Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
@@ -278,7 +221,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void DeleteLocalFilesForContent()
         {
-            if (_isReady && _localContentDb != null)
+            if (Volatile.Read(ref _isReady) && _localContentDb != null)
             {
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
             }
@@ -293,7 +236,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void DeleteLocalFilesForMedia()
         {
-            if (_isReady && _localMediaDb != null)
+            if (Volatile.Read(ref _isReady) && _localMediaDb != null)
             {
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
             }
@@ -306,10 +249,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        #endregion
-
-        #region Environment
-
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
@@ -318,9 +257,62 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return ok;
         }
 
-        #endregion
+        /// <summary>
+        /// Populates the stores
+        /// </summary>
+        private void EnsureCaches() => LazyInitializer.EnsureInitialized(
+            ref _isReady,
+            ref _isReadSet,
+            ref _isReadyLock,
+            () =>
+            {
+                // even though we are ready locked here we want to ensure that the stores lock is also locked
+                lock (_storesLock)
+                {
+                    var okContent = false;
+                    var okMedia = false;
 
-        #region Populate Stores
+                    try
+                    {
+                        if (_localContentDbExists)
+                        {
+                            okContent = LockAndLoadContent(() => LoadContentFromLocalDbLocked(true));
+                            if (!okContent)
+                            {
+                                _logger.LogWarning("Loading content from local db raised warnings, will reload from database.");
+                            }
+                        }
+
+                        if (_localMediaDbExists)
+                        {
+                            okMedia = LockAndLoadMedia(() => LoadMediaFromLocalDbLocked(true));
+                            if (!okMedia)
+                            {
+                                _logger.LogWarning("Loading media from local db raised warnings, will reload from database.");
+                            }
+                        }
+
+                        if (!okContent)
+                        {
+                            LockAndLoadContent(() => LoadContentFromDatabaseLocked(true));
+                        }
+
+                        if (!okMedia)
+                        {
+                            LockAndLoadMedia(() => LoadMediaFromDatabaseLocked(true));
+                        }
+
+                        LockAndLoadDomains();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogCritical(ex, "Panic, exception while loading cache data.");
+                        throw;
+                    }
+
+                    return true;
+                }
+            });
 
         // sudden panic... but in RepeatableRead can a content that I haven't already read, be removed
         // before I read it? NO! because the WHOLE content tree is read-locked using WithReadLocked.
@@ -482,10 +474,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        #endregion
-
-        #region Handle Notifications
-
         // note: if the service is not ready, ie _isReady is false, then notifications are ignored
 
         // SetUmbracoVersionStep issues a DistributedCache.Instance.RefreshAll...() call which should cause
@@ -512,7 +500,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
             // no cache, trash everything
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 DeleteLocalFilesForContent();
                 draftChanged = publishedChanged = true;
@@ -613,7 +601,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
             // no cache, trash everything
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 DeleteLocalFilesForMedia();
                 anythingChanged = true;
@@ -711,7 +699,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 return;
             }
@@ -812,7 +800,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 return;
             }
@@ -856,7 +844,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 return;
             }
@@ -894,11 +882,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // Methods used to prevent allocations of lists
         private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
+
         private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
-
-        #endregion
-
-        #region Content Types
 
         private IReadOnlyCollection<IPublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
         {
@@ -1028,14 +1013,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        #endregion
-
-        #region Create, Get Published Snapshot
-
         public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
+            EnsureCaches();
+
             // no cache, no joy
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
             {
                 throw new InvalidOperationException("The published snapshot service has not properly initialized.");
             }
@@ -1049,6 +1032,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
+            EnsureCaches();
+
             // note: using ObjectCacheAppCache for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
             // thing - better use a dictionary-based cache which "just" creates a concurrent
@@ -1129,10 +1114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             };
         }
 
-        #endregion
-
-        #region Rebuild Database PreCache
-
+        /// <inheritdoc />
         public override void Rebuild(
             int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
@@ -1176,12 +1158,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        #endregion
-
-        #region Instrument
-
         public override string GetStatus()
         {
+            EnsureCaches();
+
             var dbCacheIsOk = VerifyContentDbCache()
                 && VerifyMediaDbCache()
                 && VerifyMemberDbCache();
@@ -1203,20 +1183,26 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
+        // TODO: This should be async since it's calling into async
         public override void Collect()
         {
+            EnsureCaches();
+
             var contentCollect = _contentStore.CollectAsync();
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
         }
 
-        #endregion
+        internal ContentStore GetContentStore()
+        {
+            EnsureCaches();
+            return _contentStore;
+        }
 
-        #region Internals/Testing
-
-        internal ContentStore GetContentStore() => _contentStore;
-        internal ContentStore GetMediaStore() => _mediaStore;
-
-        #endregion
+        internal ContentStore GetMediaStore()
+        {
+            EnsureCaches();
+            return _mediaStore;
+        }
     }
 }

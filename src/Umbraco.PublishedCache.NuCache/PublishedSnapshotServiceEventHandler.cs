@@ -40,10 +40,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
             }
 
-            // this initializes the caches.
-            // TODO: This is still temporal coupling (i.e. Initialize)
-            _publishedSnapshotService.LoadCachesOnStartup();
-
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
             // (ideally we'd have Upgrading.App vs Upgrading.Data application states...)

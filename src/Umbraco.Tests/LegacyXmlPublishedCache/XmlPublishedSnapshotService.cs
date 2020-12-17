@@ -253,6 +253,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return "Test status";
         }
 
-        public override void LoadCachesOnStartup() { }
+        public override void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) { }
     }
 }

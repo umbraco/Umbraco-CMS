@@ -6,6 +6,7 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
+    // TODO: This base class probably shouldn't exist
     public abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         /// <summary>
@@ -51,15 +52,12 @@ namespace Umbraco.Web.PublishedCache
         /// <inheritdoc/>
         public abstract void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
-        // TODO: Why is this virtual?
-
         /// <inheritdoc/>
-        public virtual void Rebuild(
+        public abstract void Rebuild(
             int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null)
-        { }
+            IReadOnlyCollection<int> memberTypeIds = null);
 
         /// <inheritdoc/>
         public virtual void Dispose()
@@ -76,6 +74,5 @@ namespace Umbraco.Web.PublishedCache
         {
         }
 
-        public abstract void LoadCachesOnStartup();
     }
 }

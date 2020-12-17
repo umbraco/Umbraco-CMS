@@ -75,7 +75,7 @@ namespace Umbraco.Infrastructure.PublishedCache.Persistence
         void RefreshEntity(IContentBase content);
 
         /// <summary>
-        /// Rebuilds the caches for content, media and/or members based on the content type ids specified
+        /// Rebuilds the database caches for content, media and/or members based on the content type ids specified
         /// </summary>
         /// <param name="groupSize">The operation batch size to process the items</param>
         /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>

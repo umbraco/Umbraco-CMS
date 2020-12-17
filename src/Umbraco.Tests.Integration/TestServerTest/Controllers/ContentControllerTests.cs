@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,13 +22,12 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         /// <summary>
         ///     Returns 404 if the content wasn't found based on the ID specified
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task PostSave_Validate_Existing_Content()
         {
             var localizationService = GetRequiredService<ILocalizationService>();
 
-            //Add another language
+            // Add another language
             localizationService.Save(new LanguageBuilder()
                 .WithCultureInfo("da-DK")
                 .WithIsDefault(false)
@@ -76,10 +75,10 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             // Assert
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-//             Assert.AreEqual(")]}',\n{\"Message\":\"content was not found\"}", response.Item1.Content.ReadAsStringAsync().Result);
-//
-//             //var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
-//             //Assert.AreEqual(0, obj.TotalItems);
+            //             Assert.AreEqual(")]}',\n{\"Message\":\"content was not found\"}", response.Item1.Content.ReadAsStringAsync().Result);
+            //
+            //             //var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
+            //             //Assert.AreEqual(0, obj.TotalItems);
         }
 
         [Test]
@@ -88,14 +87,13 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             var localizationService = GetRequiredService<ILocalizationService>();
 
-            //Add another language
+            // Add another language
             localizationService.Save(new LanguageBuilder()
                 .WithCultureInfo("da-DK")
                 .WithIsDefault(false)
                 .Build());
 
             var url = PrepareUrl<ContentController>(x => x.PostSave(null));
-
 
             var contentTypeService = GetRequiredService<IContentTypeService>();
 
@@ -128,7 +126,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .Build();
 
             // HERE we force the test to fail
-            model.Variants = model.Variants.Select(x=>
+            model.Variants = model.Variants.Select(x =>
             {
                 x.Save = false;
                 return x;
@@ -141,7 +139,6 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             });
 
             // Assert
-
             var body = await response.Content.ReadAsStringAsync();
 
             Assert.Multiple(() =>
@@ -155,13 +152,12 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         /// <summary>
         ///     Returns 404 if any of the posted properties dont actually exist
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task PostSave_Validate_Properties_Exist()
         {
             var localizationService = GetRequiredService<ILocalizationService>();
 
-            //Add another language
+            // Add another language
             localizationService.Save(new LanguageBuilder()
                 .WithCultureInfo("da-DK")
                 .WithIsDefault(false)
@@ -215,12 +211,11 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             });
 
             // Assert
-
             var body = await response.Content.ReadAsStringAsync();
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
 
-             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]

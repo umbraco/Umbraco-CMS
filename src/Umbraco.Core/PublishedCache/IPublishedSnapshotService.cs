@@ -24,13 +24,9 @@ namespace Umbraco.Web.PublishedCache
          */
 
         /// <summary>
-        /// Loads the caches on startup - called once during startup
-        /// TODO: Temporary, this is temporal coupling, we cannot use IUmbracoApplicationLifetime.ApplicationInit (which we want to delete)
-        /// handler because that is executed with netcore's IHostApplicationLifetime.ApplicationStarted mechanism which fires async
-        /// which we don't want since this will not have initialized before our endpoints execute. So for now this is explicitly
-        /// called on UseUmbracoContentCaching on startup. 
+        /// Gets the published snapshot accessor.
         /// </summary>
-        void LoadCachesOnStartup();
+        IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
 
         /// <summary>
         /// Creates a published snapshot.
@@ -43,28 +39,21 @@ namespace Umbraco.Web.PublishedCache
         IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
 
         /// <summary>
-        /// Gets the published snapshot accessor.
-        /// </summary>
-        IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
-
-        /// <summary>
         /// Ensures that the published snapshot has the proper environment to run.
         /// </summary>
         /// <param name="errors">The errors, if any.</param>
         /// <returns>A value indicating whether the published snapshot has the proper environment to run.</returns>
         bool EnsureEnvironment(out IEnumerable<string> errors);
 
-        #region Rebuild
-
         /// <summary>
-        /// Rebuilds internal caches (but does not reload).
+        /// Rebuilds internal database caches (but does not reload).
         /// </summary>
         /// <param name="groupSize">The operation batch size to process the items</param>
         /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>
         /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
         /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
         /// <remarks>
-        /// <para>Forces the snapshot service to rebuild its internal caches. For instance, some caches
+        /// <para>Forces the snapshot service to rebuild its internal database caches. For instance, some caches
         /// may rely on a database table to store pre-serialized version of documents.</para>
         /// <para>This does *not* reload the caches. Caches need to be reloaded, for instance via
         /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
@@ -74,10 +63,6 @@ namespace Umbraco.Web.PublishedCache
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null);
-
-        #endregion
-
-        #region Changes
 
         /* An IPublishedCachesService implementation can rely on transaction-level events to update
          * its internal, database-level data, as these events are purely internal. However, it cannot
@@ -122,8 +107,6 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="payloads">The changes.</param>
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
-
-        #endregion
 
         // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
         string GetStatus();

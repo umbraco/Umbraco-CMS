@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -116,19 +116,19 @@ namespace Umbraco.Tests.Integration.TestServerTest
         }
 
         protected HttpClient Client { get; private set; }
+
         protected LinkGenerator LinkGenerator { get; private set; }
+
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-            base.TerminateCoreRuntime();
+            TerminateCoreRuntime();
 
             Factory.Dispose();
         }
-
-        #region IStartup
 
         public override void ConfigureServices(IServiceCollection services)
         {
@@ -160,9 +160,5 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             app.UseUmbraco();
         }
-
-        #endregion
-
-
     }
 }

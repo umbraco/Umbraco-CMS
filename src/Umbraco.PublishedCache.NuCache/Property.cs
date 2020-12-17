@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using Umbraco.Core;
@@ -158,6 +158,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 default:
                     throw new InvalidOperationException("Invalid cache level.");
             }
+
             return cacheValues;
         }
 
