@@ -504,11 +504,11 @@
     <key alias="innerMargin">Margen interno</key>
     <key alias="insert">Insertar</key>
     <key alias="install">Instalar</key>
-        <key alias="invalid">Inválido</key>
+    <key alias="invalid">Inválido</key>
     <key alias="justify">Justificar</key>
     <key alias="label">Etiqueta</key>
     <key alias="language">Idioma</key>
-        <key alias="last">Último</key>
+    <key alias="last">Último</key>
     <key alias="layout">Diseño</key>
     <key alias="loading">Cargando</key>
     <key alias="locked">Bloqueado</key>
@@ -520,7 +520,7 @@
     <key alias="message">Mensaje</key>
     <key alias="move">Mover</key>
     <key alias="name">Nombre</key>
-        <key alias="new">Nuevo</key>
+    <key alias="new">Nuevo</key>
     <key alias="next">Próximo</key>
     <key alias="no">No</key>
     <key alias="of">de</key>
@@ -625,7 +625,7 @@
     <key alias="databaseHeader">Configuración de la base de datos</key>
         <key alias="databaseInstall"><![CDATA[Pulsa el botón <strong> instalar </ strong> para instalar %0% la base de datos de Umbraco]]></key>
         <key alias="databaseInstallDone"><![CDATA[Se ha copiado Umbraco %0% a la base de datos. Pulsa <strong>Próximo</strong> para continuar]]></key>
-        <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la cadena de conexión del “web.config” es correcta.</p> <p>Para continuar, edita el "web.config" (bien sea usando Visual Studio o tu editor de texto preferido), ve al final del archivo y añade la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarda el archivo. </p> <p>Pincha en <strong>reintentar</strong> cuando hayas terminado.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Pincha aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
+        <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la cadena de conexión del “web.config” es correcta.</p> <p>Para continuar, edita el "web.config" (bien sea usando Visual Studio o tu editor de texto preferido), ve al final del archivo y añade la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarda el archivo. </p> <p>Pincha en <strong>reintentar</strong> cuando hayas terminado.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Pincha aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este paso, debes conocer la información correspondiente a tu servidor de base de datos ("cadena de conexión").<br /> Por favor, contacta con tu ISP si es necesario. Si estás realizando la instalación en una máquina o servidor local, quizás necesites información de tu administrador de sistemas.]]></key>
         <key alias="databaseUpgrade"><![CDATA[<p> Pincha en <strong>actualizar</strong> para actualizar la base de datos a Umbraco %0%</p> <p> Ningún contenido será borrado de la base de datos y seguirá funcionando después de la actualización </p> ]]></key>
         <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pincha en <strong>Próximo</strong> para continuar. ]]></key>
@@ -652,7 +652,7 @@
     <key alias="permissionsSettingUpPermissions">Configurando los permisos de directorios</key>
         <key alias="permissionsText">Umbraco necesita permisos de lectura/escritura en algunos directorios para poder almacenar archivos tales como imágenes y PDFs. También almacena datos en la caché para mejorar el rendimiento de tu sitio web</key>
     <key alias="runwayFromScratch">Quiero empezar de cero</key>
-        <key alias="runwayFromScratchText"><![CDATA[Tu sitio web está completamente vacío en estos momentos, lo cual es perfecto si quieres empezar de cero y crear tus propios tipos de documentos y plantillas (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">aprende cómo</a>). Todavía podrás elegir instalar Runway más adelante. Por favor ve a la sección del Desarrollador y elige Paquetes.]]></key>
+        <key alias="runwayFromScratchText"><![CDATA[Tu sitio web está completamente vacío en estos momentos, lo cual es perfecto si quieres empezar de cero y crear tus propios tipos de documentos y plantillas (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">aprende cómo</a>). Todavía podrás elegir instalar Runway más adelante. Por favor ve a la sección del Desarrollador y elige Paquetes.]]></key>
     <key alias="runwayHeader">Acabas de configurar una nueva plataforma Umbraco. ¿Qué deseas hacer ahora?</key>
     <key alias="runwayInstalled">Se ha instalado Runway</key>
     <key alias="runwayInstalledText"><![CDATA[Tienes puestos los cimientos. Selecciona los módulos que desees instalar sobre ellos.<br /> Esta es nuestra lista de módulos recomendados, selecciona los que desees instalar, o mira la <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">lista completa de módulos</a> ]]></key>
@@ -696,7 +696,7 @@
     <key alias="greeting6">Resplandeciente sábado</key>
     <key alias="instruction">Iniciar sesión</key>
     <key alias="timeout">La sesión ha caducado</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">¿Olvidaste tu contraseña?</key>
     <key alias="forgottenPasswordInstruction">Enviaremos un email a la dirección especificada con un enlace para restaurar tu contraseña</key>
         <key alias="requestPasswordResetConfirmation">Un email con instrucciones para restaurar tu contraseña será enviado a la dirección especificada si ésta está registrada.</key>
