@@ -209,7 +209,7 @@
             mediaEntry.focalPoint = mediaEntry.focalPoint || {
                 left: 0.5,
                 top: 0.5
-            };;
+            };
 
             // Copy config and only transfer coordinates.
             var newCrops = Utilities.copy(vm.model.config.crops);
