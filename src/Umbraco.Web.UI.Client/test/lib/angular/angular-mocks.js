@@ -1377,13 +1377,13 @@ function MockHttpExpectation(method, url, data, headers) {
     };
 
     this.matchHeaders = function (h) {
-        if (angular.isUndefined(headers)) return true;
+        if (Utilities.isUndefined(headers)) return true;
         if (angular.isFunction(headers)) return headers(h);
         return angular.equals(headers, h);
     };
 
     this.matchData = function (d) {
-        if (angular.isUndefined(data)) return true;
+        if (Utilities.isUndefined(data)) return true;
         if (data && angular.isFunction(data.test)) return data.test(d);
         if (data && !Utilities.isString(data)) return angular.toJson(data) == d;
         return data == d;
