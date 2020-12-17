@@ -71,8 +71,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
-                     UseTestDatabase(app.ApplicationServices);
                      Services = app.ApplicationServices;
+                     UseTestDatabase(app.ApplicationServices);
                      Configure(app);
                  });
 
