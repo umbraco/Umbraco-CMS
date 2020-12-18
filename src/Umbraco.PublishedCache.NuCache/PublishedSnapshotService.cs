@@ -135,16 +135,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _entitySerializer = entitySerializer;
             _publishedModelFactory = publishedModelFactory;
 
-            // we always want to handle repository events, configured or not
-            // assuming no repository event will trigger before the whole db is ready
-            // (ideally we'd have Upgrading.App vs Upgrading.Data application states...)
-            InitializeRepositoryEvents();
-
             _lifeTime.ApplicationInit += OnApplicationInit;
         }
 
         internal void OnApplicationInit(object sender, EventArgs e)
         {
+            // we always want to handle repository events, configured or not
+            // assuming no repository event will trigger before the whole db is ready
+            // (ideally we'd have Upgrading.App vs Upgrading.Data application states...)
+            InitializeRepositoryEvents();
+
             // however, the cache is NOT available until we are configured, because loading
             // content (and content types) from database cannot be consistent (see notes in "Handle
             // Notifications" region), so
