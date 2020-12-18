@@ -19,7 +19,9 @@ namespace Umbraco.Tests.Integration.Testing
         protected IUmbracoDatabaseFactory _databaseFactory;
         protected IList<TestDbMeta> _testDatabases;
 
-        protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands;
+        protected const int _threadCount = 2;
+
+        protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
         protected BlockingCollection<TestDbMeta> _prepareQueue;
         protected BlockingCollection<TestDbMeta> _readySchemaQueue;
@@ -92,46 +94,52 @@ namespace Umbraco.Tests.Integration.Testing
             });
         }
 
-        protected void RebuildSchema(IDbCommand command, TestDbMeta meta)
+        private void RebuildSchema(IDbCommand command, TestDbMeta meta)
         {
-            if (_cachedDatabaseInitCommands != null)
+            lock (_cachedDatabaseInitCommands)
             {
-                foreach (var dbCommand in _cachedDatabaseInitCommands)
+                if (!_cachedDatabaseInitCommands.Any())
                 {
-
-                    if (dbCommand.Text.StartsWith("SELECT "))
-                    {
-                        continue;
-                    }
-
-                    command.CommandText = dbCommand.Text;
-                    command.Parameters.Clear();
-
-                    foreach (var parameterInfo in dbCommand.Parameters)
-                    {
-                        AddParameter(command, parameterInfo);
-                    }
-
-                    command.ExecuteNonQuery();
+                    RebuildSchemaFirstTime(command, meta);
+                    return;
                 }
             }
-            else
+
+            foreach (var dbCommand in _cachedDatabaseInitCommands)
             {
-                _databaseFactory.Configure(meta.ConnectionString, Core.Constants.DatabaseProviders.SqlServer);
-
-                using (var database = (UmbracoDatabase)_databaseFactory.CreateDatabase())
+                if (dbCommand.Text.StartsWith("SELECT "))
                 {
-                    database.LogCommands = true;
+                    continue;
+                }
 
-                    using (var transaction = database.GetTransaction())
-                    {
-                        var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion());
-                        schemaCreator.InitializeDatabaseSchema();
+                command.CommandText = dbCommand.Text;
+                command.Parameters.Clear();
 
-                        transaction.Complete();
+                foreach (var parameterInfo in dbCommand.Parameters)
+                {
+                    AddParameter(command, parameterInfo);
+                }
 
-                        _cachedDatabaseInitCommands = database.Commands.ToArray();
-                    }
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private void RebuildSchemaFirstTime(IDbCommand command, TestDbMeta meta)
+        {
+            _databaseFactory.Configure(meta.ConnectionString, Core.Constants.DatabaseProviders.SqlServer);
+
+            using (var database = (UmbracoDatabase)_databaseFactory.CreateDatabase())
+            {
+                database.LogCommands = true;
+
+                using (var transaction = database.GetTransaction())
+                {
+                    var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion());
+                    schemaCreator.InitializeDatabaseSchema();
+
+                    transaction.Complete();
+
+                    _cachedDatabaseInitCommands = database.Commands.ToArray();
                 }
             }
         }

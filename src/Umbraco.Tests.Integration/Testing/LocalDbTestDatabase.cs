@@ -19,8 +19,6 @@ namespace Umbraco.Tests.Integration.Testing
         private static LocalDb.Instance _localDbInstance;
         private static string _filesPath;
 
-        private const int _threadCount = 2;
-
         public static LocalDbTestDatabase Instance { get; private set; }
 
         //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
