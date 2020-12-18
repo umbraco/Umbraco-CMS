@@ -20,7 +20,6 @@ namespace Umbraco.Web.UI.NetCore
                 {
                     x.ClearProviders();
                 })
-                .UseUmbraco()
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }

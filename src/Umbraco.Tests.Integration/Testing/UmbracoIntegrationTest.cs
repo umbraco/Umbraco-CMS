@@ -153,7 +153,6 @@ namespace Umbraco.Tests.Integration.Testing
         public virtual IHostBuilder CreateHostBuilder()
         {
             var hostBuilder = Host.CreateDefaultBuilder()
-                .UseUmbraco()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
                 // create separate Host instances. So instead of UseStartup, we just call ConfigureServices/Configure ourselves,

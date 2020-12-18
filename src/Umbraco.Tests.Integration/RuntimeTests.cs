@@ -43,7 +43,6 @@ namespace Umbraco.Tests.Integration
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
-                .UseUmbraco()
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
