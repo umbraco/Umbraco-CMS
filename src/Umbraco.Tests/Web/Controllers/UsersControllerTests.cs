@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
-                userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
+                userServiceMock.Setup(service => service.GetUserById(It.Is<int>(x => x == 1234)))
                     .Returns(new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
                 
                 //we need to manually apply automapper mappings with the mocked applicationcontext

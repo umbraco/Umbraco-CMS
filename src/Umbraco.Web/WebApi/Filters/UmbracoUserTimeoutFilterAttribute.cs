@@ -18,13 +18,13 @@ namespace Umbraco.Web.WebApi.Filters
             //this can occur if an error has already occurred.
             if (actionExecutedContext.Response == null) return;
 
-            var httpContextAttempt = actionExecutedContext.Request.TryGetHttpContext();
-            if (httpContextAttempt.Success)
+            var owinContextAttempt = actionExecutedContext.Request.TryGetOwinContext();
+            if (owinContextAttempt.Success)
             {
-                var ticket = httpContextAttempt.Result.GetUmbracoAuthTicket();
+                var ticket = owinContextAttempt.Result.GetUmbracoAuthTicket();
                 if (ticket != null && ticket.Expired == false)
                 {
-                    var remainingSeconds = httpContextAttempt.Result.GetRemainingAuthSeconds();
+                    var remainingSeconds = ticket.GetRemainingAuthSeconds();
                     actionExecutedContext.Response.Headers.Add("X-Umb-User-Seconds", remainingSeconds.ToString(CultureInfo.InvariantCulture));
                 }
             }

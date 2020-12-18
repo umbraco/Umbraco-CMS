@@ -302,7 +302,7 @@ namespace Umbraco.Core.Security
         public static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
-            var owinContext = http.ApplicationInstance.Context.GetOwinContext();
+            var owinContext = http.GetOwinContext();
             return GetUmbracoAuthTicket(owinContext);
         }
 

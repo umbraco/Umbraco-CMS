@@ -27,6 +27,20 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
+            // First check MS_OwinContext directly, should work in most cases
+            object context;
+            if (request.Properties.TryGetValue("MS_OwinContext", out context))
+            {
+                var owinContext = context as IOwinContext;
+                if (owinContext != null)
+                {
+                    return Attempt.Succeed(owinContext);
+                }
+            }
+
+            // Fall back to previous behavoir - getting the OWIN context from HttpContextBase
+            // This works fine except in unit tests using the TestServer, which mocks 
+            // The mocked HttpContextBase does not proeprly return the OWIN context
             var httpContext = request.TryGetHttpContext();
             try
             {
@@ -36,7 +50,7 @@ namespace Umbraco.Web.WebApi
             }
             catch (InvalidOperationException)
             {
-                //this will occur if there is no OWIN environment which generally would only be in things like unit tests
+                //this will occur if there is no OWIN environment which generally would only be in things like some unit tests
                 return Attempt<IOwinContext>.Fail();
             }
         }
