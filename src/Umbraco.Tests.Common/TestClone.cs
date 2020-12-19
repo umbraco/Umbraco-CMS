@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Common
@@ -11,18 +14,13 @@ namespace Umbraco.Tests.Common
             IsClone = true;
         }
 
-        public TestClone()
-        {
-            Id = Guid.NewGuid();
-        }
+        public TestClone() => Id = Guid.NewGuid();
 
         public Guid Id { get; }
+
         public bool IsClone { get; }
 
-        public object DeepClone()
-        {
-            return new TestClone(Id);
-        }
+        public object DeepClone() => new TestClone(Id);
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
@@ -33,8 +31,16 @@ namespace Umbraco.Tests.Common
         /// <param name="other">An object to compare with this object.</param>
         public bool Equals(TestClone other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return Id.Equals(other.Id);
         }
 
@@ -47,9 +53,21 @@ namespace Umbraco.Tests.Common
         /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((TestClone)obj);
         }
 
@@ -59,19 +77,10 @@ namespace Umbraco.Tests.Common
         /// <returns>
         /// A hash code for the current object.
         /// </returns>
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
+        public override int GetHashCode() => Id.GetHashCode();
 
-        public static bool operator ==(TestClone left, TestClone right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(TestClone left, TestClone right) => Equals(left, right);
 
-        public static bool operator !=(TestClone left, TestClone right)
-        {
-            return Equals(left, right) == false;
-        }
+        public static bool operator !=(TestClone left, TestClone right) => Equals(left, right) == false;
     }
 }

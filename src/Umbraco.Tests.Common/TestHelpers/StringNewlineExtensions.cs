@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Tests
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+namespace Umbraco.Tests
 {
     public static class StringNewLineExtensions
     {
@@ -9,8 +12,12 @@
         /// <returns>The filtered text.</returns>
         public static string Lf(this string text)
         {
-            if (string.IsNullOrEmpty(text)) return text;
-            text = text.Replace("\r", ""); // remove CR
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            text = text.Replace("\r", string.Empty); // remove CR
             return text;
         }
 
@@ -21,8 +28,12 @@
         /// <returns>The filtered text.</returns>
         public static string CrLf(this string text)
         {
-            if (string.IsNullOrEmpty(text)) return text;
-            text = text.Replace("\r", ""); // remove CR
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            text = text.Replace("\r", string.Empty); // remove CR
             text = text.Replace("\n", "\r\n"); // add CRLF everywhere
             return text;
         }
@@ -34,7 +45,11 @@
         /// <returns>The filtered text.</returns>
         public static string NoCrLf(this string text)
         {
-            if (string.IsNullOrEmpty(text)) return text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
             text = text.Replace("\r\n", " "); // remove CRLF
             text = text.Replace("\r", " "); // remove CR
             text = text.Replace("\n", " "); // remove LF
