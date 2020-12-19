@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
@@ -15,6 +16,7 @@ namespace Umbraco.Tests.Integration.Testing
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
 
+        private readonly TestDatabaseSettings _settings;
         private readonly LocalDb _localDb;
         private static LocalDb.Instance _localDbInstance;
         private static string _filesPath;
@@ -22,26 +24,26 @@ namespace Umbraco.Tests.Integration.Testing
         public static LocalDbTestDatabase Instance { get; private set; }
 
         //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-        internal LocalDbTestDatabase(ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
+        internal LocalDbTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
         {
             _loggerFactory = loggerFactory;
             _databaseFactory = dbFactory;
 
+            _settings = settings;
             _localDb = localDb;
             _filesPath = filesPath;
 
             Instance = this; // For GlobalSetupTeardown.cs
 
-            _testDatabases = new[]
-            {
-                // With Schema
-                TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-1", false),
-                TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-2", false),
+            var counter = 0;
 
-                // Empty (for migration testing etc)
-                TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-3", true),
-                TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-4", true),
-            };
+            var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
+                .Select(x => TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", false));
+
+            var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
+                .Select(x => TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", true));
+
+            _testDatabases = schema.Concat(empty).ToList();
 
             _localDbInstance = _localDb.GetInstance(InstanceName);
             if (_localDbInstance != null)
@@ -77,7 +79,7 @@ namespace Umbraco.Tests.Integration.Testing
                 _prepareQueue.Add(meta);
             }
 
-            for (var i = 0; i < _threadCount; i++)
+            for (var i = 0; i < _settings.PrepareThreadCount; i++)
             {
                 var thread = new Thread(PrepareDatabase);
                 thread.Start();

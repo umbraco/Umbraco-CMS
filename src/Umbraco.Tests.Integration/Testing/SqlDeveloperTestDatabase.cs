@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
@@ -14,28 +16,29 @@ namespace Umbraco.Tests.Integration.Testing
     /// </remarks>
     public class SqlDeveloperTestDatabase : BaseTestDatabase, ITestDatabase
     {
+        private readonly TestDatabaseSettings _settings;
         private readonly string _masterConnectionString;
         public const string DatabaseName = "UmbracoTests";
 
         public static SqlDeveloperTestDatabase Instance { get; private set; }
 
-        public SqlDeveloperTestDatabase(ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory, string masterConnectionString)
+        public SqlDeveloperTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory, string masterConnectionString)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
 
+            _settings = settings;
             _masterConnectionString = masterConnectionString;
 
-            _testDatabases = new[]
-            {
-                // With Schema
-                TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-1", false, masterConnectionString),
-                TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-2", false, masterConnectionString),
+            var counter = 0;
 
-                // Empty (for migration testing etc)
-                TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-3", true, masterConnectionString),
-                TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-4", true, masterConnectionString),
-            };
+            var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
+                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false, masterConnectionString));
+
+            var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
+                .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true, masterConnectionString));
+
+            _testDatabases = schema.Concat(empty).ToList();
 
             Instance = this; // For GlobalSetupTeardown.cs
         }
@@ -52,7 +55,7 @@ namespace Umbraco.Tests.Integration.Testing
                 _prepareQueue.Add(meta);
             }
 
-            for (var i = 0; i < _threadCount; i++)
+            for (var i = 0; i < _settings.PrepareThreadCount; i++)
             {
                 var thread = new Thread(PrepareDatabase);
                 thread.Start();

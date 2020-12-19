@@ -19,7 +19,6 @@ namespace Umbraco.Tests.Integration.Testing
         protected IUmbracoDatabaseFactory _databaseFactory;
         protected IList<TestDbMeta> _testDatabases;
 
-        protected const int _threadCount = 2;
 
         protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 

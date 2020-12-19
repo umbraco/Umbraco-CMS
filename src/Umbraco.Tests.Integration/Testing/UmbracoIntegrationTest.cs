@@ -279,7 +279,15 @@ namespace Umbraco.Tests.Integration.Testing
                     return _dbInstance;
                 }
 
-                _dbInstance = TestDatabaseFactory.Create(filesPath, loggerFactory, dbFactory);
+                // TODO: pull from IConfiguration
+                var settings = new TestDatabaseSettings
+                {
+                    PrepareThreadCount = 4,
+                    EmptyDatabasesCount = 2,
+                    SchemaDatabaseCount = 4
+                };
+
+                _dbInstance = TestDatabaseFactory.Create(settings, filesPath, loggerFactory, dbFactory);
 
                 return _dbInstance;
             }
