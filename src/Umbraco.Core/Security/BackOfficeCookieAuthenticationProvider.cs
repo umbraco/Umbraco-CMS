@@ -51,7 +51,7 @@ namespace Umbraco.Core.Security
                     : Guid.NewGuid();
 
                 backOfficeIdentity.UserData.SessionId = session.ToString();
-            }
+            }            
 
             base.ResponseSignIn(context);
         }
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Security
                 return;
             }
             await base.ValidateIdentity(context);
-        }
+        }        
 
         /// <summary>
         /// Ensures that the user has a valid session id

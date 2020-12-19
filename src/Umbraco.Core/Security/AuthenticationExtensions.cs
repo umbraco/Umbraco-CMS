@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -47,14 +47,14 @@ namespace Umbraco.Core.Security
             {
                 try
                 {
-                    //create the Umbraco user identity
+                    //create the Umbraco user identity 
                     var identity = new UmbracoBackOfficeIdentity(ticket);
 
                     //set the principal object
                     var principal = new GenericPrincipal(identity, identity.Roles);
 
                     //It is actually not good enough to set this on the current app Context and the thread, it also needs
-                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually
+                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
                     // an underlying fault of asp.net not propogating the User correctly.
                     if (HttpContext.Current != null)
                     {
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Security
                 if (backOfficeIdentity != null) return backOfficeIdentity;
             }
 
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = user.Identity as ClaimsIdentity;
             if (claimsIdentity != null && claimsIdentity.IsAuthenticated && claimsIdentity.HasClaim(x => x.Type == Constants.Security.SessionIdClaimType))
             {
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Security
                     return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
                 }
                 catch (InvalidOperationException)
-                {
+                {                    
                 }
             }
 
@@ -124,11 +124,11 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This will return the current back office identity.
+        /// This will return the current back office identity. 
         /// </summary>
         /// <param name="http"></param>
-        /// <param name="authenticateRequestIfNotFound">
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
+        /// <param name="authenticateRequestIfNotFound"> 
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
         /// request just as is done in the Umbraco module and then set the current identity if it is valid.
         /// Just like in the UmbracoModule, if this is true then the user's culture will be assigned to the request.
         /// </param>
@@ -142,21 +142,21 @@ namespace Umbraco.Core.Security
 
             //If it's already a UmbracoBackOfficeIdentity
             var backOfficeIdentity = GetUmbracoIdentity(http.User);
-            if (backOfficeIdentity != null) return backOfficeIdentity;
+            if (backOfficeIdentity != null) return backOfficeIdentity;            
 
             if (authenticateRequestIfNotFound == false) return null;
 
-            //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated
+            //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated 
             // which would mean something strange is going on that it is not an umbraco identity.
             if (http.User.Identity.IsAuthenticated) return null;
 
             //So the user is not authed but we've been asked to do the auth if authenticateRequestIfNotFound = true,
             // which might occur in old webforms style things or for routes that aren't included as a back office request.
             // in this case, we are just reverting to authing using the cookie.
-
-            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on
+            
+            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on 
             // how the Module will eventually do it (by calling in to any registered authenticators).
-
+            
             var ticket = http.GetUmbracoAuthTicket();
             if (http.AuthenticateCurrentRequest(ticket, true))
             {
@@ -167,11 +167,11 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This will return the current back office identity.
+        /// This will return the current back office identity. 
         /// </summary>
         /// <param name="http"></param>
         /// <param name="authenticateRequestIfNotFound">
-        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
         /// request just as is done in the Umbraco module and then set the current identity if it is valid
         /// </param>
         /// <returns>
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
         {
-            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");
+            throw new NotSupportedException("This method is not supported and should not be used, it has been removed in Umbraco 7.4");            
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Security
             if (http == null) throw new ArgumentNullException("http");
             new HttpContextWrapper(http).UmbracoLogout();
         }
-
+        
         /// <summary>
         /// This will force ticket renewal in the OWIN pipeline
         /// </summary>
@@ -252,19 +252,19 @@ namespace Umbraco.Core.Security
 
             if (http == null) throw new ArgumentNullException("http");
             if (userdata == null) throw new ArgumentNullException("userdata");
-
+            
             var userDataString = JsonConvert.SerializeObject(userdata);
             return CreateAuthTicketAndCookie(
-                http,
-                userdata.Username,
-                userDataString,
+                http, 
+                userdata.Username, 
+                userDataString, 
                 //use the configuration timeout - this is the same timeout that will be used when renewing the ticket.
-                GlobalSettings.TimeOutInMinutes,
+                GlobalSettings.TimeOutInMinutes, 
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
-                1440,
+                1440, 
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
-        }
+        }        
 
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
@@ -480,7 +480,7 @@ namespace Umbraco.Core.Security
 
             //ensure http only, this should only be able to be accessed via the server
             cookie.HttpOnly = true;
-
+				
             http.Response.Cookies.Set(cookie);
 
             return ticket;

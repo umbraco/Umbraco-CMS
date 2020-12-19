@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin;
@@ -19,15 +19,15 @@ namespace Umbraco.Web.Security.Identity
 
         public UmbracoBackOfficeCookieAuthOptions()
             : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
-        {
+        {            
         }
-
+        
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
             ISecuritySection securitySection,
             int loginTimeoutMinutes,
             bool forceSsl,
-            bool useLegacyFormsAuthDataFormat = true)
+            bool useLegacyFormsAuthDataFormat = true)            
         {
             LoginTimeoutMinutes = loginTimeoutMinutes;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Security.Identity
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
             CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
-            CookiePath = "/";
+            CookiePath = "/";            
 
             //Custom cookie manager so we can filter requests
             CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor(), explicitPaths);
@@ -89,6 +89,6 @@ namespace Umbraco.Web.Security.Identity
 
             return cookieOptions;
         }
-
+          
     }
 }

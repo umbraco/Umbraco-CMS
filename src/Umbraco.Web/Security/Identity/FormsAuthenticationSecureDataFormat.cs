@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using System.Web.Security;
 using Microsoft.Owin;
@@ -28,15 +28,15 @@ namespace Umbraco.Web.Security.Identity
         {
             var backofficeIdentity = (UmbracoBackOfficeIdentity)data.Identity;
             var userDataString = JsonConvert.SerializeObject(backofficeIdentity.UserData);
-
+            
             var ticket = new FormsAuthenticationTicket(
                 5,
                 data.Identity.Name,
-                data.Properties.IssuedUtc.HasValue
-                    ? data.Properties.IssuedUtc.Value.LocalDateTime
+                data.Properties.IssuedUtc.HasValue 
+                    ? data.Properties.IssuedUtc.Value.LocalDateTime 
                     : DateTime.Now,
-                data.Properties.ExpiresUtc.HasValue
-                    ? data.Properties.ExpiresUtc.Value.LocalDateTime
+                data.Properties.ExpiresUtc.HasValue 
+                    ? data.Properties.ExpiresUtc.Value.LocalDateTime 
                     : DateTime.Now.AddMinutes(_loginTimeoutMinutes),
                 data.Properties.IsPersistent,
                 userDataString,
