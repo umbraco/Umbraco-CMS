@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
@@ -9,9 +12,10 @@ using Umbraco.Web.Common.Exceptions;
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
-    public class UsersControllerUnitTests
+    public class UsersControllerTests
     {
-        [Test,AutoMoqData]
+        [Test]
+        [AutoMoqData]
         public void PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response(
             [Frozen] IBackOfficeUserManager backOfficeUserManager,
             UsersController sut,
@@ -25,6 +29,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             Assert.ThrowsAsync<HttpResponseException>(() => sut.PostUnlockUsers(userIds));
         }
-
     }
 }

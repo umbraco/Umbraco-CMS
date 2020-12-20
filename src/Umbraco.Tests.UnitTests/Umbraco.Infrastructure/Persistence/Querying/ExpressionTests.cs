@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -25,8 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
+            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
             {
                 Id = 12345
             };
@@ -43,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Query_With_Content_Type_Alias()
         {
-            //Arrange
+            // Arrange
             Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -57,7 +59,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Query_With_Content_Type_Aliases_IEnumerable()
         {
-            //Arrange - Contains is IEnumerable.Contains extension method
+            // Arrange - Contains is IEnumerable.Contains extension method
             var aliases = new[] { "Test1", "Test2" };
             Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
@@ -73,7 +75,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Query_With_Content_Type_Aliases_List()
         {
-            //Arrange - Contains is List.Contains instance method
+            // Arrange - Contains is List.Contains instance method
             var aliases = new System.Collections.Generic.List<string> { "Test1", "Test2" };
             Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
@@ -89,9 +91,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void CachedExpression_Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
         {
-            //Arrange
+            // Arrange
 
-            //use a single cached expression for multiple expressions and ensure the correct output
+            // use a single cached expression for multiple expressions and ensure the correct output
             // is done for both of them.
             var cachedExpression = new CachedExpression();
 
@@ -108,13 +110,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
             var result2 = modelToSqlExpressionHelper2.Visit(cachedExpression);
             Assert.AreEqual("upper([umbracoNode].[path]) LIKE upper(@0)", result2);
             Assert.AreEqual("-1,123,97%", modelToSqlExpressionHelper2.GetSqlParameters()[0]);
-
         }
 
         [Test]
         public void Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
         {
-            //Arrange
+            // Arrange
             Expression<Func<IContent, bool>> predicate = content => content.Path.StartsWith("-1");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Verify_ParentId_StartsWith_Predicate_In_Same_Result()
         {
-            //Arrange
+            // Arrange
             Expression<Func<IContent, bool>> predicate = content => content.ParentId == -1;
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -195,10 +196,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
             Assert.AreEqual("blah@blah.com", modelToSqlExpressionHelper.GetSqlParameters()[2]);
         }
 
-        private string GetSomeValue(string s)
-        {
-            return "xx" + s + "xx";
-        }
+        private string GetSomeValue(string s) => "xx" + s + "xx";
 
         private class Foo
         {
@@ -242,12 +240,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
             // and how would we get the comma there? we'd have to parse .StartsWith(group.Name + ',')
             // which is going to be quite complicated => no
 
-            //// how can we do user.Login.StartsWith(other.Value) ?? to use in WHERE or JOIN.ON clauses ??
-            //Expression<Func<UserDto, UserGroupDto, object>> predicate2 = (user, group) => user.Login.StartsWith(group.Name);
-            //var modelToSqlExpressionHelper2 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);
-            //var result2 = modelToSqlExpressionHelper2.Visit(predicate2); // fails, for now
+            // how can we do user.Login.StartsWith(other.Value) ?? to use in WHERE or JOIN.ON clauses ??
+            //// Expression<Func<UserDto, UserGroupDto, object>> predicate2 = (user, group) => user.Login.StartsWith(group.Name);
+            //// var modelToSqlExpressionHelper2 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);
+            //// var result2 = modelToSqlExpressionHelper2.Visit(predicate2); // fails, for now
 
-            //Console.WriteLine(result2);
+            //// Console.WriteLine(result2);
 
             Expression<Func<UserDto, UserGroupDto, object>> predicate3 = (user, group) => SqlExtensionsStatics.SqlText<bool>(user.Login, group.Name, (n1, n2) => $"({n1} LIKE concat({n2}, ',%'))");
             var modelToSqlExpressionHelper3 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);

@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
 
@@ -10,7 +13,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
-
             // Act
             string column = new DictionaryTranslationMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Key");
 
@@ -21,7 +23,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Language_Property()
         {
-
             // Act
             string column = new DictionaryTranslationMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Language");
 
@@ -32,7 +33,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Value_Property()
         {
-
             // Act
             string column = new DictionaryTranslationMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Value");
 

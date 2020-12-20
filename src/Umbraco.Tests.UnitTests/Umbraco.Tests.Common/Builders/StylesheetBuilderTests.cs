@@ -1,6 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Routing;
 using Umbraco.Tests.Common.Builders;
 
@@ -19,7 +22,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new StylesheetBuilder();
 
             // Act
-            var stylesheet = builder
+            Stylesheet stylesheet = builder
                 .WithPath(testPath)
                 .WithContent(testContent)
                 .Build();

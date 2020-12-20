@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,7 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Binds_Query_To_FormCollection()
         {
             // Arrange
-            var bindingContext = CreateBindingContext("?foo=bar&baz=buzz");
+            ModelBindingContext bindingContext = CreateBindingContext("?foo=bar&baz=buzz");
             var binder = new HttpQueryStringModelBinder();
 
             // Act
@@ -35,7 +39,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Sets_Culture_Form_Value_From_Query_If_Provided()
         {
             // Arrange
-            var bindingContext = CreateBindingContext("?foo=bar&baz=buzz&culture=en-gb");
+            ModelBindingContext bindingContext = CreateBindingContext("?foo=bar&baz=buzz&culture=en-gb");
             var binder = new HttpQueryStringModelBinder();
 
             // Act
@@ -53,7 +57,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Sets_Culture_Form_Value_From_Header_If_Not_Provided_In_Query()
         {
             // Arrange
-            var bindingContext = CreateBindingContext("?foo=bar&baz=buzz");
+            ModelBindingContext bindingContext = CreateBindingContext("?foo=bar&baz=buzz");
             var binder = new HttpQueryStringModelBinder();
 
             // Act
@@ -77,7 +81,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var metadataProvider = new EmptyModelMetadataProvider();
             var routeValueDictionary = new RouteValueDictionary();
             var valueProvider = new RouteValueProvider(BindingSource.Path, routeValueDictionary);
-            var modelType = typeof(FormCollection);
+            Type modelType = typeof(FormCollection);
             return new DefaultModelBindingContext
             {
                 ActionContext = actionContext,

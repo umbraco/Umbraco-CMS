@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -9,7 +11,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Formatters
     [TestFixture]
     public class IgnoreRequiredAttributesResolverUnitTests
     {
-
         [Test]
         public void Test()
         {
@@ -17,14 +18,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Formatters
 
             Assert.Multiple(() =>
             {
-                //Ensure the deserialization throws if using default settings
+                // Ensure the deserialization throws if using default settings
                 Assert.Throws<JsonSerializationException>(() =>
                     JsonConvert.DeserializeObject<ObjectWithRequiredProperty>(emptyJsonObject));
 
-                var actual = JsonConvert.DeserializeObject<ObjectWithRequiredProperty>(emptyJsonObject,new JsonSerializerSettings
-                {
-                    ContractResolver = new IgnoreRequiredAttributesResolver()
-                });
+                ObjectWithRequiredProperty actual = JsonConvert.DeserializeObject<ObjectWithRequiredProperty>(
+                    emptyJsonObject,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = new IgnoreRequiredAttributesResolver()
+                    });
 
                 Assert.IsNotNull(actual);
                 Assert.IsNull(actual.Property);
@@ -35,7 +38,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Formatters
         private class ObjectWithRequiredProperty
         {
             [DataMember(Name = "property", IsRequired = true)]
-            public string Property{ get; set; }
+            public string Property { get; set; }
         }
     }
 }

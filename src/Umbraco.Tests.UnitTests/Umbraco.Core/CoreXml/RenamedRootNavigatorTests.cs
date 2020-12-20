@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;
@@ -19,7 +22,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 </root>");
             var nav = doc.CreateNavigator();
             var xml = nav.OuterXml;
-            Assert.AreEqual(EnsureNativeLineEndings(@"<root foo=""bar"">
+            Assert.AreEqual(
+                EnsureNativeLineEndings(@"<root foo=""bar"">
   <a></a>
   <b x=""1""></b>
 </root>"), xml);
@@ -35,7 +39,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 </xx:root>");
             var nav = doc.CreateNavigator();
             var xml = nav.OuterXml;
-            Assert.AreEqual(EnsureNativeLineEndings(@"<xx:root foo=""bar"" xmlns:xx=""uri"">
+            Assert.AreEqual(
+                EnsureNativeLineEndings(@"<xx:root foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
 </xx:root>"), xml);
@@ -51,7 +56,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 </root>");
             var nav = new RenamedRootNavigator(doc.CreateNavigator(), "test");
             var xml = nav.OuterXml;
-            Assert.AreEqual(EnsureNativeLineEndings(@"<test foo=""bar"">
+            Assert.AreEqual(
+                EnsureNativeLineEndings(@"<test foo=""bar"">
   <a></a>
   <b x=""1""></b>
 </test>"), xml);
@@ -73,7 +79,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 </xx:root>");
             var nav = new RenamedRootNavigator(doc.CreateNavigator(), "test");
             var xml = nav.OuterXml;
-            Assert.AreEqual(EnsureNativeLineEndings(@"<xx:test foo=""bar"" xmlns:xx=""uri"">
+            Assert.AreEqual(
+                EnsureNativeLineEndings(@"<xx:test foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
 </xx:test>"), xml);

@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
@@ -15,17 +18,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
         private XmlDocumentBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new XmlDocumentBuilder();
-        }
+        public void SetUp() => _builder = new XmlDocumentBuilder();
 
         [Ignore("This is a benchmark test so is ignored by default")]
         [Test]
         public void Sort_Nodes_Benchmark_Legacy()
         {
-            var xml = _builder.Build();
-            var original = xml.GetElementById(1173.ToString());
+            XmlDocument xml = _builder.Build();
+            XmlElement original = xml.GetElementById(1173.ToString());
             Assert.IsNotNull(original);
 
             long totalTime = 0;
@@ -34,26 +34,27 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
 
             for (var i = 0; i < iterations; i++)
             {
-                //don't measure the time for clone!
-                var parentNode = original.Clone();
+                // don't measure the time for clone!
+                XmlNode parentNode = original.Clone();
                 watch.Start();
                 LegacySortNodes(ref parentNode);
                 watch.Stop();
                 totalTime += watch.ElapsedMilliseconds;
                 watch.Reset();
 
-                //do assertions just to make sure it is working properly.
+                // Do assertions just to make sure it is working properly.
                 var currSort = 0;
-                foreach (var child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
+                foreach (XmlNode child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
                 {
                     Assert.AreEqual(currSort, int.Parse(child.Attributes["sortOrder"].Value));
                     currSort++;
                 }
 
-                //ensure the parent node's properties still exist first
+                // Ensure the parent node's properties still exist first.
                 Assert.AreEqual("content", parentNode.ChildNodes[0].Name);
                 Assert.AreEqual("umbracoUrlAlias", parentNode.ChildNodes[1].Name);
-                //then the child nodes should come straight after
+
+                // Then the child nodes should come straight after.
                 Assert.IsTrue(parentNode.ChildNodes[2].Attributes["id"] != null);
             }
 
@@ -64,8 +65,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
         [Test]
         public void Sort_Nodes_Benchmark_New()
         {
-            var xml = _builder.Build();
-            var original = xml.GetElementById(1173.ToString());
+            XmlDocument xml = _builder.Build();
+            XmlElement original = xml.GetElementById(1173.ToString());
             Assert.IsNotNull(original);
 
             long totalTime = 0;
@@ -74,8 +75,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
 
             for (var i = 0; i < iterations; i++)
             {
-                //don't measure the time for clone!
-                var parentNode = (XmlElement) original.Clone();
+                // don't measure the time for clone!
+                var parentNode = (XmlElement)original.Clone();
                 watch.Start();
                 XmlHelper.SortNodes(
                     parentNode,
@@ -85,18 +86,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
                 totalTime += watch.ElapsedMilliseconds;
                 watch.Reset();
 
-                //do assertions just to make sure it is working properly.
+                // do assertions just to make sure it is working properly.
                 var currSort = 0;
-                foreach (var child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
+                foreach (XmlNode child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
                 {
                     Assert.AreEqual(currSort, int.Parse(child.Attributes["sortOrder"].Value));
                     currSort++;
                 }
 
-                //ensure the parent node's properties still exist first
+                // ensure the parent node's properties still exist first
                 Assert.AreEqual("content", parentNode.ChildNodes[0].Name);
                 Assert.AreEqual("umbracoUrlAlias", parentNode.ChildNodes[1].Name);
-                //then the child nodes should come straight after
+
+                // then the child nodes should come straight after
                 Assert.IsTrue(parentNode.ChildNodes[2].Attributes["id"] != null);
             }
 
@@ -106,52 +108,56 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
         [Test]
         public void Sort_Nodes()
         {
-            var xml = _builder.Build();
-            var original = xml.GetElementById(1173.ToString());
+            XmlDocument xml = _builder.Build();
+            XmlElement original = xml.GetElementById(1173.ToString());
             Assert.IsNotNull(original);
 
-            var parentNode = (XmlElement) original.Clone();
+            var parentNode = (XmlElement)original.Clone();
 
             XmlHelper.SortNodes(
                 parentNode,
                 "./* [@id]",
                 x => x.AttributeValue<int>("sortOrder"));
 
-            //do assertions just to make sure it is working properly.
+            // do assertions just to make sure it is working properly.
             var currSort = 0;
-            foreach (var child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
+            foreach (XmlNode child in parentNode.SelectNodes("./* [@id]").Cast<XmlNode>())
             {
                 Assert.AreEqual(currSort, int.Parse(child.Attributes["sortOrder"].Value));
                 currSort++;
             }
 
-            //ensure the parent node's properties still exist first
+            // ensure the parent node's properties still exist first
             Assert.AreEqual("content", parentNode.ChildNodes[0].Name);
             Assert.AreEqual("umbracoUrlAlias", parentNode.ChildNodes[1].Name);
-            //then the child nodes should come straight after
+
+            // then the child nodes should come straight after
             Assert.IsTrue(parentNode.ChildNodes[2].Attributes["id"] != null);
         }
 
         /// <summary>
         /// This was the logic to sort before and now lives here just to show the benchmarks tests above.
         /// </summary>
-        /// <param name="parentNode"></param>
         private static void LegacySortNodes(ref XmlNode parentNode)
         {
-            var n = parentNode.CloneNode(true);
+            XmlNode n = parentNode.CloneNode(true);
 
             // remove all children from original node
             var xpath = "./* [@id]";
             foreach (XmlNode child in parentNode.SelectNodes(xpath))
+            {
                 parentNode.RemoveChild(child);
+            }
 
-            var nav = n.CreateNavigator();
-            var expr = nav.Compile(xpath);
-            expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
-            var iterator = nav.Select(expr);
+            XPathNavigator nav = n.CreateNavigator();
+            XPathExpression expr = nav.Compile(xpath);
+            expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, string.Empty, XmlDataType.Number);
+            XPathNodeIterator iterator = nav.Select(expr);
             while (iterator.MoveNext())
+            {
                 parentNode.AppendChild(
-                    ((IHasXmlNode) iterator.Current).GetNode());
+                    ((IHasXmlNode)iterator.Current).GetNode());
+            }
         }
     }
 }

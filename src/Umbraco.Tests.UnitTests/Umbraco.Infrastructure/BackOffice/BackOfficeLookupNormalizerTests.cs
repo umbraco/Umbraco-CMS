@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Security;
@@ -29,6 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice
 
             Assert.AreEqual(name, normalizedName);
         }
+
         [Test]
         [TestCase(null)]
         [TestCase("")]

@@ -1,4 +1,7 @@
-﻿using System.Xml;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Xml;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -14,7 +17,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             var cdata = new XElement("test", new XCData("hello world"));
             var xdoc = new XmlDocument();
 
-            var xmlNode = cdata.GetXmlNode(xdoc);
+            XmlNode xmlNode = cdata.GetXmlNode(xdoc);
 
             Assert.AreEqual("hello world", xmlNode.InnerText);
         }
@@ -25,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             var cdata = new XElement("test", new XText("hello world"));
             var xdoc = new XmlDocument();
 
-            var xmlNode = cdata.GetXmlNode(xdoc);
+            XmlNode xmlNode = cdata.GetXmlNode(xdoc);
 
             Assert.AreEqual("hello world", xmlNode.InnerText);
         }
@@ -39,7 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             var xdoc = new XmlDocument();
             xdoc.LoadXml(xml);
 
-            var xmlNode = cdata.GetXmlNode(xdoc);
+            XmlNode xmlNode = cdata.GetXmlNode(xdoc);
 
             Assert.AreEqual("hello world", xmlNode.InnerText);
             Assert.AreEqual(xml, xdoc.OuterXml);

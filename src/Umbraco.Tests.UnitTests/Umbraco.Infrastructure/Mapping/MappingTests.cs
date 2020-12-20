@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             var mapper = new UmbracoMapper(definitions);
 
             var thing1 = new Thing1 { Value = "value" };
-            var thing2 = mapper.Map<Thing1, Thing2>(thing1);
+            Thing2 thing2 = mapper.Map<Thing1, Thing2>(thing1);
 
             Assert.IsNotNull(thing2);
             Assert.AreEqual("value", thing2.Value);
@@ -48,7 +51,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 
             var thing1A = new Thing1 { Value = "valueA" };
             var thing1B = new Thing1 { Value = "valueB" };
-            var thing1 = new[] { thing1A, thing1B };
+            Thing1[] thing1 = new[] { thing1A, thing1B };
             var thing2 = mapper.Map<IEnumerable<Thing1>, IEnumerable<Thing2>>(thing1).ToList();
 
             Assert.IsNotNull(thing2);
@@ -81,7 +84,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             var mapper = new UmbracoMapper(definitions);
 
             var thing3 = new Thing3 { Value = "value" };
-            var thing2 = mapper.Map<Thing3, Thing2>(thing3);
+            Thing2 thing2 = mapper.Map<Thing3, Thing2>(thing3);
 
             Assert.IsNotNull(thing2);
             Assert.AreEqual("value", thing2.Value);
@@ -107,7 +110,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 
             // can map a PropertyCollection
             var source = new PropertyCollection();
-            var target = mapper.Map<IEnumerable<ContentPropertyDto>>(source);
+            IEnumerable<ContentPropertyDto> target = mapper.Map<IEnumerable<ContentPropertyDto>>(source);
         }
 
         [Test]
@@ -129,7 +132,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             // if timing is good, and mapper does have non-concurrent dictionaries, it fails
             // practically, to reproduce, one needs to add a 1s sleep in the mapper's loop
             // hence, this test is explicit
-
             var thing3 = new Thing3 { Value = "value" };
             var thing4 = new Thing4();
             Exception caught = null;
@@ -138,6 +140,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             {
                 // keep failing at mapping - and looping through the maps
                 for (var i = 0; i < 10; i++)
+                {
                     try
                     {
                         mapper.Map<Thing2>(thing4);
@@ -147,6 +150,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
                         caught = e;
                         Console.WriteLine($"{e.GetType().Name} {e.Message}");
                     }
+                }
 
                 Console.WriteLine("done");
             }
@@ -158,7 +162,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
             try
             {
                 Console.WriteLine($"{DateTime.Now:O} mapping");
-                var thing2 = mapper.Map<Thing2>(thing3);
+                Thing2 thing2 = mapper.Map<Thing2>(thing3);
                 Console.WriteLine($"{DateTime.Now:O} mapped");
 
                 Assert.IsNotNull(thing2);
@@ -186,7 +190,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
                 Fruit3 = Thing5Enum.Cherry
             };
 
-            var thing6 = mapper.Map<Thing5, Thing6>(thing5);
+            Thing6 thing6 = mapper.Map<Thing5, Thing6>(thing5);
 
             Assert.IsNotNull(thing6);
             Assert.AreEqual(Thing6Enum.Apple, thing6.Fruit1);
@@ -205,12 +209,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 
             var thing7 = new Thing7();
 
-            var thing8 = mapper.Map<Thing7, Thing8>(thing7);
+            Thing8 thing8 = mapper.Map<Thing7, Thing8>(thing7);
 
             Assert.IsNotNull(thing8);
             Assert.IsNull(thing8.Things);
         }
-
 
         private class Thing1
         {
@@ -218,7 +221,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         }
 
         private class Thing3 : Thing1
-        { }
+        {
+        }
 
         private class Thing2
         {
@@ -226,12 +230,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         }
 
         private class Thing4
-        { }
+        {
+        }
 
         private class Thing5
         {
             public Thing5Enum Fruit1 { get; set; }
+
             public Thing5Enum Fruit2 { get; set; }
+
             public Thing5Enum Fruit3 { get; set; }
         }
 
@@ -245,7 +252,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         private class Thing6
         {
             public Thing6Enum Fruit1 { get; set; }
+
             public Thing6Enum Fruit2 { get; set; }
+
             public Thing6Enum Fruit3 { get; set; }
         }
 
@@ -268,26 +277,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 
         private class MapperDefinition1 : IMapDefinition
         {
-            public void DefineMaps(UmbracoMapper mapper)
-            {
-                mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
-            }
+            public void DefineMaps(UmbracoMapper mapper) => mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
 
-            private void Map(Thing1 source, Thing2 target, MapperContext context)
-            {
-                target.Value = source.Value;
-            }
+            private void Map(Thing1 source, Thing2 target, MapperContext context) => target.Value = source.Value;
         }
 
         private class MapperDefinition2 : IMapDefinition
         {
-            public void DefineMaps(UmbracoMapper mapper)
-            {
+            public void DefineMaps(UmbracoMapper mapper) =>
                 mapper.Define<IProperty, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
-            }
 
             private static void Map(IProperty source, ContentPropertyDto target, MapperContext context)
-            { }
+            {
+            }
         }
 
         private class MapperDefinition3 : IMapDefinition
@@ -328,15 +330,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
                 mapper.Define<Thing7, Thing8>((source, context) => new Thing8(), Map2);
             }
 
-            private void Map1(Thing1 source, Thing2 target, MapperContext context)
-            {
+            private void Map1(Thing1 source, Thing2 target, MapperContext context) =>
                 target.Value = source.Value;
-            }
 
-            private void Map2(Thing7 source, Thing8 target, MapperContext context)
-            {
+            private void Map2(Thing7 source, Thing8 target, MapperContext context) =>
                 target.Things = context.Map<IEnumerable<Thing2>>(source.Things);
-            }
         }
     }
 }

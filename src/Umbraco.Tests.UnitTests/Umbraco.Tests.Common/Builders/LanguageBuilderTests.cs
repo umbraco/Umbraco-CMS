@@ -1,5 +1,9 @@
-﻿using System.Globalization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Globalization;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -17,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var expected = CultureInfo.GetCultureInfo("en-GB");
 
             // Act
-            var language = builder
+            ILanguage language = builder
                 .WithCultureInfo(expected.Name)
                 .Build();
 

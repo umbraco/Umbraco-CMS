@@ -1,17 +1,18 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.BackOffice.Trees;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
-
     /// <summary>
     /// Tests for typefinder
     /// </summary>
@@ -24,11 +25,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         private Assembly[] _assemblies;
 
         [SetUp]
-        public void Initialize()
-        {
-            _assemblies = new[]
+        public void Initialize() => _assemblies = new[]
                 {
-                    this.GetType().Assembly,
+                    GetType().Assembly,
                     typeof(System.Guid).Assembly,
                     typeof(NUnit.Framework.Assert).Assembly,
                     typeof(System.Xml.NameTable).Assembly,
@@ -36,13 +35,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                     typeof(TypeFinder).Assembly,
                 };
 
-        }
-
         [Test]
         public void Find_Class_Of_Type_With_Attribute()
         {
             var typeFinder = new TypeFinder(Mock.Of<ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
-            var typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
+            IEnumerable<Type> typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
             Assert.AreEqual(2, typesFound.Count());
         }
 
@@ -50,10 +47,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         public void Find_Classes_With_Attribute()
         {
             var typeFinder = new TypeFinder(Mock.Of<ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
-            var typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
+            IEnumerable<Type> typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
-            typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (TreeAttribute).Assembly });
+            typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof(TreeAttribute).Assembly });
             Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
 
             typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>();
@@ -63,27 +60,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
         public class MyTestAttribute : Attribute
         {
-
         }
 
         public abstract class TestEditor
         {
-
         }
 
         [MyTest]
         public class BenchmarkTestEditor : TestEditor
         {
-
         }
 
         [MyTest]
         public class MyOtherTestEditor : TestEditor
         {
-
         }
-
     }
-
-
 }

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -16,19 +19,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
     {
         public PhysicalFileSystemTests()
             : base(new PhysicalFileSystem(TestHelper.IOHelper, TestHelper.GetHostingEnvironment(), Mock.Of<ILogger<PhysicalFileSystem>>(), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"), "/Media/"))
-        { }
+        {
+        }
 
         [SetUp]
         public void Setup()
         {
-
         }
 
         [TearDown]
         public void TearDown()
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
-            if (Directory.Exists(path) == false) return;
+            if (Directory.Exists(path) == false)
+            {
+                return;
+            }
 
             var files = Directory.GetFiles(path);
             foreach (var f in files)
@@ -39,16 +45,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             Directory.Delete(path, true);
         }
 
-        protected override string ConstructUrl(string path)
-        {
-            return "/Media/" + path;
-        }
+        protected override string ConstructUrl(string path) => "/Media/" + path;
 
         private string Repeat(string pattern, int count)
         {
             var text = new StringBuilder();
             for (var i = 0; i < count; i++)
+            {
                 text.Append(pattern);
+            }
+
             return text.ToString();
         }
 
@@ -58,7 +64,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             var basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+            {
                 _fileSystem.AddFile("sub/f3.txt", ms);
+            }
 
             Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub/f3.txt")));
 
@@ -80,14 +88,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             // here we initialize the PhysicalFileSystem with
             // rootPath = /path/to/FileSysTests
             // rootUrl = /Media/
-
             var basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
 
             // ensure that GetFullPath
             // - does return the proper full path
             // - does properly normalize separators
             // - does throw on invalid paths
-
             // works
             var path = _fileSystem.GetFullPath("foo.tmp");
             Assert.AreEqual(Path.Combine(basePath, @"foo.tmp"), path);

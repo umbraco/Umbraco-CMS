@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,15 +18,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private DictionaryTranslationBuilder _builder = new DictionaryTranslationBuilder();
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new DictionaryTranslationBuilder();
-        }
+        public void SetUp() => _builder = new DictionaryTranslationBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = BuildDictionaryTranslation();
+            IDictionaryTranslation item = BuildDictionaryTranslation();
 
             var clone = (DictionaryTranslation)item.DeepClone();
 
@@ -33,35 +34,36 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.Key, item.Key);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
             Assert.AreNotSame(clone.Language, item.Language);
-            //This is null because we are ignoring it from cloning due to caching/cloning issues - we don't really want
+
+            // This is null because we are ignoring it from cloning due to caching/cloning issues - we don't really want
             // this entity attached to this item but we're stuck with it for now
             Assert.IsNull(clone.Language);
             Assert.AreEqual(clone.LanguageId, item.LanguageId);
             Assert.AreEqual(clone.Value, item.Value);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps.Where(x => x.Name != "Language"))
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps.Where(x => x.Name != "Language"))
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
+            }
         }
 
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = BuildDictionaryTranslation();
+            IDictionaryTranslation item = BuildDictionaryTranslation();
 
             var json = JsonConvert.SerializeObject(item);
             Debug.Print(json);
         }
 
-        private IDictionaryTranslation BuildDictionaryTranslation()
-        {
-            return _builder
+        private IDictionaryTranslation BuildDictionaryTranslation() =>
+            _builder
                 .AddLanguage()
                     .WithCultureInfo("en-AU")
                     .Done()
                 .WithValue("colour")
-                .Build();            
-        }
+                .Build();
     }
 }

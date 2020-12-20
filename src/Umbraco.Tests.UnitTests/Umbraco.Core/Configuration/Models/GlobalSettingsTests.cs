@@ -1,4 +1,7 @@
-﻿using AutoFixture.NUnit3;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
@@ -6,8 +9,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.Common.AspNetCore;
 
-
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configurations
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models
 {
     [TestFixture]
     public class GlobalSettingsTests

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
@@ -29,15 +32,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
             var cached = new List<string>();
             var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
-                .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, string[] s) =>
-                {
-                    cached.Add(cacheKey);
-                });
+                .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, string[] s) => cached.Add(cacheKey));
             cache.Setup(x => x.SearchByKey(It.IsAny<string>())).Returns(new AuditItem[] { });
 
             var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
-            var unused = defaultPolicy.GetAll(new object[] { }, ids => new[]
+            AuditItem[] unused = defaultPolicy.GetAll(new object[] { }, ids => new[]
                     {
                         new AuditItem(1, AuditType.Copy, 123, "test", "blah"),
                         new AuditItem(2, AuditType.Copy, 123, "test", "blah2")
@@ -52,14 +52,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
             var isCached = false;
             var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
-                .Callback(() =>
-                {
-                    isCached = true;
-                });
+                .Callback(() => isCached = true);
 
             var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
-            var unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => null);
+            AuditItem unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => null);
             Assert.IsTrue(isCached);
         }
     }

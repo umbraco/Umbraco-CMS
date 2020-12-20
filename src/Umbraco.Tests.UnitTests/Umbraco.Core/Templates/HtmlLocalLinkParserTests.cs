@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -8,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.UnitTests.TestHelpers.Objects;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
@@ -43,15 +47,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
         [TestCase("hello href=\"{localLink:umb://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
         [TestCase("hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
         [TestCase("hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/1001/my-image.jpg\" world ")]
-        //this one has an invalid char so won't match
+
+        // This one has an invalid char so won't match.
         [TestCase("hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"#\" world ")]
         public void ParseLocalLinks(string input, string result)
         {
-            //setup a mock URL provider which we'll use for testing
+            // setup a mock URL provider which we'll use for testing
             var contentUrlProvider = new Mock<IUrlProvider>();
             contentUrlProvider
-                .Setup(x => x.GetUrl( It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+                .Setup(x => x.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/my-test-url"));
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = new Mock<IPublishedContent>();
@@ -67,17 +72,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
 
-            var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            IUmbracoContextFactory umbracoContextFactory = TestUmbracoContextFactory.Create(
                 umbracoContextAccessor: umbracoContextAccessor);
 
             var webRoutingSettings = new WebRoutingSettings();
-            var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
-                new UrlProviderCollection(new []{contentUrlProvider.Object}),
-                new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
-                Mock.Of<IVariationContextAccessor>()
-                );
-            using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+                new UrlProviderCollection(new[] { contentUrlProvider.Object }),
+                new MediaUrlProviderCollection(new[] { mediaUrlProvider.Object }),
+                Mock.Of<IVariationContextAccessor>());
+            using (UmbracoContextReference reference = umbracoContextFactory.EnsureUmbracoContext())
             {
                 var contentCache = Mock.Get(reference.UmbracoContext.Content);
                 contentCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(publishedContent.Object);

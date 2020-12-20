@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -17,11 +20,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
     public class RenderModelBinderTests
     {
         private ContentModelBinder _contentModelBinder;
+
         [SetUp]
-        public void SetUp()
-        {
-            _contentModelBinder = new ContentModelBinder();
-        }
+        public void SetUp() => _contentModelBinder = new ContentModelBinder();
 
         [Test]
         [TestCase(typeof(IPublishedContent), false)]
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var contextMock = new Mock<ModelBinderProviderContext>();
             contextMock.Setup(x => x.Metadata).Returns(new EmptyModelMetadataProvider().GetMetadataForType(testType));
 
-            var found = binderProvider.GetBinder(contextMock.Object);
+            IModelBinder found = binderProvider.GetBinder(contextMock.Object);
             if (expectNull)
             {
                 Assert.IsNull(found);
@@ -86,8 +87,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var bindingContext = new DefaultModelBindingContext();
 
             _contentModelBinder.BindModelAsync(bindingContext, content, typeof(ContentModel));
-            var bound = (IContentModel) bindingContext.Result.Model;
 
+            var bound = (IContentModel)bindingContext.Result.Model;
             Assert.AreSame(content, bound.Content);
         }
 
@@ -98,8 +99,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var bindingContext = new DefaultModelBindingContext();
 
             _contentModelBinder.BindModelAsync(bindingContext, content, typeof(ContentModel<MyContent>));
-            var bound = (IContentModel) bindingContext.Result.Model;
 
+            var bound = (IContentModel)bindingContext.Result.Model;
             Assert.AreSame(content, bound.Content);
         }
 
@@ -107,7 +108,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void No_DataToken_Returns_Null()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bindingContext = CreateBindingContext(typeof(ContentModel), false, content);
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel), false, content);
 
             _contentModelBinder.BindModelAsync(bindingContext);
 
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void Invalid_DataToken_Model_Type_Returns_Null()
         {
-            var bindingContext = CreateBindingContext(typeof(IPublishedContent), source: "Hello");
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(IPublishedContent), source: "Hello");
             _contentModelBinder.BindModelAsync(bindingContext);
             Assert.IsNull(bindingContext.Result.Model);
         }
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void IPublishedContent_DataToken_Model_Type_Uses_DefaultImplementation()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bindingContext = CreateBindingContext(typeof(MyContent), source: content);
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(MyContent), source: content);
 
             _contentModelBinder.BindModelAsync(bindingContext);
 
@@ -138,7 +139,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             if (withUmbracoDataToken)
+            {
                 routeData.DataTokens.Add(Constants.Web.UmbracoDataToken, source);
+            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();
@@ -157,17 +160,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             public MyCustomContentModel(IPublishedContent content)
                 : base(content)
-            { }
+            {
+            }
         }
 
         public class MyOtherContent
         {
-
         }
 
         public class MyContent : PublishedContentWrapped
         {
-            public MyContent(IPublishedContent content) : base(content)
+            public MyContent(IPublishedContent content)
+                : base(content)
             {
             }
         }

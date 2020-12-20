@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -11,7 +15,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Release_Date_Less_Than_Expire_Date()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             Assert.IsFalse(schedule.Add(now, now));
         }
@@ -19,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Cannot_Add_Duplicate_Dates_Invariant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, null);
             Assert.Throws<ArgumentException>(() => schedule.Add(null, now));
@@ -28,7 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Cannot_Add_Duplicate_Dates_Variant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, null);
             schedule.Add("en-US", now, null);
@@ -39,10 +43,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Remove_Invariant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, null);
-            var invariantSched = schedule.GetSchedule(string.Empty);
+            IEnumerable<ContentSchedule> invariantSched = schedule.GetSchedule(string.Empty);
             schedule.Remove(invariantSched.First());
             Assert.AreEqual(0, schedule.FullSchedule.Count());
         }
@@ -50,15 +54,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Remove_Variant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, null);
             schedule.Add("en-US", now, null);
-            var invariantSched = schedule.GetSchedule(string.Empty);
+            IEnumerable<ContentSchedule> invariantSched = schedule.GetSchedule(string.Empty);
             schedule.Remove(invariantSched.First());
             Assert.AreEqual(0, schedule.GetSchedule(string.Empty).Count());
             Assert.AreEqual(1, schedule.FullSchedule.Count());
-            var variantSched = schedule.GetSchedule("en-US");
+            IEnumerable<ContentSchedule> variantSched = schedule.GetSchedule("en-US");
             schedule.Remove(variantSched.First());
             Assert.AreEqual(0, schedule.GetSchedule("en-US").Count());
             Assert.AreEqual(0, schedule.FullSchedule.Count());
@@ -67,7 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Clear_Start_Invariant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, now.AddDays(1));
 
@@ -81,7 +85,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Clear_End_Variant()
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, now.AddDays(1));
             schedule.Add("en-US", now, now.AddDays(1));
@@ -102,6 +106,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count());
             Assert.AreEqual(2, schedule.FullSchedule.Count());
         }
-
     }
 }

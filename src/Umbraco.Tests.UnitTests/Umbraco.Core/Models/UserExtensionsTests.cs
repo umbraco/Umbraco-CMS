@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
@@ -7,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
+using User = Umbraco.Core.Models.Membership.User;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
@@ -16,10 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private UserBuilder _userBuilder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _userBuilder = new UserBuilder();
-        }
+        public void SetUp() => _userBuilder = new UserBuilder();
 
         [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
         [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node
@@ -32,11 +33,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 
         public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath, bool outcome)
         {
-            var user = _userBuilder
+            User user = _userBuilder
                 .WithStartContentIds(new[] { startNodeId })
                 .Build();
 
-            var content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
+            IContent content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
 
             var esmock = new Mock<IEntityService>();
             esmock
@@ -80,7 +81,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             //  6
             //  7
             //   8
-
             var paths = new Dictionary<int, string>
             {
                 { 1, "-1,1" },
@@ -106,10 +106,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             var expectedA = expected.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).OrderBy(x => x).ToArray();
 
             var ok = combinedA.Length == expectedA.Length;
-            if (ok) ok = expectedA.Where((t, i) => t != combinedA[i]).Any() == false;
+            if (ok)
+            {
+                ok = expectedA.Where((t, i) => t != combinedA[i]).Any() == false;
+            }
 
             if (ok == false)
+            {
                 Assert.Fail("Expected \"" + string.Join(",", expectedA) + "\" but got \"" + string.Join(",", combinedA) + "\".");
+            }
         }
     }
 }

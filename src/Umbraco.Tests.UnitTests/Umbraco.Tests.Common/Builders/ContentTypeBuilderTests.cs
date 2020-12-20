@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -23,8 +25,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string testPropertyGroupName = "Content";
             const int testParentId = 98;
             const int testCreatorId = 22;
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             const int testLevel = 3;
             const string testPath = "-1, 4, 10";
             const int testSortOrder = 5;
@@ -43,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new ContentTypeBuilder();
 
             // Act
-            var contentType = builder
+            IContentType contentType = builder
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithAlias(testAlias)
@@ -119,7 +121,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.IsFalse(contentType.IsContainer);
             Assert.AreEqual(2, contentType.PropertyTypes.Count());
 
-            var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
+            IOrderedEnumerable<int> propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
             Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
             Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 2, propertyTypeIds.Max());
 

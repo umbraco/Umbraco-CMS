@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -43,12 +46,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
             var container = new ServiceCollection();
             container.AddLogging();
             container.AddAntiforgery();
-            var services = container.BuildServiceProvider();
+            ServiceProvider services = container.BuildServiceProvider();
 
-            var antiforgery = services.GetRequiredService<IAntiforgery>();
-            var options = services.GetRequiredService<IOptions<AntiforgeryOptions>>();
+            IAntiforgery antiforgery = services.GetRequiredService<IAntiforgery>();
+            IOptions<AntiforgeryOptions> options = services.GetRequiredService<IOptions<AntiforgeryOptions>>();
 
-            var httpContext = GetHttpContext();
+            HttpContext httpContext = GetHttpContext();
 
             var backofficeAntiforgery = new BackOfficeAntiforgery(antiforgery, options);
             backofficeAntiforgery.GetTokens(httpContext, out var cookieToken, out var headerToken);
@@ -58,7 +61,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
             // the same context cannot validate since it's already created tokens
             httpContext = GetHttpContext();
 
-            var result = await backofficeAntiforgery.ValidateRequestAsync(httpContext);
+            Attempt<string> result = await backofficeAntiforgery.ValidateRequestAsync(httpContext);
 
             Assert.IsFalse(result.Success); // missing token
 

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -20,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Does_Not_Bind_Model_When_UmbracoDataToken_Not_In_Route_Data()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), withUmbracoDataToken: false);
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel), withUmbracoDataToken: false);
             var binder = new ContentModelBinder();
 
             // Act
@@ -34,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Does_Not_Bind_Model_When_Source_Not_Of_Expected_Type()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: new NonContentModel());
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel), source: new NonContentModel());
             var binder = new ContentModelBinder();
 
             // Act
@@ -49,7 +52,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             var content = new ContentModel(CreatePublishedContent());
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: content);
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel), source: content);
             var binder = new ContentModelBinder();
 
             // Act
@@ -63,7 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Binds_From_IPublishedContent_To_Content_Model()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: CreatePublishedContent());
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel), source: CreatePublishedContent());
             var binder = new ContentModelBinder();
 
             // Act
@@ -77,7 +80,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public void Binds_From_IPublishedContent_To_Content_Model_Of_T()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel<ContentType1>), source: new ContentModel<ContentType2>(new ContentType2(CreatePublishedContent())));
+            ModelBindingContext bindingContext = CreateBindingContext(typeof(ContentModel<ContentType1>), source: new ContentModel<ContentType2>(new ContentType2(CreatePublishedContent())));
             var binder = new ContentModelBinder();
 
             // Act
@@ -92,7 +95,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             if (withUmbracoDataToken)
+            {
                 routeData.DataTokens.Add(Constants.Web.UmbracoDataToken, source);
+            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();
@@ -111,19 +116,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
         }
 
-        private IPublishedContent CreatePublishedContent()
-        {
-            return new ContentType2(new Mock<IPublishedContent>().Object);
-        }
+        private IPublishedContent CreatePublishedContent() => new ContentType2(new Mock<IPublishedContent>().Object);
 
         public class ContentType1 : PublishedContentWrapped
         {
-            public ContentType1(IPublishedContent content) : base(content) { }
+            public ContentType1(IPublishedContent content)
+                : base(content)
+            {
+            }
         }
 
         public class ContentType2 : ContentType1
         {
-            public ContentType2(IPublishedContent content) : base(content) { }
+            public ContentType2(IPublishedContent content)
+                : base(content)
+            {
+            }
         }
     }
 }

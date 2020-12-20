@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using Moq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
@@ -22,7 +19,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("t", "t")]
         [TestCase("thisis", "Thisis")]
         [TestCase("ThisIsTheEnd", "This Is The End")]
-        //[TestCase("WhoIsNumber6InTheVillage", "Who Is Number6In The Village")] // note the issue with Number6In
+        //// [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6In The Village")] // note the issue with Number6In
         [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // now fixed since DefaultShortStringHelper is the default
         public void SpaceCamelCasing(string input, string expected)
         {
@@ -38,7 +35,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // issue is fixed
         public void CompatibleDefaultReplacement(string input, string expected)
         {
-
             var output = input.Length < 2 ? input : ShortStringHelper.SplitPascalCasing(input, ' ').ToFirstUpperInvariant();
             Assert.AreEqual(expected, output);
         }

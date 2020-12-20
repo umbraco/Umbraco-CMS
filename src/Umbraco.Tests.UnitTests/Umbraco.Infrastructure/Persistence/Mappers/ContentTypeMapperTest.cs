@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
 
@@ -20,7 +23,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Name_Property()
         {
-
             // Act
             string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Name");
 
@@ -31,7 +33,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Thumbnail_Property()
         {
-
             // Act
             string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Thumbnail");
 
@@ -42,7 +43,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Description_Property()
         {
-
             // Act
             string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Description");
 

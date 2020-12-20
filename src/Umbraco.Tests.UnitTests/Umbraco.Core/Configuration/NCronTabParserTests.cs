@@ -1,7 +1,10 @@
-﻿using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configurations
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration
 {
     [TestFixture]
     public class NCronTabParserTests
