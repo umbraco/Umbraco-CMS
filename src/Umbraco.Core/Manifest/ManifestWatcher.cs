@@ -1,14 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
 using Umbraco.Net;
 
 namespace Umbraco.Core.Manifest
 {
-    public class ManifestWatcher : DisposableObjectSlim
+    public class ManifestWatcher : IDisposable
     {
         private static readonly object Locker = new object();
         private static volatile bool _isRestarting;
@@ -48,7 +47,10 @@ namespace Umbraco.Core.Manifest
 
         private void FswChanged(object sender, FileSystemEventArgs e)
         {
-            if (e.Name.InvariantContains("package.manifest") == false) return;
+            if (!e.Name.InvariantContains("package.manifest"))
+            {
+                return;
+            }
 
             // ensure the app is not restarted multiple times for multiple
             // savings during the same app domain execution - restart once
@@ -59,14 +61,15 @@ namespace Umbraco.Core.Manifest
                 _isRestarting = true;
                 _logger.LogInformation("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
                 _umbracoApplicationLifetime.Restart();
-                Dispose(); // uh? if the app restarts then this should be disposed anyways?
             }
         }
 
-        protected override void DisposeResources()
+        public void Dispose()
         {
             foreach (var fw in _fws)
+            {
                 fw.Dispose();
+            }
         }
     }
 }

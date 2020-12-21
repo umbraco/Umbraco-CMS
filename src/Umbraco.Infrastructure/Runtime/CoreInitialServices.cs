@@ -71,8 +71,7 @@ namespace Umbraco.Infrastructure.Runtime
             builder.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
 
             builder.Services.AddSingleton<ManifestWatcher>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, ManifestWatcher>(factory => factory.GetRequiredService<ManifestWatcher>());
-            builder.AddNotificationHandler<UmbracoApplicationStopping, ManifestWatcher>(factory => factory.GetRequiredService<ManifestWatcher>());
+            builder.AddNotificationHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
 
             // composers
             builder
