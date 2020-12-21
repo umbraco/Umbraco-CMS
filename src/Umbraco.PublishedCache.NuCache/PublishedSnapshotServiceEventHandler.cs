@@ -11,6 +11,9 @@ using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
+    /// <summary>
+    /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data
+    /// </summary>
     public class PublishedSnapshotServiceEventHandler : IDisposable
     {
         private readonly IRuntimeState _runtime;
@@ -18,6 +21,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly INuCacheContentService _publishedContentService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedSnapshotServiceEventHandler"/> class.
+        /// </summary>
         public PublishedSnapshotServiceEventHandler(
             IRuntimeState runtime,
             IPublishedSnapshotService publishedSnapshotService,
@@ -28,6 +34,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedContentService = publishedContentService;
         }
 
+        /// <summary>
+        /// Binds to the Umbraco events
+        /// </summary>
+        /// <returns>Returns true if binding occurred</returns>
         public bool Start()
         {
             // however, the cache is NOT available until we are configured, because loading

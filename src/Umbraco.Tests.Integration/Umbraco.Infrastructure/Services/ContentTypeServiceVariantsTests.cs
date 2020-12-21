@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -25,10 +27,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     {
         private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
+
         private IContentService ContentService => GetRequiredService<IContentService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
+        protected override void BeforeHostStart(IHost host)
+        {
+            base.BeforeHostStart(host);
+
+            // Ensure that the events are bound on each test
+            PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
+            eventBinder.Start();
+        }
+
+        public override void TearDown()
+        {
+            // Ensure this is dipsosed
+            // TODO: How come MSDI doesn't automatically dispose all of these at the end of each test?
+            // How can we automatically dispose of all IDisposables at the end of the tests as if it were an aspnet app?
+            Services.GetRequiredService<PublishedSnapshotServiceEventHandler>().Dispose();
+            base.TearDown();
+        }
 
         private void AssertJsonStartsWith(int id, string expected)
         {
@@ -512,9 +536,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change it to invariant and back
-
-            //hack to ensure events are initialized
-            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var contentType = CreateContentType(ContentVariation.Culture);
@@ -603,10 +624,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // one simple content type, invariant
             // can change it to variant and back
             // can then switch one property to variant
-
-            //hack to ensure events are initialized
-            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
-
             var globalSettings = new GlobalSettings();
 
             var languageEn = new Language(globalSettings, "en") { IsDefault = true };
@@ -696,9 +713,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change an invariant property to variant and back
-
-            //hack to ensure events are initialized
-            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var contentType = CreateContentType(ContentVariation.Culture);
@@ -893,7 +907,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // one simple content type, variant, with both variant and invariant properties
             // can change an invariant property to variant and back
-
             CreateFrenchAndEnglishLangs();
 
             var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
@@ -974,9 +987,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // one composed content type, variant, with both variant and invariant properties
             // can change the composing content type to invariant and back
             // can change the composed content type to invariant and back
-
-            //hack to ensure events are initialized
-            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var composing = CreateContentType(ContentVariation.Culture, "composing");
@@ -1071,9 +1081,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // one composed content type, invariant
             // can change the composing content type to invariant and back
             // can change the variant composed content type to invariant and back
-
-            //hack to ensure events are initialized
-            (GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService)?.OnApplicationInit(null, null);
             CreateFrenchAndEnglishLangs();
 
             var composing = CreateContentType(ContentVariation.Culture, "composing");

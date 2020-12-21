@@ -10,6 +10,7 @@ using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.Plugins;
@@ -79,7 +80,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Start Umbraco
+        /// Enables core Umbraco functionality
         /// </summary>
         public static IApplicationBuilder UseUmbracoCore(this IApplicationBuilder app)
         {
