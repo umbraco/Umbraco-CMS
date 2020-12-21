@@ -15,12 +15,12 @@ namespace Umbraco.Web.Common.Controllers
     /// <summary>
     /// Represents the default front-end rendering controller.
     /// </summary>
-    [TypeFilter(typeof(ModelBindingExceptionFilter))]
+    [ModelBindingException]
     public class RenderController : UmbracoController, IRenderController
     {
         private readonly ILogger<RenderController> _logger;
         private readonly ICompositeViewEngine _compositeViewEngine;
-        private UmbracoRouteValues _routeValues;
+        private UmbracoRouteValues _umbracoRouteValues;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderController"/> class.
@@ -43,9 +43,9 @@ namespace Umbraco.Web.Common.Controllers
         {
             get
             {
-                if (_routeValues != null)
+                if (_umbracoRouteValues != null)
                 {
-                    return _routeValues;
+                    return _umbracoRouteValues;
                 }
 
                 if (!ControllerContext.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var def))
@@ -53,8 +53,8 @@ namespace Umbraco.Web.Common.Controllers
                     throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
                 }
 
-                _routeValues = (UmbracoRouteValues)def;
-                return _routeValues;
+                _umbracoRouteValues = (UmbracoRouteValues)def;
+                return _umbracoRouteValues;
             }
         }
 
