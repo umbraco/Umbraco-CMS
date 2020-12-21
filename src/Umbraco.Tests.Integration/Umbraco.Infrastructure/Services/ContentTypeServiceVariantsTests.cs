@@ -45,15 +45,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             eventBinder.Start();
         }
 
-        public override void TearDown()
-        {
-            // Ensure this is dipsosed
-            // TODO: How come MSDI doesn't automatically dispose all of these at the end of each test?
-            // How can we automatically dispose of all IDisposables at the end of the tests as if it were an aspnet app?
-            Services.GetRequiredService<PublishedSnapshotServiceEventHandler>().Dispose();
-            base.TearDown();
-        }
-
         private void AssertJsonStartsWith(int id, string expected)
         {
             var json = GetJson(id).Replace('"', '\'');
