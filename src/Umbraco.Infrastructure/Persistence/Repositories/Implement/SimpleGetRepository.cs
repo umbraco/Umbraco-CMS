@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
-    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : NPocoRepositoryBase<TId, TEntity>
+    internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityRepositoryBase<TId, TEntity>
         where TEntity : class, IEntity
         where TDto: class
     {

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the UserGroupRepository for doing CRUD operations for <see cref="IUserGroup"/>
     /// </summary>
-    public class UserGroupRepository : NPocoRepositoryBase<int, IUserGroup>, IUserGroupRepository
+    public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserGroupRepository
     {
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,IUserGroup>
+        #region Overrides of EntityRepositoryBase<int,IUserGroup>
 
         protected Sql<ISqlContext> GetBaseQuery(QueryType type)
         {
@@ -358,7 +358,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// used to persist a user group with associated users at once
         /// </summary>
-        private class UserGroupWithUsersRepository : NPocoRepositoryBase<int, UserGroupWithUsers>
+        private class UserGroupWithUsersRepository : EntityRepositoryBase<int, UserGroupWithUsers>
         {
             private readonly UserGroupRepository _userGroupRepo;
 

@@ -14,7 +14,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class MacroRepository : NPocoRepositoryBase<int, IMacro>, IMacroRepository
+    internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroRepository
     {
         private readonly IShortStringHelper _shortStringHelper;
 

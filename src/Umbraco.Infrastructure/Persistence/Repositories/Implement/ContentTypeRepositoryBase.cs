@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     /// <remarks>Exposes shared functionality</remarks>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
+    internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
         private readonly IShortStringHelper _shortStringHelper;
