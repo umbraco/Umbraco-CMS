@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
@@ -22,11 +21,6 @@ namespace Umbraco.Web.PublishedCache
          * snapshot". This is provided by the IPublishedSnapshotAccessor.
          *
          */
-
-        /// <summary>
-        /// Gets the published snapshot accessor.
-        /// </summary>
-        IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
 
         /// <summary>
         /// Creates a published snapshot.
