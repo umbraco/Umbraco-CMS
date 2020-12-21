@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -36,7 +35,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
 
             // create new WebApplicationFactory specifying 'this' as the IStartup instance
-            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder, BeforeHostStart);
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
@@ -72,11 +71,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  // call startup
                  builder.Configure(app =>
                  {
-                     UseTestLocalDb(app.ApplicationServices);
-                     Services = app.ApplicationServices;
                      Configure(app);
                  });
-             }).UseEnvironment(Environments.Development);
+
+            }).UseEnvironment(Environments.Development);
 
             return builder;
         }
@@ -117,15 +115,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
         protected LinkGenerator LinkGenerator { get; private set; }
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-            TerminateCoreRuntime();
-
-            Factory.Dispose();
-        }
 
         public override void ConfigureServices(IServiceCollection services)
         {

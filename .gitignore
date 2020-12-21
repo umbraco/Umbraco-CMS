@@ -191,6 +191,7 @@ src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
 /src/Umbraco.Web.UI.NetCore/App_Data/Smidge/Cache/*
 /src/Umbraco.Web.UI.NetCore/umbraco/logs
 
+src/Umbraco.Tests.Integration/umbraco/Data/
 src/Umbraco.Tests.Integration/umbraco/logs/
 
 src/Umbraco.Tests.Integration/Views/

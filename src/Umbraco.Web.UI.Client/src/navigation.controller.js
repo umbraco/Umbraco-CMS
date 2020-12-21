@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, $cookies, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource, editorState) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, $cookies, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentTypeResource, editorState) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -380,7 +380,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
      */
     function loadLanguages() {
 
-        return contentResource.allowsCultureVariation().then(function (b) {
+        return contentTypeResource.allowsCultureVariation().then(function (b) {
             if (b === true) {
                 return languageResource.getAll();
             } else {

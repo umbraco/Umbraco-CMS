@@ -18,7 +18,7 @@ resources:
       ACCEPT_EULA: Y
       SA_PASSWORD: $(SA_PASSWORD)
       MSSQL_PID: Developer
-    ports: 
+    ports:
       - 1433:1433
     options: --name mssql
 
@@ -170,6 +170,13 @@ stages:
                     $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
                   }
                 $ubuild.SetUmbracoVersion($continuous)
+
+                #Update the version in template also
+                $templatePath = 'build/templates/UmbracoSolution/.template.config/template.json'
+                $a = Get-Content $templatePath -raw | ConvertFrom-Json
+                $a.symbols.version.defaultValue = $continuous
+                $a | ConvertTo-Json -depth 32| set-content $templatePath
+
                 Write-Host "Building: $continuous"
 
         - task: PowerShell@1

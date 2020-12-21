@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Events;
 
@@ -24,6 +25,23 @@ namespace Umbraco.Core.DependencyInjection
         {
             // Register the handler as transient. This ensures that anything can be injected into it.
             builder.Services.AddTransient(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler));
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a notification handler against the Umbraco service collection.
+        /// </summary>
+        /// <typeparam name="TNotification">The type of notification.</typeparam>
+        /// <typeparam name="TNotificationHandler">The type of notificiation handler.</typeparam>
+        /// <param name="builder">The Umbraco builder.</param>
+        /// <param name="factory">Factory method</param>
+        /// <returns>The <see cref="IUmbracoBuilder"/>.</returns>
+        public static IUmbracoBuilder AddNotificationHandler<TNotification, TNotificationHandler>(this IUmbracoBuilder builder, Func<IServiceProvider, TNotificationHandler> factory)
+            where TNotificationHandler : class, INotificationHandler<TNotification>
+            where TNotification : INotification
+        {
+            // Register the handler as transient. This ensures that anything can be injected into it.
+            builder.Services.AddTransient(typeof(INotificationHandler<TNotification>), factory);
             return builder;
         }
     }

@@ -141,8 +141,6 @@
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
-    <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
-    <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />

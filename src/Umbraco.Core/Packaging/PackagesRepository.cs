@@ -5,8 +5,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
@@ -38,6 +38,8 @@ namespace Umbraco.Core.Packaging
         private readonly string _tempFolderPath;
         private readonly PackageDefinitionXmlParser _parser;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IMediaService _mediaService;
+        private readonly IMediaTypeService _mediaTypeService;
 
         /// <summary>
         /// Constructor
@@ -65,6 +67,8 @@ namespace Umbraco.Core.Packaging
             ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IOptions<GlobalSettings> globalSettings,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {
@@ -87,6 +91,8 @@ namespace Umbraco.Core.Packaging
 
             _parser = new PackageDefinitionXmlParser(_loggerFactory.CreateLogger<PackageDefinitionXmlParser>(), umbracoVersion);
             _umbracoVersion = umbracoVersion;
+            _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
         }
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
@@ -181,12 +187,15 @@ namespace Umbraco.Core.Packaging
 
                 PackageDocumentsAndTags(definition, root);
                 PackageDocumentTypes(definition, root);
+                PackageMediaTypes(definition, root);
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
                 PackageMacros(definition, root, filesXml, temporaryPath);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
                 PackageDataTypes(definition, root);
+                PackageMedia(definition, root);
+
 
                 // TODO: This needs to be split into content vs web files, for now we are going to
                 // assume all files are web (www) files. But this is a larger discussion/change since
@@ -194,13 +203,13 @@ namespace Umbraco.Core.Packaging
 
                 //Files
                 foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml, true);
+                    AppendFileToPackage(fileName, temporaryPath, filesXml);
 
                 //Load view on install...
                 if (!string.IsNullOrEmpty(definition.PackageView))
                 {
                     var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml, true);
+                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
                     root.Add(control);
                 }
 
@@ -310,7 +319,7 @@ namespace Umbraco.Core.Packaging
                 macros.Add(macroXml);
                 //if the macro has a file copy it to the xml
                 if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml, false);
+                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml);
             }
             root.Add(macros);
         }
@@ -356,6 +365,23 @@ namespace Umbraco.Core.Packaging
                 docTypesXml.Add(_serializer.Serialize(contentType));
 
             root.Add(docTypesXml);
+        }
+
+        private void PackageMediaTypes(PackageDefinition definition, XContainer root)
+        {
+            var mediaTypes = new HashSet<IMediaType>();
+            var mediaTypesXml = new XElement("MediaTypes");
+            foreach (var mediaTypeId in definition.MediaTypes)
+            {
+                if (!int.TryParse(mediaTypeId, out var outInt)) continue;
+                var mediaType = _mediaTypeService.Get(outInt);
+                if (mediaType == null) continue;
+                AddMediaType(mediaType, mediaTypes);
+            }
+            foreach (var mediaType in mediaTypes)
+                mediaTypesXml.Add(_serializer.Serialize(mediaType));
+
+            root.Add(mediaTypesXml);
         }
 
         private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
@@ -442,6 +468,18 @@ namespace Umbraco.Core.Packaging
             }
         }
 
+
+        private void PackageMedia(PackageDefinition definition, XElement root)
+        {
+            IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);
+
+            root.Add(
+                new XElement(
+                    "MediaItems",
+                    medias.Select(x => new XElement("MediaSet", _serializer.Serialize(x, definition.MediaLoadChildNodes)))));
+        }
+
+
         /// <summary>
         /// Zips the package.
         /// </summary>
@@ -461,12 +499,12 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="filesXml">The files xml node</param>
         /// <param name="isWebFile">true if it's a web file, false if it's a content file</param>
-        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml, bool isWebFile)
+        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml)
         {
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
 
-            var serverPath = isWebFile ? _hostingEnvironment.MapPathWebRoot(path) : _hostingEnvironment.MapPathContentRoot(path);
+            var serverPath = _hostingEnvironment.MapPathContentRoot(path);
 
             if (File.Exists(serverPath))
                 AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
@@ -560,6 +598,19 @@ namespace Umbraco.Core.Packaging
 
             if (!dtl.Contains(dt))
                 dtl.Add(dt);
+        }
+
+        private void AddMediaType(IMediaType mediaType, HashSet<IMediaType> mediaTypes)
+        {
+            if (mediaType.ParentId > 0)
+            {
+                var parent = _mediaTypeService.Get(mediaType.ParentId);
+                if (parent != null) // could be a container
+                    AddMediaType(parent, mediaTypes);
+            }
+
+            if (!mediaTypes.Contains(mediaType))
+                mediaTypes.Add(mediaType);
         }
 
         private static XElement GetPackageInfoXml(PackageDefinition definition, IUmbracoVersion umbracoVersion)

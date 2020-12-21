@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IContentServiceBase
+    public interface IContentService : IContentServiceBase<IContent>
     {
         #region Blueprints
 

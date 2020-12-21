@@ -92,6 +92,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual("one", s1.Get(1));
         }
 
+        [Retry(5)] // TODO make this test non-flaky.
         [Test]
         public async Task CollectValues()
         {
@@ -218,6 +219,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(0, d.Count);
         }
 
+        [Retry(5)] // TODO make this test non-flaky.
         [Test]
         public async Task CollectNulls()
         {
@@ -527,6 +529,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.GetValues(1).Length);
         }
 
+        [Retry(5)] // TODO make this test non-flaky.
         [Test]
         public async Task RandomTest1()
         {
@@ -573,6 +576,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(0, d.SnapCount);
         }
 
+        [Retry(5)] // TODO make this test non-flaky.
         [Test]
         public async Task RandomTest2()
         {

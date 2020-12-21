@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -11,7 +10,6 @@ using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.Plugins;
@@ -74,10 +72,10 @@ namespace Umbraco.Extensions
         /// </summary>
         public static bool UmbracoCanBoot(this IApplicationBuilder app)
         {
-            IRuntime runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
+            var state = app.ApplicationServices.GetRequiredService<IRuntimeState>();
 
             // can't continue if boot failed
-            return runtime.State.Level > RuntimeLevel.BootFailed;
+            return state.Level > RuntimeLevel.BootFailed;
         }
 
         /// <summary>
@@ -95,24 +93,9 @@ namespace Umbraco.Extensions
                 return app;
             }
 
-            IHostingEnvironment hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            AppDomain.CurrentDomain.SetData("DataDirectory", hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
-
-            IRuntime runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-
-            // Register a listener for application shutdown in order to terminate the runtime
-            IApplicationShutdownRegistry hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
-            var runtimeShutdown = new CoreRuntimeShutdown(runtime, hostLifetime);
-            hostLifetime.RegisterObject(runtimeShutdown);
-
             // Register our global threadabort enricher for logging
             ThreadAbortExceptionEnricher threadAbortEnricher = app.ApplicationServices.GetRequiredService<ThreadAbortExceptionEnricher>();
             LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
-
-            StaticApplicationLogging.Initialize(app.ApplicationServices.GetRequiredService<ILoggerFactory>());
-
-            // Start the runtime!
-            runtime.Start();
 
             return app;
         }
@@ -203,33 +186,6 @@ namespace Umbraco.Extensions
             });
 
             return app;
-        }
-
-        /// <summary>
-        /// Ensures the runtime is shutdown when the application is shutting down
-        /// </summary>
-        private class CoreRuntimeShutdown : IRegisteredObject
-        {
-            public CoreRuntimeShutdown(IRuntime runtime, IApplicationShutdownRegistry hostLifetime)
-            {
-                _runtime = runtime;
-                _hostLifetime = hostLifetime;
-            }
-
-            private bool _completed = false;
-            private readonly IRuntime _runtime;
-            private readonly IApplicationShutdownRegistry _hostLifetime;
-
-            public void Stop(bool immediate)
-            {
-                if (!_completed)
-                {
-                    _completed = true;
-                    _runtime.Terminate();
-                    _hostLifetime.UnregisterObject(this);
-                }
-
-            }
         }
     }
 

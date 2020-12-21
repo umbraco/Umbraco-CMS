@@ -1,20 +1,18 @@
-using System;
 using System.Xml.Linq;
 
 namespace Umbraco.Core.Models.Packaging
 {
-    public class CompiledPackageDocument
+    /// <summary>
+    /// Compiled representation of a content base (Document or Media)
+    /// </summary>
+    public class CompiledPackageContentBase
     {
-        public static CompiledPackageDocument Create(XElement xml)
-        {
-            if (xml.Name.LocalName != "DocumentSet")
-                throw new ArgumentException("The xml isn't formatted correctly, a document element is defined by <DocumentSet>", nameof(xml));
-            return new CompiledPackageDocument
+        public static CompiledPackageContentBase Create(XElement xml) =>
+            new CompiledPackageContentBase
             {
                 XmlData = xml,
                 ImportMode = xml.AttributeValue<string>("importMode")
             };
-        }
 
         public string ImportMode { get; set; } //this is never used
 

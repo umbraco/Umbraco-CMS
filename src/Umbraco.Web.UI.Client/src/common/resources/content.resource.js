@@ -42,16 +42,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
-        allowsCultureVariation: function () {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "AllowsCultureVariation")),
-                'Failed to retrieve variant content types');
-        },
-
-        savePermissions: function (saveModel) {
+      savePermissions: function (saveModel) {
             if (!saveModel) {
                 throw "saveModel cannot be null";
             }
