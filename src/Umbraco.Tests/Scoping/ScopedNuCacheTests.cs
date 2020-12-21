@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -71,7 +72,7 @@ namespace Umbraco.Tests.Scoping
         protected override IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
@@ -85,27 +86,23 @@ namespace Umbraco.Tests.Scoping
 
             var nuCacheSettings = new NuCacheSettings();
             var lifetime = new Mock<IUmbracoApplicationLifetime>();
+            var repository = new NuCacheContentRepository(ScopeProvider, AppCaches.Disabled, Mock.Of<ILogger<NuCacheContentRepository>>(), memberRepository, documentRepository, mediaRepository, Mock.Of<IShortStringHelper>(), new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }));
             var snapshotService = new PublishedSnapshotService(
                 options,
                 null,
-                lifetime.Object,
-                runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                ProfilingLogger,
+                base.ProfilingLogger,
                 NullLoggerFactory.Instance,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository,
+                new NuCacheContentService(repository, ScopeProvider, NullLoggerFactory.Instance, Mock.Of<IEventMessagesFactory>()),
                 DefaultCultureAccessor,
-                new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,
-                Mock.Of<IShortStringHelper>(),
                 IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 

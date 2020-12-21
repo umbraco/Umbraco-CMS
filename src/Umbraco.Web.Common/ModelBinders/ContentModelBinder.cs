@@ -1,40 +1,33 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Common.ModelBinders
 {
     /// <summary>
-    /// Maps view models, supporting mapping to and from any IPublishedContent or IContentModel.
+    /// Maps view models, supporting mapping to and from any <see cref="IPublishedContent"/> or <see cref="IContentModel"/>.
     /// </summary>
     public class ContentModelBinder : IModelBinder
     {
+        /// <inheritdoc/>
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (bindingContext.ActionContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out var source) == false)
+            // Although this model binder is built to work both ways between IPublishedContent and IContentModel in reality
+            // only IPublishedContent will ever exist in the request so when this model binder is used as an IModelBinder
+            // in the aspnet pipeline it will really only support converting from IPublishedContent which is contained
+            // in the UmbracoRouteValues --> IContentModel
+            if (!bindingContext.ActionContext.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var source)
+                || !(source is UmbracoRouteValues umbracoRouteValues))
             {
                 return Task.CompletedTask;
             }
 
-            // This model binder deals with IContentModel and IPublishedContent by extracting the model from the route's
-            // datatokens. This data token is set in 2 places: RenderRouteHandler, UmbracoVirtualNodeRouteHandler
-            // and both always set the model to an instance of `ContentModel`.
-
-            // No need for type checks to ensure we have the appropriate binder, as in .NET Core this is handled in the provider,
-            // in this case ContentModelBinderProvider.
-
-            // Being defensive though.... if for any reason the model is not either IContentModel or IPublishedContent,
-            // then we return since those are the only types this binder is dealing with.
-            if (source is IContentModel == false && source is IPublishedContent == false)
-            {
-                return Task.CompletedTask;
-            }
-
-            BindModelAsync(bindingContext, source, bindingContext.ModelType);
+            BindModel(bindingContext, umbracoRouteValues.PublishedContent, bindingContext.ModelType);
             return Task.CompletedTask;
         }
 
@@ -45,33 +38,42 @@ namespace Umbraco.Web.Common.ModelBinders
         // { ContentModel, ContentModel<TContent>, IPublishedContent }
         // to
         // { ContentModel, ContentModel<TContent>, IPublishedContent }
-        //
-        public Task BindModelAsync(ModelBindingContext bindingContext, object source, Type modelType)
+
+        /// <summary>
+        /// Attempts to bind the model
+        /// </summary>
+        public void BindModel(ModelBindingContext bindingContext, object source, Type modelType)
         {
             // Null model, return
             if (source == null)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             // If types already match, return
-            var sourceType = source.GetType();
-            if (sourceType.   Inherits(modelType)) // includes ==
+            Type sourceType = source.GetType();
+            if (sourceType.Inherits(modelType))
             {
                 bindingContext.Result = ModelBindingResult.Success(source);
-                return Task.CompletedTask;
+                return;
             }
 
             // Try to grab the content
             var sourceContent = source as IPublishedContent; // check if what we have is an IPublishedContent
             if (sourceContent == null && sourceType.Implements<IContentModel>())
+            {
                 // else check if it's an IContentModel, and get the content
                 sourceContent = ((IContentModel)source).Content;
+            }
+
             if (sourceContent == null)
             {
                 // else check if we can convert it to a content
-                var attempt1 = source.TryConvertTo<IPublishedContent>();
-                if (attempt1.Success) sourceContent = attempt1.Result;
+                Attempt<IPublishedContent> attempt1 = source.TryConvertTo<IPublishedContent>();
+                if (attempt1.Success)
+                {
+                    sourceContent = attempt1.Result;
+                }
             }
 
             // If we have a content
@@ -86,41 +88,41 @@ namespace Umbraco.Web.Common.ModelBinders
                     }
 
                     bindingContext.Result = ModelBindingResult.Success(sourceContent);
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 // If model is ContentModel, create and return
                 if (modelType == typeof(ContentModel))
                 {
                     bindingContext.Result = ModelBindingResult.Success(new ContentModel(sourceContent));
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 // If model is ContentModel<TContent>, check content type, then create and return
                 if (modelType.IsGenericType && modelType.GetGenericTypeDefinition() == typeof(ContentModel<>))
                 {
-                    var targetContentType = modelType.GetGenericArguments()[0];
+                    Type targetContentType = modelType.GetGenericArguments()[0];
                     if (sourceContent.GetType().Inherits(targetContentType) == false)
                     {
                         ThrowModelBindingException(true, true, sourceContent.GetType(), targetContentType);
                     }
 
                     bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(modelType, sourceContent));
-                    return Task.CompletedTask;
+                    return;
                 }
             }
 
             // Last chance : try to convert
-            var attempt2 = source.TryConvertTo(modelType);
+            Attempt<object> attempt2 = source.TryConvertTo(modelType);
             if (attempt2.Success)
             {
                 bindingContext.Result = ModelBindingResult.Success(attempt2.Result);
-                return Task.CompletedTask;
+                return;
             }
 
             // Fail
             ThrowModelBindingException(false, false, sourceType, modelType);
-            return Task.CompletedTask;
+            return;
         }
 
         private void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
@@ -129,11 +131,19 @@ namespace Umbraco.Web.Common.ModelBinders
 
             // prepare message
             msg.Append("Cannot bind source");
-            if (sourceContent) msg.Append(" content");
+            if (sourceContent)
+            {
+                msg.Append(" content");
+            }
+
             msg.Append(" type ");
             msg.Append(sourceType.FullName);
             msg.Append(" to model");
-            if (modelContent) msg.Append(" content");
+            if (modelContent)
+            {
+                msg.Append(" content");
+            }
+
             msg.Append(" type ");
             msg.Append(modelType.FullName);
             msg.Append(".");
@@ -141,7 +151,6 @@ namespace Umbraco.Web.Common.ModelBinders
             // raise event, to give model factories a chance at reporting
             // the error with more details, and optionally request that
             // the application restarts.
-
             var args = new ModelBindingArgs(sourceType, modelType, msg);
             ModelBindingException?.Invoke(this, args);
 

@@ -30,10 +30,10 @@ using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 

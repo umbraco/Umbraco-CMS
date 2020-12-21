@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -100,16 +100,13 @@ namespace Umbraco.Core
                 return false;
             }
 
-            //if its anything else we can assume it's back office
+            // if its anything else we can assume it's back office
             return true;
         }
 
         /// <summary>
         /// Checks if the current uri is an install request
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <returns></returns>
         public static bool IsInstallerRequest(this Uri url, IHostingEnvironment hostingEnvironment)
         {
             var authority = url.GetLeftPart(UriPartial.Authority);
@@ -117,18 +114,14 @@ namespace Umbraco.Core
                                     .TrimStart(authority)
                                     .TrimStart("/");
 
-            //check if this is in the umbraco back office
+            // check if this is in the umbraco back office
             return afterAuthority.InvariantStartsWith(hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install).TrimStart("/"));
         }
 
         /// <summary>
         /// Checks if the uri is a request for the default back office page
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public static bool IsDefaultBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
             if (url.AbsolutePath.InvariantEquals(backOfficePath.TrimEnd("/"))
@@ -138,6 +131,7 @@ namespace Umbraco.Core
             {
                 return true;
             }
+
             return false;
         }
 

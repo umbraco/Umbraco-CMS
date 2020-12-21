@@ -138,7 +138,7 @@ namespace Umbraco.Web.Routing
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
             SetVariationContext(request.Culture.Name);
 
-            //find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
+            // find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
             // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
             if (request.PublishedContent == null)
@@ -156,15 +156,13 @@ namespace Umbraco.Web.Routing
 
             // trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
-            //
             // also, OnPrepared() will make the PublishedRequest readonly, so nothing can change
-            //
             request.OnPrepared();
 
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template
 
-            //complete the PCR and assign the remaining values
+            // complete the PCR and assign the remaining values
             return ConfigureRequest(request);
         }
 
@@ -201,7 +199,6 @@ namespace Umbraco.Web.Routing
 
             // can't go beyond that point without a PublishedContent to render
             // it's ok not to have a template, in order to give MVC a chance to hijack routes
-
             return true;
         }
 

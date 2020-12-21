@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -1167,8 +1167,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SetValueLocked(_contentTypesById, type.Id, type);
             SetValueLocked(_contentTypesByAlias, type.Alias, type);
             // ensure the key/id map is accurate
-            if (type.TryGetKey(out var key))
-                _contentTypeKeyToIdMap[key] = type.Id;
+            _contentTypeKeyToIdMap[type.Key] = type.Id;
         }
 
         // set a node (just the node, not the tree)

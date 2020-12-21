@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
@@ -20,7 +20,6 @@ namespace Umbraco.Core.Scoping
         private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger<Scope> _logger;
-        private readonly ITypeFinder _typeFinder;
 
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
@@ -38,10 +37,15 @@ namespace Umbraco.Core.Scoping
         private IEventDispatcher _eventDispatcher;
 
         // initializes a new scope
-        private Scope(ScopeProvider scopeProvider,
+        private Scope(
+            ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, IScopeContext scopeContext, bool detachable,
+            ILogger<Scope> logger,
+            FileSystems fileSystems,
+            Scope parent,
+            IScopeContext scopeContext,
+            bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
@@ -53,7 +57,6 @@ namespace Umbraco.Core.Scoping
             _coreDebugSettings = coreDebugSettings;
             _mediaFileSystem = mediaFileSystem;
             _logger = logger;
-            _typeFinder = typeFinder;
 
             Context = scopeContext;
 
@@ -117,31 +120,38 @@ namespace Umbraco.Core.Scoping
         }
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider,
+        public Scope(
+            ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, IScopeContext scopeContext,
+            ILogger<Scope> logger,
+            FileSystems fileSystems,
+            bool detachable,
+            IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, typeFinder, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
-        public Scope(ScopeProvider scopeProvider,
+        public Scope(
+            ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent,
+            ILogger<Scope> logger,
+            FileSystems fileSystems,
+            Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, typeFinder, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -30,6 +30,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -145,11 +146,9 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var lifetime = new Mock<IUmbracoApplicationLifetime>();
-            _snapshotService = new PublishedSnapshotService(options,
+            _snapshotService = new PublishedSnapshotService(
+                options,
                 null,
-                lifetime.Object,
-                runtime,
                 serviceContext,
                 contentTypeFactory,
                 _snapshotAccessor,
@@ -157,23 +156,17 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IProfilingLogger>(),
                 NullLoggerFactory.Instance,
                 scopeProvider.Object,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
-                new TestDefaultCultureAccessor(),
                 _source,
+                new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 PublishedModelFactory,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 hostingEnvironment,
-                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 Options.Create(nuCacheSettings));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }

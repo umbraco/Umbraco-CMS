@@ -50,7 +50,10 @@ namespace Umbraco.Tests.Integration.Testing
         public void OnTestTearDown(Action tearDown)
         {
             if (_testTeardown == null)
+            {
                 _testTeardown = new List<Action>();
+            }
+
             _testTeardown.Add(tearDown);
         }
 
@@ -60,7 +63,9 @@ namespace Umbraco.Tests.Integration.Testing
         public void FixtureTearDown()
         {
             foreach (var a in _fixtureTeardown)
+            {
                 a();
+            }
         }
 
         [TearDown]
@@ -69,7 +74,9 @@ namespace Umbraco.Tests.Integration.Testing
             if (_testTeardown != null)
             {
                 foreach (var a in _testTeardown)
+                {
                     a();
+                }
             }
 
             _testTeardown = null;
@@ -79,6 +86,7 @@ namespace Umbraco.Tests.Integration.Testing
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
             host.StopAsync().GetAwaiter().GetResult();
+            host.Dispose();
         }
 
         [TearDown]
@@ -107,7 +115,7 @@ namespace Umbraco.Tests.Integration.Testing
             Configure(app);
         }
 
-        protected void BeforeHostStart(IHost host)
+        protected virtual void BeforeHostStart(IHost host)
         {
             Services = host.Services;
             UseTestDatabase(Services);
@@ -149,7 +157,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
-        /// <returns></returns>
         public virtual IHostBuilder CreateHostBuilder()
         {
             var hostBuilder = Host.CreateDefaultBuilder()
@@ -182,8 +189,6 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         #endregion
-
-        #region IStartup
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
@@ -244,8 +249,6 @@ namespace Umbraco.Tests.Integration.Testing
 
             app.UseUmbracoCore(); // This no longer starts CoreRuntime, it's very fast
         }
-
-        #endregion
 
         #region LocalDb
 
@@ -387,8 +390,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #endregion
 
-        #region Common services
-
         protected UmbracoTestAttribute TestOptions => TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
@@ -420,13 +421,16 @@ namespace Umbraco.Tests.Integration.Testing
         /// Returns the <see cref="ILoggerFactory"/>
         /// </summary>
         protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
-        protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
-        protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
-        protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
-        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
-        protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
-        #endregion
+        protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
+
+        protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
+
+        protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
+
+        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+        protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
         #region Builders
 

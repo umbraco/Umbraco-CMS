@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
@@ -27,56 +27,71 @@ namespace Umbraco.Web.Common.Macros
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly Func<IUmbracoContext> _getUmbracoContext;
+        //private readonly Func<IUmbracoContext> _getUmbracoContext;
 
         public PartialViewMacroEngine(
-            IUmbracoContextAccessor umbracoContextAccessor,
+            //IUmbracoContextAccessor umbracoContextAccessor,
             IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment)
         {
             _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
 
-            _getUmbracoContext = () =>
-            {
-                var context = umbracoContextAccessor.UmbracoContext;
-                if (context == null)
-                    throw new InvalidOperationException(
-                        $"The {GetType()} cannot execute with a null UmbracoContext.Current reference.");
-                return context;
-            };
+            //_getUmbracoContext = () =>
+            //{
+            //    var context = umbracoContextAccessor.UmbracoContext;
+            //    if (context == null)
+            //    {
+            //        throw new InvalidOperationException(
+            //            $"The {GetType()} cannot execute with a null UmbracoContext.Current reference.");
+            //    }
+
+            //    return context;
+            //};
         }
 
-        public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
-        {
-            var temp = GetVirtualPathFromPhysicalPath(tempFileName);
-            try
-            {
-                CompileAndInstantiate(temp);
-            }
-            catch (Exception exception)
-            {
-                errorMessage = exception.Message;
-                return false;
-            }
+        //public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
+        //{
+        //    var temp = GetVirtualPathFromPhysicalPath(tempFileName);
+        //    try
+        //    {
+        //        CompileAndInstantiate(temp);
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        errorMessage = exception.Message;
+        //        return false;
+        //    }
 
-            errorMessage = string.Empty;
-            return true;
-        }
+        //    errorMessage = string.Empty;
+        //    return true;
+        //}
 
         public MacroContent Execute(MacroModel macro, IPublishedContent content)
         {
-            if (macro == null) throw new ArgumentNullException(nameof(macro));
-            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (macro == null)
+            {
+                throw new ArgumentNullException(nameof(macro));
+            }
+
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
             if (string.IsNullOrWhiteSpace(macro.MacroSource))
+            {
                 throw new ArgumentException("The MacroSource property of the macro object cannot be null or empty");
+            }
 
             var httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            var umbCtx = _getUmbracoContext();
+            //var umbCtx = _getUmbracoContext();
             var routeVals = new RouteData();
             routeVals.Values.Add("controller", "PartialViewMacro");
             routeVals.Values.Add("action", "Index");
-            routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
+
+            //TODO: Was required for UmbracoViewPage need to figure out if we still need that, i really don't think this is necessary
+            //routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); 
 
             var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
             var tempDataProvider = httpContext.RequestServices.GetRequiredService<ITempDataProvider>();
@@ -109,6 +124,7 @@ namespace Umbraco.Web.Common.Macros
 
             return new MacroContent { Text = output };
         }
+
         private class FakeView : IView
         {
             /// <inheritdoc />
@@ -120,29 +136,30 @@ namespace Umbraco.Web.Common.Macros
             /// <inheritdoc />
             public string Path { get; } = "View";
         }
-        private string GetVirtualPathFromPhysicalPath(string physicalPath)
-        {
-            var rootpath = _hostingEnvironment.MapPathContentRoot("~/");
-            physicalPath = physicalPath.Replace(rootpath, "");
-            physicalPath = physicalPath.Replace("\\", "/");
-            return "~/" + physicalPath;
-        }
 
-        private static PartialViewMacroPage CompileAndInstantiate(string virtualPath)
-        {
-            // //Compile Razor - We Will Leave This To ASP.NET Compilation Engine & ASP.NET WebPages
-            // //Security in medium trust is strict around here, so we can only pass a virtual file path
-            // //ASP.NET Compilation Engine caches returned types
-            // //Changed From BuildManager As Other Properties Are Attached Like Context Path/
-            // var webPageBase = WebPageBase.CreateInstanceFromVirtualPath(virtualPath);
-            // var webPage = webPageBase as PartialViewMacroPage;
-            // if (webPage == null)
-            //     throw new InvalidCastException("All Partial View Macro views must inherit from " + typeof(PartialViewMacroPage).FullName);
-            // return webPage;
+        //private string GetVirtualPathFromPhysicalPath(string physicalPath)
+        //{
+        //    var rootpath = _hostingEnvironment.MapPathContentRoot("~/");
+        //    physicalPath = physicalPath.Replace(rootpath, "");
+        //    physicalPath = physicalPath.Replace("\\", "/");
+        //    return "~/" + physicalPath;
+        //}
 
-            //TODO? How to check this
-            return null;
-        }
+        //private static PartialViewMacroPage CompileAndInstantiate(string virtualPath)
+        //{
+        //    // //Compile Razor - We Will Leave This To ASP.NET Compilation Engine & ASP.NET WebPages
+        //    // //Security in medium trust is strict around here, so we can only pass a virtual file path
+        //    // //ASP.NET Compilation Engine caches returned types
+        //    // //Changed From BuildManager As Other Properties Are Attached Like Context Path/
+        //    // var webPageBase = WebPageBase.CreateInstanceFromVirtualPath(virtualPath);
+        //    // var webPage = webPageBase as PartialViewMacroPage;
+        //    // if (webPage == null)
+        //    //     throw new InvalidCastException("All Partial View Macro views must inherit from " + typeof(PartialViewMacroPage).FullName);
+        //    // return webPage;
+
+        //    //TODO? How to check this
+        //    return null;
+        //}
     }
 
 }
