@@ -174,7 +174,6 @@
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestControllerActivator.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestControllerActivatorBase.cs" />
-    <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />

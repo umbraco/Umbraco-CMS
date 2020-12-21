@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-                Assert.AreEqual(")]}',\n{\"Message\":\"No variants flagged for saving\"}", body);
+                Assert.AreEqual(AngularJsonMediaTypeFormatter.XsrfPrefix + "{\"Message\":\"No variants flagged for saving\"}", body);
             });
 
         }

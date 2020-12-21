@@ -2,7 +2,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,20 +10,18 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Web.Common.Controllers;
-using Microsoft.Extensions.Hosting;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Runtime;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -133,8 +130,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
-            var typeLoader = services.AddTypeLoader(GetType().Assembly, TestHelper.GetWebHostEnvironment(), TestHelper.GetHostingEnvironment(),
-                TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration, TestHelper.Profiler);
+            var typeLoader = services.AddTypeLoader(
+                GetType().Assembly,
+                TestHelper.GetWebHostEnvironment(),
+                TestHelper.GetHostingEnvironment(),
+                TestHelper.ConsoleLoggerFactory,
+                AppCaches.NoCache,
+                Configuration,
+                TestHelper.Profiler);
 
             var builder = new UmbracoBuilder(services, Configuration, typeLoader);
 
@@ -147,10 +150,16 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
-                //.WithMiniProfiler() // we don't want this running in tests
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
+                    // Adds Umbraco.Web.BackOffice
                     mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
+
+                    // Adds Umbraco.Web.Common
+                    mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
+
+                    // Adds Umbraco.Web.Website
+                    mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
                 .Build();
@@ -159,6 +168,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void Configure(IApplicationBuilder app)
         {
             app.UseUmbraco();
+            app.UseUmbracoBackOffice();
+            app.UseUmbracoWebsite();
         }
     }
 }
