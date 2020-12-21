@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -177,8 +178,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #endregion
 
-        public string StatusUrl => throw new System.NotImplementedException();
-
         #region Xml specific
 
         /// <summary>
@@ -258,13 +257,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #endregion
 
-        public string GetStatus()
-        {
-            return "Test status";
-        }
-
         public void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) { }
 
-        public void Collect() { }
+        public Task CollectAsync() => Task.CompletedTask;
     }
 }

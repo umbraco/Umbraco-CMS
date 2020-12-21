@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
@@ -102,12 +103,9 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="payloads">The changes.</param>
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
-        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
-        string GetStatus();
-
-        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
-        string StatusUrl { get; }
-
-        void Collect();
+        /// <summary>
+        /// Cleans up unused snapshots
+        /// </summary>
+        Task CollectAsync();
     }
 }

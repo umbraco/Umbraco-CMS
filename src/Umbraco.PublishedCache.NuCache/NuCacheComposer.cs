@@ -27,6 +27,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions());
             builder.SetPublishedSnapshotService<PublishedSnapshotService>();
 
+            // Add as itself
+            builder.Services.AddSingleton<PublishedSnapshotService>();
+            builder.Services.AddSingleton<IPublishedSnapshotStatus, PublishedSnapshotStatus>();
+
             // replace this service since we want to improve the content/media
             // mapping lookups if we are using nucache.
             // TODO: Gotta wonder how much this does actually improve perf? It's a lot of weird code to make this happen so hope it's worth it

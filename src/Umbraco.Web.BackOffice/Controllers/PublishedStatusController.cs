@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.PublishedCache;
 
@@ -6,22 +6,22 @@ namespace Umbraco.Web.BackOffice.Controllers
 {
     public class PublishedStatusController : UmbracoAuthorizedApiController
     {
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly IPublishedSnapshotStatus _publishedSnapshotStatus;
 
-        public PublishedStatusController(IPublishedSnapshotService publishedSnapshotService)
+        public PublishedStatusController(IPublishedSnapshotStatus publishedSnapshotStatus)
         {
-            _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _publishedSnapshotStatus = publishedSnapshotStatus ?? throw new ArgumentNullException(nameof(publishedSnapshotStatus));
         }
 
         [HttpGet]
         public string GetPublishedStatusUrl()
         {
-            if (!string.IsNullOrWhiteSpace(_publishedSnapshotService.StatusUrl))
+            if (!string.IsNullOrWhiteSpace(_publishedSnapshotStatus.StatusUrl))
             {
-                return _publishedSnapshotService.StatusUrl;
+                return _publishedSnapshotStatus.StatusUrl;
             }
 
-            throw new NotSupportedException("Not supported: " + _publishedSnapshotService.GetType().FullName);
+            throw new NotSupportedException("Not supported: " + _publishedSnapshotStatus.GetType().FullName);
         }
     }
 }
