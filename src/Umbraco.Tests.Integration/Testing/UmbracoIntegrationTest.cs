@@ -86,6 +86,7 @@ namespace Umbraco.Tests.Integration.Testing
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
             host.StopAsync().GetAwaiter().GetResult();
+            host.Dispose();
         }
 
         [TearDown]
