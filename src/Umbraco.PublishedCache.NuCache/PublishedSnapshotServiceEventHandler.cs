@@ -155,17 +155,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <summary>
-        /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache table
+        /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache database table
         /// </summary>
         private void OnLanguageSaved(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
         {
-            // TODO: This should be a cache refresher call!
-
             // culture changed on an existing language
             var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
             if (cultureChanged)
             {
-                // Rebuild all content types
+                // Rebuild all content for all content types
                 _publishedSnapshotService.Rebuild(contentTypeIds: Array.Empty<int>());
             }
         }
