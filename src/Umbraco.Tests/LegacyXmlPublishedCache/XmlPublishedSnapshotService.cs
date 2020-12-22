@@ -2,14 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Runtime;
@@ -136,30 +132,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #endregion
 
-        #region Environment
-
-        public bool EnsureEnvironment(out IEnumerable<string> errors)
-        {
-            // Test creating/saving/deleting a file in the same location as the content xml file
-            // NOTE: We cannot modify the xml file directly because a background thread is responsible for
-            // that and we might get lock issues.
-            try
-            {
-                XmlStore.EnsureFilePermission();
-                errors = Enumerable.Empty<string>();
-                return true;
-            }
-            catch
-            {
-                errors = new[] { SystemFiles.GetContentCacheXml(_hostingEnvironment) };
-                return false;
-            }
-        }
-
-        #endregion
-
-        #region Caches
-
         public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
             // use _requestCache to store recursive properties lookup, etc. both in content
@@ -175,8 +147,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
                 domainCache);
         }
-
-        #endregion
 
         #region Xml specific
 

@@ -34,13 +34,6 @@ namespace Umbraco.Web.PublishedCache
         IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
 
         /// <summary>
-        /// Ensures that the published snapshot has the proper environment to run.
-        /// </summary>
-        /// <param name="errors">The errors, if any.</param>
-        /// <returns>A value indicating whether the published snapshot has the proper environment to run.</returns>
-        bool EnsureEnvironment(out IEnumerable<string> errors);
-
-        /// <summary>
         /// Rebuilds internal database caches (but does not reload).
         /// </summary>
         /// <param name="groupSize">The operation batch size to process the items</param>

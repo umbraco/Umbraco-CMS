@@ -45,7 +45,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IIOHelper _ioHelper;
         private readonly NuCacheSettings _config;
 
         private bool _isReady;
@@ -90,7 +89,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             IHostingEnvironment hostingEnvironment,
-            IIOHelper ioHelper, // TODO: Remove this, it is only needed for "EnsureEnvironment" which doesn't need to belong to this service
             IOptions<NuCacheSettings> config)
         {
             _serviceContext = serviceContext;
@@ -105,7 +103,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _ioHelper = ioHelper;
             _config = config.Value;
 
             // we need an Xml serializer here so that the member cache can support XPath,
@@ -251,14 +248,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 File.Delete(localMediaDbPath);
             }
-        }
-
-        public bool EnsureEnvironment(out IEnumerable<string> errors)
-        {
-            // must have app_data and be able to write files into it
-            var ok = _ioHelper.TryCreateDirectory(GetLocalFilesPath());
-            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
-            return ok;
         }
 
         /// <summary>
