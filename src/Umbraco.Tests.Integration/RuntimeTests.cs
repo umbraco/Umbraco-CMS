@@ -12,6 +12,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration
 {

@@ -20,6 +20,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddTestCore(TestHelper) // This is the important one!
                 .AddWebComponents()
                 .AddRuntimeMinifier()
-                .AddBackOffice()
+                .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()

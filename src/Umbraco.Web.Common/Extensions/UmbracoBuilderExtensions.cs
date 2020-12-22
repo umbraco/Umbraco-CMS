@@ -18,11 +18,13 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -34,15 +36,20 @@ using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Telemetry;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Web.Common.Extensions
 {
     // TODO: We could add parameters to configure each of these for flexibility
+
+    /// <summary>
+    /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
+    /// </summary>
     public static class UmbracoBuilderExtensions
     {
         public static IUmbracoBuilder AddUmbraco(
@@ -62,7 +69,7 @@ namespace Umbraco.Core.DependencyInjection
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
@@ -72,10 +79,10 @@ namespace Umbraco.Core.DependencyInjection
 
             var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
             var appCaches = AppCaches.Create(requestCache);
-            services.AddUnique<AppCaches>(appCaches);
+            services.AddUnique(appCaches);
 
             IProfiler profiler = GetWebProfiler(config);
-            services.AddUnique<IProfiler>(profiler);
+            services.AddUnique(profiler);
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
             TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
@@ -102,7 +109,7 @@ namespace Umbraco.Core.DependencyInjection
                 factory.GetServices<IEmbeddedDatabaseCreator>()
             ));
 
-            builder.Services.AddUnique<IMainDomLock>(factory =>
+            builder.Services.AddUnique(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
                 var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
@@ -135,20 +142,20 @@ namespace Umbraco.Core.DependencyInjection
             }
 
                 );
-            builder.Services.AddUnique<IAppPolicyCache>(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
-            builder.Services.AddUnique<IRequestCache>(factory => factory.GetRequiredService<AppCaches>().RequestCache);
+            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
+            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
             builder.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
             builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
             builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique<IUmbracoDatabase>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
-            builder.Services.AddUnique<ISqlContext>(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
+            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
             builder.Services.AddUnique<IMainDom, MainDom>();
 
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
-            builder.Services.AddHostedService<IRuntime>(factory => factory.GetRequiredService<IRuntime>());
+            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             builder.AddCoreInitialServices();
             builder.AddComposers();
@@ -201,7 +208,6 @@ namespace Umbraco.Core.DependencyInjection
             return builder;
         }
 
-
         public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
         {
             builder.Services.AddHostedService<HealthCheckNotifier>();
@@ -235,8 +241,8 @@ namespace Umbraco.Core.DependencyInjection
         {
             // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
             // this will directly affect developers who need to call that themselves.
-            //We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
-            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
+            // We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
+            // But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
             var mvcBuilder = builder.Services.AddControllersWithViews(options =>
             {
                 options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());

@@ -30,6 +30,7 @@ using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -223,7 +224,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             builder.AddWebComponents();
             builder.AddRuntimeMinifier();
-            builder.AddBackOffice();
+            builder.AddBackOfficeAuthentication();
             builder.AddBackOfficeIdentity();
 
             services.AddMvc();

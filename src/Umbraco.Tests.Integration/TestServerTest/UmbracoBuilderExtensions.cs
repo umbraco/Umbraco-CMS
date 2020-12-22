@@ -4,6 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.Common.Extensions;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
