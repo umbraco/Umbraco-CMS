@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
@@ -115,20 +116,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         }
 
         [Test]
-        public async Task RenderModelOf_ContentType1_To_ContentType1()
+        public void RenderModelOf_ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
 
         [Test]
-        public async Task RenderModelOf_ContentType2_To_ContentType1()
+        public void RenderModelOf_ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
             var model = new ContentModel<ContentType2>(content);
@@ -138,20 +139,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
                 Model = model
             };
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
 
         [Test]
-        public async Task RenderModelOf_ContentType1_To_ContentType2()
+        public void RenderModelOf_ContentType1_To_ContentType2()
         {
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
@@ -169,14 +170,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         }
 
         [Test]
-        public async Task RenderModelOf_ContentType2_To_RenderModelOf_ContentType1()
+        public void RenderModelOf_ContentType2_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType2(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType2>(view.Model.Content);
@@ -190,44 +191,44 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
-        public async Task ContentType1_To_RenderModel()
+        public void ContentType1_To_RenderModel()
         {
             var content = new ContentType1(null);
             var view = new RenderModelTestPage();
 
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentModel>(view.Model);
         }
 
         [Test]
-        public async Task ContentType1_To_RenderModelOf_ContentType1()
+        public void ContentType1_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType1(null);
             var view = new RenderModelOfContentType1TestPage();
 
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
         [Test]
-        public async Task ContentType2_To_RenderModelOf_ContentType1()
+        public void ContentType2_To_RenderModelOf_ContentType1()
         {
             // Same as above but with ContentModel<ContentType2>
             var content = new ContentType2(null);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentType2> viewData = GetViewDataDictionary<ContentType2>(content);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
@@ -240,17 +241,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
-        public async Task ContentType1_To_ContentType1()
+        public void ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
             var view = new ContentType1TestPage();
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
@@ -262,17 +263,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
-            Assert.ThrowsAsync<ModelBindingException>(async () => await view.SetViewDataAsyncX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
 
         [Test]
-        public async Task ContentType2_To_ContentType1()
+        public void ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
             var view = new ContentType1TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
-            await view.SetViewDataAsyncX(viewData);
+            view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
@@ -312,7 +313,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             public override Task ExecuteAsync() => throw new NotImplementedException();
 
-            public async Task SetViewDataAsyncX(ViewDataDictionary viewData) => await SetViewDataAsync(viewData);
+            public void SetViewData(ViewDataDictionary viewData) => ViewData = (ViewDataDictionary<TModel>)BindViewData(viewData);
         }
 
         public class RenderModelTestPage : TestPage<ContentModel>

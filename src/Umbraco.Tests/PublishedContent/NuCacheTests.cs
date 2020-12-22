@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -186,11 +186,9 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var lifetime = new Mock<IUmbracoApplicationLifetime>();
-            _snapshotService = new PublishedSnapshotService(options,
+            _snapshotService = new PublishedSnapshotService(
+                options,
                 null,
-                lifetime.Object,
-                runtime,
                 serviceContext,
                 contentTypeFactory,
                 new TestPublishedSnapshotAccessor(),
@@ -198,21 +196,14 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IProfilingLogger>(),
                 NullLoggerFactory.Instance,
                 scopeProvider,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
-                new TestDefaultCultureAccessor(),
                 dataSource,
+                new TestDefaultCultureAccessor(),
                 Microsoft.Extensions.Options.Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
-
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

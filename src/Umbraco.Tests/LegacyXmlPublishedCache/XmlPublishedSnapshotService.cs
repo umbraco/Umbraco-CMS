@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -161,36 +161,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var domainCache = new DomainCache(_domainService, _defaultCultureAccessor);
 
             return new PublishedSnapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache,_variationContextAccessor, previewToken),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, _variationContextAccessor, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor, _variationContextAccessor),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
                 domainCache);
-        }
-
-        #endregion
-
-        #region Preview
-
-        public override string EnterPreview(IUser user, int contentId)
-        {
-            var previewContent = new PreviewContent(_xmlStore, user.Id);
-            previewContent.CreatePreviewSet(contentId, true); // preview branch below that content
-            return previewContent.Token;
-            //previewContent.ActivatePreviewCookie();
-        }
-
-        public override void RefreshPreview(string previewToken, int contentId)
-        {
-            if (previewToken.IsNullOrWhiteSpace()) return;
-            var previewContent = new PreviewContent(_xmlStore, previewToken);
-            previewContent.CreatePreviewSet(contentId, true); // preview branch below that content
-        }
-
-        public override void ExitPreview(string previewToken)
-        {
-            if (previewToken.IsNullOrWhiteSpace()) return;
-            var previewContent = new PreviewContent(_xmlStore, previewToken);
-            previewContent.ClearPreviewSet();
         }
 
         #endregion
@@ -278,5 +252,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             return "Test status";
         }
+
+        public override void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) { }
     }
 }

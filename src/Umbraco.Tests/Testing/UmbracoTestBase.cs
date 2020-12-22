@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -235,10 +235,7 @@ namespace Umbraco.Tests.Testing
 
             services.AddUnique(membershipHelper);
 
-
-
-
-            TestObjects = new TestObjects(services);
+            TestObjects = new TestObjects();
             Compose();
             Current.Factory = Factory = Builder.CreateServiceProvider();
             Initialize();
@@ -496,7 +493,7 @@ namespace Umbraco.Tests.Testing
             Builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Builder.Services.AddUnique(factory
-                => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<ITypeFinder>(), factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
             Builder.Services.AddUnique(factory => (IScopeAccessor)factory.GetRequiredService<IScopeProvider>());
 
             Builder.ComposeServices();

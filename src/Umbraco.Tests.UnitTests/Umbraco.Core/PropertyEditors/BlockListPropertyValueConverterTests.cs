@@ -32,19 +32,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         /// </summary>
         private IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
         {
-            IPublishedContentType2 test1ContentType = Mock.Of<IPublishedContentType2>(x =>
+            IPublishedContentType test1ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == _contentKey1
                 && x.Alias == ContentAlias1);
-            IPublishedContentType2 test2ContentType = Mock.Of<IPublishedContentType2>(x =>
+            IPublishedContentType test2ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == _contentKey2
                 && x.Alias == ContentAlias2);
-            IPublishedContentType2 test3ContentType = Mock.Of<IPublishedContentType2>(x =>
+            IPublishedContentType test3ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == _settingKey1
                 && x.Alias == SettingAlias1);
-            IPublishedContentType2 test4ContentType = Mock.Of<IPublishedContentType2>(x =>
+            IPublishedContentType test4ContentType = Mock.Of<IPublishedContentType>(x =>
                 x.IsElement == true
                 && x.Key == _settingKey2
                 && x.Alias == SettingAlias2);

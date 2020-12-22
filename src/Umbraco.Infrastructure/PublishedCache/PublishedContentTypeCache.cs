@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -190,8 +190,7 @@ namespace Umbraco.Web.PublishedCache
                 try
                 {
                     _lock.EnterWriteLock();
-                    if (type.TryGetKey(out var key))
-                        _keyToIdMap[key] = type.Id;
+                    _keyToIdMap[type.Key] = type.Id;
                     return _typesByAlias[aliasKey] = _typesById[type.Id] = type;
                 }
                 finally
@@ -227,8 +226,7 @@ namespace Umbraco.Web.PublishedCache
                 try
                 {
                     _lock.EnterWriteLock();
-                    if (type.TryGetKey(out var key))
-                        _keyToIdMap[key] = type.Id;
+                    _keyToIdMap[type.Key] = type.Id;
                     return _typesByAlias[GetAliasKey(type)] = _typesById[type.Id] = type;
                 }
                 finally

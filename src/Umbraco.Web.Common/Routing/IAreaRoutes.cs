@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Web.Common.Routing
 {
@@ -11,6 +11,10 @@ namespace Umbraco.Web.Common.Routing
         // on individual ext methods. This would reduce the amount of code in Startup, but could also mean there's less control over startup
         // if someone wanted that. Maybe we can just have both.
 
+        /// <summary>
+        /// Create routes for an area
+        /// </summary>
+        /// <param name="endpoints">The endpoint route builder</param>
         void CreateRoutes(IEndpointRouteBuilder endpoints);
     }
 }

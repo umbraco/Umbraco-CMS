@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Macros
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MacroRenderer(
-            IProfilingLogger profilingLogger ,
+            IProfilingLogger profilingLogger,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Macros
             IRequestAccessor requestAccessor,
              IHttpContextAccessor httpContextAccessor)
         {
-            _profilingLogger = profilingLogger  ?? throw new ArgumentNullException(nameof(profilingLogger ));
+            _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -111,12 +111,14 @@ namespace Umbraco.Web.Macros
         private MacroContent GetMacroContentFromCache(MacroModel model)
         {
             // only if cache is enabled
-            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0) return null;
+            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0)
+                return null;
 
             var cache = _appCaches.RuntimeCache;
             var macroContent = cache.GetCacheItem<MacroContent>(CacheKeys.MacroContentCacheKey + model.CacheIdentifier);
 
-            if (macroContent == null) return null;
+            if (macroContent == null)
+                return null;
 
             _logger.LogDebug("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
 
@@ -145,16 +147,19 @@ namespace Umbraco.Web.Macros
         private void AddMacroContentToCache(MacroModel model, MacroContent macroContent)
         {
             // only if cache is enabled
-            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0) return;
+            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0)
+                return;
 
             // just make sure...
-            if (macroContent == null) return;
+            if (macroContent == null)
+                return;
 
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
                 var key = _memberUserKeyProvider.GetMemberProviderUserKey();
-                if (key is null) return;
+                if (key is null)
+                    return;
             }
 
             // remember when we cache the content
@@ -184,10 +189,12 @@ namespace Umbraco.Web.Macros
         private FileInfo GetMacroFile(MacroModel model)
         {
             var filename = GetMacroFileName(model);
-            if (filename == null) return null;
+            if (filename == null)
+                return null;
 
             var mapped = _hostingEnvironment.MapPathContentRoot(filename);
-            if (mapped == null) return null;
+            if (mapped == null)
+                return null;
 
             var file = new FileInfo(mapped);
             return file.Exists ? file : null;
@@ -223,7 +230,8 @@ namespace Umbraco.Web.Macros
 
         private MacroContent Render(MacroModel macro, IPublishedContent content)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
 
             var macroInfo = $"Render Macro: {macro.Name}, cache: {macro.CacheDuration}";
             using (_profilingLogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
@@ -328,7 +336,8 @@ namespace Umbraco.Web.Macros
         /// should not be cached. In that case the attempt may also contain an exception.</remarks>
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
@@ -356,7 +365,7 @@ namespace Umbraco.Web.Macros
         /// <returns>The text output of the macro execution.</returns>
         private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
-            var engine = new PartialViewMacroEngine(_umbracoContextAccessor, _httpContextAccessor, _hostingEnvironment);
+            var engine = new PartialViewMacroEngine(_httpContextAccessor, _hostingEnvironment);
             return engine.Execute(macro, content);
         }
 

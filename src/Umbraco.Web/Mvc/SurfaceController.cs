@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core;
 using System.Collections.Specialized;
 using Umbraco.Core.Cache;
@@ -204,8 +204,10 @@ namespace Umbraco.Web.Mvc
             while (currentContext != null)
             {
                 var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
-                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                if (currentRouteData.Values.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
+                {
+                    return Attempt.Succeed((RouteDefinition)currentRouteData.Values[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                }
 
                 currentContext = currentContext.IsChildAction
                     ? currentContext.ParentActionViewContext

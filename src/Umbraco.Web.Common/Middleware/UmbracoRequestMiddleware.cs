@@ -1,15 +1,15 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using System.Threading;
 using Umbraco.Core.Cache;
-using System.Collections.Generic;
-using Umbraco.Core.Security;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -18,7 +18,12 @@ namespace Umbraco.Web.Common.Middleware
     /// Manages Umbraco request objects and their lifetime
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// This is responsible for initializing the content cache
+    /// </para>
+    /// <para>
     /// This is responsible for creating and assigning an <see cref="IUmbracoContext"/>
+    /// </para>
     /// </remarks>
     public class UmbracoRequestMiddleware : IMiddleware
     {
@@ -27,21 +32,31 @@ namespace Umbraco.Web.Common.Middleware
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
+        private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
+        private static bool s_cacheInitialized = false;
+        private static bool s_cacheInitializedFlag = false;
+        private static object s_cacheInitializedLock = new object();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
+        /// </summary>
         public UmbracoRequestMiddleware(
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            IBackOfficeSecurityFactory backofficeSecurityFactory)
+            IBackOfficeSecurityFactory backofficeSecurityFactory,
+            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler)
         {
             _logger = logger;
             _umbracoRequestLifetimeManager = umbracoRequestLifetimeManager;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
             _backofficeSecurityFactory = backofficeSecurityFactory;
+            _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
         }
 
+        /// <inheritdoc/>
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
@@ -52,16 +67,18 @@ namespace Umbraco.Web.Common.Middleware
                 await next(context);
                 return;
             }
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext
-            var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
+            EnsureContentCacheInitialized();
+
+            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext, TODO: Why?
+            UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             try
             {
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                   _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }
 
                 try
@@ -107,16 +124,15 @@ namespace Umbraco.Web.Common.Middleware
         /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
-        /// <param name="http"></param>
-        /// <param name="requestCache"></param>
-        /// <param name="requestUri"></param>
         private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
         {
             // do not process if client-side request
             if (requestUri.IsClientSideRequest())
+            {
                 return;
+            }
 
-            //get a list of keys to dispose
+            // get a list of keys to dispose
             var keys = new HashSet<string>();
             foreach (var i in requestCache)
             {
@@ -125,7 +141,7 @@ namespace Umbraco.Web.Common.Middleware
                     keys.Add(i.Key);
                 }
             }
-            //dispose each item and key that was found as disposable.
+            // dispose each item and key that was found as disposable.
             foreach (var k in keys)
             {
                 try
@@ -147,6 +163,17 @@ namespace Umbraco.Web.Common.Middleware
             }
         }
 
-
+        /// <summary>
+        /// Initializes the content cache one time
+        /// </summary>
+        private void EnsureContentCacheInitialized() => LazyInitializer.EnsureInitialized(
+            ref s_cacheInitialized,
+            ref s_cacheInitializedFlag,
+            ref s_cacheInitializedLock,
+            () =>
+            {
+                _publishedSnapshotServiceEventHandler.Start();
+                return true;
+            });
     }
 }

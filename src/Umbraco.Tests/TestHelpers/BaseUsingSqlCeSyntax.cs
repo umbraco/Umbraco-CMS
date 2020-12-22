@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ISqlContext SqlContext { get; private set; }
 
-        internal TestObjects TestObjects = new TestObjects(null);
+        internal TestObjects TestObjects = new TestObjects();
 
         protected Sql<ISqlContext> Sql()
         {

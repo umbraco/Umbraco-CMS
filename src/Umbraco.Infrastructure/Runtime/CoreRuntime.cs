@@ -43,8 +43,6 @@ namespace Umbraco.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
-
-
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 

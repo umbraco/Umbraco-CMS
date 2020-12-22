@@ -622,19 +622,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Saves content
         /// </summary>
-        /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
-            var contentItemDisplay = await PostSaveInternal(contentItem,
+            var contentItemDisplay = await PostSaveInternal(
+                contentItem,
                 content =>
                 {
                     EnsureUniqueName(content.Name, content, "Name");
 
                     _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
-                     //we need to reuse the underlying logic so return the result that it wants
-                     return OperationResult.Succeed(new EventMessages());
+
+                    // we need to reuse the underlying logic so return the result that it wants
+                    return OperationResult.Succeed(new EventMessages());
                 },
                 content =>
                 {
@@ -649,7 +650,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Saves content
         /// </summary>
-        /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [OutgoingEditorModelEvent]
@@ -665,9 +665,9 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private async Task<ContentItemDisplay> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
-            //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
-            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
-            //uploaded files to being *only* the actual file name (as it should be).
+            // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
+            // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            // uploaded files to being *only* the actual file name (as it should be).
             if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
             {
                 foreach (var file in contentItem.UploadedFiles)
@@ -676,7 +676,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
             }
 
-            //If we've reached here it means:
+            // If we've reached here it means:
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
@@ -686,20 +686,20 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var passesCriticalValidationRules = ValidateCriticalData(contentItem, out var variantCount);
 
-            //we will continue to save if model state is invalid, however we cannot save if critical data is missing.
+            // we will continue to save if model state is invalid, however we cannot save if critical data is missing.
             if (!ModelState.IsValid)
             {
-                //check for critical data validation issues, we can't continue saving if this data is invalid
+                // check for critical data validation issues, we can't continue saving if this data is invalid
                 if (!passesCriticalValidationRules)
                 {
-                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                    // ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw a validation message
                     var forDisplay = mapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
                 }
 
-                //if there's only one variant and the model state is not valid we cannot publish so change it to save
+                // if there's only one variant and the model state is not valid we cannot publish so change it to save
                 if (variantCount == 1)
                 {
                     switch (contentItem.Action)

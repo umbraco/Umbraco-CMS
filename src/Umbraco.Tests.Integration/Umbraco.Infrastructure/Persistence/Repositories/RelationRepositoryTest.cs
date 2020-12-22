@@ -19,7 +19,7 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Boot = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RelationRepositoryTest : UmbracoIntegrationTest
     {
         private RelationType _relateContent;
@@ -432,7 +432,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             {
                 var accessor = (IScopeAccessor)ScopeProvider;
                 var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger<RelationTypeRepository>>());
-                var entityRepository = new EntityRepository(accessor);
+                var entityRepository = new EntityRepository(accessor, AppCaches.Disabled);
                 var relationRepository = new RelationRepository(accessor, Mock.Of<ILogger<RelationRepository>>(), relationTypeRepository, entityRepository);
 
                 relationTypeRepository.Save(_relateContent);

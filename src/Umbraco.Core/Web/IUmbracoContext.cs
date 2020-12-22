@@ -49,11 +49,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
         /// </summary>
-        bool IsFrontEndUmbracoRequest { get; }
+        bool IsFrontEndUmbracoRequest { get; } // TODO: This could easily be an ext method and mocking just means setting the published request to null
 
         /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
+        // TODO: Can we refactor this and not expose this mutable object here? Instead just expose IPublishedContent? A bunch of stuff would need to change but would be better
         IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
