@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Binds to the Umbraco events
         /// </summary>
         /// <returns>Returns true if binding occurred</returns>
-        public bool Start()
+        public bool Initialize()
         {
             // however, the cache is NOT available until we are configured, because loading
             // content (and content types) from database cannot be consistent (see notes in "Handle

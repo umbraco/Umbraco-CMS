@@ -13,24 +13,24 @@ namespace Umbraco.Web.Common.Filters
     /// <summary>
     /// Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
     /// </summary>
-    public class JsonDateTimeFormatAttribute : TypeFilterAttribute
+    public sealed class JsonDateTimeFormatAttribute : TypeFilterAttribute
     {
-        public JsonDateTimeFormatAttribute() : base(typeof(JsonDateTimeFormatFilter))
-        {
-            Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonDateTimeFormatAttribute"/> class.
+        /// </summary>
+        public JsonDateTimeFormatAttribute()
+            : base(typeof(JsonDateTimeFormatFilter)) =>
+            Order = 2; // must be higher than AngularJsonOnlyConfigurationAttribute.Order
 
         private class JsonDateTimeFormatFilter : IResultFilter
         {
             private readonly string _format = "yyyy-MM-dd HH:mm:ss";
 
-            private readonly IOptions<MvcNewtonsoftJsonOptions> _mvcNewtonsoftJsonOptions;
             private readonly ArrayPool<char> _arrayPool;
             private readonly IOptions<MvcOptions> _options;
 
-            public JsonDateTimeFormatFilter(IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions, ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+            public JsonDateTimeFormatFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
             {
-                _mvcNewtonsoftJsonOptions = mvcNewtonsoftJsonOptions;
                 _arrayPool = arrayPool;
                 _options = options;
             }

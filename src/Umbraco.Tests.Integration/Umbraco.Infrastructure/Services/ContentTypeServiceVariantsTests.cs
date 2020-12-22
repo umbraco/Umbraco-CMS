@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Ensure that the events are bound on each test
             PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
-            eventBinder.Start();
+            eventBinder.Initialize();
         }
 
         private void AssertJsonStartsWith(int id, string expected)

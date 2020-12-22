@@ -23,6 +23,9 @@ namespace Umbraco.Infrastructure.Runtime
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
+        /// </summary>
         public CoreRuntime(
             ILoggerFactory loggerFactory,
             IRuntimeState state,

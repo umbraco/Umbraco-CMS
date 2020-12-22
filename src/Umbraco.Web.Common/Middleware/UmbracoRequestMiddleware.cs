@@ -172,7 +172,7 @@ namespace Umbraco.Web.Common.Middleware
             ref s_cacheInitializedLock,
             () =>
             {
-                _publishedSnapshotServiceEventHandler.Start();
+                _publishedSnapshotServiceEventHandler.Initialize();
                 return true;
             });
     }
