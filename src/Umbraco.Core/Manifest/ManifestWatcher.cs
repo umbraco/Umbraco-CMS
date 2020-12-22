@@ -15,6 +15,7 @@ namespace Umbraco.Core.Manifest
         private readonly ILogger<ManifestWatcher> _logger;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
+        private bool _disposed;
 
         public ManifestWatcher(ILogger<ManifestWatcher> logger, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
@@ -64,12 +65,22 @@ namespace Umbraco.Core.Manifest
             }
         }
 
-        public void Dispose()
+        private void Dispose(bool disposing)
         {
-            foreach (var fw in _fws)
+            // ReSharper disable InvertIf
+            if (disposing && !_disposed)
             {
-                fw.Dispose();
+                foreach (FileSystemWatcher fw in _fws)
+                {
+                    fw.Dispose();
+                }
+
+                _disposed = true;
             }
+
+            // ReSharper restore InvertIf
         }
+
+        public void Dispose() => Dispose(true);
     }
 }
