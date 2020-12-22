@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,6 +8,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,13 +28,12 @@ using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -168,18 +168,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public MemberDisplay GetEmpty(string contentTypeAlias = null)
+        public ActionResult<MemberDisplay> GetEmpty(string contentTypeAlias = null)
         {
             IMember emptyContent;
             if (contentTypeAlias == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(contentTypeAlias, StatusCodes.Status404NotFound);
             }
 
             var contentType = _memberTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
             }
 
             var passwordGenerator = new PasswordGenerator(_passwordConfig);
@@ -218,7 +218,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
-                throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
+                return new ValidationErrorResult(forDisplay);
             }
 
             //We're gonna look up the current roles now because the below code can cause
@@ -241,7 +241,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     break;
                 default:
                     //we don't support anything else for members
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return new ValidationErrorResult(contentItem.Action, StatusCodes.Status404NotFound);
             }
 
             //TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope

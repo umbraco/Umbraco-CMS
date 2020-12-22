@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,14 +16,12 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Common.ActionsResults;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -190,7 +188,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (installType == PackageInstallType.AlreadyInstalled)
                     {
                         //this package is already installed
-                        throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult(
                             _localizedTextService.Localize("packager/packageAlreadyInstalled"));
                     }
 
@@ -217,7 +215,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="packageGuid"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<LocalPackageInstallModel> Fetch(string packageGuid)
+        public async Task<ActionResult<LocalPackageInstallModel>> Fetch(string packageGuid)
         {
             //Default path
             string fileName = packageGuid + ".umb";
@@ -244,7 +242,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (installType == PackageInstallType.AlreadyInstalled)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(
                     _localizedTextService.Localize("packager/packageAlreadyInstalled"));
             }
 
@@ -259,7 +257,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public PackageInstallModel Import(PackageInstallModel model)
+        public ActionResult<PackageInstallModel> Import(PackageInstallModel model)
         {
             var zipFile = new FileInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), model.ZipFileName));
 
@@ -270,7 +268,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (_umbracoVersion.Current < packageMinVersion)
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
                         _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }
 
@@ -289,7 +287,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     //save to the installedPackages.config, this will create a new entry with a new Id
                     if (!_packagingService.SaveInstalledPackage(packageDefinition))
-                        throw HttpResponseException.CreateNotificationValidationErrorResponse("Could not save the package");
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult("Could not save the package");
 
                     model.Id = packageDefinition.Id;
                     break;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +36,7 @@ using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
@@ -649,7 +650,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (_mediaService.Sort(sortedMedia) == false)
                 {
                     _logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
-                    throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
+                    return new ValidationErrorResult("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Ok();
             }

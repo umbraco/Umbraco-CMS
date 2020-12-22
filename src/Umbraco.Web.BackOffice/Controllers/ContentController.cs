@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +16,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
@@ -24,23 +25,21 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Extensions;
+using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Models.Mapping;
-using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
-using System.Threading.Tasks;
+using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.Routing;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -1603,7 +1602,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
                     // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
-                    throw HttpResponseException.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
+                    return new ValidationErrorResult("Content sorting failed, this was probably caused by an event being cancelled");
                 }
 
                 return Ok();

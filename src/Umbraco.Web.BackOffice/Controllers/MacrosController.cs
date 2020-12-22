@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Services;
+using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,14 +12,12 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -74,19 +72,19 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Name can not be empty");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Name can not be empty");
             }
 
             var alias = name.ToSafeAlias(_shortStringHelper);
 
             if (_macroService.GetByAlias(alias) != null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Macro with this alias already exists");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Macro with this alias already exists");
             }
 
             if (name == null || name.Length > 255)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Name cannnot be more than 255 characters in length.");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Name cannnot be more than 255 characters in length.");
             }
 
             try
@@ -106,19 +104,19 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 const string errorMessage = "Error creating macro";
                 _logger.LogError(exception, errorMessage);
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(errorMessage);
             }
         }
 
         [HttpGet]
         [DetermineAmbiguousActionByPassingParameters]
-        public MacroDisplay GetById(int id)
+        public ActionResult<MacroDisplay> GetById(int id)
         {
             var macro = _macroService.GetById(id);
 
             if (macro == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {id} does not exist");
             }
 
             var macroDisplay = MapToDisplay(macro);
@@ -128,13 +126,13 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [HttpGet]
         [DetermineAmbiguousActionByPassingParameters]
-        public MacroDisplay GetById(Guid id)
+        public ActionResult<MacroDisplay> GetById(Guid id)
         {
             var macro = _macroService.GetById(id);
 
             if (macro == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {id} does not exist");
             }
 
             var macroDisplay = MapToDisplay(macro);
@@ -144,16 +142,16 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [HttpGet]
         [DetermineAmbiguousActionByPassingParameters]
-        public MacroDisplay GetById(Udi id)
+        public ActionResult<MacroDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {id} does not exist");
 
             var macro = _macroService.GetById(guidUdi.Guid);
             if (macro == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {id} does not exist");
             }
 
             var macroDisplay = MapToDisplay(macro);
@@ -162,13 +160,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public OkResult DeleteById(int id)
+        public ActionResult DeleteById(int id)
         {
             var macro = _macroService.GetById(id);
 
             if (macro == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {id} does not exist");
             }
 
             _macroService.Delete(macro);
@@ -177,23 +175,23 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public MacroDisplay Save(MacroDisplay macroDisplay)
+        public ActionResult<MacroDisplay> Save(MacroDisplay macroDisplay)
         {
             if (macroDisplay == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"No macro data found in request");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("No macro data found in request");
             }
 
             if (macroDisplay.Name == null || macroDisplay.Name.Length > 255)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Name cannnot be more than 255 characters in length.");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Name cannnot be more than 255 characters in length.");
             }
 
             var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));
 
             if (macro == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with id {macroDisplay.Id} does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"Macro with id {macroDisplay.Id} does not exist");
             }
 
             if (macroDisplay.Alias != macro.Alias)
@@ -202,7 +200,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                 if (macroByAlias != null)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse($"Macro with this alias already exists");
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult("Macro with this alias already exists");
                 }
             }
 
@@ -230,7 +228,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 const string errorMessage = "Error creating macro";
                 _logger.LogError(exception, errorMessage);
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(errorMessage);
             }
         }
 

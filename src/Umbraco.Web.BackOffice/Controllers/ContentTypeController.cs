@@ -21,9 +21,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -118,12 +118,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(int id)
+        public ActionResult<DocumentTypeDisplay> GetById(int id)
         {
             var ct = _contentTypeService.Get(id);
             if (ct == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(ct, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(ct);
@@ -137,12 +137,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(Guid id)
+        public ActionResult<DocumentTypeDisplay> GetById(Guid id)
         {
             var contentType = _contentTypeService.Get(id);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -156,16 +156,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(Udi id)
+        public ActionResult<DocumentTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
 
             var contentType = _contentTypeService.Get(guidUdi.Guid);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -185,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _contentTypeService.Get(id);
             if (foundType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
             }
 
             _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -263,13 +263,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
-        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
+        public ActionResult<ContentPropertyDisplay> GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = _dataTypeService.GetDataType(id);
 
             if (dataTypeDiff == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(dataTypeDiff, StatusCodes.Status404NotFound);
             }
 
             var configuration = _dataTypeService.GetDataType(id).Configuration;
@@ -304,9 +304,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -314,9 +315,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

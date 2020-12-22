@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,16 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -97,7 +94,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (language.IsDefault)
             {
                 var message = $"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.";
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(message);
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(message);
             }
 
             // service is happy deleting a language that's fallback for another language,
@@ -113,10 +110,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
         [HttpPost]
-        public Language SaveLanguage(Language language)
+        public ActionResult<Language> SaveLanguage(Language language)
         {
             if (!ModelState.IsValid)
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(ModelState);
 
             // this is prone to race conditions but the service will not let us proceed anyways
             var existingByCulture = _localizationService.GetLanguageByIsoCode(language.IsoCode);
@@ -132,7 +129,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 //someone is trying to create a language that already exist
                 ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(ModelState);
             }
 
             var existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
@@ -149,7 +146,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 catch (CultureNotFoundException)
                 {
                     ModelState.AddModelError("IsoCode", "No Culture found with name " + language.IsoCode);
-                    throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                    return new ValidationErrorResult(ModelState);
                 }
 
                 // create it (creating a new language cannot create a fallback cycle)
@@ -172,7 +169,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (existingById.IsDefault && !language.IsDefault)
             {
                 ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(ModelState);
             }
 
             existingById.IsDefault = language.IsDefault;
@@ -187,12 +184,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
                 {
                     ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
-                    throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                    return new ValidationErrorResult(ModelState);
                 }
                 if (CreatesCycle(existingById, languages))
                 {
                     ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existingById.FallbackLanguageId.Value].IsoCode} would create a circular path.");
-                    throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                    return new ValidationErrorResult(ModelState);
                 }
             }
 
