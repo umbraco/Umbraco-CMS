@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -34,6 +34,7 @@ namespace Umbraco.Web.Common.Filters
                 _arrayPool = arrayPool;
                 _options = options;
             }
+
             public void OnResultExecuted(ResultExecutedContext context)
             {
             }

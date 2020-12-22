@@ -1,14 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.Routing;
 using Umbraco.Web.Website.ViewEngines;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// <see cref="IUmbracoBuilder"/> extensions for umbraco front-end website
+    /// </summary>
     public static class UmbracoBuilderExtensions
     {
+        /// <summary>
+        /// Add services for the umbraco front-end website
+        /// </summary>
         public static IUmbracoBuilder AddUmbracoWebsite(this IUmbracoBuilder builder)
         {
             // Set the render & plugin view engines (Super complicated, but this allows us to use the IServiceCollection
@@ -21,12 +28,14 @@ namespace Umbraco.Extensions
             // Wraps all existing view engines in a ProfilerViewEngine
             builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, ProfilingViewEngineWrapperMvcViewOptionsSetup>();
 
-            //TODO figure out if we need more to work on load balanced setups
+            // TODO figure out if we need more to work on load balanced setups
             builder.Services.AddDataProtection();
+
+            builder.Services.AddScoped<UmbracoRouteValueTransformer>();
+            builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
 
             return builder;
         }
-
 
     }
 }

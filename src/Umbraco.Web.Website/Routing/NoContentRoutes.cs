@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -17,6 +17,9 @@ namespace Umbraco.Web.Website.Routing
         private readonly IRuntimeState _runtimeState;
         private readonly string _umbracoPathSegment;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NoContentRoutes"/> class.
+        /// </summary>
         public NoContentRoutes(
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
@@ -26,6 +29,7 @@ namespace Umbraco.Web.Website.Routing
             _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
         }
 
+        /// <inheritdoc/>
         public void CreateRoutes(IEndpointRouteBuilder endpoints)
         {
             switch (_runtimeState.Level)
@@ -35,13 +39,16 @@ namespace Umbraco.Web.Website.Routing
                 case RuntimeLevel.Upgrade:
                     break;
                 case RuntimeLevel.Run:
+
+                    // TODO: I don't really think this is working AFAIK the code has just been migrated but it's not really enabled
+                    // yet. Our route handler needs to be aware that there is no content and redirect there. Though, this could all be
+                    // managed directly in UmbracoRouteValueTransformer. Else it could actually do a 'redirect' but that would need to be
+                    // an internal rewrite.
                     endpoints.MapControllerRoute(
-                        // named consistently
-                        Constants.Web.NoContentRouteName,
+                        Constants.Web.NoContentRouteName, // named consistently
                         _umbracoPathSegment + "/UmbNoContent",
-                        new { controller = "RenderNoContent", action = "Index" }
-                        );
-                     break;
+                        new { controller = "RenderNoContent", action = "Index" });
+                    break;
                 case RuntimeLevel.BootFailed:
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:

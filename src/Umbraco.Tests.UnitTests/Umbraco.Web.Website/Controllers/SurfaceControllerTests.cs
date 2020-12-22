@@ -14,11 +14,13 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.Routing;
 using CoreConstants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
@@ -163,16 +165,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
-            var publishedRequestMock = new Mock<IPublishedRequest>();
-            publishedRequestMock.Setup(x => x.PublishedContent).Returns(content);
-
-           var routeDefinition = new RouteDefinition
-            {
-                PublishedRequest = publishedRequestMock.Object
-            };
+            var routeDefinition = new UmbracoRouteValues(content);
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
+            routeData.Values.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>());
             ctrl.ControllerContext = new ControllerContext()

@@ -39,14 +39,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var mock = new Mock<IServiceProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             var logger = loggerFactory.CreateLogger("GenericLogger");
-            var typeFinder = TestHelper.GetTypeFinder();
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
             var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
+            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);

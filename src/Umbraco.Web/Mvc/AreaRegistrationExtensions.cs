@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -127,7 +127,9 @@ namespace Umbraco.Web.Mvc
 
             //match this area
             controllerPluginRoute.DataTokens.Add("area", area.AreaName);
-            controllerPluginRoute.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, umbracoTokenValue); //ensure the umbraco token is set
+
+            // TODO: No longer needed, remove
+            //controllerPluginRoute.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, umbracoTokenValue); //ensure the umbraco token is set
 
             return controllerPluginRoute;
         }
