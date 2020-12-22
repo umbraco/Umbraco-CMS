@@ -73,9 +73,11 @@ namespace Umbraco.Web.Common.Middleware
             _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext, TODO: Why?
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
+            bool isFrontEndRequest = umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest();
+
             try
             {
-                if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
+                if (isFrontEndRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
                     _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
@@ -104,7 +106,7 @@ namespace Umbraco.Web.Common.Middleware
             }
             finally
             {
-                if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
+                if (isFrontEndRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
                     _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);

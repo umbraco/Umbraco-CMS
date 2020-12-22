@@ -111,11 +111,6 @@ namespace Umbraco.Web
         public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
-        /// Boolean value indicating whether the current request is a front-end umbraco request
-        /// </summary>
-        public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         public IPublishedRequest PublishedRequest { get; set; }

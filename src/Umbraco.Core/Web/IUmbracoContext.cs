@@ -6,7 +6,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
-    public interface IUmbracoContext
+    public interface IUmbracoContext : IDisposable
     {
         /// <summary>
         /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
@@ -47,11 +47,6 @@ namespace Umbraco.Web
         IDomainCache Domains { get; }
 
         /// <summary>
-        /// Boolean value indicating whether the current request is a front-end umbraco request
-        /// </summary>
-        bool IsFrontEndUmbracoRequest { get; } // TODO: This could easily be an ext method and mocking just means setting the published request to null
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         // TODO: Can we refactor this and not expose this mutable object here? Instead just expose IPublishedContent? A bunch of stuff would need to change but would be better
@@ -74,6 +69,5 @@ namespace Umbraco.Web
         bool InPreviewMode { get; }
 
         IDisposable ForcedPreview(bool preview);
-        void Dispose();
     }
 }
