@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
@@ -11,6 +14,7 @@ namespace Umbraco.Tests.Runtimes
     {
         private ProfilingViewEngineWrapperMvcViewOptionsSetup Sut =>
             new ProfilingViewEngineWrapperMvcViewOptionsSetup(Mock.Of<IProfiler>());
+
         [Test]
         public void WrapViewEngines_HasEngines_WrapsAll()
         {
@@ -67,9 +71,6 @@ namespace Umbraco.Tests.Runtimes
         }
 
         [Test]
-        public void WrapViewEngines_CollectionIsNull_DoesNotThrow()
-        {
-            Assert.DoesNotThrow(() => Sut.Configure(new MvcViewOptions()));
-        }
+        public void WrapViewEngines_CollectionIsNull_DoesNotThrow() => Assert.DoesNotThrow(() => Sut.Configure(new MvcViewOptions()));
     }
 }

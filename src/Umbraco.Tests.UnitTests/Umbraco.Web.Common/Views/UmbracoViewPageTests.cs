@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -20,7 +23,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel(content);
             var view = new RenderModelTestPage();
-            var viewData = GetViewDataDictionary<ContentModel>(model);
+            ViewDataDictionary<ContentModel> viewData = GetViewDataDictionary<ContentModel>(model);
             view.ViewData = viewData;
 
             Assert.AreSame(model, view.Model);
@@ -31,7 +34,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             var content = new ContentType1(null);
             var view = new ContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentType1>(content);
+            ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
             view.ViewData = viewData;
 
@@ -44,7 +47,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType2(null);
             var view = new ContentType1TestPage();
 
-            var viewData = GetViewDataDictionary<ContentType1>(content);
+            ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
             view.ViewData = viewData;
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
@@ -56,7 +59,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel(content);
             var view = new ContentType2TestPage();
-            var viewData = GetViewDataDictionary(model);
+            ViewDataDictionary viewData = GetViewDataDictionary(model);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
@@ -67,7 +70,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
+            ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
             view.ViewData = viewData;
 
@@ -81,7 +84,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType2(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
+            ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
             view.ViewData = viewData;
 
             Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
@@ -94,11 +97,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel(content);
             var view = new RenderModelOfContentType2TestPage();
-            var viewData = GetViewDataDictionary(model);
+            ViewDataDictionary viewData = GetViewDataDictionary(model);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
-
 
         [Test]
         public void RenderModelOf_ContentType1_To_RenderModel()
@@ -106,7 +108,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelTestPage();
-            var viewData = GetViewDataDictionary<ContentModel>(model);
+            ViewDataDictionary<ContentModel> viewData = GetViewDataDictionary<ContentModel>(model);
 
             view.ViewData = viewData;
 
@@ -119,7 +121,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
+            ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
             view.SetViewData(viewData);
 
@@ -132,9 +134,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType2(null);
             var model = new ContentModel<ContentType2>(content);
             var view = new ContentType1TestPage();
-            var viewData =  new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
             {
-                Model =  model
+                Model = model
             };
 
             view.SetViewData(viewData);
@@ -145,11 +147,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_ContentType2()
         {
-
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType2TestPage();
-            var viewData = GetViewDataDictionary(model);
+            ViewDataDictionary viewData = GetViewDataDictionary(model);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
@@ -160,7 +161,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
+            ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
             view.ViewData = viewData;
 
@@ -174,7 +175,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType2(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
+            ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
 
             view.SetViewData(viewData);
 
@@ -188,7 +189,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType2TestPage();
-            var viewData = GetViewDataDictionary(model);
+            ViewDataDictionary viewData = GetViewDataDictionary(model);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
@@ -199,7 +200,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var view = new RenderModelTestPage();
 
-            var viewData = GetViewDataDictionary<ContentType1>(content);
+            ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
             view.SetViewData(viewData);
 
@@ -212,7 +213,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             var content = new ContentType1(null);
             var view = new RenderModelOfContentType1TestPage();
 
-            var viewData = GetViewDataDictionary<ContentType1>(content);
+            ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
             view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             // Same as above but with ContentModel<ContentType2>
             var content = new ContentType2(null);
             var view = new RenderModelOfContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentType2>(content);
+            ViewDataDictionary<ContentType2> viewData = GetViewDataDictionary<ContentType2>(content);
 
             view.SetViewData(viewData);
 
@@ -238,7 +239,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             var content = new ContentType1(null);
             var view = new RenderModelOfContentType2TestPage();
-            var viewData = GetViewDataDictionary(content);
+            ViewDataDictionary viewData = GetViewDataDictionary(content);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
@@ -248,7 +249,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             var content = new ContentType1(null);
             var view = new ContentType1TestPage();
-            var viewData = GetViewDataDictionary<ContentType1>(content);
+            ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
             view.SetViewData(viewData);
 
@@ -260,7 +261,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             var content = new ContentType1(null);
             var view = new ContentType2TestPage();
-            var viewData = GetViewDataDictionary(content);
+            ViewDataDictionary viewData = GetViewDataDictionary(content);
 
             Assert.Throws<ModelBindingException>(() => view.SetViewData(viewData));
         }
@@ -270,14 +271,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             var content = new ContentType2(null);
             var view = new ContentType1TestPage();
-            var viewData = GetViewDataDictionary(content);
+            ViewDataDictionary viewData = GetViewDataDictionary(content);
 
             view.SetViewData(viewData);
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
-
-        #region Test helpers methods
 
         private ViewDataDictionary<T> GetViewDataDictionary<T>(object model)
         {
@@ -294,45 +293,47 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
             };
         }
 
-        #endregion
-
-        #region Test elements
-
         public class ContentType1 : PublishedContentWrapped
         {
-            public ContentType1(IPublishedContent content) : base(content) {}
+            public ContentType1(IPublishedContent content)
+                : base(content)
+            {
+            }
         }
 
         public class ContentType2 : ContentType1
         {
-            public ContentType2(IPublishedContent content) : base(content) { }
+            public ContentType2(IPublishedContent content)
+                : base(content)
+            {
+            }
         }
 
         public class TestPage<TModel> : UmbracoViewPage<TModel>
         {
-            public override Task ExecuteAsync()
-            {
-                throw new NotImplementedException();
-            }
+            public override Task ExecuteAsync() => throw new NotImplementedException();
 
             public void SetViewData(ViewDataDictionary viewData) => ViewData = (ViewDataDictionary<TModel>)BindViewData(viewData);
         }
 
         public class RenderModelTestPage : TestPage<ContentModel>
-        { }
+        {
+        }
 
         public class ContentType1TestPage : TestPage<ContentType1>
-        { }
+        {
+        }
 
         public class ContentType2TestPage : TestPage<ContentType2>
-        { }
+        {
+        }
 
         public class RenderModelOfContentType1TestPage : TestPage<ContentModel<ContentType1>>
-        { }
+        {
+        }
 
         public class RenderModelOfContentType2TestPage : TestPage<ContentModel<ContentType2>>
-        { }
-
-        #endregion
+        {
+        }
     }
 }

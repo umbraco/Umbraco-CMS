@@ -1,4 +1,7 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -17,7 +20,6 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
-
     [TestFixture]
     public class BackOfficeAreaRoutesTests
     {
@@ -27,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         [TestCase(RuntimeLevel.Boot)]
         public void RuntimeState_No_Routes(RuntimeLevel level)
         {
-            var routes = GetBackOfficeAreaRoutes(level);
+            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(level);
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 
@@ -37,12 +39,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         [Test]
         public void RuntimeState_Upgrade()
         {
-            var routes = GetBackOfficeAreaRoutes(RuntimeLevel.Upgrade);
+            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(RuntimeLevel.Upgrade);
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 
             Assert.AreEqual(1, endpoints.DataSources.Count);
-            var route = endpoints.DataSources.First();
+            EndpointDataSource route = endpoints.DataSources.First();
             Assert.AreEqual(2, route.Endpoints.Count);
             AssertMinimalBackOfficeRoutes(route);
         }
@@ -50,18 +52,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         [Test]
         public void RuntimeState_Run()
         {
-            var routes = GetBackOfficeAreaRoutes(RuntimeLevel.Run);
+            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(RuntimeLevel.Run);
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 
             Assert.AreEqual(1, endpoints.DataSources.Count);
-            var route = endpoints.DataSources.First();
+            EndpointDataSource route = endpoints.DataSources.First();
             Assert.AreEqual(3, route.Endpoints.Count);
 
             AssertMinimalBackOfficeRoutes(route);
 
             var endpoint4 = (RouteEndpoint)route.Endpoints[2];
-            var apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
+            string apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
             Assert.AreEqual($"umbraco/backoffice/api/{apiControllerName.ToLowerInvariant()}/{{action}}/{{id?}}", endpoint4.RoutePattern.RawText);
             Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey("area"));
             Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey("action"));
@@ -78,7 +80,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(endpoint1.RoutePattern.Defaults["area"], typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
             var endpoint2 = (RouteEndpoint)route.Endpoints[1];
-            var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
+            string controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
             Assert.AreEqual($"umbraco/backoffice/{Constants.Web.Mvc.BackOfficeApiArea.ToLowerInvariant()}/{controllerName.ToLowerInvariant()}/{{action}}/{{id?}}", endpoint2.RoutePattern.RawText);
             Assert.AreEqual(Constants.Web.Mvc.BackOfficeApiArea, endpoint2.RoutePattern.Defaults["area"]);
             Assert.IsFalse(endpoint2.RoutePattern.Defaults.ContainsKey("action"));
@@ -101,7 +103,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         [IsBackOffice]
         private class Testing1Controller : UmbracoApiController
         {
-
         }
     }
 }

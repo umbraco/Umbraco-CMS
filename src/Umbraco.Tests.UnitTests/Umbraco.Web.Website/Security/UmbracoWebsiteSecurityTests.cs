@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;

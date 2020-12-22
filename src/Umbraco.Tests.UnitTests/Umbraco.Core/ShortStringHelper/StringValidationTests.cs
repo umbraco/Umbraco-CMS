@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
@@ -30,8 +31,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         //
         // since Umbraco is now 4.7.2+, the setting is required for the following tests to pass
 
-        //[TestCase("fdsa@fdsa", ExpectedResult = false)]
-        //[TestCase("fdsa@fdsa.", ExpectedResult = false)]
+        // [TestCase("fdsa@fdsa", ExpectedResult = false)]
+        // [TestCase("fdsa@fdsa.", ExpectedResult = false)]
         public bool Validate_Email_Address(string input)
         {
             var foo = new EmailAddressAttribute();

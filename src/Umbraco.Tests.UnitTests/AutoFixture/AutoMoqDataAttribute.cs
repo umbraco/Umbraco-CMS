@@ -1,6 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
@@ -14,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Install;
@@ -23,20 +23,6 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
 {
-
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = true)]
-    public class InlineAutoMoqDataAttribute : InlineAutoDataAttribute
-    {
-        /// <summary>
-        /// Uses AutoFixture to automatically mock (using Moq) the injected types. E.g when injecting interfaces.
-        /// AutoFixture is used to generate concrete types. If the concrete type required some types injected, the
-        /// [Frozen] can be used to ensure the same variable is injected and available as parameter for the test
-        /// </summary>
-        public InlineAutoMoqDataAttribute(params object[] arguments) : base(() => AutoMoqDataAttribute.AutoMockCustomizations.Default, arguments)
-        {
-        }
-    }
-
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute
     {
@@ -45,7 +31,8 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
         /// AutoFixture is used to generate concrete types. If the concrete type required some types injected, the
         /// [Frozen] can be used to ensure the same variable is injected and available as parameter for the test
         /// </summary>
-        public AutoMoqDataAttribute() : base(() => AutoMockCustomizations.Default)
+        public AutoMoqDataAttribute()
+            : base(() => AutoMockCustomizations.Default)
         {
         }
 
@@ -58,8 +45,8 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                 public void Customize(IFixture fixture)
                 {
                     fixture.Customize<BackOfficeIdentityUser>(
-                        u => u.FromFactory<string ,string, string>(
-                            (a,b,c) => BackOfficeIdentityUser.CreateNew(new GlobalSettings(),a,b,c)));
+                        u => u.FromFactory<string, string, string>(
+                            (a, b, c) => BackOfficeIdentityUser.CreateNew(new GlobalSettings(), a, b, c)));
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
@@ -68,6 +55,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()));
 
                     fixture.Customize(new AutoMoqCustomization());
+
                     // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
 
@@ -93,13 +81,11 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
                     var connectionStrings = new ConnectionStrings();
-                    fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
-
+                    fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings));
 
                     var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
                     fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));
                     fixture.Customize<IHttpContextAccessor>(x => x.FromFactory(() => httpContextAccessor));
-
                 }
             }
         }

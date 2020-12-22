@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
@@ -37,6 +38,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             mock.Setup(x => x.Build()).Returns(httpContext => Task.CompletedTask);
             return mock.Object;
         }
-        
     }
 }

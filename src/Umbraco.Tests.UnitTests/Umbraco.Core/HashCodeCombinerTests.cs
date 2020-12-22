@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -11,10 +14,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
     {
         private DirectoryInfo PrepareFolder()
         {
-            var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner",
-                Guid.NewGuid().ToString("N")));
-            foreach (var f in dir.GetFiles())
+            DirectoryInfo assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+            DirectoryInfo dir = Directory.CreateDirectory(
+                Path.Combine(assDir.FullName, "HashCombiner", Guid.NewGuid().ToString("N")));
+            foreach (FileInfo f in dir.GetFiles())
             {
                 f.Delete();
             }
@@ -57,7 +60,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         [Test]
         public void HashCombiner_Test_DateTime()
         {
-            var dt = DateTime.Now;
+            DateTime dt = DateTime.Now;
             var combiner1 = new HashCodeCombiner();
             combiner1.AddDateTime(dt);
 
@@ -74,19 +77,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         [Test]
         public void HashCombiner_Test_File()
         {
-            var dir = PrepareFolder();
+            DirectoryInfo dir = PrepareFolder();
             var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
             File.Delete(file1Path);
-            using (var file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
+            using (StreamWriter file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
             {
                 file1.WriteLine("hello");
             }
 
             var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
             File.Delete(file2Path);
-            using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
+            using (StreamWriter file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
             {
-                //even though files are the same, the dates are different
+                // even though files are the same, the dates are different
                 file2.WriteLine("hello");
             }
 
@@ -110,15 +113,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         [Test]
         public void HashCombiner_Test_Folder()
         {
-            var dir = PrepareFolder();
+            DirectoryInfo dir = PrepareFolder();
             var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
             File.Delete(file1Path);
-            using (var file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
+            using (StreamWriter file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
             {
                 file1.WriteLine("hello");
             }
 
-            //first test the whole folder
+            // first test the whole folder
             var combiner1 = new HashCodeCombiner();
             combiner1.AddFolder(dir);
 
@@ -127,13 +130,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
 
             Assert.AreEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
 
-            //now add a file to the folder
-
+            // now add a file to the folder
             var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
             File.Delete(file2Path);
-            using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
+            using (StreamWriter file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
             {
-                //even though files are the same, the dates are different
+                // even though files are the same, the dates are different
                 file2.WriteLine("hello");
             }
 

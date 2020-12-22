@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Odbc;
@@ -7,6 +10,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
@@ -17,19 +21,29 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
     [TestFixture]
     public class TypeHelperTests
     {
+        private class Base<T>
+        {
+        }
 
+        private interface IBase<T>
+        {
+        }
 
-        class Base<T> { }
+        private interface IDerived<T> : IBase<T>
+        {
+        }
 
-        interface IBase<T> { }
+        private class Derived<T> : Base<T>, IBase<T>
+        {
+        }
 
-        interface IDerived<T> : IBase<T> { }
+        private class Derived2<T> : Derived<T>
+        {
+        }
 
-        class Derived<T> : Base<T>, IBase<T> { }
-
-        class Derived2<T> : Derived<T> { }
-
-        class DerivedI<T> : IDerived<T> { }
+        private class DerivedI<T> : IDerived<T>
+        {
+        }
 
         [Test]
         public void Is_Static_Class()
@@ -41,44 +55,41 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         [Test]
         public void Find_Common_Base_Class()
         {
-            var t1 = TypeHelper.GetLowestBaseType(typeof (OleDbCommand),
-                                                  typeof (OdbcCommand),
-                                                  typeof (SqlCommand));
+            Attempt<Type> t1 = TypeHelper.GetLowestBaseType(
+                typeof(OleDbCommand),
+                typeof(OdbcCommand),
+                typeof(SqlCommand));
             Assert.IsFalse(t1.Success);
 
-            var t2 = TypeHelper.GetLowestBaseType(typeof (OleDbCommand),
-                                                  typeof (OdbcCommand),
-                                                  typeof (SqlCommand),
-                                                  typeof (Component));
+            Attempt<Type> t2 = TypeHelper.GetLowestBaseType(
+                typeof(OleDbCommand),
+                typeof(OdbcCommand),
+                typeof(SqlCommand),
+                typeof(Component));
             Assert.IsTrue(t2.Success);
             Assert.AreEqual(typeof(Component), t2.Result);
 
-            var t3 = TypeHelper.GetLowestBaseType(typeof (OleDbCommand),
-                                                  typeof (OdbcCommand),
-                                                  typeof (SqlCommand),
-                                                  typeof (Component),
-                                                  typeof (Component).BaseType);
+            Attempt<Type> t3 = TypeHelper.GetLowestBaseType(
+                typeof(OleDbCommand),
+                typeof(OdbcCommand),
+                typeof(SqlCommand),
+                typeof(Component),
+                typeof(Component).BaseType);
             Assert.IsTrue(t3.Success);
             Assert.AreEqual(typeof(MarshalByRefObject), t3.Result);
 
-            var t4 = TypeHelper.GetLowestBaseType(typeof(OleDbCommand),
-                                                   typeof(OdbcCommand),
-                                                   typeof(SqlCommand),
-                                                   typeof(Component),
-                                                   typeof(Component).BaseType,
-                                                   typeof(int));
+            Attempt<Type> t4 = TypeHelper.GetLowestBaseType(
+                typeof(OleDbCommand),
+                typeof(OdbcCommand),
+                typeof(SqlCommand),
+                typeof(Component),
+                typeof(Component).BaseType,
+                typeof(int));
             Assert.IsFalse(t4.Success);
 
-            var t5 = TypeHelper.GetLowestBaseType(typeof(PropertyAliasDto));
+            Attempt<Type> t5 = TypeHelper.GetLowestBaseType(typeof(PropertyAliasDto));
             Assert.IsTrue(t5.Success);
             Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
-
-            //var t6 = TypeHelper.GetLowestBaseType(typeof (IApplicationEventHandler),
-            //                                      typeof (SchedulerComponent),
-            //                                      typeof(CacheRefresherComponent));
-            //Assert.IsTrue(t6.Success);
-            //Assert.AreEqual(typeof(IApplicationEventHandler), t6.Result);
-
         }
 
         [Test]
@@ -96,10 +107,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(System.Collections.IEnumerable), bindings));
             Assert.AreEqual(0, bindings.Count);
 
-            var t1 = typeof(IList<>); // IList<>
-            var a1 = t1.GetGenericArguments()[0]; // <T>
+            Type t1 = typeof(IList<>); // IList<>
+            Type a1 = t1.GetGenericArguments()[0]; // <T>
             t1 = t1.MakeGenericType(a1); // IList<T>
-            var t2 = a1;
+            Type t2 = a1;
 
             bindings = new Dictionary<string, Type>();
             Assert.IsTrue(TypeHelper.MatchType(typeof(int), t2, bindings));
@@ -145,12 +156,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             // both are OK
             Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<>)));
 
-            var t1 = typeof (IDictionary<,>); // IDictionary<,>
-            var a1 = t1.GetGenericArguments()[0];
+            Type t1 = typeof(IDictionary<,>); // IDictionary<,>
+            Type a1 = t1.GetGenericArguments()[0];
             t1 = t1.MakeGenericType(a1, a1); // IDictionary<T,T>
 
             // both are OK
-
             Assert.IsTrue(TypeHelper.MatchType(typeof(Dictionary<int, int>), t1));
 
             Assert.IsFalse(TypeHelper.MatchType(typeof(Dictionary<int, string>), t1));
@@ -164,7 +174,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.IsTrue(TypeHelper.MatchType(typeof(Derived2<int>), typeof(IBase<>)));
             Assert.IsTrue(TypeHelper.MatchType(typeof(int?), typeof(Nullable<>)));
 
-
             Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(object)));
             Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(List<>)));
             Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(IEnumerable<>)));
@@ -172,20 +181,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IEnumerable<int>)));
             Assert.IsFalse(TypeHelper.MatchType(typeof(int), typeof(Nullable<>)));
 
-            //This get's the "Type" from the Count extension method on IEnumerable<T>, however the type IEnumerable<T> isn't
+            // This get's the "Type" from the Count extension method on IEnumerable<T>, however the type IEnumerable<T> isn't
             // IEnumerable<> and it is not a generic definition, this attempts to explain that:
             // http://blogs.msdn.com/b/haibo_luo/archive/2006/02/17/534480.aspx
-
-            var genericEnumerableNonGenericDefinition = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public)
+            Type genericEnumerableNonGenericDefinition = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .Single(x => x.Name == "Count" && x.GetParameters().Count() == 1)
                 .GetParameters()
                 .Single()
                 .ParameterType;
 
             Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), genericEnumerableNonGenericDefinition));
-
         }
-
 
         [Test]
         public void CreateOpenGenericTypes()
@@ -198,7 +204,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             // assembly; or null if the current instance represents a generic type parameter, an array type, pointer
             // type, or byref type based on a type parameter, or a generic type that is not a generic type definition
             // but contains unresolved type parameters."
-
             var t = Type.GetType("System.Collections.Generic.IList`1");
             Assert.IsNotNull(t);
             Assert.IsTrue(t.IsGenericTypeDefinition);
@@ -206,7 +211,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.AreEqual("System.Collections.Generic.IList`1", t.FullName);
             Assert.AreEqual("System.Collections.Generic.IList`1[T]", t.ToString());
 
-            t = typeof (IList<>);
+            t = typeof(IList<>);
             Assert.IsTrue(t.IsGenericTypeDefinition);
             Assert.AreEqual("IList`1", t.Name);
             Assert.AreEqual("System.Collections.Generic.IList`1", t.FullName);
@@ -241,7 +246,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             t = typeof(IList<int>);
             Assert.AreEqual("System.Collections.Generic.IList`1[System.Int32]", t.ToString());
 
-            t = typeof (IDictionary<,>);
+            t = typeof(IDictionary<,>);
             t = t.MakeGenericType(typeof(int), t.GetGenericArguments()[1]);
             Assert.IsFalse(t.IsGenericTypeDefinition); // not anymore
             Assert.AreEqual("IDictionary`2", t.Name);

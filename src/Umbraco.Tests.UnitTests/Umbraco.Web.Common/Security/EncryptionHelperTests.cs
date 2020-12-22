@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Web;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
@@ -10,7 +11,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
     [TestFixture]
     public class EncryptionHelperTests
     {
-
         private IDataProtectionProvider DataProtectionProvider { get; } = new EphemeralDataProtectionProvider();
 
         [Test]
@@ -28,9 +28,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
                 DataProtectionProvider,
                 "FormController",
                 "FormAction",
-                "",
-                additionalRouteValues
-            );
+                string.Empty,
+                additionalRouteValues);
 
             var result = EncryptionHelper.Decrypt(encryptedRouteString, DataProtectionProvider);
 
@@ -44,19 +43,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
         {
             var additionalRouteValues = new Dictionary<string, object>()
             {
-                {"key1", "value1"},
-                {"key2", "value2"},
-                {"Key3", "Value3"},
-                {"keY4", "valuE4"}
+                { "key1", "value1" },
+                { "key2", "value2" },
+                { "Key3", "Value3" },
+                { "keY4", "valuE4" }
             };
 
             var encryptedRouteString = EncryptionHelper.CreateEncryptedRouteString(
                 DataProtectionProvider,
                 "FormController",
                 "FormAction",
-                "",
-                additionalRouteValues
-            );
+                string.Empty,
+                additionalRouteValues);
 
             var result = EncryptionHelper.Decrypt(encryptedRouteString, DataProtectionProvider);
 

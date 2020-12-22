@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -20,12 +24,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const bool testIsApproved = true;
             const bool testIsLockedOut = true;
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             const int testFailedPasswordAttempts = 22;
-            var testLastLockoutDate = DateTime.Now.AddHours(-2);
-            var testLastLoginDate = DateTime.Now.AddHours(-3);
-            var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
+            DateTime testLastLockoutDate = DateTime.Now.AddHours(-2);
+            DateTime testLastLoginDate = DateTime.Now.AddHours(-3);
+            DateTime testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
             var testComments = "comments";
             var testSessionTimeout = 5;
             var testStartContentIds = new[] { 3 };
@@ -34,7 +38,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new UserBuilder();
 
             // Act
-            var user = builder                
+            User user = builder
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithName(testName)

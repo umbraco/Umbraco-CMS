@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -11,18 +14,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
     {
         private string Generate(bool isCaseSensitive, params string[] strs)
         {
-            using (var generator = new HashGenerator())
+            using var generator = new HashGenerator();
+            foreach (var str in strs)
             {
-                foreach (var str in strs)
+                if (isCaseSensitive)
                 {
-                    if (isCaseSensitive)
-                        generator.AddString(str);
-                    else
-                        generator.AddCaseInsensitiveString(str);
+                    generator.AddString(str);
                 }
-
-                return generator.GenerateHash();
+                else
+                {
+                    generator.AddCaseInsensitiveString(str);
+                }
             }
+
+            return generator.GenerateHash();
         }
 
         [Test]
@@ -53,10 +58,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
 
         private DirectoryInfo PrepareFolder()
         {
-            var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "HashCombiner",
-                Guid.NewGuid().ToString("N")));
-            foreach (var f in dir.GetFiles())
+            DirectoryInfo assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+            DirectoryInfo dir = Directory.CreateDirectory(
+                Path.Combine(assDir.FullName, "HashCombiner", Guid.NewGuid().ToString("N")));
+            foreach (FileInfo f in dir.GetFiles())
             {
                 f.Delete();
             }
@@ -95,92 +100,85 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         [Test]
         public void HashCombiner_Test_DateTime()
         {
-            using (var combiner1 = new HashGenerator())
-            using (var combiner2 = new HashGenerator())
-            {
-                var dt = DateTime.Now;
-                combiner1.AddDateTime(dt);
-                combiner2.AddDateTime(dt);
-                Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
-                combiner2.AddDateTime(DateTime.Now);
-                Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
-            }
+            using var combiner1 = new HashGenerator();
+            using var combiner2 = new HashGenerator();
+            DateTime dt = DateTime.Now;
+            combiner1.AddDateTime(dt);
+            combiner2.AddDateTime(dt);
+            Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            combiner2.AddDateTime(DateTime.Now);
+            Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
         }
 
         [Test]
         public void HashCombiner_Test_File()
         {
-            using (var combiner1 = new HashGenerator())
-            using (var combiner2 = new HashGenerator())
-            using (var combiner3 = new HashGenerator())
+            using var combiner1 = new HashGenerator();
+            using var combiner2 = new HashGenerator();
+            using var combiner3 = new HashGenerator();
+            DirectoryInfo dir = PrepareFolder();
+            var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
+            File.Delete(file1Path);
+            using (StreamWriter file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
             {
-                var dir = PrepareFolder();
-                var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
-                File.Delete(file1Path);
-                using (var file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
-                {
-                    file1.WriteLine("hello");
-                }
-
-                var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
-                File.Delete(file2Path);
-                using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
-                {
-                    //even though files are the same, the dates are different
-                    file2.WriteLine("hello");
-                }
-
-                combiner1.AddFile(new FileInfo(file1Path));
-
-                combiner2.AddFile(new FileInfo(file1Path));
-
-                combiner3.AddFile(new FileInfo(file2Path));
-
-                Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
-                Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
-
-                combiner2.AddFile(new FileInfo(file2Path));
-
-                Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+                file1.WriteLine("hello");
             }
+
+            var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
+            File.Delete(file2Path);
+            using (StreamWriter file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
+            {
+                // even though files are the same, the dates are different
+                file2.WriteLine("hello");
+            }
+
+            combiner1.AddFile(new FileInfo(file1Path));
+
+            combiner2.AddFile(new FileInfo(file1Path));
+
+            combiner3.AddFile(new FileInfo(file2Path));
+
+            Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
+
+            combiner2.AddFile(new FileInfo(file2Path));
+
+            Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
         }
 
         [Test]
         public void HashCombiner_Test_Folder()
         {
-            using (var combiner1 = new HashGenerator())
-            using (var combiner2 = new HashGenerator())
-            using (var combiner3 = new HashGenerator())
+            using var combiner1 = new HashGenerator();
+            using var combiner2 = new HashGenerator();
+            using var combiner3 = new HashGenerator();
+            DirectoryInfo dir = PrepareFolder();
+            var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
+            File.Delete(file1Path);
+            using (StreamWriter file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
             {
-                var dir = PrepareFolder();
-                var file1Path = Path.Combine(dir.FullName, "hastest1.txt");
-                File.Delete(file1Path);
-                using (var file1 = File.CreateText(Path.Combine(dir.FullName, "hastest1.txt")))
-                {
-                    file1.WriteLine("hello");
-                }
-
-                //first test the whole folder
-                combiner1.AddFolder(dir);
-
-                combiner2.AddFolder(dir);
-
-                Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
-
-                //now add a file to the folder
-
-                var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
-                File.Delete(file2Path);
-                using (var file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
-                {
-                    //even though files are the same, the dates are different
-                    file2.WriteLine("hello");
-                }
-
-                combiner3.AddFolder(dir);
-
-                Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
+                file1.WriteLine("hello");
             }
+
+            // first test the whole folder
+            combiner1.AddFolder(dir);
+
+            combiner2.AddFolder(dir);
+
+            Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+
+            // now add a file to the folder
+            var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
+            File.Delete(file2Path);
+            using (StreamWriter file2 = File.CreateText(Path.Combine(dir.FullName, "hastest2.txt")))
+            {
+                // even though files are the same, the dates are different
+                file2.WriteLine("hello");
+            }
+
+            combiner3.AddFolder(dir);
+
+            Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
         }
     }
 }

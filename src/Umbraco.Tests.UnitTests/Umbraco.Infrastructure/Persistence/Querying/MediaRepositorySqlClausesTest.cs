@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
@@ -15,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var nodeObjectTypeId = Constants.ObjectTypes.Media;
+            Guid nodeObjectTypeId = Constants.ObjectTypes.Media;
 
             var expected = new Sql();
             expected.Select("*")
@@ -24,7 +27,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
                 .InnerJoin("[umbracoNode]").On($"[{Constants.DatabaseSchema.Tables.Content}].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("b796f64c-1f99-4ffb-b886-4bf4bc011a9c"));
 
-            var sql = Sql();
+            Sql<ISqlContext> sql = Sql();
             sql.SelectAll()
                 .From<ContentVersionDto>()
                 .InnerJoin<ContentDto>()

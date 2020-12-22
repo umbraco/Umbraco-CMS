@@ -1,5 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Diagnostics;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,15 +17,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private PropertyGroupBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new PropertyGroupBuilder();
-        }
+        public void SetUp() => _builder = new PropertyGroupBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var pg = BuildPropertyGroup();
+            PropertyGroup pg = BuildPropertyGroup();
 
             var clone = (PropertyGroup)pg.DeepClone();
 
@@ -43,9 +43,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 Assert.AreEqual(clone.PropertyTypes[i], pg.PropertyTypes[i]);
             }
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(pg, null));
             }
@@ -54,15 +54,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var pg = BuildPropertyGroup();
+            PropertyGroup pg = BuildPropertyGroup();
 
             var json = JsonConvert.SerializeObject(pg);
             Debug.Print(json);
         }
 
-        private PropertyGroup BuildPropertyGroup()
-        {
-            return _builder
+        private PropertyGroup BuildPropertyGroup() =>
+            _builder
                 .WithId(77)
                 .WithName("Group1")
                 .AddPropertyType()
@@ -71,15 +70,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                     .WithName("Test")
                     .WithDescription("testing")
                     .WithPropertyGroupId(11)
-                    .WithMandatory(true)                    
+                    .WithMandatory(true)
                     .WithValidationRegExp("xxxx")
                     .Done()
                 .AddPropertyType()
                     .WithId(4)
                     .WithAlias("test2")
-                    .WithName("Test2")         
+                    .WithName("Test2")
                     .Done()
                 .Build();
-        }
     }
 }

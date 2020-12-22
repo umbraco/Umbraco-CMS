@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
 using Umbraco.Core;
 
@@ -22,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         {
             var version = new Version(major, minor, build, rev);
 
-            var result = version.SubtractRevision();
+            Version result = version.SubtractRevision();
 
             Assert.AreEqual(new Version(outcome), result);
         }
