@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Core
 {
@@ -6,8 +6,7 @@ namespace Umbraco.Core
     /// Abstract implementation of managed IDisposable.
     /// </summary>
     /// <remarks>
-    /// This is for objects that do NOT have unmanaged resources. Use <see cref="DisposableObject"/>
-    /// for objects that DO have unmanaged resources and need to deal with them when disposing.
+    /// This is for objects that do NOT have unmanaged resources.
     ///
     /// Can also be used as a pattern for when inheriting is not possible.
     ///
@@ -19,35 +18,39 @@ namespace Umbraco.Core
     /// </remarks>
     public abstract class DisposableObjectSlim : IDisposable
     {
-        private readonly object _locko = new object();
-
-        // gets a value indicating whether this instance is disposed.
-        // for internal tests only (not thread safe)
+        /// <summary>
+        /// Gets a value indicating whether this instance is disposed.
+        /// </summary>
+        /// <remarks>
+        /// for internal tests only (not thread safe)
+        /// </remarks>
         public bool Disposed { get; private set; }
 
-        // implements IDisposable
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        /// <summary>
+        /// Disposes managed resources
+        /// </summary>
+        protected abstract void DisposeResources();
 
-        private void Dispose(bool disposing)
+        /// <summary>
+        /// Disposes managed resources
+        /// </summary>
+        /// <param name="disposing">True if disposing via Dispose method and not a finalizer. Always true for this class.</param>
+        protected virtual void Dispose(bool disposing)
         {
-            // can happen if the object construction failed
-            if (_locko == null)
-                return;
-
-            lock (_locko)
+            if (!Disposed)
             {
-                if (Disposed) return;
+                if (disposing)
+                {
+                    DisposeResources();
+                }
+
                 Disposed = true;
             }
-
-            if (disposing)
-                DisposeResources();
         }
 
-        protected virtual void DisposeResources() { }
+        /// <inheritdoc/>
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+        public void Dispose() => Dispose(disposing: true); // We do not use GC.SuppressFinalize because this has no finalizer
+#pragma warning restore CA1063 // Implement IDisposable Correctly
     }
 }
