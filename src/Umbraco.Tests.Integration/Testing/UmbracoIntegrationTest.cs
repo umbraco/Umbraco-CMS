@@ -25,6 +25,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -232,7 +233,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             builder.Build();
 
-            CustomTestSetup(services);
+            CustomTestSetup(builder);
         }
 
         protected virtual AppCaches GetAppCaches()
@@ -402,7 +403,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public TestHelper TestHelper { get; } = new TestHelper();
 
-        protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
+        protected virtual void CustomTestSetup(IUmbracoBuilder builder) { }
 
         /// <summary>
         /// Returns the DI container

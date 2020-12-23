@@ -24,9 +24,8 @@ namespace Umbraco.Tests.Testing
         public bool Mapper { get => _mapper.ValueOrDefault(WithApplication); set => _mapper.Set(value); }
         private readonly Settable<bool> _mapper = new Settable<bool>();
 
-        // FIXME: to be completed
         /// <summary>
-        /// Gets or sets a value indicating ...
+        /// Gets or sets a value indicating whether the LEGACY XML Cache used in tests should bind to repository events
         /// </summary>
         public bool PublishedRepositoryEvents { get => _publishedRepositoryEvents.ValueOrDefault(false); set => _publishedRepositoryEvents.Set(value); }
         private readonly Settable<bool> _publishedRepositoryEvents = new Settable<bool>();

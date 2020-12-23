@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -31,8 +32,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
         private IServerMessenger ServerMessenger => GetRequiredService<IServerMessenger>();
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
-        protected override Action<IServiceCollection> CustomTestSetup => (services)
-            => services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+            => builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
 
         protected override AppCaches GetAppCaches()
         {
