@@ -19,8 +19,9 @@ using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest

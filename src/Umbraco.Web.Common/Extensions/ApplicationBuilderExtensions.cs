@@ -14,7 +14,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.Plugins;
-using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Extensions
 {

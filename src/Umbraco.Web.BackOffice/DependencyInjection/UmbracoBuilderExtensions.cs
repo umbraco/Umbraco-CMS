@@ -1,16 +1,20 @@
 using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.Extensions;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Common.DependencyInjection;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Web.BackOffice.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
     /// </summary>
-    public static class BackOfficeUmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Adds all required components to run the Umbraco back office
@@ -76,14 +80,15 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds Umbraco back office authorization policies
         /// </summary>
-        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Umbraco.Core.Constants.Security.BackOfficeAuthenticationType)
+        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Core.Constants.Security.BackOfficeAuthenticationType)
         {
             builder.Services.AddBackOfficeAuthorizationPolicies(backOfficeAuthenticationScheme);
 
-            // TODO: See other TODOs in things like UmbracoApiControllerBase ... AFAIK all of this is only used for the back office
-            // so IMO these controllers and the features auth policies should just be moved to the back office project and then this
-            // ext method can be removed.
-            builder.Services.AddUmbracoCommonAuthorizationPolicies();
+            builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
+
+            builder.Services.AddAuthorization(options
+                => options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy
+                    => policy.Requirements.Add(new FeatureAuthorizeRequirement())));
 
             return builder;
         }
@@ -97,5 +102,20 @@ namespace Umbraco.Extensions
 
             return builder;
         }
+
+        /// <summary>
+        /// Adds support for external login providers in Umbraco
+        /// </summary>
+        public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder, Action<BackOfficeExternalLoginsBuilder> builder)
+        {
+            builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
+            return umbracoBuilder;
+        }
+
+        /// <summary>
+        /// Gets the back office tree collection builder
+        /// </summary>
+        public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<TreeCollectionBuilder>();
     }
 }

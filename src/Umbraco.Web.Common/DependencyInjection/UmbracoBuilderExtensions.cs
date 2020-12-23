@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -36,21 +36,19 @@ using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Telemetry;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Web.Common.DependencyInjection
 {
     // TODO: We could add parameters to configure each of these for flexibility
 
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         public static IUmbracoBuilder AddUmbraco(
             this IServiceCollection services,
@@ -90,11 +88,15 @@ namespace Umbraco.Web.Common.Extensions
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
 
-        /// <remarks>Composes Composers</remarks>
+        /// <summary>
+        /// Adds core Umbraco services
+        /// </summary>
         public static IUmbracoBuilder AddUmbracoCore(this IUmbracoBuilder builder)
         {
             if (builder is null)
+            {
                 throw new ArgumentNullException(nameof(builder));
+            }
 
             builder.Services.AddLazySupport();
 
@@ -163,15 +165,21 @@ namespace Umbraco.Web.Common.Extensions
             return builder;
         }
 
+        /// <summary>
+        /// Adds Umbraco composers for plugins
+        /// </summary>
         public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
         {
-            var composerTypes = builder.TypeLoader.GetTypes<IComposer>();
-            var enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+            IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<IComposer>();
+            IEnumerable<Attribute> enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();
 
             return builder;
         }
 
+        /// <summary>
+        /// Add Umbraco configuration services and options
+        /// </summary>
         public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
         {
             // Register configuration validators.
@@ -208,6 +216,9 @@ namespace Umbraco.Web.Common.Extensions
             return builder;
         }
 
+        /// <summary>
+        /// Add Umbraco hosted services
+        /// </summary>
         public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
         {
             builder.Services.AddHostedService<HealthCheckNotifier>();
@@ -221,40 +232,44 @@ namespace Umbraco.Web.Common.Extensions
             return builder;
         }
 
+        // TODO: Not sure this needs to exist and/or be public?
         public static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
         {
             builder.Services.AddHttpClient();
             return builder;
         }
 
+        /// <summary>
+        /// Adds mini profiler services for Umbraco
+        /// </summary>
         public static IUmbracoBuilder AddMiniProfiler(this IUmbracoBuilder builder)
         {
             builder.Services.AddMiniProfiler(options =>
-            {
-                options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-            });
+
+                // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
+                options.ShouldProfile = request => false);
 
             return builder;
         }
 
-        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<MvcOptions> mvcOptions = null, Action<IMvcBuilder> mvcBuilding = null)
+        public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder> mvcBuilding = null)
         {
             // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
             // this will directly affect developers who need to call that themselves.
             // We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
             // But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
-            var mvcBuilder = builder.Services.AddControllersWithViews(options =>
-            {
-                options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());
+            IMvcBuilder mvcBuilder = builder.Services
+                .AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
 
-                options.Filters.Insert(0, new EnsurePartialViewMacroViewContextFilterAttribute());
-                mvcOptions?.Invoke(options);
-            }).AddRazorRuntimeCompilation();
             mvcBuilding?.Invoke(mvcBuilder);
 
             return builder;
         }
 
+        /// <summary>
+        /// Add runtime minifier support for Umbraco
+        /// </summary>
         public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
         {
             builder.Services.AddSmidge(builder.Config.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
@@ -274,7 +289,7 @@ namespace Umbraco.Web.Common.Extensions
                 options.Cookie.HttpOnly = true;
             });
 
-            builder.Services.ConfigureOptions<UmbracoWebServiceCollectionExtensions.UmbracoMvcConfigureOptions>();
+            builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);
@@ -282,9 +297,10 @@ namespace Umbraco.Web.Common.Extensions
             return builder;
         }
 
+        // TODO: Does this need to exist and/or be public?
         public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
         {
-            // TODO: We need to figure out why thsi is needed and fix those endpoints to not need them, we don't want to change global things
+            // TODO: We need to figure out why this is needed and fix those endpoints to not need them, we don't want to change global things
             // If using Kestrel: https://stackoverflow.com/a/55196057
             builder.Services.Configure<KestrelServerOptions>(options =>
             {

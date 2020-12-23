@@ -4,7 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -13,8 +13,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// <summary>
         /// Uses a test version of Umbraco Core with a test IRuntime
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
         public static IUmbracoBuilder AddTestCore(this IUmbracoBuilder builder, TestHelper testHelper)
         {
             builder.AddUmbracoCore();

@@ -12,7 +12,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration
 {
@@ -37,7 +37,6 @@ namespace Umbraco.Tests.Integration
         /// <summary>
         /// Calling AddUmbracoCore to configure the container and UseUmbracoCore to start the runtime
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task UseUmbracoCore()
         {

@@ -16,7 +16,6 @@ using NUnit.Framework;
 using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
@@ -31,7 +30,8 @@ using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Web.Common.Extensions;
+using Umbraco.Web.BackOffice.DependencyInjection;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -400,7 +400,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public IConfiguration Configuration { get; protected set; }
 
-        public TestHelper TestHelper = new TestHelper();
+        public TestHelper TestHelper { get; } = new TestHelper();
 
         protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 
