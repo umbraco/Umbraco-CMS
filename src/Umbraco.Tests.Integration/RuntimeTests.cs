@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.Common.DependencyInjection;
@@ -65,6 +66,7 @@ namespace Umbraco.Tests.Integration
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration()
                         .AddUmbracoCore()
+                        .AddNuCache()
                         .Build();
 
                     services.AddRouting(); // LinkGenerator
