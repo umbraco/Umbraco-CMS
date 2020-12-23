@@ -10,8 +10,10 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration
 {
@@ -36,7 +38,6 @@ namespace Umbraco.Tests.Integration
         /// <summary>
         /// Calling AddUmbracoCore to configure the container and UseUmbracoCore to start the runtime
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task UseUmbracoCore()
         {
@@ -65,6 +66,7 @@ namespace Umbraco.Tests.Integration
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration()
                         .AddUmbracoCore()
+                        .AddNuCache()
                         .Build();
 
                     services.AddRouting(); // LinkGenerator

@@ -94,14 +94,26 @@ namespace Umbraco.Infrastructure.PublishedCache.Persistence
 
         /// <inheritdoc/>
         public bool VerifyContentDbCache()
-            => _repository.VerifyContentDbCache();
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.ContentTree);
+            return _repository.VerifyContentDbCache();
+        }
 
         /// <inheritdoc/>
         public bool VerifyMediaDbCache()
-            => _repository.VerifyMediaDbCache();
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _repository.VerifyMediaDbCache();
+        }
 
         /// <inheritdoc/>
         public bool VerifyMemberDbCache()
-            => _repository.VerifyMemberDbCache();
+        {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _repository.VerifyMemberDbCache();
+        }
     }
 }

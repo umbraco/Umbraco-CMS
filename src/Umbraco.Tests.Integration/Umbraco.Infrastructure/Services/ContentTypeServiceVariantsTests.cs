@@ -7,11 +7,13 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Net;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -36,13 +38,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddNuCache();
+
         protected override void BeforeHostStart(IHost host)
         {
             base.BeforeHostStart(host);
 
             // Ensure that the events are bound on each test
             PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
-            eventBinder.Start();
+            eventBinder.Initialize();
         }
 
         private void AssertJsonStartsWith(int id, string expected)

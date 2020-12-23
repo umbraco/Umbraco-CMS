@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     // TODO: We need to get a readonly ISO code for the domain assigned
 
-    internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
+    internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
     {
         public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DomainRepository> logger)
             : base(scopeAccessor, cache, logger)

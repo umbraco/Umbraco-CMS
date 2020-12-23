@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,7 +15,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
@@ -29,10 +29,12 @@ using File = System.IO.File;
 namespace Umbraco.Web.PublishedCache.NuCache
 {
 
-    internal class PublishedSnapshotService : PublishedSnapshotServiceBase
+    internal class PublishedSnapshotService : IPublishedSnapshotService
     {
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IScopeProvider _scopeProvider;
         private readonly INuCacheContentService _publishedContentService;
@@ -43,10 +45,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IIOHelper _ioHelper;
         private readonly NuCacheSettings _config;
 
-        // volatile because we read it with no lock
         private bool _isReady;
         private bool _isReadSet;
         private object _isReadyLock;
@@ -89,12 +89,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             IHostingEnvironment hostingEnvironment,
-            IIOHelper ioHelper, // TODO: Remove this, it is only needed for "EnsureEnvironment" which doesn't need to belong to this service
             IOptions<NuCacheSettings> config)
-            : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _variationContextAccessor = variationContextAccessor;
             _profilingLogger = profilingLogger;
             _loggerFactory = loggerFactory;
             _logger = _loggerFactory.CreateLogger<PublishedSnapshotService>();
@@ -103,7 +103,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _ioHelper = ioHelper;
             _config = config.Value;
 
             // we need an Xml serializer here so that the member cache can support XPath,
@@ -126,21 +125,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // figure out whether it can read the databases or it should populate them from sql
 
                     _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localContentDb);
+                    _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localContentDb);
                     _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localMediaDb);
+                    _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localMediaDb);
                 }
                 else
                 {
                     _logger.LogInformation("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
+                    _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
                     _logger.LogInformation("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
+                    _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();
             }
         }
+
+        protected PublishedSnapshot CurrentPublishedSnapshot => (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
 
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.
@@ -249,18 +250,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public override bool EnsureEnvironment(out IEnumerable<string> errors)
-        {
-            // must have app_data and be able to write files into it
-            var ok = _ioHelper.TryCreateDirectory(GetLocalFilesPath());
-            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
-            return ok;
-        }
-
         /// <summary>
         /// Populates the stores
         /// </summary>
-        private void EnsureCaches() => LazyInitializer.EnsureInitialized(
+        internal void EnsureCaches() => LazyInitializer.EnsureInitialized(
             ref _isReady,
             ref _isReadSet,
             ref _isReadyLock,
@@ -497,7 +490,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
         // DataTypeCacheRefresher
 
-        public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
+        public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
             // no cache, trash everything
             if (Volatile.Read(ref _isReady) == false)
@@ -516,7 +509,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (draftChanged || publishedChanged)
             {
-                ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
+                CurrentPublishedSnapshot.Resync();
             }
         }
 
@@ -598,7 +591,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
+        public void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
             // no cache, trash everything
             if (Volatile.Read(ref _isReady) == false)
@@ -616,7 +609,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (anythingChanged)
             {
-                ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
+                CurrentPublishedSnapshot.Resync();
             }
         }
 
@@ -696,7 +689,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
+        public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
             if (Volatile.Read(ref _isReady) == false)
@@ -746,7 +739,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
+            CurrentPublishedSnapshot.Resync();
         }
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<List<int>, List<int>, List<int>, List<int>> action)
@@ -797,7 +790,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
+        public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
             if (Volatile.Read(ref _isReady) == false)
@@ -838,10 +831,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
+            CurrentPublishedSnapshot.Resync();
         }
 
-        public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
+        public void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
             // no cache, nothing we can do
             if (Volatile.Read(ref _isReady) == false)
@@ -910,7 +903,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             // some may be missing - not checking here
-
             return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)).ToList();
         }
 
@@ -946,7 +938,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // content (and content types) are read-locked while reading content
             // contentStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.ContentTypes);
@@ -985,7 +976,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // media (and content types) are read-locked while reading media
             // mediaStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
-
             using (var scope = _scopeProvider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.MediaTypes);
@@ -1013,7 +1003,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
+        public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
             EnsureCaches();
 
@@ -1043,7 +1033,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // nothing like that...
             // for elements cache, DictionaryAppCache is a No-No, use something better.
             // ie FastDictionaryAppCache (thread safe and all)
-
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
             IAppCache elementsCache;
@@ -1055,7 +1044,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             lock (_elementsLock)
             {
-                var scopeContext = _scopeProvider.Context;
+                IScopeContext scopeContext = _scopeProvider.Context;
 
                 if (scopeContext == null)
                 {
@@ -1085,7 +1074,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }, int.MaxValue);
                 }
 
-
                 // create a new snapshot cache if snapshots are different gens
                 if (contentSnap.Gen != _contentGen || mediaSnap.Gen != _mediaGen || domainSnap.Gen != _domainGen || _elementsCache == null)
                 {
@@ -1105,9 +1093,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, Options.Create(_globalSettings), VariationContextAccessor),
-                MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer, _publishedModelFactory),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, Options.Create(_globalSettings), _variationContextAccessor),
+                MediaCache = new MediaCache(previewDefault, mediaSnap, _variationContextAccessor),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, _publishedSnapshotAccessor, _variationContextAccessor, _entitySerializer, _publishedModelFactory),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache
@@ -1115,82 +1103,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override void Rebuild(
+        public void Rebuild(
             int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null)
             => _publishedContentService.Rebuild(groupSize, contentTypeIds, mediaTypeIds, memberTypeIds);
 
-        public bool VerifyContentDbCache()
-        {
-            // TODO: Shouldn't this entire logic just exist in the call to _publishedContentService?
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var ok = _publishedContentService.VerifyContentDbCache();
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        public bool VerifyMediaDbCache()
-        {
-            // TODO: Shouldn't this entire logic just exist in the call to _publishedContentService?
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var ok = _publishedContentService.VerifyMediaDbCache();
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        public bool VerifyMemberDbCache()
-        {
-            // TODO: Shouldn't this entire logic just exist in the call to _publishedContentService?
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var ok = _publishedContentService.VerifyMemberDbCache();
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        public override string GetStatus()
+        public async Task CollectAsync()
         {
             EnsureCaches();
 
-            var dbCacheIsOk = VerifyContentDbCache()
-                && VerifyMediaDbCache()
-                && VerifyMemberDbCache();
-
-            var cg = _contentStore.GenCount;
-            var mg = _mediaStore.GenCount;
-            var cs = _contentStore.SnapCount;
-            var ms = _mediaStore.SnapCount;
-            var ce = _contentStore.Count;
-            var me = _mediaStore.Count;
-
-            return
-                " Database cache is " + (dbCacheIsOk ? "ok" : "NOT ok (rebuild?)") + "." +
-                " ContentStore contains " + ce + " item" + (ce > 1 ? "s" : "") +
-                " and has " + cg + " generation" + (cg > 1 ? "s" : "") +
-                " and " + cs + " snapshot" + (cs > 1 ? "s" : "") + "." +
-                " MediaStore contains " + me + " item" + (ce > 1 ? "s" : "") +
-                " and has " + mg + " generation" + (mg > 1 ? "s" : "") +
-                " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
-        }
-
-        // TODO: This should be async since it's calling into async
-        public override void Collect()
-        {
-            EnsureCaches();
-
-            var contentCollect = _contentStore.CollectAsync();
-            var mediaCollect = _mediaStore.CollectAsync();
-            System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
+            await _contentStore.CollectAsync();
+            await _mediaStore.CollectAsync();
         }
 
         internal ContentStore GetContentStore()
@@ -1204,5 +1129,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             EnsureCaches();
             return _mediaStore;
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        { }
     }
 }

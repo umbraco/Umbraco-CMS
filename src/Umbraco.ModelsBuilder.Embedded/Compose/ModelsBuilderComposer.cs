@@ -12,7 +12,7 @@ using Umbraco.Core.DependencyInjection;
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     // TODO: We'll need to change this stuff to IUmbracoBuilder ext and control the order of things there
-    [ComposeBefore(typeof(IPublishedCacheComposer))]
+    // This needs to execute before the AddNuCache call
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
         public void Compose(IUmbracoBuilder builder)

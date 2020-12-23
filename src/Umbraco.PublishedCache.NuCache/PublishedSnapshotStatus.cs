@@ -1,0 +1,53 @@
+using Umbraco.Infrastructure.PublishedCache.Persistence;
+
+namespace Umbraco.Web.PublishedCache.NuCache
+{
+    /// <summary>
+    /// Generates a status report for <see cref="PublishedSnapshotService"/>
+    /// </summary>
+    internal class PublishedSnapshotStatus : IPublishedSnapshotStatus
+    {
+        private readonly PublishedSnapshotService _service;
+        private readonly INuCacheContentService _publishedContentService;
+
+        public PublishedSnapshotStatus(PublishedSnapshotService service, INuCacheContentService publishedContentService)
+        {
+            _service = service;
+            _publishedContentService = publishedContentService;
+        }
+
+        /// <inheritdoc/>
+        public virtual string StatusUrl => "views/dashboard/settings/publishedsnapshotcache.html";
+
+        /// <inheritdoc/>
+        public string GetStatus()
+        {
+            _service.EnsureCaches();
+
+            var dbCacheIsOk = _publishedContentService.VerifyContentDbCache()
+                && _publishedContentService.VerifyMediaDbCache()
+                && _publishedContentService.VerifyMemberDbCache()
+                ? "ok"
+                : "NOT ok (rebuild?)";
+
+            ContentStore contentStore = _service.GetContentStore();
+            ContentStore mediaStore = _service.GetMediaStore();
+
+            var contentStoreGen = contentStore.GenCount;
+            var mediaStoreGen = mediaStore.GenCount;
+            var contentStoreSnap = contentStore.SnapCount;
+            var mediaStoreSnap = mediaStore.SnapCount;
+            var contentStoreCount = contentStore.Count;
+            var mediaStoreCount = mediaStore.Count;
+
+            string contentStoreCountPlural = contentStoreCount > 1 ? "s" : string.Empty;
+            string contentStoreGenPlural = contentStoreGen > 1 ? "s" : string.Empty;
+            string contentStoreSnapPlural = contentStoreSnap > 1 ? "s" : string.Empty;
+            string mediaStoreCountPlural = mediaStoreCount > 1 ? "s" : string.Empty;
+            string mediaStoreGenPlural = mediaStoreGen > 1 ? "s" : string.Empty;
+            string mediaStoreSnapPlural = mediaStoreSnap > 1 ? "s" : string.Empty;
+
+            return $" Database cache is {dbCacheIsOk}. ContentStore contains {contentStoreCount} item{contentStoreCountPlural} and has {contentStoreGen} generation{contentStoreGenPlural} and {contentStoreSnap} snapshot{contentStoreSnapPlural}. MediaStore contains {mediaStoreCount} item{mediaStoreCountPlural} and has {mediaStoreGen} generation{mediaStoreGenPlural} and {mediaStoreSnap} snapshot{mediaStoreSnapPlural}.";
+        }
+    }
+}

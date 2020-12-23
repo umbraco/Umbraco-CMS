@@ -103,7 +103,6 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 hostingEnvironment,
-                IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);

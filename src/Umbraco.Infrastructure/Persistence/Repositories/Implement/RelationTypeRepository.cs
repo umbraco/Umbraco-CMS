@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="RelationType"/>
     /// </summary>
-    internal class RelationTypeRepository : NPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
+    internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
         public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
             : base(scopeAccessor, cache, logger)
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,RelationType>
+        #region Overrides of EntityRepositoryBase<int,RelationType>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

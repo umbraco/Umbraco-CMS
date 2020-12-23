@@ -114,8 +114,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(int id)
@@ -133,8 +131,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given guid
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Guid id)
@@ -152,8 +148,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given udi
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Udi id)
@@ -175,8 +169,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -195,7 +187,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all user defined properties.
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
@@ -205,7 +196,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all the standard fields.
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllStandardFields()
         {
@@ -217,8 +207,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
@@ -235,7 +223,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns true if any content types have culture variation enabled
         /// </summary>
-        /// <returns></returns>
         [HttpGet]
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public bool AllowsCultureVariation()
@@ -248,8 +235,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns where a particular composition has been used
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
@@ -287,8 +272,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type container with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

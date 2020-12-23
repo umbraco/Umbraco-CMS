@@ -1,14 +1,15 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;

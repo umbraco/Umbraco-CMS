@@ -202,7 +202,6 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 TestHelper.GetHostingEnvironment(),
-                TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             // invariant is the current default

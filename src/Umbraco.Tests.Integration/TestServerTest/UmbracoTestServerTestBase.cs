@@ -15,11 +15,14 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -135,7 +138,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddTestCore(TestHelper) // This is the important one!
                 .AddWebComponents()
                 .AddRuntimeMinifier()
-                .AddBackOffice()
+                .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
@@ -151,6 +154,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
+                .AddNuCache()
                 .Build();
         }
 

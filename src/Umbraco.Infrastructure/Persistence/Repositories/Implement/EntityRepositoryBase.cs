@@ -156,7 +156,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected abstract void PersistUpdatedItem(TEntity item);
 
-        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // TODO: obsolete, use QueryType instead everywhere
+        // TODO: obsolete, use QueryType instead everywhere like GetBaseQuery(QueryType queryType);
+        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount);
 
         protected abstract string GetBaseWhereClause();
 

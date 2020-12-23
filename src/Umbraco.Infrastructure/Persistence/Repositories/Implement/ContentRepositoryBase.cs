@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public static bool ThrowOnWarning = false;
     }
 
-    public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
+    public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
             AppCaches cache,
-            ILogger<NPocoRepositoryBase<TId, TEntity>> logger,
+            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,

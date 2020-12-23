@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
+using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
@@ -13,15 +14,13 @@ using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Web.BackOffice.DependencyInjection
 {
-    public static class BackOfficeServiceCollectionExtensions
+    public static class ServiceCollectionExtensions
     {
-
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity
         /// </summary>
-        /// <param name="services"></param>
         public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             services.AddDataProtection();
@@ -79,12 +78,10 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Add authorization handlers and policies
         /// </summary>
-        /// <param name="services"></param>
         public static void AddBackOfficeAuthorizationPolicies(this IServiceCollection services, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
         {
             // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
-            // any auth defining a matching requirement and scheme. 
-
+            // any auth defining a matching requirement and scheme.
             services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
             services.AddSingleton<IAuthorizationHandler, TreeHandler>();
             services.AddSingleton<IAuthorizationHandler, SectionHandler>();
@@ -247,7 +244,7 @@ namespace Umbraco.Extensions
                 policy.Requirements.Add(new SectionRequirement(Constants.Applications.Settings));
             });
 
-            //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
+            // We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
             // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
             options.AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, policy =>
             {

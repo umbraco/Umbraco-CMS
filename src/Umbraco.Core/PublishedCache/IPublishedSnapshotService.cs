@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
+using System.Threading.Tasks;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
@@ -24,11 +24,6 @@ namespace Umbraco.Web.PublishedCache
          */
 
         /// <summary>
-        /// Gets the published snapshot accessor.
-        /// </summary>
-        IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
-
-        /// <summary>
         /// Creates a published snapshot.
         /// </summary>
         /// <param name="previewToken">A preview token, or <c>null</c> if not previewing.</param>
@@ -37,13 +32,6 @@ namespace Umbraco.Web.PublishedCache
         /// is previewing, and what is or is not visible in preview depends on the content of the token,
         /// which is not specified and depends on the actual published snapshot service implementation.</remarks>
         IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
-
-        /// <summary>
-        /// Ensures that the published snapshot has the proper environment to run.
-        /// </summary>
-        /// <param name="errors">The errors, if any.</param>
-        /// <returns>A value indicating whether the published snapshot has the proper environment to run.</returns>
-        bool EnsureEnvironment(out IEnumerable<string> errors);
 
         /// <summary>
         /// Rebuilds internal database caches (but does not reload).
@@ -108,12 +96,9 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="payloads">The changes.</param>
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
-        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
-        string GetStatus();
-
-        // TODO: This is weird, why is this is this a thing? Maybe IPublishedSnapshotStatus?
-        string StatusUrl { get; }
-
-        void Collect();
+        /// <summary>
+        /// Cleans up unused snapshots
+        /// </summary>
+        Task CollectAsync();
     }
 }

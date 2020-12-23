@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Extensions

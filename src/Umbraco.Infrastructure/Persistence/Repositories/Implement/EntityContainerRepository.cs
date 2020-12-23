@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// An internal repository for managing entity containers such as doc type, media type, data type containers.
     /// </summary>
-    internal class EntityContainerRepository : NPocoRepositoryBase<int, EntityContainer>, IEntityContainerRepository
+    internal class EntityContainerRepository : EntityRepositoryBase<int, EntityContainer>, IEntityContainerRepository
     {
         private readonly Guid _containerObjectType;
 

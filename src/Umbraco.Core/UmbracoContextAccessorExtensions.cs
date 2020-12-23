@@ -3,6 +3,7 @@ using Umbraco.Web;
 
 namespace Umbraco.Core
 {
+
     public static class UmbracoContextAccessorExtensions
     {
         public static IUmbracoContext GetRequiredUmbracoContext(this IUmbracoContextAccessor umbracoContextAccessor)

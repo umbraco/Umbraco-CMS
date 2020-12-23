@@ -1,31 +1,39 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.PublishedCache;
 using Umbraco.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Infrastructure.PublishedCache.DependencyInjection
 {
-    // TODO: We'll need to change this stuff to IUmbracoBuilder ext and control the order of things there,
-    // see comment in ModelsBuilderComposer which requires this weird IPublishedCacheComposer
-    public class NuCacheComposer : IComposer, IPublishedCacheComposer
+    /// <summary>
+    /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco's NuCache
+    /// </summary>
+    public static class UmbracoBuilderExtensions
     {
-        /// <inheritdoc/>
-        public void Compose(IUmbracoBuilder builder)
+        /// <summary>
+        /// Adds Umbraco NuCache dependencies
+        /// </summary>
+        public static IUmbracoBuilder AddNuCache(this IUmbracoBuilder builder)
         {
             // register the NuCache database data source
-            builder.Services.AddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
-            builder.Services.AddSingleton<INuCacheContentService, NuCacheContentService>();
-            builder.Services.AddSingleton<PublishedSnapshotServiceEventHandler>();
+            builder.Services.TryAddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
+            builder.Services.TryAddSingleton<INuCacheContentService, NuCacheContentService>();
+            builder.Services.TryAddSingleton<PublishedSnapshotServiceEventHandler>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
-            builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions());
+            builder.Services.TryAddTransient(factory => new PublishedSnapshotServiceOptions());
             builder.SetPublishedSnapshotService<PublishedSnapshotService>();
+
+            // Add as itself
+            builder.Services.TryAddSingleton<PublishedSnapshotService>();
+            builder.Services.TryAddSingleton<IPublishedSnapshotStatus, PublishedSnapshotStatus>();
 
             // replace this service since we want to improve the content/media
             // mapping lookups if we are using nucache.
@@ -45,6 +53,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // add the NuCache health check (hidden from type finder)
             // TODO: no NuCache health check yet
             // composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
+            return builder;
         }
     }
 }

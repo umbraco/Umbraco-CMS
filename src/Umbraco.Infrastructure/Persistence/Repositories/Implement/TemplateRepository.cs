@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the Template Repository
     /// </summary>
-    internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
+    internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
     {
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,ITemplate>
+        #region Overrides of EntityRepositoryBase<int,ITemplate>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

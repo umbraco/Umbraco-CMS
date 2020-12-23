@@ -16,7 +16,6 @@ using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.ModelBinding;
 using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
@@ -25,6 +24,7 @@ using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.Runtime
 {

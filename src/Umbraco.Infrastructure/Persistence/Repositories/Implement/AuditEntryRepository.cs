@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the NPoco implementation of <see cref="IAuditEntryRepository"/>.
     /// </summary>
-    internal class AuditEntryRepository : NPocoRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
+    internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditEntryRepository"/> class.

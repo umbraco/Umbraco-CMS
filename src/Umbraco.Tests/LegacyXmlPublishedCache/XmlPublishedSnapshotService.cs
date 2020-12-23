@@ -1,14 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Runtime;
@@ -25,7 +22,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// <summary>
     /// Implements a published snapshot service.
     /// </summary>
-    internal class XmlPublishedSnapshotService : PublishedSnapshotServiceBase
+    internal class XmlPublishedSnapshotService : IPublishedSnapshotService
     {
         private readonly XmlStore _xmlStore;
         private readonly RoutesCache _routesCache;
@@ -48,13 +45,17 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         #region Constructors
 
         // used in WebBootManager + tests
-        public XmlPublishedSnapshotService(ServiceContext serviceContext,
+        public XmlPublishedSnapshotService(
+            ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IAppCache requestCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            IDocumentRepository documentRepository,
+            IMediaRepository mediaRepository,
+            IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             ILoggerFactory loggerFactory,
             GlobalSettings globalSettings,
@@ -63,9 +64,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
-
             MainDom mainDom,
-            bool testing = false, bool enableRepositoryEvents = true)
+            bool testing = false,
+            bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache,
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
@@ -76,13 +77,17 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         // used in some tests
-        internal XmlPublishedSnapshotService(ServiceContext serviceContext,
+        internal XmlPublishedSnapshotService(
+            ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IAppCache requestCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            IDocumentRepository documentRepository,
+            IMediaRepository mediaRepository,
+            IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             ILoggerFactory loggerFactory,
             GlobalSettings globalSettings,
@@ -93,8 +98,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
-            bool testing, bool enableRepositoryEvents)
-            : base(publishedSnapshotAccessor, variationContextAccessor)
+            bool testing,
+            bool enableRepositoryEvents)
         {
             _routesCache = new RoutesCache();
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -120,38 +125,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _hostingLifetime = hostingLifetime;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _xmlStore.Dispose();
         }
 
         #endregion
 
-        #region Environment
-
-        public override bool EnsureEnvironment(out IEnumerable<string> errors)
-        {
-            // Test creating/saving/deleting a file in the same location as the content xml file
-            // NOTE: We cannot modify the xml file directly because a background thread is responsible for
-            // that and we might get lock issues.
-            try
-            {
-                XmlStore.EnsureFilePermission();
-                errors = Enumerable.Empty<string>();
-                return true;
-            }
-            catch
-            {
-                errors = new[] { SystemFiles.GetContentCacheXml(_hostingEnvironment) };
-                return false;
-            }
-        }
-
-        #endregion
-
-        #region Caches
-
-        public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
+        public IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
             // use _requestCache to store recursive properties lookup, etc. both in content
             // and media cache. Life span should be the current request. Or, ideally
@@ -166,8 +147,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
                 domainCache);
         }
-
-        #endregion
 
         #region Xml specific
 
@@ -215,12 +194,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Change management
 
-        public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
+        public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
             _xmlStore.Notify(payloads, out draftChanged, out publishedChanged);
         }
 
-        public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
+        public void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
             foreach (var payload in payloads)
                 PublishedMediaCache.ClearCache(payload.Id);
@@ -228,31 +207,28 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             anythingChanged = true;
         }
 
-        public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
+        public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
             _xmlStore.Notify(payloads);
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
                 _routesCache.Clear();
         }
 
-        public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
+        public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
             _publishedContentTypeFactory.NotifyDataTypeChanges(payloads.Select(x => x.Id).ToArray());
             _xmlStore.Notify(payloads);
         }
 
-        public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
+        public void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
             _routesCache.Clear();
         }
 
         #endregion
 
-        public override string GetStatus()
-        {
-            return "Test status";
-        }
+        public void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) { }
 
-        public override void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) { }
+        public Task CollectAsync() => Task.CompletedTask;
     }
 }

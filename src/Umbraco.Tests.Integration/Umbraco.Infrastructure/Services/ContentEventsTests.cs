@@ -1,17 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Microsoft.Extensions.Logging;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
@@ -21,13 +24,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class ContentEventsTests : UmbracoIntegrationTestWithContent
     {
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
+
         private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
+
         private ILogger<ContentEventsTests> Logger => GetRequiredService<ILogger<ContentEventsTests>>();
 
         #region Setup
-
-        // trace ContentRepository unit-of-work events (refresh, remove), and ContentCacheRefresher CacheUpdated event
-        //
 
         [SetUp]
         public void SetUp()
@@ -52,19 +54,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(_contentType);
         }
 
-        // protected override void Compose()
-        // {
-        //     base.Compose();
-        //
-        //     Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-        //     composition.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
-        //
-        //     Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
-        //         .Add<ContentTypeCacheRefresher>()
-        //         .Add<ContentCacheRefresher>()
-        //         .Add<MacroCacheRefresher>();
-        // }
-
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddNuCache();
 
         [TearDown]
         public void TearDownTest()

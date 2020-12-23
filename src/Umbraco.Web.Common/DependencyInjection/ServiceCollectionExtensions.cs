@@ -1,37 +1,22 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
-using Smidge;
-using Smidge.Nuglify;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Web.Common.ApplicationModels;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Web.Common.DependencyInjection
 {
-    public static class UmbracoWebServiceCollectionExtensions
+    public static class ServiceCollectionExtensions
     {
-     
-
-
         /// <summary>
         /// Adds Image Sharp with Umbraco settings
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
         public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IConfiguration configuration)
         {
             var imagingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigImaging)
@@ -50,7 +35,7 @@ namespace Umbraco.Extensions
 
                             return Task.CompletedTask;
                         };
-                        options.OnBeforeSaveAsync = _ =>  Task.CompletedTask;
+                        options.OnBeforeSaveAsync = _ => Task.CompletedTask;
                         options.OnProcessedAsync = _ => Task.CompletedTask;
                         options.OnPrepareResponseAsync = _ => Task.CompletedTask;
                     })
@@ -70,7 +55,6 @@ namespace Umbraco.Extensions
             return services;
         }
 
-
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
         {
             if (commands.TryGetValue(parameter, out var command))
@@ -84,30 +68,5 @@ namespace Umbraco.Extensions
                 }
             }
         }
-
-        /// <summary>
-        /// Options for globally configuring MVC for Umbraco
-        /// </summary>
-        /// <remarks>
-        /// We generally don't want to change the global MVC settings since we want to be unobtrusive as possible but some
-        /// global mods are needed - so long as they don't interfere with normal user usages of MVC.
-        /// </remarks>
-        public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
-        {
-
-            // TODO: we can inject params with DI here
-            public UmbracoMvcConfigureOptions()
-            {
-            }
-
-            // TODO: we can configure global mvc options here if we need to
-            public void Configure(MvcOptions options)
-            {
-
-            }
-        }
-
-
     }
-
 }
