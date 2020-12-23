@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         [TearDown]
-        public virtual void TearDown()
+        public async Task TearDownAsync()
         {
             if (_testTeardown != null)
             {
@@ -86,7 +87,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
-            host.StopAsync().GetAwaiter().GetResult();
+            await host.StopAsync();
             host.Dispose();
         }
 

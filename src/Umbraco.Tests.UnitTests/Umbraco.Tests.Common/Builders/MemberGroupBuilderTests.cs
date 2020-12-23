@@ -1,6 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -17,15 +21,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string testName = "Test Group";
             const int testCreatorId = 4;
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             var testAdditionalData1 = new KeyValuePair<string, object>("test1", 123);
             var testAdditionalData2 = new KeyValuePair<string, object>("test2", "hello");
 
             var builder = new MemberGroupBuilder();
 
             // Act
-            var group = builder
+            MemberGroup group = builder
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithName(testName)

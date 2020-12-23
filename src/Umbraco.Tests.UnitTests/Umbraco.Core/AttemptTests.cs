@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core
@@ -9,10 +12,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         [Test]
         public void AttemptIf()
         {
-            // just making sure that it is ok to use TryParse as a condition
-
-            int value;
-            var attempt = Attempt.If(int.TryParse("1234", out value), value);
+            // Just making sure that it is ok to use TryParse as a condition.
+            var attempt = Attempt.If(int.TryParse("1234", out int value), value);
             Assert.IsTrue(attempt.Success);
             Assert.AreEqual(1234, attempt.Result);
 

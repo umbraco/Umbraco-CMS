@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,16 +18,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private MemberGroupBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new MemberGroupBuilder();
-        }
+        public void SetUp() => _builder = new MemberGroupBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
             // Arrange
-            var group = BuildMemberGroup();
+            MemberGroup group = BuildMemberGroup();
 
             // Act
             var clone = (MemberGroup)group.DeepClone();
@@ -40,24 +41,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.UpdateDate, group.UpdateDate);
             Assert.AreEqual(clone.Name, group.Name);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(group, null));
+            }
         }
 
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var group = BuildMemberGroup();
+            MemberGroup group = BuildMemberGroup();
 
             var json = JsonConvert.SerializeObject(group);
             Debug.Print(json);
         }
 
-        private MemberGroup BuildMemberGroup()
-        {
-            return _builder
+        private MemberGroup BuildMemberGroup() =>
+            _builder
                 .WithId(6)
                 .WithKey(Guid.NewGuid())
                 .WithName("Test Group")
@@ -69,6 +71,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                     .WithKeyValue("test2", "hello")
                     .Done()
                 .Build();
-        }
     }
 }

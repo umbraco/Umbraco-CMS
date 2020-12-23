@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +30,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
-            var logger = Mock.Of<ILogger<ProfilingLogger>>();
-            var loggerFactory = NullLoggerFactory.Instance;
-            var profiler = Mock.Of<IProfiler>();
+            ILogger<ProfilingLogger> logger = Mock.Of<ILogger<ProfilingLogger>>();
+            NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
+            IProfiler profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
-            var localizationService = Mock.Of<ILocalizationService>();
+            ILocalizationService localizationService = Mock.Of<ILocalizationService>();
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(loggerFactory, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer());
+            var editor = new NestedContentPropertyEditor(loggerFactory, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), localizationService, Mock.Of<IContentTypeService>(), Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var serializer = new ConfigurationEditorJsonSerializer();
@@ -74,7 +77,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             // mocked dataservice returns nested content preValues
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new []{dataType1, dataType2, dataType3});
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2, dataType3 });
 
             var publishedModelFactory = new Mock<IPublishedModelFactory>();
 
@@ -93,7 +96,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 .Returns((IPublishedElement element) =>
                 {
                     if (element.ContentType.Alias.InvariantEquals("contentN1"))
+                    {
                         return new TestElementModel(element);
+                    }
+
                     return element;
                 });
 
@@ -101,11 +107,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             publishedModelFactory
                 .Setup(x => x.CreateModelList(It.IsAny<string>()))
                 .Returns((string alias) =>
-                {
-                    return alias == "contentN1"
+                    alias == "contentN1"
                         ? (IList)new List<TestElementModel>()
-                        : (IList)new List<IPublishedElement>();
-                });
+                        : (IList)new List<IPublishedElement>());
 
             var contentCache = new Mock<IPublishedContentCache>();
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
@@ -145,16 +149,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return factory.CreatePropertyType(contentType, "propertyN1", 3);
             }
 
-            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "content1", CreatePropertyTypes1);
-            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "content2", CreatePropertyTypes2);
-            var contentTypeN1 = factory.CreateContentType(Guid.NewGuid(), 2, "contentN1", CreatePropertyTypesN1, isElement: true);
+            IPublishedContentType contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "content1", CreatePropertyTypes1);
+            IPublishedContentType contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "content2", CreatePropertyTypes2);
+            IPublishedContentType contentTypeN1 = factory.CreateContentType(Guid.NewGuid(), 2, "contentN1", CreatePropertyTypesN1, isElement: true);
 
             // mocked content cache returns content types
             contentCache
                 .Setup(x => x.GetContentType(It.IsAny<string>()))
                 .Returns((string alias) =>
                 {
-                    if (alias.InvariantEquals("contentN1")) return contentTypeN1;
+                    if (alias.InvariantEquals("contentN1"))
+                    {
+                        return contentTypeN1;
+                    }
+
                     return null;
                 });
 
@@ -164,7 +172,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         [Test]
         public void SingleNestedTest()
         {
-            (var contentType1, _) = CreateContentTypes();
+            (IPublishedContentType contentType1, _) = CreateContentTypes();
 
             // nested single converter returns the proper value clr type TestModel, and cache level
             Assert.AreEqual(typeof(TestElementModel), contentType1.GetPropertyType("property1").ClrType);
@@ -177,12 +185,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 Key = key,
                 Properties = new[]
                 {
-                    new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
+                    new TestPublishedProperty(
+                        contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
                 }
             };
-            var value = content.Value(Mock.Of<IPublishedValueFallback>(),"property1");
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "property1");
 
             // nested single converter returns proper TestModel value
             Assert.IsInstanceOf<TestElementModel>(value);
@@ -194,7 +203,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         [Test]
         public void ManyNestedTest()
         {
-            (_, var contentType2) = CreateContentTypes();
+            (_, IPublishedContentType contentType2) = CreateContentTypes();
 
             // nested many converter returns the proper value clr type IEnumerable<TestModel>, and cache level
             Assert.AreEqual(typeof(IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
@@ -214,7 +223,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 ]")
                 }
             };
-            var value = content.Value(Mock.Of<IPublishedValueFallback>(), ("property2"));
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "property2");
 
             // nested many converter returns proper IEnumerable<TestModel> value
             Assert.IsInstanceOf<IEnumerable<IPublishedElement>>(value);
@@ -230,12 +239,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         {
             public TestElementModel(IPublishedElement content)
                 : base(content)
-            { }
+            {
+            }
 
-            public string PropValue => this.Value<string>(Mock.Of<IPublishedValueFallback>(),"propertyN1");
+            public string PropValue => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "propertyN1");
         }
 
-        class TestPublishedProperty : PublishedPropertyBase
+        public class TestPublishedProperty : PublishedPropertyBase
         {
             private readonly bool _preview;
             private readonly object _sourceValue;
@@ -260,14 +270,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             private object InterValue => PropertyType.ConvertSourceToInter(null, _sourceValue, false);
 
-            internal void SetOwner(IPublishedElement owner)
-            {
-                _owner = owner;
-            }
+            internal void SetOwner(IPublishedElement owner) => _owner = owner;
 
             public override bool HasValue(string culture = null, string segment = null) => _hasValue;
+
             public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+
             public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+
             public override object GetXPathValue(string culture = null, string segment = null) => throw new InvalidOperationException("This method won't be implemented.");
         }
     }

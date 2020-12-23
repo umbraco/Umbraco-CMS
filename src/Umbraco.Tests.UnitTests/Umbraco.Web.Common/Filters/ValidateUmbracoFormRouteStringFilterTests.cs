@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
@@ -36,6 +39,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
             Assert.DoesNotThrow(() => filter.ValidateRouteString(validUfprt, ControllerName, ControllerAction, Area));
             Assert.DoesNotThrow(() => filter.ValidateRouteString(validUfprt, ControllerName.ToLowerInvariant(), ControllerAction.ToLowerInvariant(), Area.ToLowerInvariant()));
         }
-
     }
 }

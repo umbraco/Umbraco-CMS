@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
-            var bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
+            ModelBindingContext bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
             bindingContext.ActionContext.RouteData.Values.Remove(Constants.Web.UmbracoRouteDefinitionDataToken);
 
             // Act
@@ -68,7 +71,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
-            var bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
+            ModelBindingContext bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
             bindingContext.ActionContext.RouteData.Values[Constants.Web.UmbracoRouteDefinitionDataToken] = new NonContentModel();
 
             // Act
@@ -83,7 +86,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
-            var bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
+            ModelBindingContext bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
 
             // Act
             await _contentModelBinder.BindModelAsync(bindingContext);
@@ -108,7 +111,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
-            var bindingContext = new DefaultModelBindingContext();
+            ModelBindingContext bindingContext = new DefaultModelBindingContext();
 
             // Act
             _contentModelBinder.BindModel(bindingContext, pc, typeof(ContentModel));
@@ -122,7 +125,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
-            var bindingContext = new DefaultModelBindingContext();
+            ModelBindingContext bindingContext = new DefaultModelBindingContext();
 
             // Act
             _contentModelBinder.BindModel(bindingContext, new ContentModel<ContentType2>(new ContentType2(pc)), typeof(ContentModel<ContentType1>));
@@ -211,6 +214,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
             routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedContent));
+            {
+            }
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();
@@ -234,13 +239,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         public class ContentType1 : PublishedContentWrapped
         {
             public ContentType1(IPublishedContent content)
-                : base(content) { }
+                : base(content)
+            {
+            }
         }
 
         public class ContentType2 : ContentType1
         {
             public ContentType2(IPublishedContent content)
-                : base(content) { }
+                : base(content)
+            {
+            }
         }
 
         public class MyCustomContentModel : ContentModel

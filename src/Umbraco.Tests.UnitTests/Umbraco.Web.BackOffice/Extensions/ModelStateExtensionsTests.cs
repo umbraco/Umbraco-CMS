@@ -1,4 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
@@ -11,7 +15,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
     [TestFixture]
     public class ModelStateExtensionsTests
     {
-
         [Test]
         public void Get_Cultures_With_Errors()
         {
@@ -19,12 +22,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
-            ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); // invariant property
+            ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); // variant property
 
-            var result = ms.GetVariantsWithErrors("en-US");
+            IReadOnlyList<(string culture, string segment)> result = ms.GetVariantsWithErrors("en-US");
 
-            //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
+            // even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("en-US", result[0].culture);
 
@@ -44,12 +47,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
-            ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); // invariant property
+            ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); // variant property
 
-            var result = ms.GetVariantsWithPropertyErrors("en-US");
+            IReadOnlyList<(string culture, string segment)> result = ms.GetVariantsWithPropertyErrors("en-US");
 
-            //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
+            // even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("en-US", result[0].culture);
         }
@@ -61,7 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); // invariant property
 
             Assert.AreEqual("_Properties.headerImage.invariant.null", ms.Keys.First());
         }
@@ -73,7 +76,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", "en-US"); //variant property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", "en-US"); // variant property
 
             Assert.AreEqual("_Properties.headerImage.en-US.null", ms.Keys.First());
         }
@@ -85,7 +88,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null, "mySegment"); //invariant/segment property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null, "mySegment"); // invariant/segment property
 
             Assert.AreEqual("_Properties.headerImage.invariant.mySegment", ms.Keys.First());
         }
@@ -97,7 +100,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", "en-US", "mySegment"); //variant/segment property
+            ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", "en-US", "mySegment"); // variant/segment property
 
             Assert.AreEqual("_Properties.headerImage.en-US.mySegment", ms.Keys.First());
         }
@@ -109,7 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", null, "mySegment"); //invariant/segment property
+            ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", null, "mySegment"); // invariant/segment property
 
             Assert.AreEqual("_Properties.headerImage.invariant.mySegment.myField", ms.Keys.First());
         }
@@ -121,7 +124,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-            ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", "en-US", "mySegment"); //variant/segment property
+            ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", "en-US", "mySegment"); // variant/segment property
 
             Assert.AreEqual("_Properties.headerImage.en-US.mySegment.myField", ms.Keys.First());
         }

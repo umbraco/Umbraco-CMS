@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -14,21 +18,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
         [SetUp]
         public virtual void Setup()
         {
-
         }
 
         [TearDown]
-        public virtual void TearDown()
-        {
-            AppCache.Clear();
-        }
+        public virtual void TearDown() => AppCache.Clear();
 
         [Test]
         public void Throws_On_Reentry()
         {
             // don't run for DictionaryAppCache - not making sense
-            if (GetType() == typeof (DictionaryAppCacheTests))
+            if (GetType() == typeof(DictionaryAppCacheTests))
+            {
                 Assert.Ignore("Do not run for DictionaryAppCache.");
+            }
 
             Exception exception = null;
             var result = AppCache.Get("blah", () =>
@@ -41,6 +43,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
                 {
                     exception = e;
                 }
+
                 return "value";
             });
             Assert.IsNotNull(exception);
@@ -61,7 +64,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
                         throw new Exception("Do not cache this");
                     });
             }
-            catch (Exception){}
+            catch (Exception)
+            {
+            }
 
             try
             {
@@ -71,10 +76,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
                         throw new Exception("Do not cache this");
                     });
             }
-            catch (Exception){}
+            catch (Exception)
+            {
+            }
 
             Assert.Greater(counter, 1);
-
         }
 
         [Test]
@@ -87,17 +93,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
             result = AppCache.Get("Blah", () =>
                 {
                     counter++;
-                    return "";
+                    return string.Empty;
                 });
 
             result = AppCache.Get("Blah", () =>
                 {
                     counter++;
-                    return "";
+                    return string.Empty;
                 });
 
             Assert.AreEqual(1, counter);
-
         }
 
         [Test]
@@ -114,7 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 
             Assert.AreEqual(4, GetTotalItemCount);
 
-            var result = AppCache.SearchByKey("Tes");
+            IEnumerable<object> result = AppCache.SearchByKey("Tes");
 
             Assert.AreEqual(3, result.Count());
         }
@@ -228,7 +233,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 
             Assert.AreEqual(4, GetTotalItemCount);
 
-            //Provider.ClearCacheObjectTypes("umbraco.MacroCacheContent");
+            ////Provider.ClearCacheObjectTypes("umbraco.MacroCacheContent");
             AppCache.ClearOfType<MacroCacheContent>();
 
             Assert.AreEqual(1, GetTotalItemCount);
@@ -253,7 +258,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
             Assert.AreEqual(1, GetTotalItemCount);
         }
 
-        //just used for these tests
+        // Just used for these tests
         private class MacroCacheContent
         {
         }

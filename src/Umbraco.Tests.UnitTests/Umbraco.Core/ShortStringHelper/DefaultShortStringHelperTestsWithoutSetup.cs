@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -13,7 +15,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
     [TestFixture]
     public class DefaultShortStringHelperTestsWithoutSetup
     {
-
         [Test]
         public void U4_4056()
         {
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings() ));
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings()));
             Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
         }
 
@@ -126,6 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+
                     // uppercase letter means new term
                     BreakTermsOnUpper = true,
                     Separator = '*'
@@ -136,6 +138,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+
                     // uppercase letter is part of term
                     BreakTermsOnUpper = false,
                     Separator = '*'
@@ -150,6 +153,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+
                     // non-uppercase letter means cut acronym
                     CutAcronymOnNonUpper = true,
                     Separator = '*'
@@ -163,6 +167,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+
                     // non-uppercase letter means word
                     CutAcronymOnNonUpper = false,
                     Separator = '*'
@@ -287,12 +292,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             var bytes = Encoding.UTF8.GetBytes(str);
             Assert.AreEqual(10, bytes.Length);
             Assert.AreEqual('a', bytes[0]);
-            // then next string element is two chars (surrogate pair) or 4 bytes, 21 bits of code point
+
+            // Then next string element is two chars (surrogate pair) or 4 bytes, 21 bits of code point.
             Assert.AreEqual('z', bytes[5]);
-            // then next string element is one char and 3 bytes, 16 bits of code point
+
+            // Then next string element is one char and 3 bytes, 16 bits of code point.
             Assert.AreEqual('t', bytes[9]);
-            //foreach (var b in bytes)
-            //    Debug.Print("{0:X}", b);
+
+            //// foreach (var b in bytes)
+            ////    Debug.Print("{0:X}", b);
 
             Debug.Print("\U00010B70");
         }
@@ -323,7 +331,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
                     Separator = '*'
                 }));
-            Assert.AreEqual("", helper.CleanString("中文测试", CleanStringType.Alias));
+            Assert.AreEqual(string.Empty, helper.CleanString("中文测试", CleanStringType.Alias));
             Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
         }
 
@@ -370,7 +378,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 
             // FIXME: "C" can't be an acronym
             // FIXME: "DBXreview" = acronym?!
-
             Assert.AreEqual("aaa BBB CCc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias)); // unchanged
             Assert.AreEqual("aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.CamelCase));
             Assert.AreEqual("Aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.PascalCase));
@@ -385,7 +392,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             //     eg "XmlWriter (pascal) or "htmlReader" (camel) - "SpecialXmlWriter" (pascal) or "specialHtmlReader" (camel)
             // - Do not capitalize any of the characters of any acronyms, whatever their length, at the beginning of a camel-cased identifier.
             //     eg "xmlWriter" or "dbWriter" (camel)
-
             Assert.AreEqual("aaa BB Ccc", helper.CleanString("aaa BB ccc", CleanStringType.Alias | CleanStringType.CamelCase));
             Assert.AreEqual("aa Bb Ccc", helper.CleanString("AA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
             Assert.AreEqual("aaa Bb Ccc", helper.CleanString("AAA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
@@ -426,6 +432,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         //     var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
         //     Assert.AreEqual(expected, output);
         // }
-
     }
 }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -36,7 +39,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             public void AttachScope(IScope scope, bool callContext = false) => throw new NotImplementedException();
 
             public IScope DetachScope() => throw new NotImplementedException();
-
 
             public IScopeContext Context { get; set; }
 
@@ -85,7 +87,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() => Execute.Sql("").Do();
+            public override void Migrate() => Execute.Sql(string.Empty).Do();
         }
 
         public class BadMigration1 : MigrationBase

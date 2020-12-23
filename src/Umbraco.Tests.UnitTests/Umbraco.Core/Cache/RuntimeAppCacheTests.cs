@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -18,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
             Assert.AreEqual(now, AppCache.GetCacheItem<DateTime>("DateTimeTest"));
             Assert.AreEqual(now, AppCache.GetCacheItem<DateTime?>("DateTimeTest"));
 
-            Thread.Sleep(300); //sleep longer than the cache expiration
+            Thread.Sleep(300); // sleep longer than the cache expiration
 
             Assert.AreEqual(default(DateTime), AppCache.GetCacheItem<DateTime>("DateTimeTest"));
             Assert.AreEqual(null, AppCache.GetCacheItem<DateTime?>("DateTimeTest"));

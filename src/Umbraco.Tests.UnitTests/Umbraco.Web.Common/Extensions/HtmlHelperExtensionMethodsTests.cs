@@ -1,4 +1,7 @@
-﻿using System.Text.Encodings.Web;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -10,7 +13,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
 {
-
     [TestFixture]
     public class HtmlHelperExtensionMethodsTests
     {
@@ -18,16 +20,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
         private const string SampleWithBoldAndAnchorElements = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
         [SetUp]
-        public virtual void Initialize()
-        {
-            //create an empty htmlHelper
-            _htmlHelper = new HtmlHelper(Mock.Of<IHtmlGenerator>(),
+        public virtual void Initialize() =>
+
+            // Create an empty HtmlHelper.
+            _htmlHelper = new HtmlHelper(
+                Mock.Of<IHtmlGenerator>(),
                 Mock.Of<ICompositeViewEngine>(),
                 Mock.Of<IModelMetadataProvider>(),
                 Mock.Of<IViewBufferScope>(),
                 new HtmlTestEncoder(),
                 UrlEncoder.Default);
-        }
 
         private HtmlHelper _htmlHelper;
 

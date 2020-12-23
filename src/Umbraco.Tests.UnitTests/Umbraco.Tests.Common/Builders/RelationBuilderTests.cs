@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -16,8 +20,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const int childId = 8;
             const int id = 4;
             var key = Guid.NewGuid();
-            var createDate = DateTime.Now.AddHours(-1);
-            var updateDate = DateTime.Now;
+            DateTime createDate = DateTime.Now.AddHours(-1);
+            DateTime updateDate = DateTime.Now;
             const string comment = "test comment";
             const int relationTypeId = 66;
             const string relationTypeAlias = "test";
@@ -28,7 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new RelationBuilder();
 
             // Act
-            var relation = builder
+            Relation relation = builder
                 .BetweenIds(parentId, childId)
                 .WithId(id)
                 .WithComment(comment)

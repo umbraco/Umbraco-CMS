@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -31,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new MacroBuilder();
 
             // Act
-            var macro = builder
+            Macro macro = builder
                 .WithId(id)
                 .WithKey(key)
                 .WithUseInEditor(useInEditor)

@@ -1,6 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -26,15 +30,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string testContentTypeIcon = "icon";
             const string testContentTypeThumbnail = "thumb";
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             var testAdditionalData1 = new KeyValuePair<string, object>("test1", 123);
             var testAdditionalData2 = new KeyValuePair<string, object>("test2", "hello");
 
             var builder = new DocumentEntitySlimBuilder();
 
             // Act
-            var item = builder
+            DocumentEntitySlim item = builder
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithCreatorId(testCreatorId)

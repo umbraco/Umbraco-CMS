@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -33,12 +36,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const int testSortOrder = 5;
             const bool testTrashed = false;
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             const int testFailedPasswordAttempts = 22;
-            var testLastLockoutDate = DateTime.Now.AddHours(-2);
-            var testLastLoginDate = DateTime.Now.AddHours(-3);
-            var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
+            DateTime testLastLockoutDate = DateTime.Now.AddHours(-2);
+            DateTime testLastLoginDate = DateTime.Now.AddHours(-3);
+            DateTime testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
             var testPropertyType1 = new PropertyTypeDetail { Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88 };
             var testPropertyType2 = new PropertyTypeDetail { Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87 };
             var testPropertyType3 = new PropertyTypeDetail { Alias = "author", Name = "Author", Description = "Writer of the article", SortOrder = 1, DataTypeId = -88 };
@@ -53,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new MemberBuilder();
 
             // Act
-            var member = builder
+            Member member = builder
                 .AddMemberType()
                     .WithId(testMemberTypeId)
                     .WithAlias(testMemberTypeAlias)
@@ -140,7 +143,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
             Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
 
-            var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x);
+            IOrderedEnumerable<int> propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x);
             Assert.AreEqual(testPropertyIdsIncrementingFrom + 1, propertyIds.Min());
             Assert.AreEqual(testPropertyIdsIncrementingFrom + 10, propertyIds.Max());
 

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -47,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [Test]
         public void CreateAsync_When_User_Is_Null_Expect_ArgumentNullException()
         {
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
             Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
         }
@@ -55,9 +58,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [Test]
         public async Task CreateAsync_Should_Create_Principal_With_Umbraco_Identity()
         {
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
+            ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
             var umbracoBackOfficeIdentity = claimsPrincipal.Identity as UmbracoBackOfficeIdentity;
             Assert.IsNotNull(umbracoBackOfficeIdentity);
@@ -67,9 +70,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [TestCase(ClaimTypes.Name, TestUserName)]
         public async Task CreateAsync_Should_Include_Claim(string expectedClaimType, object expectedClaimValue)
         {
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
+            ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
             Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
@@ -84,9 +87,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             _mockUserManager.Setup(x => x.SupportsUserSecurityStamp).Returns(true);
             _mockUserManager.Setup(x => x.GetSecurityStampAsync(_testUser)).ReturnsAsync(_testUser.SecurityStamp);
 
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
+            ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
             Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
@@ -100,11 +103,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 
             _testUser.Roles.Add(new IdentityUserRole<string> { RoleId = expectedClaimValue });
             _mockUserManager.Setup(x => x.SupportsUserRole).Returns(true);
-            _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] {expectedClaimValue});
+            _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] { expectedClaimValue });
 
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
+            ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
         }
@@ -115,14 +118,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             const string expectedClaimType = "custom";
             const string expectedClaimValue = "val";
 
-            _testUser.Claims.Add(new IdentityUserClaim<string> { ClaimType = expectedClaimType, ClaimValue = expectedClaimValue});
+            _testUser.Claims.Add(new IdentityUserClaim<string> { ClaimType = expectedClaimType, ClaimValue = expectedClaimValue });
             _mockUserManager.Setup(x => x.SupportsUserClaim).Returns(true);
             _mockUserManager.Setup(x => x.GetClaimsAsync(_testUser)).ReturnsAsync(
-                new List<Claim> {new Claim(expectedClaimType, expectedClaimValue)});
+                new List<Claim> { new Claim(expectedClaimType, expectedClaimValue) });
 
-            var sut = CreateSut();
+            BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
-            var claimsPrincipal = await sut.CreateAsync(_testUser);
+            ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
         }

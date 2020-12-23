@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -17,7 +20,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
         [Test]
         public void Redirects_To_Root_When_Content_Published()
         {
-
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
             var mockIOHelper = new Mock<IIOHelper>();
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var mockIOHelper = new Mock<IIOHelper>();
             mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == UmbracoPathSetting))).Returns(UmbracoPath);
 
-            var globalSettings = Options.Create(new GlobalSettings()
+            IOptions<GlobalSettings> globalSettings = Options.Create(new GlobalSettings()
             {
                 UmbracoPath = UmbracoPathSetting,
                 NoNodesViewPath = ViewPath,
