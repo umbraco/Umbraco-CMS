@@ -14,6 +14,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -33,7 +34,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
-            => builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
+        {
+            builder.AddNuCache();
+            builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
+        }
 
         protected override AppCaches GetAppCaches()
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -10,17 +10,17 @@ namespace Umbraco.Tests.Integration.Testing
     public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     {
         protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         protected IFileService FileService => GetRequiredService<IFileService>();
+
         protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
         [SetUp]
-        public void Setup(){
-            CreateTestData();
-        }
+        public void Setup() => CreateTestData();
 
         public virtual void CreateTestData()
         {
-            //NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
+            // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
