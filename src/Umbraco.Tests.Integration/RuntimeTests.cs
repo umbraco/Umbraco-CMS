@@ -70,6 +70,7 @@ namespace Umbraco.Tests.Integration
                     builder.Services.AddUnique(AppCaches.NoCache);
                     builder.AddConfiguration()
                         .AddUmbracoCore()
+                        .AddNuCache()
                         .Build();
 
                     services.AddRouting(); // LinkGenerator
