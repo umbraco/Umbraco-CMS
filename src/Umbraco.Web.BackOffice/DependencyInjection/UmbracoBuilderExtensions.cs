@@ -14,7 +14,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
     /// </summary>
-    public static partial class UmbracoBuilderExtensions
+    public static class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Adds all required components to run the Umbraco back office

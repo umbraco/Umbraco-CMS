@@ -48,7 +48,7 @@ namespace Umbraco.Web.Common.DependencyInjection
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
     /// </summary>
-    public static partial class UmbracoBuilderExtensions
+    public static class UmbracoBuilderExtensions
     {
         public static IUmbracoBuilder AddUmbraco(
             this IServiceCollection services,
