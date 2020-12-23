@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Identity.Web;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.BackOffice.Security;
