@@ -158,6 +158,8 @@
     <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
+    <Compile Include="Editors\AllowedChildrenEventArgs.cs" />
+    <Compile Include="Editors\AllowedChildrenEventManager.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\ChallengeResult.cs" />
     <Compile Include="Editors\ElementTypeController.cs" />
@@ -380,6 +382,7 @@
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
+    <Compile Include="WebApi\Filters\OutgoingAllowedChildrenEvent.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
