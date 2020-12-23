@@ -468,6 +468,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
+        [OutgoingAllowedChildrenEvent]
         [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
