@@ -15,6 +15,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -153,6 +154,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
+                .AddNuCache()
                 .Build();
         }
 

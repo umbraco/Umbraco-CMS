@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Infrastructure.PublishedCache.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
 using Umbraco.Web.Website.ViewEngines;

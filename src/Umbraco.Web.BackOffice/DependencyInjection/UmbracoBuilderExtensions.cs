@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Infrastructure.PublishedCache.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Trees;

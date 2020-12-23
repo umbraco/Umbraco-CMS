@@ -9,12 +9,12 @@ using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Infrastructure.PublishedCache.Extensions
+namespace Umbraco.Infrastructure.PublishedCache.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco's NuCache
     /// </summary>
-    public static class NuCacheUmbracoBuilderExtensions
+    public static class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Adds Umbraco NuCache dependencies
