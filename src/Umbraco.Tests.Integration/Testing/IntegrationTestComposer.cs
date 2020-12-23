@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -22,10 +22,10 @@ using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
+using Umbraco.Infrastructure.Cache;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -38,11 +38,12 @@ namespace Umbraco.Tests.Integration.Testing
     /// </remarks>
     public class IntegrationTestComposer : ComponentComposer<IntegrationTestComponent>
     {
+        // TODO: Kill this and only enable using ext methods what we need (first we need to kill composers)
+
         public override void Compose(IUmbracoBuilder builder)
         {
             base.Compose(builder);
 
-            builder.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
             builder.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
             builder.Services.AddUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
 
@@ -65,7 +66,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// Used to register a replacement for <see cref="ILocalizedTextService"/> where the file sources are the ones within the netcore project so
         /// we don't need to copy files
         /// </summary>
-        /// <returns></returns>
         private ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
         {
             var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
@@ -153,6 +153,8 @@ namespace Umbraco.Tests.Integration.Testing
             {
 
             }
+
+            public void Sync() { }
         }
 
     }

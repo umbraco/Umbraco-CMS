@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;

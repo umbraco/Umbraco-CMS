@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -25,13 +25,11 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger, IBatchedDatabaseServerMessenger
     {
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IRequestCache _requestCache;
         private readonly IRequestAccessor _requestAccessor;
 
         public BatchedDatabaseServerMessenger(
             IMainDom mainDom,
-            IUmbracoDatabaseFactory databaseFactory,
             IScopeProvider scopeProvider,
             IProfilingLogger proflog,
             ILogger<BatchedDatabaseServerMessenger> logger,
@@ -42,32 +40,10 @@ namespace Umbraco.Web
             IRequestCache requestCache,
             IRequestAccessor requestAccessor,
             IOptions<GlobalSettings> globalSettings)
-            : base(mainDom, scopeProvider, databaseFactory, proflog, logger, serverRegistrar, true, callbacks, hostingEnvironment, cacheRefreshers, globalSettings)
+            : base(mainDom, scopeProvider, proflog, logger, serverRegistrar, true, callbacks, hostingEnvironment, cacheRefreshers, globalSettings)
         {
-            _databaseFactory = databaseFactory;
             _requestCache = requestCache;
             _requestAccessor = requestAccessor;
-        }
-
-        // invoked by DatabaseServerRegistrarAndMessengerComponent
-        public void Startup()
-        {
-            _requestAccessor.EndRequest += UmbracoModule_EndRequest;
-
-            if (_databaseFactory.CanConnect == false)
-            {
-                Logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
-            }
-            else
-            {
-                Boot();
-            }
-        }
-
-        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
-        {
-            // will clear the batch - will remain in HttpContext though - that's ok
-            FlushBatch();
         }
 
         protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)

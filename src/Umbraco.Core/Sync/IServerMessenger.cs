@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// Broadcasts distributed cache notifications to all servers of a load balanced environment.
+    /// Transmits distributed cache notifications for all servers of a load balanced environment.
     /// </summary>
     /// <remarks>Also ensures that the notification is processed on the local environment.</remarks>
     public interface IServerMessenger
     {
+        /// <summary>
+        /// Called to synchronize a server with queued notifications
+        /// </summary>
+        void Sync();
+
         /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>

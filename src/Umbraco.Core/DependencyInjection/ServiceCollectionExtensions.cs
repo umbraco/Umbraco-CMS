@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
@@ -21,7 +22,7 @@ namespace Umbraco.Core
             where TImplementing : class, TService1, TService2
         {
             services.AddUnique<TService1, TImplementing>();
-            services.AddUnique<TService2>(factory => (TImplementing) factory.GetRequiredService<TService1>());
+            services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>());
         }
 
         public static void AddUnique<TImplementing>(this IServiceCollection services)
@@ -48,7 +49,7 @@ namespace Umbraco.Core
         /// </summary>
         public static void AddUnique<TService>(this IServiceCollection services, TService instance)
             where TService : class
-            => services.Replace(ServiceDescriptor.Singleton<TService>(instance));
+            => services.Replace(ServiceDescriptor.Singleton(instance));
 
         public static IServiceCollection AddLazySupport(this IServiceCollection services)
         {

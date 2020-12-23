@@ -2171,6 +2171,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             public LocalServerMessenger() : base(false)
             { }
 
+            public override void Sync() { }
+
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {
             }

@@ -17,7 +17,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
     public class InstructionProcessTask : RecurringHostedServiceBase
     {
         private readonly IRuntimeState _runtimeState;
-        private readonly IDatabaseServerMessenger _messenger;
+        private readonly IServerMessenger _messenger;
         private readonly ILogger<InstructionProcessTask> _logger;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
             : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
         {
             _runtimeState = runtimeState;
-            _messenger = messenger as IDatabaseServerMessenger ?? throw new ArgumentNullException(nameof(messenger));
+            _messenger = messenger as IServerMessenger ?? throw new ArgumentNullException(nameof(messenger));
             _logger = logger;
         }
 

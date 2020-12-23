@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -345,6 +345,8 @@ namespace Umbraco.Core.Sync
 
             DeliverRemote(refresher, messageType, idsA);
         }
+
+        public abstract void Sync();
 
         //protected virtual void Deliver(ICacheRefresher refresher, object payload)
         //{

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging.Serilog.Enrichers;

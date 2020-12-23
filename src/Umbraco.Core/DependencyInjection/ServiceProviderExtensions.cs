@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Composing;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IFactory"/> class.

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.Common.DependencyInjection;
@@ -42,16 +44,15 @@ namespace Umbraco.Tests.Integration
         {
             var testHelper = new TestHelper();
 
-            var hostBuilder = new HostBuilder()
+            IHostBuilder hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    IWebHostEnvironment webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
                     // Add it!
-
-                    var typeLoader = services.AddTypeLoader(
+                    TypeLoader typeLoader = services.AddTypeLoader(
                         GetType().Assembly,
                         webHostEnvironment,
                         testHelper.GetHostingEnvironment(),
@@ -60,9 +61,13 @@ namespace Umbraco.Tests.Integration
                         hostContext.Configuration,
                         testHelper.Profiler);
 
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,
+                    var builder = new UmbracoBuilder(
+                        services,
+                        hostContext.Configuration,
+                        typeLoader,
                         testHelper.ConsoleLoggerFactory);
-                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
+
+                    builder.Services.AddUnique(AppCaches.NoCache);
                     builder.AddConfiguration()
                         .AddUmbracoCore()
                         .Build();
@@ -70,15 +75,14 @@ namespace Umbraco.Tests.Integration
                     services.AddRouting(); // LinkGenerator
                 });
 
-            var host = await hostBuilder.StartAsync();
+            IHost host = await hostBuilder.StartAsync();
             var app = new ApplicationBuilder(host.Services);
 
             app.UseUmbracoCore();
 
-
             // assert results
-            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
-            var mainDom = app.ApplicationServices.GetRequiredService<IMainDom>();
+            IRuntimeState runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
+            IMainDom mainDom = app.ApplicationServices.GetRequiredService<IMainDom>();
 
             Assert.IsTrue(mainDom.IsMainDom);
             Assert.IsNull(runtimeState.BootFailedException);
@@ -97,10 +101,7 @@ namespace Umbraco.Tests.Integration
                 IsComposed = true;
             }
 
-            public static void Reset()
-            {
-                IsComposed = false;
-            }
+            public static void Reset() => IsComposed = false;
 
             public static bool IsComposed { get; private set; }
         }
@@ -108,24 +109,16 @@ namespace Umbraco.Tests.Integration
         public class MyComponent : IComponent
         {
             public static bool IsInit { get; private set; }
+
             public static bool IsTerminated { get; private set; }
 
             private readonly ILogger<MyComponent> _logger;
 
-            public MyComponent(ILogger<MyComponent> logger)
-            {
-                _logger = logger;
-            }
+            public MyComponent(ILogger<MyComponent> logger) => _logger = logger;
 
-            public void Initialize()
-            {
-                IsInit = true;
-            }
+            public void Initialize() => IsInit = true;
 
-            public void Terminate()
-            {
-                IsTerminated = true;
-            }
+            public void Terminate() => IsTerminated = true;
 
             public static void Reset()
             {
@@ -134,6 +127,4 @@ namespace Umbraco.Tests.Integration
             }
         }
     }
-
-
 }

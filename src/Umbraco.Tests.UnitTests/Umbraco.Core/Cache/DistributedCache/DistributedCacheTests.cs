@@ -127,12 +127,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
         internal class TestServerMessenger : IServerMessenger
         {
             // Used for tests
-            public List<int> IntIdsRefreshed = new List<int>();
-            public List<Guid> GuidIdsRefreshed = new List<Guid>();
-            public List<int> IntIdsRemoved = new List<int>();
-            public List<string> PayloadsRemoved = new List<string>();
-            public List<string> PayloadsRefreshed = new List<string>();
-            public int CountOfFullRefreshes = 0;
+            public List<int> IntIdsRefreshed { get; } = new List<int>();
+            public List<Guid> GuidIdsRefreshed { get; } = new List<Guid>();
+            public List<int> IntIdsRemoved { get; } = new List<int>();
+            public List<string> PayloadsRemoved { get; } = new List<string>();
+            public List<string> PayloadsRefreshed { get; } = new List<string>();
+            public int CountOfFullRefreshes { get; private set; } = 0;
 
             public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
@@ -156,6 +156,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
             public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds) => GuidIdsRefreshed.AddRange(guidIds);
 
             public void PerformRefreshAll(ICacheRefresher refresher) => CountOfFullRefreshes++;
+
+            public void Sync() { }
         }
 
         internal class TestServerRegistrar : IServerRegistrar

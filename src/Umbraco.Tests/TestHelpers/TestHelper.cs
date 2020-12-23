@@ -38,6 +38,7 @@ using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {

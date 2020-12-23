@@ -1,7 +1,6 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;

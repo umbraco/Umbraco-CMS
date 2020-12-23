@@ -1,7 +1,6 @@
 using System;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -13,9 +12,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Media;
 using Umbraco.Core.Migrations;
@@ -23,7 +20,6 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -38,6 +34,7 @@ using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
+using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -62,10 +59,30 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
-namespace Umbraco.Infrastructure.Runtime
+namespace Umbraco.Infrastructure.DependencyInjection
 {
-    public static class CoreInitialServices
+    public static partial class UmbracoBuilderExtensions
     {
+
+        /*
+         * TODO: Many of these things are not "Core" services and are probably not required to run
+         * 
+         * This should be split up:
+         *   - Distributed Cache
+         *   - BackOffice
+         *     - Manifest
+         *     - Property Editors
+         *     - Packages
+         *     - Dashboards
+         *     - OEmbed
+         *     - Sections
+         *     - Content Apps
+         *     - Health Checks
+         *     - ETC...
+         *   - Installation
+         *   - Front End
+         */
+
         public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
         {
             builder.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
@@ -130,7 +147,7 @@ namespace Umbraco.Infrastructure.Runtime
             builder.DataValueReferenceFactories();
 
             // register a server registrar, by default it's the db registrar
-            builder.Services.AddUnique<IServerRegistrar>(f =>
+            builder.Services.AddUnique(f =>
             {
                 var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
@@ -138,7 +155,7 @@ namespace Umbraco.Infrastructure.Runtime
                 // even on 1 single server we can have 2 concurrent app domains
                 var singleServer = globalSettings.DisableElectionForSingleServer;
                 return singleServer
-                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
+                    ? (IServerRegistrar)new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
                     : new DatabaseServerRegistrar(
                         new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
             });
@@ -183,7 +200,6 @@ namespace Umbraco.Infrastructure.Runtime
             // by default, register a noop factory
             builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
-            // by default
             builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             builder.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
@@ -253,10 +269,8 @@ namespace Umbraco.Infrastructure.Runtime
             builder.EditorValidators()
                 .Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
 
-
             builder.TourFilters();
 
-            // replace with web implementation
             builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             // register OEmbed providers - no type scanning - all explicit opt-in of adding types
@@ -337,7 +351,6 @@ namespace Umbraco.Infrastructure.Runtime
 
             // register distributed cache
             builder.Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
-
 
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 

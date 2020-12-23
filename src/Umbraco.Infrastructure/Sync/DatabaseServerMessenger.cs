@@ -23,15 +23,20 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// An <see cref="IServerMessenger"/> that works by storing messages in the database.
     /// </summary>
-    //
-    // this messenger writes ALL instructions to the database,
-    // but only processes instructions coming from remote servers,
-    // thus ensuring that instructions run only once
-    //
-    public class DatabaseServerMessenger : ServerMessengerBase, IDatabaseServerMessenger
+    public abstract class DatabaseServerMessenger : ServerMessengerBase
     {
+        // TODO: This class is never used directly, only BatchedDatabaseServerMessenger is used so
+        // this could/should be combined with that or made abstract and/or just cleaned up.
+
+        // TODO: This class needs to be split into a service/repo for DB access
+
+        /*
+         * this messenger writes ALL instructions to the database,
+         * but only processes instructions coming from remote servers,
+         *  thus ensuring that instructions run only once
+         */
+
         private readonly IMainDom _mainDom;
-        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
@@ -43,22 +48,28 @@ namespace Umbraco.Core.Sync
         private int _lastId = -1;
         private DateTime _lastSync;
         private DateTime _lastPruned;
-        private bool _initialized;
+        private readonly Lazy<bool> _initialized;
         private bool _syncing;
         private bool _released;
 
-        public DatabaseServerMessengerCallbacks Callbacks { get; }
-
-        public GlobalSettings GlobalSettings { get; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseServerMessenger"/> class.
+        /// </summary>
         public DatabaseServerMessenger(
-            IMainDom mainDom, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
-            bool distributedEnabled, DatabaseServerMessengerCallbacks callbacks, IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers, IOptions<GlobalSettings> globalSettings)
+            IMainDom mainDom,
+            IScopeProvider scopeProvider,
+            IProfilingLogger proflog,
+            ILogger<DatabaseServerMessenger> logger,
+            IServerRegistrar serverRegistrar,
+            bool distributedEnabled,
+            DatabaseServerMessengerCallbacks callbacks,
+            IHostingEnvironment hostingEnvironment,
+            CacheRefresherCollection cacheRefreshers,
+            IOptions<GlobalSettings> globalSettings)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _mainDom = mainDom;
-            _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _serverRegistrar = serverRegistrar;
             _hostingEnvironment = hostingEnvironment;
@@ -76,24 +87,28 @@ namespace Umbraco.Core.Sync
                 + " [P" + Process.GetCurrentProcess().Id // eg 1234
                 + "/D" + AppDomain.CurrentDomain.Id // eg 22
                 + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
+
+            _initialized = new Lazy<bool>(EnsureInitialized);
         }
+
+        public DatabaseServerMessengerCallbacks Callbacks { get; }
+
+        public GlobalSettings GlobalSettings { get; }
 
         protected ILogger<DatabaseServerMessenger> Logger { get; }
 
         protected IScopeProvider ScopeProvider { get; }
 
-        protected Sql<ISqlContext> Sql() => _umbracoDatabaseFactory.SqlContext.Sql();
+        protected Sql<ISqlContext> Sql() => ScopeProvider.SqlContext.Sql();
 
         private string DistCacheFilePath => _distCacheFilePath.Value;
 
         #region Messenger
 
+        // we don't care if there's servers listed or not,
+        // if distributed call is enabled we will make the call
         protected override bool RequiresDistributed(ICacheRefresher refresher, MessageType dispatchType)
-        {
-            // we don't care if there's servers listed or not,
-            // if distributed call is enabled we will make the call
-            return _initialized && DistributedEnabled;
-        }
+            => _initialized.Value && DistributedEnabled;
 
         protected override void DeliverRemote(
             ICacheRefresher refresher,
@@ -104,7 +119,9 @@ namespace Umbraco.Core.Sync
             var idsA = ids?.ToArray();
 
             if (GetArrayType(idsA, out var idType) == false)
+            {
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
+            }
 
             var instructions = RefreshInstruction.GetInstructions(refresher, messageType, idsA, idType, json);
 
@@ -130,16 +147,11 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Boots the messenger.
         /// </summary>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// Callers MUST ensure thread-safety.
-        /// </remarks>
-        protected void Boot()
+        private bool EnsureInitialized()
         {
             // weight:10, must release *before* the published snapshot service, because once released
             // the service will *not* be able to properly handle our notifications anymore
             const int weight = 10;
-
 
             var registered = _mainDom.Register(
                 () =>
@@ -154,7 +166,7 @@ namespace Umbraco.Core.Sync
                     // properly releasing MainDom - a timeout here means that one refresher
                     // is taking too much time processing, however when it's done we will
                     // not update lastId and stop everything
-                    var idle =_syncIdle.WaitOne(5000);
+                    var idle = _syncIdle.WaitOne(5000);
                     if (idle == false)
                     {
                         Logger.LogWarning("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
@@ -163,15 +175,16 @@ namespace Umbraco.Core.Sync
                 weight);
 
             if (registered == false)
-                return;
+            {
+                return false;
+            }
 
             ReadLastSynced(); // get _lastId
-            using (var scope = ScopeProvider.CreateScope())
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 EnsureInstructions(scope.Database); // reset _lastId if instructions are missing
-                Initialize(scope.Database); // boot
-
-                scope.Complete();
+                return Initialize(scope.Database); // boot
             }
         }
 
@@ -182,14 +195,19 @@ namespace Umbraco.Core.Sync
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// Callers MUST ensure thread-safety.
         /// </remarks>
-        private void Initialize(IUmbracoDatabase database)
+        private bool Initialize(IUmbracoDatabase database)
         {
             lock (_locko)
             {
-                if (_released) return;
+                if (_released)
+                {
+                    return false;
+                }
 
                 var coldboot = false;
-                if (_lastId < 0) // never synced before
+
+                // never synced before
+                if (_lastId < 0)
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
@@ -201,12 +219,12 @@ namespace Umbraco.Core.Sync
                 }
                 else
                 {
-                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                    //row so we will sum these numbers to get the actual count.
-                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    // check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    // row so we will sum these numbers to get the actual count.
+                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new { lastId = _lastId });
                     if (count > GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount)
                     {
-                        //too many instructions, proceed to cold boot
+                        // too many instructions, proceed to cold boot
                         Logger.LogWarning(
                             "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
@@ -224,38 +242,55 @@ namespace Umbraco.Core.Sync
                     // when doing it before, some instructions might run twice - not an issue
                     var maxId = database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
 
-                    //if there is a max currently, or if we've never synced
+                    // if there is a max currently, or if we've never synced
                     if (maxId > 0 || _lastId < 0)
+                    {
                         SaveLastSynced(maxId);
+                    }
 
                     // execute initializing callbacks
                     if (Callbacks.InitializingCallbacks != null)
+                    {
                         foreach (var callback in Callbacks.InitializingCallbacks)
+                        {
                             callback();
+                        }
+                    }
                 }
 
-                _initialized = true;
+                return true;
             }
         }
 
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        public void Sync()
+        public override void Sync()
         {
+            if (!_initialized.Value)
+            {
+                return;
+            }
+
             lock (_locko)
             {
                 if (_syncing)
+                {
                     return;
+                }
 
-                //Don't continue if we are released
+                // Don't continue if we are released
                 if (_released)
+                {
                     return;
+                }
 
                 if ((DateTime.UtcNow - _lastSync) <= GlobalSettings.DatabaseServerMessenger.TimeBetweenSyncOperations)
+                {
                     return;
+                }
 
-                //Set our flag and the lock to be in it's original state (i.e. it can be awaited)
+                // Set our flag and the lock to be in it's original state (i.e. it can be awaited)
                 _syncing = true;
                 _syncIdle.Reset();
                 _lastSync = DateTime.UtcNow;
@@ -268,7 +303,7 @@ namespace Umbraco.Core.Sync
                 {
                     ProcessDatabaseInstructions(scope.Database);
 
-                    //Check for pruning throttling
+                    // Check for pruning throttling
                     if (_released || (DateTime.UtcNow - _lastPruned) <= GlobalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                     {
                         scope.Complete();
@@ -292,7 +327,7 @@ namespace Umbraco.Core.Sync
             {
                 lock (_locko)
                 {
-                    //We must reset our flag and signal any waiting locks
+                    // We must reset our flag and signal any waiting locks
                     _syncing = false;
                 }
 
@@ -306,9 +341,6 @@ namespace Umbraco.Core.Sync
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
-        /// <returns>
-        /// Returns the number of processed instructions
-        /// </returns>
         private void ProcessDatabaseInstructions(IUmbracoDatabase database)
         {
             // NOTE
@@ -324,7 +356,7 @@ namespace Umbraco.Core.Sync
                 .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
                 .OrderBy<CacheInstructionDto>(dto => dto.Id);
 
-            //only retrieve the top 100 (just in case there's tons)
+            // only retrieve the top 100 (just in case there's tons)
             // even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many
             // rows in one request thread since each row can contain a ton of instructions (until 7.5.5 in which case
             // a row can only contain MaxProcessingInstructionCount)
@@ -337,15 +369,15 @@ namespace Umbraco.Core.Sync
 
             var lastId = 0;
 
-            //tracks which ones have already been processed to avoid duplicates
+            // tracks which ones have already been processed to avoid duplicates
             var processed = new HashSet<RefreshInstruction>();
 
-            //It would have been nice to do this in a Query instead of Fetch using a data reader to save
+            // It would have been nice to do this in a Query instead of Fetch using a data reader to save
             // some memory however we cannot do that because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open
             foreach (var dto in database.Fetch<CacheInstructionDto>(topSql))
             {
-                //If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
+                // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown
                 if (_released)
                 {
@@ -377,10 +409,10 @@ namespace Umbraco.Core.Sync
 
                 var instructionBatch = GetAllInstructions(jsonA);
 
-                //process as per-normal
+                // process as per-normal
                 var success = ProcessDatabaseInstructions(instructionBatch, dto, processed, ref lastId);
 
-                //if they couldn't be all processed (i.e. we're shutting down) then exit
+                // if they couldn't be all processed (i.e. we're shutting down) then exit
                 if (success == false)
                 {
                     Logger.LogInformation("The current batch of instructions was not processed, app is shutting down");
@@ -425,11 +457,11 @@ namespace Umbraco.Core.Sync
             //}
             catch (Exception ex)
             {
-                    Logger.LogError(
-                        ex,
-                        "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
-                        dto.Id,
-                        dto.Instructions);
+                Logger.LogError(
+                    ex,
+                    "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
+                    dto.Id,
+                    dto.Instructions);
 
                 //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                 // will be thrown over and over. The only thing we can do is ignore and move on.
@@ -509,7 +541,8 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void ReadLastSynced()
         {
-            if (File.Exists(DistCacheFilePath) == false) return;
+            if (File.Exists(DistCacheFilePath) == false)
+                return;
 
             var content = File.ReadAllText(DistCacheFilePath);
             if (int.TryParse(content, out var last))

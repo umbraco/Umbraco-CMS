@@ -1,4 +1,3 @@
-﻿using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Manifest;
@@ -11,18 +10,17 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Sections;
 using Umbraco.Web.Tour;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.DependencyInjection
 {
-    public static partial class CompositionExtensions
+    /// <summary>
+    /// Extension methods for <see cref="IUmbracoBuilder"/>
+    /// </summary>
+    public static partial class UmbracoBuilderExtensions
     {
-
-        #region Collection Builders
-
         /// <summary>
         /// Gets the actions collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <returns></returns>
         public static ActionCollectionBuilder Actions(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<ActionCollectionBuilder>();
 
@@ -30,7 +28,6 @@ namespace Umbraco.Core
         /// Gets the content apps collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <returns></returns>
         public static ContentAppFactoryCollectionBuilder ContentApps(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
 
@@ -38,7 +35,6 @@ namespace Umbraco.Core
         /// Gets the content finders collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <returns></returns>
         public static ContentFinderCollectionBuilder ContentFinders(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
@@ -46,7 +42,6 @@ namespace Umbraco.Core
         /// Gets the editor validators collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <returns></returns>
         public static EditorValidatorCollectionBuilder EditorValidators(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
@@ -90,7 +85,6 @@ namespace Umbraco.Core
         public static ComponentCollectionBuilder Components(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
-
         /// <summary>
         /// Gets the backoffice dashboards collection builder.
         /// </summary>
@@ -109,15 +103,11 @@ namespace Umbraco.Core
                 .Add<RedirectUrlDashboard>()
                 .Add<SettingsDashboard>();
 
-
         /// <summary>
         /// Gets the content finders collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <returns></returns>
         public static MediaUrlGeneratorCollectionBuilder MediaUrlGenerators(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
-
-        #endregion
     }
 }

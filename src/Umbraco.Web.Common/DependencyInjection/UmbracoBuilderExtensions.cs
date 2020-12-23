@@ -31,9 +31,11 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Infrastructure.Runtime;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.DependencyInjection;
@@ -50,6 +52,9 @@ namespace Umbraco.Web.Common.DependencyInjection
     /// </summary>
     public static class UmbracoBuilderExtensions
     {
+        /// <summary>
+        /// Creates an <see cref="IUmbracoBuilder"/> and registers basic Umbraco services
+        /// </summary>
         public static IUmbracoBuilder AddUmbraco(
             this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
@@ -64,6 +69,8 @@ namespace Umbraco.Web.Common.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(config));
             }
+
+            // TODO: Should some/all of these registrations be moved directly into UmbracoBuilder?
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 

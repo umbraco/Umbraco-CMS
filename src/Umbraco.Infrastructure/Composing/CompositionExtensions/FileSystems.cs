@@ -7,6 +7,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.DependencyInjection;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {

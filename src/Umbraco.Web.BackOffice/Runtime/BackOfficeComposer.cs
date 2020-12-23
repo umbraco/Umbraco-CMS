@@ -1,7 +1,6 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;

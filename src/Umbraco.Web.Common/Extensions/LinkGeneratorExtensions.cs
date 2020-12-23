@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -9,7 +9,6 @@ using Umbraco.Web.Common.Install;
 using Umbraco.Core.Hosting;
 using System.Linq.Expressions;
 using Umbraco.Web.Common.Controllers;
-using System.Linq;
 
 namespace Umbraco.Extensions
 {

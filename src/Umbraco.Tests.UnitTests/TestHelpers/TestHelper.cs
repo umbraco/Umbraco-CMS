@@ -18,6 +18,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;

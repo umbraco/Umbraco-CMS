@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {

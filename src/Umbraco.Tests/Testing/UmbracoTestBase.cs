@@ -43,6 +43,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;

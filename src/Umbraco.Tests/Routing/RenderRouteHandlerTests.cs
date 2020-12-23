@@ -26,6 +26,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Runtime;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Routing
 {

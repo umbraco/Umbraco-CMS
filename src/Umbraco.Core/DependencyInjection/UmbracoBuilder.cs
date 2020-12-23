@@ -14,17 +14,26 @@ namespace Umbraco.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
-        public IServiceCollection Services { get; }
-        public IConfiguration Config { get; }
-        public TypeLoader TypeLoader { get; }
-        public ILoggerFactory BuilderLoggerFactory { get; }
-
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
+        public IServiceCollection Services { get; }
+
+        public IConfiguration Config { get; }
+
+        public TypeLoader TypeLoader { get; }
+
+        public ILoggerFactory BuilderLoggerFactory { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
             : this(services, config, typeLoader, NullLoggerFactory.Instance)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader, ILoggerFactory loggerFactory)
         {
             Services = services;
@@ -43,10 +52,12 @@ namespace Umbraco.Core.DependencyInjection
         public TBuilder WithCollectionBuilder<TBuilder>()
             where TBuilder : ICollectionBuilder, new()
         {
-            var typeOfBuilder = typeof(TBuilder);
+            Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out var o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
+            {
                 return (TBuilder)o;
+            }
 
             var builder = new TBuilder();
             _builders[typeOfBuilder] = builder;
@@ -55,8 +66,10 @@ namespace Umbraco.Core.DependencyInjection
 
         public void Build()
         {
-            foreach (var builder in _builders.Values)
+            foreach (ICollectionBuilder builder in _builders.Values)
+            {
                 builder.RegisterWith(Services);
+            }
 
             _builders.Clear();
         }
