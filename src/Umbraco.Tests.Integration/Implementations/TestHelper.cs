@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data.Common;
@@ -44,22 +47,25 @@ namespace Umbraco.Tests.Integration.Implementations
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string _tempWorkingDir;
 
-        public TestHelper() : base(typeof(TestHelper).Assembly)
+        public TestHelper()
+            : base(typeof(TestHelper).Assembly)
         {
             var httpContext = new DefaultHttpContext();
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
             _httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
             _ipResolver = new AspNetCoreIpResolver(_httpContextAccessor);
 
-            var contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
+            string contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             var hostEnvironment = new Mock<IWebHostEnvironment>();
-            // this must be the assembly name for the WebApplicationFactory to work
+
+            // This must be the assembly name for the WebApplicationFactory to work.
             hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name);
             hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => contentRoot);
             hostEnvironment.Setup(x => x.ContentRootFileProvider).Returns(() => new PhysicalFileProvider(contentRoot));
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
             hostEnvironment.Setup(x => x.WebRootFileProvider).Returns(() => new PhysicalFileProvider(WorkingDirectory));
-            // we also need to expose it as the obsolete interface since netcore's WebApplicationFactory casts it
+
+            // We also need to expose it as the obsolete interface since netcore's WebApplicationFactory casts it.
             hostEnvironment.As<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
 
             _hostEnvironment = hostEnvironment.Object;
@@ -69,25 +75,24 @@ namespace Umbraco.Tests.Integration.Implementations
             ProfilingLogger = new ProfilingLogger(ConsoleLoggerFactory.CreateLogger<ProfilingLogger>(), Profiler);
         }
 
-
         public override string WorkingDirectory
         {
             get
             {
                 // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
                 // on a build server and if so we'll use the %temp% path.
-
                 if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory")))
                 {
-                    // we are using Azure Devops!
+                    // We are using Azure Devops!
+                    if (_tempWorkingDir != null)
+                    {
+                        return _tempWorkingDir;
+                    }
 
-                    if (_tempWorkingDir != null) return _tempWorkingDir;
-
-                    var temp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoTemp");
+                    string temp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoTemp");
                     Directory.CreateDirectory(temp);
                     _tempWorkingDir = temp;
                     return _tempWorkingDir;
-
                 }
                 else
                 {
@@ -99,10 +104,13 @@ namespace Umbraco.Tests.Integration.Implementations
         public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } =
             new TestUmbracoBootPermissionChecker();
 
-        public AppCaches AppCaches { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance,
+        public AppCaches AppCaches { get; } = new AppCaches(
+            NoAppCache.Instance,
+            NoAppCache.Instance,
             new IsolatedCaches(type => NoAppCache.Instance));
 
         public ILoggerFactory ConsoleLoggerFactory { get; private set; }
+
         public IProfilingLogger ProfilingLogger { get; private set; }
 
         public IProfiler Profiler { get; } = new VoidProfiler();
@@ -123,7 +131,7 @@ namespace Umbraco.Tests.Integration.Implementations
             if (_backOfficeInfo == null)
             {
                 var globalSettings = new GlobalSettings();
-                var mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
+                IOptionsMonitor<GlobalSettings> mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
                 _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings);
             }
 
@@ -148,39 +156,43 @@ namespace Umbraco.Tests.Integration.Implementations
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
-        /// <param name="relativePath"></param>
-        /// <returns></returns>
         public override string MapPathForTestFiles(string relativePath)
         {
             if (!relativePath.StartsWith("~/"))
+            {
                 throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
+            }
 
-            var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
+            string codeBase = typeof(TestHelperBase).Assembly.CodeBase;
             var uri = new Uri(codeBase);
-            var path = uri.LocalPath;
-            var bin = Path.GetDirectoryName(path);
+            string path = uri.LocalPath;
+            string bin = Path.GetDirectoryName(path);
 
             return relativePath.Replace("~/", bin + "/");
         }
 
-        public void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
+        public void AssertPropertyValuesAreEqual(object actual, object expected, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
             const int dateDeltaMilliseconds = 1000; // 1s
 
-            var properties = expected.GetType().GetProperties();
-            foreach (var property in properties)
+            PropertyInfo[] properties = expected.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
             {
-                // ignore properties that are attributed with EditorBrowsableState.Never
-                var att = property.GetCustomAttribute<EditorBrowsableAttribute>(false);
+                // Ignore properties that are attributed with EditorBrowsableState.Never.
+                EditorBrowsableAttribute att = property.GetCustomAttribute<EditorBrowsableAttribute>(false);
                 if (att != null && att.State == EditorBrowsableState.Never)
+                {
                     continue;
+                }
 
-                // ignore explicitly ignored properties
+                // Ignore explicitly ignored properties.
                 if (ignoreProperties != null && ignoreProperties.Contains(property.Name))
+                {
                     continue;
+                }
 
-                var actualValue = property.GetValue(actual, null);
-                var expectedValue = property.GetValue(expected, null);
+                object actualValue = property.GetValue(actual, null);
+                object expectedValue = property.GetValue(expected, null);
 
                 AssertAreEqual(property, expectedValue, actualValue, sorter, dateDeltaMilliseconds);
             }
@@ -188,8 +200,6 @@ namespace Umbraco.Tests.Integration.Implementations
 
         private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
         {
-
-
             if (sorter == null)
             {
                 // this is pretty hackerific but saves us some code to write
@@ -197,7 +207,7 @@ namespace Umbraco.Tests.Integration.Implementations
                 {
                     // semi-generic way of ensuring any collection of IEntity are sorted by Ids for comparison
                     var entities = enumerable.OfType<IEntity>().ToList();
-                    return entities.Count > 0 ? (IEnumerable) entities.OrderBy(x => x.Id) : entities;
+                    return entities.Count > 0 ? (IEnumerable)entities.OrderBy(x => x.Id) : entities;
                 };
             }
 
@@ -205,46 +215,55 @@ namespace Umbraco.Tests.Integration.Implementations
             var actualListEx = sorter(actual).Cast<object>().ToList();
 
             if (actualListEx.Count != expectedListEx.Count)
+            {
                 Assert.Fail("Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements", property.PropertyType.Name, property.Name, expectedListEx.Count, actualListEx.Count);
+            }
 
-            for (var i = 0; i < actualListEx.Count; i++)
+            for (int i = 0; i < actualListEx.Count; i++)
+            {
                 AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
+            }
         }
 
         private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
         {
-            if (!(expected is string) && expected is IEnumerable)
+            if (!(expected is string) && expected is IEnumerable enumerable)
             {
                 // sort property collection by alias, not by property ids
                 // on members, built-in properties don't have ids (always zero)
                 if (expected is PropertyCollection)
-                    sorter = e => ((PropertyCollection) e).OrderBy(x => x.Alias);
+                {
+                    sorter = e => ((PropertyCollection)e).OrderBy(x => x.Alias);
+                }
 
                 // compare lists
-                AssertListsAreEqual(property, (IEnumerable) actual, (IEnumerable) expected, sorter, dateDeltaMilliseconds);
+                AssertListsAreEqual(property, (IEnumerable)actual, enumerable, sorter, dateDeltaMilliseconds);
             }
             else if (expected is DateTime expectedDateTime)
             {
                 // compare date & time with delta
-                var actualDateTime = (DateTime) actual;
-                var delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
+                var actualDateTime = (DateTime)actual;
+                double delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
                 Assert.IsTrue(Math.Abs(delta) <= dateDeltaMilliseconds, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expected, actual);
             }
             else if (expected is Property expectedProperty)
             {
                 // compare values
-                var actualProperty = (Property) actual;
-                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
-                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
+                var actualProperty = (Property)actual;
+                IPropertyValue[] expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
+                IPropertyValue[] actualPropertyValues = actualProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
                 if (expectedPropertyValues.Length != actualPropertyValues.Length)
+                {
                     Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
-                for (var i = 0; i < expectedPropertyValues.Length; i++)
+                }
+
+                for (int i = 0; i < expectedPropertyValues.Length; i++)
                 {
                     // This is not pretty, but since a property value can be a datetime we can't just always compare them as is.
                     // This is made worse by the fact that PublishedValue is not always set, meaning we can't lump it all into the same if block
                     if (expectedPropertyValues[i].EditedValue is DateTime expectedEditDateTime)
                     {
-                        var actualEditDateTime = (DateTime) actualPropertyValues[i].EditedValue;
+                        var actualEditDateTime = (DateTime)actualPropertyValues[i].EditedValue;
                         AssertDateTime(expectedEditDateTime, actualEditDateTime, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".", dateDeltaMilliseconds);
                     }
                     else
@@ -254,7 +273,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
                     if (expectedPropertyValues[i].PublishedValue is DateTime expectedPublishDateTime)
                     {
-                        var actualPublishedDateTime = (DateTime) actualPropertyValues[i].PublishedValue;
+                        var actualPublishedDateTime = (DateTime)actualPropertyValues[i].PublishedValue;
                         AssertDateTime(expectedPublishDateTime, actualPublishedDateTime, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].PublishedValue}\" but got \"{actualPropertyValues[i].PublishedValue}\".", dateDeltaMilliseconds);
                     }
                     else
@@ -266,22 +285,28 @@ namespace Umbraco.Tests.Integration.Implementations
             else if (expected is IDataEditor expectedEditor)
             {
                 Assert.IsInstanceOf<IDataEditor>(actual);
-                var actualEditor = (IDataEditor) actual;
+                var actualEditor = (IDataEditor)actual;
                 Assert.AreEqual(expectedEditor.Alias,  actualEditor.Alias);
+
                 // what else shall we test?
             }
             else
             {
                 // directly compare values
-                Assert.AreEqual(expected, actual, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name,
-                    expected?.ToString() ?? "<null>", actual?.ToString() ?? "<null>");
+                Assert.AreEqual(
+                    expected,
+                    actual,
+                    "Property {0}.{1} does not match. Expected: {2} but was: {3}",
+                    property.DeclaringType.Name,
+                    property.Name,
+                    expected?.ToString() ?? "<null>",
+                    actual?.ToString() ?? "<null>");
             }
         }
 
-        private static void AssertDateTime(DateTime expected, DateTime actual, string failureMessage,
-            int dateDeltaMiliseconds = 0)
+        private static void AssertDateTime(DateTime expected, DateTime actual, string failureMessage, int dateDeltaMiliseconds = 0)
         {
-            var delta = (actual - expected).TotalMilliseconds;
+            double delta = (actual - expected).TotalMilliseconds;
             Assert.IsTrue(Math.Abs(delta) <= dateDeltaMiliseconds, failureMessage);
         }
 
@@ -289,32 +314,38 @@ namespace Umbraco.Tests.Integration.Implementations
         {
             Try(() =>
             {
-                if (Directory.Exists(path) == false) return;
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                if (Directory.Exists(path) == false)
+                {
+                    return;
+                }
+
+                foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                {
                     File.Delete(file);
+                }
             });
 
             Try(() =>
             {
-                if (Directory.Exists(path) == false) return;
+                if (Directory.Exists(path) == false)
+                {
+                    return;
+                }
+
                 Directory.Delete(path, true);
             });
         }
 
-        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
+        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200) =>
             Try<AssertionException>(action, maxTries, waitMilliseconds);
-        }
 
-        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
+        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200) =>
             Try<Exception>(action, maxTries, waitMilliseconds);
-        }
 
         public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
             where T : Exception
         {
-            var tries = 0;
+            int tries = 0;
             while (true)
             {
                 try
@@ -325,7 +356,10 @@ namespace Umbraco.Tests.Integration.Implementations
                 catch (T)
                 {
                     if (tries++ > maxTries)
+                    {
                         throw;
+                    }
+
                     Thread.Sleep(waitMilliseconds);
                 }
             }

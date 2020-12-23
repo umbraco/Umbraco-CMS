@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,12 +8,16 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Tests.Integration.Testing;
 
-// this class has NO NAMESPACE
-// it applies to the whole assembly
-
-[SetUpFixture]
 // ReSharper disable once CheckNamespace
-public class TestsSetup
+
+/// <summary>
+/// Global setup and teardown.
+/// </summary>
+/// <remarks>
+/// This class has NO NAMESPACE so it applies to the whole assembly.
+/// </remarks>
+[SetUpFixture]
+public class GlobalSetupTeardown
 {
     private Stopwatch _stopwatch;
 

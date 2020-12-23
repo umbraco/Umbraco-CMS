@@ -1,4 +1,7 @@
-﻿using Examine;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Examine;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
@@ -12,15 +15,9 @@ namespace Umbraco.Tests.Integration.Testing
     {
         private readonly IExamineManager _examineManager;
 
-        public IntegrationTestComponent(IExamineManager examineManager)
-        {
-            _examineManager = examineManager;
-        }
+        public IntegrationTestComponent(IExamineManager examineManager) => _examineManager = examineManager;
 
-        public void Initialize()
-        {
-            ConfigureExamineIndexes();
-        }
+        public void Initialize() => ConfigureExamineIndexes();
 
         public void Terminate()
         {
@@ -31,7 +28,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// </summary>
         private void ConfigureExamineIndexes()
         {
-            foreach (var index in _examineManager.Indexes)
+            foreach (IIndex index in _examineManager.Indexes)
             {
                 if (index is LuceneIndex luceneIndex)
                 {

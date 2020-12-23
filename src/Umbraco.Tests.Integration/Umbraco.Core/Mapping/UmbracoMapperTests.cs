@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -42,11 +45,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         private IContentTypeService _contentTypeService;
         private ILocalizedTextService _localizedTextService;
 
-
         [Test]
         public void To_Media_Item_Simple()
         {
-            var content = _mediaBuilder
+            Media content = _mediaBuilder
                 .AddMediaType()
                     .AddPropertyGroup()
                         .AddPropertyType()
@@ -56,11 +58,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>(content);
+            ContentItemBasic<ContentPropertyBasic> result = _sut.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
-            foreach (var p in content.Properties)
+            foreach (IProperty p in content.Properties)
             {
                 AssertBasicProperty(result, p);
             }
@@ -69,7 +71,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void To_Content_Item_Simple()
         {
-            var content = _contentBuilder
+            Content content = _contentBuilder
                 .AddContentType()
                     .AddPropertyGroup()
                         .AddPropertyType()
@@ -79,11 +81,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content);
+            ContentItemBasic<ContentPropertyBasic> result = _sut.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
-            foreach (var p in content.Properties)
+            foreach (IProperty p in content.Properties)
             {
                 AssertBasicProperty(result, p);
             }
@@ -92,7 +94,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void To_Content_Item_Dto()
         {
-            var content = _contentBuilder
+            Content content = _contentBuilder
                 .AddContentType()
                     .AddPropertyGroup()
                         .AddPropertyType()
@@ -102,9 +104,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IContent, ContentPropertyCollectionDto>(content);
+            ContentPropertyCollectionDto result = _sut.Map<IContent, ContentPropertyCollectionDto>(content);
 
-            foreach (var p in content.Properties)
+            foreach (IProperty p in content.Properties)
             {
                 AssertProperty(result, p);
             }
@@ -113,7 +115,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void To_Media_Item_Dto()
         {
-            var content = _mediaBuilder
+            Media content = _mediaBuilder
                 .AddMediaType()
                     .AddPropertyGroup()
                         .AddPropertyType()
@@ -122,35 +124,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .Done()
                 .Build();
 
-            var result = _sut.Map<IMedia, ContentPropertyCollectionDto>(content);
+            ContentPropertyCollectionDto result = _sut.Map<IMedia, ContentPropertyCollectionDto>(content);
 
             Assert.GreaterOrEqual(result.Properties.Count(), 1);
             Assert.AreEqual(content.Properties.Count, result.Properties.Count());
-            foreach (var p in content.Properties)
+            foreach (IProperty p in content.Properties)
             {
                 AssertProperty(result, p);
             }
         }
 
-        #region Assertions
-
         private void AssertDisplayProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
-            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            T pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
 
-            //pDto.Alias = p.Alias;
-            //pDto.Description = p.PropertyType.Description;
-            //pDto.Label = p.PropertyType.Name;
-            //pDto.Config = applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId);
-
+            // pDto.Alias = p.Alias;
+            // pDto.Description = p.PropertyType.Description;
+            // pDto.Label = p.PropertyType.Name;
+            // pDto.Config = applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId);
         }
 
         [Test]
         public void To_Display_Model()
         {
-            var contentType = _contentTypeBuilder
+            IContentType contentType = _contentTypeBuilder
                 .WithId(0)
                 .AddPropertyGroup()
                     .WithId(1)
@@ -175,17 +174,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .Build();
             _contentTypeService.Save(contentType);
 
-            var content = _contentBuilder
+            Content content = _contentBuilder
                 .WithContentType(contentType)
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IContent, ContentItemDisplay>(content);
+            ContentItemDisplay result = _sut.Map<IContent, ContentItemDisplay>(content);
 
             AssertBasics(result, content);
 
-            var invariantContent = result.Variants.First();
-            foreach (var p in content.Properties)
+            ContentVariantDisplay invariantContent = result.Variants.First();
+            foreach (IProperty p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
                 AssertDisplayProperty(invariantContent, p);
@@ -199,22 +198,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void To_Display_Model_No_Tabs()
         {
-            var contentType = _contentTypeBuilder
+            IContentType contentType = _contentTypeBuilder
                 .WithId(0)
                 .Build();
             _contentTypeService.Save(contentType);
 
-            var content = _contentBuilder
+            Content content = _contentBuilder
                 .WithContentType(contentType)
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IContent, ContentItemDisplay>(content);
+            ContentItemDisplay result = _sut.Map<IContent, ContentItemDisplay>(content);
 
             AssertBasics(result, content);
 
-            var invariantContent = result.Variants.First();
-            foreach (var p in content.Properties)
+            ContentVariantDisplay invariantContent = result.Variants.First();
+            foreach (IProperty p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
                 AssertDisplayProperty(invariantContent, p);
@@ -226,7 +225,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void To_Display_Model_With_Non_Grouped_Properties()
         {
-            var contentType = _contentTypeBuilder
+            IContentType contentType = _contentTypeBuilder
                 .WithId(0)
                 .AddPropertyType()
                     .WithId(1)
@@ -243,17 +242,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 .Build();
             _contentTypeService.Save(contentType);
 
-            var content = _contentBuilder
+            Content content = _contentBuilder
                 .WithContentType(contentType)
                 .WithCreatorId(Constants.Security.SuperUserId)
                 .Build();
 
-            var result = _sut.Map<IContent, ContentItemDisplay>(content);
+            ContentItemDisplay result = _sut.Map<IContent, ContentItemDisplay>(content);
 
             AssertBasics(result, content);
 
-            var invariantContent = result.Variants.First();
-            foreach (var p in content.Properties)
+            ContentVariantDisplay invariantContent = result.Variants.First();
+            foreach (IProperty p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
                 AssertDisplayProperty(invariantContent, p);
@@ -268,7 +267,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             Assert.AreEqual(content.Id, result.Id);
 
-            var ownerId = content.CreatorId;
+            int ownerId = content.CreatorId;
             if (ownerId != 0)
             {
                 Assert.IsNotNull(result.Owner);
@@ -280,13 +279,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 Assert.IsNull(result.Owner); // because, 0 is no user
             }
 
-            var invariantContent = result.Variants.First();
+            ContentVariantDisplay invariantContent = result.Variants.First();
 
             Assert.AreEqual(content.ParentId, result.ParentId);
             Assert.AreEqual(content.UpdateDate, invariantContent.UpdateDate);
             Assert.AreEqual(content.CreateDate, invariantContent.CreateDate);
             Assert.AreEqual(content.Name, invariantContent.Name);
-            Assert.AreEqual(content.Properties.Count(),
+            Assert.AreEqual(
+                content.Properties.Count(),
                 ((IContentProperties<ContentPropertyDisplay>)invariantContent).Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
@@ -296,7 +296,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             Assert.AreEqual(content.Id, result.Id);
 
-            var ownerId = content.CreatorId;
+            int ownerId = content.CreatorId;
             if (ownerId != 0)
             {
                 Assert.IsNotNull(result.Owner);
@@ -318,24 +318,30 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         private void AssertBasicProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
-            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            T pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
             Assert.AreEqual(p.Alias, pDto.Alias);
             Assert.AreEqual(p.Id, pDto.Id);
 
             if (p.GetValue() == null)
+            {
                 Assert.AreEqual(pDto.Value, string.Empty);
-            else if (p.GetValue() is decimal)
-                Assert.AreEqual(pDto.Value, ((decimal) p.GetValue()).ToString(NumberFormatInfo.InvariantInfo));
+            }
+            else if (p.GetValue() is decimal decimalValue)
+            {
+                Assert.AreEqual(pDto.Value, decimalValue.ToString(NumberFormatInfo.InvariantInfo));
+            }
             else
+            {
                 Assert.AreEqual(pDto.Value, p.GetValue().ToString());
+            }
         }
 
         private void AssertProperty(IContentProperties<ContentPropertyDto> result, IProperty p)
         {
             AssertBasicProperty(result, p);
 
-            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            ContentPropertyDto pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
             Assert.AreEqual(p.PropertyType.Mandatory, pDto.IsRequired);
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
@@ -350,11 +356,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         {
             AssertBasics(result, content);
 
-            foreach (var p in content.Properties)
+            foreach (IProperty p in content.Properties)
             {
                 AssertProperty(result, p);
             }
         }
-        #endregion
     }
 }

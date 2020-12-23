@@ -1,7 +1,11 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -12,6 +16,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
@@ -28,14 +33,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class MemberServiceTests : UmbracoIntegrationTest
     {
         private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
         private IMemberService MemberService => GetRequiredService<IMemberService>();
 
         [SetUp]
-        public void SetupTest()
-        {
+        public void SetupTest() =>
+
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
             global::Umbraco.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
-        }
 
         [Test]
         public void Can_Update_Member_Property_Values()
@@ -64,11 +69,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_By_Username()
         {
-            var memberType = MemberTypeService.Get("member");
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
-            var member2 = MemberService.GetByUsername(member.Username);
+            IMember member2 = MemberService.GetByUsername(member.Username);
 
             Assert.IsNotNull(member2);
             Assert.AreEqual(member.Email, member2.Email);
@@ -77,8 +82,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Set_Last_Login_Date()
         {
-            var now = DateTime.Now;
-            var memberType = MemberTypeService.Get("member");
+            DateTime now = DateTime.Now;
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
             {
                 LastLoginDate = now,
@@ -86,10 +91,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             };
             MemberService.Save(member);
 
-            var newDate = now.AddDays(10);
+            DateTime newDate = now.AddDays(10);
             MemberService.SetLastLogin(member.Username, newDate);
 
-            //re-get
+            // re-get
             member = MemberService.GetById(member.Id);
 
             Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
@@ -99,7 +104,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Create_Member_With_Properties()
         {
-            var memberType = MemberTypeService.Get("member");
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
@@ -111,14 +116,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
             var variationContextAccessor = new TestVariationContextAccessor();
-            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
+            IPublishedContent pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
 
             // contains the umbracoMember... properties created when installing, on the member type
             // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
             //
             // TODO: see TODO in PublishedContentType, this list contains duplicates
-
-            var aliases = new[]
+            string[] aliases = new[]
             {
                 Constants.Conventions.Member.Comments,
                 Constants.Conventions.Member.FailedPasswordAttempts,
@@ -142,7 +146,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
 
-            var email = properties[aliases.IndexOf(nameof(IMember.Email))];
+            IPublishedProperty email = properties[aliases.IndexOf(nameof(IMember.Email))];
             Assert.AreEqual("xemail", email.GetSourceValue());
         }
 
@@ -155,7 +159,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(member);
 
             Assert.AreNotEqual(0, member.Id);
-            var foundMember = MemberService.GetById(member.Id);
+            IMember foundMember = MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreEqual("test@test.com", foundMember.Email);
         }
@@ -169,7 +173,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(member);
 
             Assert.AreNotEqual(0, member.Id);
-            var foundMember = MemberService.GetById(member.Id);
+            IMember foundMember = MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreEqual("test@test.marketing", foundMember.Email);
         }
@@ -179,7 +183,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             MemberService.AddRole("MyTestRole");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<string> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -191,7 +195,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole");
             MemberService.AddRole("MyTestRole");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<string> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -204,10 +208,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole2");
             MemberService.AddRole("MyTestRole3");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<string> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(3, found.Count());
         }
+
         [Test]
         public void Can_Get_All_Roles_IDs()
         {
@@ -215,10 +220,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole2");
             MemberService.AddRole("MyTestRole3");
 
-            var found = MemberService.GetAllRolesIds();
+            IEnumerable<int> found = MemberService.GetAllRolesIds();
 
             Assert.AreEqual(3, found.Count());
         }
+
         [Test]
         public void Can_Get_All_Roles_By_Member_Id()
         {
@@ -232,11 +238,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRoles(member.Id);
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles(member.Id);
 
             Assert.AreEqual(2, memberRoles.Count());
-
         }
+
         [Test]
         public void Can_Get_All_Roles_Ids_By_Member_Id()
         {
@@ -250,11 +256,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRolesIds(member.Id);
+            IEnumerable<int> memberRoles = MemberService.GetAllRolesIds(member.Id);
 
             Assert.AreEqual(2, memberRoles.Count());
-
         }
+
         [Test]
         public void Can_Get_All_Roles_By_Member_Username()
         {
@@ -262,7 +268,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
-            //need to test with '@' symbol in the lookup
+
+            // need to test with '@' symbol in the lookup
             IMember member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
             MemberService.Save(member2);
 
@@ -271,10 +278,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRoles("test");
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles("test");
             Assert.AreEqual(2, memberRoles.Count());
 
-            var memberRoles2 = MemberService.GetAllRoles("test2@test.com");
+            IEnumerable<string> memberRoles2 = MemberService.GetAllRoles("test2@test.com");
             Assert.AreEqual(2, memberRoles2.Count());
         }
 
@@ -285,7 +292,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             MemberService.DeleteRole("MyTestRole1", false);
 
-            var memberRoles = MemberService.GetAllRoles();
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles();
 
             Assert.AreEqual(0, memberRoles.Count());
         }
@@ -309,7 +316,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             MemberService.AddRole("MyTestRole1");
             int roleId;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 roleId = scope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
                 scope.Complete();
@@ -317,19 +324,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
                 scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
                 scope.Complete();
             }
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(2, membersInRole.Count());
         }
 
@@ -342,7 +349,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => MemberService.Save(member));
-
         }
 
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.StartsWith, 1)]
@@ -355,16 +361,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
-            var member3 = MemberBuilder.CreateSimpleMember(memberType, "test3", "test3@test.com", "pass", "test3");
+            Member member3 = MemberBuilder.CreateSimpleMember(memberType, "test3", "test3@test.com", "pass", "test3");
             MemberService.Save(member3);
 
             MemberService.AssignRoles(new[] { member1.Id, member2.Id, member3.Id }, new[] { roleName1 });
 
-            var result = MemberService.FindMembersInRole(roleName1, usernameToMatch, matchType);
+            IEnumerable<IMember> result = MemberService.FindMembersInRole(roleName1, usernameToMatch, matchType);
             Assert.AreEqual(resultCount, result.Count());
         }
 
@@ -375,9 +381,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
             // temp make sure they exist
@@ -386,7 +392,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
             Assert.AreEqual(2, membersInRole.Count());
         }
@@ -398,9 +404,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
             // temp make sure they exist
@@ -409,7 +415,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "mytestrole1" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
             Assert.AreEqual(2, membersInRole.Count());
         }
@@ -421,14 +427,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
             MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
             Assert.AreEqual(2, membersInRole.Count());
         }
@@ -440,14 +446,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1@test.com");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1@test.com");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
             MemberService.Save(member2);
 
             MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
             Assert.AreEqual(2, membersInRole.Count());
         }
@@ -457,15 +463,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
-            //implicitly create the role
+            // implicitly create the role
             MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
             Assert.AreEqual(2, membersInRole.Count());
         }
@@ -475,17 +481,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
             MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            MemberService.DissociateRoles(new[] {member1.Id }, new[] {"MyTestRole1"});
+            MemberService.DissociateRoles(new[] { member1.Id }, new[] { "MyTestRole1" });
             MemberService.DissociateRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole2" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(1, membersInRole.Count());
             membersInRole = MemberService.GetMembersInRole("MyTestRole2");
             Assert.AreEqual(0, membersInRole.Count());
@@ -496,9 +502,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
             MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1", "MyTestRole2" });
@@ -506,7 +512,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.DissociateRoles(new[] { member1.Username }, new[] { "MyTestRole1" });
             MemberService.DissociateRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole2" });
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(1, membersInRole.Count());
             membersInRole = MemberService.GetMembersInRole("MyTestRole2");
             Assert.AreEqual(0, membersInRole.Count());
@@ -521,7 +527,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(member);
 
             MemberService.Delete(member);
-            var deleted = MemberService.GetById(member.Id);
+            IMember deleted = MemberService.GetById(member.Id);
 
             // Assert
             Assert.That(deleted, Is.Null);
@@ -562,17 +568,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
-            var resolved = MemberService.GetByEmail(member.Email);
+            IMember resolved = MemberService.GetByEmail(member.Email);
 
-            //NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
+            // NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
             // just a c# property of the Member object
             resolved.Email = "changed@test.com";
 
-            //NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
+            // NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
             // the underlying 'Property'
             resolved.FailedPasswordAttempts = 1234;
 
-            var dirtyMember = (ICanBeDirty) resolved;
+            var dirtyMember = (ICanBeDirty)resolved;
             var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
             Assert.IsTrue(dirtyMember.IsDirty());
             Assert.AreEqual(1, dirtyProperties.Count);
@@ -597,7 +603,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
             MemberService.Save(member);
-
 
             Assert.AreEqual("Test Real Name", member.Name);
         }
@@ -631,11 +636,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
-            long totalRecs;
-            var found = MemberService.GetAll(0, 2, out totalRecs);
+            IEnumerable<IMember> found = MemberService.GetAll(0, 2, out long totalRecs);
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(10, totalRecs);
@@ -648,11 +652,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
-            long totalRecs;
-            var found = MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-");
+            IEnumerable<IMember> found = MemberService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending, true, null, "Member No-");
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(10, totalRecs);
@@ -671,14 +674,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindMembersByDisplayName("B", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            IEnumerable<IMember> found = MemberService.FindMembersByDisplayName("B", 0, 100, out long totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -688,14 +690,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //don't find this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello","hello");
+
+            // don't find this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            IEnumerable<IMember> found = MemberService.FindByEmail("tes", 0, 100, out long totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -705,14 +707,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            IEnumerable<IMember> found = MemberService.FindByEmail("test.com", 0, 100, out long totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -722,14 +724,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            IEnumerable<IMember> found = MemberService.FindByEmail("test", 0, 100, out long totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -739,14 +741,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            IEnumerable<IMember> found = MemberService.FindByEmail("hello@test.com", 0, 100, out long totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -756,14 +758,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //don't find this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // don't find this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            IEnumerable<IMember> found = MemberService.FindByUsername("tes", 0, 100, out long totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -773,14 +775,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            IEnumerable<IMember> found = MemberService.FindByUsername("llo", 0, 100, out long totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -790,14 +792,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hellotest");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hellotest");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            IEnumerable<IMember> found = MemberService.FindByUsername("test", 0, 100, out long totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -807,14 +809,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            //include this
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // include this
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            long totalRecs;
-            var found = MemberService.FindByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            IEnumerable<IMember> found = MemberService.FindByUsername("hello", 0, 100, out long totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -824,12 +826,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "title", "hello member", StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
@@ -840,12 +842,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "title", " member", StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
@@ -856,12 +858,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "title", "Member No", StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
@@ -872,13 +874,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("title", "title of mine");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "title", "mine", StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(1, found.Count());
@@ -888,21 +890,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Int_Value_Exact()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
-                {
-                    Name = "Number",
-                    //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    DataTypeId = -51
-                }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "number")
+                    {
+                        Name = "Number",
+                        DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("number", 2);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "number", 2, ValuePropertyMatchType.Exact);
 
             Assert.AreEqual(2, found.Count());
@@ -912,21 +918,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Int_Value_Greater_Than()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
-            {
-                Name = "Number",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -51
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "number")
+                    {
+                        Name = "Number",
+                        DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("number", 10);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "number", 3, ValuePropertyMatchType.GreaterThan);
 
             Assert.AreEqual(7, found.Count());
@@ -936,21 +946,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Int_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
-            {
-                Name = "Number",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -51
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "number")
+                {
+                    Name = "Number",
+                    DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("number", 10);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "number", 3, ValuePropertyMatchType.GreaterThanOrEqualTo);
 
             Assert.AreEqual(8, found.Count());
@@ -960,21 +974,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Int_Value_Less_Than()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date, "number")
-            {
-                Name = "Number",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -51
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.DateTime,
+                    ValueStorageType.Date,
+                    "number")
+                    {
+                        Name = "Number",
+                        DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("number", 1);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "number", 5, ValuePropertyMatchType.LessThan);
 
             Assert.AreEqual(6, found.Count());
@@ -984,21 +1002,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Int_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
-            {
-                Name = "Number",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -51
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "number")
+                    {
+                        Name = "Number",
+                        DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("number", 1);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "number", 5, ValuePropertyMatchType.LessThanOrEqualTo);
 
             Assert.AreEqual(7, found.Count());
@@ -1008,21 +1030,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Date_Value_Exact()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
-            {
-                Name = "Date",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -36
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "date")
+                    {
+                        Name = "Date",
+                        DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 2, 0));
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 2, 0), ValuePropertyMatchType.Exact);
 
             Assert.AreEqual(2, found.Count());
@@ -1032,21 +1058,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Date_Value_Greater_Than()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
-            {
-                Name = "Date",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -36
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "date")
+                    {
+                        Name = "Date",
+                        DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThan);
 
             Assert.AreEqual(7, found.Count());
@@ -1056,21 +1086,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Date_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
-            {
-                Name = "Date",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -36
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "date")
+                    {
+                        Name = "Date",
+                        DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThanOrEqualTo);
 
             Assert.AreEqual(8, found.Count());
@@ -1080,21 +1114,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Date_Value_Less_Than()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
-            {
-                Name = "Date",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -36
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "date")
+                    {
+                        Name = "Date",
+                        DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
 
             Assert.AreEqual(6, found.Count());
@@ -1104,21 +1142,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Property_Date_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
-            {
-                Name = "Date",
-                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeId = -36
-            }, "Content");
+            memberType.AddPropertyType(
+                new PropertyType(
+                    ShortStringHelper,
+                    Constants.PropertyEditors.Aliases.Integer,
+                    ValueStorageType.Integer,
+                    "date")
+                    {
+                        Name = "Date",
+                        DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    }, "Content");
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
             MemberService.Save(customMember);
 
-            var found = MemberService.GetMembersByPropertyValue(
+            IEnumerable<IMember> found = MemberService.GetMembersByPropertyValue(
                 "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThanOrEqualTo);
 
             Assert.AreEqual(7, found.Count());
@@ -1129,12 +1171,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetCount(MemberCountType.All);
+            int found = MemberService.GetCount(MemberCountType.All);
 
             Assert.AreEqual(11, found);
         }
@@ -1144,14 +1186,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetCount(MemberCountType.LockedOut);
+            int found = MemberService.GetCount(MemberCountType.LockedOut);
 
             Assert.AreEqual(6, found);
         }
@@ -1161,14 +1203,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsApproved = i % 2 == 0);
+            IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsApproved = i % 2 == 0);
             MemberService.Save(members);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
             MemberService.Save(customMember);
 
-            var found = MemberService.GetCount(MemberCountType.Approved);
+            int found = MemberService.GetCount(MemberCountType.Approved);
 
             Assert.AreEqual(5, found);
         }
@@ -1182,12 +1224,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberTypeService.Save(memberType);
             Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            //this should not throw an exception
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+
+            // this should not throw an exception
             customMember.Comments = "hello world";
             MemberService.Save(customMember);
 
-            var found = MemberService.GetById(customMember.Id);
+            IMember found = MemberService.GetById(customMember.Id);
 
             Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
         }
@@ -1201,19 +1244,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
-            var date = DateTime.Now;
+            Member member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
+            DateTime date = DateTime.Now;
             member.LastLoginDate = DateTime.Now;
             MemberService.Save(member);
 
-            var result = MemberService.GetById(member.Id);
+            IMember result = MemberService.GetById(member.Id);
             Assert.AreEqual(
                 date.TruncateTo(DateTimeExtensions.DateTruncate.Second),
                 result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
-            //now ensure the col is correct
-            var sqlContext = GetRequiredService<ISqlContext>();
-            var sql = sqlContext.Sql().Select<PropertyDataDto>()
+            // now ensure the col is correct
+            ISqlContext sqlContext = GetRequiredService<ISqlContext>();
+            Sql<ISqlContext> sql = sqlContext.Sql().Select<PropertyDataDto>()
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
                 .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
@@ -1221,7 +1264,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
 
             List<PropertyDataDto> colResult;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 colResult = scope.Database.Fetch<PropertyDataDto>(sql);
                 scope.Complete();
@@ -1240,10 +1283,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
 
-            var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            Member customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
 
-            var found = MemberService.GetById(customMember.Id);
+            IMember found = MemberService.GetById(customMember.Id);
 
             Assert.IsTrue(found.IsApproved);
         }

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -13,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
@@ -42,15 +46,13 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
-            {
+
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
-                {
+
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { });
-                });
-            });
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { })));
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -62,21 +64,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override IHostBuilder CreateHostBuilder()
         {
-            var builder = base.CreateHostBuilder();
+            IHostBuilder builder = base.CreateHostBuilder();
             builder.ConfigureWebHost(builder =>
             {
                  // need to configure the IWebHostEnvironment too
-                 builder.ConfigureServices((c, s) =>
-                 {
-                     c.HostingEnvironment = TestHelper.GetWebHostEnvironment();
-                 });
+                 builder.ConfigureServices((c, s) => c.HostingEnvironment = TestHelper.GetWebHostEnvironment());
 
                  // call startup
-                 builder.Configure(app =>
-                 {
-                     Configure(app);
-                 });
-
+                 builder.Configure(app => Configure(app));
             }).UseEnvironment(Environments.Development);
 
             return builder;
@@ -90,11 +85,11 @@ namespace Umbraco.Tests.Integration.TestServerTest
         protected string PrepareUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            var url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
+            string url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
 
-            var backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
-            var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
-            var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
+            IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
+            IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
+            IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
             httpContextAccessor.HttpContext = new DefaultHttpContext
             {
@@ -122,7 +117,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
-            var typeLoader = services.AddTypeLoader(
+            TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
                 TestHelper.GetWebHostEnvironment(),
                 TestHelper.GetHostingEnvironment(),

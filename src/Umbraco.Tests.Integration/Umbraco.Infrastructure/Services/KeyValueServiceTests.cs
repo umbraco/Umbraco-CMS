@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
@@ -20,7 +23,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void GetValue_ForMissingKey_ReturnsNull()
         {
             // Act
-            var value = KeyValueService.GetValue("foo");
+            string value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsNull(value);
@@ -32,7 +35,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var value = KeyValueService.GetValue("foo");
+            string value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.AreEqual("bar", value);
@@ -45,7 +48,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Act
             KeyValueService.SetValue("foo", "buzz");
-            var value = KeyValueService.GetValue("foo");
+            string value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.AreEqual("buzz", value);
@@ -57,8 +60,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var result = KeyValueService.TrySetValue("foo", "bar", "buzz");
-            var value = KeyValueService.GetValue("foo");
+            bool result = KeyValueService.TrySetValue("foo", "bar", "buzz");
+            string value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsTrue(result);
@@ -71,8 +74,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var result = KeyValueService.TrySetValue("foo", "bang", "buzz");
-            var value = KeyValueService.GetValue("foo");
+            bool result = KeyValueService.TrySetValue("foo", "bang", "buzz");
+            string value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsFalse(result);

@@ -1,6 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
@@ -13,10 +17,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {
-                using (var scope = provider.CreateScope())
+                using (IScope scope = provider.CreateScope())
                 {
                     scope.ReadLock(-666);
                     scope.Complete();
@@ -27,8 +31,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ReadLockExisting()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.Servers);
                 scope.Complete();
@@ -38,10 +42,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             Assert.Throws<ArgumentException>(() =>
             {
-                using (var scope = provider.CreateScope())
+                using (IScope scope = provider.CreateScope())
                 {
                     scope.WriteLock(-666);
                     scope.Complete();
@@ -52,8 +56,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void WriteLockExisting()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.Servers);
                 scope.Complete();

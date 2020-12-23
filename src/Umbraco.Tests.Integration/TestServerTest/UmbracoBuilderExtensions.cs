@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;

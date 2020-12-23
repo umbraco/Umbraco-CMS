@@ -1,4 +1,8 @@
-﻿using System.Data.SqlClient;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -29,10 +33,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Cannot_Add_Duplicate_Macros()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
 
@@ -44,12 +48,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Cannot_Update_To_Duplicate_Macro_Alias()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
-                var macro = repository.Get(1);
+                IMacro macro = repository.Get(1);
                 macro.Alias = "test2";
 
                 Assert.Throws<SqlException>(() => repository.Save(macro));
@@ -60,10 +64,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -74,13 +78,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Get_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var macro = repository.Get(1);
+                IMacro macro = repository.Get(1);
 
                 // Assert
                 Assert.That(macro, Is.Not.Null);
@@ -100,13 +104,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetAll_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var macros = repository.GetMany();
+                IEnumerable<IMacro> macros = repository.GetMany();
 
                 // Assert
                 Assert.That(macros.Count(), Is.EqualTo(3));
@@ -117,14 +121,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetByQuery_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var query = scope.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
-                var result = repository.Get((IQuery<IMacro>) query);
+                IQuery<IMacro> query = scope.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
+                IEnumerable<IMacro> result = repository.Get((IQuery<IMacro>)query);
 
                 // Assert
                 Assert.AreEqual(1, result.Count());
@@ -135,13 +139,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Count_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var query = scope.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
+                IQuery<IMacro> query = scope.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -153,10 +157,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
                 var macro = new Macro(ShortStringHelper, "test", "Test", "~/views/macropartials/test.cshtml");
@@ -165,7 +169,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
-                Assert.That(macro.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4
+                Assert.That(macro.Id, Is.EqualTo(4)); // With 3 existing entries the Id should be 4
                 Assert.Greater(macro.Properties.Values.Single().Id, 0);
             }
         }
@@ -174,13 +178,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var macro = repository.Get(2);
+                IMacro macro = repository.Get(2);
                 macro.Name = "Hello";
                 macro.CacheDuration = 1234;
                 macro.CacheByPage = true;
@@ -191,7 +195,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 repository.Save(macro);
 
-                var macroUpdated = repository.Get(2);
+                IMacro macroUpdated = repository.Get(2);
 
                 // Assert
                 Assert.That(macroUpdated, Is.Not.Null);
@@ -209,17 +213,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var macro = repository.Get(3);
+                IMacro macro = repository.Get(3);
                 Assert.IsNotNull(macro);
                 repository.Delete(macro);
 
-                var exists = repository.Exists(3);
+                bool exists = repository.Exists(3);
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -230,14 +234,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Exists_On_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                var exists = repository.Exists(3);
-                var doesntExist = repository.Exists(10);
+                bool exists = repository.Exists(3);
+                bool doesntExist = repository.Exists(10);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -249,25 +253,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Add_Property_For_Macro()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
-                var macro = repository.Get(1);
+                IMacro macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
 
                 repository.Save(macro);
 
                 // Assert
-                Assert.Greater(macro.Properties.Values.First().Id, 0); //ensure id is returned
-                var result = repository.Get(1);
+                Assert.Greater(macro.Properties.Values.First().Id, 0); // ensure id is returned
+                IMacro result = repository.Get(1);
                 Assert.Greater(result.Properties.Values.First().Id, 0);
                 Assert.AreEqual(1, result.Properties.Values.Count());
                 Assert.AreEqual("new1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("New1", result.Properties.Values.First().Name);
                 Assert.AreEqual(3, result.Properties.Values.First().SortOrder);
-
             }
         }
 
@@ -275,24 +278,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Add_New_Macro_With_Property()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
                 repository.Save(macro);
 
-
                 // Assert
-                var result = repository.Get(macro.Id);
+                IMacro result = repository.Get(macro.Id);
                 Assert.AreEqual(1, result.Properties.Values.Count());
                 Assert.AreEqual("blah1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("New1", result.Properties.Values.First().Name);
                 Assert.AreEqual(4, result.Properties.Values.First().SortOrder);
-
             }
         }
 
@@ -300,23 +301,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Remove_Macro_Property()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
                 repository.Save(macro);
 
-                var result = repository.Get(macro.Id);
+                IMacro result = repository.Get(macro.Id);
                 result.Properties.Remove("blah1");
                 repository.Save(result);
 
                 // Assert
                 result = repository.Get(macro.Id);
                 Assert.AreEqual(0, result.Properties.Values.Count());
-
             }
         }
 
@@ -324,16 +324,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Add_Remove_Macro_Properties()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 var macro = new Macro(ShortStringHelper, "newmacro", "A new macro", "~/views/macropartials/test1.cshtml");
                 var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
                 var prop2 = new MacroProperty("blah2", "New2", 3, "test.editor");
 
-                //add/remove a few to test the collection observable
+                // add/remove a few to test the collection observable
                 macro.Properties.Add(prop1);
                 macro.Properties.Add(prop2);
                 macro.Properties.Remove(prop1);
@@ -343,11 +343,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(macro);
 
                 // Assert
-                var result = repository.Get(macro.Id);
+                IMacro result = repository.Get(macro.Id);
 
                 Assert.AreEqual(1, result.Properties.Values.Count());
                 Assert.AreEqual("blah2", result.Properties.Values.Single().Alias);
-
             }
         }
 
@@ -355,26 +354,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Update_Property_For_Macro()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
-                var macro = repository.Get(1);
+                IMacro macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
                 repository.Save(macro);
 
-                //Act
+                // Act
                 macro = repository.Get(1);
                 macro.Properties["new1"].Name = "this is a new name";
                 repository.Save(macro);
 
-
                 // Assert
-                var result = repository.Get(1);
+                IMacro result = repository.Get(1);
                 Assert.AreEqual("new1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("this is a new name", result.Properties.Values.First().Name);
-
             }
         }
 
@@ -382,32 +379,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Update_Macro_Property_Alias()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
-                var macro = repository.Get(1);
+                IMacro macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
                 repository.Save(macro);
 
-                //Act
+                // Act
                 macro = repository.Get(1);
                 macro.Properties.UpdateProperty("new1", newAlias: "newAlias");
                 repository.Save(macro);
 
                 // Assert
-                var result = repository.Get(1);
+                IMacro result = repository.Get(1);
                 Assert.AreEqual("newAlias", result.Properties.Values.First().Alias);
             }
         }
 
         public void CreateTestData()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, _logger, ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
                 repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));

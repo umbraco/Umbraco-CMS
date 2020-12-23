@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -18,24 +21,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void GetPage()
         {
-            var sut = (AuditService) GetRequiredService<IAuditService>();
-            var expected = new AuditEntryBuilder().Build();
+            var sut = (AuditService)GetRequiredService<IAuditService>();
+            IAuditEntry expected = new AuditEntryBuilder().Build();
 
-
-            for (var i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 sut.Write(
                     expected.PerformingUserId + i,
                     expected.PerformingDetails,
                     expected.PerformingIp,
                     expected.EventDateUtc.AddMinutes(i),
-                    expected.AffectedUserId+ i,
+                    expected.AffectedUserId + i,
                     expected.AffectedDetails,
                     expected.EventType,
                     expected.EventDetails);
             }
 
-            var entries = sut.GetPage(2, 2, out var count).ToArray();
+            IAuditEntry[] entries = sut.GetPage(2, 2, out long count).ToArray();
 
             Assert.Multiple(() =>
             {
@@ -48,20 +50,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void GetUserLogs()
         {
-            var sut = (AuditService) Services.GetRequiredService<IAuditService>();
+            var sut = (AuditService)Services.GetRequiredService<IAuditService>();
 
-            var eventDateUtc = DateTime.UtcNow.AddDays(-1);
+            DateTime eventDateUtc = DateTime.UtcNow.AddDays(-1);
 
-            var numberOfEntries = 10;
-            for (var i = 0; i < numberOfEntries; i++)
+            int numberOfEntries = 10;
+            for (int i = 0; i < numberOfEntries; i++)
             {
                 eventDateUtc = eventDateUtc.AddMinutes(1);
-                sut.Add(AuditType.Unpublish, -1, 33, "", "blah");
+                sut.Add(AuditType.Unpublish, -1, 33, string.Empty, "blah");
             }
 
-            sut.Add(AuditType.Publish, -1, 33, "", "blah");
+            sut.Add(AuditType.Publish, -1, 33, string.Empty, "blah");
 
-            var logs = sut.GetUserLogs(-1, AuditType.Unpublish).ToArray();
+            IAuditItem[] logs = sut.GetUserLogs(-1, AuditType.Unpublish).ToArray();
 
             Assert.Multiple(() =>
             {
@@ -75,10 +77,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Write_and_GetAll()
         {
-            var sut = (AuditService) Services.GetRequiredService<IAuditService>();
-            var expected = new AuditEntryBuilder().Build();
+            var sut = (AuditService)Services.GetRequiredService<IAuditService>();
+            IAuditEntry expected = new AuditEntryBuilder().Build();
 
-            var actual = sut.Write(
+            IAuditEntry actual = sut.Write(
                 expected.PerformingUserId,
                 expected.PerformingDetails,
                 expected.PerformingIp,
@@ -88,7 +90,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 expected.EventType,
                 expected.EventDetails);
 
-            var entries = sut.GetAll().ToArray();
+            IAuditEntry[] entries = sut.GetAll().ToArray();
 
             Assert.Multiple(() =>
             {

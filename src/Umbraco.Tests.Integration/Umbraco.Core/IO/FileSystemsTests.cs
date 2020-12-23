@@ -1,56 +1,49 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
-    [UmbracoTest()]
+    [UmbracoTest]
     public class FileSystemsTests : UmbracoIntegrationTest
     {
         [Test]
         public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = GetRequiredService<IMediaFileSystem>();
+            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void Can_Get_IMediaFileSystem()
         {
-            var fileSystem = GetRequiredService<IMediaFileSystem>();
+            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void IMediaFileSystem_Is_Singleton()
         {
-            var fileSystem1 = GetRequiredService<IMediaFileSystem>();
-            var fileSystem2 = GetRequiredService<IMediaFileSystem>();
+            IMediaFileSystem fileSystem1 = GetRequiredService<IMediaFileSystem>();
+            IMediaFileSystem fileSystem2 = GetRequiredService<IMediaFileSystem>();
             Assert.AreSame(fileSystem1, fileSystem2);
         }
 
         [Test]
         public void Can_Unwrap_MediaFileSystem()
         {
-            var fileSystem = GetRequiredService<IMediaFileSystem>();
-            var unwrapped = fileSystem.Unwrap();
+            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
+            IFileSystem unwrapped = fileSystem.Unwrap();
             Assert.IsNotNull(unwrapped);
             var physical = unwrapped as PhysicalFileSystem;
             Assert.IsNotNull(physical);
@@ -59,21 +52,21 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            var fs = GetRequiredService<IMediaFileSystem>();
+            IMediaFileSystem fs = GetRequiredService<IMediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-            var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+            string virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);
 
             // ~/media/1234/file.txt exists
-            var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
-            var physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtPath));
+            IHostingEnvironment hostingEnvironment = GetRequiredService<IHostingEnvironment>();
+            string physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtPath));
             Assert.IsTrue(File.Exists(physPath));
 
             // ~/media/1234/file.txt is gone
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            var scheme = GetRequiredService<IMediaPathScheme>();
+            IMediaPathScheme scheme = GetRequiredService<IMediaPathScheme>();
             if (scheme is UniqueMediaPathScheme)
             {
                 // ~/media/1234 is *not* gone
@@ -91,7 +84,6 @@ namespace Umbraco.Tests.IO
             physPath = Path.GetDirectoryName(physPath);
             Assert.IsTrue(Directory.Exists(physPath));
         }
-
 
         // FIXME: don't make sense anymore
         /*

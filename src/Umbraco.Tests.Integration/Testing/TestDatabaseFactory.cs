@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
@@ -9,7 +12,7 @@ namespace Umbraco.Tests.Integration.Testing
     {
         public static ITestDatabase Create(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
-            var connectionString = Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString");
+            string connectionString = Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString");
 
             return string.IsNullOrEmpty(connectionString)
                 ? CreateLocalDb(filesPath, loggerFactory, dbFactory)

@@ -1,11 +1,14 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
-
-    public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+    public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
+        where TStartup : class
     {
         private readonly Func<IHostBuilder> _createHostBuilder;
         private readonly Action<IHost> _beforeStart;

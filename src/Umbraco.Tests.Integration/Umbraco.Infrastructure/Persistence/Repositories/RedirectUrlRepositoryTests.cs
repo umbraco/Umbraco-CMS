@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -18,19 +22,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     {
         [SetUp]
-        public void SetUp()
-        {
-            CreateTestData();
-        }
+        public void SetUp() => CreateTestData();
 
         [Test]
         public void CanSaveAndGet()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
+                IRedirectUrlRepository repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -42,10 +43,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var rurl = repo.GetMostRecentUrl("blah");
+                IRedirectUrlRepository repo = CreateRepository(provider);
+                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
                 scope.Complete();
 
                 Assert.IsNotNull(rurl);
@@ -56,10 +57,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void CanSaveAndGetWithCulture()
         {
-            var culture = "en";
-            using (var scope =  ScopeProvider.CreateScope())
+            string culture = "en";
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = CreateRepository(ScopeProvider);
+                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -72,10 +73,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = CreateRepository(ScopeProvider);
-                var rurl = repo.GetMostRecentUrl("blah");
+                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
+                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
                 scope.Complete();
 
                 Assert.IsNotNull(rurl);
@@ -84,17 +85,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             }
         }
 
-
         [Test]
         public void CanSaveAndGetMostRecent()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
+                IRedirectUrlRepository repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -109,7 +109,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 // and... can that happen in real life?
                 // we don't really *care* about the IX, only supposed to make things faster...
                 // BUT in realife we AddOrUpdate in a trx so it should be safe, always
-
                 rurl = new RedirectUrl
                 {
                     ContentKey = _otherpage.Key,
@@ -122,10 +121,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var rurl = repo.GetMostRecentUrl("blah");
+                IRedirectUrlRepository repo = CreateRepository(provider);
+                IRedirectUrl rurl = repo.GetMostRecentUrl("blah");
                 scope.Complete();
 
                 Assert.IsNotNull(rurl);
@@ -136,13 +135,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void CanSaveAndGetMostRecentForCulture()
         {
-            var cultureA = "en";
-            var cultureB = "de";
+            string cultureA = "en";
+            string cultureB = "de";
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = CreateRepository(ScopeProvider);
+                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -158,7 +157,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 // and... can that happen in real life?
                 // we don't really *care* about the IX, only supposed to make things faster...
                 // BUT in realife we AddOrUpdate in a trx so it should be safe, always
-
                 rurl = new RedirectUrl
                 {
                     ContentKey = _otherpage.Key,
@@ -172,10 +170,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = CreateRepository(ScopeProvider);
-                var rurl = repo.GetMostRecentUrl("blah", cultureA);
+                IRedirectUrlRepository repo = CreateRepository(ScopeProvider);
+                IRedirectUrl rurl = repo.GetMostRecentUrl("blah", cultureA);
                 scope.Complete();
 
                 Assert.IsNotNull(rurl);
@@ -184,15 +182,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             }
         }
 
-
         [Test]
         public void CanSaveAndGetByContent()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
+                IRedirectUrlRepository repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -204,7 +201,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
 
                 // FIXME: goes too fast and bam, errors, first is blah
-
                 rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -217,10 +213,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
+                IRedirectUrlRepository repo = CreateRepository(provider);
+                IRedirectUrl[] rurls = repo.GetContentUrls(_textpage.Key).ToArray();
                 scope.Complete();
 
                 Assert.AreEqual(2, rurls.Length);
@@ -232,11 +228,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void CanSaveAndDelete()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
+                IRedirectUrlRepository repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -258,57 +254,59 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
+                IRedirectUrlRepository repo = CreateRepository(provider);
                 repo.DeleteContentUrls(_textpage.Key);
                 scope.Complete();
 
-                var rurls = repo.GetContentUrls(_textpage.Key);
+                IEnumerable<IRedirectUrl> rurls = repo.GetContentUrls(_textpage.Key);
 
                 Assert.AreEqual(0, rurls.Count());
             }
         }
 
-        private IRedirectUrlRepository CreateRepository(IScopeProvider provider)
-        {
-            return new RedirectUrlRepository((IScopeAccessor) provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
-        }
+        private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
+            new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
 
-        private IContent _textpage, _subpage, _otherpage, _trashed;
+        private IContent _textpage;
+        private IContent _subpage;
+        private IContent _otherpage;
+        private IContent _trashed;
 
         public void CreateTestData()
         {
-            var fileService = GetRequiredService<IFileService>();
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            IFileService fileService = GetRequiredService<IFileService>();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             fileService.SaveTemplate(template); // else, FK violation on contentType!
 
-            var contentService = GetRequiredService<IContentService>();
-            var contentTypeService = GetRequiredService<IContentTypeService>();
-            //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            IContentService contentService = GetRequiredService<IContentService>();
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+
+            // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             contentType.Key = Guid.NewGuid();
             contentTypeService.Save(contentType);
 
-            //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
+            // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = ContentBuilder.CreateSimpleContent(contentType);
             _textpage.Key = Guid.NewGuid();
             contentService.Save(_textpage);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
+            // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             _subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
             _subpage.Key = Guid.NewGuid();
             contentService.Save(_subpage);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
+            // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             _otherpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
             _otherpage.Key = Guid.NewGuid();
             contentService.Save(_otherpage);
 
-            //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
+            // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
             _trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             _trashed.Key = Guid.NewGuid();
-            ((Content) _trashed).Trashed = true;
+            ((Content)_trashed).Trashed = true;
             contentService.Save(_trashed);
         }
     }

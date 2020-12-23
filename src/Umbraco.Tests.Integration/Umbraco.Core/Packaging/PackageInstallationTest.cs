@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,6 +19,7 @@ namespace Umbraco.Tests.Packaging
     public class PackageInstallationTest : UmbracoIntegrationTest
     {
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+
         private IPackageInstallation PackageInstallation => GetRequiredService<IPackageInstallation>();
 
         private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
@@ -24,9 +28,8 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Read_Compiled_Package_1()
         {
-            var package = PackageInstallation.ReadPackage(
-                //this is where our test zip file is
-                new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage)));
+            var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
+            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
             Assert.IsNotNull(package);
             Assert.AreEqual(1, package.Files.Count);
             Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
@@ -47,9 +50,8 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Read_Compiled_Package_2()
         {
-            var package = PackageInstallation.ReadPackage(
-                //this is where our test zip file is
-                new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), HelloPackage)));
+            var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), HelloPackage));
+            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
             Assert.IsNotNull(package);
             Assert.AreEqual(0, package.Files.Count);
             Assert.AreEqual("Hello", package.Name);
@@ -73,18 +75,17 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Read_Compiled_Package_Warnings()
         {
-            //copy a file to the same path that the package will install so we can detect file conflicts
-
-            var filePath = Path.Combine(HostingEnvironment.MapPathContentRoot("~/"), "bin", "Auros.DocumentTypePicker.dll");
+            // Copy a file to the same path that the package will install so we can detect file conflicts.
+            string filePath = Path.Combine(HostingEnvironment.MapPathContentRoot("~/"), "bin", "Auros.DocumentTypePicker.dll");
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, "test");
 
-            //this is where our test zip file is
-            var packageFile = Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage);
+            // this is where our test zip file is
+            string packageFile = Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage);
             Console.WriteLine(packageFile);
 
-            var package = PackageInstallation.ReadPackage(new FileInfo(packageFile));
-            var preInstallWarnings = package.Warnings;
+            CompiledPackage package = PackageInstallation.ReadPackage(new FileInfo(packageFile));
+            PreInstallWarnings preInstallWarnings = package.Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
             Assert.AreEqual(1, preInstallWarnings.FilesReplaced.Count());
@@ -96,14 +97,13 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Install_Files()
         {
-            var package = PackageInstallation.ReadPackage(
-                //this is where our test zip file is
-                new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage)));
+            var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
+            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
 
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();
-            def.Files = new List<string>(); //clear out the files of the def for testing, this should be populated by the install
+            def.Files = new List<string>(); // clear out the files of the def for testing, this should be populated by the install
 
             var result = PackageInstallation.InstallPackageFiles(def, package, -1).ToList();
 
@@ -111,26 +111,24 @@ namespace Umbraco.Tests.Packaging
             Assert.AreEqual(Path.Combine("bin", "Auros.DocumentTypePicker.dll"), result[0]);
             Assert.IsTrue(File.Exists(Path.Combine(HostingEnvironment.MapPathContentRoot("~/"), result[0])));
 
-            //make sure the def is updated too
+            // make sure the def is updated too
             Assert.AreEqual(result.Count, def.Files.Count);
         }
 
         [Test]
         public void Install_Data()
         {
-            var package = PackageInstallation.ReadPackage(
-                //this is where our test zip file is
-                new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage)));
+            var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
+            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();
 
-            var summary = PackageInstallation.InstallPackageData(def, package, -1);
+            InstallationSummary summary = PackageInstallation.InstallPackageData(def, package, -1);
 
             Assert.AreEqual(1, summary.DataTypesInstalled.Count());
 
-
-            //make sure the def is updated too
+            // make sure the def is updated too
             Assert.AreEqual(summary.DataTypesInstalled.Count(), def.DataTypes.Count);
         }
     }
