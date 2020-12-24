@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Composing;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.DependencyInjection
 {
@@ -16,6 +15,8 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
         {
+            // TODO: Should have a better name
+
             IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<IComposer>();
             IEnumerable<Attribute> enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();

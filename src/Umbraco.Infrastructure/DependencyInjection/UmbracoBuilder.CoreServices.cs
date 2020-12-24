@@ -6,10 +6,10 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dashboards;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
+using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Media;
@@ -19,28 +19,22 @@ using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Templates;
-using Umbraco.Core.Trees;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
+using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
-using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
@@ -48,39 +42,20 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
-using Umbraco.Web.Sections;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {
-
-        /*
-         * TODO: Many of these things are not "Core" services and are probably not required to run
-         *
-         * This should be split up:
-         *   - Distributed Cache
-         *   - BackOffice
-         *     - Manifest
-         *     - Property Editors
-         *     - Packages
-         *     - Dashboards
-         *     - OEmbed
-         *     - Sections
-         *     - Content Apps
-         *     - Health Checks
-         *     - ETC...
-         *   - Installation
-         *   - Front End
-         */
-
         /// <summary>
         /// Adds all core Umbraco services required to run which may be replaced later in the pipeline
         /// </summary>
         public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
         {
-            builder.AddMainDom();
+            builder
+                .AddMainDom()
+                .AddLogging();
 
             builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
@@ -155,7 +130,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
-            
+
             builder.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             builder.Services.AddScoped<UmbracoTreeSearcher>();
@@ -198,10 +173,20 @@ namespace Umbraco.Infrastructure.DependencyInjection
             return builder;
         }
 
+        /// <summary>
+        /// Adds logging requirements for Umbraco
+        /// </summary>
+        private static IUmbracoBuilder AddLogging(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddUnique<ThreadAbortExceptionEnricher>();
+            builder.Services.AddUnique<HttpSessionIdEnricher>();
+            builder.Services.AddUnique<HttpRequestNumberEnricher>();
+            builder.Services.AddUnique<HttpRequestIdEnricher>();
+            return builder;
+        }
+
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<IMainDom, MainDom>();
-
             builder.Services.AddUnique<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;

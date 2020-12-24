@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Scoping
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
-            Builder.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
+            Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
         }

@@ -1,25 +1,20 @@
 using System;
 
-namespace Umbraco.Net
+namespace Umbraco.Core.Hosting
 {
-    // TODO: This shouldn't be in this namespace?
     public interface IUmbracoApplicationLifetime
     {
         /// <summary>
         /// A value indicating whether the application is restarting after the current request.
         /// </summary>
         bool IsRestarting { get; }
+
         /// <summary>
         /// Terminates the current application. The application restarts the next time a request is received for it.
         /// </summary>
         void Restart();
 
+        // TODO: Should be killed and replaced with UmbracoApplicationStarting notifications
         event EventHandler ApplicationInit;
-    }
-
-
-    public interface IUmbracoApplicationLifetimeManager
-    {
-        void InvokeApplicationInit();
     }
 }

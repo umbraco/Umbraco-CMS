@@ -37,10 +37,10 @@ namespace Umbraco.Tests.Integration
         }
 
         /// <summary>
-        /// Calling AddUmbracoCore to configure the container and UseUmbracoCore to start the runtime
+        /// This will boot up umbraco with components enabled to show they initialize and shutdown
         /// </summary>
         [Test]
-        public async Task UseUmbracoCore()
+        public async Task Start_And_Stop_Umbraco_With_Components_Enabled()
         {
             var testHelper = new TestHelper();
 
@@ -70,6 +70,8 @@ namespace Umbraco.Tests.Integration
                     builder.Services.AddUnique(AppCaches.NoCache);
                     builder.AddConfiguration()
                         .AddUmbracoCore()
+                        .AddWebComponents()
+                        .AddComposers()
                         .Build();
 
                     services.AddRouting(); // LinkGenerator

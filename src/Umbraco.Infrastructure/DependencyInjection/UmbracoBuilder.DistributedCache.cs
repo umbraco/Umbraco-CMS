@@ -26,26 +26,9 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
         {
-            // NOTE: the `DistributedCache` is registered in UmbracoBuilder since it's a core service
-
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, DatabaseServerMessengerNotificationHandler>();
-
-            // TODO: We don't need server registrar anymore
-            // register a server registrar, by default it's the db registrar
-            builder.Services.AddUnique<IServerRegistrar>(f =>
-            {
-                var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
-
-                // TODO:  we still register the full IServerMessenger because
-                // even on 1 single server we can have 2 concurrent app domains
-                var singleServer = globalSettings.DisableElectionForSingleServer;
-                return singleServer
-                    ? (IServerRegistrar)new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
-                    : new DatabaseServerRegistrar(
-                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
-            });
 
             builder.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             return builder;
@@ -57,15 +40,15 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// <typeparam name="T">The type of the server registrar.</typeparam>
         /// <param name="builder">The builder.</param>
         public static void SetServerRegistrar<T>(this IUmbracoBuilder builder)
-            where T : class, IServerRegistrar
-            => builder.Services.AddUnique<IServerRegistrar, T>();
+            where T : class, IServerRoleAccessor
+            => builder.Services.AddUnique<IServerRoleAccessor, T>();
 
         /// <summary>
         /// Sets the server registrar.
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a server registrar.</param>
-        public static void SetServerRegistrar(this IUmbracoBuilder builder, Func<IServiceProvider, IServerRegistrar> factory)
+        public static void SetServerRegistrar(this IUmbracoBuilder builder, Func<IServiceProvider, IServerRoleAccessor> factory)
             => builder.Services.AddUnique(factory);
 
         /// <summary>
@@ -73,7 +56,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="registrar">A server registrar.</param>
-        public static void SetServerRegistrar(this IUmbracoBuilder builder, IServerRegistrar registrar)
+        public static void SetServerRegistrar(this IUmbracoBuilder builder, IServerRoleAccessor registrar)
             => builder.Services.AddUnique(registrar);
 
         /// <summary>

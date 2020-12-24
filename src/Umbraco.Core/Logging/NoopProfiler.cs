@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Core.Logging
 {
-    public class VoidProfiler : IProfiler
+    public class NoopProfiler : IProfiler
     {
         private readonly VoidDisposable _disposable = new VoidDisposable();
 

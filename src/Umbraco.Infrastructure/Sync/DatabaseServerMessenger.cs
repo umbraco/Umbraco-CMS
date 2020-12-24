@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly CacheRefresherCollection _cacheRefreshers;
 
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Sync
             IScopeProvider scopeProvider,
             IProfilingLogger proflog,
             ILogger<DatabaseServerMessenger> logger,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             bool distributedEnabled,
             DatabaseServerMessengerCallbacks callbacks,
             IHostingEnvironment hostingEnvironment,
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Sync
 
                     _lastPruned = _lastSync;
 
-                    switch (_serverRegistrar.GetCurrentServerRole())
+                    switch (_serverRegistrar.CurrentServerRole)
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:

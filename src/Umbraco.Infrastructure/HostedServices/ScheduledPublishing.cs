@@ -27,7 +27,7 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
-        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Umbraco.Infrastructure.HostedServices
         public ScheduledPublishing(
             IRuntimeState runtimeState,
             IMainDom mainDom,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
@@ -69,7 +69,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 return Task.CompletedTask;
             }
 
-            switch (_serverRegistrar.GetCurrentServerRole())
+            switch (_serverRegistrar.CurrentServerRole)
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");

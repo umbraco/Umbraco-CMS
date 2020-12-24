@@ -27,8 +27,10 @@ using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.DependencyInjection;
@@ -212,7 +214,6 @@ namespace Umbraco.Tests.Integration.Testing
                 TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
 
-
             builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
@@ -222,13 +223,14 @@ namespace Umbraco.Tests.Integration.Testing
             builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
 
+            //.AddTestServices(TestHelper)
+            builder.AddWebComponents()
+                .AddRuntimeMinifier()
+                .AddBackOfficeAuthentication()
+                .AddBackOfficeIdentity();
+                //.AddComposers();
+
             services.AddSignalR();
-
-            builder.AddWebComponents();
-            builder.AddRuntimeMinifier();
-            builder.AddBackOfficeAuthentication();
-            builder.AddBackOfficeIdentity();
-
             services.AddMvc();
 
             builder.Build();

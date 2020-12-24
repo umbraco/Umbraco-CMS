@@ -34,7 +34,7 @@ namespace Umbraco.Web
             IScopeProvider scopeProvider,
             IProfilingLogger proflog,
             ILogger<BatchedDatabaseServerMessenger> logger,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             DatabaseServerMessengerCallbacks callbacks,
             IHostingEnvironment hostingEnvironment,
             CacheRefresherCollection cacheRefreshers,

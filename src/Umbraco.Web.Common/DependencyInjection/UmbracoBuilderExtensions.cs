@@ -88,8 +88,6 @@ namespace Umbraco.Web.Common.DependencyInjection
                 throw new ArgumentNullException(nameof(config));
             }
 
-            // TODO: Should some/all of these registrations be moved directly into UmbracoBuilder?
-
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
             var loggingDir = tempHostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.LogFiles);
@@ -116,6 +114,9 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// <summary>
         /// Adds core Umbraco services
         /// </summary>
+        /// <remarks>
+        /// This will not add any composers/components
+        /// </remarks>
         public static IUmbracoBuilder AddUmbracoCore(this IUmbracoBuilder builder)
         {
             if (builder is null)
@@ -142,8 +143,9 @@ namespace Umbraco.Web.Common.DependencyInjection
 
             builder.AddCoreInitialServices();
 
-            // TODO: This should be a separate call to opt-in to plugins
-            builder.AddComposers();
+            // aspnet app lifetime mgmt
+            builder.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             return builder;
         }
@@ -232,11 +234,6 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
 
-            // Our own netcore implementations
-            builder.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
-
-            builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
-
             // The umbraco request lifetime
             builder.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
@@ -278,8 +275,10 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
             builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
-            builder.AddNuCache();
             builder.AddHttpClients();
+
+            // TODO: Does this belong in web components??
+            builder.AddNuCache();
 
             return builder;
         }
@@ -364,7 +363,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             {
                 // should let it be null, that's how MiniProfiler is meant to work,
                 // but our own IProfiler expects an instance so let's get one
-                return new VoidProfiler();
+                return new NoopProfiler();
             }
 
             var webProfiler = new WebProfiler();

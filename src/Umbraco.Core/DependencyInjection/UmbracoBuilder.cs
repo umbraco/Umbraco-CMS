@@ -8,10 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -107,6 +110,14 @@ namespace Umbraco.Core.DependencyInjection
 
             Services.AddLazySupport();
 
+            // Adds no-op registrations as many core services require these dependencies but these
+            // dependencies cannot be fulfilled in the Core project
+            Services.AddUnique<IMarchal, NoopMarchal>();
+            Services.AddUnique<IProfiler, NoopProfiler>();
+            Services.AddUnique<IApplicationShutdownRegistry, NoopApplicationShutdownRegistry>();
+            Services.AddUnique<IUmbracoApplicationLifetimeManager, NoopUmbracoApplicationLifetimeManager>();
+
+            Services.AddUnique<IMainDom, MainDom>();
             Services.AddUnique<IMainDomLock, MainDomSemaphoreLock>();
 
             Services.AddUnique<IIOHelper>(factory =>
@@ -195,6 +206,16 @@ namespace Umbraco.Core.DependencyInjection
 
             Services.AddUnique<PropertyEditorCollection>();
             Services.AddUnique<ParameterEditorCollection>();
+
+            // register a server registrar, by default it's the db registrar
+            Services.AddUnique<IServerRoleAccessor>(f =>
+            {
+                GlobalSettings globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                var singleServer = globalSettings.DisableElectionForSingleServer;
+                return singleServer
+                    ? (IServerRoleAccessor)new SingleServerRoleAccessor()
+                    : new ElectedServerRoleAccessor(f.GetRequiredService<IServerRegistrationService>());
+            });
         }
     }
 }

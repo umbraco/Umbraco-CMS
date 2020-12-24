@@ -11,7 +11,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Net;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;

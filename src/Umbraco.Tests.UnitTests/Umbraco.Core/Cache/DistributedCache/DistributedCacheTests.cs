@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
     {
         private global::Umbraco.Web.Cache.DistributedCache _distributedCache;
 
-        private IServerRegistrar ServerRegistrar { get; set; }
+        private IServerRoleAccessor ServerRegistrar { get; set; }
 
         private TestServerMessenger ServerMessenger { get; set; }
 
@@ -162,14 +162,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
             public void SendMessages() { }
         }
 
-        internal class TestServerRegistrar : IServerRegistrar
+        internal class TestServerRegistrar : IServerRoleAccessor
         {
             public IEnumerable<IServerAddress> Registrations => new List<IServerAddress>
             {
                 new TestServerAddress("localhost")
             };
 
-            public ServerRole GetCurrentServerRole() => throw new NotImplementedException();
+            public ServerRole CurrentServerRole => throw new NotImplementedException();
         }
 
         public class TestServerAddress : IServerAddress
