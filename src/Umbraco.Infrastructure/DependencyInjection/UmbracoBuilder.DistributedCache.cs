@@ -9,7 +9,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.Cache;
-using Umbraco.Web;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Search;

@@ -12,8 +12,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
+using Umbraco.Web;
 
-namespace Umbraco.Web
+namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// An <see cref="IServerMessenger"/> implementation that works by storing messages in the database.
@@ -61,7 +62,8 @@ namespace Umbraco.Web
         public override void SendMessages()
         {
             var batch = GetBatch(false);
-            if (batch == null) return;
+            if (batch == null)
+                return;
 
             var instructions = batch.SelectMany(x => x.Instructions).ToArray();
             batch.Clear();
@@ -95,7 +97,8 @@ namespace Umbraco.Web
         {
             var key = nameof(BatchedDatabaseServerMessenger);
 
-            if (!_requestCache.IsAvailable) return null;
+            if (!_requestCache.IsAvailable)
+                return null;
 
             // no thread-safety here because it'll run in only 1 thread (request) at a time
             var batch = (ICollection<RefreshInstructionEnvelope>)_requestCache.Get(key);
