@@ -139,6 +139,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .AddUmbracoCore()
                 .AddWebComponents()
                 .AddRuntimeMinifier()
+                .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)

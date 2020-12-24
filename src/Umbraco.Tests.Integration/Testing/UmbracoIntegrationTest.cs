@@ -217,25 +217,20 @@ namespace Umbraco.Tests.Integration.Testing
             builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
-                .AddUmbracoCore();
-
-            builder.Services.AddUnique<AppCaches>(GetAppCaches());
-            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
-            builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
-
-            //.AddTestServices(TestHelper)
-            builder.AddWebComponents()
+                .AddUmbracoCore()
+                .AddWebComponents()
                 .AddRuntimeMinifier()
                 .AddBackOfficeAuthentication()
-                .AddBackOfficeIdentity();
+                .AddBackOfficeIdentity()
+                .AddTestServices(TestHelper, GetAppCaches());
                 //.AddComposers();
 
             services.AddSignalR();
             services.AddMvc();
 
-            builder.Build();
-
             CustomTestSetup(builder);
+
+            builder.Build();
         }
 
         protected virtual AppCaches GetAppCaches()

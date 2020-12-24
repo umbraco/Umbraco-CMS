@@ -34,9 +34,9 @@ namespace Umbraco.Tests.Integration.DependencyInjection
         /// <summary>
         /// Uses/Replaces services with testing services
         /// </summary>
-        public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper)
+        public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper, AppCaches appCaches = null)
         {
-            builder.Services.AddUnique(AppCaches.NoCache);
+            builder.Services.AddUnique(appCaches ?? AppCaches.NoCache);
             builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique(testHelper.MainDom);
 
