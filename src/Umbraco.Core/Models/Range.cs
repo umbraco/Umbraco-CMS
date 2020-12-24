@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "{0},{1}", this.Minimum, this.Maximum);
+        public override string ToString() => this.ToString("{0},{1}", CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
