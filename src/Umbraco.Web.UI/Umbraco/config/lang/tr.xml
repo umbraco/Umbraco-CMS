@@ -1140,7 +1140,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
  
       İyi günler!
  
-      Umbraco robotunun alkışları
+      Umbraco robotundan teşekkürler
     ]]>
     </key>
     <key alias="mailBodyVariantSummary">Aşağıdaki diller %0% değiştirildi</key>
@@ -1204,7 +1204,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															İyi günler dilerim!<br /><br />
-															Umbraco robottan Alkış
+															Umbraco robotundan teşekkürler
 														</p>
 													</td>
 												</tr>
@@ -1858,7 +1858,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
  
       İyi günler!       
       
-      Umbraco robotunun alkışları     
+      Umbraco robotdan teşekkürler    
       ]]>
     </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
