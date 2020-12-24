@@ -18,7 +18,6 @@ using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
@@ -28,6 +27,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Testing
             if (configure == false) return;
 
             Builder
-                .ComposeCoreMappingProfiles();
+                .AddCoreMappingProfiles();
         }
 
         protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, UmbracoTestOptions.TypeLoader option)
@@ -452,7 +452,7 @@ namespace Umbraco.Tests.Testing
             if (withApplication == false) return;
 
             // default Datalayer/Repositories/SQL/Database/etc...
-            Builder.ComposeRepositories();
+            Builder.AddRepositories();
 
             Builder.Services.AddUnique<IExamineManager, ExamineManager>();
 
@@ -497,7 +497,7 @@ namespace Umbraco.Tests.Testing
                 => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
             Builder.Services.AddUnique(factory => (IScopeAccessor)factory.GetRequiredService<IScopeProvider>());
 
-            Builder.ComposeServices();
+            Builder.AddServices();
 
             // composition root is doing weird things, fix
             Builder.Services.AddUnique<ITreeService, TreeService>();

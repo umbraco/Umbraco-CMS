@@ -1,15 +1,18 @@
-﻿using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Composes repositories.
     /// </summary>
-    internal static class Repositories
+    public static partial class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder ComposeRepositories(this IUmbracoBuilder builder)
+        /// <summary>
+        /// Adds the Umbraco repositories
+        /// </summary>
+        internal static IUmbracoBuilder AddRepositories(this IUmbracoBuilder builder)
         {
             // repositories
             builder.Services.AddUnique<IAuditRepository, AuditRepository>();

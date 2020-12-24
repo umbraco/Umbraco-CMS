@@ -1,18 +1,16 @@
-using System;
+using System.Runtime.InteropServices;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Media;
 using Umbraco.Core.Migrations;
@@ -20,16 +18,14 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Sync;
 using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
@@ -37,10 +33,8 @@ using Umbraco.Infrastructure.Media;
 using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Cache;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Install;
@@ -54,8 +48,6 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Umbraco.Web.Sections;
-using Umbraco.Web.Services;
-using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
@@ -66,7 +58,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
         /*
          * TODO: Many of these things are not "Core" services and are probably not required to run
-         * 
+         *
          * This should be split up:
          *   - Distributed Cache
          *   - BackOffice
@@ -83,19 +75,25 @@ namespace Umbraco.Infrastructure.DependencyInjection
          *   - Front End
          */
 
+        /// <summary>
+        /// Adds all core Umbraco services required to run which may be replaced later in the pipeline
+        /// </summary>
         public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
         {
-            builder.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+            builder.AddMainDom();
 
-            builder.Services.AddSingleton<ManifestWatcher>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
+            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
+            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
+            builder.Services.AddUnique<IRuntime, CoreRuntime>();
 
             // composers
             builder
-                .ComposeRepositories()
-                .ComposeServices()
-                .ComposeCoreMappingProfiles()
-                .ComposeFileSystems();
+                .AddRepositories()
+                .AddServices()
+                .AddCoreMappingProfiles()
+                .AddFileSystems();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
@@ -110,7 +108,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
             builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
             builder.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
-            builder.Services.AddUnique<InstallStatusTracker>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around
@@ -146,41 +143,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
             // references to media item/s
             builder.DataValueReferenceFactories();
 
-            // register a server registrar, by default it's the db registrar
-            builder.Services.AddUnique(f =>
-            {
-                var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
-
-                // TODO:  we still register the full IServerMessenger because
-                // even on 1 single server we can have 2 concurrent app domains
-                var singleServer = globalSettings.DisableElectionForSingleServer;
-                return singleServer
-                    ? (IServerRegistrar)new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
-                    : new DatabaseServerRegistrar(
-                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
-            });
-
-            // by default we'll use the database server messenger with default options (no callbacks),
-            // this will be overridden by the db thing in the corresponding components in the web
-            // project
-            builder.Services.AddUnique<IServerMessenger>(factory
-                => new DatabaseServerMessenger(
-                    factory.GetRequiredService<IMainDom>(),
-                    factory.GetRequiredService<IScopeProvider>(),
-                    factory.GetRequiredService<IUmbracoDatabaseFactory>(),
-                    factory.GetRequiredService<IProfilingLogger>(),
-                    factory.GetRequiredService<ILogger<DatabaseServerMessenger>>(),
-                    factory.GetRequiredService<IServerRegistrar>(),
-                    true,
-                    new DatabaseServerMessengerCallbacks(),
-                    factory.GetRequiredService<IHostingEnvironment>(),
-                    factory.GetRequiredService<CacheRefresherCollection>(),
-                    factory.GetRequiredService<IOptions<GlobalSettings>>()
-                ));
-
-            builder.CacheRefreshers()
-                .Add(() => builder.TypeLoader.GetCacheRefreshers());
-
             builder.PackageActions()
                 .Add(() => builder.TypeLoader.GetPackageActions());
 
@@ -197,43 +159,20 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-            // by default, register a noop factory
-            builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
-
             builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
-            builder.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
-            builder.Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
-            builder.Services.AddUnique<UriUtility>();
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             builder.Services.AddUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             builder.Services.AddUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
-            builder.Services.AddUnique<IDashboardService, DashboardService>();
-
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             builder.Dashboards()
                 .Add(builder.TypeLoader.GetTypes<IDashboard>());
 
-            // will be injected in controllers when needed to invoke rest endpoints on Our
-            builder.Services.AddUnique<IInstallationService, InstallationService>();
-            builder.Services.AddUnique<IUpgradeService, UpgradeService>();
-
-            // Grid config is not a real config file as we know them
-            builder.Services.AddUnique<IGridConfig, GridConfig>();
-
             // Config manipulator
             builder.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
 
-            // register the umbraco context factory
-            // composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            builder.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
-
-            builder.Services.AddUnique<HtmlLocalLinkParser>();
-            builder.Services.AddUnique<HtmlImageSourceParser>();
-            builder.Services.AddUnique<HtmlUrlParser>();
             builder.Services.AddUnique<RichTextEditorPastedImages>();
             builder.Services.AddUnique<BlockEditorConverter>();
 
@@ -254,14 +193,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
-            builder.Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
-
-            // register properties fallback
-            builder.Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
-
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
-
-            builder.Services.AddUnique<UmbracoFeatures>();
 
             builder.Actions()
                 .Add(() => builder.TypeLoader.GetTypes<IAction>());
@@ -311,9 +243,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>();
 
-            // register published router
-            builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
-
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
             builder.HealthChecks()
@@ -325,12 +254,14 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             builder.ContentFinders()
+
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
-                //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
+
+                // .Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
@@ -339,25 +270,12 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.SearchableTrees()
                 .Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
 
-            // replace some services
-            builder.Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
-            builder.Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            builder.Services.AddUnique<ITreeService, TreeService>();
-            builder.Services.AddUnique<ISectionService, SectionService>();
+            // replace
             builder.Services.AddUnique<IEmailSender, EmailSender>();
-            builder.Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
 
             builder.Services.AddUnique<IExamineManager, ExamineManager>();
 
-            // register distributed cache
-            builder.Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
-
             builder.Services.AddScoped<ITagQuery, TagQuery>();
-
-            builder.Services.AddUnique<HtmlLocalLinkParser>();
-            builder.Services.AddUnique<HtmlUrlParser>();
-            builder.Services.AddUnique<HtmlImageSourceParser>();
-            builder.Services.AddUnique<RichTextEditorPastedImages>();
 
             builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
@@ -365,14 +283,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
                 return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
-
-            builder.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
-
-            // register the http context and umbraco context accessors
-            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
-            // we have no http context, eg when booting Umbraco or in background threads, so instead
-            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            builder.Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
             // register accessors for cultures
             builder.Services.AddUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
@@ -389,15 +299,31 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
 
-            builder.Services.AddUnique(factory => new LegacyPasswordSecurity());
-            builder.Services.AddUnique<UserEditorAuthorizationHelper>();
-            builder.Services.AddUnique<ContentPermissions>();
-
-            builder.Services.AddUnique<MediaPermissions>();
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
 
-
             builder.Services.AddUnique<PackageDataInstallation>();
+
+            return builder;
+        }
+
+        private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddUnique<IMainDom, MainDom>();
+
+            builder.Services.AddUnique<IMainDomLock>(factory =>
+            {
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+
+                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+
+                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
+                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
+                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
+            });
 
             return builder;
         }

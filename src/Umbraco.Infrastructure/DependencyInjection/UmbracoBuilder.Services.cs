@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -15,16 +16,15 @@ using Umbraco.Core.Routing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Infrastructure.DependencyInjection
 {
-    internal static class Services
+    public static partial class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder ComposeServices(this IUmbracoBuilder builder)
+        /// <summary>
+        /// Adds Umbraco services
+        /// </summary>
+        internal static IUmbracoBuilder AddServices(this IUmbracoBuilder builder)
         {
-            // register a transient messages factory, which will be replaced by the web
-            // boot manager when running in a web context
-            builder.Services.AddUnique<IEventMessagesFactory, TransientEventMessagesFactory>();
-
             // register the service context
             builder.Services.AddUnique<ServiceContext>();
 
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             builder.Services.AddUnique<IExternalLoginService, ExternalLoginService>();
             builder.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
             builder.Services.AddUnique<IConsentService, ConsentService>();
-            builder.Services.AddTransient<LocalizedTextServiceFileSources>(SourcesFactory);
+            builder.Services.AddTransient(SourcesFactory);
             builder.Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
@@ -82,9 +82,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <summary>
         /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
         /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="packageRepoFileName"></param>
-        /// <returns></returns>
         private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
             => new PackagesRepository(
                 factory.GetRequiredService<IContentService>(),
@@ -106,9 +103,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var globalSettings = container.GetRequiredService<IOptions<GlobalSettings>>().Value;
-            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath , "config","lang")));
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath, "config", "lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config  ,"lang")));
+            var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config, "lang")));
 
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
@@ -117,7 +114,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 
-            //user defined langs that overwrite the default, these should not be used by plugin creators
+            // user defined langs that overwrite the default, these should not be used by plugin creators
             var userLangFolders = configLangFolder.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : configLangFolder

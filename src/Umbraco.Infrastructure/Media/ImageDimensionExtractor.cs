@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using Umbraco.Core;
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Media
         /// use potentially large amounts of memory.</remarks>
         public ImageSize GetDimensions(Stream stream)
         {
-            //Try to load with exif
+            // Try to load with exif
             try
             {
                 if (ExifImageDimensionExtractor.TryGetDimensions(stream, out var width, out var height))
@@ -28,12 +28,13 @@ namespace Umbraco.Web.Media
             }
             catch
             {
-                //We will just swallow, just means we can't read exif data, we don't want to log an error either
+                // We will just swallow, just means we can't read exif data, we don't want to log an error either
             }
 
-            //we have no choice but to try to read in via GDI
+            // we have no choice but to try to read in via GDI
             try
             {
+                // TODO: We should be using ImageSharp for this
                 using (var image = Image.FromStream(stream))
                 {
                     var fileWidth = image.Width;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Media
             }
             catch (Exception)
             {
-                //We will just swallow, just means we can't read via GDI, we don't want to log an error either
+                // We will just swallow, just means we can't read via GDI, we don't want to log an error either
             }
 
             return new ImageSize(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);

@@ -3,12 +3,36 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mail;
+using Umbraco.Core.Manifest;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Runtime;
+using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
+using Umbraco.Web;
+using Umbraco.Web.Cache;
+using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
+using Umbraco.Web.Install;
+using Umbraco.Web.Models.PublishedContent;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Core.DependencyInjection
 {
@@ -79,6 +103,93 @@ namespace Umbraco.Core.DependencyInjection
             // Register as singleton to allow injection everywhere.
             Services.AddSingleton<ServiceFactory>(p => p.GetService);
             Services.AddSingleton<IEventAggregator, EventAggregator>();
+
+            Services.AddLazySupport();
+
+            Services.AddUnique<IMainDomLock, MainDomSemaphoreLock>();
+
+            Services.AddUnique<IIOHelper>(factory =>
+            {
+                IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return new IOHelperLinux(hostingEnvironment);
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return new IOHelperOSX(hostingEnvironment);
+                }
+
+                return new IOHelperWindows(hostingEnvironment);
+            });
+
+            Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
+            Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
+            Services.AddUnique<IProfilingLogger, ProfilingLogger>();
+            Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
+
+            this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+
+            Services.AddSingleton<ManifestWatcher>();
+            this.AddNotificationHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
+
+            Services.AddUnique<InstallStatusTracker>();
+
+            // by default, register a noop factory
+            Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
+
+            Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
+            Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
+
+            Services.AddUnique<UriUtility>();
+
+            Services.AddUnique<IDashboardService, DashboardService>();
+
+            // will be injected in controllers when needed to invoke rest endpoints on Our
+            Services.AddUnique<IInstallationService, InstallationService>();
+            Services.AddUnique<IUpgradeService, UpgradeService>();
+
+            // Grid config is not a real config file as we know them
+            Services.AddUnique<IGridConfig, GridConfig>();
+
+            Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
+            Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
+
+            Services.AddUnique<HtmlLocalLinkParser>();
+            Services.AddUnique<HtmlImageSourceParser>();
+            Services.AddUnique<HtmlUrlParser>();
+
+            // register properties fallback
+            Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
+
+            Services.AddUnique<UmbracoFeatures>();
+
+            // register published router
+            Services.AddUnique<IPublishedRouter, PublishedRouter>();
+
+            Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
+            Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
+            Services.AddUnique<ITreeService, TreeService>();
+            Services.AddUnique<ISectionService, SectionService>();
+
+            Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
+            Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
+
+            // register distributed cache
+            Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
+
+            // register the http context and umbraco context accessors
+            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
+            // we have no http context, eg when booting Umbraco or in background threads, so instead
+            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
+            Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+
+            Services.AddUnique<LegacyPasswordSecurity>();
+            Services.AddUnique<UserEditorAuthorizationHelper>();
+            Services.AddUnique<ContentPermissions>();
+            Services.AddUnique<MediaPermissions>();
         }
     }
 }

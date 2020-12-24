@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Runtime
             _logger = logger;
         }
 
-        //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+        // WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
         public Task ListenAsync() => _signal.WaitOneAsync();
 
         public Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Runtime
             // if more than 1 instance reach that point, one will get the lock
             // and the other one will timeout, which is accepted
 
-            //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+            // This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
             try
             {
                 _lockRelease = _systemLock.Lock(millisecondsTimeout);

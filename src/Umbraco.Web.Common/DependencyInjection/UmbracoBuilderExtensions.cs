@@ -105,66 +105,22 @@ namespace Umbraco.Web.Common.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddLazySupport();
+            // Add ASP.NET specific services
+            builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
+            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
+            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             // Add supported databases
             builder.AddUmbracoSqlCeSupport();
             builder.AddUmbracoSqlServerSupport();
 
+            // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
                 factory.GetServices<IEmbeddedDatabaseCreator>()
             ));
-
-            builder.Services.AddUnique(factory =>
-            {
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
-                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-
-                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
-
-                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
-            });
-
-            builder.Services.AddUnique<IIOHelper>(factory =>
-            {
-                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    return new IOHelperLinux(hostingEnvironment);
-                }
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    return new IOHelperOSX(hostingEnvironment);
-                }
-
-                return new IOHelperWindows(hostingEnvironment);
-            }
-
-                );
-            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
-            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
-            builder.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
-            builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
-            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
-            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
-            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
-            builder.Services.AddUnique<IMainDom, MainDom>();
-
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
-            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             builder.AddCoreInitialServices();
             builder.AddComposers();

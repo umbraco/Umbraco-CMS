@@ -1,8 +1,11 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
+using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.Cache;
@@ -28,6 +31,21 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, DatabaseServerMessengerNotificationHandler>();
+
+            // TODO: We don't need server registrar anymore
+            // register a server registrar, by default it's the db registrar
+            builder.Services.AddUnique(f =>
+            {
+                var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+                // TODO:  we still register the full IServerMessenger because
+                // even on 1 single server we can have 2 concurrent app domains
+                var singleServer = globalSettings.DisableElectionForSingleServer;
+                return singleServer
+                    ? (IServerRegistrar)new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
+                    : new DatabaseServerRegistrar(
+                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
+            });
 
             builder.CacheRefreshers()
                 .Add(() => builder.TypeLoader.GetCacheRefreshers());

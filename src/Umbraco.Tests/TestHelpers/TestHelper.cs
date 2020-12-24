@@ -39,6 +39,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Mail;
 
 namespace Umbraco.Tests.TestHelpers
 {

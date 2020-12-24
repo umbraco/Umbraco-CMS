@@ -4,17 +4,14 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
-
+namespace Umbraco.Infrastructure.DependencyInjection
 {
-    public static class CoreMappingProfiles
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Registers the core Umbraco mapper definitions
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IUmbracoBuilder ComposeCoreMappingProfiles(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddCoreMappingProfiles(this IUmbracoBuilder builder)
         {
             builder.Services.AddUnique<UmbracoMapper>();
 
@@ -34,8 +31,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
                 .Add<LanguageMapDefinition>()
-                .Add<IdentityMapDefinition>()
-               ;
+                .Add<IdentityMapDefinition>();
 
             builder.Services.AddTransient<CommonMapper>();
             builder.Services.AddTransient<MemberTabsAndPropertiesMapper>();

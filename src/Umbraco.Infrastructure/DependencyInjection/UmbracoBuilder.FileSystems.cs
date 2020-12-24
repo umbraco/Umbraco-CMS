@@ -1,17 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
-using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.DependencyInjection;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Infrastructure.DependencyInjection
 {
-    internal static class FileSystems
+    public static partial class UmbracoBuilderExtensions
     {
         /*
          * HOW TO REPLACE THE MEDIA UNDERLYING FILESYSTEM
@@ -35,16 +33,16 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          *
          */
 
-        public static IUmbracoBuilder ComposeFileSystems(this IUmbracoBuilder builder)
+        internal static IUmbracoBuilder AddFileSystems(this IUmbracoBuilder builder)
         {
             // register FileSystems, which manages all filesystems
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            builder.Services.AddUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
+            builder.Services.AddUnique(factory => factory.CreateInstance<FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            builder.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<Core.IO.FileSystems>());
+            builder.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<FileSystems>());
 
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();

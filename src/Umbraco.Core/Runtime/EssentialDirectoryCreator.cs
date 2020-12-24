@@ -1,13 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Infrastructure.Runtime
+namespace Umbraco.Core.Runtime
 {
     public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplicationStarting>
     {

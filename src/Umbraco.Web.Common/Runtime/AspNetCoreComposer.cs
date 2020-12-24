@@ -20,11 +20,11 @@ using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Common.Templates;
-using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Infrastructure.DependencyInjection;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Common.Runtime
             builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
 
             //register the install components
-            builder.ComposeInstaller();
+            builder.AddInstaller();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()

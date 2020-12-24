@@ -18,6 +18,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;

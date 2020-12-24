@@ -51,7 +51,7 @@ namespace Umbraco.Core.DependencyInjection
             where TService : class
             => services.Replace(ServiceDescriptor.Singleton(instance));
 
-        public static IServiceCollection AddLazySupport(this IServiceCollection services)
+        internal static IServiceCollection AddLazySupport(this IServiceCollection services)
         {
             services.Replace(ServiceDescriptor.Transient(typeof(Lazy<>), typeof(LazyResolve<>)));
             return services;

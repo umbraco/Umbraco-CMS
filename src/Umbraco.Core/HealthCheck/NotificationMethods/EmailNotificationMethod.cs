@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.HealthCheck;

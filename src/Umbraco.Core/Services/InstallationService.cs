@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Core.Services
 {
     public class InstallationService : IInstallationService
     {

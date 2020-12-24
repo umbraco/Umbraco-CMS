@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Mail
 {
     /// <summary>
     /// Simple abstraction to send an email message
