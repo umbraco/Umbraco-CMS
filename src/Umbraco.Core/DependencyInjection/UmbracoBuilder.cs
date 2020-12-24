@@ -20,6 +20,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -130,6 +131,7 @@ namespace Umbraco.Core.DependencyInjection
             Services.AddUnique<IProfilingLogger, ProfilingLogger>();
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
+            this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
 
             Services.AddSingleton<ManifestWatcher>();
@@ -190,6 +192,9 @@ namespace Umbraco.Core.DependencyInjection
             Services.AddUnique<UserEditorAuthorizationHelper>();
             Services.AddUnique<ContentPermissions>();
             Services.AddUnique<MediaPermissions>();
+
+            Services.AddUnique<PropertyEditorCollection>();
+            Services.AddUnique<ParameterEditorCollection>();
         }
     }
 }

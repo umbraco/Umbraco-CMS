@@ -11,7 +11,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// <summary>
         /// Adds the services for the Umbraco installer
         /// </summary>
-        public static IUmbracoBuilder AddInstaller(this IUmbracoBuilder builder)
+        internal static IUmbracoBuilder AddInstaller(this IUmbracoBuilder builder)
         {
             // register the installer steps
             builder.Services.AddScoped<InstallSetupStep, NewInstallStep>();

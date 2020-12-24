@@ -47,7 +47,7 @@ namespace Umbraco.Infrastructure.Cache
             // Hence we hook up a one-off task on an HTTP request to ensure this is retrieved, which caches the value and makes it available
             // for the hosted services to use when the HTTP request is not available.
             _requestAccessor.RouteAttempt += EnsureApplicationUrlOnce;
-            _requestAccessor.EndRequest += UmbracoModule_EndRequest;
+            _requestAccessor.EndRequest += EndRequest;
 
             Startup();
 
@@ -88,6 +88,6 @@ namespace Umbraco.Infrastructure.Cache
         /// <summary>
         /// Clear the batch on end request
         /// </summary>
-        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e) => _messenger?.FlushBatch();
+        private void EndRequest(object sender, UmbracoRequestEventArgs e) => _messenger?.FlushBatch();
     }
 }

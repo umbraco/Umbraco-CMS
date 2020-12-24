@@ -1,6 +1,4 @@
-﻿using Umbraco.Web.Trees;
-
-namespace Umbraco.Web.Search
+namespace Umbraco.Core.Trees
 {
     public class SearchableApplicationTree
     {

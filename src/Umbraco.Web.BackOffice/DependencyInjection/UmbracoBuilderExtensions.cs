@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Security;
@@ -32,8 +33,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
-                .AddHttpClients()
-                .AddNuCache();
+                .AddDistributedCache();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements

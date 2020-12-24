@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
@@ -35,7 +36,7 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
 
-            builder.AddNuCache();
+            builder.AddDistributedCache();
 
             return builder;
         }

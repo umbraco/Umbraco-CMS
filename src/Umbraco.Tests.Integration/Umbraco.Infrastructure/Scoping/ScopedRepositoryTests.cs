@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -14,7 +11,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -29,15 +25,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
         private DistributedCacheBinder _distributedCacheBinder;
 
         private IUserService UserService => GetRequiredService<IUserService>();
-        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-        private IServerMessenger ServerMessenger => GetRequiredService<IServerMessenger>();
-        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
-        protected override void CustomTestSetup(IUmbracoBuilder builder)
-        {
-            builder.AddNuCache();
-            builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
-        }
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
+        private IServerMessenger ServerMessenger { get; } = new LocalServerMessenger();
+
+        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
         protected override AppCaches GetAppCaches()
         {

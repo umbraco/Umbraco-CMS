@@ -154,7 +154,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
-                .AddNuCache()
                 .Build();
         }
 

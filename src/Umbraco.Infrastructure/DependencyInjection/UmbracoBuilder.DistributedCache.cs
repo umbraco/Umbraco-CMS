@@ -26,7 +26,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
         {
-            // NOTE: the `DistributedCache` is registered in AddCoreInitialServices since it's a core service
+            // NOTE: the `DistributedCache` is registered in UmbracoBuilder since it's a core service
 
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
@@ -34,7 +34,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
             // TODO: We don't need server registrar anymore
             // register a server registrar, by default it's the db registrar
-            builder.Services.AddUnique(f =>
+            builder.Services.AddUnique<IServerRegistrar>(f =>
             {
                 var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
@@ -46,9 +46,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
                     : new DatabaseServerRegistrar(
                         new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>));
             });
-
-            builder.CacheRefreshers()
-                .Add(() => builder.TypeLoader.GetCacheRefreshers());
 
             builder.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             return builder;

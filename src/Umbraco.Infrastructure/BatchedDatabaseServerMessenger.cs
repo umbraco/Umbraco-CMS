@@ -9,11 +9,9 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -28,6 +26,9 @@ namespace Umbraco.Web
         private readonly IRequestCache _requestCache;
         private readonly IRequestAccessor _requestAccessor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger"/> class.
+        /// </summary>
         public BatchedDatabaseServerMessenger(
             IMainDom mainDom,
             IScopeProvider scopeProvider,

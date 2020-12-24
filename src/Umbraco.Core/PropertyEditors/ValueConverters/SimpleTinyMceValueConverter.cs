@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.
     /// </summary>
     [DefaultPropertyValueConverter]
-    public class TinyMceValueConverter : PropertyValueConverterBase
+    public class SimpleTinyMceValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce;

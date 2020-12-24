@@ -27,6 +27,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Templates;
+using Umbraco.Core.Trees;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
@@ -49,7 +50,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Umbraco.Web.Sections;
 using Umbraco.Web.Trees;
-using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {
@@ -116,46 +116,17 @@ namespace Umbraco.Infrastructure.DependencyInjection
             // register manifest parser, will be injected in collection builders where needed
             builder.Services.AddUnique<IManifestParser, ManifestParser>();
 
-            // register our predefined validators
-            builder.ManifestValueValidators()
-                .Add<RequiredValidator>()
-                .Add<RegexValidator>()
-                .Add<DelimitedValueValidator>()
-                .Add<EmailValidator>()
-                .Add<IntegerValidator>()
-                .Add<DecimalValidator>();
-
             // register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
-
-            // properties and parameters derive from data editors
-            builder.DataEditors()
-                .Add(() => builder.TypeLoader.GetDataEditors());
 
             builder.MediaUrlGenerators()
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
-            builder.Services.AddUnique<PropertyEditorCollection>();
-            builder.Services.AddUnique<ParameterEditorCollection>();
-
-            // Used to determine if a datatype/editor should be storing/tracking
-            // references to media item/s
-            builder.DataValueReferenceFactories();
-
-            builder.PackageActions()
-                .Add(() => builder.TypeLoader.GetPackageActions());
-
-            builder.PropertyValueConverters()
-                .Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
-
             builder.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             builder.Services.AddUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
-
-            builder.UrlSegmentProviders()
-                .Append<DefaultUrlSegmentProvider>();
 
             builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
@@ -166,10 +137,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
 
-            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            builder.Dashboards()
-                .Add(builder.TypeLoader.GetTypes<IDashboard>());
-
             // Config manipulator
             builder.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
 
@@ -177,98 +144,21 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<BlockEditorConverter>();
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
-            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
-            // here because there cannot be two converters for one property editor - and we want the full
-            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
-            // (the limited one, defined in Core, is there for tests) - same for others
+            // discovered when CoreBootManager configures the converters. We will remove the basic one defined
+            // in core so that the more enhanced version is active.
             builder.PropertyValueConverters()
-                .Remove<TinyMceValueConverter>()
-                .Remove<TextStringValueConverter>()
-                .Remove<MarkdownEditorValueConverter>();
-
-            builder.UrlProviders()
-                .Append<AliasUrlProvider>()
-                .Append<DefaultUrlProvider>();
-
-            builder.MediaUrlProviders()
-                .Append<DefaultMediaUrlProvider>();
+                .Remove<SimpleTinyMceValueConverter>();
 
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            builder.Actions()
-                .Add(() => builder.TypeLoader.GetTypes<IAction>());
-
-            builder.EditorValidators()
-                .Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
-
-            builder.TourFilters();
-
             builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
-            // register OEmbed providers - no type scanning - all explicit opt-in of adding types
-            // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
-            builder.OEmbedProviders()
-                .Append<YouTube>()
-                .Append<Twitter>()
-                .Append<Vimeo>()
-                .Append<DailyMotion>()
-                .Append<Flickr>()
-                .Append<Slideshare>()
-                .Append<Kickstarter>()
-                .Append<GettyImages>()
-                .Append<Ted>()
-                .Append<Soundcloud>()
-                .Append<Issuu>()
-                .Append<Hulu>()
-                .Append<Giphy>();
-
-            // register back office sections in the order we want them rendered
-            builder.Sections()
-                .Append<ContentSection>()
-                .Append<MediaSection>()
-                .Append<SettingsSection>()
-                .Append<PackagesSection>()
-                .Append<UsersSection>()
-                .Append<MembersSection>()
-                .Append<FormsSection>()
-                .Append<TranslationSection>();
-
-            // register known content apps
-            builder.ContentApps()
-                .Append<ListViewContentAppFactory>()
-                .Append<ContentEditorContentAppFactory>()
-                .Append<ContentInfoContentAppFactory>()
-                .Append<ContentTypeDesignContentAppFactory>()
-                .Append<ContentTypeListViewContentAppFactory>()
-                .Append<ContentTypePermissionsContentAppFactory>()
-                .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
-            builder.HealthChecks()
-                .Add(() => builder.TypeLoader.GetTypes<Core.HealthCheck.HealthCheck>());
-
-            builder.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
-                .Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
-
+            
             builder.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-            builder.ContentFinders()
-
-                // all built-in finders in the correct order,
-                // devs can then modify this list on application startup
-                .Append<ContentFinderByPageIdQuery>()
-                .Append<ContentFinderByUrl>()
-                .Append<ContentFinderByIdPath>()
-
-                // .Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
-
             builder.Services.AddScoped<UmbracoTreeSearcher>();
-
-            builder.SearchableTrees()
-                .Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
 
             // replace
             builder.Services.AddUnique<IEmailSender, EmailSender>();
@@ -302,6 +192,8 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
 
             builder.Services.AddUnique<PackageDataInstallation>();
+
+            builder.AddInstaller();
 
             return builder;
         }
