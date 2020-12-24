@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -192,7 +193,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
-            Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
+            IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!

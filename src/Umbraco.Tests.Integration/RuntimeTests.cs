@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Integration
             IHostBuilder hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostEnvironment = testHelper.GetWebHostEnvironment();
+                    IWebHostEnvironment webHostEnvironment = testHelper.GetWebHostEnvironment();
                     services.AddSingleton(testHelper.DbProviderFactoryCreator);
                     services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
 
