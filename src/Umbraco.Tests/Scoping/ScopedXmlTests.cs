@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
@@ -299,6 +299,8 @@ namespace Umbraco.Tests.Scoping
             public LocalServerMessenger()
                 : base(false)
             { }
+
+            public override void SendMessages() { }
 
             public override void Sync() { }
 

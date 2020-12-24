@@ -114,47 +114,49 @@ namespace Umbraco.Tests.Integration.Testing
             public NoopServerMessenger()
             { }
 
-            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+            public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
 
             }
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
 
             }
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
 
             }
 
-            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
 
             }
 
-            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
+            public void QueueRemove(ICacheRefresher refresher, params int[] numericIds)
             {
 
             }
 
-            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
+            public void QueueRefresh(ICacheRefresher refresher, params int[] numericIds)
             {
 
             }
 
-            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
+            public void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds)
             {
 
             }
 
-            public void PerformRefreshAll(ICacheRefresher refresher)
+            public void QueueRefreshAll(ICacheRefresher refresher)
             {
 
             }
 
             public void Sync() { }
+
+            public void SendMessages() { }
         }
 
     }

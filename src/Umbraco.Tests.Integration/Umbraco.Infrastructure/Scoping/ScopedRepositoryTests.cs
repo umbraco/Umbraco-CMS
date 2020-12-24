@@ -328,6 +328,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
                 : base(false)
             { }
 
+            public override void SendMessages() { }
+
             public override void Sync() { }
 
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)

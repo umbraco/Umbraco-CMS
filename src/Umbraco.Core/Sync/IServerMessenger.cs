@@ -15,11 +15,16 @@ namespace Umbraco.Core.Sync
         void Sync();
 
         /// <summary>
+        /// Called to send/commit the queued messages created with the Perform methods
+        /// </summary>
+        void SendMessages();
+
+        /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="payload">The notification content.</param>
-        void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload);
+        void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload);
 
         /// <summary>
         /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
@@ -28,7 +33,7 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getNumericId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The invalidated items.</param>
-        void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
         /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
@@ -37,7 +42,7 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getGuidId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The invalidated items.</param>
-        void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
+        void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
 
         /// <summary>
         /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
@@ -46,33 +51,33 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getNumericId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The removed items.</param>
-        void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
         /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="numericIds">The unique identifiers of the removed items.</param>
-        void PerformRemove(ICacheRefresher refresher, params int[] numericIds);
+        void QueueRemove(ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
         /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="numericIds">The unique identifiers of the invalidated items.</param>
-        void PerformRefresh(ICacheRefresher refresher, params int[] numericIds);
+        void QueueRefresh(ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
         /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="guidIds">The unique identifiers of the invalidated items.</param>
-        void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds);
+        void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds);
 
         /// <summary>
         /// Notifies all servers of a global invalidation for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <param name="refresher">The ICacheRefresher.</param>
-        void PerformRefreshAll(ICacheRefresher refresher);
+        void QueueRefreshAll(ICacheRefresher refresher);
     }
 }

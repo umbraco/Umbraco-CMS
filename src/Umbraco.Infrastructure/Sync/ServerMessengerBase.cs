@@ -55,7 +55,7 @@ namespace Umbraco.Core.Sync
 
         #region IServerMessenger
 
-        public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+        public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (payload == null) throw new ArgumentNullException(nameof(payload));
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RefreshByJson, json: jsonPayload);
         }
 
-        public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+        public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RefreshByInstance, getId, instances);
         }
 
-        public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+        public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RefreshByInstance, getId, instances);
         }
 
-        public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+        public void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RemoveByInstance, getId, instances);
         }
 
-        public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
+        public void QueueRemove(ICacheRefresher refresher, params int[] numericIds)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RemoveById, numericIds.Cast<object>());
         }
 
-        public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
+        public void QueueRefresh(ICacheRefresher refresher, params int[] numericIds)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RefreshById, numericIds.Cast<object>());
         }
 
-        public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
+        public void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Sync
             Deliver(refresher, MessageType.RefreshById, guidIds.Cast<object>());
         }
 
-        public void PerformRefreshAll(ICacheRefresher refresher)
+        public void QueueRefreshAll(ICacheRefresher refresher)
         {
 
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
@@ -346,8 +346,6 @@ namespace Umbraco.Core.Sync
             DeliverRemote(refresher, messageType, idsA);
         }
 
-        public abstract void Sync();
-
         //protected virtual void Deliver(ICacheRefresher refresher, object payload)
         //{
         //    if (servers == null) throw new ArgumentNullException("servers");
@@ -367,5 +365,8 @@ namespace Umbraco.Core.Sync
         //}
 
         #endregion
+
+        public abstract void Sync();
+        public abstract void SendMessages();
     }
 }

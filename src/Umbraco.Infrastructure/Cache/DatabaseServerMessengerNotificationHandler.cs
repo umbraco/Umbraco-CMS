@@ -15,7 +15,7 @@ namespace Umbraco.Infrastructure.Cache
     /// </summary>
     public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStarting>
     {
-        private readonly IBatchedDatabaseServerMessenger _messenger;
+        private readonly IServerMessenger _messenger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IDistributedCacheBinder _distributedCacheBinder;
@@ -35,7 +35,7 @@ namespace Umbraco.Infrastructure.Cache
             _databaseFactory = databaseFactory;
             _distributedCacheBinder = distributedCacheBinder;
             _logger = logger;
-            _messenger = serverMessenger as IBatchedDatabaseServerMessenger;
+            _messenger = serverMessenger;
         }
 
         /// <inheritdoc/>
@@ -88,6 +88,6 @@ namespace Umbraco.Infrastructure.Cache
         /// <summary>
         /// Clear the batch on end request
         /// </summary>
-        private void EndRequest(object sender, UmbracoRequestEventArgs e) => _messenger?.FlushBatch();
+        private void EndRequest(object sender, UmbracoRequestEventArgs e) => _messenger?.SendMessages();
     }
 }

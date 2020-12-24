@@ -134,30 +134,32 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
             public List<string> PayloadsRefreshed { get; } = new List<string>();
             public int CountOfFullRefreshes { get; private set; } = 0;
 
-            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+            public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
                 // doing nothing
             }
 
             public void PerformRefresh(ICacheRefresher refresher, string jsonPayload) => PayloadsRefreshed.Add(jsonPayload);
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRefreshed.AddRange(instances.Select(getNumericId));
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRefreshed.AddRange(instances.Select(getNumericId));
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances) => GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances) => GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
 
             public void PerformRemove(ICacheRefresher refresher, string jsonPayload) => PayloadsRemoved.Add(jsonPayload);
 
-            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRemoved.AddRange(instances.Select(getNumericId));
+            public void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRemoved.AddRange(instances.Select(getNumericId));
 
-            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds) => IntIdsRemoved.AddRange(numericIds);
+            public void QueueRemove(ICacheRefresher refresher, params int[] numericIds) => IntIdsRemoved.AddRange(numericIds);
 
-            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds) => IntIdsRefreshed.AddRange(numericIds);
+            public void QueueRefresh(ICacheRefresher refresher, params int[] numericIds) => IntIdsRefreshed.AddRange(numericIds);
 
-            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds) => GuidIdsRefreshed.AddRange(guidIds);
+            public void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds) => GuidIdsRefreshed.AddRange(guidIds);
 
-            public void PerformRefreshAll(ICacheRefresher refresher) => CountOfFullRefreshes++;
+            public void QueueRefreshAll(ICacheRefresher refresher) => CountOfFullRefreshes++;
 
             public void Sync() { }
+
+            public void SendMessages() { }
         }
 
         internal class TestServerRegistrar : IServerRegistrar

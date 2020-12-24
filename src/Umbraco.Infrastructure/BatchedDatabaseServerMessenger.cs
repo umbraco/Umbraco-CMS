@@ -21,7 +21,7 @@ namespace Umbraco.Web
     /// <remarks>
     /// This binds to appropriate umbraco events in order to trigger the Boot(), Sync() & FlushBatch() calls
     /// </remarks>
-    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger, IBatchedDatabaseServerMessenger
+    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
         private readonly IRequestCache _requestCache;
         private readonly IRequestAccessor _requestAccessor;
@@ -58,7 +58,7 @@ namespace Umbraco.Web
             BatchMessage(refresher, messageType, idsA, arrayType, json);
         }
 
-        public void FlushBatch()
+        public override void SendMessages()
         {
             var batch = GetBatch(false);
             if (batch == null) return;
@@ -66,13 +66,14 @@ namespace Umbraco.Web
             var instructions = batch.SelectMany(x => x.Instructions).ToArray();
             batch.Clear();
 
-            //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
+            // Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
             using (var scope = ScopeProvider.CreateScope())
             {
                 foreach (var instructionsBatch in instructions.InGroupsOf(GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                 {
                     WriteInstructions(scope, instructionsBatch);
                 }
+
                 scope.Complete();
             }
 

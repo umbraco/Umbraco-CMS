@@ -123,9 +123,9 @@ namespace Umbraco.Infrastructure.HostedServices
                 finally
                 {
                     // If running on a temp context, we have to flush the messenger
-                    if (contextReference.IsRoot && _serverMessenger is IBatchedDatabaseServerMessenger m)
+                    if (contextReference.IsRoot)
                     {
-                        m.FlushBatch();
+                        _serverMessenger.SendMessages();
                     }
                 }
             }
