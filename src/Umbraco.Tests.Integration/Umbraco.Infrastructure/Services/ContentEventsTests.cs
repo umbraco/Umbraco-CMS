@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+#pragma warning disable SA1124 // Do not use regions (justification: regions are currently adding some useful organisation to this file)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,6 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
@@ -28,16 +29,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     {
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
-
-
         private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
 
         private ILogger<ContentEventsTests> Logger => GetRequiredService<ILogger<ContentEventsTests>>();
+
+        #region Setup
+
         [SetUp]
         public void SetUp()
         {
-            _h1 = new DistributedCacheBinder(new DistributedCache(new LocalServerMessenger(), CacheRefresherCollection), UmbracoContextFactory, GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _h1.BindEvents(true);
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(new LocalServerMessenger(), CacheRefresherCollection), UmbracoContextFactory, GetRequiredService<ILogger<DistributedCacheBinder>>());
+            _distributedCacheBinder.BindEvents(true);
 
             _events = new List<EventInstance>();
 
@@ -61,7 +63,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [TearDown]
         public void TearDownTest()
         {
-            _h1?.UnbindEvents();
+            _distributedCacheBinder?.UnbindEvents();
 
             // Clear ALL events
             DocumentRepository.ScopedEntityRefresh -= ContentRepositoryRefreshed;
@@ -70,7 +72,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
-        private DistributedCacheBinder _h1;
+        private DistributedCacheBinder _distributedCacheBinder;
         private IList<EventInstance> _events;
         private int _msgCount;
         private IContentType _contentType;
@@ -140,6 +142,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             return content1;
         }
 
+        #endregion
+
+        #region Validate Setup
+
         [Test]
         public void CreatedBranchIsOk()
         {
@@ -199,10 +205,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(content52.Edited);
         }
 
+        #endregion
+
+        #region Events tracer
+
         private class EventInstance
         {
-            // ReSharper disable MemberCanBePrivate.Local
-            // ReSharper disable UnusedAutoPropertyAccessor.Local
             public int Message { get; set; }
 
             public string Sender { get; set; }
@@ -213,8 +221,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             public object EventArgs { get; set; }
 
-            // ReSharper restore MemberCanBePrivate.Local
-            // ReSharper restore UnusedAutoPropertyAccessor.Local
             public override string ToString() => $"{Message:000}: {Sender.Replace(" ", string.Empty)}/{Name}/{Args}";
         }
 
@@ -227,7 +233,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // UpdateDate will be dirty
             // Published may be dirty if saving a Published entity
             // so cannot do this (would always be true):
-            // return content.IsEntityDirty();
+            ////return content.IsEntityDirty();
 
             // have to be more precise & specify properties
             return s_propertiesImpactingAllVersions.Any(content.IsPropertyDirty);
@@ -281,92 +287,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                     }
 
                     return $"{x.Id}.{xstate}";
-
-                    bool willBePublished = publishedState == PublishedState.Publishing || x.Published; // && ((Content) x).PublishedState == PublishedState.Unpublishing;
-
-                    // saved content
-                    string state = willBePublished ? "p" : "u";
-
-                    if (publishedState == PublishedState.Publishing)
-                    {
-                        // content is published and x is the published version
-                        //   figure out whether it is masked or not - what to do exactly in each case
-                        //   would depend on the handler implementation - ie is it still updating
-                        //   data for masked version or not
-                        bool isPathPublished = sender.IsPathPublished(x); // expensive!
-                        if (isPathPublished)
-                        {
-                            state += "p"; // refresh (using x)
-                        }
-                        else
-                        {
-                            state += "m"; // masked
-                        }
-                    }
-                    else if (publishedState == PublishedState.Unpublishing)
-                    {
-                        // unpublishing content, clear
-                        //  handlers would probably clear data
-                        state += "x";
-                    }
-                    else if (publishedState == PublishedState.Published)
-                    {
-                        bool isPathPublished = sender.IsPathPublished(x); // expensive!
-                        if (isPathPublished == false)
-                        {
-                            state += "m"; // masked
-                        }
-                        else if (HasChangesImpactingAllVersions(x))
-                        {
-                            state += "p"; // refresh (using published = sender.GetByVersion(x.PublishedVersionGuid))
-                        }
-                        else
-                        {
-                            state += "u"; // no impact on published version
-                        }
-                    }
-                    else // Unpublished
-                    {
-                        state += "u"; // no published version
-                    }
-
-                    //// published version
-                    // if (x.Published == false)
-                    // {
-                    //    // x is not a published version
-
-                    // // unpublishing content, clear
-                    //    //  handlers would probably clear data
-                    //    if (((Content)x).PublishedState == PublishedState.Unpublishing)
-                    //    {
-                    //        state += "x";
-                    //    }
-                    //    else if (x.Published)
-                    //    {
-                    //        var isPathPublished = sender.IsPathPublished(x); // expensive!
-                    //        if (isPathPublished == false)
-                    //            state += "m"; // masked
-                    //        else if (HasChangesImpactingAllVersions(x))
-                    //            state += "p"; // refresh (using published = sender.GetByVersion(x.PublishedVersionGuid))
-                    //        else
-                    //            state += "u"; // no impact on published version
-                    //    }
-                    //    else
-                    //        state += "u"; // no published version
-                    // }
-                    // else
-                    // {
-                    //    // content is published and x is the published version
-                    //    //   figure out whether it is masked or not - what to do exactly in each case
-                    //    //   would depend on the handler implementation - ie is it still updating
-                    //    //   data for masked version or not
-                    //    var isPathPublished = sender.IsPathPublished(x); // expensive!
-                    //    if (isPathPublished)
-                    //        state += "p"; // refresh (using x)
-                    //    else
-                    //        state += "m"; // masked
-                    // }
-                    return $"{state}-{x.Id}";
                 }))
             };
             _events.Add(e);
@@ -385,7 +305,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 Sender = "ContentRepository",
                 EventArgs = args,
                 Name = "Remove",
-                //// Args = string.Join(",", args.Entities.Select(x => (x.Published ? "p" : "u") + x.Id))
                 Args = string.Join(",", entities.Select(x => x.Id))
             };
             _events.Add(e);
@@ -403,7 +322,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 Sender = "ContentRepository",
                 EventArgs = args,
                 Name = "RemoveVersion",
-                //// Args = string.Join(",", args.Versions.Select(x => string.Format("{0}:{1}", x.Item1, x.Item2)))
                 Args = $"{args.EntityId}:{args.VersionId}"
             };
             _events.Add(e);
@@ -445,8 +363,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             }
         }
 
+        #endregion
+
+        #region Utils
+
         private IEnumerable<IContent> Children(IContent content)
             => ContentService.GetPagedChildren(content.Id, 0, int.MaxValue, out long total);
+
+        #endregion
+
+        #region Save, Publish & Unpublish single content
 
         [Test]
         public void SaveUnpublishedContent()
@@ -688,12 +614,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             int m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u", _events[i++].ToString());
             m++;
-
-            //// Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content.Id), _events[i++].ToString());
-            //// Assert.AreEqual("changed", ContentService.GetById(((ContentCacheRefresher.JsonPayload)_events[i - 1].EventArgs).Id).Name);
-
+            ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content.Id), _events[i++].ToString());
+            ////Assert.AreEqual("changed", ContentService.GetById(((ContentCacheRefresher.JsonPayload)_events[i - 1].EventArgs).Id).Name);
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
         }
+
+        #endregion
+
+        #region Publish & Unpublish branch
 
         [Test]
         public void UnpublishContentBranch()
@@ -717,9 +645,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             int m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p-u", _events[i++].ToString());
             m++;
-
-            //// Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content1.Id), _events[i++].ToString());
-
+            ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content1.Id), _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
         }
 
@@ -780,16 +706,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content2C = Children(content1C[0]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
             // force:false => only republish the root node + nodes that are edited
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());        // content1 was unpublished, now published
 
             // change: only content4 shows here, because it has changes - others don't need to be published
-            // Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());    // content1/content2
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());    // content1/content2
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());    // content1/content4
-
-            // Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());    // content1/content2/content21
-            // Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());    // content1/content4/content41
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());    // content1/content2/content21
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());    // content1/content4/content41
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
@@ -819,24 +744,29 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
+
             // force:true => all nodes are republished, refreshing all nodes - but only with changes - published w/out changes are not repub
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());
-            //// Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
-            //// Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());
-            //// Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u+p", _events[i++].ToString());
-            //// Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p+p", _events[i++].ToString());
+            ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Sort
 
         [Test]
         public void SortAll()
@@ -861,7 +791,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(8, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString()); // content5 is not published
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString()); // content2 is published
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString()); // content3 is not published
@@ -897,7 +827,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(4, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString()); // content5 is not published
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString()); // content4 is published + changes
             m++;
@@ -905,6 +835,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[2].Id}", _events[i].ToString()); // content4 is published
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Trash
 
         // incl. trashing a published, unpublished content, w/changes
         // incl. trashing a branch, untrashing a single masked content
@@ -965,8 +899,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             int m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m", _events[i++].ToString());
             m++;
-
-            // Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
+            ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
         }
 
@@ -1015,8 +948,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             int m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m", _events[i++].ToString());
             m++;
-
-            // Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
+            ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
         }
 
@@ -1038,7 +970,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
@@ -1052,6 +984,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
@@ -1099,7 +1032,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(4, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
             m++;
@@ -1133,7 +1066,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             int i = 0;
             int m = 0;
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
@@ -1151,6 +1084,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Delete
 
         [Test]
         public void DeleteUnpublishedContent()
@@ -1253,7 +1190,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(14, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
@@ -1271,6 +1208,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Move
 
         [Test]
         public void MoveUnpublishedContentUnderUnpublished()
@@ -1671,7 +1612,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
@@ -1712,7 +1653,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
@@ -1757,7 +1698,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
@@ -1800,7 +1741,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
@@ -1842,7 +1783,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
@@ -1889,7 +1830,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content3C = Children(content1C[1]).ToArray();
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
@@ -1907,6 +1848,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Copy
 
         [Test]
         public void CopyUnpublishedContent()
@@ -1987,7 +1932,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(14, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy.Id}.u=u", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copyC[0].Id}.u=u", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy2C[0].Id}.u=u", _events[i++].ToString());
@@ -2005,6 +1950,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}", _events[i].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Rollback
 
         [Test]
         public void Rollback()
@@ -2034,11 +1983,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(2, _events.Count);
             int i = 0;
             int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (suppression necessary and justified here as it's used in an interpolated string format.
+#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
+
+        #endregion
+
+        #region Misc
 
         [Test]
         public void ContentRemembers()
@@ -2062,6 +2015,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void HasInitialContent() => Assert.AreEqual(4, ContentService.Count());
 
+        #endregion
+
+        #region TODO
+
+        // all content type events
+        #endregion
+
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
@@ -2075,3 +2035,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
     }
 }
+
+#pragma warning restore SA1124 // Do not use regions
