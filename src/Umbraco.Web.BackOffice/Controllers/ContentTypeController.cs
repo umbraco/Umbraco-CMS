@@ -223,7 +223,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
+            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement).Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -254,7 +254,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType)
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType).Value
                 .Select(x => new
                 {
                     contentType = x

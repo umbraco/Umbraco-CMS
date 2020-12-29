@@ -1,30 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -74,15 +65,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberTypeDisplay GetById(int id)
+        public ActionResult<MemberTypeDisplay> GetById(int id)
         {
-            var ct = _memberTypeService.Get(id);
-            if (ct == null)
+            var mt = _memberTypeService.Get(id);
+            if (mt == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(mt, StatusCodes.Status404NotFound);
             }
 
-            var dto =_umbracoMapper.Map<IMemberType, MemberTypeDisplay>(ct);
+            var dto =_umbracoMapper.Map<IMemberType, MemberTypeDisplay>(mt);
             return dto;
         }
 
@@ -92,12 +83,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberTypeDisplay GetById(Guid id)
+        public ActionResult<MemberTypeDisplay> GetById(Guid id)
         {
             var memberType = _memberTypeService.Get(id);
             if (memberType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
@@ -110,16 +101,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberTypeDisplay GetById(Udi id)
+        public ActionResult<MemberTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
 
             var memberType = _memberTypeService.Get(guidUdi.Guid);
             if (memberType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
@@ -138,7 +129,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _memberTypeService.Get(id);
             if (foundType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
             }
 
             _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -163,7 +154,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             [FromQuery]string[] filterContentTypes,
             [FromQuery]string[] filterPropertyTypes)
         {
-            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false)
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false).Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -221,7 +212,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         if (ct.IsSensitiveProperty(foundOnContentType.Alias) && prop.IsSensitiveData == false)
                         {
                             //if these don't match, then we cannot continue, this user is not allowed to change this value
-                            throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            return new ValidationErrorResult(ct, StatusCodes.Status403Forbidden);
                         }
                     }
                 }
@@ -230,7 +221,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     //if it is new, then we can just verify if any property has sensitive data turned on which is not allowed
                     if (props.Any(prop => prop.IsSensitiveData))
                     {
-                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                        return new ValidationErrorResult(props, StatusCodes.Status403Forbidden);
                     }
                 }
             }
@@ -249,7 +240,5 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return display;
         }
-
-
     }
 }

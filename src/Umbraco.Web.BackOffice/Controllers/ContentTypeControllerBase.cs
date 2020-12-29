@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Net.Http.Headers;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
@@ -16,6 +15,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
@@ -74,7 +74,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeId"></param>
         /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
-        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId,
+        protected ActionResult<IEnumerable<Tuple<EntityBasic, bool>>> PerformGetAvailableCompositeContentTypes(int contentTypeId,
             UmbracoObjectTypes type,
             string[] filterContentTypes,
             string[] filterPropertyTypes,
@@ -92,7 +92,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source = ContentTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
                     }
                     allContentTypes = ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -101,7 +101,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source =MediaTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
                     }
                     allContentTypes =MediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -110,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source = MemberTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
                     }
                     allContentTypes = MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -178,7 +178,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type">Type of content Type, eg documentType or mediaType</param>
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId, UmbracoObjectTypes type)
+        protected ActionResult<IEnumerable<EntityBasic>> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId, UmbracoObjectTypes type)
         {
             var id = 0;
 
@@ -205,7 +205,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
 
                 if (source == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
 
                 id = source.Id;
             }
@@ -416,11 +416,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -457,11 +457,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -558,7 +558,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (invalidCompositionException != null)
             {
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
-                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
+                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
             }
             return null;
         }

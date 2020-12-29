@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Models;
@@ -19,6 +17,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Search;
@@ -26,11 +25,9 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -207,7 +204,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<int> GetPath(int id, UmbracoEntityTypes type)
         {
-            var foundContent = GetResultForId(id, type);
+            var foundContent = GetResultForId(id, type).Value;
 
             return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
@@ -221,7 +218,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<int> GetPath(Guid id, UmbracoEntityTypes type)
         {
-            var foundContent = GetResultForKey(id, type);
+            var foundContent = GetResultForKey(id, type).Value;
 
             return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
@@ -233,14 +230,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<int> GetPath(Udi id, UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<int>> GetPath(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
-                return GetPath(guidUdi.Guid, type);
+                return new ActionResult<IEnumerable<int>>(GetPath(guidUdi.Guid, type));
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
         }
 
         /// <summary>
@@ -254,7 +251,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var intId = _entityService.GetId(udi);
             if (!intId.Success)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(intId.Result, StatusCodes.Status404NotFound);
             UmbracoEntityTypes entityType;
             switch (udi.EntityType)
             {
@@ -268,7 +265,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     entityType = UmbracoEntityTypes.Member;
                     break;
                 default:
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return new ValidationErrorResult(udi.EntityType, StatusCodes.Status404NotFound);
             }
             return GetUrl(intId.Result, entityType, culture);
         }
@@ -356,11 +353,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [HttpGet]
         [DetermineAmbiguousActionByPassingParameters]
-        public UrlAndAnchors GetUrlAndAnchors(Udi id, string culture = "*")
+        public ActionResult<UrlAndAnchors> GetUrlAndAnchors(Udi id, string culture = "*")
         {
             var intId = _entityService.GetId(id);
             if (!intId.Success)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(intId.Result, StatusCodes.Status404NotFound);
 
             return GetUrlAndAnchors(intId.Result, culture);
         }
@@ -395,7 +392,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
-            return GetResultForId(id, type);
+            return GetResultForId(id, type).Value;
         }
 
         /// <summary>
@@ -407,7 +404,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public EntityBasic GetById(Guid id, UmbracoEntityTypes type)
         {
-            return GetResultForKey(id, type);
+            return GetResultForKey(id, type).Value;
         }
 
         /// <summary>
@@ -417,14 +414,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public EntityBasic GetById(Udi id, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic> GetById(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
                 return GetResultForKey(guidUdi.Guid, type);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
         }
         #endregion
 
@@ -441,13 +439,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         [HttpPost]
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
             }
-            return GetResultForIds(ids, type);
+
+            return new ActionResult<IEnumerable<EntityBasic>>(GetResultForIds(ids, type));
         }
 
         /// <summary>
@@ -462,13 +461,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         [HttpPost]
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
             }
-            return GetResultForKeys(ids, type);
+
+            return new ActionResult<IEnumerable<EntityBasic>>(GetResultForKeys(ids, type));
         }
 
         /// <summary>
@@ -485,16 +485,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         [HttpPost]
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Udi[] ids, [FromQuery]UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]Udi[] ids, [FromQuery]UmbracoEntityTypes type)
         {
             if (ids == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
             }
 
             if (ids.Length == 0)
             {
-                return Enumerable.Empty<EntityBasic>();
+                return Enumerable.Empty<EntityBasic>().ToList();
             }
 
             //all udi types will need to be the same in this list so we'll determine by the first
@@ -503,10 +503,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             var guidUdi = ids[0] as GuidUdi;
             if (guidUdi != null)
             {
-                return GetResultForKeys(ids.Select(x => ((GuidUdi)x).Guid).ToArray(), type);
+                return new ActionResult<IEnumerable<EntityBasic>>(GetResultForKeys(ids.Select(x => ((GuidUdi)x).Guid).ToArray(), type));
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
         }
         #endregion
 
@@ -562,7 +562,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="dataTypeKey"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public PagedResult<EntityBasic> GetPagedChildren(
+        public ActionResult<PagedResult<EntityBasic>> GetPagedChildren(
             string id,
             UmbracoEntityTypes type,
             int pageNumber,
@@ -580,13 +580,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (Guid.TryParse(id, out _))
             {
                 //Not supported currently
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(id, StatusCodes.Status404NotFound);
             }
 
             if (UdiParser.TryParse(id, out _))
             {
                 //Not supported currently
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(id, StatusCodes.Status404NotFound);
             }
 
             //so we don't have an INT, GUID or UDI, it's just a string, so now need to check if it's a special id or a member type
@@ -624,7 +624,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public PagedResult<EntityBasic> GetPagedChildren(
+        public ActionResult<PagedResult<EntityBasic>> GetPagedChildren(
             int id,
             UmbracoEntityTypes type,
             int pageNumber,
@@ -635,9 +635,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(pageNumber, StatusCodes.Status404NotFound);
             if (pageSize <= 0)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(pageSize, StatusCodes.Status404NotFound);
 
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
@@ -724,7 +724,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-        public PagedResult<EntityBasic> GetPagedDescendants(
+        public ActionResult<PagedResult<EntityBasic>> GetPagedDescendants(
             int id,
             UmbracoEntityTypes type,
             int pageNumber,
@@ -735,9 +735,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(pageNumber, StatusCodes.Status404NotFound);
             if (pageSize <= 0)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(pageSize, StatusCodes.Status404NotFound);
 
             // re-normalize since NULL can be passed in
             filter = filter ?? string.Empty;
@@ -972,7 +972,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-        private EntityBasic GetResultForKey(Guid key, UmbracoEntityTypes entityType)
+        private ActionResult<EntityBasic> GetResultForKey(Guid key, UmbracoEntityTypes entityType)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
@@ -980,7 +980,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var found = _entityService.Get(key, objectType.Value);
                 if (found == null)
                 {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
                 }
                 return _umbracoMapper.Map<IEntitySlim, EntityBasic>(found);
             }
@@ -1004,7 +1004,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-        private EntityBasic GetResultForId(int id, UmbracoEntityTypes entityType)
+        private ActionResult<EntityBasic> GetResultForId(int id, UmbracoEntityTypes entityType)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
@@ -1012,7 +1012,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var found = _entityService.Get(id, objectType.Value);
                 if (found == null)
                 {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
                 }
                 return MapEntity(found);
             }

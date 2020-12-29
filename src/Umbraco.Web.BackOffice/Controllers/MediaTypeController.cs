@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
@@ -11,10 +12,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -78,12 +78,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public MediaTypeDisplay GetById(int id)
+        public ActionResult<MediaTypeDisplay> GetById(int id)
         {
             var ct = _mediaTypeService.Get(id);
             if (ct == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(ct, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(ct);
@@ -97,12 +97,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public MediaTypeDisplay GetById(Guid id)
+        public ActionResult<MediaTypeDisplay> GetById(Guid id)
         {
             var mediaType = _mediaTypeService.Get(id);
             if (mediaType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(mediaType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
@@ -116,16 +116,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        public MediaTypeDisplay GetById(Udi id)
+        public ActionResult<MediaTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
 
             var mediaType = _mediaTypeService.Get(guidUdi.Guid);
             if (mediaType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(mediaType, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
@@ -145,7 +145,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _mediaTypeService.Get(id);
             if (foundType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
             }
 
             _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -179,7 +179,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
         {
             var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType,
-                    filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
+                    filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement).Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -200,7 +200,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
             var result =
-                PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType)
+                PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType).Value
                     .Select(x => new
                     {
                         contentType = x
@@ -257,9 +257,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
@@ -267,9 +268,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
@@ -373,15 +375,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
+        public ActionResult<IEnumerable<ContentTypeBasic>> GetAllowedChildren(Guid contentId)
         {
             var entity = _entityService.Get(contentId);
             if (entity != null)
             {
-                return GetAllowedChildren(entity.Id);
+                return new ActionResult<IEnumerable<ContentTypeBasic>>(GetAllowedChildren(entity.Id));
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return new ValidationErrorResult(entity, StatusCodes.Status404NotFound);
         }
 
         /// <summary>
@@ -390,7 +392,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
+        public ActionResult<IEnumerable<ContentTypeBasic>> GetAllowedChildren(Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;
             if (guidUdi != null)
@@ -398,11 +400,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var entity = _entityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
-                    return GetAllowedChildren(entity.Id);
+                    return new ActionResult<IEnumerable<ContentTypeBasic>>(GetAllowedChildren(entity.Id));
                 }
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
         }
 
         #endregion

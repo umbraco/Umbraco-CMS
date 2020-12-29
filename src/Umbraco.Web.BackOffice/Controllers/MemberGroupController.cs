@@ -1,17 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 
@@ -46,12 +45,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberGroupDisplay GetById(int id)
+        public ActionResult<MemberGroupDisplay> GetById(int id)
         {
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
             }
 
             var dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -65,12 +64,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberGroupDisplay GetById(Guid id)
+        public ActionResult<MemberGroupDisplay> GetById(Guid id)
         {
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
             }
 
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -82,16 +81,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public MemberGroupDisplay GetById(Udi id)
+        public ActionResult<MemberGroupDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
 
             var memberGroup = _memberGroupService.GetById(guidUdi.Guid);
             if (memberGroup == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
             }
 
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -110,7 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
             }
 
             _memberGroupService.Delete(memberGroup);
@@ -129,14 +128,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(item);
         }
 
-        public MemberGroupDisplay PostSave(MemberGroupSave saveModel)
+        public ActionResult<MemberGroupDisplay> PostSave(MemberGroupSave saveModel)
         {
 
             var id = int.Parse(saveModel.Id.ToString());
             var memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
             }
 
             memberGroup.Name = saveModel.Name;

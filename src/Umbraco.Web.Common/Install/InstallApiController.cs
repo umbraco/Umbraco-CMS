@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,10 +10,9 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Net;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Security;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
 
@@ -96,7 +95,7 @@ namespace Umbraco.Web.Common.Install
         /// <summary>
         ///     Installs.
         /// </summary>
-        public async Task<InstallProgressResultModel> PostPerformInstall(InstallInstructions installModel)
+        public async Task<ActionResult<InstallProgressResultModel>> PostPerformInstall(InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
 
@@ -157,7 +156,7 @@ namespace Umbraco.Web.Common.Install
                     var installException = ex as InstallException;
                     if (installException != null)
                     {
-                        throw HttpResponseException.CreateValidationErrorResponse(new
+                        return new ValidationErrorResult(new
                         {
                             view = installException.View,
                             model = installException.ViewModel,
@@ -165,7 +164,7 @@ namespace Umbraco.Web.Common.Install
                         });
                     }
 
-                    throw HttpResponseException.CreateValidationErrorResponse(new
+                    return new ValidationErrorResult(new
                     {
                         step = step.Name,
                         view = "error",
