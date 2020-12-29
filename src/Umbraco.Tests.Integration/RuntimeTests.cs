@@ -10,8 +10,10 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration
 {
@@ -34,64 +36,14 @@ namespace Umbraco.Tests.Integration
         }
 
         /// <summary>
-        /// Calling AddUmbracoCore to configure the container
-        /// </summary>
-        [Test]
-        public async Task AddUmbracoCore()
-        {
-            var testHelper = new TestHelper();
-
-            var hostBuilder = new HostBuilder()
-                .UseUmbraco()
-                .ConfigureServices((hostContext, services) =>
-                {
-                    var webHostEnvironment = testHelper.GetWebHostEnvironment();
-                    services.AddSingleton(testHelper.DbProviderFactoryCreator);
-                    services.AddRequiredNetCoreServices(testHelper, webHostEnvironment);
-
-                    // Add it!
-                    var typeLoader = services.AddTypeLoader(
-                        GetType().Assembly,
-                        webHostEnvironment,
-                        testHelper.GetHostingEnvironment(),
-                        testHelper.ConsoleLoggerFactory,
-                        AppCaches.NoCache,
-                        hostContext.Configuration,
-                        testHelper.Profiler);
-
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
-                    builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
-                    builder.AddConfiguration();
-                    builder.AddUmbracoCore();
-                });
-
-            var host = await hostBuilder.StartAsync();
-            var app = new ApplicationBuilder(host.Services);
-
-            // assert results
-            var runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
-            var mainDom = app.ApplicationServices.GetRequiredService<IMainDom>();
-
-            Assert.IsFalse(mainDom.IsMainDom); // We haven't "Started" the runtime yet
-            Assert.IsNull(runtimeState.BootFailedException);
-            Assert.IsFalse(MyComponent.IsInit); // We haven't "Started" the runtime yet
-
-            await host.StopAsync();
-
-            Assert.IsFalse(MyComponent.IsTerminated); // we didn't "Start" the runtime so nothing was registered for shutdown
-        }
-
-        /// <summary>
         /// Calling AddUmbracoCore to configure the container and UseUmbracoCore to start the runtime
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task UseUmbracoCore()
         {
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
-                .UseUmbraco()
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
@@ -109,11 +61,13 @@ namespace Umbraco.Tests.Integration
                         hostContext.Configuration,
                         testHelper.Profiler);
 
-                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader, testHelper.ConsoleLoggerFactory);
+                    var builder = new UmbracoBuilder(services, hostContext.Configuration, typeLoader,
+                        testHelper.ConsoleLoggerFactory);
                     builder.Services.AddUnique<AppCaches>(AppCaches.NoCache);
                     builder.AddConfiguration()
-                          .AddUmbracoCore()
-                          .Build();
+                        .AddUmbracoCore()
+                        .AddNuCache()
+                        .Build();
 
                     services.AddRouting(); // LinkGenerator
                 });

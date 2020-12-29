@@ -1,13 +1,9 @@
-﻿using System;
-using System.Web.Mvc;
+using System;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Represents the data required to route to a specific controller/action during an Umbraco request
-    /// </summary>
-    /// Migrated already to .Net Core
+    // TODO: Migrated already to .Net Core
     public class RouteDefinition
     {
         public string ControllerName { get; set; }

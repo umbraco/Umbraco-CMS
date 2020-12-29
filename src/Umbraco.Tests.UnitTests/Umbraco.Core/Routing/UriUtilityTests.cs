@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
@@ -46,10 +49,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         {
             // Arrange
             var sourceUri = new Uri(sourceUrl);
-            var uriUtility = BuildUriUtility("/");
+            UriUtility uriUtility = BuildUriUtility("/");
 
             // Act
-            var resultUri = uriUtility.UriToUmbraco(sourceUri);
+            Uri resultUri = uriUtility.UriToUmbraco(sourceUri);
 
             // Assert
             var expectedUri = new Uri(expectedUrl);
@@ -70,10 +73,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
             // Arrange
             var sourceUri = new Uri(sourceUrl, UriKind.Relative);
             var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = trailingSlash };
-            var uriUtility = BuildUriUtility("/");
+            UriUtility uriUtility = BuildUriUtility("/");
 
             // Act
-            var resultUri = uriUtility.UriFromUmbraco(sourceUri, requestHandlerSettings);
+            Uri resultUri = uriUtility.UriFromUmbraco(sourceUri, requestHandlerSettings);
 
             // Assert
             var expectedUri = new Uri(expectedUrl, UriKind.Relative);
@@ -90,7 +93,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         public void Uri_To_Absolute(string virtualPath, string sourceUrl, string expectedUrl)
         {
             // Arrange
-            var uriUtility = BuildUriUtility(virtualPath);
+            UriUtility uriUtility = BuildUriUtility(virtualPath);
 
             // Act
             var resultUrl = uriUtility.ToAbsolute(sourceUrl);
@@ -109,7 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         public void Url_To_App_Relative(string virtualPath, string sourceUrl, string expectedUrl)
         {
             // Arrange
-            var uriUtility = BuildUriUtility(virtualPath);
+            UriUtility uriUtility = BuildUriUtility(virtualPath);
 
             // Act
             var resultUrl = uriUtility.ToAppRelative(sourceUrl);

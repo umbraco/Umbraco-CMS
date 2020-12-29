@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
-using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web.Compose;
 
@@ -15,15 +18,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore,
-
         };
 
-        private const string _contentGuid1 = "036ce82586a64dfba2d523a99ed80f58";
-        private const string _contentGuid2 = "48288c21a38a40ef82deb3eda90a58f6";
-        private const string _settingsGuid1 = "ffd35c4e2eea4900abfa5611b67b2492";
-        private const string _subContentGuid1 = "4c44ce6b3a5c4f5f8f15e3dc24819a9e";
-        private const string _subContentGuid2 = "a062c06d6b0b44ac892b35d90309c7f8";
-        private const string _subSettingsGuid1 = "4d998d980ffa4eee8afdc23c4abd6d29";
+        private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";
+        private const string ContentGuid2 = "48288c21a38a40ef82deb3eda90a58f6";
+        private const string SettingsGuid1 = "ffd35c4e2eea4900abfa5611b67b2492";
+        private const string SubContentGuid1 = "4c44ce6b3a5c4f5f8f15e3dc24819a9e";
+        private const string SubContentGuid2 = "a062c06d6b0b44ac892b35d90309c7f8";
+        private const string SubSettingsGuid1 = "4d998d980ffa4eee8afdc23c4abd6d29";
 
         [Test]
         public void Cannot_Have_Null_Udi()
@@ -38,14 +40,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             var guids = Enumerable.Range(0, 3).Select(x => Guid.NewGuid()).ToList();
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             var json = GetBlockListJson(null);
 
-            var expected = ReplaceGuids(json, guids, _contentGuid1, _contentGuid2, _settingsGuid1);
+            var expected = ReplaceGuids(json, guids, ContentGuid1, ContentGuid2, SettingsGuid1);
 
             var component = new BlockEditorComponent();
-            var result = component.ReplaceBlockListUdis(json, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
             var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -60,9 +62,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var guids = Enumerable.Range(0, 6).Select(x => Guid.NewGuid()).ToList();
 
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
-            var innerJson = GetBlockListJson(null, _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var innerJson = GetBlockListJson(null, SubContentGuid1, SubContentGuid2, SubSettingsGuid1);
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -72,12 +74,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var json = GetBlockListJson(innerJsonEscaped);
 
             var component = new BlockEditorComponent();
-            var result = component.ReplaceBlockListUdis(json, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             // the expected result is that the subFeatures data is no longer escaped
-            var expected = ReplaceGuids(GetBlockListJson(innerJson), guids,
-                _contentGuid1, _contentGuid2, _settingsGuid1,
-                _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var expected = ReplaceGuids(
+                GetBlockListJson(innerJson),
+                guids,
+                ContentGuid1,
+                ContentGuid2,
+                SettingsGuid1,
+                SubContentGuid1,
+                SubContentGuid2,
+                SubSettingsGuid1);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
             var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -91,20 +99,26 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             var guids = Enumerable.Range(0, 6).Select(x => Guid.NewGuid()).ToList();
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             // nested blocks without property value escaping used in the conversion
-            var innerJson = GetBlockListJson(null, _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var innerJson = GetBlockListJson(null, SubContentGuid1, SubContentGuid2, SubSettingsGuid1);
 
             // get the json with the subFeatures as unescaped
             var json = GetBlockListJson(innerJson);
 
-            var expected = ReplaceGuids(GetBlockListJson(innerJson), guids,
-                _contentGuid1, _contentGuid2, _settingsGuid1,
-                _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var expected = ReplaceGuids(
+                GetBlockListJson(innerJson),
+                guids,
+                ContentGuid1,
+                ContentGuid2,
+                SettingsGuid1,
+                SubContentGuid1,
+                SubContentGuid2,
+                SubSettingsGuid1);
 
             var component = new BlockEditorComponent();
-            var result = component.ReplaceBlockListUdis(json, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
             var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -118,9 +132,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             var guids = Enumerable.Range(0, 6).Select(x => Guid.NewGuid()).ToList();
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
-            var innerJson = GetBlockListJson(null, _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var innerJson = GetBlockListJson(null, SubContentGuid1, SubContentGuid2, SubSettingsGuid1);
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -132,12 +146,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var json = GetBlockListJson(complexEditorJsonEscaped);
 
             var component = new BlockEditorComponent();
-            var result = component.ReplaceBlockListUdis(json, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             // the expected result is that the subFeatures data is no longer escaped
-            var expected = ReplaceGuids(GetBlockListJson(GetGridJson(innerJson)), guids,
-                _contentGuid1, _contentGuid2, _settingsGuid1,
-                _subContentGuid1, _subContentGuid2, _subSettingsGuid1);
+            var expected = ReplaceGuids(
+                GetBlockListJson(GetGridJson(innerJson)),
+                guids,
+                ContentGuid1,
+                ContentGuid2,
+                SettingsGuid1,
+                SubContentGuid1,
+                SubContentGuid2,
+                SubSettingsGuid1);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
             var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -146,10 +166,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             Assert.AreEqual(expectedJson, resultJson);
         }
 
-        private string GetBlockListJson(string subFeatures,
-            string contentGuid1 = _contentGuid1,
-            string contentGuid2 = _contentGuid2,
-            string settingsGuid1 = _settingsGuid1)
+        private string GetBlockListJson(
+            string subFeatures,
+            string contentGuid1 = ContentGuid1,
+            string contentGuid2 = ContentGuid2,
+            string settingsGuid1 = SettingsGuid1)
         {
             return @"{
     ""layout"":
@@ -254,8 +275,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 var old = oldGuids[i];
                 json = json.Replace(old, newGuids[i].ToString("N"));
             }
+
             return json;
         }
-
     }
 }

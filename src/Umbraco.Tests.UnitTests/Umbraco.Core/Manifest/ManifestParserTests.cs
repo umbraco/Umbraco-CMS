@@ -1,21 +1,24 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using Moq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using NUnit.Framework;
+using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Dashboards;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
-using Umbraco.Core.Services;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.IO;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 
@@ -37,14 +40,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
                 new DelimitedValueValidator(),
             };
             _ioHelper = TestHelper.IOHelper;
-            var loggerFactory = NullLoggerFactory.Instance;
+            NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
             _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  loggerFactory.CreateLogger<ManifestParser>(), loggerFactory, _ioHelper, TestHelper.GetHostingEnvironment(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>());
         }
 
         [Test]
         public void DelimitedValueValidator()
         {
-
             const string json = @"{'propertyEditors': [
     {
         alias: 'Test.Test2',
@@ -64,7 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
     }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
 
             Assert.AreEqual(1, manifest.ParameterEditors.Length);
             Assert.AreEqual(1, manifest.ParameterEditors[0].GetValueEditor().Validators.Count);
@@ -80,7 +82,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
         [Test]
         public void CanParseComments()
         {
-
             const string json1 = @"
 // this is a single-line comment
 {
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
 }
 ";
 
-            var jobject = (JObject) JsonConvert.DeserializeObject(json1);
+            var jobject = (JObject)JsonConvert.DeserializeObject(json1);
             Assert.AreEqual("2", jobject.Property("x").Value.ToString());
             Assert.AreEqual("3", jobject.Property("y").Value.ToString());
             Assert.AreEqual("4", jobject.Property("z").Value.ToString());
@@ -115,8 +116,8 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         [Test]
         public void CanParseManifest_ScriptsAndStylesheets()
         {
-            var json = "{}";
-            var manifest = _parser.ParseManifest(json);
+            string json = "{}";
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(0, manifest.Scripts.Length);
 
             json = "{javascript: []}";
@@ -139,7 +140,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.Throws<JsonReaderException>(() => _parser.ParseManifest(json));
 
             json = "{}";
-             manifest = _parser.ParseManifest(json);
+            manifest = _parser.ParseManifest(json);
             Assert.AreEqual(0, manifest.Stylesheets.Length);
 
             json = "{css: []}";
@@ -153,8 +154,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             json = "{propertyEditors: [], css: ['~/stylesheet.css', '~/random-long-name.css']}";
             manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.Stylesheets.Length);
-
-
 
             json = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js'], css: ['~/stylesheet.css', '~/random-long-name.css']}";
             manifest = _parser.ParseManifest(json);
@@ -212,10 +211,10 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
     }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.PropertyEditors.Length);
 
-            var editor = manifest.PropertyEditors[1];
+            IDataEditor editor = manifest.PropertyEditors[1];
             Assert.IsTrue((editor.Type & EditorType.MacroParameter) > 0);
 
             editor = manifest.PropertyEditors[0];
@@ -223,18 +222,18 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("Test 1", editor.Name);
             Assert.IsFalse((editor.Type & EditorType.MacroParameter) > 0);
 
-            var valueEditor = editor.GetValueEditor();
+            IDataValueEditor valueEditor = editor.GetValueEditor();
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html"), valueEditor.View);
             Assert.AreEqual("int", valueEditor.ValueType);
             Assert.IsTrue(valueEditor.HideLabel);
 
             // these two don't make much sense here
-            // valueEditor.RegexValidator;
-            // valueEditor.RequiredValidator;
+            //// valueEditor.RegexValidator;
+            //// valueEditor.RequiredValidator;
 
-            var validators = valueEditor.Validators;
+            List<IValueValidator> validators = valueEditor.Validators;
             Assert.AreEqual(2, validators.Count);
-            var validator = validators[0];
+            IValueValidator validator = validators[0];
             var v1 = validator as RequiredValidator;
             Assert.IsNotNull(v1);
             Assert.AreEqual("Required", v1.ValidationName);
@@ -245,19 +244,19 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("\\d*", v2.Configuration);
 
             // this is not part of the manifest
-            var preValues = editor.GetConfigurationEditor().DefaultConfiguration;
+            IDictionary<string, object> preValues = editor.GetConfigurationEditor().DefaultConfiguration;
             Assert.IsEmpty(preValues);
 
-            var preValueEditor = editor.GetConfigurationEditor();
+            IConfigurationEditor preValueEditor = editor.GetConfigurationEditor();
             Assert.IsNotNull(preValueEditor);
             Assert.IsNotNull(preValueEditor.Fields);
             Assert.AreEqual(2, preValueEditor.Fields.Count);
 
-            var f = preValueEditor.Fields[0];
+            ConfigurationField f = preValueEditor.Fields[0];
             Assert.AreEqual("key1", f.Key);
             Assert.AreEqual("Some config 1", f.Name);
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html"), f.View);
-            var fvalidators = f.Validators;
+            List<IValueValidator> fvalidators = f.Validators;
             Assert.IsNotNull(fvalidators);
             Assert.AreEqual(1, fvalidators.Count);
             var fv = fvalidators[0] as RequiredValidator;
@@ -294,27 +293,27 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
     }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(3, manifest.ParameterEditors.Length);
 
             Assert.IsTrue(manifest.ParameterEditors.All(x => (x.Type & EditorType.MacroParameter) > 0));
 
-            var editor = manifest.ParameterEditors[1];
+            IDataEditor editor = manifest.ParameterEditors[1];
             Assert.AreEqual("parameter2", editor.Alias);
             Assert.AreEqual("Another parameter", editor.Name);
 
-            var config = editor.DefaultConfiguration;
+            IDictionary<string, object> config = editor.DefaultConfiguration;
             Assert.AreEqual(1, config.Count);
             Assert.IsTrue(config.ContainsKey("key1"));
             Assert.AreEqual("some config val", config["key1"]);
 
-            var valueEditor = editor.GetValueEditor();
+            IDataValueEditor valueEditor = editor.GetValueEditor();
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html"), valueEditor.View);
 
             editor = manifest.ParameterEditors[2];
             Assert.Throws<InvalidOperationException>(() =>
             {
-                var _ = editor.GetValueEditor();
+                IDataValueEditor valueEditor = editor.GetValueEditor();
             });
         }
 
@@ -353,20 +352,20 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         }
     ]
 }";
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.GridEditors.Length);
 
-            var editor = manifest.GridEditors[0];
+            GridEditor editor = manifest.GridEditors[0];
             Assert.AreEqual("small-hero", editor.Alias);
             Assert.AreEqual("Small Hero", editor.Name);
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPlugin/small-hero/editortemplate.html"), editor.View);
             Assert.AreEqual(_ioHelper.ResolveUrl("/Views/Partials/Grid/Editors/SmallHero.cshtml"), editor.Render);
             Assert.AreEqual("icon-presentation", editor.Icon);
 
-            var config = editor.Config;
+            IDictionary<string, object> config = editor.Config;
             Assert.AreEqual(2, config.Count);
             Assert.IsTrue(config.ContainsKey("image"));
-            var c = config["image"];
+            object c = config["image"];
             Assert.IsInstanceOf<JObject>(c); // FIXME: is this what we want?
             Assert.IsTrue(config.ContainsKey("link"));
             c = config["link"];
@@ -394,11 +393,11 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
     }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.ContentApps.Length);
 
             Assert.IsInstanceOf<ManifestContentAppDefinition>(manifest.ContentApps[0]);
-            var app0 = (ManifestContentAppDefinition) manifest.ContentApps[0];
+            var app0 = (ManifestContentAppDefinition)manifest.ContentApps[0];
             Assert.AreEqual("myPackageApp1", app0.Alias);
             Assert.AreEqual("My App1", app0.Name);
             Assert.AreEqual("icon-foo", app0.Icon);
@@ -431,11 +430,11 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
     }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.Dashboards.Length);
 
             Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[0]);
-            var db0 = manifest.Dashboards[0];
+            ManifestDashboard db0 = manifest.Dashboards[0];
             Assert.AreEqual("something", db0.Alias);
             Assert.AreEqual(100, db0.Weight);
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/Dashboards/one.html"), db0.View);
@@ -448,7 +447,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("foo", db0.AccessRules[1].Value);
 
             Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[1]);
-            var db1 = manifest.Dashboards[1];
+            ManifestDashboard db1 = manifest.Dashboards[1];
             Assert.AreEqual("something.else", db1.Alias);
             Assert.AreEqual(-1, db1.Weight);
             Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/Dashboards/two.html"), db1.View);
@@ -464,7 +463,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
     { ""alias"": ""hello"", ""name"": ""World"" }
 ]}";
 
-            var manifest = _parser.ParseManifest(json);
+            PackageManifest manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.Sections.Length);
             Assert.AreEqual("content", manifest.Sections[0].Alias);
             Assert.AreEqual("hello", manifest.Sections[1].Alias);

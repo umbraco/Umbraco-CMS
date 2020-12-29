@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -16,12 +20,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new DataTypeBuilder();
 
             // Act
-            var dtd = builder
+            DataType dataType = builder
                 .WithId(testId)
                 .Build();
 
             // Assert
-            Assert.AreEqual(testId, dtd.Id);
+            Assert.AreEqual(testId, dataType.Id);
         }
     }
 }

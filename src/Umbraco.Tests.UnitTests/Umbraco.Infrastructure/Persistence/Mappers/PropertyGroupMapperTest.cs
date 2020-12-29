@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
 

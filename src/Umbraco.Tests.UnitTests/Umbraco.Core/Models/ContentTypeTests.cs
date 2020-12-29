@@ -1,6 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -17,10 +21,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Add_Duplicate_Property_Aliases()
         {
-            var contentType = BuildContentType();
+            ContentType contentType = BuildContentType();
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
-            var additionalPropertyType = propertyTypeBuilder
+            PropertyType additionalPropertyType = propertyTypeBuilder
                 .WithAlias("title")
                 .Build();
 
@@ -32,16 +36,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
         public void Cannot_Update_Duplicate_Property_Aliases()
         {
-            var contentType = BuildContentType();
+            ContentType contentType = BuildContentType();
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
-            var additionalPropertyType = propertyTypeBuilder
+            PropertyType additionalPropertyType = propertyTypeBuilder
                 .WithAlias("title")
                 .Build();
 
             contentType.PropertyTypeCollection.Add(additionalPropertyType);
 
-            var toUpdate = contentType.PropertyTypeCollection["myPropertyType2"];
+            IPropertyType toUpdate = contentType.PropertyTypeCollection["myPropertyType2"];
 
             Assert.Throws<InvalidOperationException>(() => toUpdate.Alias = "myPropertyType");
         }
@@ -49,7 +53,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
         {
-            var contentType = BuildContentTypeSort();
+            ContentTypeSort contentType = BuildContentTypeSort();
             var clone = (ContentTypeSort)contentType.DeepClone();
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
@@ -71,7 +75,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Deep_Clone_Content_Type_With_Reset_Identities()
         {
-            var contentType = BuildContentType();
+            ContentType contentType = BuildContentType();
 
             var clone = (ContentType)contentType.DeepCloneWithResetIdentities("newAlias");
 
@@ -79,22 +83,26 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreNotEqual("newAlias", contentType.Alias);
             Assert.IsFalse(clone.HasIdentity);
 
-            foreach (var propertyGroup in clone.PropertyGroups)
+            foreach (PropertyGroup propertyGroup in clone.PropertyGroups)
             {
                 Assert.IsFalse(propertyGroup.HasIdentity);
-                foreach (var propertyType in propertyGroup.PropertyTypes)
+                foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
+                {
                     Assert.IsFalse(propertyType.HasIdentity);
+                }
             }
 
-            foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
+            foreach (IPropertyType propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
+            {
                 Assert.IsFalse(propertyType.HasIdentity);
-        }        
+            }
+        }
 
         [Test]
         public void Can_Deep_Clone_Content_Type()
         {
             // Arrange
-            var contentType = BuildContentType();
+            ContentType contentType = BuildContentType();
 
             // Act
             var clone = (ContentType)contentType.DeepClone();
@@ -109,6 +117,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 Assert.AreNotSame(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
                 Assert.AreEqual(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
             }
+
             Assert.AreNotSame(clone.PropertyGroups, contentType.PropertyGroups);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
@@ -116,6 +125,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
                 Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
             }
+
             Assert.AreNotSame(clone.PropertyTypes, contentType.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
             Assert.AreEqual(0, clone.NoGroupPropertyTypes.Count());
@@ -140,19 +150,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            }
 
-            //need to ensure the event handlers are wired
-
+            // Need to ensure the event handlers are wired
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
 
             var propertyTypeBuilder = new PropertyTypeBuilder();
-            var additionalPropertyType = propertyTypeBuilder
+            PropertyType additionalPropertyType = propertyTypeBuilder
                 .WithAlias("blah")
                 .Build();
 
@@ -167,7 +178,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         public void Can_Serialize_Content_Type_Without_Error()
         {
             // Arrange
-            var contentType = BuildContentType();
+            ContentType contentType = BuildContentType();
 
             var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);
@@ -183,7 +194,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         public void Can_Deep_Clone_Media_Type()
         {
             // Arrange
-            var contentType = BuildMediaType();
+            MediaType contentType = BuildMediaType();
 
             // Act
             var clone = (MediaType)contentType.DeepClone();
@@ -198,12 +209,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
                 Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
             }
+
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
             for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
             {
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
                 Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
             }
+
             Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
             Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
             Assert.AreEqual(clone.Key, contentType.Key);
@@ -216,17 +229,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            }
         }
 
         [Test]
         public void Can_Serialize_Media_Type_Without_Error()
         {
             // Arrange
-            var contentType = BuildMediaType();
+            MediaType contentType = BuildMediaType();
 
             var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);
@@ -242,7 +257,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         public void Can_Deep_Clone_Member_Type()
         {
             // Arrange
-            var contentType = BuildMemberType();
+            MemberType contentType = BuildMemberType();
 
             // Act
             var clone = (MemberType)contentType.DeepClone();
@@ -257,12 +272,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
                 Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
             }
+
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
             for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
             {
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
                 Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
             }
+
             Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
             Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
             Assert.AreEqual(clone.Key, contentType.Key);
@@ -276,16 +293,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
 
             // This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            }
         }
 
         [Test]
         public void Can_Serialize_Member_Type_Without_Error()
         {
             // Arrange
-            var contentType = BuildMemberType();
+            MemberType contentType = BuildMemberType();
 
             var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);

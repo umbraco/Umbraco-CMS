@@ -952,7 +952,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // reading repository purely for looking up by GUID
         // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
-        private class ContentByGuidReadRepository : NPocoRepositoryBase<Guid, IContent>
+        private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
         {
             private readonly DocumentRepository _outerRepo;
 

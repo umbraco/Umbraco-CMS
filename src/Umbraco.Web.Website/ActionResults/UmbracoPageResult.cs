@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Website.ActionResults
         /// </summary>
         private static void ValidateRouteData(RouteData routeData)
         {
-            if (routeData.DataTokens.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken) == false)
+            if (routeData.Values.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken) == false)
             {
                 throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
                                                     " in the context of an Http POST when using a SurfaceController form");

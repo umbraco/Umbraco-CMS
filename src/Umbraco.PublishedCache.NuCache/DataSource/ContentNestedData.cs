@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using Umbraco.Core.Serialization;
 
@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// </summary>
     internal class ContentNestedData
     {
-        //dont serialize empty properties
+        // dont serialize empty properties
         [JsonProperty("pd")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }
@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         [JsonProperty("us")]
         public string UrlSegment { get; set; }
 
-        //Legacy properties used to deserialize existing nucache db entries
+        // Legacy properties used to deserialize existing nucache db entries
         [JsonProperty("properties")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
         private Dictionary<string, PropertyData[]> LegacyPropertyData { set { PropertyData = value; } }

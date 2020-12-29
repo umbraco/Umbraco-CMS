@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
 
@@ -29,7 +29,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public object Value { get; set; }
 
 
-        //Legacy properties used to deserialize existing nucache db entries
+        // Legacy properties used to deserialize existing nucache db entries
         [JsonProperty("culture")]
         private string LegacyCulture
         {

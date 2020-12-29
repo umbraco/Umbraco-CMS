@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
@@ -21,16 +16,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         private IShortStringHelper ShortStringHelper { get; set; }
 
         [SetUp]
-        public void SetUp()
-        {
+        public void SetUp() =>
 
             // NOTE pre-filters runs _before_ Recode takes place
             // so there still may be utf8 chars even though you want ascii
-
             ShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.FileName, new DefaultShortStringHelperConfig.Config
                 {
-                    //PreFilter = ClearFileChars, // done in IsTerm
+                    // PreFilter = ClearFileChars, // done in IsTerm
                     IsTerm = (c, leading) => (char.IsLetterOrDigit(c) || c == '_') && DefaultShortStringHelper.IsValidFileNameChar(c),
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
                     Separator = '-'
@@ -68,18 +61,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
                     StringType = CleanStringType.Ascii,
                     BreakTermsOnUpper = true
                 }));
-        }
 
-        private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex s_frenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static string FilterFrenchElisions(string s)
-        {
-            return FrenchElisionsRegex.Replace(s, "");
-        }
+        private static string FilterFrenchElisions(string s) => s_frenchElisionsRegex.Replace(s, string.Empty);
 
         private static string StripQuotes(string s)
         {
-            s = s.ReplaceMany(new Dictionary<string, string> {{"'", ""}, {"\u8217", ""}});
+            s = s.ReplaceMany(new Dictionary<string, string> { { "'", string.Empty }, { "\u8217", string.Empty } });
             return s;
         }
 
@@ -89,7 +78,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             return s;
         }
 
-        #region Cases
         [TestCase("foo", "foo")]
         [TestCase("    foo    ", "foo")]
         [TestCase("Foo", "Foo")]
@@ -121,14 +109,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("whatIfWeDoItAgain", "whatIfWeDoItAgain")]
         [TestCase("WhatIfWEDOITAgain", "WhatIfWEDOITAgain")]
         [TestCase("WhatIfWe doItAgain", "WhatIfWeDoItAgain")]
-        #endregion
         public void CleanStringForSafeAlias(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForSafeAlias(input);
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
         [TestCase("Home Page", "home-page")]
         [TestCase("Shannon's Home Page!", "shannons-home-page")]
         [TestCase("#Someones's Twitter $h1z%n", "someoness-twitter-h1z-n")]
@@ -137,14 +123,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("汉#字*/漢?字", "")]
         [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
         [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
-        #endregion
         public void CleanStringForUrlSegment(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForUrlSegment(input);
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
         [TestCase("ThisIsTheEndMyFriend", "This Is The End My Friend")]
         [TestCase("ThisIsTHEEndMyFriend", "This Is THE End My Friend")]
         [TestCase("THISIsTHEEndMyFriend", "THIS Is THE End My Friend")]
@@ -153,7 +137,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("ThisIsTHEEndMyFriendXYZ", "This Is THE End My Friend XYZ")]
         [TestCase("ThisIsTHEEndMyFriendXYZt", "This Is THE End My Friend XY Zt")]
         [TestCase("UneÉlévationÀPartir", "Une Élévation À Partir")]
-        #endregion
         public void SplitPascalCasing(string input, string expected)
         {
             var output = ShortStringHelper.SplitPascalCasing(input, ' ');
@@ -164,13 +147,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
         [TestCase("sauté dans l'espace", "saute-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
         [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Utf8 | CleanStringType.LowerCase)]
         [TestCase("sauté dans l'espace", "SauteDansLEspace", "fr-FR", CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.PascalCase)]
         [TestCase("he doesn't want", "he-doesnt-want", null, CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
         [TestCase("he doesn't want", "heDoesntWant", null, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase)]
-        #endregion
         public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
         {
             // picks the proper config per culture
@@ -179,7 +160,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
         [TestCase("foo.txt", "foo.txt")]
         [TestCase("foo", "foo")]
         [TestCase(".txt", ".txt")]
@@ -192,7 +172,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("yop.Straße Zvöskî", "yop.strasse-zvoski")]
         [TestCase("yop.Straße Zvös--kî", "yop.strasse-zvos-ki")]
         [TestCase("ma--ma---ma.ma-----ma", "ma-ma-ma.ma-ma")]
-        #endregion
         public void CleanStringForSafeFileName(string input, string expected)
         {
             var output = ShortStringHelper.CleanStringForSafeFileName(input);

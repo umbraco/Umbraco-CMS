@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web;
 using System.Web.Routing;
 using Microsoft.Extensions.Logging;
@@ -157,9 +157,6 @@ namespace Umbraco.Web
         /// <summary>
         /// Checks the current request and ensures that it is routable based on the structure of the request and URI
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
         internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(IUmbracoContext context, HttpContextBase httpContext)
         {
             var uri = context.OriginalRequestUrl;
@@ -186,8 +183,8 @@ namespace Umbraco.Web
             return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
         }
 
-
-
+        // TODO: Where should this execute in netcore? This will have to be a middleware
+        // executing before UseRouting so that it is done before any endpoint routing takes place.
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
             var level = _runtime.Level;

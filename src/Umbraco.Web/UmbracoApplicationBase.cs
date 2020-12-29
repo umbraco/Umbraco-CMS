@@ -46,7 +46,6 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase()
         {
-       
                 HostingSettings hostingSettings = null;
                 GlobalSettings globalSettings = null;
                 SecuritySettings securitySettings = null;
@@ -60,8 +59,6 @@ namespace Umbraco.Web
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                StaticApplicationLogging.Initialize(_loggerFactory);
-                Logger = NullLogger<UmbracoApplicationBase>.Instance;
         }
 
         private IProfiler GetWebProfiler(IHostingEnvironment hostingEnvironment)
@@ -87,7 +84,6 @@ namespace Umbraco.Web
             _loggerFactory = loggerFactory;
 
             Logger = logger;
-            StaticApplicationLogging.Initialize(_loggerFactory);
         }
 
         protected ILogger<UmbracoApplicationBase> Logger { get; }
@@ -189,7 +185,6 @@ namespace Umbraco.Web
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetRequiredService<IRequestCache>()));
 
             _runtime = _factory.GetRequiredService<IRuntime>();
-            _runtime.Start();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
@@ -237,7 +232,6 @@ namespace Umbraco.Web
         {
             if (_runtime != null)
             {
-                _runtime.Terminate();
                 _runtime.DisposeIfDisposable();
 
                 _runtime = null;

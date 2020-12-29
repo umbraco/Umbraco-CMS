@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.UnitTests.TestHelpers
 {

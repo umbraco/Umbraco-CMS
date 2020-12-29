@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -16,13 +19,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         private int _id;
         private Guid _key;
 
-        protected Item()
-        {
-            _propertyChangedInfo = new Dictionary<string, bool>();
-        }
+        protected Item() => _propertyChangedInfo = new Dictionary<string, bool>();
 
         /// <summary>
-        /// Integer Id
+        /// Gets or sets the integer Id
         /// </summary>
         [DataMember]
         public int Id
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         }
 
         /// <summary>
-        /// Guid based Id
+        /// Gets or sets the Guid based Id
         /// </summary>
         /// <remarks>The key is currectly used to store the Unique Id from the
         /// umbracoNode table, which many of the entities are based on.</remarks>
@@ -66,8 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         public DateTime? DeleteDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the WasCancelled flag, which is used to track
-        /// whether some action against an entity was cancelled through some event.
+        /// Gets or sets a value indicating whether some action against an entity was cancelled through some event.
         /// This only exists so we have a way to check if an event was cancelled through
         /// the new api, which also needs to take effect in the legacy api.
         /// </summary>
@@ -86,7 +85,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         protected virtual void OnPropertyChanged(PropertyInfo propertyInfo)
         {
             if (_withChanges == false)
+            {
                 return;
+            }
 
             _propertyChangedInfo[propertyInfo.Name] = true;
 
@@ -96,7 +97,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         public virtual void ResetIdentity()
         {
             _hasIdentity = false;
-            _id = default(int);
+            _id = default;
         }
 
         /// <summary>
@@ -111,15 +112,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         /// <summary>
         /// Method to call on entity saved/updated
         /// </summary>
-        internal virtual void UpdatingEntity()
-        {
-            UpdateDate = DateTime.Now;
-        }
+        internal virtual void UpdatingEntity() => UpdateDate = DateTime.Now;
 
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
-        //private readonly IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
         private readonly IDictionary<string, bool> _propertyChangedInfo;
 
         /// <summary>
@@ -127,24 +124,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         /// </summary>
         /// <param name="propertyName">Name of the property to check</param>
         /// <returns>True if Property is dirty, otherwise False</returns>
-        public virtual bool IsPropertyDirty(string propertyName)
-        {
-            return _propertyChangedInfo.Any(x => x.Key == propertyName);
-        }
+        public virtual bool IsPropertyDirty(string propertyName) => _propertyChangedInfo.Any(x => x.Key == propertyName);
 
-        public virtual IEnumerable<string> GetDirtyProperties()
-        {
-            return _propertyChangedInfo.Keys;
-        }
+        public virtual IEnumerable<string> GetDirtyProperties() => _propertyChangedInfo.Keys;
 
         /// <summary>
         /// Indicates whether the current entity is dirty.
         /// </summary>
         /// <returns>True if entity is dirty, otherwise False</returns>
-        public virtual bool IsDirty()
-        {
-            return _propertyChangedInfo.Any();
-        }
+        public virtual bool IsDirty() => _propertyChangedInfo.Any();
 
         /// <summary>
         /// Resets dirty properties by clearing the dictionary used to track changes.
@@ -153,29 +141,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         /// Please note that resetting the dirty properties could potentially
         /// obstruct the saving of a new or updated entity.
         /// </remarks>
-        public virtual void ResetDirtyProperties()
-        {
-            _propertyChangedInfo.Clear();
-        }
+        public virtual void ResetDirtyProperties() => _propertyChangedInfo.Clear();
 
         /// <summary>
         /// Disables change tracking.
         /// </summary>
-        public void DisableChangeTracking()
-        {
-            _withChanges = false;
-        }
+        public void DisableChangeTracking() => _withChanges = false;
 
         /// <summary>
         /// Enables change tracking.
         /// </summary>
-        public void EnableChangeTracking()
-        {
-            _withChanges = true;
-        }
+        public void EnableChangeTracking() => _withChanges = true;
 
         /// <summary>
-        /// Indicates whether the current entity has an identity, eg. Id.
+        /// Gets or sets a value indicating whether the current entity has an identity, eg. Id.
         /// </summary>
         public virtual bool HasIdentity
         {
@@ -183,15 +162,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
             protected set => _hasIdentity = value;
         }
 
-        public static bool operator ==(Item left, Item right)
-        {
-            return ReferenceEquals(left, right);
-        }
+        public static bool operator ==(Item left, Item right) => ReferenceEquals(left, right);
 
-        public static bool operator !=(Item left, Item right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Item left, Item right) => !(left == right);
 
         /*public virtual bool SameIdentityAs(IEntity other)
         {
@@ -249,9 +222,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
             return _hash.Value;
         }*/
 
-        public object DeepClone()
-        {
-            return this.MemberwiseClone();
-        }
+        public object DeepClone() => this.MemberwiseClone();
     }
 }

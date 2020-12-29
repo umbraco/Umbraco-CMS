@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
@@ -17,8 +20,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string testAlias = "test";
             const string testName = "Test";
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             const string testPath = "-1,3";
             const string testContent = "blah";
             const string testMasterTemplateAlias = "master";
@@ -27,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new TemplateBuilder();
 
             // Act
-            var template = builder
+            ITemplate template = builder
                 .WithId(3)
                 .WithAlias(testAlias)
                 .WithName(testName)

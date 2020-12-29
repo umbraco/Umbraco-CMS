@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,7 +14,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
      [TestFixture]
      public class ContentModelValidatorTests
      {
-
          [Test]
          public void Test_Serializer()
          {
@@ -52,7 +54,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
              var outerError = new ComplexEditorValidationResult();
              var id4 = Guid.NewGuid();
              var addressBookCollectionElementTypeResult = new ComplexEditorElementTypeValidationResult("addressBookCollection", id4);
-             var booksPropertyTypeResult= new ComplexEditorPropertyTypeValidationResult("books");
+             var booksPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("books");
              booksPropertyTypeResult.AddValidationResult(nestedLevel1); // books is the outer most validation result
              addressBookCollectionElementTypeResult.ValidationResults.Add(booksPropertyTypeResult);
              outerError.ValidationResults.Add(addressBookCollectionElementTypeResult);
@@ -60,7 +62,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
              var serialized = JsonConvert.SerializeObject(outerError, Formatting.Indented, new ValidationResultConverter());
              Console.WriteLine(serialized);
 
-             var jsonError = JsonConvert.DeserializeObject<JArray>(serialized);
+             JArray jsonError = JsonConvert.DeserializeObject<JArray>(serialized);
 
              Assert.IsNotNull(jsonError.SelectToken("$[0]"));
              Assert.AreEqual(id4.ToString(), jsonError.SelectToken("$[0].$id").Value<string>());
@@ -105,6 +107,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
              Assert.IsNotNull(error5);
              Assert.AreEqual(2, error5.Count);
          }
-
      }
  }

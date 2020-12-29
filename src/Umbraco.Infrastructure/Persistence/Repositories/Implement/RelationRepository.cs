@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Relation"/>
     /// </summary>
-    internal class RelationRepository : NPocoRepositoryBase<int, IRelation>, IRelationRepository
+    internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IEntityRepository _entityRepository;
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,Relation>
+        #region Overrides of EntityRepositoryBase<int,Relation>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

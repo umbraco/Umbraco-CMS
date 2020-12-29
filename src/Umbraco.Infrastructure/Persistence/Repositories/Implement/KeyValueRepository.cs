@@ -12,7 +12,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class KeyValueRepository : NPocoRepositoryBase<string, IKeyValue>, IKeyValueRepository
+    internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
     {
         public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<string, IKeyValue>
+        #region Overrides of EntityRepositoryBase<string, IKeyValue>
 
         protected override Guid NodeObjectTypeId => throw new NotSupportedException();
 

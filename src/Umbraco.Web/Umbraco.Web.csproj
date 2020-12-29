@@ -182,7 +182,6 @@
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
-    <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
@@ -191,8 +190,6 @@
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
-    <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
@@ -238,7 +235,6 @@
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
-    <Compile Include="Mvc\RenderControllerFactory.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -34,11 +37,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             var configurationEditorJsonSerializer = new ConfigurationEditorJsonSerializer();
             var jsonSerializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), jsonSerializer), configurationEditorJsonSerializer)
+            var dataType = new DataType(
+                new VoidEditor(
+                    NullLoggerFactory.Instance,
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    jsonSerializer), configurationEditorJsonSerializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
-
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
@@ -47,7 +55,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", dataType.Id);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
+            IPublishedContentType setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             // PublishedElementPropertyBase.GetCacheLevels:
             //
@@ -61,7 +69,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             // anything else is not > None, use Content
             //
             // for standalone elements, it's only None or Content
-
             var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -70,7 +77,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             // source is always converted once and cached per content
             // inter conversion depends on the specified cache level
-
             Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(interConverts, converter.InterConverts);
@@ -108,8 +114,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
         [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
 
-        public void CachePublishedSnapshotTest(PropertyCacheLevel referenceCacheLevel, PropertyCacheLevel converterCacheLevel, int interConverts,
-            int elementsCount1, int snapshotCount1, int elementsCount2, int snapshotCount2)
+        public void CachePublishedSnapshotTest(
+            PropertyCacheLevel referenceCacheLevel,
+            PropertyCacheLevel converterCacheLevel,
+            int interConverts,
+            int elementsCount1,
+            int snapshotCount1,
+            int elementsCount2,
+            int snapshotCount2)
         {
             var converter = new CacheConverter1(converterCacheLevel);
 
@@ -119,8 +131,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             });
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
+            var dataType = new DataType(
+                new VoidEditor(
+                    NullLoggerFactory.Instance,
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -131,7 +149,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
+            IPublishedContentType setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             var elementsCache = new FastDictionaryAppCache();
             var snapshotCache = new FastDictionaryAppCache();
@@ -146,7 +164,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             // pretend we're creating this set as a value for a property
             // referenceCacheLevel is the cache level for this fictious property
             // converterCacheLevel is the cache level specified by the converter
-
             var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, referenceCacheLevel, publishedSnapshotAccessor.Object);
 
             Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -163,7 +180,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             Assert.AreEqual(elementsCount2, elementsCache.Count);
             Assert.AreEqual(snapshotCount2, snapshotCache.Count);
 
-            var oldSnapshotCache = snapshotCache;
+            FastDictionaryAppCache oldSnapshotCache = snapshotCache;
             snapshotCache.Clear();
 
             Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -175,7 +192,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Count, converter.InterConverts);
 
-            var oldElementsCache = elementsCache;
+            FastDictionaryAppCache oldElementsCache = elementsCache;
             elementsCache.Clear();
 
             Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -203,7 +220,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                     new VoidEditor(
                         NullLoggerFactory.Instance,
                         dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
+                        Mock.Of<ILocalizationService>(),
                         Mock.Of<ILocalizedTextService>(),
                         Mock.Of<IShortStringHelper>(),
                         new JsonNetSerializer()),
@@ -218,7 +235,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
+            IPublishedContentType setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             Assert.Throws<Exception>(() =>
             {
@@ -230,16 +247,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         {
             private readonly PropertyCacheLevel _cacheLevel;
 
-            public CacheConverter1(PropertyCacheLevel cacheLevel)
-            {
-                _cacheLevel = cacheLevel;
-            }
+            public CacheConverter1(PropertyCacheLevel cacheLevel) => _cacheLevel = cacheLevel;
 
             public int SourceConverts { get; private set; }
+
             public int InterConverts { get; private set; }
 
             public bool? IsValue(object value, PropertyValueLevel level)
-                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
 
             public bool IsConverter(IPublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
@@ -259,11 +274,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 InterConverts++;
-                return (int) inter;
+                return (int)inter;
             }
 
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => ((int) inter).ToString();
+                => ((int)inter).ToString();
         }
     }
 }

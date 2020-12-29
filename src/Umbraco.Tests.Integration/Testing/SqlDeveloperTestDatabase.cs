@@ -17,8 +17,6 @@ namespace Umbraco.Tests.Integration.Testing
         private readonly string _masterConnectionString;
         public const string DatabaseName = "UmbracoTests";
 
-        private const int _threadCount = 2;
-
         public static SqlDeveloperTestDatabase Instance { get; private set; }
 
         public SqlDeveloperTestDatabase(ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory, string masterConnectionString)

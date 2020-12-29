@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -16,9 +20,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string alias = "test";
             const string name = "Test";
             var key = Guid.NewGuid();
-            var createDate = DateTime.Now.AddHours(-2);
-            var updateDate = DateTime.Now.AddHours(-1);
-            var deleteDate = DateTime.Now;
+            DateTime createDate = DateTime.Now.AddHours(-2);
+            DateTime updateDate = DateTime.Now.AddHours(-1);
+            DateTime deleteDate = DateTime.Now;
             var parentObjectType = Guid.NewGuid();
             var childObjectType = Guid.NewGuid();
             const bool isBidirectional = true;
@@ -26,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new RelationTypeBuilder();
 
             // Act
-            var relationType = builder
+            IRelationType relationType = builder
                 .WithId(id)
                 .WithAlias(alias)
                 .WithName(name)

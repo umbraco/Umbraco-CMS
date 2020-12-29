@@ -1,12 +1,12 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
-using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Does_Not_Set_Result_When_No_Errors_In_Model_State()
         {
             // Arrange
-            var context = CreateContext();
+            ActionExecutingContext context = CreateContext();
             var attribute = new ValidationFilterAttribute();
 
             // Act
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Returns_Bad_Request_When_Errors_In_Model_State()
         {
             // Arrange
-            var context = CreateContext(withError: true);
+            ActionExecutingContext context = CreateContext(withError: true);
             var attribute = new ValidationFilterAttribute();
 
             // Act

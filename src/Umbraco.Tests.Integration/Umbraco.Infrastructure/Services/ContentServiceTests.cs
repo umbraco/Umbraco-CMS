@@ -22,45 +22,50 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
+
     /// <summary>
     /// Tests covering all methods in the ContentService class.
     /// </summary>
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+    [UmbracoTest(
+        Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
         WithApplication = true)]
     public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
         // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
-
-        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
-        private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         private IAuditService AuditService => GetRequiredService<IAuditService>();
+
         private IUserService UserService => GetRequiredService<IUserService>();
+
         private IRelationService RelationService => GetRequiredService<IRelationService>();
+
         private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
+
         private ITagService TagService => GetRequiredService<ITagService>();
+
         private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
+
         private IDomainService DomainService => GetRequiredService<IDomainService>();
+
         private INotificationService NotificationService => GetRequiredService<INotificationService>();
+
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+
         private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
         [SetUp]
-        public void Setup()
-        {
-            ContentRepositoryBase.ThrowOnWarning = true;
-        }
+        public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
         [TearDown]
-        public void Teardown()
-        {
-            ContentRepositoryBase.ThrowOnWarning = false;
-        }
+        public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
 
         [Test]
         public void Create_Blueprint()
@@ -442,54 +447,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-        }
-
-        [Test]
-        [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
-            PublishedRepositoryEvents = true,
-            WithApplication = true,
-            Boot = true)]
-        public void Automatically_Track_Relations()
-        {
-            var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-            MediaTypeService.Save(mt);
-            var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
-            var m2 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
-            MediaService.Save(m1);
-            MediaService.Save(m2);
-
-            var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
-
-            var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
-            ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-
-            ContentTypeService.Save(ct);
-
-            var c1 = ContentBuilder.CreateTextpageContent(ct, "my content 1", -1);
-            ContentService.Save(c1);
-
-            var c2 = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
-
-            //'bodyText' is a property with a RTE property editor which we knows tracks relations
-            c2.Properties["bodyText"].SetValue(@"<p>
-        <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
-</p><p><img src='/media/234234.jpg' data-udi=""umb://media/" + m2.Key.ToString("N") + @""" />
-</p>
-<p>
-    <a href=""{locallink:umb://document/" + c1.Key.ToString("N") + @"}"">hello</a>
-</p>");
-
-            ContentService.Save(c2);
-
-            var relations = RelationService.GetByParentId(c2.Id).ToList();
-            Assert.AreEqual(3, relations.Count);
-            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
-            Assert.AreEqual(m1.Id, relations[0].ChildId);
-            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[1].RelationType.Alias);
-            Assert.AreEqual(m2.Id, relations[1].ChildId);
-            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, relations[2].RelationType.Alias);
-            Assert.AreEqual(c1.Id, relations[2].ChildId);
         }
 
         [Test]

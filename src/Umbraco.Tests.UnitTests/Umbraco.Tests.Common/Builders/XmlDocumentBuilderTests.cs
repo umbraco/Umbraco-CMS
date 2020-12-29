@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Xml;
+using NUnit.Framework;
 using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
@@ -16,7 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new XmlDocumentBuilder();
 
             // Act
-            var xml = builder
+            XmlDocument xml = builder
                 .WithContent(content)
                 .Build();
 

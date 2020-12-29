@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Migrations;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
@@ -6,8 +9,8 @@ namespace Umbraco.Tests.Migrations.Stubs
     {
         public FourElevenMigration(IMigrationContext context)
             : base(context)
-        { }
-
+        {
+        }
 
         public override void Migrate()
         {

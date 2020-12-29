@@ -1,18 +1,17 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.HealthCheck;
-using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Infrastructure.HealthCheck;
-using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 {
     [TestFixture]
     public class HealthCheckResultsTests
     {
-        #region Stub checks
-
         [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A1", "Stub check")]
         public abstract class StubHealthCheck : HealthCheck
         {
@@ -25,27 +24,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
                 _message = message;
             }
 
-            public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-            {
-                throw new NotImplementedException();
-            }
+            public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => throw new NotImplementedException();
 
-            public override IEnumerable<HealthCheckStatus> GetStatus()
-            {
-                return new List<HealthCheckStatus>
+            public override IEnumerable<HealthCheckStatus> GetStatus() =>
+                new List<HealthCheckStatus>
                 {
                     new HealthCheckStatus(_message)
                     {
                         ResultType = _resultType
                     }
                 };
-            }
         }
 
         [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A1", "Stub check 1")]
         public class StubHealthCheck1 : StubHealthCheck
         {
-            public StubHealthCheck1(StatusResultType resultType, string message) : base(resultType, message)
+            public StubHealthCheck1(StatusResultType resultType, string message)
+                : base(resultType, message)
             {
             }
         }
@@ -53,7 +48,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
         [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A2", "Stub check 2")]
         public class StubHealthCheck2 : StubHealthCheck
         {
-            public StubHealthCheck2(StatusResultType resultType, string message) : base(resultType, message)
+            public StubHealthCheck2(StatusResultType resultType, string message)
+                : base(resultType, message)
             {
             }
         }
@@ -61,17 +57,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
         [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A3", "Stub check 3")]
         public class StubHealthCheck3 : StubHealthCheck
         {
-            public StubHealthCheck3(StatusResultType resultType, string message) : base(resultType, message)
+            public StubHealthCheck3(StatusResultType resultType, string message)
+                : base(resultType, message)
             {
             }
 
-            public override IEnumerable<HealthCheckStatus> GetStatus()
-            {
-                throw new Exception("Check threw exception");
-            }
+            public override IEnumerable<HealthCheckStatus> GetStatus() => throw new Exception("Check threw exception");
         }
-
-        #endregion
 
         [Test]
         public void HealthCheckResults_WithSuccessfulChecks_ReturnsCorrectResultDescription()

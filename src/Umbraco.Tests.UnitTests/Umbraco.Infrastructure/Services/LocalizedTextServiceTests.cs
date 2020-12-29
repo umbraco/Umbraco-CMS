@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -13,7 +16,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
     [TestFixture]
     public class LocalizedTextServiceTests
     {
-        private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
+        private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
+
         [Test]
         public void Using_Dictionary_Gets_All_Stored_Values()
         {
@@ -27,22 +31,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea1", new Dictionary<string, string>
                                 {
-                                    {"testKey1", "testValue1"},
-                                    {"testKey2", "testValue2"}
+                                    { "testKey1", "testValue1" },
+                                    { "testKey2", "testValue2" }
                                 }
                             },
                             {
                                 "testArea2", new Dictionary<string, string>
                                 {
-                                    {"blah1", "blahValue1"},
-                                    {"blah2", "blahValue2"}
+                                    { "blah1", "blahValue1" },
+                                    { "blah2", "blahValue2" }
                                 }
                             },
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.GetAllStoredValues(culture);
+            IDictionary<string, string> result = txtService.GetAllStoredValues(culture);
 
             Assert.AreEqual(4, result.Count);
             Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
@@ -53,18 +57,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
             Assert.AreEqual("testValue2", result["testArea1/testKey2"]);
             Assert.AreEqual("blahValue1", result["testArea2/blah1"]);
             Assert.AreEqual("blahValue2", result["testArea2/blah2"]);
-
         }
 
         [Test]
         public void Using_XDocument_Gets_All_Stored_Values()
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
-            var txtService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>
+            var txtService = new LocalizedTextService(
+                new Dictionary<CultureInfo, Lazy<XDocument>>
                 {
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
-                            new XElement("language",
+                            new XElement(
+                                "language",
                                 new XElement("area", new XAttribute("alias", "testArea1"),
                                     new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
                                     new XElement("key", new XAttribute("alias", "testKey2"), "testValue2")),
@@ -72,9 +77,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                     new XElement("key", new XAttribute("alias", "blah1"), "blahValue1"),
                                     new XElement("key", new XAttribute("alias", "blah2"), "blahValue2")))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.GetAllStoredValues(culture);
+            IDictionary<string, string> result = txtService.GetAllStoredValues(culture);
 
             Assert.AreEqual(4, result.Count());
             Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
@@ -85,9 +90,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
             Assert.AreEqual("testValue2", result["testArea1/testKey2"]);
             Assert.AreEqual("blahValue1", result["testArea2/blah1"]);
             Assert.AreEqual("blahValue2", result["testArea2/blah2"]);
-
         }
-
 
         [Test]
         public void Using_XDocument_Gets_All_Stored_Values_With_Duplicates()
@@ -98,17 +101,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                 {
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
-                            new XElement("language",
+                            new XElement(
+                                "language",
                                 new XElement("area", new XAttribute("alias", "testArea1"),
                                     new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
                                     new XElement("key", new XAttribute("alias", "testKey1"), "testValue1")))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.GetAllStoredValues(culture);
+            IDictionary<string, string> result = txtService.GetAllStoredValues(culture);
 
             Assert.AreEqual(1, result.Count());
-
         }
 
         [Test]
@@ -124,14 +127,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "testValue"}
+                                    { "testKey", "testValue" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testArea/testKey", culture);
+            string result = txtService.Localize("testArea/testKey", culture);
 
             Assert.AreEqual("testValue", result);
         }
@@ -149,14 +152,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "testValue"}
+                                    { "testKey", "testValue" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testKey", culture);
+            string result = txtService.Localize("testKey", culture);
 
             Assert.AreEqual("testValue", result);
         }
@@ -174,16 +177,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "testValue"}
+                                    { "testKey", "testValue" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testArea/doNotFind", culture);
+            string result = txtService.Localize("testArea/doNotFind", culture);
 
-            //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+            // NOTE: Based on how legacy works, the default text does not contain the area, just the key
             Assert.AreEqual("[doNotFind]", result);
         }
 
@@ -200,14 +203,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "testValue"}
+                                    { "testKey", "testValue" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("doNotFind", culture);
+            string result = txtService.Localize("doNotFind", culture);
 
             Assert.AreEqual("[doNotFind]", result);
         }
@@ -225,14 +228,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "Hello %0%, you are such a %1% %2%"}
+                                    { "testKey", "Hello %0%, you are such a %1% %2%" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testKey", culture,
+            string result = txtService.Localize(
+                "testKey",
+                culture,
                 new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
             Assert.AreEqual("Hello world, you are such a great planet", result);
@@ -251,9 +256,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testArea/testKey", culture);
+            string result = txtService.Localize("testArea/testKey", culture);
 
             Assert.AreEqual("testValue", result);
         }
@@ -271,9 +276,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testKey", culture);
+            string result = txtService.Localize("testKey", culture);
 
             Assert.AreEqual("testValue", result);
         }
@@ -291,11 +296,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testArea/doNotFind", culture);
+            string result = txtService.Localize("testArea/doNotFind", culture);
 
-            //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+            // NOTE: Based on how legacy works, the default text does not contain the area, just the key
             Assert.AreEqual("[doNotFind]", result);
         }
 
@@ -312,9 +317,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("doNotFind", culture);
+            string result = txtService.Localize("doNotFind", culture);
 
             Assert.AreEqual("[doNotFind]", result);
         }
@@ -332,9 +337,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "Hello %0%, you are such a %1% %2%"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-            var result = txtService.Localize("testKey", culture,
+            string result = txtService.Localize("testKey", culture,
                 new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
             Assert.AreEqual("Hello world, you are such a great planet", result);
@@ -353,12 +358,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
-                                    {"testKey", "testValue"}
+                                    { "testKey", "testValue" }
                                 }
                             }
                         }
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
             Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }
@@ -373,10 +378,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
-                                    "testValue"))))
+                                new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
                     }
-                }, _loggerFactory.CreateLogger<LocalizedTextService>());
+                }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
             Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }

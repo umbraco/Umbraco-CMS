@@ -14,7 +14,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
+    internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
         public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger)
             : base(scopeAccessor, cache, logger)

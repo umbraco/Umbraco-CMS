@@ -1,8 +1,11 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
@@ -16,15 +19,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private PropertyTypeBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new PropertyTypeBuilder();
-        }
+        public void SetUp() => _builder = new PropertyTypeBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = BuildPropertyType();
+            PropertyType pt = BuildPropertyType();
 
             var clone = (PropertyType)pt.DeepClone();
 
@@ -45,9 +45,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.ValidationRegExp, pt.ValidationRegExp);
             Assert.AreEqual(clone.ValueStorageType, pt.ValueStorageType);
 
-            //This double verifies by reflection (don't test properties marked with [DoNotClone]
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps.Where(p => p.GetCustomAttribute<DoNotCloneAttribute>(false) == null))
+            // This double verifies by reflection (don't test properties marked with [DoNotClone]
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps.Where(p => p.GetCustomAttribute<DoNotCloneAttribute>(false) == null))
             {
                 var expected = propertyInfo.GetValue(pt, null);
                 var actual = propertyInfo.GetValue(clone, null);
@@ -64,15 +64,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var pt = BuildPropertyType();
+            PropertyType pt = BuildPropertyType();
 
             var json = JsonConvert.SerializeObject(pt);
             Debug.Print(json);
         }
 
-        private PropertyType BuildPropertyType()
-        {
-            return _builder
+        private PropertyType BuildPropertyType() =>
+            _builder
                 .WithId(3)
                 .WithPropertyEditorAlias("TestPropertyEditor")
                 .WithAlias("test")
@@ -84,6 +83,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 .WithMandatory(true)
                 .WithValidationRegExp("xxxx")
                 .Build();
-        }
     }
 }

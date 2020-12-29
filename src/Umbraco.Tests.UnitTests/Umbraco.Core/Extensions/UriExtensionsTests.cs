@@ -1,12 +1,13 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions

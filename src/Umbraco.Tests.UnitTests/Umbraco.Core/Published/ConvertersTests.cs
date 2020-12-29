@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -19,8 +22,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
     [TestFixture]
     public class ConvertersTests
     {
-        #region SimpleConverter1
-
         [Test]
         public void SimpleConverter1Test()
         {
@@ -31,8 +32,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
+            var dataType = new DataType(
+                new VoidEditor(
+                    Mock.Of<ILoggerFactory>(),
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    new JsonNetSerializer()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -43,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return contentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
+            IPublishedContentType elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
@@ -92,10 +99,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 => ((int)inter).ToString();
         }
 
-        #endregion
-
-        #region SimpleConverter2
-
         [Test]
         public void SimpleConverter2Test()
         {
@@ -106,7 +109,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
-            var publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
+            IPublishedSnapshotAccessor publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
@@ -115,8 +118,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
+            var dataType = new DataType(
+                new VoidEditor(
+                    Mock.Of<ILoggerFactory>(),
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    new JsonNetSerializer()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -127,11 +136,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 yield return contentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
+            IPublishedContentType elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-            var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
+            IPublishedContentType cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
             var cnt1 = new SolidPublishedContent(cntType1) { Id = 1234 };
             cacheContent[cnt1.Id] = cnt1;
 
@@ -156,10 +165,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
             public Type GetPropertyValueType(IPublishedPropertyType propertyType)
-                // the first version would be the "generic" version, but say we want to be more precise
+
+                // The first version would be the "generic" version, but say we want to be more precise
                 // and return: whatever Clr type is generated for content type with alias "cnt1" -- which
                 // we cannot really typeof() at the moment because it has not been generated, hence ModelType.
-                // => typeof (IPublishedContent);
+                // => typeof(IPublishedContent);
                 => ModelType.For("cnt1");
 
             public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
@@ -174,7 +184,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int)inter).ToString();
         }
-
-        #endregion
     }
 }

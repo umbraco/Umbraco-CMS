@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -46,13 +46,13 @@ namespace Umbraco.Web.BackOffice.Trees
             IControllerFactory controllerFactory,
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider
             )
-              {
+        {
             _treeService = treeService;
             _sectionService = sectionService;
             _localizedTextService = localizedTextService;
             _controllerFactory = controllerFactory;
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
-              }
+        }
 
         /// <summary>
         /// Returns the tree nodes for an application
@@ -62,7 +62,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
@@ -165,7 +165,8 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </remarks>
         private async Task<TreeNode> TryGetRootNode(Tree tree, FormCollection querystring)
         {
-            if (tree == null) throw new ArgumentNullException(nameof(tree));
+            if (tree == null)
+                throw new ArgumentNullException(nameof(tree));
 
             try
             {
@@ -185,7 +186,8 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         private async Task<TreeRootNode> GetTreeRootNode(Tree tree, int id, FormCollection querystring)
         {
-            if (tree == null) throw new ArgumentNullException(nameof(tree));
+            if (tree == null)
+                throw new ArgumentNullException(nameof(tree));
 
             var children = await GetChildren(tree, id, querystring);
             var rootNode = await GetRootNode(tree, querystring);
@@ -214,9 +216,10 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         private async Task<TreeNode> GetRootNode(Tree tree, FormCollection querystring)
         {
-            if (tree == null) throw new ArgumentNullException(nameof(tree));
+            if (tree == null)
+                throw new ArgumentNullException(nameof(tree));
 
-            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+            var controller = (TreeControllerBase)await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
             var rootNode = controller.GetRootNode(querystring);
             if (rootNode == null)
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
@@ -228,7 +231,8 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         private async Task<TreeNodeCollection> GetChildren(Tree tree, int id, FormCollection querystring)
         {
-            if (tree == null) throw new ArgumentNullException(nameof(tree));
+            if (tree == null)
+                throw new ArgumentNullException(nameof(tree));
 
             // the method we proxy has an 'id' parameter which is *not* in the querystring,
             // we need to add it for the proxy to work (else, it does not find the method,
@@ -237,7 +241,7 @@ namespace Umbraco.Web.BackOffice.Trees
             d["id"] = StringValues.Empty;
             var proxyQuerystring = new FormCollection(d);
 
-            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
+            var controller = (TreeControllerBase)await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
             return controller.GetNodes(id.ToInvariantString(), querystring);
         }
 
@@ -267,7 +271,7 @@ namespace Umbraco.Web.BackOffice.Trees
             });
             if (!(querystring is null))
             {
-                foreach (var (key,value) in querystring)
+                foreach (var (key, value) in querystring)
                 {
                     routeData.Values[key] = value;
                 }
@@ -281,11 +285,11 @@ namespace Umbraco.Web.BackOffice.Trees
 
             var actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
             var proxyControllerContext = new ControllerContext(actionContext);
-            var controller = (TreeController) _controllerFactory.CreateController(proxyControllerContext);
+            var controller = (TreeController)_controllerFactory.CreateController(proxyControllerContext);
 
-             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
-             if (!isAllowed)
-                 throw new HttpResponseException(HttpStatusCode.Forbidden);
+            var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
+            if (!isAllowed)
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             return controller;
         }

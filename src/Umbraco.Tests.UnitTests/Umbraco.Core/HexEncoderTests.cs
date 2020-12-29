@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -39,7 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             Assert.AreEqual(expected, actual);
         }
 
-        private static readonly char[] _bytesToHexStringLookup = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        private static readonly char[] s_bytesToHexStringLookup = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         // Reference implementation taken from original extension method.
         private static string ToHexString(byte[] bytes, char separator, int blockSize, int blockCount)
@@ -49,8 +52,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             for (var i = 0; i < bytesLength; i++)
             {
                 var b = bytes[i];
-                chars[p++] = _bytesToHexStringLookup[b / 0x10];
-                chars[p++] = _bytesToHexStringLookup[b % 0x10];
+                chars[p++] = s_bytesToHexStringLookup[b / 0x10];
+                chars[p++] = s_bytesToHexStringLookup[b % 0x10];
                 if (count == blockCount)
                 {
                     continue;
@@ -65,6 +68,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
                 size = 0;
                 count++;
             }
+
             return new string(chars, 0, chars.Length);
         }
     }

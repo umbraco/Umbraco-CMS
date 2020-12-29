@@ -9,7 +9,7 @@ using Umbraco.Core.Configuration.Models.Validation;
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {
     [TestFixture]
-    public class GlobalSettingsValidationTests
+    public class GlobalSettingsValidatorTests
     {
         [Test]
         public void Returns_Success_ForValid_Configuration()

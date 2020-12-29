@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
@@ -21,8 +24,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             const string testName = "Test";
             const int testSortOrder = 9;
             const int testDataTypeId = 5;
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             const string testDescription = "testing";
             const int testPropertyGroupId = 11;
             const bool testMandatory = true;
@@ -33,7 +36,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new PropertyTypeBuilder();
 
             // Act
-            var propertyType = builder
+            PropertyType propertyType = builder
                 .WithId(testId)
                 .WithPropertyEditorAlias(testPropertyEditorAlias)
                 .WithValueStorageType(testValueStorageType)
