@@ -353,7 +353,7 @@ Use this directive to construct a header inside the main editor window.
             }
 
             function SetPageTitle(title) {
-                    scope.$emit("$changeTitle", title);
+                scope.$emit("$changeTitle", title);
             }
 
             $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
