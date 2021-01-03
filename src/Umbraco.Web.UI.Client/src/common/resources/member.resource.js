@@ -51,26 +51,12 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 options.orderDirection = "Descending";
             }
 
-            //converts the value to a js bool
-            function toBool(v) {
-                if (Utilities.isNumber(v)) {
-                    return v > 0;
-                }
-                if (Utilities.isString(v)) {
-                    return v === "true";
-                }
-                if (typeof v === "boolean") {
-                    return v;
-                }
-                return false;
-            }
-
             var params = [
                 { pageNumber: options.pageNumber },
                 { pageSize: options.pageSize },
                 { orderBy: options.orderBy },
                 { orderDirection: options.orderDirection },
-                { orderBySystemField: toBool(options.orderBySystemField) },
+                { orderBySystemField: Object.toBoolean(options.orderBySystemField) },
                 { filter: options.filter }
             ];
             if (memberTypeAlias != null) {

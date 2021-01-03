@@ -648,20 +648,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            
-            //converts the value to a js bool
-            function toBool(v) {
-                if (Utilities.isNumber(v)) {
-                    return v > 0;
-                }
-                if (Utilities.isString(v)) {
-                    return v === "true";
-                }
-                if (typeof v === "boolean") {
-                    return v;
-                }
-                return false;
-            }
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -675,7 +661,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            orderBySystemField: toBool(options.orderBySystemField),
+                            orderBySystemField: Object.toBoolean(options.orderBySystemField),
                             filter: options.filter,
                             cultureName: options.cultureName
                         })),
