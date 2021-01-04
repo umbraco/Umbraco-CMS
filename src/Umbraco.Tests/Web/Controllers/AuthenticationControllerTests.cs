@@ -12,7 +12,6 @@ using System.Web.Http;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
@@ -37,6 +36,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Web.Routing;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Web.Controllers
 {

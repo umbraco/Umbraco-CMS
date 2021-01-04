@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -10,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.UnitTests.TestHelpers.Objects;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
@@ -48,7 +52,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
     <div><img src=""/media/987645/test.jpg"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>");
 
-            Assert.AreEqual(@"<p>
+            Assert.AreEqual(
+                @"<p>
 <div>
     <img src=""/media/12354/test.jpg"" />
 </div></p>
@@ -60,8 +65,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void Ensure_Image_Sources()
         {
-            //setup a mock URL provider which we'll use for testing
-
+            // setup a mock URL provider which we'll use for testing
             var mediaType = new PublishedContentType(Guid.NewGuid(), 777, "image", PublishedItemType.Media, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);
@@ -71,17 +75,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
 
-            var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            IUmbracoContextFactory umbracoContextFactory = TestUmbracoContextFactory.Create(
                 umbracoContextAccessor: umbracoContextAccessor);
 
             var webRoutingSettings = new WebRoutingSettings();
-            var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
                 Options.Create(webRoutingSettings),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
-                new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
-                Mock.Of<IVariationContextAccessor>()
-                );
-            using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+                new MediaUrlProviderCollection(new[] { mediaUrlProvider.Object }),
+                Mock.Of<IVariationContextAccessor>());
+            using (UmbracoContextReference reference = umbracoContextFactory.EnsureUmbracoContext())
             {
                 var mediaCache = Mock.Get(reference.UmbracoContext.Media);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
@@ -99,7 +103,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
     <div><img src=""?width=100"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>");
 
-                Assert.AreEqual(@"<p>
+                Assert.AreEqual(
+                    @"<p>
 <div>
     <img src="""" />
 </div></p>
@@ -115,33 +120,27 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
         [TestCase(
             @"<div><img src="""" /></div>",
             ExpectedResult = @"<div><img src="""" /></div>",
-            TestName = "Empty source is not updated with no data-udi set"
-        )]
+            TestName = "Empty source is not updated with no data-udi set")]
         [TestCase(
             @"<div><img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
-            TestName = "Empty source is updated with data-udi set"
-        )]
+            TestName = "Empty source is updated with data-udi set")]
         [TestCase(
             @"<div><img src=""non empty src"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
-            TestName = "Filled source is overwritten with data-udi set"
-        )]
+            TestName = "Filled source is overwritten with data-udi set")]
         [TestCase(
             @"<div><img src=""some src"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
-            TestName = "Attributes are persisted"
-        )]
+            TestName = "Attributes are persisted")]
         [TestCase(
             @"<div><img src=""somesrc?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
-            TestName = "Source is trimmed and parameters are prefixed"
-        )]
+            TestName = "Source is trimmed and parameters are prefixed")]
         [TestCase(
             @"<div><img src=""?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
-            TestName = "Parameters are prefixed"
-        )]
+            TestName = "Parameters are prefixed")]
         [TestCase(
             @"<div>
                 <img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>
@@ -154,8 +153,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
                 <img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD5""/>
                 <img src=""/media/1001/image.jpg?asd"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD6""/>
               </div>",
-            TestName = "Multiple img tags are handled"
-        )]
+            TestName = "Multiple img tags are handled")]
 
         [Category("Ensure image sources")]
         public string Ensure_ImageSources_Processing(string sourceHtml)

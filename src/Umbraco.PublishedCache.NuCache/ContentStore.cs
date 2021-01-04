@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -1167,8 +1167,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SetValueLocked(_contentTypesById, type.Id, type);
             SetValueLocked(_contentTypesByAlias, type.Alias, type);
             // ensure the key/id map is accurate
-            if (type.TryGetKey(out var key))
-                _contentTypeKeyToIdMap[key] = type.Id;
+            _contentTypeKeyToIdMap[type.Key] = type.Id;
         }
 
         // set a node (just the node, not the tree)
@@ -1353,7 +1352,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // reading _floorGen is safe if _collectTask is null
                 if (_collectTask == null && _collectAuto && _liveGen - _floorGen > CollectMinGenDelta)
+                {
                     CollectAsyncLocked();
+                }
 
                 return snapshot;
             }
@@ -1375,8 +1376,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private Task CollectAsyncLocked()
         {
+            // NOTE: What in the heck is going on here? Why is any of this running in async contexts?
+            // SD: From what I can tell this was designed to be a set and forget background task to do the
+            // collecting which is why it's called from non-async methods within this class. This is
+            // slightly dangerous because it's not taking into account app shutdown.
+            // TODO: There should be a different method or class responsible for executing the cleanup on a
+            // background (set and forget) thread.
+
             if (_collectTask != null)
+            {
                 return _collectTask;
+            }
 
             // ReSharper disable InconsistentlySynchronizedField
             var task = _collectTask = Task.Run((Action)Collect);

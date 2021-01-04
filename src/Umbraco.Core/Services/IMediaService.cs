@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Services
         /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public interface IMediaService : IContentServiceBase
+    public interface IMediaService : IContentServiceBase<IMedia>
     {
         int CountNotTrashed(string contentTypeAlias = null);
         int Count(string mediaTypeAlias = null);

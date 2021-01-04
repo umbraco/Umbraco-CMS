@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DataType"/>
     /// </summary>
-    internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
+    internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
         private readonly IConfigurationEditorJsonSerializer _serializer;
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,DataTypeDefinition>
+        #region Overrides of EntityRepositoryBase<int,DataTypeDefinition>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -32,8 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe,
-                Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
             IMigrationBuilder migrationBuilder = Mock.Of<IMigrationBuilder>();
@@ -68,8 +70,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
                 // execute plan
-                state = plan.Execute(s, sourceState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(),
-                    loggerFactory);
+                state = plan.Execute(s, sourceState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(), loggerFactory);
 
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
@@ -97,10 +98,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         public void CannotTransitionToSameState()
         {
             var plan = new MigrationPlan("default");
-            Assert.Throws<ArgumentException>(() =>
-            {
-                plan.From("aaa").To("aaa");
-            });
+            Assert.Throws<ArgumentException>(() => plan.From("aaa").To("aaa"));
         }
 
         [Test]
@@ -108,10 +106,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             var plan = new MigrationPlan("default");
             plan.From("aaa").To("bbb");
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                plan.From("aaa").To("ccc");
-            });
+            Assert.Throws<InvalidOperationException>(() => plan.From("aaa").To("ccc"));
         }
 
         [Test]
@@ -191,7 +186,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             WritePlanToConsole(plan);
 
             plan.Validate();
-            AssertList(plan.FollowPath(), "", "aaa", "bbb", "ccc", "*", "*", "fff", "ggg");
+            AssertList(plan.FollowPath(), string.Empty, "aaa", "bbb", "ccc", "*", "*", "fff", "ggg");
             AssertList(plan.FollowPath("ccc"), "ccc", "*", "*", "fff", "ggg");
             AssertList(plan.FollowPath("eee"), "eee", "*", "*", "fff", "ggg");
         }

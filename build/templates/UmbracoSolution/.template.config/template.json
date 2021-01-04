@@ -9,7 +9,7 @@
         "language": "C#",
         "type": "project"
     },
-    "sourceName": "UmbracoSolution", // Will be replaced with the value provided via -n
+    "sourceName": "UmbracoSolution",
     "preferNameDirectory": true,
     "symbols": {
         "version": {

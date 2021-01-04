@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Extensions;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.Configuration.Extensions;
 using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.NotificationMethods;
@@ -30,7 +30,7 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IRuntimeState _runtimeState;
-        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IMainDom _mainDom;
         private readonly IScopeProvider _scopeProvider;
         private readonly ILogger<HealthCheckNotifier> _logger;
@@ -54,7 +54,7 @@ namespace Umbraco.Infrastructure.HostedServices
             HealthCheckCollection healthChecks,
             HealthCheckNotificationMethodCollection notifications,
             IRuntimeState runtimeState,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             IMainDom mainDom,
             IScopeProvider scopeProvider,
             ILogger<HealthCheckNotifier> logger,
@@ -87,7 +87,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 return;
             }
 
-            switch (_serverRegistrar.GetCurrentServerRole())
+            switch (_serverRegistrar.CurrentServerRole)
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");

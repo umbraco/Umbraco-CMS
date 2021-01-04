@@ -29,7 +29,8 @@ namespace Umbraco.Web
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
+        internal UmbracoContext(
+            IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IBackOfficeSecurity backofficeSecurity,
             GlobalSettings globalSettings,
@@ -122,11 +123,6 @@ namespace Umbraco.Web
         /// Gets the domains cache.
         /// </summary>
         public IDomainCache Domains => PublishedSnapshot.Domains;
-
-        /// <summary>
-        /// Boolean value indicating whether the current request is a front-end umbraco request
-        /// </summary>
-        public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
         /// Gets/sets the PublishedRequest object

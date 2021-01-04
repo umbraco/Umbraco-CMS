@@ -7,9 +7,9 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Media;
@@ -39,8 +39,9 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            UploadAutoFillProperties uploadAutoFillProperties)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            UploadAutoFillProperties uploadAutoFillProperties,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings));
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
             return editor;
         }
@@ -162,7 +163,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        internal void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> args)
+        public void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> args)
         {
             foreach (var entity in args.SavedEntities)
                 AutoFillProperties(entity);
@@ -173,7 +174,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        internal void ContentServiceSaving(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        public void ContentServiceSaving(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
         {
             foreach (var entity in args.SavedEntities)
                 AutoFillProperties(entity);

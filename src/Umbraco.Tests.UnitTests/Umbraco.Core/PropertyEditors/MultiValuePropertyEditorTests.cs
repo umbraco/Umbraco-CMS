@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -30,7 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -46,14 +48,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             dataTypeServiceMock
-                .Setup(x=>x.GetDataType(It.IsAny<int>()))
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(dataType);
 
             var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 1,Value 2,Value 3");
 
-            var valueEditor = dataType.Editor.GetValueEditor();
-            ((DataValueEditor) valueEditor).Configuration = dataType.Configuration;
+            IDataValueEditor valueEditor = dataType.Editor.GetValueEditor();
+            ((DataValueEditor)valueEditor).Configuration = dataType.Configuration;
             var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeServiceMock.Object);
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
@@ -63,7 +65,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()), serializer)
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -78,9 +80,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             };
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-                dataTypeServiceMock
-                    .Setup(x=>x.GetDataType(It.IsAny<int>()))
-                    .Returns(dataType);
+            dataTypeServiceMock
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(dataType);
 
             var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 2");
@@ -97,17 +99,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // (that should be fixed with proper injection)
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
-            //var appContext = new ApplicationContext(
-            //    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
-            //    new ServiceContext(
-            //        localizedTextService: textService.Object
-            //    ),
-            //    Mock.Of<CacheHelper>(),
-            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()))
-            //{
-            //    //IsReady = true
-            //};
-            //Current.ApplicationContext = appContext;
+
+            //// var appContext = new ApplicationContext(
+            ////    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+            ////    new ServiceContext(
+            ////        localizedTextService: textService.Object
+            ////    ),
+            ////    Mock.Of<CacheHelper>(),
+            ////    new ProfilingLogger(logger, Mock.Of<IProfiler>()))
+            //// {
+            ////    //IsReady = true
+            //// };
+            //// Current.ApplicationContext = appContext;
 
             var configuration = new ValueListConfiguration
             {
@@ -121,7 +124,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>());
 
-            var result = editor.ToConfigurationEditor(configuration);
+            Dictionary<string, object> result = editor.ToConfigurationEditor(configuration);
 
             // 'result' is meant to be serialized, is built with anonymous objects
             // so we cannot really test what's in it - but by serializing it

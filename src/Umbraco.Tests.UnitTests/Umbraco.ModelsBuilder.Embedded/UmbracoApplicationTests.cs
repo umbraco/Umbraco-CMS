@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.ModelsBuilder.Embedded;
@@ -9,23 +12,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
     [TestFixture]
     public class UmbracoApplicationTests
     {
-        //[Test]
-        //public void Test()
-        //{
-        //    // start and terminate
-        //    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
-        //    { }
+        //// [Test]
+        //// public void Test()
+        //// {
+        ////    // start and terminate
+        ////    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
+        ////    { }
 
-        //    // start and terminate
-        //    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
-        //    { }
+        //// // start and terminate
+        ////    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
+        ////    { }
 
-        //    // start, use and terminate
-        //    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
-        //    {
-        //        var types = app.GetContentTypes();
-        //    }
-        //}
+        //// // start, use and terminate
+        ////    using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
+        ////    {
+        ////        var types = app.GetContentTypes();
+        ////    }
+        //// }
 
         [Test]
         public void ThrowsOnDuplicateAliases()

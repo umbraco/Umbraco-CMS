@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -40,10 +43,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
                 new TestClone()
             };
 
-            var val = _provider.GetCacheItem("test", () => original);
+            DeepCloneableList<TestClone> val = _provider.GetCacheItem("test", () => original);
 
             Assert.AreEqual(original.Count, val.Count);
-            foreach (var item in val)
+            foreach (TestClone item in val)
             {
                 Assert.IsTrue(item.IsClone);
             }
@@ -84,21 +87,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
         {
             Debug.Print("get" + i);
             if (i < 3)
+            {
                 throw new Exception("fail");
+            }
+
             return "succ" + i;
         }
 
         private class TestClass : BeingDirtyBase, IDeepCloneable
         {
-            public TestClass()
-            {
-                CloneId = Guid.NewGuid();
-            }
+            public TestClass() => CloneId = Guid.NewGuid();
 
             private string _name;
+
             public string Name
             {
                 get => _name;
+
                 set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
             }
 

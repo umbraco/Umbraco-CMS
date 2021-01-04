@@ -1,17 +1,18 @@
-using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Extensions;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.BackOffice.Extensions;
+using Umbraco.Web.BackOffice.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {
     [TestFixture]
     public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddMembersIdentity();
+
         [Test]
         public void AddMembersIdentity_ExpectMembersUserStoreResolvable()
         {
@@ -28,7 +29,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 
             Assert.NotNull(userManager);
         }
-
-        protected override Action<IServiceCollection> CustomTestSetup => (services) => services.AddMembersIdentity();
     }
 }

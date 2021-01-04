@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Reflection;
 using System.Text;
 using NUnit.Framework;
@@ -23,7 +26,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
             string TypeName(Type type)
             {
                 if (!type.IsGenericType)
+                {
                     return type.Name;
+                }
+
                 var sb = new StringBuilder();
                 TypeNameSb(type, sb);
                 return sb.ToString();
@@ -36,24 +42,42 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                 name = pos > 0 ? name.Substring(0, pos) : name;
                 sb.Append(name);
                 if (!type.IsGenericType)
+                {
                     return;
+                }
+
                 sb.Append("<");
                 var first = true;
                 foreach (var arg in type.GetGenericArguments())
                 {
-                    if (first) first = false;
-                    else sb.Append(", ");
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        sb.Append(", ");
+                    }
+
                     TypeNameSb(arg, sb);
                 }
+
                 sb.Append(">");
             }
 
             foreach (var e in events)
             {
                 // only continue if this is a TypedEventHandler
-                if (!e.EventHandlerType.IsGenericType) continue;
+                if (!e.EventHandlerType.IsGenericType)
+                {
+                    continue;
+                }
+
                 var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
-                if (typedEventHandler != typeDef) continue;
+                if (typedEventHandler != typeDef)
+                {
+                    continue;
+                }
 
                 // get the event args type
                 var eventArgsType = e.EventHandlerType.GenericTypeArguments[1];
@@ -62,7 +86,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
                 // exclude -ing (eg Saving) events, we don't deal with them in EventDefinitionBase (they always trigger)
                 var found = EventNameExtractor.FindEvents(serviceType, eventArgsType, EventNameExtractor.MatchIngNames);
 
-                if (found.Length == 1) continue;
+                if (found.Length == 1)
+                {
+                    continue;
+                }
 
                 if (found.Length == 0)
                 {

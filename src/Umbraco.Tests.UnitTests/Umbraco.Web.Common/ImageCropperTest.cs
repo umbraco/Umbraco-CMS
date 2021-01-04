@@ -1,19 +1,21 @@
-﻿using System.Globalization;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Models;
-using System.Text;
-using Umbraco.Core.Media;
 using Umbraco.Extensions;
-using System.Collections.Generic;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 {
-
     [TestFixture]
     public class ImageCropperTest
     {
@@ -25,9 +27,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void CanConvertImageCropperDataSetSrcToString()
         {
-            //cropperJson3 - has not crops
-            var cropperValue = CropperJson3.DeserializeImageCropperValue();
-            var serialized = cropperValue.TryConvertTo<string>();
+            // cropperJson3 - has not crops
+            ImageCropperValue cropperValue = CropperJson3.DeserializeImageCropperValue();
+            Attempt<string> serialized = cropperValue.TryConvertTo<string>();
             Assert.IsTrue(serialized.Success);
             Assert.AreEqual("/media/1005/img_0672.jpg", serialized.Result);
         }
@@ -35,9 +37,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void CanConvertImageCropperDataSetJObject()
         {
-            //cropperJson3 - has not crops
-            var cropperValue = CropperJson3.DeserializeImageCropperValue();
-            var serialized = cropperValue.TryConvertTo<JObject>();
+            // cropperJson3 - has not crops
+            ImageCropperValue cropperValue = CropperJson3.DeserializeImageCropperValue();
+            Attempt<JObject> serialized = cropperValue.TryConvertTo<JObject>();
             Assert.IsTrue(serialized.Success);
             Assert.AreEqual(cropperValue, serialized.Result.ToObject<ImageCropperValue>());
         }
@@ -45,56 +47,56 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void CanConvertImageCropperDataSetJsonToString()
         {
-            var cropperValue = CropperJson1.DeserializeImageCropperValue();
-            var serialized = cropperValue.TryConvertTo<string>();
+            ImageCropperValue cropperValue = CropperJson1.DeserializeImageCropperValue();
+            Attempt<string> serialized = cropperValue.TryConvertTo<string>();
             Assert.IsTrue(serialized.Success);
             Assert.IsTrue(serialized.Result.DetectIsJson());
-            var obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1, new JsonSerializerSettings {Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal});
+            ImageCropperValue obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1, new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal });
             Assert.AreEqual(cropperValue, obj);
         }
 
-        // [TestCase(CropperJson1, CropperJson1, true)]
-        // [TestCase(CropperJson1, CropperJson2, false)]
-        // public void CanConvertImageCropperPropertyEditor(string val1, string val2, bool expected)
-        // {
-        //     try
-        //     {
-        //         var container = TestHelper.GetRegister();
-        //         var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
-        //
-        //         composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-        //
-        //         Current.Factory = composition.CreateFactory();
-        //
-        //         var logger = Mock.Of<ILogger>();
-        //         var scheme = Mock.Of<IMediaPathScheme>();
-        //         var shortStringHelper = Mock.Of<IShortStringHelper>();
-        //
-        //         var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
-        //
-        //         var dataTypeService = new TestObjects.TestDataTypeService(
-        //             new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSettings>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>())) { Id = 1 });
-        //
-        //         var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
-        //
-        //         var converter = new ImageCropperValueConverter();
-        //         var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 1), val1, false); // does not use type for conversion
-        //
-        //         var resultShouldMatch = val2.DeserializeImageCropperValue();
-        //         if (expected)
-        //         {
-        //             Assert.AreEqual(resultShouldMatch, result);
-        //         }
-        //         else
-        //         {
-        //             Assert.AreNotEqual(resultShouldMatch, result);
-        //         }
-        //     }
-        //     finally
-        //     {
-        //         Current.Reset();
-        //     }
-        // }
+        //// [TestCase(CropperJson1, CropperJson1, true)]
+        //// [TestCase(CropperJson1, CropperJson2, false)]
+        //// public void CanConvertImageCropperPropertyEditor(string val1, string val2, bool expected)
+        //// {
+        ////     try
+        ////     {
+        ////         var container = TestHelper.GetRegister();
+        ////         var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+        ////
+        ////         composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+        ////
+        ////         Current.Factory = composition.CreateFactory();
+        ////
+        ////         var logger = Mock.Of<ILogger>();
+        ////         var scheme = Mock.Of<IMediaPathScheme>();
+        ////         var shortStringHelper = Mock.Of<IShortStringHelper>();
+        ////
+        ////         var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
+        ////
+        ////         var dataTypeService = new TestObjects.TestDataTypeService(
+        ////             new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSettings>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>())) { Id = 1 });
+        ////
+        ////         var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+        ////
+        ////         var converter = new ImageCropperValueConverter();
+        ////         var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 1), val1, false); // does not use type for conversion
+        ////
+        ////         var resultShouldMatch = val2.DeserializeImageCropperValue();
+        ////         if (expected)
+        ////         {
+        ////             Assert.AreEqual(resultShouldMatch, result);
+        ////         }
+        ////         else
+        ////         {
+        ////             Assert.AreNotEqual(resultShouldMatch, result);
+        ////         }
+        ////     }
+        ////     finally
+        ////     {
+        ////         Current.Reset();
+        ////     }
+        //// }
 
         [Test]
         public void GetCropUrl_CropAliasTest()
@@ -150,7 +152,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetBaseCropUrlFromModelTest()
         {
-            var cropDataSet = CropperJson1.DeserializeImageCropperValue();
+            ImageCropperValue cropDataSet = CropperJson1.DeserializeImageCropperValue();
             var urlString = cropDataSet.GetCropUrl("thumb", new TestImageUrlGenerator());
             Assert.AreEqual("?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
         }
@@ -161,7 +163,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrl_CropAliasHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode:ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode: ImageCropRatioMode.Height);
             Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&hr=1&w=100", urlString);
         }
 
@@ -171,7 +173,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrl_WidthHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode:ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Height);
             Assert.AreEqual(MediaPath + "?f=0.80827067669172936x0.96&hr=0.5&w=300", urlString);
         }
 
@@ -194,7 +196,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var urlStringMin = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
             var urlStringBoxPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
             var urlStringPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Max);
             var urlStringStretch = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
 
             Assert.AreEqual(MediaPath + "?m=min&w=300&h=150", urlStringMin);
@@ -222,7 +224,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
 
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, width: 300, height: 150, preferFocalPoint:true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, width: 300, height: 150, preferFocalPoint: true);
             Assert.AreEqual(MediaPath + "?m=defaultcrop&w=300&h=150", urlString);
         }
 
@@ -340,20 +342,62 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
                 else
                 {
                     imageProcessorUrl.Append("?m=" + options.ImageCropMode.ToString().ToLower());
-                    if (options.ImageCropAnchor != null)imageProcessorUrl.Append("&a=" + options.ImageCropAnchor.ToString().ToLower());
+                    if (options.ImageCropAnchor != null)
+                    {
+                        imageProcessorUrl.Append("&a=" + options.ImageCropAnchor.ToString().ToLower());
+                    }
                 }
 
                 var hasFormat = options.FurtherOptions != null && options.FurtherOptions.InvariantContains("&f=");
-                if (options.Quality != null && hasFormat == false) imageProcessorUrl.Append("&q=" + options.Quality);
-                if (options.HeightRatio != null) imageProcessorUrl.Append("&hr=" + options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
-                if (options.WidthRatio != null) imageProcessorUrl.Append("&wr=" + options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
-                if (options.Width != null) imageProcessorUrl.Append("&w=" + options.Width);
-                if (options.Height != null) imageProcessorUrl.Append("&h=" + options.Height);
-                if (options.UpScale == false) imageProcessorUrl.Append("&u=no");
-                if (options.AnimationProcessMode != null) imageProcessorUrl.Append("&apm=" + options.AnimationProcessMode);
-                if (options.FurtherOptions != null) imageProcessorUrl.Append(options.FurtherOptions);
-                if (options.Quality != null && hasFormat) imageProcessorUrl.Append("&q=" + options.Quality);
-                if (options.CacheBusterValue != null) imageProcessorUrl.Append("&r=").Append(options.CacheBusterValue);
+                if (options.Quality != null && hasFormat == false)
+                {
+                    imageProcessorUrl.Append("&q=" + options.Quality);
+                }
+
+                if (options.HeightRatio != null)
+                {
+                    imageProcessorUrl.Append("&hr=" + options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
+                }
+
+                if (options.WidthRatio != null)
+                {
+                    imageProcessorUrl.Append("&wr=" + options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
+                }
+
+                if (options.Width != null)
+                {
+                    imageProcessorUrl.Append("&w=" + options.Width);
+                }
+
+                if (options.Height != null)
+                {
+                    imageProcessorUrl.Append("&h=" + options.Height);
+                }
+
+                if (options.UpScale == false)
+                {
+                    imageProcessorUrl.Append("&u=no");
+                }
+
+                if (options.AnimationProcessMode != null)
+                {
+                    imageProcessorUrl.Append("&apm=" + options.AnimationProcessMode);
+                }
+
+                if (options.FurtherOptions != null)
+                {
+                    imageProcessorUrl.Append(options.FurtherOptions);
+                }
+
+                if (options.Quality != null && hasFormat)
+                {
+                    imageProcessorUrl.Append("&q=" + options.Quality);
+                }
+
+                if (options.CacheBusterValue != null)
+                {
+                    imageProcessorUrl.Append("&r=").Append(options.CacheBusterValue);
+                }
 
                 return imageProcessorUrl.ToString();
             }

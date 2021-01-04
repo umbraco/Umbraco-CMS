@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -14,14 +18,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             // Arrange
             const int testId = 4;
             var testKey = Guid.NewGuid();
-            var testCreateDate = DateTime.Now.AddHours(-1);
-            var testUpdateDate = DateTime.Now;
+            DateTime testCreateDate = DateTime.Now.AddHours(-1);
+            DateTime testUpdateDate = DateTime.Now;
             var testPropertyTypeId = 3;
 
             var builder = new PropertyBuilder();
 
             // Act
-            var property = builder
+            IProperty property = builder
                 .WithId(testId)
                 .WithKey(testKey)
                 .WithCreateDate(testCreateDate)

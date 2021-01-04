@@ -361,6 +361,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                         "HasContentNodes",
                         [{ id: id }])),
                 'Failed to retrieve indication for whether content type with id ' + id + ' has associated content nodes');
+        },
+
+        allowsCultureVariation: function () {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentTypeApiBaseUrl",
+                "AllowsCultureVariation")),
+            'Failed to retrieve variant content types');
         }
     };
 }

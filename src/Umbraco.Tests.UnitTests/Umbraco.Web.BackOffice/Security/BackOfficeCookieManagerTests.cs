@@ -1,10 +1,10 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
         {
             var globalSettings = new GlobalSettings();
 
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
+            IRuntimeState runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
         {
             var globalSettings = new GlobalSettings();
 
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
+            IRuntimeState runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
         {
             var globalSettings = new GlobalSettings();
 
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
+            IRuntimeState runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
             GenerateAuthPaths(out var remainingTimeoutSecondsPath, out var isAuthPath);
 
@@ -73,13 +73,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             Assert.IsTrue(result);
         }
 
-
         [Test]
         public void ShouldAuthenticateRequest_Not_Back_Office()
         {
             var globalSettings = new GlobalSettings();
 
-            var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
+            IRuntimeState runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
@@ -104,7 +103,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
 
             // this is on the same controller but is considered a back office request
             var aPath = isAuthPath = $"/umbraco/{Constants.Web.Mvc.BackOfficePathSegment}/{Constants.Web.Mvc.BackOfficeApiArea}/{controllerName}/{nameof(AuthenticationController.IsAuthenticated)}".ToLower();
-
         }
     }
 }

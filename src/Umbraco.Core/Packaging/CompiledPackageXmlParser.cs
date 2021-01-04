@@ -6,7 +6,6 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Packaging;
-using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
 {
@@ -64,7 +63,9 @@ namespace Umbraco.Core.Packaging
                 Languages = xml.Root.Element("Languages")?.Elements("Language") ?? Enumerable.Empty<XElement>(),
                 DictionaryItems = xml.Root.Element("DictionaryItems")?.Elements("DictionaryItem") ?? Enumerable.Empty<XElement>(),
                 DocumentTypes = xml.Root.Element("DocumentTypes")?.Elements("DocumentType") ?? Enumerable.Empty<XElement>(),
-                Documents = xml.Root.Element("Documents")?.Elements("DocumentSet")?.Select(CompiledPackageDocument.Create) ?? Enumerable.Empty<CompiledPackageDocument>(),
+                MediaTypes = xml.Root.Element("MediaTypes")?.Elements("MediaType") ?? Enumerable.Empty<XElement>(),
+                Documents = xml.Root.Element("Documents")?.Elements("DocumentSet")?.Select(CompiledPackageContentBase.Create) ?? Enumerable.Empty<CompiledPackageContentBase>(),
+                Media = xml.Root.Element("MediaItems")?.Elements()?.Select(CompiledPackageContentBase.Create) ?? Enumerable.Empty<CompiledPackageContentBase>(),
             };
 
             def.Warnings = GetPreInstallWarnings(def, applicationRootFolder);

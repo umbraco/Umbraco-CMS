@@ -174,7 +174,6 @@
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestControllerActivator.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestControllerActivatorBase.cs" />
-    <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
@@ -200,7 +199,6 @@
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
@@ -217,12 +215,6 @@
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
-    <Compile Include="Packaging\PackageDataInstallationTests.cs" />
-    <Compile Include="Services\Importing\ImportResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ImportResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
@@ -250,7 +242,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
-    <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />
@@ -271,7 +262,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
@@ -311,11 +301,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Services\Importing\ImportResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
@@ -323,23 +308,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Services\Importing\CompositionsTestPackage-Random.xml" />
-    <Content Include="Services\Importing\CompositionsTestPackage.xml" />
     <Content Include="Services\Importing\Dictionary-Package.xml" />
-    <Content Include="Services\Importing\Fanoe-Package.xml" />
     <Content Include="UmbracoExamine\TestFiles\media.xml" />
-    <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
-    <Content Include="Services\Importing\SingleDocType.xml" />
-    <Content Include="Services\Importing\StandardMvc-Package.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Services\Importing\TemplateOnly-Package.xml" />
-    <Content Include="Services\Importing\TemplateOnly-Updated-Package.xml" />
-    <Content Include="Services\Importing\uBlogsy-Package.xml" />
-    <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

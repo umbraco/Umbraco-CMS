@@ -1,8 +1,10 @@
-﻿using System.IO;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Packaging;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
@@ -14,7 +16,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
 
         private static FileInfo GetTestPackagePath(string packageName)
         {
-            var testPackagesDirName = Path.Combine("Umbraco.Core","Packaging","Packages");
+            var testPackagesDirName = Path.Combine("Umbraco.Core", "Packaging", "Packages");
             var testDir = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
             var path = Path.Combine(testDir, testPackagesDirName, packageName);
             return new FileInfo(path);
@@ -27,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
             var sut = new PackageExtraction();
 
             // Act
-            var result = sut.ReadFilesFromArchive(GetTestPackagePath(PackageFileName), new[] { "Package.xml" });
+            IEnumerable<byte[]> result = sut.ReadFilesFromArchive(GetTestPackagePath(PackageFileName), new[] { "Package.xml" });
 
             // Assert
             Assert.AreEqual(1, result.Count());
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
             var sut = new PackageExtraction();
 
             // Act
-            var result = sut.FindMissingFiles(GetTestPackagePath(PackageFileName), new[] { "DoesNotExists.XYZ" });
+            IEnumerable<string> result = sut.FindMissingFiles(GetTestPackagePath(PackageFileName), new[] { "DoesNotExists.XYZ" });
 
             // Assert
             Assert.AreEqual(1, result.Count());

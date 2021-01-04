@@ -13,7 +13,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -273,8 +272,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
         public class ComplexTestEditor : NestedContentPropertyEditor
         {
              public ComplexTestEditor(ILoggerFactory loggerFactory, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizationService localizationService,
-                IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-                 : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService)
+                IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
+                 : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService, jsonSerializer)
             {
             }
 
@@ -290,17 +289,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
          [DataEditor("test", "test", "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
          public class TestEditor : DataEditor
          {
-             public TestEditor(ILoggerFactory loggerFactory,
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
-                ILocalizedTextService localizedTextService,
-                IShortStringHelper shortStringHelper)
-                 : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+             public TestEditor(
+                 ILoggerFactory loggerFactory,
+                 IDataTypeService dataTypeService,
+                 ILocalizationService localizationService,
+                 ILocalizedTextService localizedTextService,
+                 IShortStringHelper shortStringHelper,
+                 IJsonSerializer jsonSerializer)
+                 : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
             {
 
             }
 
-            protected override IDataValueEditor CreateValueEditor() => new TestValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
+            protected override IDataValueEditor CreateValueEditor() => new TestValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
             private class TestValueEditor : DataValueEditor
             {
@@ -309,8 +310,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
                     ILocalizationService localizationService,
                     ILocalizedTextService localizedTextService,
                     IShortStringHelper shortStringHelper,
+                    IJsonSerializer jsonSerializer,
                     DataEditorAttribute attribute)
-                    : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+                    : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
                 {
                     Validators.Add(new NeverValidateValidator());
                 }

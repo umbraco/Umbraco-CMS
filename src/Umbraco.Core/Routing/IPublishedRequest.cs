@@ -11,7 +11,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the UmbracoContext.
         /// </summary>
-        IUmbracoContext UmbracoContext { get; }
+        IUmbracoContext UmbracoContext { get; } // TODO: This should be injected and removed from here
 
         /// <summary>
         /// Gets or sets the cleaned up Uri used for routing.

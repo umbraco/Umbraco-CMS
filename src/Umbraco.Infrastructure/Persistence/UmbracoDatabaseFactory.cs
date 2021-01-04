@@ -327,16 +327,5 @@ namespace Umbraco.Core.Persistence
             //db?.Dispose();
             Volatile.Write(ref _initialized, false);
         }
-
-        // during tests, the thread static var can leak between tests
-        // this method provides a way to force-reset the variable
-        internal void ResetForTests()
-        {
-            // TODO: remove all this eventually
-            //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
-            //_umbracoDatabaseAccessor.UmbracoDatabase = null;
-            //db?.Dispose();
-            //_databaseScopeAccessor.Scope = null;
-        }
     }
 }

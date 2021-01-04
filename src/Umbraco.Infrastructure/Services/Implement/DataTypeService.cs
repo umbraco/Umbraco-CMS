@@ -6,11 +6,11 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
@@ -29,11 +29,14 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ILocalizationService _localizationService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public DataTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataTypeRepository = dataTypeRepository;
@@ -45,6 +48,7 @@ namespace Umbraco.Core.Services.Implement
             _localizedTextService = localizedTextService;
             _localizationService = localizationService;
             _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
         }
 
         #region Containers
@@ -324,7 +328,7 @@ namespace Umbraco.Core.Services.Implement
                 .Where(x => x.Editor is MissingPropertyEditor);
             foreach (var dataType in dataTypesWithMissingEditors)
             {
-                dataType.Editor = new LabelPropertyEditor(LoggerFactory, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper);
+                dataType.Editor = new LabelPropertyEditor(LoggerFactory, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper, _jsonSerializer);
             }
         }
 

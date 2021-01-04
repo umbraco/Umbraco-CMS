@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -16,10 +16,23 @@ namespace Umbraco.Core.Services.Implement
 
         protected abstract TService This { get; }
 
-        // that one must be dispatched
+        /// <summary>
+        /// Raised when a <see cref="TItem"/> is changed
+        /// </summary>
+        /// <remarks>
+        /// This event is dispatched after the trans is completed. Used by event refreshers.
+        /// </remarks>
         public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> Changed;
 
-        // that one is always immediate (transactional)
+        /// <summary>
+        /// Occurs when an <see cref="TItem"/> is created or updated from within the <see cref="IScope"/> (transaction)
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this event being raised within the transaction is so that listeners can perform database
+        /// operations from within the same transaction and guarantee data consistency so that if anything goes wrong
+        /// the entire transaction can be rolled back. This is used by Nucache.
+        /// TODO: See remarks in ContentRepositoryBase about these types of events.
+        /// </remarks>
         public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> ScopedRefreshedEntity;
 
         // used by tests to clear events
@@ -45,9 +58,11 @@ namespace Umbraco.Core.Services.Implement
             scope.Events.Dispatch(Changed, This, args, nameof(Changed));
         }
 
+        /// <summary>
+        /// Raises the <see cref="ScopedRefreshedEntity"/> event during the <see cref="IScope"/> (transaction)
+        /// </summary>
         protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
         {
-            // that one is always immediate (not dispatched, transactional)
             ScopedRefreshedEntity.RaiseEvent(args, This);
         }
 

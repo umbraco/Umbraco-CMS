@@ -4,8 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -120,6 +118,7 @@ namespace Umbraco.Core.Services.Implement
             //xml.Add(new XAttribute("creatorID", media.CreatorId));
             xml.Add(new XAttribute("writerName", media.GetWriterProfile(_userService)?.Name ?? string.Empty));
             xml.Add(new XAttribute("writerID", media.WriterId));
+            xml.Add(new XAttribute("udi", media.GetUdi()));
 
             //xml.Add(new XAttribute("template", 0)); // no template for media
 
@@ -335,6 +334,7 @@ namespace Umbraco.Core.Services.Implement
             return xml;
         }
 
+
         public XElement Serialize(IMediaType mediaType)
         {
             var info = new XElement("Info",
@@ -375,7 +375,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Validation", propertyType.ValidationRegExp),
                                                    new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
                                                    new XElement("LabelOnTop", propertyType.LabelOnTop),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
+                                                   new XElement("Description", new XCData(propertyType.Description ?? string.Empty)));
                 genericProperties.Add(genericProperty);
             }
 
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Alias", propertyType.Alias),
                                                    new XElement("Key", propertyType.Key),
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),                                                   
+                                                   new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),

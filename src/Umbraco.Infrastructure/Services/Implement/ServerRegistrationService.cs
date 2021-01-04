@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
@@ -26,11 +25,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
-        /// <param name="scopeProvider">A UnitOfWork provider.</param>
-        /// <param name="loggerFactory">A logger factory</param>
-        /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IScopeProvider scopeProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            IServerRegistrationRepository serverRegistrationRepository, IHostingEnvironment hostingEnvironment)
+        public ServerRegistrationService(
+            IScopeProvider scopeProvider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IServerRegistrationRepository serverRegistrationRepository,
+            IHostingEnvironment hostingEnvironment)
             : base(scopeProvider, loggerFactory, eventMessagesFactory)
         {
             _serverRegistrationRepository = serverRegistrationRepository;
@@ -41,10 +41,10 @@ namespace Umbraco.Core.Services.Implement
         /// Touches a server to mark it as active; deactivate stale servers.
         /// </summary>
         /// <param name="serverAddress">The server URL.</param>
-        /// <param name="serverIdentity">The server unique identity.</param>
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
-        public void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout)
+        public void TouchServer(string serverAddress, TimeSpan staleTimeout)
         {
+            var serverIdentity = GetCurrentServerIdentity();
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.Servers);
@@ -145,18 +145,15 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets the local server identity.
-        /// </summary>
-        public string CurrentServerIdentity => NetworkHelper.MachineName // eg DOMAIN\SERVER
-                                               + "/" + _hostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT;
-
-        /// <summary>
         /// Gets the role of the current server.
         /// </summary>
         /// <returns>The role of the current server.</returns>
-        public ServerRole GetCurrentServerRole()
-        {
-            return _currentServerRole;
-        }
+        public ServerRole GetCurrentServerRole() => _currentServerRole;
+
+        /// <summary>
+        /// Gets the local server identity.
+        /// </summary>
+        private string GetCurrentServerIdentity() => NetworkHelper.MachineName // eg DOMAIN\SERVER
+                                               + "/" + _hostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT;
     }
 }

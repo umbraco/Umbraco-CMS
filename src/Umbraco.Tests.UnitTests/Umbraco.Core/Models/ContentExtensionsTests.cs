@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -15,11 +18,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_Reset_Clears_SavedPublishedState()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.PublishedState = PublishedState.Publishing;
             Assert.IsFalse(content.Published);
@@ -31,15 +34,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_OnlyIfActuallyChanged_Content()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
             // if you assign a content property with its value it is not dirty
             // if you assign it with another value then back, it is dirty
-
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             content.Published = true;
@@ -56,16 +58,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_OnlyIfActuallyChanged_User()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
-            var prop = content.Properties.First();
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            IProperty prop = content.Properties.First();
 
             // if you assign a user property with its value it is not dirty
             // if you assign it with another value then back, it is dirty
-
             prop.SetValue("A");
             content.ResetDirtyProperties(false);
             Assert.IsFalse(prop.IsDirty());
@@ -83,15 +84,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_UpdateDate()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
-            var prop = content.Properties.First();
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            IProperty prop = content.Properties.First();
 
             content.ResetDirtyProperties(false);
-            var d = content.UpdateDate;
+            DateTime d = content.UpdateDate;
             prop.SetValue("A");
             Assert.IsTrue(content.IsAnyUserPropertyDirty());
             Assert.IsFalse(content.IsEntityDirty());
@@ -109,11 +110,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_WasDirty_ContentProperty()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
@@ -139,11 +140,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_WasDirty_ContentSortOrder()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
@@ -169,12 +170,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void DirtyProperty_WasDirty_UserProperty()
         {
-            var contentTypeService = Mock.Of<IContentTypeService>();
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            IContentTypeService contentTypeService = Mock.Of<IContentTypeService>();
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             Mock.Get(contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
-            var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
-            var prop = content.Properties.First();
+            Content content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
+            IProperty prop = content.Properties.First();
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
@@ -189,13 +190,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             prop.SetValue("b");
             content.ResetDirtyProperties(true); // what PersistUpdatedItem does
             Assert.IsFalse(content.IsDirty());
-            //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
+            //// Assert.IsFalse(content.WasDirty()); // not impacted by user properties
             Assert.IsTrue(content.WasDirty()); // now it is!
             prop.SetValue("a");
             prop.SetValue("b");
             content.ResetDirtyProperties(); // what PersistUpdatedItem does
             Assert.IsFalse(content.IsDirty());
-            //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
+            //// Assert.IsFalse(content.WasDirty()); // not impacted by user properties
             Assert.IsTrue(content.WasDirty()); // now it is!
         }
     }

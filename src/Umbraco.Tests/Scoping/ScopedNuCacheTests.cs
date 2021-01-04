@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -17,7 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Net;
+using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -45,7 +47,7 @@ namespace Umbraco.Tests.Scoping
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Builder.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Builder.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
+            Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
         }
@@ -71,7 +73,7 @@ namespace Umbraco.Tests.Scoping
         protected override IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
@@ -85,28 +87,23 @@ namespace Umbraco.Tests.Scoping
 
             var nuCacheSettings = new NuCacheSettings();
             var lifetime = new Mock<IUmbracoApplicationLifetime>();
+            var repository = new NuCacheContentRepository(ScopeProvider, AppCaches.Disabled, Mock.Of<ILogger<NuCacheContentRepository>>(), memberRepository, documentRepository, mediaRepository, Mock.Of<IShortStringHelper>(), new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }));
             var snapshotService = new PublishedSnapshotService(
                 options,
                 null,
-                lifetime.Object,
-                runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                ProfilingLogger,
+                base.ProfilingLogger,
                 NullLoggerFactory.Instance,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository,
+                new NuCacheContentService(repository, ScopeProvider, NullLoggerFactory.Instance, Mock.Of<IEventMessagesFactory>()),
                 DefaultCultureAccessor,
-                new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,
-                Mock.Of<IShortStringHelper>(),
-                IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);

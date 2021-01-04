@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -27,12 +25,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
         private DistributedCacheBinder _distributedCacheBinder;
 
         private IUserService UserService => GetRequiredService<IUserService>();
-        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-        private IServerMessenger ServerMessenger => GetRequiredService<IServerMessenger>();
-        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
-        protected override Action<IServiceCollection> CustomTestSetup => (services)
-            => services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
+        private IServerMessenger ServerMessenger { get; } = new LocalServerMessenger();
+
+        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
         protected override AppCaches GetAppCaches()
         {
@@ -329,6 +327,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
             public LocalServerMessenger()
                 : base(false)
             { }
+
+            public override void SendMessages() { }
+
+            public override void Sync() { }
 
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {

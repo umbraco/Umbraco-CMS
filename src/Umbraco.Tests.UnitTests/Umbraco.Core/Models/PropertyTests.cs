@@ -1,27 +1,27 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
-{ 
+{
     [TestFixture]
     public class PropertyTests
     {
         private PropertyBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new PropertyBuilder();
-        }
+        public void SetUp() => _builder = new PropertyBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var property = BuildProperty();
+            IProperty property = BuildProperty();
 
             property.SetValue("hello");
             property.PublishValues();
@@ -37,16 +37,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             }
 
             // This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(property, null));
             }
         }
 
-        private IProperty BuildProperty()
-        {
-            return _builder
+        private IProperty BuildProperty() =>
+            _builder
                 .WithId(4)
                 .AddPropertyType()
                     .WithId(3)
@@ -61,6 +60,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                     .WithValidationRegExp("xxxx")
                     .Done()
                 .Build();
-        }
     }
 }

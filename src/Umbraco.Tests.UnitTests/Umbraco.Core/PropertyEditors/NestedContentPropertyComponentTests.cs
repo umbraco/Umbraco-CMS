@@ -1,15 +1,13 @@
-﻿using Newtonsoft.Json;
-using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using Umbraco.Web.Compose;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
-
     [TestFixture]
     public class NestedContentPropertyComponentTests
     {
@@ -24,9 +22,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void No_Nesting()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             var json = @"[
   {""key"":""04a6dba8-813c-4144-8aca-86a3f24ebf08"",""name"":""Item 1"",""ncContentTypeAlias"":""nested"",""text"":""woot""},
@@ -37,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("d8e214d8-c5a5-4b45-9b51-4050dd47f5fa", guids[1].ToString());
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
         }
@@ -45,9 +43,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void One_Level_Nesting_Unescaped()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             var json = @"[{
 		""key"": ""04a6dba8-813c-4144-8aca-86a3f24ebf08"",
@@ -81,7 +79,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
         }
@@ -89,9 +87,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void One_Level_Nesting_Escaped()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -129,7 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
         }
@@ -137,9 +135,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void Nested_In_Complex_Editor_Escaped()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -212,7 +210,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
     }]
 }";
 
-
             var json = @"[{
 		""key"": ""04a6dba8-813c-4144-8aca-86a3f24ebf08"",
 		""name"": ""Item 1"",
@@ -234,18 +231,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
         }
 
-
         [Test]
         public void No_Nesting_Generates_Keys_For_Missing_Items()
         {
-            var guids = new[] { Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             var json = @"[
   {""key"":""04a6dba8-813c-4144-8aca-86a3f24ebf08"",""name"":""Item 1 my key wont change"",""ncContentTypeAlias"":""nested"",""text"":""woot""},
@@ -253,7 +249,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 ]";
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, true, guidFactory);
+            var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON
             Assert.IsTrue(JsonConvert.DeserializeObject(result).ToString().Contains(guids[0].ToString()));
@@ -265,9 +261,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void One_Level_Nesting_Escaped_Generates_Keys_For_Missing_Items()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -296,7 +292,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 ]";
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, true, guidFactory);
+            var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON for each item
             Assert.IsTrue(JsonConvert.DeserializeObject(result).ToString().Contains(guids[0].ToString()));
@@ -307,9 +303,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void Nested_In_Complex_Editor_Escaped_Generates_Keys_For_Missing_Items()
         {
-            var guids = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            Guid[] guids = new[] { Guid.NewGuid(), Guid.NewGuid() };
             var guidCounter = 0;
-            Func<Guid> guidFactory = () => guids[guidCounter++];
+            Guid GuidFactory() => guids[guidCounter++];
 
             // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
             // and this is how to do that, the result will also include quotes around it.
@@ -381,7 +377,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
     }]
 }";
 
-
             var json = @"[{
 		""key"": ""04a6dba8-813c-4144-8aca-86a3f24ebf08"",
 		""name"": ""Item 1"",
@@ -396,7 +391,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 ]";
 
             var component = new NestedContentPropertyComponent();
-            var result = component.CreateNestedContentKeys(json, true, guidFactory);
+            var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON for each item
             Assert.IsTrue(JsonConvert.DeserializeObject(result).ToString().Contains(guids[0].ToString()));

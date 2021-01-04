@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -196,7 +196,7 @@ namespace Umbraco.Core.Manifest
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_loggerFactory, _ioHelper, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper),
+                new DataEditorConverter(_loggerFactory, _ioHelper, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, _jsonSerializer),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 

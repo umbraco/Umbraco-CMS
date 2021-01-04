@@ -1,27 +1,17 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
-    [UmbracoTest()]
+    [UmbracoTest]
     public class FileSystemsTests : UmbracoIntegrationTest
     {
         [Test]

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using NUnit.Framework;
@@ -27,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         public void FindFirstValue_WhenMatchingClaimPresent_ExpectCorrectValue()
         {
             var expectedClaim = new Claim("test", "123", "string", "Umbraco");
-            var identity = new ClaimsIdentity(new List<Claim> {expectedClaim});
+            var identity = new ClaimsIdentity(new List<Claim> { expectedClaim });
 
             var value = identity.FindFirstValue("test");
 
@@ -39,7 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
         {
             var expectedClaim = new Claim("test", "123", "string", "Umbraco");
             var dupeClaim = new Claim(expectedClaim.Type, Guid.NewGuid().ToString());
-            var identity = new ClaimsIdentity(new List<Claim> {expectedClaim, dupeClaim});
+            var identity = new ClaimsIdentity(new List<Claim> { expectedClaim, dupeClaim });
 
             var value = identity.FindFirstValue("test");
 

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
@@ -9,8 +12,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
@@ -21,15 +22,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
         // see notes in the converter
         // only ONE date format is expected here
 
-        //[TestCase("2012-11-10", true)]
-        //[TestCase("2012/11/10", true)]
-        //[TestCase("10/11/2012", true)]
-        //[TestCase("11/10/2012", false)]
-        //[TestCase("Sat 10, Nov 2012", true)]
-        //[TestCase("Saturday 10, Nov 2012", true)]
-        //[TestCase("Sat 10, November 2012", true)]
-        //[TestCase("Saturday 10, November 2012", true)]
-        //[TestCase("2012-11-10 13:14:15", true)]
+        // [TestCase("2012-11-10", true)]
+        // [TestCase("2012/11/10", true)]
+        // [TestCase("10/11/2012", true)]
+        // [TestCase("11/10/2012", false)]
+        // [TestCase("Sat 10, Nov 2012", true)]
+        // [TestCase("Saturday 10, Nov 2012", true)]
+        // [TestCase("Sat 10, November 2012", true)]
+        // [TestCase("Saturday 10, November 2012", true)]
+        // [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10T13:14:15", true)]
         [TestCase("", false)]
@@ -40,9 +41,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var result = converter.ConvertSourceToIntermediate(null, null, date, false); // does not use type for conversion
 
             if (expected)
-                Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
+            {
+                Assert.AreEqual(dateTime.Date, ((DateTime)result).Date);
+            }
             else
+            {
                 Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
+            }
         }
 
         [TestCase("TRUE", true)]
@@ -96,10 +101,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                     })));
 
             var publishedPropType = new PublishedPropertyType(
-                new PublishedContentType(Guid.NewGuid(),1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+                new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
                 new PropertyType(Mock.Of<IShortStringHelper>(),  "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
                 new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
-                Mock.Of<IPublishedModelFactory>(), mockPublishedContentTypeFactory.Object);
+                Mock.Of<IPublishedModelFactory>(),
+                mockPublishedContentTypeFactory.Object);
 
             var converter = new FlexibleDropdownPropertyValueConverter();
             var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);

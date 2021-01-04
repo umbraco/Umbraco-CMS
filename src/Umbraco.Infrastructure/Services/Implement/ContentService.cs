@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -386,6 +385,16 @@ namespace Umbraco.Core.Services.Implement
                 return _documentRepository.Get(key);
             }
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="contents"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns></returns>
+        Attempt<OperationResult> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId,
+            bool raiseEvents) => Attempt.Succeed(Save(contents, userId, raiseEvents));
 
         /// <summary>
         /// Gets <see cref="IContent"/> objects by Ids

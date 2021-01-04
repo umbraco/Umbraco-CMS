@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -20,9 +20,7 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Represents the properties and methods that are needed in order to render an Umbraco view.
-    /// </summary>
+    // TODO: This has been ported to netcore, just needs testing
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
         private readonly GlobalSettings _globalSettings;
@@ -50,11 +48,9 @@ namespace Umbraco.Web.Mvc
         // like the Services & ApplicationCache properties, and have a setter for those special weird
         // cases.
 
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public IUmbracoContext UmbracoContext => _umbracoContext
-            ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
+        // TODO: Can be injected to the view in netcore, else injected to the base model
+        // public IUmbracoContext UmbracoContext => _umbracoContext
+        //    ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>
         /// Gets the public content request.
@@ -63,21 +59,27 @@ namespace Umbraco.Web.Mvc
         {
             get
             {
-                const string token = Core.Constants.Web.PublishedDocumentRequestDataToken;
+                // TODO: we only have one data token for a route now: Constants.Web.UmbracoRouteDefinitionDataToken
 
-                // we should always try to return the object from the data tokens just in case its a custom object and not
-                // the one from UmbracoContext. Fallback to UmbracoContext if necessary.
+                throw new NotImplementedException("Probably needs to be ported to netcore");
 
-                // try view context
-                if (ViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (IPublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                //// we should always try to return the object from the data tokens just in case its a custom object and not
+                //// the one from UmbracoContext. Fallback to UmbracoContext if necessary.
 
-                // child action, try parent view context
-                if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (IPublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                //// try view context
+                //if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken))
+                //{
+                //    return (IPublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(Constants.Web.UmbracoRouteDefinitionDataToken);
+                //}
 
-                // fallback to UmbracoContext
-                return UmbracoContext.PublishedRequest;
+                //// child action, try parent view context
+                //if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken))
+                //{
+                //    return (IPublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(Constants.Web.UmbracoRouteDefinitionDataToken);
+                //}
+
+                //// fallback to UmbracoContext
+                //return UmbracoContext.PublishedRequest;
             }
         }
 

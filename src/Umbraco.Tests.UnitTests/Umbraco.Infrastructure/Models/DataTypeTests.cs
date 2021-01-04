@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Reflection;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
@@ -12,19 +16,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         private DataTypeBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new DataTypeBuilder();
-        }
+        public void SetUp() => _builder = new DataTypeBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-             var dtd = _builder
-                .WithId(3123)
-                .Build();
+            DataType dtd = _builder
+               .WithId(3123)
+               .Build();
 
-            var clone = (DataType) dtd.DeepClone();
+            var clone = (DataType)dtd.DeepClone();
 
             Assert.AreNotSame(clone, dtd);
             Assert.AreEqual(clone, dtd);
@@ -41,9 +42,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(clone.Trashed, dtd.Trashed);
             Assert.AreEqual(clone.UpdateDate, dtd.UpdateDate);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(dtd, null));
             }
@@ -52,10 +53,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = _builder.Build();
+            DataType item = _builder.Build();
 
             Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
         }
-
     }
 }

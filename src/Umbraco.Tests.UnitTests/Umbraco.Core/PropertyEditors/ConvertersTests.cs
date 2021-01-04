@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -45,7 +48,6 @@ namespace Umbraco.Tests.Published
                 }, Mock.Of<IPublishedValueFallback>());
             register.AddTransient(f => factory);
 
-
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id =>
@@ -62,11 +64,24 @@ namespace Umbraco.Tests.Published
 
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()),
+            var dataType1 = new DataType(
+                new VoidEditor(
+                    NullLoggerFactory.Instance,
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    new JsonNetSerializer()),
                 serializer) { Id = 1 };
-            var dataType2 = new DataType(new VoidEditor("2", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()),
+            var dataType2 = new DataType(
+                new VoidEditor(
+                    "2",
+                    NullLoggerFactory.Instance,
+                    Mock.Of<IDataTypeService>(),
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    new JsonNetSerializer()),
                 serializer) { Id = 2 };
 
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2 });
@@ -87,10 +102,16 @@ namespace Umbraco.Tests.Published
             IPublishedContentType contentType2 =
                 contentTypeFactory.CreateContentType(Guid.NewGuid(), 1003, "content2", t => CreatePropertyTypes(t, 2));
 
-            var element1 = new PublishedElement(elementType1, Guid.NewGuid(),
-                new Dictionary<string, object> { { "prop1", "val1" } }, false);
-            var element2 = new PublishedElement(elementType2, Guid.NewGuid(),
-                new Dictionary<string, object> { { "prop2", "1003" } }, false);
+            var element1 = new PublishedElement(
+                elementType1,
+                Guid.NewGuid(),
+                new Dictionary<string, object> { { "prop1", "val1" } },
+                false);
+            var element2 = new PublishedElement(
+                elementType2,
+                Guid.NewGuid(),
+                new Dictionary<string, object> { { "prop2", "1003" } },
+                false);
             var cnt1 = new SolidPublishedContent(contentType1)
             {
                 Id = 1003,
@@ -115,9 +136,11 @@ namespace Umbraco.Tests.Published
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory
             // must test ModelClrType with special equals 'cos they are not ref-equals
-            Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1")),
+            Assert.IsTrue(ModelType.Equals(
+                typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1")),
                 contentType2.GetPropertyType("prop2").ModelClrType));
-            Assert.AreEqual(typeof(IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>),
+            Assert.AreEqual(
+                typeof(IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>),
                 contentType2.GetPropertyType("prop2").ClrType);
 
             // can create a model for an element
@@ -133,9 +156,9 @@ namespace Umbraco.Tests.Published
             // and get direct property
             Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(
                 model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2"));
-            Assert.AreEqual(1,
-                ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(),
-                    "prop2")).Length);
+            Assert.AreEqual(
+                1,
+                ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2")).Length);
 
             // and get model property
             Assert.IsInstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>(mmodel2.Prop2);
@@ -174,15 +197,21 @@ namespace Umbraco.Tests.Published
             public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
                 => PropertyCacheLevel.Elements;
 
-            public override object ConvertSourceToIntermediate(IPublishedElement owner,
-                IPublishedPropertyType propertyType, object source, bool preview)
+            public override object ConvertSourceToIntermediate(
+                IPublishedElement owner,
+                IPublishedPropertyType propertyType,
+                object source,
+                bool preview)
             {
                 var s = source as string;
                 return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
             }
 
-            public override object ConvertIntermediateToObject(IPublishedElement owner,
-                IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter,
+            public override object ConvertIntermediateToObject(
+                IPublishedElement owner,
+                IPublishedPropertyType propertyType,
+                PropertyCacheLevel referenceCacheLevel,
+                object inter,
                 bool preview) => ((int[])inter).Select(x =>
                 (PublishedSnapshotTestObjects.TestContentModel1)_publishedSnapshotAccessor.PublishedSnapshot.Content
                     .GetById(x)).ToArray();

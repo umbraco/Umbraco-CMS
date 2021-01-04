@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -14,7 +17,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     public class AlterMigrationTests
     {
         private readonly ILogger<MigrationContext> _logger = Mock.Of<ILogger<MigrationContext>>();
-
 
         [Test]
         public void Drop_Foreign_Key()
@@ -34,7 +36,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 
             // Assert
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql,
+            Assert.That(
+                database.Operations[0].Sql,
                 Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
         }
 
@@ -53,7 +56,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             }
 
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql,
+            Assert.That(
+                database.Operations[0].Sql,
                 Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
@@ -82,7 +86,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             }
 
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations[0].Sql,
+            Assert.That(
+                database.Operations[0].Sql,
                 Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
@@ -94,8 +99,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             }
 
             public override void Migrate() =>
+
                 // bad/good syntax...
-                //Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
+                //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
                 Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
         }
 
@@ -114,9 +120,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             // Assert
             Assert.That(database.Operations.Any(), Is.True);
 
-            //Console output
+            // Console output
             Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
-            Debug.Print("");
+            Debug.Print(string.Empty);
             foreach (TestDatabase.Operation expression in database.Operations)
             {
                 Debug.Print(expression.ToString());

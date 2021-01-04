@@ -32,22 +32,16 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
         /// <summary>
         /// Get the status for this health check
         /// </summary>
-        /// <returns></returns>
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            //return the statuses
-            return new[] { CheckFolderPermissions(), CheckFilePermissions() };
-        }
+        // TODO: This should really just run the IFilePermissionHelper.RunFilePermissionTestSuite and then we'd have a
+        // IFilePermissions interface resolved as a collection within the IFilePermissionHelper that runs checks against all
+        // IFilePermissions registered. Then there's no hard coding things done here and the checks here will be consistent
+        // with the checks run in IFilePermissionHelper.RunFilePermissionTestSuite which occurs on install too.
+        public override IEnumerable<HealthCheckStatus> GetStatus() => new[] { CheckFolderPermissions(), CheckFilePermissions() };
 
         /// <summary>
         /// Executes the action and returns it's status
         /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
-            throw new InvalidOperationException("FolderAndFilePermissionsCheck has no executable actions");
-        }
+        public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => throw new InvalidOperationException("FolderAndFilePermissionsCheck has no executable actions");
 
         private HealthCheckStatus CheckFolderPermissions()
         {
@@ -67,8 +61,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
                 { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
-            //These are special paths to check that will restart an app domain if a file is written to them,
-            //so these need to be tested differently
+            // These are special paths to check that will restart an app domain if a file is written to them,
+            // so these need to be tested differently
             var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
             {
                 { Constants.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
@@ -80,7 +74,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
             var optionalPathCheckResult = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out var optionalFailedPaths);
 
-            //now check the special folders
+            // now check the special folders
             var requiredPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart: true);
             var optionalPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
@@ -89,7 +83,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
             requiredPathCheckResult = requiredPathCheckResult && requiredPathCheckResult2;
             optionalPathCheckResult = optionalPathCheckResult && optionalPathCheckResult2;
 
-            //combine the paths
+            // combine the paths
             requiredFailedPaths = requiredFailedPaths.Concat(requiredFailedPaths2).ToList();
             optionalFailedPaths = requiredFailedPaths.Concat(optionalFailedPaths2).ToList();
 
@@ -106,23 +100,19 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
             };
 
             // Run checks for required and optional paths for modify permission
-            IEnumerable<string> requiredFailedPaths;
-            IEnumerable<string> optionalFailedPaths;
-            var requiredPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
-            var optionalPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
+            var requiredPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out IEnumerable<string> requiredFailedPaths);
+            var optionalPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out IEnumerable<string> optionalFailedPaths);
 
             return GetStatus(requiredPathCheckResult, requiredFailedPaths, optionalPathCheckResult, optionalFailedPaths, PermissionCheckFor.File);
         }
 
-        private string[] GetPathsToCheck(Dictionary<string, PermissionCheckRequirement> pathsToCheck,
-            PermissionCheckRequirement requirement)
-        {
-            return pathsToCheck
+        private string[] GetPathsToCheck(
+            Dictionary<string, PermissionCheckRequirement> pathsToCheck,
+            PermissionCheckRequirement requirement) => pathsToCheck
                 .Where(x => x.Value == requirement)
                 .Select(x => _hostingEnvironment.MapPathContentRoot(x.Key))
                 .OrderBy(x => x)
                 .ToArray();
-        }
 
         private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths, bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths, PermissionCheckFor checkingFor)
         {

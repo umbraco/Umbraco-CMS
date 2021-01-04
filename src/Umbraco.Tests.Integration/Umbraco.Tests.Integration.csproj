@@ -7,6 +7,10 @@
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+        <DefineConstants>IS_WINDOWS</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="TEMP\**" />
       <EmbeddedResource Remove="TEMP\**" />
@@ -15,6 +19,16 @@
       <EmbeddedResource Remove="Views\**" />
       <None Remove="Views\**" />
       <None Remove="create_slicing_filter_condition.sh" />
+      <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+        <SubType>Designer</SubType>
+      </EmbeddedResource>
+      <Compile Update="Umbraco.Infrastructure\Services\Importing\ImportResources.Designer.cs">
+        <AutoGen>True</AutoGen>
+        <DesignTime>True</DesignTime>
+        <DependentUpon>ImportResources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +36,22 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="Umbraco.Infrastructure\Services\Importing\CheckboxList-Content-Package.xml">
+        <SubType>Designer</SubType>
+      </Content>
+      <Content Include="Umbraco.Infrastructure\Services\Importing\CompositionsTestPackage-Random.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\CompositionsTestPackage.xml" />
       <Content Include="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\Fanoe-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\InheritedDocTypes-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\SingleDocType.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\StandardMvc-Package.xml">
+        <SubType>Designer</SubType>
+      </Content>
+      <Content Include="Umbraco.Infrastructure\Services\Importing\TemplateOnly-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\TemplateOnly-Updated-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\uBlogsy-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\XsltSearch-Package.xml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,22 +81,6 @@
 
     <ItemGroup>
       <Folder Include="Umbraco\logs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Umbraco.Infrastructure\Services\Importing\ImportResources.Designer.cs">
-        <DependentUpon>ImportResources.resx</DependentUpon>
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
-        <SubType>Designer</SubType>
-        <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
-        <Generator>ResXFileCodeGenerator</Generator>
-      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

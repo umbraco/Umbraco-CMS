@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Templates;
@@ -47,8 +48,9 @@ namespace Umbraco.Web.PropertyEditors
             HtmlLocalLinkParser localLinkParser,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            IImageUrlGenerator imageUrlGenerator,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _ioHelper = ioHelper;
@@ -64,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator, JsonSerializer);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
@@ -87,14 +89,15 @@ namespace Umbraco.Web.PropertyEditors
                 RichTextEditorPastedImages pastedImages,
                 HtmlLocalLinkParser localLinkParser,
                 IShortStringHelper shortStringHelper,
-                IImageUrlGenerator imageUrlGenerator)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+                IImageUrlGenerator imageUrlGenerator,
+                IJsonSerializer jsonSerializer)
+                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, backOfficeSecurityAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator);
-                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute);
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, backOfficeSecurityAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator, jsonSerializer);
+                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute);
                 _imageUrlGenerator = imageUrlGenerator;
             }
 

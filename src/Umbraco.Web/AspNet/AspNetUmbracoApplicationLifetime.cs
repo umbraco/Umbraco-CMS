@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Web;
-using Umbraco.Net;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.AspNet
 {

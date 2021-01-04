@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Serialization;
 
@@ -49,7 +52,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Serialization
         [Test]
         public void DeserializeSubset__Subset_value_as_object()
         {
-
             var expected = new MyStruct()
             {
                 Key = "Test"
@@ -65,7 +67,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Serialization
         [Test]
         public void DeserializeSubset__Subset_value_as_array()
         {
-            var expected = new []{"test"};
+            var expected = new[] { "test" };
             var key = "text";
             var full = $"{{\"{key}\": {JsonConvert.SerializeObject(expected)}";
 

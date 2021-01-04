@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Threading;
 using Microsoft.Extensions.Options;
@@ -55,6 +55,7 @@ namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadAbortExceptionInfo", message));
             }
             else
+            {
                 try
                 {
                     var dumped = MiniDump.Dump(_marchal, _hostingEnvironment, withException: true);
@@ -68,6 +69,7 @@ namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
                     message = "Failed to create a minidump. " + ex;
                     logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadAbortExceptionInfo", message));
                 }
+            }
         }
 
         private static bool IsTimeoutThreadAbortException(Exception exception)

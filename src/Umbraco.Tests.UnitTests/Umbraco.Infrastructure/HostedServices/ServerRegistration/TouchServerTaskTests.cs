@@ -21,7 +21,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
         private Mock<IServerRegistrationService> _mockServerRegistrationService;
 
         private const string ApplicationUrl = "https://mysite.com/";
-        private const string ServerIdentity = "Test/1";
         private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
 
         [TestCase(RuntimeLevel.Boot)]
@@ -63,8 +62,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
             var mockLogger = new Mock<ILogger<TouchServerTask>>();
 
             _mockServerRegistrationService = new Mock<IServerRegistrationService>();
-            _mockServerRegistrationService.SetupGet(x => x.CurrentServerIdentity).Returns(ServerIdentity);
-
+            
             var settings = new GlobalSettings
             {
                 DatabaseServerRegistrar = new DatabaseServerRegistrarSettings
@@ -89,7 +87,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
                 .Verify(
                     x => x.TouchServer(
                         It.Is<string>(y => y == ApplicationUrl),
-                        It.Is<string>(y => y == ServerIdentity),
                         It.Is<TimeSpan>(y => y == _staleServerTimeout)),
                     times);
     }

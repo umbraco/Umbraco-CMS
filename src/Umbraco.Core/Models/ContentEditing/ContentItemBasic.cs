@@ -91,6 +91,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         private IEnumerable<T> _properties;
 
+        [DataMember(Name = "properties")]
         public virtual IEnumerable<T> Properties
         {
             get => _properties;

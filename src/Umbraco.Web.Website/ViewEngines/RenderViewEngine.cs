@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +16,10 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Website.ViewEngines
 {
+    // TODO: We don't really need to have different view engines simply to search additional places,
+    // we can just do ConfigureOptions<RazorViewEngineOptions> on startup to add more to the
+    // default list so this can be totally removed/replaced with configure options logic.
+
     /// <summary>
     /// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
     /// this includes paths to render partial macros and media item templates.
@@ -23,6 +27,9 @@ namespace Umbraco.Web.Website.ViewEngines
     public class RenderViewEngine : RazorViewEngine, IRenderViewEngine
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderViewEngine"/> class.
+        /// </summary>
         public RenderViewEngine(
             IRazorPageFactoryProvider pageFactory,
             IRazorPageActivator pageActivator,
@@ -33,27 +40,24 @@ namespace Umbraco.Web.Website.ViewEngines
         {
         }
 
-        private static IOptions<RazorViewEngineOptions> OverrideViewLocations()
+        private static IOptions<RazorViewEngineOptions> OverrideViewLocations() => Options.Create(new RazorViewEngineOptions()
         {
-            return Options.Create<RazorViewEngineOptions>(new RazorViewEngineOptions()
-            {
-                //NOTE: we will make the main view location the last to be searched since if it is the first to be searched and there is both a view and a partial
-                // view in both locations and the main view is rendering a partial view with the same name, we will get a stack overflow exception.
-                // http://issues.umbraco.org/issue/U4-1287, http://issues.umbraco.org/issue/U4-1215
-                ViewLocationFormats =
+            // NOTE: we will make the main view location the last to be searched since if it is the first to be searched and there is both a view and a partial
+            // view in both locations and the main view is rendering a partial view with the same name, we will get a stack overflow exception.
+            // http://issues.umbraco.org/issue/U4-1287, http://issues.umbraco.org/issue/U4-1215
+            ViewLocationFormats =
                 {
-                    "/Partials/{0}.cshtml",
-                    "/MacroPartials/{0}.cshtml",
-                    "/{0}.cshtml"
+                    "/Views/Partials/{0}.cshtml",
+                    "/Views/MacroPartials/{0}.cshtml",
+                    "/Views/{0}.cshtml"
                 },
-                AreaViewLocationFormats =
+            AreaViewLocationFormats =
                 {
-                    "/Partials/{0}.cshtml",
-                    "/MacroPartials/{0}.cshtml",
-                    "/{0}.cshtml"
+                    "/Views/Partials/{0}.cshtml",
+                    "/Views/MacroPartials/{0}.cshtml",
+                    "/Views/{0}.cshtml"
                 }
-            });
-        }
+        });
 
         public new ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
         {
@@ -72,16 +76,17 @@ namespace Umbraco.Web.Website.ViewEngines
         /// <returns></returns>
         private static bool ShouldFindView(ActionContext context, bool isMainPage)
         {
-            //In v8, this was testing recursively into if it was a child action, but child action do not exist anymore,
-            //And my best guess is that it
-            context.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out var umbracoToken);
-            // first check if we're rendering a partial view for the back office, or surface controller, etc...
-            // anything that is not ContentModel as this should only pertain to Umbraco views.
-            if (!isMainPage && !(umbracoToken is ContentModel))
-                return true;
-
-            // only find views if we're rendering the umbraco front end
-            return umbracoToken is ContentModel;
+            return true;
+            // TODO: Determine if this is required, i don't think it is
+            ////In v8, this was testing recursively into if it was a child action, but child action do not exist anymore,
+            ////And my best guess is that it
+            //context.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out var umbracoToken);
+            //// first check if we're rendering a partial view for the back office, or surface controller, etc...
+            //// anything that is not ContentModel as this should only pertain to Umbraco views.
+            //if (!isMainPage && !(umbracoToken is ContentModel))
+            //    return true;
+            //// only find views if we're rendering the umbraco front end
+            //return umbracoToken is ContentModel;
         }
 
 

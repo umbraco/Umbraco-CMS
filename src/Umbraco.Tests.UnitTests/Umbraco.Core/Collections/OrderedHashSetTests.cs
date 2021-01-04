@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NUnit.Framework;
 using Umbraco.Core.Collections;
 
@@ -11,8 +14,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
         public void Keeps_Last()
         {
             var list = new OrderedHashSet<MyClass>(keepOldest: false);
-            var items = new[] {new MyClass("test"), new MyClass("test"), new MyClass("test")};
-            foreach (var item in items)
+            MyClass[] items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            foreach (MyClass item in items)
             {
                 list.Add(item);
             }
@@ -26,8 +29,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
         public void Keeps_First()
         {
             var list = new OrderedHashSet<MyClass>(keepOldest: true);
-            var items = new[] {new MyClass("test"), new MyClass("test"), new MyClass("test")};
-            foreach (var item in items)
+            MyClass[] items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            foreach (MyClass item in items)
             {
                 list.Add(item);
             }
@@ -45,37 +48,49 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
             }
 
             public string Name { get; }
+
             public Guid Id { get; }
 
             public bool Equals(MyClass other)
             {
-                if (ReferenceEquals(null, other)) return false;
-                if (ReferenceEquals(this, other)) return true;
+                if (other is null)
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, other))
+                {
+                    return true;
+                }
+
                 return string.Equals(Name, other.Name);
             }
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((MyClass) obj);
+                if (obj is null)
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != GetType())
+                {
+                    return false;
+                }
+
+                return Equals((MyClass)obj);
             }
 
-            public override int GetHashCode()
-            {
-                return Name.GetHashCode();
-            }
+            public override int GetHashCode() => Name.GetHashCode();
 
-            public static bool operator ==(MyClass left, MyClass right)
-            {
-                return Equals(left, right);
-            }
+            public static bool operator ==(MyClass left, MyClass right) => Equals(left, right);
 
-            public static bool operator !=(MyClass left, MyClass right)
-            {
-                return Equals(left, right) == false;
-            }
+            public static bool operator !=(MyClass left, MyClass right) => Equals(left, right) == false;
         }
     }
 }

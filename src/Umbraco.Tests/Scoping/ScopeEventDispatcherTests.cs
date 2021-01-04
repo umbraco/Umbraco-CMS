@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -35,11 +34,11 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var services =  TestHelper.GetRegister();
+            var services = TestHelper.GetRegister();
 
             var composition = new UmbracoBuilder(services, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
-            _testObjects = new TestObjects(services);
+            _testObjects = new TestObjects();
 
             var globalSettings = new GlobalSettings();
             composition.Services.AddUnique(factory => new FileSystems(factory, factory.GetService<ILogger<FileSystems>>(), factory.GetService<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
@@ -47,7 +46,7 @@ namespace Umbraco.Tests.Scoping
 
             Current.Factory = composition.CreateServiceProvider();
         }
-        
+
         [TestCase(false, true, true)]
         [TestCase(false, true, false)]
         [TestCase(false, false, true)]
@@ -140,7 +139,7 @@ namespace Umbraco.Tests.Scoping
             {
 
                 //content1 will be filtered from the args
-                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(new[]{ content1 , content3}));
+                scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(new[] { content1, content3 }));
                 scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1), "DoDeleteForContent");
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
                 //this entire event will be filtered
@@ -156,7 +155,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreEqual(content3.Id, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First().Id);
 
                 Assert.AreEqual(typeof(DeleteEventArgs<IContent>), events[1].Args.GetType());
-                Assert.AreEqual(content1.Id, ((DeleteEventArgs<IContent>) events[1].Args).DeletedEntities.First().Id);
+                Assert.AreEqual(content1.Id, ((DeleteEventArgs<IContent>)events[1].Args).DeletedEntities.First().Id);
 
                 Assert.AreEqual(typeof(SaveEventArgs<IContent>), events[2].Args.GetType());
                 Assert.AreEqual(content2.Id, ((SaveEventArgs<IContent>)events[2].Args).SavedEntities.First().Id);
@@ -177,8 +176,8 @@ namespace Umbraco.Tests.Scoping
             var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
-                scope.Events.Dispatch(Test_Unpublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "Unpublished");
-                scope.Events.Dispatch(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new [] { content }), "Deleted");
+                scope.Events.Dispatch(Test_Unpublished, contentService, new PublishEventArgs<IContent>(new[] { content }), "Unpublished");
+                scope.Events.Dispatch(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new[] { content }), "Deleted");
 
                 // see U4-10764
                 var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
@@ -258,9 +257,9 @@ namespace Umbraco.Tests.Scoping
                 // events have been queued
                 var events = scope.Events.GetEvents(EventDefinitionFilter.FirstIn).ToArray();
                 Assert.AreEqual(1, events.Length);
-                Assert.AreEqual(content1, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First());
+                Assert.AreEqual(content1, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First());
                 Assert.IsTrue(object.ReferenceEquals(content1, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First()));
-                Assert.AreEqual(content1.UpdateDate, ((SaveEventArgs<IContent>) events[0].Args).SavedEntities.First().UpdateDate);
+                Assert.AreEqual(content1.UpdateDate, ((SaveEventArgs<IContent>)events[0].Args).SavedEntities.First().UpdateDate);
             }
         }
 

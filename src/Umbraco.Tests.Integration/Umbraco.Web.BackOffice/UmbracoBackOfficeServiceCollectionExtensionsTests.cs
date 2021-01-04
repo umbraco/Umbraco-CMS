@@ -1,17 +1,18 @@
-using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Security;
-using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.Security;
+using Umbraco.Web.BackOffice.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 {
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddUmbracoBackOfficeIdentity();
+
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserStoreResolvable()
         {
@@ -37,7 +38,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
 
             Assert.NotNull(userManager);
         }
-
-        protected override Action<IServiceCollection> CustomTestSetup => (services) => services.AddUmbracoBackOfficeIdentity();
     }
 }

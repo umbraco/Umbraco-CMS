@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Examine;
@@ -50,8 +51,9 @@ namespace Umbraco.Web.PropertyEditors
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
             ILocalizedTextService localizedTextService,
-            IImageUrlGenerator imageUrlGenerator)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            IImageUrlGenerator imageUrlGenerator,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;
@@ -65,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator, JsonSerializer);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -92,8 +94,9 @@ namespace Umbraco.Web.PropertyEditors
                 HtmlImageSourceParser imageSourceParser,
                 HtmlLocalLinkParser localLinkParser,
                 RichTextEditorPastedImages pastedImages,
-                IImageUrlGenerator imageUrlGenerator)
-                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, attribute)
+                IImageUrlGenerator imageUrlGenerator,
+                IJsonSerializer jsonSerializer)
+                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;

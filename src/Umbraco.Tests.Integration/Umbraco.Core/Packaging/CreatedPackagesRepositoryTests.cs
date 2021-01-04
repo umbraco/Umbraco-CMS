@@ -45,6 +45,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
         private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ContentService, ContentTypeService, DataTypeService,
@@ -53,6 +55,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
             EntityXmlSerializer, LoggerFactory,
             UmbracoVersion,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
+            MediaService,
+            MediaTypeService,
             "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",
@@ -158,8 +162,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
         {
             var file1 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/package.manifest";
             var file2 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/styles.css";
-            var mappedFile1 = IOHelper.MapPath(file1);
-            var mappedFile2 = IOHelper.MapPath(file2);
+            var mappedFile1 = HostingEnvironment.MapPathContentRoot(file1);
+            var mappedFile2 = HostingEnvironment.MapPathContentRoot(file2);
             Directory.CreateDirectory(Path.GetDirectoryName(mappedFile1));
             Directory.CreateDirectory(Path.GetDirectoryName(mappedFile2));
             File.WriteAllText(mappedFile1, "hello world");
@@ -183,7 +187,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
             def = PackageBuilder.GetById(def.Id); //re-get
             Assert.IsNotNull(def.PackagePath);
 
-            using (var archive = ZipFile.OpenRead(IOHelper.MapPath(zip)))
+            using (var archive = ZipFile.OpenRead(HostingEnvironment.MapPathWebRoot(zip)))
             {
                 Assert.AreEqual(3, archive.Entries.Count);
 

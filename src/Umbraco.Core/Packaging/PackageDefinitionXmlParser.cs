@@ -46,10 +46,13 @@ namespace Umbraco.Core.Packaging
                 Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? "<actions></actions>", //take the entire outer xml value
                 ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
                 ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
+                MediaUdis = xml.Element("media")?.Elements("nodeUdi").Select(x => (GuidUdi)UdiParser.Parse(x.Value)).ToList() ?? new List<GuidUdi>(),
+                MediaLoadChildNodes = xml.Element("media")?.AttributeValue<bool>("loadChildNodes") ?? false,
                 Macros = xml.Element("macros")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Templates = xml.Element("templates")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Stylesheets = xml.Element("stylesheets")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DocumentTypes = xml.Element("documentTypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                MediaTypes = xml.Element("mediaTypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Languages = xml.Element("languages")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DataTypes = xml.Element("datatypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
@@ -103,11 +106,17 @@ namespace Umbraco.Core.Packaging
                 new XElement("templates", string.Join(",", def.Templates ?? Array.Empty<string>())),
                 new XElement("stylesheets", string.Join(",", def.Stylesheets ?? Array.Empty<string>())),
                 new XElement("documentTypes", string.Join(",", def.DocumentTypes ?? Array.Empty<string>())),
+                new XElement("mediaTypes", string.Join(",", def.MediaTypes ?? Array.Empty<string>())),
                 new XElement("macros", string.Join(",", def.Macros ?? Array.Empty<string>())),
                 new XElement("files", (def.Files ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("file", x))),
                 new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
-                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())));
+                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())),
 
+                new XElement(
+                    "media",
+                    def.MediaUdis.Select(x=> (object)new XElement("nodeUdi", x))
+                    .Union(new []{new XAttribute("loadChildNodes", def.MediaLoadChildNodes) }))
+                );
             return packageXml;
         }
 

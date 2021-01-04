@@ -1,12 +1,14 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
@@ -23,14 +25,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
             // want to cache as a (static) template for ever, and ever - note
             // that using a MemoryCache would allow us to set a size limit, or
             // something equivalent, to reduce risk of memory explosion
-            var sql = sqlTemplates.Get("xxx", s => s
+            Sql<ISqlContext> sql = sqlTemplates.Get("xxx", s => s
                 .SelectAll()
                 .From("zbThing1")
                 .Where("id=@id", new { id = SqlTemplate.Arg("id") })).Sql(new { id = 1 });
 
-            var sql2 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(1);
+            Sql<ISqlContext> sql2 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(1);
 
-            var sql3 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(new { id = 1 });
+            Sql<ISqlContext> sql3 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(new { id = 1 });
         }
 
         [Test]
@@ -44,10 +46,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 
             const string sqlBase = "SELECT [zbThing1].[id] AS [Id], [zbThing1].[name] AS [Name] FROM [zbThing1] WHERE ";
 
-            var template = sqlTemplates.Get("sql1", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+            SqlTemplate template = sqlTemplates.Get("sql1", s => s.Select<Thing1Dto>().From<Thing1Dto>()
                 .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
-            var sql = template.Sql("foo");
+            Sql<ISqlContext> sql = template.Sql("foo");
             Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
             Assert.AreEqual(1, sql.Arguments.Length);
             Assert.AreEqual("foo", sql.Arguments[0]);
@@ -90,7 +92,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 
             // but we cannot name them, because the arg name is the value of "i"
             // so we have to explicitely create the argument
-
             template = sqlTemplates.Get("sql4", s => s.Select<Thing1Dto>().From<Thing1Dto>()
                 .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i")));
 
@@ -105,7 +106,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
             Assert.AreEqual(123, sql.Arguments[0]);
 
             // and thanks to a patched visitor, this now works
-
             sql = template.Sql(new { i = "foo" });
             Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
             Assert.AreEqual(1, sql.Arguments.Length);
@@ -120,7 +120,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
             Assert.Throws<InvalidOperationException>(() => template.Sql(new { i = 123, j = 456 }));
 
             // now with more arguments
-
             template = sqlTemplates.Get("sql4a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
                 .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i") && x.Name == SqlTemplate.Arg<string>("name")));
             sql = template.Sql(0, 1);
@@ -139,7 +138,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
             Assert.AreEqual(1, sql.Arguments[1]);
 
             // works, magic
-
             template = sqlTemplates.Get("sql5", s => s.Select<Thing1Dto>().From<Thing1Dto>()
                 .WhereIn<Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i")));
 
@@ -178,20 +176,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
             // idea to just add the WhereIn to a templated, immutable SQL template
 
             // more fun...
-
             template = sqlTemplates.Get("sql6", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+
                 // do NOT do this, this is NOT a visited expression
-                //.Append(" AND whatever=@0", SqlTemplate.Arg<string>("j"))
+                //// .Append(" AND whatever=@0", SqlTemplate.Arg<string>("j"))
 
                 // does not work anymore - due to proper TemplateArg
                 //// instead, directly name the argument
-                //.Append("AND whatever=@0", "j")
-                //.Append("AND whatever=@0", "k")
+                ////.Append("AND whatever=@0", "j")
+                ////.Append("AND whatever=@0", "k")
 
                 // instead, explicitely create the argument
                 .Append("AND whatever=@0", SqlTemplate.Arg("j"))
-                .Append("AND whatever=@0", SqlTemplate.Arg("k"))
-            );
+                .Append("AND whatever=@0", SqlTemplate.Arg("k")));
 
             sql = template.Sql(new { j = new[] { 1, 2, 3 }, k = "oops" });
             Assert.AreEqual(sqlBase.TrimEnd("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3", sql.SQL.NoCrLf());

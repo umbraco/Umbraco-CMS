@@ -1,11 +1,3 @@
-﻿using Examine;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using NUnit.Framework;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,10 +7,17 @@ using System.Reflection;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Xml.Linq;
+using Examine;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using NUnit.Framework;
+using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
@@ -28,6 +27,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
@@ -43,6 +43,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -50,6 +51,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
 using Umbraco.Web.AspNet;
+using Umbraco.Web.Composing;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Install;
@@ -63,7 +65,6 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
-using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -235,10 +236,7 @@ namespace Umbraco.Tests.Testing
 
             services.AddUnique(membershipHelper);
 
-
-
-
-            TestObjects = new TestObjects(services);
+            TestObjects = new TestObjects();
             Compose();
             Current.Factory = Factory = Builder.CreateServiceProvider();
             Initialize();
@@ -315,6 +313,8 @@ namespace Umbraco.Tests.Testing
             Builder.Services.AddUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Builder.Services.AddUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Builder.Services.AddUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
+            Builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
+            Builder.Services.AddUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
             Builder.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             Builder.Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
             // register back office sections in the order we want them rendered
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Testing
             if (configure == false) return;
 
             Builder
-                .ComposeCoreMappingProfiles();
+                .AddCoreMappingProfiles();
         }
 
         protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, UmbracoTestOptions.TypeLoader option)
@@ -452,7 +452,7 @@ namespace Umbraco.Tests.Testing
             if (withApplication == false) return;
 
             // default Datalayer/Repositories/SQL/Database/etc...
-            Builder.ComposeRepositories();
+            Builder.AddRepositories();
 
             Builder.Services.AddUnique<IExamineManager, ExamineManager>();
 
@@ -494,10 +494,10 @@ namespace Umbraco.Tests.Testing
             Builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Builder.Services.AddUnique(factory
-                => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<ITypeFinder>(), factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
             Builder.Services.AddUnique(factory => (IScopeAccessor)factory.GetRequiredService<IScopeProvider>());
 
-            Builder.ComposeServices();
+            Builder.AddServices();
 
             // composition root is doing weird things, fix
             Builder.Services.AddUnique<ITreeService, TreeService>();

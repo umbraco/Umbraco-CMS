@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -36,8 +37,15 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
-        public MultipleTextStringPropertyEditor(ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public MultipleTextStringPropertyEditor(
+            ILoggerFactory loggerFactory,
+            IIOHelper ioHelper,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _ioHelper = ioHelper;
             _dataTypeService = dataTypeService;
@@ -46,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
@@ -58,8 +66,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly ILocalizedTextService _localizedTextService;
 
-            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+            public MultipleTextStringPropertyValueEditor(
+                IDataTypeService dataTypeService,
+                ILocalizationService localizationService,
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
                 _localizedTextService = localizedTextService;
             }

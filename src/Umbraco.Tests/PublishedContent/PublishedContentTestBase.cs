@@ -1,25 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Umbraco.Core;
+using Moq;
+using Umbraco.Core.IO;
+using Umbraco.Core.Media;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Tests.TestHelpers;
-using Moq;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Routing;
-using Umbraco.Core.Media;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -38,7 +36,7 @@ namespace Umbraco.Tests.PublishedContent
             Builder.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Clear()
                 .Append<DatePickerValueConverter>()
-                .Append<TinyMceValueConverter>()
+                .Append<SimpleTinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
         }
 
@@ -67,7 +65,8 @@ namespace Umbraco.Tests.PublishedContent
                     ShortStringHelper,
                     IOHelper,
                     LocalizedTextService,
-                    Mock.Of<IImageUrlGenerator>()),
+                    Mock.Of<IImageUrlGenerator>(),
+                    new JsonNetSerializer()),
                     serializer) { Id = 1 });
 
 

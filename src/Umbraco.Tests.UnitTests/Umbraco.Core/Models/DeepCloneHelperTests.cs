@@ -1,4 +1,6 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,74 +151,76 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 MyTest1 = new object[]
                 {
                     new Test1(), "hello",
-                    //not cloneable so this property will get skipped
+
+                    // Not cloneable so this property will get skipped.
                     new Test2()
                 }
             };
 
             var clone = (Test3)test1.DeepClone();
 
-            //it skipped this property so these will now be the same
+            // It skipped this property so these will now be the same.
             Assert.AreSame(clone.MyTest1, test1.MyTest1);
-
         }
 
         public class Test1 : BaseCloneable
         {
             public string Name { get; set; }
+
             public int Age { get; set; }
 
             public Test1 MyTest1 { get; set; }
-            public Test2 MyTest2 { get; set; }
 
+            public Test2 MyTest2 { get; set; }
         }
 
         public class Test2
         {
             public string Name { get; set; }
+
             public Test1 MyTest1 { get; set; }
         }
 
         public class Test3 : BaseCloneable
         {
             public string Name { get; set; }
-            public object[] MyTest1 { get; set; }
 
+            public object[] MyTest1 { get; set; }
         }
 
         public class Test4 : BaseCloneable
         {
             public string Name { get; set; }
-            public Test1[] MyTest1 { get; set; }
 
+            public Test1[] MyTest1 { get; set; }
         }
 
         public class Test5 : BaseCloneable
         {
             public string Name { get; set; }
-            public IEnumerable MyTest1 { get; set; }
 
+            public IEnumerable MyTest1 { get; set; }
         }
 
         public class Test6 : BaseCloneable
         {
             public string Name { get; set; }
-            public IEnumerable<Test1> MyTest1 { get; set; }
 
+            public IEnumerable<Test1> MyTest1 { get; set; }
         }
 
         public class Test7 : BaseCloneable
         {
             public string Name { get; set; }
-            public List<Test1> MyTest1 { get; set; }
 
+            public List<Test1> MyTest1 { get; set; }
         }
 
         public class Test8 : BaseCloneable
         {
             public string Name { get; set; }
-            public ICollection<Test1> MyTest1 { get; set; }
 
+            public ICollection<Test1> MyTest1 { get; set; }
         }
 
         public abstract class BaseCloneable : IDeepCloneable

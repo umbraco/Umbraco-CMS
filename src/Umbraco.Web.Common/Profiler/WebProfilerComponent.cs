@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Net;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Middleware;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Common.Profiler
 {
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Common.Profiler
             if (_profiler != null) return;
 
             // if VoidProfiler was registered, let it be known
-            if (profiler is VoidProfiler)
+            if (profiler is NoopProfiler)
                 logger.LogInformation(
                     "Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
             _profile = false;

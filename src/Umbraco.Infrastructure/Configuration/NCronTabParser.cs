@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using NCrontab;
 
 namespace Umbraco.Core.Configuration
 {
-
     public class NCronTabParser : ICronTabParser
     {
         public bool IsValidCronTab(string cronTab)

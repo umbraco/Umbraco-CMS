@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
@@ -21,13 +21,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class ContentEventsTests : UmbracoIntegrationTestWithContent
     {
         private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
+
         private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
+
         private ILogger<ContentEventsTests> Logger => GetRequiredService<ILogger<ContentEventsTests>>();
 
         #region Setup
-
-        // trace ContentRepository unit-of-work events (refresh, remove), and ContentCacheRefresher CacheUpdated event
-        //
 
         [SetUp]
         public void SetUp()
@@ -51,20 +50,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             FileService.SaveTemplate(_contentType.DefaultTemplate);
             ContentTypeService.Save(_contentType);
         }
-
-        // protected override void Compose()
-        // {
-        //     base.Compose();
-        //
-        //     Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-        //     composition.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
-        //
-        //     Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
-        //         .Add<ContentTypeCacheRefresher>()
-        //         .Add<ContentCacheRefresher>()
-        //         .Add<MacroCacheRefresher>();
-        // }
-
 
         [TearDown]
         public void TearDownTest()
@@ -2180,6 +2165,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             public LocalServerMessenger() : base(false)
             { }
+
+            public override void SendMessages() { }
+
+            public override void Sync() { }
 
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {

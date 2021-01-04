@@ -13,11 +13,9 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -105,7 +103,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (package == null)
                 return NotFound();
 
-            var fullPath = _hostingEnvironment.MapPathContentRoot(package.PackagePath);
+            var fullPath = _hostingEnvironment.MapPathWebRoot(package.PackagePath);
             if (!System.IO.File.Exists(fullPath))
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("No file found for path " + package.PackagePath);
 

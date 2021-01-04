@@ -412,7 +412,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
         /// </remarks>
-        private class MediaByGuidReadRepository : NPocoRepositoryBase<Guid, IMedia>
+        private class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
         {
             private readonly MediaRepository _outerRepo;
 

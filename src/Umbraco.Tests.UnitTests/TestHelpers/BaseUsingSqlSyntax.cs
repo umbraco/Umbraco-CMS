@@ -1,18 +1,18 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -23,26 +23,22 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ISqlContext SqlContext { get; private set; }
 
-        protected Sql<ISqlContext> Sql()
-        {
-            return NPoco.Sql.BuilderFor(SqlContext);
-        }
+        protected Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor(SqlContext);
 
         [SetUp]
         public virtual void Setup()
         {
-            var container = TestHelper.GetServiceCollection();
-            var typeLoader = TestHelper.GetMockedTypeLoader();
+            IServiceCollection container = TestHelper.GetServiceCollection();
+            TypeLoader typeLoader = TestHelper.GetMockedTypeLoader();
 
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
-    
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
-            composition.Services.AddUnique<ISqlContext>(_ => SqlContext);
+            composition.Services.AddUnique(_ => SqlContext);
 
-            var factory = composition.CreateServiceProvider();
+            IServiceProvider factory = composition.CreateServiceProvider();
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
             var sqlSyntax = new SqlServerSyntaxProvider();

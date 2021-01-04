@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Core.IO
 {

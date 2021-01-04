@@ -1,15 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -20,21 +21,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
     /// <para>Returns <see cref="IEntitySlim"/> objects, i.e. lightweight representation of entities.</para>
     /// </remarks>
-    internal class EntityRepository : IEntityRepository
+    internal class EntityRepository : RepositoryBase, IEntityRepository
     {
-        private readonly IScopeAccessor _scopeAccessor;
-
-        public EntityRepository(IScopeAccessor scopeAccessor)
+        public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
+            : base(scopeAccessor, appCaches)
         {
-            _scopeAccessor = scopeAccessor;
         }
 
-        protected IUmbracoDatabase Database => _scopeAccessor.AmbientScope.Database;
-        protected Sql<ISqlContext> Sql() => _scopeAccessor.AmbientScope.SqlContext.Sql();
-        protected ISqlSyntaxProvider SqlSyntax => _scopeAccessor.AmbientScope.SqlContext.SqlSyntax;
-
         #region Repository
-        
+
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering)
         {
@@ -49,17 +44,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
             var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
 
-            var sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
+            Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
             {
                 sqlCustomization?.Invoke(s);
 
                 if (filter != null)
                 {
-                    foreach (var filterClause in filter.GetWhereClauses())
+                    foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+                    {
                         s.Where(filterClause.Item1, filterClause.Item2);
+                    }
                 }
-                
-
             }, objectTypes);
 
             ordering = ordering ?? Ordering.ByDefault();
@@ -75,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-            //no matter what we always must have node id ordered at the end
+            // no matter what we always must have node id ordered at the end
             sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
 
             // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
@@ -102,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEntitySlim GetEntity(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
         {
-            //isContent is going to return a 1:M result now with the variants so we need to do different things
+            // isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
                 var cdtos = Database.Fetch<DocumentEntityDto>(sql);
@@ -164,7 +159,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
         {
-            //isContent is going to return a 1:M result now with the variants so we need to do different things
+            // isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
                 var cdtos = Database.Fetch<DocumentEntityDto>(sql);

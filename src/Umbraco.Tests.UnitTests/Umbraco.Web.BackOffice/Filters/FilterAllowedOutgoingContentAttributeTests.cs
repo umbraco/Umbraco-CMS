@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -23,16 +26,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         [Test]
         public void GetValueFromResponse_Already_EnumerableContent()
         {
-            var expected = new List<ContentItemBasic>() {new ContentItemBasic()};
+            var expected = new List<ContentItemBasic>() { new ContentItemBasic() };
 
-            var att = new FilterAllowedOutgoingContentFilter(expected.GetType(),
+            var att = new FilterAllowedOutgoingContentFilter(
+                expected.GetType(),
                 null,
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackOfficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>());
 
-            var result = att.GetValueFromResponse(new ObjectResult(expected));
+            dynamic result = att.GetValueFromResponse(new ObjectResult(expected));
 
             Assert.AreEqual(expected, result);
         }
@@ -41,16 +45,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void GetValueFromResponse_From_Property()
         {
             var expected = new List<ContentItemBasic>() { new ContentItemBasic() };
-            var container = new MyTestClass() {MyList = expected};
+            var container = new MyTestClass() { MyList = expected };
 
-            var att = new FilterAllowedOutgoingContentFilter(expected.GetType(),
+            var att = new FilterAllowedOutgoingContentFilter(
+                expected.GetType(),
                 nameof(MyTestClass.MyList),
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackOfficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>());
 
-            var result = att.GetValueFromResponse(new ObjectResult(container));
+            dynamic result = att.GetValueFromResponse(new ObjectResult(container));
 
             Assert.AreEqual(expected, result);
         }
@@ -61,45 +66,47 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
             var expected = new List<ContentItemBasic>() { new ContentItemBasic() };
             var container = new MyTestClass() { MyList = expected };
 
-            var att = new FilterAllowedOutgoingContentFilter(expected.GetType(),
+            var att = new FilterAllowedOutgoingContentFilter(
+                expected.GetType(),
                 "DontFind",
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackOfficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>());
 
-            var actual = att.GetValueFromResponse(new ObjectResult(container));
+            dynamic actual = att.GetValueFromResponse(new ObjectResult(container));
 
             Assert.IsNull(actual);
-
         }
 
         [Test]
         public void Filter_On_Start_Node()
         {
-            var user = CreateUser(id: 9, startContentId: 5);
+            IUser user = CreateUser(id: 9, startContentId: 5);
             var userServiceMock = new Mock<IUserService>();
-            var userService = userServiceMock.Object;
+            IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
-            var entityService = entityServiceMock.Object;
+            IEntityService entityService = entityServiceMock.Object;
 
             var list = new List<ContentItemBasic>();
-            var att = new FilterAllowedOutgoingContentFilter(list.GetType(),
+            var att = new FilterAllowedOutgoingContentFilter(
+                list.GetType(),
                 null,
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
-                Mock.Of<IBackOfficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>());
 
-            var path = "";
+            var path = string.Empty;
             for (var i = 0; i < 10; i++)
             {
                 if (i > 0 && path.EndsWith(",") == false)
                 {
                     path += ",";
                 }
+
                 path += i.ToInvariantString();
                 list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
             }
@@ -107,7 +114,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
             att.FilterBasedOnStartNode(list, user);
 
             Assert.AreEqual(5, list.Count);
-
        }
 
         [Test]
@@ -116,30 +122,33 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
             var list = new List<ContentItemBasic>();
             for (var i = 0; i < 10; i++)
             {
-                list.Add(new ContentItemBasic{Id = i, Name = "Test" + i, ParentId = -1});
+                list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = -1 });
             }
+
             var ids = list.Select(x => (int)x.Id).ToArray();
 
-            var user = CreateUser(id: 9, startContentId: 0);
+            IUser user = CreateUser(id: 9, startContentId: 0);
 
             var userServiceMock = new Mock<IUserService>();
-            //we're only assigning 3 nodes browse permissions so that is what we expect as a result
+
+            // We're only assigning 3 nodes browse permissions so that is what we expect as a result
             var permissions = new EntityPermissionCollection
             {
-                new EntityPermission(9876, 1, new string[]{ ActionBrowse.ActionLetter.ToString() }),
-                new EntityPermission(9876, 2, new string[]{ ActionBrowse.ActionLetter.ToString() }),
-                new EntityPermission(9876, 3, new string[]{ ActionBrowse.ActionLetter.ToString() }),
-                new EntityPermission(9876, 4, new string[]{ ActionUpdate.ActionLetter.ToString() })
+                new EntityPermission(9876, 1, new string[] { ActionBrowse.ActionLetter.ToString() }),
+                new EntityPermission(9876, 2, new string[] { ActionBrowse.ActionLetter.ToString() }),
+                new EntityPermission(9876, 3, new string[] { ActionBrowse.ActionLetter.ToString() }),
+                new EntityPermission(9876, 4, new string[] { ActionUpdate.ActionLetter.ToString() })
             };
             userServiceMock.Setup(x => x.GetPermissions(user, ids)).Returns(permissions);
-            var userService = userServiceMock.Object;
+            IUserService userService = userServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentFilter(list.GetType(),
+            var att = new FilterAllowedOutgoingContentFilter(
+                list.GetType(),
                 null,
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackOfficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>());
             att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);
@@ -148,13 +157,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
             Assert.AreEqual(3, list.ElementAt(2).Id);
         }
 
-        private IUser CreateUser(int id = 0, int? startContentId = null)
-        {
-            return new UserBuilder()
+        private IUser CreateUser(int id = 0, int? startContentId = null) =>
+            new UserBuilder()
                 .WithId(id)
                 .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0])
                 .Build();
-        }
 
         private class MyTestClass
         {

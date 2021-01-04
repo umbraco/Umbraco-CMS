@@ -1,14 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -27,10 +24,10 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -120,7 +117,7 @@ namespace Umbraco.Tests.PublishedContent
             var serializer = new ConfigurationEditorJsonSerializer();
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer) { Id = 3 };
 
             var dataTypes = new[]
             {
@@ -189,11 +186,9 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var lifetime = new Mock<IUmbracoApplicationLifetime>();
-            _snapshotService = new PublishedSnapshotService(options,
+            _snapshotService = new PublishedSnapshotService(
+                options,
                 null,
-                lifetime.Object,
-                runtime,
                 serviceContext,
                 contentTypeFactory,
                 new TestPublishedSnapshotAccessor(),
@@ -201,21 +196,13 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IProfilingLogger>(),
                 NullLoggerFactory.Instance,
                 scopeProvider,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
-                new TestDefaultCultureAccessor(),
                 dataSource,
+                new TestDefaultCultureAccessor(),
                 Microsoft.Extensions.Options.Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                Mock.Of<IShortStringHelper>(),
-                TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
-
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

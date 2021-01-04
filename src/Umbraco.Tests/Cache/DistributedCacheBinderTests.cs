@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;

@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -19,20 +16,21 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Serialization;
-using Umbraco.Net;
+using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -70,7 +68,7 @@ namespace Umbraco.Tests.PublishedContent
             var serializer = new ConfigurationEditorJsonSerializer();
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()), serializer) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer) { Id = 3 };
 
             var dataTypes = new[]
             {
@@ -148,11 +146,9 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
-            var lifetime = new Mock<IUmbracoApplicationLifetime>();
-            _snapshotService = new PublishedSnapshotService(options,
+            _snapshotService = new PublishedSnapshotService(
+                options,
                 null,
-                lifetime.Object,
-                runtime,
                 serviceContext,
                 contentTypeFactory,
                 _snapshotAccessor,
@@ -160,23 +156,16 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IProfilingLogger>(),
                 NullLoggerFactory.Instance,
                 scopeProvider.Object,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
-                new TestDefaultCultureAccessor(),
                 _source,
+                new TestDefaultCultureAccessor(),
                 Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 PublishedModelFactory,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 hostingEnvironment,
-                Mock.Of<IShortStringHelper>(),
-                TestHelper.IOHelper,
                 Options.Create(nuCacheSettings));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }

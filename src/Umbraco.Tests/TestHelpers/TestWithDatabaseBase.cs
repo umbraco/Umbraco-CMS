@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.Threading;
@@ -32,6 +32,7 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
 using Umbraco.Core.Security;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -91,7 +92,6 @@ namespace Umbraco.Tests.TestHelpers
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>);
                 var factory = new UmbracoDatabaseFactory(f.GetRequiredService<ILogger<UmbracoDatabaseFactory>>(), f.GetRequiredService<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
-                factory.ResetForTests();
                 return factory;
             });
         }

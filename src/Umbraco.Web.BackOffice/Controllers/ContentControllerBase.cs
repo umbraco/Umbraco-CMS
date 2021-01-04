@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,14 +24,12 @@ namespace Umbraco.Web.BackOffice.Controllers
     [JsonDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
-        protected ICultureDictionary CultureDictionary { get; }
-        protected ILoggerFactory LoggerFactory { get; }
-        protected IShortStringHelper ShortStringHelper { get; }
-        protected IEventMessagesFactory EventMessages { get; }
-        protected ILocalizedTextService LocalizedTextService { get; }
         private readonly ILogger<ContentControllerBase> _logger;
         private readonly IJsonSerializer _serializer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentControllerBase"/> class.
+        /// </summary>
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
             ILoggerFactory loggerFactory,
@@ -48,6 +46,31 @@ namespace Umbraco.Web.BackOffice.Controllers
             LocalizedTextService = localizedTextService;
             _serializer = serializer;
         }
+
+        /// <summary>
+        /// Gets the <see cref="ICultureDictionary"/>
+        /// </summary>
+        protected ICultureDictionary CultureDictionary { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ILoggerFactory"/>
+        /// </summary>
+        protected ILoggerFactory LoggerFactory { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IShortStringHelper"/>
+        /// </summary>
+        protected IShortStringHelper ShortStringHelper { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEventMessagesFactory"/>
+        /// </summary>
+        protected IEventMessagesFactory EventMessages { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ILocalizedTextService"/>
+        /// </summary>
+        protected ILocalizedTextService LocalizedTextService { get; }
 
         /// <summary>
         /// Handles if the content for the specified ID isn't found

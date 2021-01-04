@@ -7,49 +7,41 @@ using System.Net.Mime;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using ContentType = Umbraco.Core.Models.ContentType;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Serialization;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]    
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
         // It would be possible to have something like a ContentTypeInfoController for the GetAllPropertyTypeAliases/GetCount/GetAllowedChildren/etc... actions
 
         private readonly IEntityXmlSerializer _serializer;
-        private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IScopeProvider _scopeProvider;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -58,14 +50,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IFileService _fileService;
         private readonly ILogger<ContentTypeController> _logger;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IContentService _contentService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly ILocalizationService _LocalizationService;
-        private readonly IMacroService _macroService;
-        private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IConfigurationEditorJsonSerializer _jsonSerializer;
+        private readonly PackageDataInstallation _packageDataInstallation;
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
@@ -75,23 +63,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
-            IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
             IFileService fileService,
             ILogger<ContentTypeController> logger,
-            ILoggerFactory loggerFactory,
             IContentService contentService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            ILocalizationService localizationService,
-            IMacroService macroService,
-            IEntityService entityService,
             IHostingEnvironment hostingEnvironment,
             EditorValidatorCollection editorValidatorCollection,
-            IConfigurationEditorJsonSerializer jsonSerializer)
+            PackageDataInstallation packageDataInstallation)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -101,9 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService)
         {
             _serializer = serializer;
-            _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
-            _scopeProvider = scopeProvider;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -112,14 +92,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _fileService = fileService;
             _logger = logger;
-            _loggerFactory = loggerFactory;
             _contentService = contentService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _LocalizationService = localizationService;
-            _macroService = macroService;
-            _entityService = entityService;
             _hostingEnvironment = hostingEnvironment;
-            _jsonSerializer = jsonSerializer;
+            _packageDataInstallation = packageDataInstallation;
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -138,8 +114,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(int id)
@@ -157,8 +131,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given guid
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Guid id)
@@ -176,8 +148,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given udi
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public DocumentTypeDisplay GetById(Udi id)
@@ -199,8 +169,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -219,8 +187,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all user defined properties.
         /// </summary>
-        /// <returns></returns>
-        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]        
+        [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return _contentTypeService.GetAllPropertyTypeAliases();
@@ -229,7 +196,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all the standard fields.
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllStandardFields()
         {
@@ -241,8 +207,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
@@ -255,12 +219,22 @@ namespace Umbraco.Web.BackOffice.Controllers
                 });
             return Ok(result);
         }
+
+        /// <summary>
+        /// Returns true if any content types have culture variation enabled
+        /// </summary>
+        [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        public bool AllowsCultureVariation()
+        {
+            IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll();
+            return contentTypes.Any(contentType => contentType.VariesByCulture());
+        }
+
         /// <summary>
         /// Returns where a particular composition has been used
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
@@ -298,8 +272,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type container with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -626,15 +598,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var dataInstaller = new PackageDataInstallation(_loggerFactory.CreateLogger<PackageDataInstallation>(), _loggerFactory, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService, _jsonSerializer);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
             var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            dataInstaller.ImportDocumentType(element, userId);
+            _packageDataInstallation.ImportDocumentType(element, userId);
 
             // Try to clean up the temporary file.
             try

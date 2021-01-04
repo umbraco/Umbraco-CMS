@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DictionaryItem"/>
     /// </summary>
-    internal class DictionaryRepository : NPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
+    internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
         private readonly ILoggerFactory _loggerFactory;
 
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,DictionaryItem>
+        #region Overrides of EntityRepositoryBase<int,DictionaryItem>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

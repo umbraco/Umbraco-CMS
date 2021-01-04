@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
@@ -21,7 +24,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
-
             // Act
             string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Key");
 
@@ -32,7 +34,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_DatabaseType_Property()
         {
-
             // Act
             string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("DatabaseType");
 
@@ -43,7 +44,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_PropertyEditorAlias_Property()
         {
-
             // Act
             string column = new DataTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("EditorAlias");
 

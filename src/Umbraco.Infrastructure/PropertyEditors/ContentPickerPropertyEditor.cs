@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -32,8 +33,9 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizedTextService localizedTextService,
             ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper)
-            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
+            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper, jsonSerializer)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -46,11 +48,12 @@ namespace Umbraco.Web.PropertyEditors
             return new ContentPickerConfigurationEditor(_ioHelper);
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, JsonSerializer, Attribute);
 
         internal class ContentPickerPropertyValueEditor  : DataValueEditor, IDataValueReference
         {
-            public ContentPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute) : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
+            public ContentPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
             {
             }
 
