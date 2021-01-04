@@ -31,7 +31,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
             : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
         {
             _runtimeState = runtimeState;
-            _messenger = messenger as IServerMessenger ?? throw new ArgumentNullException(nameof(messenger));
+            _messenger = messenger;
             _logger = logger;
         }
 
