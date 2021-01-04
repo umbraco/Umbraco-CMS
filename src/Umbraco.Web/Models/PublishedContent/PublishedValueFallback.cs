@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.PublishedContent
         {
             _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, ref culture, ref segment);
 
-            var includeFallBackLanguage = fallback.Contains(Fallback.DisplayFallBackLanguage);
+            var includeFallbackLanguage = fallback.Contains(Fallback.DisplayFallbackLanguage);
 
             foreach (var f in fallback)
             {
@@ -48,10 +48,10 @@ namespace Umbraco.Web.Models.PublishedContent
                         value = defaultValue;
                         return true;
                     case Fallback.Language:
-                        if (TryGetValueWithLanguageFallback(property, culture, segment, out value, includeFallBackLanguage))
+                        if (TryGetValueWithLanguageFallback(property, culture, segment, out value, includeFallbackLanguage))
                             return true;
                         break;
-                    case Fallback.DisplayFallBackLanguage:
+                    case Fallback.DisplayFallbackLanguage:
                         continue;
                     default:
                         throw NotSupportedFallbackMethod(f, "property");
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models.PublishedContent
         public bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
             var propertyType = content.ContentType.GetPropertyType(alias);
-            var includeFallBackLanguage = fallback.Contains(Fallback.DisplayFallBackLanguage);
+            var includeFallbackLanguage = fallback.Contains(Fallback.DisplayFallbackLanguage);
             if (propertyType == null)
             {
                 value = default;
@@ -91,10 +91,10 @@ namespace Umbraco.Web.Models.PublishedContent
                         value = defaultValue;
                         return true;
                     case Fallback.Language:
-                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value, includeFallBackLanguage))
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value, includeFallbackLanguage))
                             return true;
                         break;
-                    case Fallback.DisplayFallBackLanguage:
+                    case Fallback.DisplayFallbackLanguage:
                         continue;
                     default:
                         throw NotSupportedFallbackMethod(f, "element");
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Models.PublishedContent
         public virtual bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value, out IPublishedProperty noValueProperty)
         {
             noValueProperty = default;
-            var includeFallBackLanguage = fallback.Contains(Fallback.DisplayFallBackLanguage);
+            var includeFallbackLanguage = fallback.Contains(Fallback.DisplayFallbackLanguage);
 
             var propertyType = content.ContentType.GetPropertyType(alias);
             if (propertyType != null)
@@ -140,14 +140,14 @@ namespace Umbraco.Web.Models.PublishedContent
                     case Fallback.Language:
                         if (propertyType == null)
                             continue;
-                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value, includeFallBackLanguage))
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value, includeFallbackLanguage))
                             return true;
                         break;
                     case Fallback.Ancestors:
-                        if (TryGetValueWithAncestorsFallback(content, alias, culture, segment, out value, ref noValueProperty, includeFallBackLanguage))
+                        if (TryGetValueWithAncestorsFallback(content, alias, culture, segment, out value, ref noValueProperty, includeFallbackLanguage))
                             return true;
                         break;
-                    case Fallback.DisplayFallBackLanguage:
+                    case Fallback.DisplayFallbackLanguage:
                         continue;
                     default:
                         throw NotSupportedFallbackMethod(f, "content");
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Models.PublishedContent
         // tries to get a value, recursing the tree
         // because we recurse, content may not even have the a property with the specified alias (but only some ancestor)
         // in case no value was found, noValueProperty contains the first property that was found (which does not have a value)
-        private bool TryGetValueWithAncestorsFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value, ref IPublishedProperty noValueProperty, bool includeFallBackLanguage)
+        private bool TryGetValueWithAncestorsFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value, ref IPublishedProperty noValueProperty, bool includeFallbackLanguage)
         {
             IPublishedProperty property; // if we are here, content's property has no value
             var originalCulture = culture;
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Models.PublishedContent
             if (property != null && property.HasValue(culture, segment))
             {
                 value = property.Value<T>(culture, segment);
-                if (includeFallBackLanguage && originalCulture != culture)
+                if (includeFallbackLanguage && originalCulture != culture)
                 {
                     value = GetMarkUpForFallbackLanguage(culture, value);
                 }
@@ -207,7 +207,7 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string culture, string segment, out T value, bool includeFallBackLanguage)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string culture, string segment, out T value, bool includeFallbackLanguage)
         {
             value = default;
 
@@ -233,7 +233,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 if (property.HasValue(culture2, segment))
                 {
                     value = property.Value<T>(culture2, segment);
-                    if (includeFallBackLanguage && culture2 != culture)
+                    if (includeFallbackLanguage && culture2 != culture)
                     {
                         value = GetMarkUpForFallbackLanguage(culture2, value);
                     }
@@ -245,7 +245,7 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string culture, string segment, out T value, bool includeFallBackLanguage)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string culture, string segment, out T value, bool includeFallbackLanguage)
         {
             value = default;
 
@@ -271,7 +271,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 if (content.HasValue(alias, culture2, segment))
                 {
                     value = content.Value<T>(alias, culture2, segment);
-                    if (includeFallBackLanguage && culture2 != culture)
+                    if (includeFallbackLanguage && culture2 != culture)
                     {
                         value = GetMarkUpForFallbackLanguage(culture2, value);
                     }
@@ -283,7 +283,7 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value, bool includeFallBackLanguage)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value, bool includeFallbackLanguage)
         {
             value = default;
 
@@ -312,7 +312,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 if (content.HasValue(alias, culture2, segment))
                 {
                     value = content.Value<T>(alias, culture2, segment);
-                    if (includeFallBackLanguage && culture2 != culture)
+                    if (includeFallbackLanguage && culture2 != culture)
                     {
                         value = GetMarkUpForFallbackLanguage(culture2, value);
 
