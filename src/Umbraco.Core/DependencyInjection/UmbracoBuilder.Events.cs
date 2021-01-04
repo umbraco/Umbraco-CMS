@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.DependencyInjection
@@ -23,7 +24,15 @@ namespace Umbraco.Core.DependencyInjection
             where TNotification : INotification
         {
             // Register the handler as transient. This ensures that anything can be injected into it.
-            builder.Services.AddTransient(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler));
+            var descriptor = new ServiceDescriptor(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler), ServiceLifetime.Transient);
+
+            // TODO: Waiting on feedback here https://github.com/umbraco/Umbraco-CMS/pull/9556/files#r548365396 about whether
+            // we perform this duplicate check or not.
+            if (!builder.Services.Contains(descriptor))
+            {
+                builder.Services.Add(descriptor);
+            }
+
             return builder;
         }
     }

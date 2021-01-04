@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Net;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Runtime

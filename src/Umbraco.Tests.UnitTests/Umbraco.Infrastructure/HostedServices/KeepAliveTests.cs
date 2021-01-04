@@ -81,8 +81,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockRequestAccessor = new Mock<IRequestAccessor>();
             mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(new Uri(ApplicationUrl));
 
-            var mockServerRegistrar = new Mock<IServerRegistrar>();
-            mockServerRegistrar.Setup(x => x.GetCurrentServerRole()).Returns(serverRole);
+            var mockServerRegistrar = new Mock<IServerRoleAccessor>();
+            mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
 
             var mockMainDom = new Mock<IMainDom>();
             mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);

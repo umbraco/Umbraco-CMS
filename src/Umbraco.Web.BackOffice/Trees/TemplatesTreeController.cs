@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
+using Umbraco.Core.Trees;
 using Umbraco.Extensions;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Filters;

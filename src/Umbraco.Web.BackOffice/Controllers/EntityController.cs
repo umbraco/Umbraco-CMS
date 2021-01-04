@@ -31,6 +31,7 @@ using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Core.Trees;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

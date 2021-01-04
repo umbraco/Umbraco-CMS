@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.BackOffice.Security;
@@ -46,6 +47,7 @@ namespace Umbraco.Web.UI.NetCore
             services.AddUmbraco(_env, _config)
                 .AddBackOffice()
                 .AddWebsite()
+                .AddComposers()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 

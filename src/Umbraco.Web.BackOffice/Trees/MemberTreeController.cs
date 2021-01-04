@@ -22,6 +22,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Core.Trees;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
