@@ -24,8 +24,9 @@ namespace Umbraco.Core.DependencyInjection
             where TNotification : INotification
         {
             // Register the handler as transient. This ensures that anything can be injected into it.
-            // TODO: Waiting on feedback here https://github.com/umbraco/Umbraco-CMS/pull/9556/files#r548365396
-            builder.Services.TryAddTransient(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler));
+            // TODO: Waiting on feedback here for TryAddTransient https://github.com/umbraco/Umbraco-CMS/pull/9556/files#r548365396
+            // ... though this will fail tests so it's not the final answer so we'll see where that discussion goes.
+            builder.Services.AddTransient(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler));
             return builder;
         }
     }

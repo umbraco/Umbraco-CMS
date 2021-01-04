@@ -25,6 +25,7 @@ using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -156,6 +157,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
+                .AddWebsite()
                 .AddTestServices(TestHelper) // This is the important one!
                 .Build();
         }
