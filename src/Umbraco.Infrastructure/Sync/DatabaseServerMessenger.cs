@@ -25,9 +25,6 @@ namespace Umbraco.Core.Sync
     /// </summary>
     public abstract class DatabaseServerMessenger : ServerMessengerBase
     {
-        // TODO: This class is never used directly, only BatchedDatabaseServerMessenger is used so
-        // this could/should be combined with that or made abstract and/or just cleaned up.
-
         // TODO: This class needs to be split into a service/repo for DB access
 
         /*
@@ -55,7 +52,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServerMessenger"/> class.
         /// </summary>
-        public DatabaseServerMessenger(
+        protected DatabaseServerMessenger(
             IMainDom mainDom,
             IScopeProvider scopeProvider,
             IProfilingLogger proflog,
