@@ -43,8 +43,6 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
 
-            builder.AddDistributedCache();
-
             return builder;
         }
 
