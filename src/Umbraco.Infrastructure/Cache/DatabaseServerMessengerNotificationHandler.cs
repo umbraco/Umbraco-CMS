@@ -70,7 +70,10 @@ namespace Umbraco.Infrastructure.Cache
         }
 
         // TODO: I don't really know or think that the Application Url plays a role anymore with the DB dist cache,
-        // this might be really old stuff
+        // this might be really old stuff. I 'think' all this is doing is ensuring that the IRequestAccessor.GetApplicationUrl
+        // is definitely called during the first request. If that is still required, that logic doesn't belong here. That logic
+        // should be part of it's own service/middleware. There's also TODO notes within IRequestAccessor.GetApplicationUrl directly
+        // mentioning that the property doesn't belong on that service either. This should be investigated and resolved in a separate task.
         private void EnsureApplicationUrlOnce(object sender, RoutableAttemptEventArgs e)
         {
             if (e.Outcome == EnsureRoutableOutcome.IsRoutable || e.Outcome == EnsureRoutableOutcome.NotDocumentRequest)
