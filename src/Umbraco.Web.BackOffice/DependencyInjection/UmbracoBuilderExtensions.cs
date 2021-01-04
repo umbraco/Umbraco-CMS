@@ -149,7 +149,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             builder.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
-            builder.ComposeWebMappingProfiles();
+            builder.AddWebMappingProfiles();
 
             builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
             {

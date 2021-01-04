@@ -25,6 +25,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.DependencyInjection;
@@ -223,7 +224,14 @@ namespace Umbraco.Tests.Integration.Testing
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddTestServices(TestHelper, GetAppCaches());
-                //.AddComposers();
+
+            if (TestOptions.Mapper)
+            {
+                // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
+                builder
+                    .AddCoreMappingProfiles()
+                    .AddWebMappingProfiles();
+            }
 
             services.AddSignalR();
             services.AddMvc();
