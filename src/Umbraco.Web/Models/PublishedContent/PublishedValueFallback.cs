@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -326,8 +327,20 @@ namespace Umbraco.Web.Models.PublishedContent
 
         private T GetMarkUpForFallbackLanguage<T>(string culture2, T value)
         {
-            var newValue ="<span lang=\"" + culture2 + "\">" + value + "</span>";
-            return (T)Convert.ChangeType(newValue, typeof(T));
+            var typeOfT = typeof(T);
+            if (typeOfT.Name== "string" || typeOfT.Name== "IHtmlString")
+            { 
+                var newValue ="<span lang=\"" + culture2 + "\">" + value + "</span>";
+                if (typeOfT.Name == "string")
+                {
+                    return (T)Convert.ChangeType(newValue, typeof(T));
+                }
+
+                var htmlString = new MvcHtmlString(newValue);
+                return (T) (IHtmlString)htmlString;
+            }
+
+            return value;
         }
     }
 }
