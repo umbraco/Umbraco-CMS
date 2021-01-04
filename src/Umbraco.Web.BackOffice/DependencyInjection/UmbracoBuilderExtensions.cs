@@ -43,7 +43,8 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddMvcAndRazor()
                 .AddWebServer()
                 .AddPreviewSupport()
-                .AddHostedServices();
+                .AddHostedServices()
+                .AddDistributedCache();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
