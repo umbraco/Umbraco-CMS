@@ -170,7 +170,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This only works when the user is logged in (partially)
         /// </remarks>
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController
+        [AllowAnonymous]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());

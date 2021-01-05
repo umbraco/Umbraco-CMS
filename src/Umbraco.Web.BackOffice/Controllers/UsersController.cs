@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -39,9 +38,6 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -548,9 +544,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 token.ToUrlBase64());
 
             // Get an mvc helper to get the URL
-            var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.VerifyInvite),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
+                new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     invite = inviteToken
                 });
 
