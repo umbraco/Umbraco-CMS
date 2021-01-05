@@ -336,7 +336,7 @@ namespace Umbraco.Core.Runtime
             {
                 try
                 {
-                    _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
+                    _state.DetermineRuntimeLevel(databaseFactory);
 
                     profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 

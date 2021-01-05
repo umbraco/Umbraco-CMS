@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 using Umbraco.Core.Cache;
@@ -42,14 +43,8 @@ namespace Umbraco.Core
             set => _installMissingDatabase = value;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the runtime should enter Install level when the database is empty.
-        /// </summary>
-        /// <remarks>
-        /// <para>By default, when a database connection string is configured and it is possible to connect to
-        /// the database, but the database is empty, the runtime enters the <c>Install</c> level. If this options
-        /// is set to <c>false</c>, it enters the <c>BootFailed</c> level instead.</para>
-        /// </remarks>
+        [Obsolete("This setting is no longer used and will be removed in future versions. If a database connection string is configured and the database is empty Umbraco will be installed during the installation sequence.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool InstallEmptyDatabase
         {
             get => _installEmptyDatabase ?? BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", true);

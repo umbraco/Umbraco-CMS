@@ -401,7 +401,7 @@ namespace Umbraco.Core.Runtime
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
 
-                        if (_dbFactory.Configured)
+                        if (_dbFactory.Configured && _hasTable)
                         {
                             using var db = _dbFactory.CreateDatabase();
                             using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);

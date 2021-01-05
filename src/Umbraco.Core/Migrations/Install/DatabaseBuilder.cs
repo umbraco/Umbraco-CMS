@@ -446,11 +446,9 @@ namespace Umbraco.Core.Migrations.Install
 
                 var schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
-                //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
-                //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
-                //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && !hasInstalledVersion)
+                //If the determined version is "empty" its a new install - otherwise upgrade the existing
+                if (!hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
