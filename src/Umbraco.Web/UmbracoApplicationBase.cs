@@ -68,10 +68,10 @@ namespace Umbraco.Web
             {
                 // should let it be null, that's how MiniProfiler is meant to work,
                 // but our own IProfiler expects an instance so let's get one
-                return new VoidProfiler();
+                return new NoopProfiler();
             }
 
-            return new VoidProfiler();
+            return new NoopProfiler();
         }
 
         protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, ILoggerFactory loggerFactory, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)

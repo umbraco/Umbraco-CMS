@@ -6,9 +6,9 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
-using Umbraco.Net;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

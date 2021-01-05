@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Net;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
@@ -18,8 +18,6 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Common.Install
 {
-    using Constants = Umbraco.Core.Constants;
-
     [UmbracoApiController]
     [TypeFilter(typeof(HttpResponseExceptionFilter))]
     [AngularJsonOnlyConfiguration]

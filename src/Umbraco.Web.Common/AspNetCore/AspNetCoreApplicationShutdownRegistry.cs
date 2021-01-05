@@ -13,10 +13,11 @@ namespace Umbraco.Web.Common.AspNetCore
         private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
             new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AspNetCoreApplicationShutdownRegistry"/> class.
+        /// </summary>
         public AspNetCoreApplicationShutdownRegistry(IHostApplicationLifetime hostApplicationLifetime)
-        {
-            _hostApplicationLifetime = hostApplicationLifetime;
-        }
+            => _hostApplicationLifetime = hostApplicationLifetime;
 
         public void RegisterObject(IRegisteredObject registeredObject)
         {
@@ -43,17 +44,11 @@ namespace Umbraco.Web.Common.AspNetCore
         {
             private readonly IRegisteredObject _inner;
 
-            public RegisteredObjectWrapper(IRegisteredObject inner)
-            {
-                _inner = inner;
-            }
+            public RegisteredObjectWrapper(IRegisteredObject inner) => _inner = inner;
 
             public CancellationTokenRegistration CancellationTokenRegistration { get; set; }
 
-            public void Stop(bool immediate)
-            {
-                _inner.Stop(immediate);
-            }
+            public void Stop(bool immediate) => _inner.Stop(immediate);
         }
     }
 }

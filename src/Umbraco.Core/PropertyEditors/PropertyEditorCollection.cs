@@ -1,11 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
-
-
     public class PropertyEditorCollection : BuilderCollectionBase<IDataEditor>
     {
         public PropertyEditorCollection(DataEditorCollection dataEditors, IManifestParser manifestParser)

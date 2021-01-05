@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
 using Umbraco.Core;
@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// used dynamically.
     /// </summary>
     [DefaultPropertyValueConverter]
-    public class RteMacroRenderingValueConverter : TinyMceValueConverter
+    public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;

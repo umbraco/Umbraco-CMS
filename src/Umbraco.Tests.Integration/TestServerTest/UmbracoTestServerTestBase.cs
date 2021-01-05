@@ -16,6 +16,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
+using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -24,6 +25,7 @@ using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -135,9 +137,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
             builder
                 .AddConfiguration()
-                .AddTestCore(TestHelper) // This is the important one!
+                .AddUmbracoCore()
                 .AddWebComponents()
                 .AddRuntimeMinifier()
+                .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
@@ -154,7 +157,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
                 })
                 .AddWebServer()
-                .AddNuCache()
+                .AddWebsite()
+                .AddTestServices(TestHelper) // This is the important one!
                 .Build();
         }
 

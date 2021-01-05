@@ -5,16 +5,13 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
@@ -53,8 +50,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             FileService.SaveTemplate(_contentType.DefaultTemplate);
             ContentTypeService.Save(_contentType);
         }
-
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddNuCache();
 
         [TearDown]
         public void TearDownTest()
@@ -2170,6 +2165,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             public LocalServerMessenger() : base(false)
             { }
+
+            public override void SendMessages() { }
+
+            public override void Sync() { }
 
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {

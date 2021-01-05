@@ -46,7 +46,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
 
-            _serverMessenger.PerformRefresh(
+            _serverMessenger.QueueRefresh(
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            _serverMessenger.PerformRefresh(
+            _serverMessenger.QueueRefresh(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == Guid.Empty) return;
 
-            _serverMessenger.PerformRefresh(
+            _serverMessenger.QueueRefresh(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payload == null) return;
 
-            _serverMessenger.PerformRefresh(
+            _serverMessenger.QueueRefresh(
                 GetRefresherById(refresherGuid),
                 payload);
         }
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payloads == null) return;
 
-            _serverMessenger.PerformRefresh(
+            _serverMessenger.QueueRefresh(
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
         }
@@ -125,7 +125,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty) return;
 
-            _serverMessenger.PerformRefreshAll(
+            _serverMessenger.QueueRefreshAll(
                 GetRefresherById(refresherGuid));
         }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            _serverMessenger.PerformRemove(
+            _serverMessenger.QueueRemove(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Cache
         /// </remarks>
         public void Remove<T>(Guid refresherGuid, Func<T, int> getNumericId, params T[] instances)
         {
-            _serverMessenger.PerformRemove(
+            _serverMessenger.QueueRemove(
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);
@@ -164,9 +164,15 @@ namespace Umbraco.Web.Cache
         #endregion
 
         // helper method to get an ICacheRefresher by its unique identifier
-        private  ICacheRefresher GetRefresherById(Guid refresherGuid)
+        private ICacheRefresher GetRefresherById(Guid refresherGuid)
         {
-            return _cacheRefreshers[refresherGuid];
+            ICacheRefresher refresher = _cacheRefreshers[refresherGuid];
+            if (refresher == null)
+            {
+                throw new InvalidOperationException($"No cache refresher found with id {refresherGuid}");
+            }
+
+            return refresher;
         }
     }
 }

@@ -25,10 +25,13 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.DependencyInjection;
@@ -212,28 +215,30 @@ namespace Umbraco.Tests.Integration.Testing
                 TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
 
-
             builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
-                .AddUmbracoCore();
+                .AddUmbracoCore()
+                .AddWebComponents()
+                .AddRuntimeMinifier()
+                .AddBackOfficeAuthentication()
+                .AddBackOfficeIdentity()
+                .AddTestServices(TestHelper, GetAppCaches());
 
-            builder.Services.AddUnique<AppCaches>(GetAppCaches());
-            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
-            builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
+            if (TestOptions.Mapper)
+            {
+                // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
+                builder
+                    .AddCoreMappingProfiles()
+                    .AddWebMappingProfiles();
+            }
 
             services.AddSignalR();
-
-            builder.AddWebComponents();
-            builder.AddRuntimeMinifier();
-            builder.AddBackOfficeAuthentication();
-            builder.AddBackOfficeIdentity();
-
             services.AddMvc();
 
-            builder.Build();
-
             CustomTestSetup(builder);
+
+            builder.Build();
         }
 
         protected virtual AppCaches GetAppCaches()

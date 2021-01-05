@@ -24,7 +24,7 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly KeepAliveSettings _keepAliveSettings;
         private readonly ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IHttpClientFactory _httpClientFactory;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Infrastructure.HostedServices
             IOptions<KeepAliveSettings> keepAliveSettings,
             ILogger<KeepAlive> logger,
             IProfilingLogger profilingLogger,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             IHttpClientFactory httpClientFactory)
             : base(TimeSpan.FromMinutes(5), DefaultDelay)
         {
@@ -64,7 +64,7 @@ namespace Umbraco.Infrastructure.HostedServices
             }
 
             // Don't run on replicas nor unknown role servers
-            switch (_serverRegistrar.GetCurrentServerRole())
+            switch (_serverRegistrar.CurrentServerRole)
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");

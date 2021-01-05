@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Web.Routing;
 

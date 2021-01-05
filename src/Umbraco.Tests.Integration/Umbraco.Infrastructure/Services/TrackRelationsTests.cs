@@ -19,8 +19,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         Boot = true)]
     public class TrackRelationsTests : UmbracoIntegrationTestWithContent
     {
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddNuCache();
-
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
