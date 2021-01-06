@@ -199,7 +199,6 @@
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
-    <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
