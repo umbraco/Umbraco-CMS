@@ -39,7 +39,6 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Routing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -652,14 +651,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [OutgoingEditorModelEvent]
-        public async Task<ContentItemDisplay> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
                 content => _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id),
                 MapToDisplay);
 
-            return contentItemDisplay.Value;
+            return contentItemDisplay;
         }
 
         private async Task<ActionResult<ContentItemDisplay>> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
