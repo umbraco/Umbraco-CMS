@@ -129,7 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
-    <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
@@ -313,6 +312,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

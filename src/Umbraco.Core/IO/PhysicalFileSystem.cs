@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Composing;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.IO
@@ -177,7 +175,7 @@ namespace Umbraco.Core.IO
         /// <param name="path">The filesystem-relative path of the directory.</param>
         /// <param name="filter">A filter.</param>
         /// <returns>The filesystem-relative path to the matching files in the directory.</returns>
-        /// <remarks>Filesystem-relative paths use forward-slashes as directory separators.</remarks>
+        /// <remarks>Filesystem-relative paths use forward-slashes as directory separators.</remarks> //TODO check is this is true on linux and windows..
         public IEnumerable<string> GetFiles(string path, string filter)
         {
             var fullPath = GetFullPath(path);
