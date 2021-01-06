@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Data.SqlServerCe;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence
@@ -14,11 +16,11 @@ namespace Umbraco.Tests.Persistence
     [TestFixture]
     [Timeout(60000)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-    public class LocksTests : TestWithDatabaseBase
+    public class LocksTests : UmbracoIntegrationTest
     {
-        protected override void Initialize()
+        [SetUp]
+        protected void SetUp()
         {
-            base.Initialize();
 
             // create a few lock objects
             using (var scope = ScopeProvider.CreateScope())
@@ -200,7 +202,7 @@ namespace Umbraco.Tests.Persistence
             thread2.Join();
 
             Assert.IsNotNull(e1);
-            Assert.IsInstanceOf<SqlCeLockTimeoutException>(e1);
+            AssertIsSqlLockException(e1);
 
             // the assertion below depends on timing conditions - on a fast enough environment,
             // thread1 dies (deadlock) and frees thread2, which succeeds - however on a slow
@@ -209,9 +211,18 @@ namespace Umbraco.Tests.Persistence
             //
             //Assert.IsNull(e2);
             if (e2 != null)
-                Assert.IsInstanceOf<SqlCeLockTimeoutException>(e2);
+            {
+                AssertIsSqlLockException(e2);
+            }
+
         }
 
+        private void AssertIsSqlLockException(Exception e)
+        {
+            var sqlException = e as SqlException;
+            Assert.IsNotNull(sqlException);
+            Assert.AreEqual(1222, sqlException.Number);
+        }
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -304,11 +315,18 @@ namespace Umbraco.Tests.Persistence
         private void WriteLocks(IDatabaseQuery database)
         {
             Console.WriteLine("LOCKS:");
-            var info = database.Query<dynamic>("SELECT * FROM sys.lock_information;").ToList();
+            var info = database.Query<dynamic>("SELECT * FROM sys.dm_tran_locks;").ToList();
+            var sb = new StringBuilder("> ");
             foreach (var row in info)
-                Console.WriteLine(string.Format("> {0} {1} {2} {3} {4} {5} {6}", row.request_spid,
-                    row.resource_type, row.resource_description, row.request_mode, row.resource_table,
-                    row.resource_table_id, row.request_status));
+            {
+                if (row is IDictionary<string, object> values)
+                {
+                    sb.AppendJoin(", ", values);
+                }
+                sb.AppendLine(string.Empty);
+            }
+            Console.WriteLine(sb.ToString());
+
         }
     }
 }
