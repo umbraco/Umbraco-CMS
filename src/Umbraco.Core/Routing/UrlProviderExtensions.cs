@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -175,35 +175,43 @@ namespace Umbraco.Web.Routing
         {
             // test for collisions on the 'main' URL
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
-            if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
+            if (uri.IsAbsoluteUri == false)
+            {
+                uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
+            }
+
             uri = uriUtility.UriToUmbraco(uri);
-            var pcr = publishedRouter.CreateRequest(umbracoContext, uri);
+            IPublishedRequestBuilder pcr = publishedRouter.CreateRequest(uri);
             publishedRouter.TryRouteRequest(pcr);
 
             urlInfo = null;
 
-            if (pcr.HasPublishedContent == false)
+            if (pcr.PublishedContent == null)
             {
                 urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
                 return true;
             }
 
-            if (pcr.IgnorePublishedContentCollisions)
-                return false;
+            // TODO: What is this?
+            //if (pcr.IgnorePublishedContentCollisions)
+            //{
+            //    return false;
+            //}
 
             if (pcr.PublishedContent.Id != content.Id)
             {
-                var o = pcr.PublishedContent;
+                IPublishedContent o = pcr.PublishedContent;
                 var l = new List<string>();
                 while (o != null)
                 {
                     l.Add(o.Name(variationContextAccessor));
                     o = o.Parent;
                 }
+
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                 urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
+                urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
                 return true;
             }
 

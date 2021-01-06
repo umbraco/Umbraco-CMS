@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -93,15 +93,14 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal PublishedRouter CreatePublishedRouter(IServiceProvider container = null, ContentFinderCollection contentFinders = null)
+        internal PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor, IServiceProvider container = null, ContentFinderCollection contentFinders = null)
         {
             var webRoutingSettings = new WebRoutingSettings();
-            return CreatePublishedRouter(webRoutingSettings, container ?? Factory, contentFinders);
+            return CreatePublishedRouter(umbracoContextAccessor, webRoutingSettings, container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(WebRoutingSettings webRoutingSettings, IServiceProvider container = null, ContentFinderCollection contentFinders = null)
-        {
-            return new PublishedRouter(
+        internal static PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor, WebRoutingSettings webRoutingSettings, IServiceProvider container = null, ContentFinderCollection contentFinders = null)
+            => new PublishedRouter(
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
@@ -111,11 +110,11 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
-                container?.GetRequiredService<IPublicAccessChecker>()?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
-                container?.GetRequiredService<IFileService>()?? Current.Factory.GetRequiredService<IFileService>(),
+                container?.GetRequiredService<IPublicAccessChecker>() ?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
+                container?.GetRequiredService<IFileService>() ?? Current.Factory.GetRequiredService<IFileService>(),
                 container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
-                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>()
+                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>(),
+                umbracoContextAccessor
             );
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -57,15 +57,15 @@ namespace Umbraco.Tests.Routing
             //SetDomains1();
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var publishedRouter = CreatePublishedRouter();
-            var request = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var request = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
             // must lookup domain
             publishedRouter.FindDomain(request);
 
             if (expectedNode > 0)
                 Assert.AreEqual(expectedCulture, request.Culture.Name);
 
-            var finder = new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
+            var finder = new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)

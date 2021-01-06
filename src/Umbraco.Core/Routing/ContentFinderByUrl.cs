@@ -14,44 +14,70 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger<ContentFinderByUrl> _logger;
 
-        public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByUrl"/> class.
+        /// </summary>
+        public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _logger = logger;
+            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            UmbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
         }
+
+        /// <summary>
+        /// Gets the <see cref="IUmbracoContextAccessor"/>
+        /// </summary>
+        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
         /// <summary>
         /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public virtual bool TryFindContent(IPublishedRequest frequest)
+        public virtual bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            string route;
-            if (frequest.HasDomain)
-                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
-            else
-                route = frequest.Uri.GetAbsolutePathDecoded();
+            IUmbracoContext umbCtx = UmbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null)
+            {
+                return false;
+            }
 
-            var node = FindContent(frequest, route);
+            string route;
+            if (frequest.Domain != null)
+            {
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
+            }
+            else
+            {
+                route = frequest.Uri.GetAbsolutePathDecoded();
+            }
+
+            IPublishedContent node = FindContent(frequest, route);
             return node != null;
         }
 
         /// <summary>
         /// Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
         /// </summary>
-        /// <param name="docreq">The document request.</param>
-        /// <param name="route">The route.</param>
         /// <returns>The document node, or null.</returns>
-        protected IPublishedContent FindContent(IPublishedRequest docreq, string route)
+        protected IPublishedContent FindContent(IPublishedRequestBuilder docreq, string route)
         {
-            if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
+            IUmbracoContext umbCtx = UmbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null)
+            {
+                return null;
+            }
+
+            if (docreq == null)
+            {
+                throw new System.ArgumentNullException(nameof(docreq));
+            }
 
             _logger.LogDebug("Test route {Route}", route);
 
-            var node = docreq.UmbracoContext.Content.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
+            IPublishedContent node = umbCtx.Content.GetByRoute(umbCtx.InPreviewMode, route, culture: docreq.Culture?.Name);
             if (node != null)
             {
-                docreq.PublishedContent = node;
+                docreq.SetPublishedContent(node);
                 _logger.LogDebug("Got content, id={NodeId}", node.Id);
             }
             else

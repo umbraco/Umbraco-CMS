@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -48,10 +48,10 @@ namespace Umbraco.Tests.Routing
         public void Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
             var lookup =
-                new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
+                new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
 
             var result = lookup.TryFindContent(frequest);
 

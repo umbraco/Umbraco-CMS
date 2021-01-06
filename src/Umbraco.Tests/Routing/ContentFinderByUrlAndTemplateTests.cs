@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
@@ -32,17 +32,24 @@ namespace Umbraco.Tests.Routing
             var template1 = CreateTemplate("test");
             var template2 = CreateTemplate("blah");
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings: globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var reqBuilder = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
-            var lookup = new ContentFinderByUrlAndTemplate(LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(), ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+            var lookup = new ContentFinderByUrlAndTemplate(
+                LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(),
+                ServiceContext.FileService,
+                ServiceContext.ContentTypeService,
+                GetUmbracoContextAccessor(umbracoContext),
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
 
-            var result = lookup.TryFindContent(frequest);
+            var result = lookup.TryFindContent(reqBuilder);
+
+            IPublishedRequest frequest = reqBuilder.Build();
 
             Assert.IsTrue(result);
             Assert.IsNotNull(frequest.PublishedContent);
-            Assert.IsNotNull(frequest.TemplateAlias);
-            Assert.AreEqual("blah".ToUpperInvariant(), frequest.TemplateAlias.ToUpperInvariant());
+            Assert.IsNotNull(frequest.GetTemplateAlias());
+            Assert.AreEqual("blah".ToUpperInvariant(), frequest.GetTemplateAlias().ToUpperInvariant());
         }
     }
 }

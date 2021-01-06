@@ -20,12 +20,21 @@ namespace Umbraco.Web.Routing
     {
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger<ContentFinderByUrlAlias> _logger;
 
-        public ContentFinderByUrlAlias(ILogger<ContentFinderByUrlAlias> logger, IPublishedValueFallback publishedValueFallback, IVariationContextAccessor variationContextAccessor)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByUrlAlias"/> class.
+        /// </summary>
+        public ContentFinderByUrlAlias(
+            ILogger<ContentFinderByUrlAlias> logger,
+            IPublishedValueFallback publishedValueFallback,
+            IVariationContextAccessor variationContextAccessor,
+            IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedValueFallback = publishedValueFallback;
             _variationContextAccessor = variationContextAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
         }
 
@@ -34,21 +43,29 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(IPublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
+            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null)
+            {
+                return false;
+            }
+
             IPublishedContent node = null;
 
-            if (frequest.Uri.AbsolutePath != "/") // no alias if "/"
+            // no alias if "/"
+            if (frequest.Uri.AbsolutePath != "/")
             {
-                node = FindContentByAlias(frequest.UmbracoContext.Content,
-                    frequest.HasDomain ? frequest.Domain.ContentId : 0,
+                node = FindContentByAlias(
+                    umbCtx.Content,
+                    frequest.Domain != null ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
                     frequest.Uri.GetAbsolutePathDecoded());
 
                 if (node != null)
                 {
-                    frequest.PublishedContent = node;
-                    _logger.LogDebug("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
+                    frequest.SetPublishedContent(node);
+                    _logger.LogDebug("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, node.Id);
                 }
             }
 
@@ -57,7 +74,10 @@ namespace Umbraco.Web.Routing
 
         private IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
         {
-            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (alias == null)
+            {
+                throw new ArgumentNullException(nameof(alias));
+            }
 
             // the alias may be "foo/bar" or "/foo/bar"
             // there may be spaces as in "/foo/bar,  /foo/nil"
@@ -65,7 +85,6 @@ namespace Umbraco.Web.Routing
 
             // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
-
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
             var test1 = alias.TrimStart('/') + ",";
@@ -80,38 +99,52 @@ namespace Umbraco.Web.Routing
                 // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
                 // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
                 // ")]"
+                if (!c.HasProperty(propertyAlias))
+                {
+                    return false;
+                }
 
-                if (!c.HasProperty(propertyAlias)) return false;
-                var p = c.GetProperty(propertyAlias);
+                IPublishedProperty p = c.GetProperty(propertyAlias);
                 var varies = p.PropertyType.VariesByCulture();
                 string v;
                 if (varies)
                 {
-                    if (!c.HasCulture(culture)) return false;
+                    if (!c.HasCulture(culture))
+                    {
+                        return false;
+                    }
+
                     v = c.Value<string>(_publishedValueFallback, propertyAlias, culture);
                 }
                 else
                 {
                     v = c.Value<string>(_publishedValueFallback, propertyAlias);
                 }
-                if (string.IsNullOrWhiteSpace(v)) return false;
-                v = "," + v.Replace(" ", "") + ",";
+
+                if (string.IsNullOrWhiteSpace(v))
+                {
+                    return false;
+                }
+
+                v = "," + v.Replace(" ", string.Empty) + ",";
                 return v.InvariantContains(a1) || v.InvariantContains(a2);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
             // but the only solution is to entirely refactor URL providers to stop being dynamic
-
             if (rootNodeId > 0)
             {
-                var rootNode = cache.GetById(rootNodeId);
+                IPublishedContent rootNode = cache.GetById(rootNodeId);
                 return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
             }
 
-            foreach (var rootContent in cache.GetAtRoot())
+            foreach (IPublishedContent rootContent in cache.GetAtRoot())
             {
-                var c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
-                if (c != null) return c;
+                IPublishedContent c = rootContent.DescendantsOrSelf(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+                if (c != null)
+                {
+                    return c;
+                }
             }
 
             return null;

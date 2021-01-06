@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Routing
 
             // get the nice URL for 100111
             var umbracoContext = GetUmbracoContext(url, 9999, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            var umbracoContextAccessor = GetUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
@@ -59,14 +59,14 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
             // route a rogue URL
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             publishedRouter.FindDomain(frequest);
-            Assert.IsTrue(frequest.HasDomain);
+            Assert.IsTrue(frequest.HasDomain());
 
             // check that it's been routed
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);

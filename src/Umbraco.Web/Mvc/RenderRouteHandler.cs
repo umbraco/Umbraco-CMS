@@ -219,7 +219,7 @@ namespace Umbraco.Web.Mvc
 
             var defaultControllerType = Current.DefaultRenderMvcControllerType;
             var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
-            //creates the default route definition which maps to the 'UmbracoController' controller
+            // creates the default route definition which maps to the 'UmbracoController' controller
             var def = new RouteDefinition
                 {
                     ControllerName = defaultControllerName,
@@ -229,28 +229,28 @@ namespace Umbraco.Web.Mvc
                     HasHijackedRoute = false
                 };
 
-            //check that a template is defined), if it doesn't and there is a hijacked route it will just route
+            // check that a template is defined), if it doesn't and there is a hijacked route it will just route
             // to the index Action
-            if (request.HasTemplate)
+            if (request.HasTemplate())
             {
-                //the template Alias should always be already saved with a safe name.
-                //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                // the template Alias should always be already saved with a safe name.
+                // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias(_shortStringHelper);
+                var templateName = request.GetTemplateAlias().Split('.')[0].ToSafeAlias(_shortStringHelper);
                 def.ActionName = templateName;
             }
 
-            //check if there's a custom controller assigned, base on the document type alias.
+            // check if there's a custom controller assigned, base on the document type alias.
             var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, request.PublishedContent.ContentType.Alias);
 
-            //check if that controller exists
+            // check if that controller exists
             if (controllerType != null)
             {
-                //ensure the controller is of type IRenderMvcController and ControllerBase
+                // ensure the controller is of type IRenderMvcController and ControllerBase
                 if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType)
                     && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
                 {
-                    //set the controller and name to the custom one
+                    // set the controller and name to the custom one
                     def.ControllerType = controllerType;
                     def.ControllerName = ControllerExtensions.GetControllerName(controllerType);
                     if (def.ControllerName != defaultControllerName)
@@ -266,12 +266,12 @@ namespace Umbraco.Web.Mvc
                         typeof(IRenderController).FullName,
                         typeof(ControllerBase).FullName);
 
-                    //we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
+                    // we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
                     // that have already been set above.
                 }
             }
 
-            //store the route definition
+            // store the route definition
             requestContext.RouteData.Values[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
             return def;
@@ -284,15 +284,19 @@ namespace Umbraco.Web.Mvc
             // missing template, so we're in a 404 here
             // so the content, if any, is a custom 404 page of some sort
 
-            if (request.HasPublishedContent == false)
+            if (request.HasPublishedContent() == false)
+            {
                 // means the builder could not find a proper document to handle 404
                 return new PublishedContentNotFoundHandler();
+            }
 
-            if (request.HasTemplate == false)
+            if (request.HasTemplate() == false)
+            {
                 // means the engine could find a proper document, but the document has no template
                 // at that point there isn't much we can do and there is no point returning
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
+            }
 
             return null;
         }
@@ -300,8 +304,6 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// this will determine the controller and set the values in the route data
         /// </summary>
-        /// <param name="requestContext"></param>
-        /// <param name="request"></param>
         internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, IPublishedRequest request)
         {
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
@@ -309,7 +311,7 @@ namespace Umbraco.Web.Mvc
 
             var routeDef = GetUmbracoRouteDefinition(requestContext, request);
 
-            //Need to check for a special case if there is form data being posted back to an Umbraco URL
+            // Need to check for a special case if there is form data being posted back to an Umbraco URL
             var postedInfo = GetFormInfo(requestContext);
             if (postedInfo != null)
             {
@@ -321,10 +323,11 @@ namespace Umbraco.Web.Mvc
             // if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
             // We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
             // for example for json rendering in headless.
-            if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
-                && routeDef.HasHijackedRoute == false)
+            if (request.HasTemplate() == false && Features.Disabled.DisableTemplates == false && routeDef.HasHijackedRoute == false)
             {
-                request.UpdateToNotFound(); // request will go 404
+
+                // TODO: Handle this differently
+                // request.UpdateToNotFound(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.

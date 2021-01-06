@@ -135,16 +135,15 @@ namespace Umbraco.Web
 
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
-            var request = _publishedRouter.CreateRequest(umbracoContext);
-            umbracoContext.PublishedRequest = request;
-            _publishedRouter.PrepareRequest(request);
+            var requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
 
             // HandleHttpResponseStatus returns a value indicating that the request should
             // not be processed any further, eg because it has been redirect. then, exit.
             if (UmbracoModule.HandleHttpResponseStatus(httpContext, request, _logger))
                 return;
 
-            if (request.HasPublishedContent == false)
+            if (request.HasPublishedContent() == false)
                 httpContext.RemapHandler(new PublishedContentNotFoundHandler());
             else
                 RewriteToUmbracoHandler(httpContext, request);

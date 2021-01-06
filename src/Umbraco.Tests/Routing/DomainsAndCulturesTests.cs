@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
@@ -268,15 +268,15 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);
@@ -316,14 +316,14 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
 
             // find document
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
@@ -369,8 +369,8 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
@@ -378,7 +378,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);

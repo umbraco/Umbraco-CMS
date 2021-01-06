@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -133,13 +133,13 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
@@ -174,14 +174,14 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);

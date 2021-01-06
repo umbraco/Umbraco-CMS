@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -16,13 +14,10 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
 
@@ -143,12 +138,12 @@ namespace Umbraco.Web.Website.Routing
 
             // check that a template is defined), if it doesn't and there is a hijacked route it will just route
             // to the index Action
-            if (request.HasTemplate)
+            if (request.HasTemplate())
             {
                 // the template Alias should always be already saved with a safe name.
                 // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                customActionName = request.TemplateAlias.Split('.')[0].ToSafeAlias(_shortStringHelper);
+                customActionName = request.GetTemplateAlias().Split('.')[0].ToSafeAlias(_shortStringHelper);
             }
 
             // creates the default route definition which maps to the 'UmbracoController' controller
@@ -229,12 +224,12 @@ namespace Umbraco.Web.Website.Routing
 
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-            IPublishedRequest request = _publishedRouter.CreateRequest(umbracoContext);
+            IPublishedRequestBuilder requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
-            // TODO: This is ugly with the re-assignment to umbraco context also because IPublishedRequest is mutable
-            publishedRequest = umbracoContext.PublishedRequest = request;
-            bool prepared = _publishedRouter.PrepareRequest(request);
-            return prepared && request.HasPublishedContent;
+            // TODO: This is ugly with the re-assignment to umbraco context
+            publishedRequest = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
+
+            return publishedRequest.Success() && publishedRequest.HasPublishedContent();
 
             // // HandleHttpResponseStatus returns a value indicating that the request should
             // // not be processed any further, eg because it has been redirect. then, exit.

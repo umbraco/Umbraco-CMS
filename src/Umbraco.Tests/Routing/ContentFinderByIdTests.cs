@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -18,10 +18,10 @@ namespace Umbraco.Tests.Routing
         public void Lookup_By_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
-            var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), LoggerFactory.CreateLogger<ContentFinderByIdPath>(), Factory.GetRequiredService<IRequestAccessor>());
+            var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), LoggerFactory.CreateLogger<ContentFinderByIdPath>(), Factory.GetRequiredService<IRequestAccessor>(), GetUmbracoContextAccessor(umbracoContext));
 
 
             var result = lookup.TryFindContent(frequest);

@@ -1,4 +1,4 @@
-﻿using System.Web;
+using System.Web;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
@@ -31,9 +31,9 @@ namespace Umbraco.Web.Routing
 
             var frequest = Current.UmbracoContext.PublishedRequest;
             var reason = "Cannot render the page at URL '{0}'.";
-            if (frequest.HasPublishedContent == false)
+            if (frequest.HasPublishedContent() == false)
                 reason = "No umbraco document matches the URL '{0}'.";
-            else if (frequest.HasTemplate == false)
+            else if (frequest.HasTemplate() == false)
                 reason = "No template exists to render the document at URL '{0}'.";
 
             response.Write("<html><body><h1>Page not found</h1>");

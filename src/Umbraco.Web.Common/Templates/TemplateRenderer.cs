@@ -65,12 +65,13 @@ namespace Umbraco.Web.Common.Templates
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+
             // instantiate a request and process
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
-            var contentRequest = _publishedRouter.CreateRequest(umbracoContext);
+            var requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
-            var doc = contentRequest.UmbracoContext.Content.GetById(pageId);
+            var doc = umbracoContext.Content.GetById(pageId);
 
             if (doc == null)
             {
@@ -78,32 +79,37 @@ namespace Umbraco.Web.Common.Templates
                 return;
             }
 
-            //in some cases the UmbracoContext will not have a PublishedRequest assigned to it if we are not in the
-            //execution of a front-end rendered page. In this case set the culture to the default.
-            //set the culture to the same as is currently rendering
+            // in some cases the UmbracoContext will not have a PublishedRequest assigned to it if we are not in the
+            // execution of a front-end rendered page. In this case set the culture to the default.
+            // set the culture to the same as is currently rendering
             if (umbracoContext.PublishedRequest == null)
             {
                 var defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
-                contentRequest.Culture = defaultLanguage == null
+
+                requestBuilder.SetCulture(defaultLanguage == null
                     ? CultureInfo.CurrentUICulture
-                    : defaultLanguage.CultureInfo;
+                    : defaultLanguage.CultureInfo);
             }
             else
             {
-                contentRequest.Culture = umbracoContext.PublishedRequest.Culture;
+                requestBuilder.SetCulture(umbracoContext.PublishedRequest.Culture);
             }
 
-            //set the doc that was found by id
-            contentRequest.PublishedContent = doc;
-            //set the template, either based on the AltTemplate found or the standard template of the doc
+            // set the doc that was found by id
+            requestBuilder.SetPublishedContent(doc);
+
+            // set the template, either based on the AltTemplate found or the standard template of the doc
             var templateId = _webRoutingSettings.DisableAlternativeTemplates || !altTemplateId.HasValue
                 ? doc.TemplateId
                 : altTemplateId.Value;
-            if (templateId.HasValue)
-                contentRequest.TemplateModel = _fileService.GetTemplate(templateId.Value);
 
-            //if there is not template then exit
-            if (contentRequest.HasTemplate == false)
+            if (templateId.HasValue)
+            {
+                requestBuilder.SetTemplate(_fileService.GetTemplate(templateId.Value));
+            }
+
+            // if there is not template then exit
+            if (requestBuilder.HasTemplate() == false)
             {
                 if (altTemplateId.HasValue == false)
                 {
@@ -113,24 +119,27 @@ namespace Umbraco.Web.Common.Templates
                 {
                     writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->", altTemplateId);
                 }
+
                 return;
             }
 
-            //First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
-            //after this page has rendered.
-            SaveExistingItems(out var oldPublishedRequest);
+            // First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
+            // after this page has rendered.
+            SaveExistingItems(out IPublishedRequest oldPublishedRequest);
+
+            IPublishedRequest contentRequest = requestBuilder.Build();
 
             try
             {
-                //set the new items on context objects for this templates execution
+                // set the new items on context objects for this templates execution
                 SetNewItemsOnContextObjects(contentRequest);
 
-                //Render the template
+                // Render the template
                 ExecuteTemplateRendering(writer, contentRequest);
             }
             finally
             {
-                //restore items on context objects to continuing rendering the parent template
+                // restore items on context objects to continuing rendering the parent template
                 RestoreItems(oldPublishedRequest);
             }
 
@@ -140,11 +149,11 @@ namespace Umbraco.Web.Common.Templates
         {
             var httpContext = _httpContextAccessor.GetRequiredHttpContext();
 
-            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.TemplateAlias}.cshtml", false);
+            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", false);
 
             if (viewResult.Success == false)
             {
-                throw new InvalidOperationException($"A view with the name {request.TemplateAlias} could not be found");
+                throw new InvalidOperationException($"A view with the name {request.GetTemplateAlias()} could not be found");
             }
 
             var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
@@ -175,7 +184,7 @@ namespace Umbraco.Web.Common.Templates
 
         private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {
-            //now, set the new ones for this page execution
+            // now, set the new ones for this page execution
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
 
@@ -184,8 +193,8 @@ namespace Umbraco.Web.Common.Templates
         /// </summary>
         private void SaveExistingItems(out IPublishedRequest oldPublishedRequest)
         {
-            //Many objects require that these legacy items are in the http context items... before we render this template we need to first
-            //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
+            // Many objects require that these legacy items are in the http context items... before we render this template we need to first
+            // save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
             oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
         }
 

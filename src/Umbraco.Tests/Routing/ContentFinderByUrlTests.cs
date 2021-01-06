@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
@@ -6,6 +6,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
 using Microsoft.Extensions.Logging;
+using Umbraco.Web;
+using Moq;
 
 namespace Umbraco.Tests.Routing
 {
@@ -30,9 +32,9 @@ namespace Umbraco.Tests.Routing
 
             var snapshotService = CreatePublishedSnapshotService(globalSettings);
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings, snapshotService: snapshotService);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
 
             Assert.IsTrue(globalSettings.HideTopLevelNodeFromPath);
 
@@ -64,9 +66,9 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
 
             Assert.IsFalse(globalSettings.HideTopLevelNodeFromPath);
 
@@ -88,9 +90,9 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
 
             var result = lookup.TryFindContent(frequest);
 
@@ -114,10 +116,10 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/")));
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
 
             var result = lookup.TryFindContent(frequest);
 
@@ -142,10 +144,10 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå")));
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
 
             var result = lookup.TryFindContent(frequest);
 
