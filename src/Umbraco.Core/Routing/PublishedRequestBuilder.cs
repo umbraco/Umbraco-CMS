@@ -17,19 +17,19 @@ namespace Umbraco.Web.Routing
         private IReadOnlyList<string> _cacheExtensions;
         private IPublishedContent _internalRedirectContent;
         private string _redirectUrl;
-        private HttpStatusCode _responseStatus = HttpStatusCode.NotFound;
-        private string _responseDesc;
+        private HttpStatusCode? _responseStatus;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequestBuilder"/> class.
         /// </summary>
-        public PublishedRequestBuilder(IFileService fileService)
+        public PublishedRequestBuilder(Uri uri, IFileService fileService)
         {
+            Uri = uri;
             _fileService = fileService;
         }
 
         /// <inheritdoc/>
-        public Uri Uri { get; private set; }
+        public Uri Uri { get; }
 
         /// <inheritdoc/>
         public DomainAndUri Domain { get; private set; }
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
         public bool IsInternalRedirectPublishedContent { get; private set; } // TODO: Not sure what this is yet
 
         /// <inheritdoc/>
-        public int ResponseStatusCode => (int)_responseStatus;
+        public int? ResponseStatusCode => _responseStatus.HasValue ? (int?)_responseStatus : null;
 
         /// <inheritdoc/>
         public IPublishedContent PublishedContent { get; private set; }
@@ -58,18 +58,10 @@ namespace Umbraco.Web.Routing
                 Domain,
                 Culture,
                 _redirectUrl,
-                (int)_responseStatus,
-                _responseDesc,
+                _responseStatus.HasValue ? (int?)_responseStatus : null,
                 _cacheExtensions,
                 _headers,
                 _cacheability);
-
-        /// <inheritdoc/>
-        public IPublishedRequestBuilder ResetTemplate()
-        {
-            Template = null;
-            return this;
-        }
 
         /// <inheritdoc/>
         public IPublishedRequestBuilder SetCacheabilityNoCache(bool cacheability)
@@ -114,13 +106,6 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetIs404(bool is404)
-        {
-            _responseStatus = HttpStatusCode.NotFound;
-            return this;
-        }
-
-        /// <inheritdoc/>
         public IPublishedRequestBuilder SetPublishedContent(IPublishedContent content)
         {
             PublishedContent = content;
@@ -144,10 +129,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetResponseStatus(int code, string description = null)
+        public IPublishedRequestBuilder SetResponseStatus(int code)
         {
             _responseStatus = (HttpStatusCode)code;
-            _responseDesc = description;
             return this;
         }
 

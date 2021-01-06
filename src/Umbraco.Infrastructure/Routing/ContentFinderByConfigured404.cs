@@ -111,7 +111,7 @@ namespace Umbraco.Web.Routing
 
             frequest
                 .SetPublishedContent(content)
-                .SetIs404(true);
+                .SetIs404();
 
             return content != null;
         }

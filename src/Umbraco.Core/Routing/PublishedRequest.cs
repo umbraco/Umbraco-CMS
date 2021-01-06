@@ -16,20 +16,19 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
         /// </summary>
-        public PublishedRequest(Uri uri, /*bool ignorePublishedContentCollisions, */IPublishedContent publishedContent, bool isInternalRedirectPublishedContent, ITemplate template, DomainAndUri domain, CultureInfo culture, string redirectUrl, int responseStatusCode, string responseStatusDescription, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache)
+        public PublishedRequest(Uri uri, /*bool ignorePublishedContentCollisions, */IPublishedContent publishedContent, bool isInternalRedirectPublishedContent, ITemplate template, DomainAndUri domain, CultureInfo culture, string redirectUrl, int? responseStatusCode, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache)
         {
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
             //IgnorePublishedContentCollisions = ignorePublishedContentCollisions;
-            PublishedContent = publishedContent ?? throw new ArgumentNullException(nameof(publishedContent));
+            PublishedContent = publishedContent;
             IsInternalRedirectPublishedContent = isInternalRedirectPublishedContent;
-            Template = template ?? throw new ArgumentNullException(nameof(template));
-            Domain = domain ?? throw new ArgumentNullException(nameof(domain));
+            Template = template;
+            Domain = domain;
             Culture = culture ?? throw new ArgumentNullException(nameof(culture));
-            RedirectUrl = redirectUrl ?? throw new ArgumentNullException(nameof(redirectUrl));
+            RedirectUrl = redirectUrl;
             ResponseStatusCode = responseStatusCode;
-            ResponseStatusDescription = responseStatusDescription ?? throw new ArgumentNullException(nameof(responseStatusDescription));
-            CacheExtensions = cacheExtensions ?? throw new ArgumentNullException(nameof(cacheExtensions));
-            Headers = headers ?? throw new ArgumentNullException(nameof(headers));
+            CacheExtensions = cacheExtensions;
+            Headers = headers;
             CacheabilityNoCache = cacheabilityNoCache;
         }
 
@@ -41,9 +40,6 @@ namespace Umbraco.Web.Routing
 
         /// <inheritdoc/>
         public IPublishedContent PublishedContent { get; }
-
-        /// <inheritdoc/>
-        public IPublishedContent InitialPublishedContent { get; }
 
         /// <inheritdoc/>
         public bool IsInternalRedirectPublishedContent { get; }
@@ -61,10 +57,7 @@ namespace Umbraco.Web.Routing
         public string RedirectUrl { get; }
 
         /// <inheritdoc/>
-        public int ResponseStatusCode { get; }
-
-        /// <inheritdoc/>
-        public string ResponseStatusDescription { get; }
+        public int? ResponseStatusCode { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<string> CacheExtensions { get; }

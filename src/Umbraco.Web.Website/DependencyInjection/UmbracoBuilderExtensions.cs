@@ -23,8 +23,6 @@ namespace Umbraco.Web.Website.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<NoContentRoutes>();
-
             builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 

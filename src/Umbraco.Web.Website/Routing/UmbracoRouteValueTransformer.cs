@@ -93,14 +93,19 @@ namespace Umbraco.Web.Website.Routing
                 return values;
             }
 
-            bool routed = RouteRequest(_umbracoContextAccessor.UmbracoContext, out IPublishedRequest publishedRequest);
-            if (!routed)
+            // Check if there is no existing content and return the no content controller
+            if (!_umbracoContextAccessor.UmbracoContext.Content.HasContent())
             {
-                return values;
-                // TODO: Deal with it not being routable, perhaps this should be an enum result?
+                values["controller"] = ControllerExtensions.GetControllerName<RenderNoContentController>();
+                values["action"] = nameof(RenderNoContentController.Index);
+
+                return await Task.FromResult(values);
             }
 
+            RouteRequest(_umbracoContextAccessor.UmbracoContext, out IPublishedRequest publishedRequest);
+
             UmbracoRouteValues routeDef = GetUmbracoRouteDefinition(httpContext, values, publishedRequest);
+
             values["controller"] = routeDef.ControllerName;
             if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
             {
@@ -134,7 +139,6 @@ namespace Umbraco.Web.Website.Routing
             var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
 
             string customActionName = null;
-            var customControllerName = request.PublishedContent.ContentType.Alias; // never null
 
             // check that a template is defined), if it doesn't and there is a hijacked route it will just route
             // to the index Action
@@ -143,17 +147,31 @@ namespace Umbraco.Web.Website.Routing
                 // the template Alias should always be already saved with a safe name.
                 // if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                customActionName = request.GetTemplateAlias().Split('.')[0].ToSafeAlias(_shortStringHelper);
+                customActionName = request.GetTemplateAlias()?.Split('.')[0].ToSafeAlias(_shortStringHelper);
             }
 
             // creates the default route definition which maps to the 'UmbracoController' controller
             var def = new UmbracoRouteValues(
-                request.PublishedContent,
+                request,
                 defaultControllerName,
                 defaultControllerType,
                 templateName: customActionName);
 
-            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates(customControllerName, customActionName, def.ActionName);
+            var customControllerName = request.PublishedContent?.ContentType.Alias;
+            if (customControllerName != null)
+            {
+                def = DetermineHijackedRoute(def, customControllerName, customActionName, request);
+            }
+
+            // store the route definition
+            values.TryAdd(Constants.Web.UmbracoRouteDefinitionDataToken, def);
+
+            return def;
+        }
+
+        private UmbracoRouteValues DetermineHijackedRoute(UmbracoRouteValues routeValues, string customControllerName, string customActionName, IPublishedRequest request)
+        {
+            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates(customControllerName, customActionName, routeValues.ActionName);
 
             // check if there's a custom controller assigned, base on the document type alias.
             var customControllerCandidates = candidates.Where(x => x.ControllerName.InvariantEquals(customControllerName)).ToList();
@@ -170,11 +188,12 @@ namespace Umbraco.Web.Website.Routing
                     // now check if the custom action matches
                     var customActionExists = customActionName != null && customControllerCandidates.Any(x => x.ActionName.InvariantEquals(customActionName));
 
-                    def = new UmbracoRouteValues(
-                        request.PublishedContent,
+                    // it's a hijacked route with a custom controller, so return the the values
+                    return new UmbracoRouteValues(
+                        request,
                         controllerDescriptor.ControllerName,
                         controllerDescriptor.ControllerTypeInfo,
-                        customActionExists ? customActionName : def.ActionName,
+                        customActionExists ? customActionName : routeValues.ActionName,
                         customActionName,
                         true); // Hijacked = true
                 }
@@ -192,10 +211,7 @@ namespace Umbraco.Web.Website.Routing
                 }
             }
 
-            // store the route definition
-            values.TryAdd(Constants.Web.UmbracoRouteDefinitionDataToken, def);
-
-            return def;
+            return routeValues;
         }
 
         /// <summary>
@@ -228,7 +244,7 @@ namespace Umbraco.Web.Website.Routing
             // Maybe could be a one-time Set method instead?
             publishedRequest = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
 
-            return publishedRequest.Success() && publishedRequest.HasPublishedContent();
+            return publishedRequest.Success();
 
             // // HandleHttpResponseStatus returns a value indicating that the request should
             // // not be processed any further, eg because it has been redirect. then, exit.

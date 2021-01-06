@@ -2,13 +2,41 @@ using System.Net;
 
 namespace Umbraco.Web.Routing
 {
+
     public static class PublishedRequestExtensions
     {
+        /// <summary>
+        /// Gets the <see cref="UmbracoRouteResult"/>
+        /// </summary>
+        public static UmbracoRouteResult GetRouteResult(this IPublishedRequest publishedRequest)
+        {
+            if (publishedRequest.IsRedirect())
+            {
+                return UmbracoRouteResult.Redirect;
+            }
+
+            if (!publishedRequest.HasPublishedContent())
+            {
+                return UmbracoRouteResult.NotFound;
+            }
+
+            return UmbracoRouteResult.Success;
+        }
+
         /// <summary>
         /// Gets a value indicating whether the request was successfully routed
         /// </summary>
         public static bool Success(this IPublishedRequest publishedRequest)
             => !publishedRequest.IsRedirect() && publishedRequest.HasPublishedContent();
+
+        /// <summary>
+        /// Sets the response status to be 404 not found
+        /// </summary>
+        public static IPublishedRequestBuilder SetIs404(this IPublishedRequestBuilder publishedRequest)
+        {
+            publishedRequest.SetResponseStatus((int)HttpStatusCode.NotFound);
+            return publishedRequest;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request has a content.

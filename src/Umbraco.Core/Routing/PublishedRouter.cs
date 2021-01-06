@@ -72,7 +72,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public IPublishedRequestBuilder CreateRequest(Uri uri) => new PublishedRequestBuilder(_fileService);
+        public IPublishedRequestBuilder CreateRequest(Uri uri) => new PublishedRequestBuilder(uri, _fileService);
 
         /// <inheritdoc />
         public bool TryRouteRequest(IPublishedRequestBuilder request)
@@ -106,6 +106,10 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public IPublishedRequest RouteRequest(IPublishedRequestBuilder request)
         {
+            //// trigger the Preparing event - at that point anything can still be changed
+            //// the idea is that it is possible to change the uri
+            //request.OnPreparing();
+
             // find domain
             FindDomain(request);
 
@@ -411,7 +415,7 @@ namespace Umbraco.Web.Routing
                 // handle not found
                 if (request.PublishedContent == null)
                 {
-                    request.SetIs404(true);
+                    request.SetIs404();
                     _logger.LogDebug("HandlePublishedContent: No document, try last chance lookup");
 
                     // if it fails then give up, there isn't much more that we can do

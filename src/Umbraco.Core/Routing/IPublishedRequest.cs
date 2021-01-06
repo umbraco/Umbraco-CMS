@@ -60,14 +60,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>Does not actually set the http response status code, only registers that the response
         /// should use the specified code. The code will or will not be used, in due time.</remarks>
-        int ResponseStatusCode { get; }
-
-        /// <summary>
-        /// Gets the content request http response status description.
-        /// </summary>
-        /// <remarks>Does not actually set the http response status description, only registers that the response
-        /// should use the specified description. The description will or will not be used, in due time.</remarks>
-        string ResponseStatusDescription { get; }
+        int? ResponseStatusCode { get; }
 
         /// <summary>
         /// Gets a list of Extensions to append to the Response.Cache object.

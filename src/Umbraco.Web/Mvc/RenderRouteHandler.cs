@@ -284,19 +284,22 @@ namespace Umbraco.Web.Mvc
             // missing template, so we're in a 404 here
             // so the content, if any, is a custom 404 page of some sort
 
-            if (request.HasPublishedContent() == false)
-            {
-                // means the builder could not find a proper document to handle 404
-                return new PublishedContentNotFoundHandler();
-            }
 
-            if (request.HasTemplate() == false)
-            {
-                // means the engine could find a proper document, but the document has no template
-                // at that point there isn't much we can do and there is no point returning
-                // to Mvc since Mvc can't do much
-                return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
-            }
+            // TODO: Handle this differently in netcore....
+
+            //if (request.HasPublishedContent() == false)
+            //{
+            //    // means the builder could not find a proper document to handle 404
+            //    return new PublishedContentNotFoundHandler();
+            //}
+
+            //if (request.HasTemplate() == false)
+            //{
+            //    // means the engine could find a proper document, but the document has no template
+            //    // at that point there isn't much we can do and there is no point returning
+            //    // to Mvc since Mvc can't do much
+            //    return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
+            //}
 
             return null;
         }
@@ -318,6 +321,7 @@ namespace Umbraco.Web.Mvc
                 return HandlePostedValues(requestContext, postedInfo);
             }
 
+            // TODO: Surely this check is part of the PublishedRouter?
 
             // Here we need to check if there is no hijacked route and no template assigned,
             // if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
@@ -326,13 +330,14 @@ namespace Umbraco.Web.Mvc
             if (request.HasTemplate() == false && Features.Disabled.DisableTemplates == false && routeDef.HasHijackedRoute == false)
             {
 
-                // TODO: Handle this differently
+                // TODO: Handle this differently in netcore....
+
                 // request.UpdateToNotFound(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.
-                if (UmbracoModule.HandleHttpResponseStatus(requestContext.HttpContext, request, Current.Logger))
-                    return null;
+                //if (UmbracoModule.HandleHttpResponseStatus(requestContext.HttpContext, request, Current.Logger))
+                //    return null;
 
                 var handler = GetHandlerOnMissingTemplate(request);
 

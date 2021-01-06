@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the content request http response status code.
         /// </summary>
-        int ResponseStatusCode { get; }
+        int? ResponseStatusCode { get; }
 
         /// <summary>
         /// Gets the current <see cref="IPublishedContent"/> assigned (if any)
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
         /// <param name="content">The requested content.</param>
         /// <remarks>Depending on <c>UmbracoSettings.InternalRedirectPreservesTemplate</c>, will
         /// preserve or reset the template, if any.</remarks>
-        IPublishedRequestBuilder SetInternalRedirectPublishedContent(IPublishedContent content);
+        IPublishedRequestBuilder SetInternalRedirectPublishedContent(IPublishedContent content); // TODO: Need to figure this one out
 
         /// <summary>
         /// Tries to set the template to use to display the requested content.
@@ -96,11 +96,6 @@ namespace Umbraco.Web.Routing
         /// <param name="template">The template.</param>
         /// <remarks>Setting the template does refresh <c>RenderingEngine</c>.</remarks>
         IPublishedRequestBuilder SetTemplate(ITemplate template);
-
-        /// <summary>
-        /// Resets the template.
-        /// </summary>
-        IPublishedRequestBuilder ResetTemplate();
 
         /// <summary>
         /// Indicates that the content request should trigger a permanent redirect (301).
@@ -123,11 +118,10 @@ namespace Umbraco.Web.Routing
         /// Sets the http response status code, along with an optional associated description.
         /// </summary>
         /// <param name="code">The http status code.</param>
-        /// <param name="description">The description.</param>
         /// <remarks>Does not actually set the http response status code and description, only registers that
         /// the response should use the specified code and description. The code and description will or will
         /// not be used, in due time.</remarks>
-        IPublishedRequestBuilder SetResponseStatus(int code, string description = null);
+        IPublishedRequestBuilder SetResponseStatus(int code);
 
         IPublishedRequestBuilder SetCacheabilityNoCache(bool cacheability);
 
@@ -140,16 +134,5 @@ namespace Umbraco.Web.Routing
         /// Sets a dictionary of Headers to append to the Response object.
         /// </summary>
         IPublishedRequestBuilder SetHeaders(IReadOnlyDictionary<string, string> headers);
-
-        /// <summary>
-        /// Sets a value indicating that the requested content could not be found.
-        /// </summary>
-        /// <remarks>This is set in the <c>PublishedContentRequestBuilder</c> and can also be used in
-        /// custom content finders or <c>Prepared</c> event handlers, where we want to allow developers
-        /// to indicate a request is 404 but not to cancel it.</remarks>
-        IPublishedRequestBuilder SetIs404(bool is404);
-
-        // TODO: This seems to be the same as is404?
-        //IPublishedRequestBuilder UpdateToNotFound();
     }
 }
