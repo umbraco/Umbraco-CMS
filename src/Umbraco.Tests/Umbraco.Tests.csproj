@@ -128,7 +128,6 @@
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
