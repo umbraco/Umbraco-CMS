@@ -218,15 +218,14 @@ namespace Umbraco.Web.Website.Routing
 
             // ok, process
 
-            // note: requestModule.UmbracoRewrite also did some stripping of &umbPage
-            // from the querystring... that was in v3.x to fix some issues with pre-forms
-            // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
-
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
             IPublishedRequestBuilder requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
 
-            // TODO: This is ugly with the re-assignment to umbraco context
+            // TODO: This is ugly with the re-assignment to umbraco context but at least its now
+            // an immutable object. The only way to make this better would be to have a RouteRequest
+            // as part of UmbracoContext but then it will require a PublishedRouter dependency so not sure that's worth it.
+            // Maybe could be a one-time Set method instead?
             publishedRequest = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
 
             return publishedRequest.Success() && publishedRequest.HasPublishedContent();

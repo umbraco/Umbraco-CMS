@@ -16,7 +16,6 @@ namespace Umbraco.Web.Routing
         private bool _cacheability;
         private IReadOnlyList<string> _cacheExtensions;
         private IPublishedContent _internalRedirectContent;
-        private bool _isInitContent;
         private string _redirectUrl;
         private HttpStatusCode _responseStatus = HttpStatusCode.NotFound;
         private string _responseDesc;
@@ -40,9 +39,6 @@ namespace Umbraco.Web.Routing
 
         /// <inheritdoc/>
         public ITemplate Template { get; private set; }
-
-        /// <inheritdoc/>
-        public bool IsInitialPublishedContent { get; private set; }
 
         /// <inheritdoc/>
         public bool IsInternalRedirectPublishedContent { get; private set; } // TODO: Not sure what this is yet
@@ -121,13 +117,6 @@ namespace Umbraco.Web.Routing
         public IPublishedRequestBuilder SetIs404(bool is404)
         {
             _responseStatus = HttpStatusCode.NotFound;
-            return this;
-        }
-
-        /// <inheritdoc/>
-        public IPublishedRequestBuilder SetIsInitialPublishedContent()
-        {
-            _isInitContent = true;
             return this;
         }
 

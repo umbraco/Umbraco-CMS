@@ -56,11 +56,6 @@ namespace Umbraco.Web.Routing
         public static bool IsRedirectPermanent(this IPublishedRequest publishedRequest) => publishedRequest.ResponseStatusCode == (int)HttpStatusCode.Moved;
 
         /// <summary>
-        /// Gets a value indicating whether the current published content is the initial one.
-        /// </summary>
-        public static bool IsInitialPublishedContent(this IPublishedRequest publishedRequest) => publishedRequest.InitialPublishedContent != null;
-
-        /// <summary>
         /// Gets a value indicating whether the content request has a domain.
         /// </summary>
         public static bool HasDomain(this IPublishedRequestBuilder publishedRequest) => publishedRequest.Domain != null;

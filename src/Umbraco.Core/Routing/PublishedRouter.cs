@@ -318,13 +318,15 @@ namespace Umbraco.Web.Routing
         internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
         {
             if (directory == null || directory.Exists == false)
+            {
                 return false;
+            }
 
             var pos = alias.IndexOf('/');
             if (pos > 0)
             {
                 // recurse
-                var subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
+                DirectoryInfo subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
                 alias = alias.Substring(pos + 1);
                 return subdir != null && FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
             }
@@ -351,6 +353,8 @@ namespace Umbraco.Web.Routing
                 return;
             }
 
+            var foundContentByFinders = request.HasPublishedContent();
+
             // not handling umbracoRedirect here but after LookupDocument2
             // so internal redirect, 404, etc has precedence over redirect
 
@@ -358,7 +362,7 @@ namespace Umbraco.Web.Routing
             HandlePublishedContent(request);
 
             // find a template
-            FindTemplate(request);
+            FindTemplate(request, foundContentByFinders);
 
             // handle umbracoRedirect
             FollowExternalRedirect(request);
@@ -375,7 +379,6 @@ namespace Umbraco.Web.Routing
             // look for the document
             // the first successful finder, if any, will set this.PublishedContent, and may also set this.Template
             // some finders may implement caching
-
             using (_profilingLogger.DebugDuration<PublishedRouter>(
                 $"{tracePrefix}Begin finders",
                 $"{tracePrefix}End finders"))
@@ -387,10 +390,6 @@ namespace Umbraco.Web.Routing
                     return finder.TryFindContent(request);
                 });
             }
-
-            // indicate that the published content (if any) we have at the moment is the
-            // one that was found by the standard finders before anything else took place.
-            request.SetIsInitialPublishedContent();
         }
 
         /// <summary>
@@ -588,7 +587,9 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Finds a template for the current node, if any.
         /// </summary>
-        private void FindTemplate(IPublishedRequestBuilder request)
+        /// <param name="request">The request builder.</param>
+        /// <param name="contentFoundByFinders">If the content was found by the finders, before anything such as 404, redirect... took place.</param>
+        private void FindTemplate(IPublishedRequestBuilder request, bool contentFoundByFinders)
         {
             // TODO: We've removed the event, might need to re-add?
             // NOTE: at the moment there is only 1 way to find a template, and then ppl must
@@ -604,7 +605,7 @@ namespace Umbraco.Web.Routing
             // only if the published content is the initial once, else the alternate template
             // does not apply
             // + optionally, apply the alternate template on internal redirects
-            var useAltTemplate = request.IsInitialPublishedContent
+            var useAltTemplate = contentFoundByFinders
                 || (_webRoutingSettings.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
 
             var altTemplate = useAltTemplate

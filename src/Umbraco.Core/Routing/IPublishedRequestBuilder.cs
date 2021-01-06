@@ -29,11 +29,6 @@ namespace Umbraco.Web.Routing
         CultureInfo Culture { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the current published content is the initial one.
-        /// </summary>
-        bool IsInitialPublishedContent { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the current published content has been obtained
         /// from the initial published content following internal redirections exclusively.
         /// </summary>
@@ -83,11 +78,6 @@ namespace Umbraco.Web.Routing
         /// <remarks>Depending on <c>UmbracoSettings.InternalRedirectPreservesTemplate</c>, will
         /// preserve or reset the template, if any.</remarks>
         IPublishedRequestBuilder SetInternalRedirectPublishedContent(IPublishedContent content);
-
-        /// <summary>
-        /// Indicates that the current PublishedContent is the initial one.
-        /// </summary>
-        IPublishedRequestBuilder SetIsInitialPublishedContent(); // TODO: Required?
 
         /// <summary>
         /// Tries to set the template to use to display the requested content.

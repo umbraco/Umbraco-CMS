@@ -76,10 +76,7 @@ namespace Umbraco.Web.Routing
         public bool CacheabilityNoCache { get; }
     }
 
-    /// <summary>
-    /// Represents a request for one specified Umbraco IPublishedContent to be rendered
-    /// by one specified template, using one specified Culture and RenderingEngine.
-    /// </summary>
+    // TODO: Kill this, but we need to port all of it's functionality
     public class PublishedRequestOld // : IPublishedRequest
     {
         private readonly IPublishedRouter _publishedRouter;

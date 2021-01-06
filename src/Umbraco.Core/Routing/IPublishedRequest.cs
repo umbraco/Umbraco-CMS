@@ -26,13 +26,6 @@ namespace Umbraco.Web.Routing
         IPublishedContent PublishedContent { get; }
 
         /// <summary>
-        /// Gets the initial requested content.
-        /// </summary>
-        /// <remarks>The initial requested content is the content that was found by the finders,
-        /// before anything such as 404, redirect... took place.</remarks>
-        IPublishedContent InitialPublishedContent { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the current published content has been obtained
         /// from the initial published content following internal redirections exclusively.
         /// </summary>
