@@ -27,6 +27,7 @@ namespace Umbraco.Core.Runtime
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
         private object _locker = new object();
+        private bool _hasTable = false;
 
         public SqlMainDomLock(ILogger logger)
         {
@@ -37,14 +38,14 @@ namespace Umbraco.Core.Runtime
             _dbFactory = new UmbracoDatabaseFactory(
                Constants.System.UmbracoConnectionName,
                _logger,
-               new Lazy<IMapperCollection>(() => new Persistence.Mappers.MapperCollection(Enumerable.Empty<BaseMapper>())));
+               new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
             if (!_dbFactory.Configured)
             {
-                // if we aren't configured, then we're in an install state, in which case we have no choice but to assume we can acquire
+                // if we aren't configured then we're in an install state, in which case we have no choice but to assume we can acquire
                 return true;
             }
 
@@ -58,6 +59,14 @@ namespace Umbraco.Core.Runtime
             var tempId = Guid.NewGuid().ToString();
 
             using var db = _dbFactory.CreateDatabase();
+
+            _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+            if (!_hasTable)
+            {
+                // the Db does not contain the required table, we must be in an install state we have no choice but to assume we can acquire
+                return true;
+            }
+
             using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
             try
@@ -162,10 +171,22 @@ namespace Umbraco.Core.Runtime
                     {
                         _logger.Debug<SqlMainDomLock>("Task canceled, exiting loop");
                         return;
-                    }
-                        
+                    }   
 
                     using var db = _dbFactory.CreateDatabase();
+
+                    if (!_hasTable)
+                    {
+                        // re-check if its still false, we don't want to re-query once we know its there since this
+                        // loop needs to use minimal resources
+                        _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                        if (!_hasTable)
+                        {
+                            // the Db does not contain the required table, we just keep looping since we can't query the db
+                            continue;
+                        }
+                    }
+
                     using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                     try
                     {
@@ -380,7 +401,7 @@ namespace Umbraco.Core.Runtime
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
 
-                        if (_dbFactory.Configured)
+                        if (_dbFactory.Configured && _hasTable)
                         {
                             using var db = _dbFactory.CreateDatabase();
                             using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
