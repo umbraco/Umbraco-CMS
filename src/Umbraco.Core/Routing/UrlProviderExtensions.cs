@@ -204,20 +204,19 @@ namespace Umbraco.Web.Routing
             }
 
             uri = uriUtility.UriToUmbraco(uri);
-            IPublishedRequestBuilder pcr = await publishedRouter.CreateRequestAsync(uri);
-            var routeResult = await publishedRouter.TryRouteRequestAsync(pcr);
+            IPublishedRequestBuilder builder = await publishedRouter.CreateRequestAsync(uri);
+            IPublishedRequest pcr = await publishedRouter.RouteRequestAsync(builder, new RouteRequestOptions(RouteDirection.Outbound));
 
-            if (pcr.PublishedContent == null)
+            if (!pcr.HasPublishedContent())
             {
                 var urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
                 return Attempt.Succeed(urlInfo);
             }
 
-            // TODO: What is this?
-            //if (pcr.IgnorePublishedContentCollisions)
-            //{
-            //    return false;
-            //}
+            if (pcr.IgnorePublishedContentCollisions)
+            {
+                return Attempt<UrlInfo>.Fail();
+            }
 
             if (pcr.PublishedContent.Id != content.Id)
             {

@@ -100,26 +100,25 @@ namespace Umbraco.Web.Routing
             return publishedRequestBuilder;
         }
 
-        /// <inheritdoc />
-        public Task<bool> TryRouteRequestAsync(IPublishedRequestBuilder request)
+        private IPublishedRequest TryRouteRequest(IPublishedRequestBuilder request)
         {
             FindDomain(request);
 
             // TODO: This was ported from v8 but how could it possibly have a redirect here?
             if (request.IsRedirect())
             {
-                return Task.FromResult(false);
+                return request.Build();
             }
 
             // TODO: This was ported from v8 but how could it possibly have content here?
             if (request.HasPublishedContent())
             {
-                return Task.FromResult(true);
+                return request.Build();
             }
 
             FindPublishedContent(request);
 
-            return Task.FromResult(request.Build().Success());
+            return request.Build();
         }
 
         private void SetVariationContext(CultureInfo culture)
@@ -138,11 +137,18 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request)
+        public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request, RouteRequestOptions options)
         {
+            // outbound routing performs different/simpler logic
+            if (options.RouteDirection == RouteDirection.Outbound)
+            {
+                return TryRouteRequest(request);
+            }
+
             // find domain
             FindDomain(request);
 
+            // TODO: This was ported from v8 but how could it possibly have a redirect here?
             // if request has been flagged to redirect then return
             // whoever called us is in charge of actually redirecting
             if (request.IsRedirect())
@@ -156,7 +162,8 @@ namespace Umbraco.Web.Routing
             // find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
             // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
-            if (request.PublishedContent == null)
+            // TODO: This might very well change when we look into porting custom routes in netcore like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler.
+            if (!request.HasPublishedContent())
             {
                 // find the document & template
                 FindPublishedContentAndTemplate(request);

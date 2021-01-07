@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
@@ -10,8 +8,6 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public interface IPublishedRouter
     {
-        // TODO: consider this and UmbracoRouteValueTransformer - move some code around?
-
         /// <summary>
         /// Creates a published request.
         /// </summary>
@@ -20,18 +16,12 @@ namespace Umbraco.Web.Routing
         Task<IPublishedRequestBuilder> CreateRequestAsync(Uri uri);
 
         /// <summary>
-        /// Prepares a request for rendering.
+        /// Sends a <see cref="IPublishedRequestBuilder"/> through the routing pipeline and builds a result.
         /// </summary>
         /// <param name="request">The request.</param>
-        /// <returns>A value indicating whether the request was successfully prepared and can be rendered.</returns>
-        Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request);
-
-        /// <summary>
-        /// Tries to route a request.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>A value indicating whether the request can be routed to a document.</returns>
-        Task<bool> TryRouteRequestAsync(IPublishedRequestBuilder request);
+        /// <param name="options">The options.</param>
+        /// <returns>The built <see cref="IPublishedRequest"/> instance.</returns>
+        Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request, RouteRequestOptions options);
 
         /// <summary>
         /// Updates the request to "not found".

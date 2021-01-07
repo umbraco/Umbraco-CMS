@@ -11,6 +11,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
+using RouteDirection = Umbraco.Web.Routing.RouteDirection;
 
 namespace Umbraco.Web.Website.Routing
 {
@@ -112,7 +113,7 @@ namespace Umbraco.Web.Website.Routing
             // an immutable object. The only way to make this better would be to have a RouteRequest
             // as part of UmbracoContext but then it will require a PublishedRouter dependency so not sure that's worth it.
             // Maybe could be a one-time Set method instead?
-            IPublishedRequest publishedRequest = umbracoContext.PublishedRequest = await _publishedRouter.RouteRequestAsync(requestBuilder);
+            IPublishedRequest publishedRequest = umbracoContext.PublishedRequest = await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound));
 
             return publishedRequest;
         }

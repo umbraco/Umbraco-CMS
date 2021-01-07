@@ -13,11 +13,9 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
         /// </summary>
-        public PublishedRequest(Uri uri, IPublishedContent publishedContent, bool isInternalRedirect, ITemplate template, DomainAndUri domain, CultureInfo culture, string redirectUrl, int? responseStatusCode, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache)
+        public PublishedRequest(Uri uri, IPublishedContent publishedContent, bool isInternalRedirect, ITemplate template, DomainAndUri domain, CultureInfo culture, string redirectUrl, int? responseStatusCode, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache, bool ignorePublishedContentCollisions)
         {
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
-            // TODO: What is this?
-            //IgnorePublishedContentCollisions = ignorePublishedContentCollisions;
             PublishedContent = publishedContent;
             IsInternalRedirect = isInternalRedirect;
             Template = template;
@@ -28,6 +26,7 @@ namespace Umbraco.Web.Routing
             CacheExtensions = cacheExtensions;
             Headers = headers;
             SetNoCacheHeader = cacheabilityNoCache;
+            IgnorePublishedContentCollisions = ignorePublishedContentCollisions;
         }
 
         /// <inheritdoc/>

@@ -138,5 +138,19 @@ namespace Umbraco.Web.Routing
         /// Sets a dictionary of Headers to append to the Response object.
         /// </summary>
         IPublishedRequestBuilder SetHeaders(IReadOnlyDictionary<string, string> headers);
+
+        /// <summary>
+        /// Can be called to configure the <see cref="IPublishedRequest"/> result to ignore URL collisions
+        /// </summary>
+        /// <remarks>
+        /// <para>This is an uncommon API used for edge cases with complex routing and would be used
+        /// by developers to configure the request to disable collision checks in <see cref="UrlProviderExtensions"/>.</para>
+        /// <para>This flag is based on previous Umbraco versions but it is not clear how this flag can be set by developers since
+        /// collission checking only occurs in the back office which is launched by <see cref="IPublishedRouter.TryRouteRequestAsync(IPublishedRequestBuilder)"/>
+        /// for which events do not execute.</para>
+        /// <para>More can be read about this setting here: https://github.com/umbraco/Umbraco-CMS/pull/2148, https://issues.umbraco.org/issue/U4-10345
+        /// but it's still unclear how this was used.</para>
+        /// </remarks>
+        void IgnorePublishedContentCollisions();
     }
 }

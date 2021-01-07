@@ -18,6 +18,7 @@ namespace Umbraco.Web.Routing
         private string _redirectUrl;
         private HttpStatusCode? _responseStatus;
         private IPublishedContent _publishedContent;
+        private bool _ignorePublishedContentCollisions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequestBuilder"/> class.
@@ -70,7 +71,8 @@ namespace Umbraco.Web.Routing
                 _responseStatus.HasValue ? (int?)_responseStatus : null,
                 _cacheExtensions,
                 _headers,
-                _cacheability);
+                _cacheability,
+                _ignorePublishedContentCollisions);
 
         /// <inheritdoc/>
         public IPublishedRequestBuilder SetNoCacheHeader(bool cacheability)
@@ -190,5 +192,8 @@ namespace Umbraco.Web.Routing
             Template = model;
             return true;
         }
+
+        /// <inheritdoc/>
+        public void IgnorePublishedContentCollisions() => _ignorePublishedContentCollisions = true;
     }
 }

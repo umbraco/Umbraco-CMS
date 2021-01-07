@@ -6,7 +6,9 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
-
+    /// <summary>
+    /// The result of Umbraco routing built with the <see cref="IPublishedRequestBuilder"/>
+    /// </summary>
     public interface IPublishedRequest
     {
         /// <summary>
@@ -14,11 +16,6 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
         Uri Uri { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
-        /// </summary>
-        bool IgnorePublishedContentCollisions { get; }
 
         /// <summary>
         /// Gets a value indicating the requested content.
@@ -73,8 +70,22 @@ namespace Umbraco.Web.Routing
         IReadOnlyDictionary<string, string> Headers { get; }
 
         /// <summary>
-        /// Gets a value indicating if the no-cache value should be added to the Cache-Control header
+        /// Gets a value indicating whether the no-cache value should be added to the Cache-Control header
         /// </summary>
         bool SetNoCacheHeader { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is an uncommon API used for edge cases with complex routing and would be used
+        /// by developers to configure the request to disable collision checks in <see cref="UrlProviderExtensions"/>.</para>
+        /// <para>This flag is based on previous Umbraco versions but it is not clear how this flag can be set by developers since
+        /// collission checking only occurs in the back office which is launched by <see cref="IPublishedRouter.TryRouteRequestAsync(IPublishedRequestBuilder)"/>
+        /// for which events do not execute.</para>
+        /// <para>More can be read about this setting here: https://github.com/umbraco/Umbraco-CMS/pull/2148, https://issues.umbraco.org/issue/U4-10345
+        /// but it's still unclear how this was used.</para>
+        /// </remarks>
+        bool IgnorePublishedContentCollisions { get; }
     }
 }

@@ -11,6 +11,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
+using RouteDirection = Umbraco.Web.Routing.RouteDirection;
 
 namespace Umbraco.Web
 {
@@ -136,7 +137,7 @@ namespace Umbraco.Web
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
             var requestBuilder = _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl).Result;
-            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequestAsync(requestBuilder).Result;
+            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound)).Result;
 
             // NOTE: This has been ported to netcore
             // HandleHttpResponseStatus returns a value indicating that the request should
