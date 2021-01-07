@@ -55,7 +55,7 @@ namespace Umbraco.Web.Common.Controllers
         {
             var cacheControlHeaders = new List<string>();
 
-            if (pcr.CacheabilityNoCache)
+            if (pcr.SetNoCacheHeader)
             {
                 cacheControlHeaders.Add("no-cache");
             }

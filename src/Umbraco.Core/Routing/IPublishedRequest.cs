@@ -72,6 +72,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         IReadOnlyDictionary<string, string> Headers { get; }
 
-        bool CacheabilityNoCache { get; }
+        /// <summary>
+        /// Gets a value indicating if the no-cache value should be added to the Cache-Control header
+        /// </summary>
+        bool SetNoCacheHeader { get; }
     }
 }

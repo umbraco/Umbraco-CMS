@@ -81,7 +81,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Web.Routing
 
             IPublishedRequest request = sut.Build();
 
-            Assert.AreEqual(true, request.CacheabilityNoCache);
+            Assert.AreEqual(true, request.SetNoCacheHeader);
             Assert.AreEqual(cacheExt, request.CacheExtensions);
             Assert.AreEqual(usCulture, request.Culture);
             Assert.AreEqual(domain, request.Domain);

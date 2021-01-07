@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
             ResponseStatusCode = responseStatusCode;
             CacheExtensions = cacheExtensions;
             Headers = headers;
-            CacheabilityNoCache = cacheabilityNoCache;
+            SetNoCacheHeader = cacheabilityNoCache;
         }
 
         /// <inheritdoc/>
@@ -64,6 +64,6 @@ namespace Umbraco.Web.Routing
         public IReadOnlyDictionary<string, string> Headers { get; }
 
         /// <inheritdoc/>
-        public bool CacheabilityNoCache { get; }
+        public bool SetNoCacheHeader { get; }
     }
 }
