@@ -54,7 +54,21 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(macro);
             Assert.AreEqual("Test1", macro.Name);
         }
+        [Test]
+        public void Can_Get_By_Aliases()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
 
+            // Act
+            var macros = macroService.GetAll("test1","test2");
+
+            //assert
+            Assert.IsNotNull(macros);
+            Assert.AreEqual(2, macros.Count());
+            Assert.AreEqual("Test1", macros.ToArray()[0].Name);
+            Assert.AreEqual("Test2", macros.ToArray()[1].Name);
+        }
         [Test]
         public void Can_Get_All()
         {

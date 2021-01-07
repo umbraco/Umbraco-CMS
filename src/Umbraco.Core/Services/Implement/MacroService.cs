@@ -34,8 +34,14 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var q = Query<IMacro>().Where(x => x.Alias == alias);
-                return _macroRepository.Get(q).FirstOrDefault();
+               return _macroRepository.GetByAlias(alias);
+            }
+        }
+        public IEnumerable<IMacro> GetAll(params string[] aliases)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _macroRepository.GetAllByAlias(aliases);
             }
         }
 

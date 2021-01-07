@@ -109,6 +109,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<HtmlMacroParameterParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
             composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
