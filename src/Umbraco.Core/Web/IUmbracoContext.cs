@@ -58,7 +58,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the variation context accessor.
         /// </summary>
-        IVariationContextAccessor VariationContextAccessor { get; } // TODO: Does this need to be a property, it can be injected when needed
+        IVariationContextAccessor VariationContextAccessor { get; } // TODO: This shouldn't expose the accessor should it? IUmbracoContext is basically the accessor to the VariationContext since IUmbracoContextFactory currently creates it?
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

@@ -98,6 +98,10 @@ namespace Umbraco.Web.Routing
 
         private void SetVariationContext(CultureInfo culture)
         {
+            // set the culture on the thread - once, so it's set when running document lookups
+            // TODO: Set this on HttpContext!
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
+
             VariationContext variationContext = _variationContextAccessor.VariationContext;
             if (variationContext != null && variationContext.Culture == culture?.Name)
             {
@@ -124,9 +128,7 @@ namespace Umbraco.Web.Routing
                 return request.Build();
             }
 
-            // set the culture on the thread - once, so it's set when running document lookups
-            // TODO: Set this on HttpContext!
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
+            // set the culture
             SetVariationContext(request.Culture);
 
             // find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
@@ -141,8 +143,7 @@ namespace Umbraco.Web.Routing
             // handle wildcard domains
             HandleWildcardDomains(request);
 
-            // set the culture on the thread -- again, 'cos it might have changed due to a finder or wildcard domain
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
+            // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
             SetVariationContext(request.Culture);
 
             //// trigger the Prepared event - at that point it is still possible to change about anything
@@ -175,11 +176,9 @@ namespace Umbraco.Web.Routing
                 return frequest.Build();
             }
 
-            var result = frequest.Build();
+            IPublishedRequest result = frequest.Build();
 
-            // set the culture on the thread -- again, 'cos it might have changed in the event handler
-            // TODO: Set this on HttpContext!
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = frequest.Culture;
+            // set the culture -- again, 'cos it might have changed in the event handler
             SetVariationContext(result.Culture);
 
             return result;
