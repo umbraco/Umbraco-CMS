@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>Used by PublishedContentRequestEngine.FindTemplate() to figure out whether to
         /// apply the internal redirect or not, when content is not the initial content.</remarks>
-        bool IsInternalRedirectPublishedContent { get; } // TODO: Not sure what thsi is yet
+        bool IsInternalRedirect { get; }
 
         /// <summary>
         /// Gets the template assigned to the request (if any)

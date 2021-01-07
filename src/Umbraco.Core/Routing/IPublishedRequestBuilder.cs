@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>Used by PublishedContentRequestEngine.FindTemplate() to figure out whether to
         /// apply the internal redirect or not, when content is not the initial content.</remarks>
-        bool IsInternalRedirectPublishedContent { get; }
+        bool IsInternalRedirect { get; }
 
         /// <summary>
         /// Gets the content request http response status code.
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Routing
         IPublishedRequest Build();
 
         /// <summary>
-        /// Sets the domain for the request
+        /// Sets the domain for the request which also sets the culture
         /// </summary>
         IPublishedRequestBuilder SetDomain(DomainAndUri domain);
 
@@ -69,15 +69,15 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Sets the found <see cref="IPublishedContent"/> for the request
         /// </summary>
+        /// <remarks>Setting the content clears the template and redirect</remarks>
         IPublishedRequestBuilder SetPublishedContent(IPublishedContent content);
 
         /// <summary>
         /// Sets the requested content, following an internal redirect.
         /// </summary>
         /// <param name="content">The requested content.</param>
-        /// <remarks>Depending on <c>UmbracoSettings.InternalRedirectPreservesTemplate</c>, will
-        /// preserve or reset the template, if any.</remarks>
-        IPublishedRequestBuilder SetInternalRedirectPublishedContent(IPublishedContent content); // TODO: Need to figure this one out
+        /// <remarks>Since this sets the content, it will clear the template</remarks>
+        IPublishedRequestBuilder SetInternalRedirect(IPublishedContent content);
 
         /// <summary>
         /// Tries to set the template to use to display the requested content.
@@ -123,7 +123,11 @@ namespace Umbraco.Web.Routing
         /// not be used, in due time.</remarks>
         IPublishedRequestBuilder SetResponseStatus(int code);
 
-        IPublishedRequestBuilder SetCacheabilityNoCache(bool cacheability);
+        /// <summary>
+        /// Sets the no-cache value to the Cache-Control header
+        /// </summary>
+        /// <param name="setHeader">True to set the header, false to not set it</param>
+        IPublishedRequestBuilder SetNoCacheHeader(bool setHeader);
 
         /// <summary>
         /// Sets a list of Extensions to append to the Response.Cache object.

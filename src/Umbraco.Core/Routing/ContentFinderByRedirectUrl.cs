@@ -82,7 +82,7 @@ namespace Umbraco.Web.Routing
                 // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
                 // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
                 // to problems if you rename a page back to it's original name or create a new page with the original name
-                .SetCacheabilityNoCache(true)
+                .SetNoCacheHeader(true)
                 .SetCacheExtensions(new List<string> { "no-store, must-revalidate" })
                 .SetHeaders(new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } });
 

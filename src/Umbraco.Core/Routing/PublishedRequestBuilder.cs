@@ -15,9 +15,9 @@ namespace Umbraco.Web.Routing
         private IReadOnlyDictionary<string, string> _headers;
         private bool _cacheability;
         private IReadOnlyList<string> _cacheExtensions;
-        private IPublishedContent _internalRedirectContent;
         private string _redirectUrl;
         private HttpStatusCode? _responseStatus;
+        private IPublishedContent _publishedContent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequestBuilder"/> class.
@@ -41,19 +41,28 @@ namespace Umbraco.Web.Routing
         public ITemplate Template { get; private set; }
 
         /// <inheritdoc/>
-        public bool IsInternalRedirectPublishedContent { get; private set; } // TODO: Not sure what this is yet
+        public bool IsInternalRedirect { get; private set; }
 
         /// <inheritdoc/>
         public int? ResponseStatusCode => _responseStatus.HasValue ? (int?)_responseStatus : null;
 
         /// <inheritdoc/>
-        public IPublishedContent PublishedContent { get; private set; }
+        public IPublishedContent PublishedContent
+        {
+            get => _publishedContent;
+            private set
+            {
+                _publishedContent = value;
+                IsInternalRedirect = false;
+                Template = null;
+            }
+        }
 
         /// <inheritdoc/>
         public IPublishedRequest Build() => new PublishedRequest(
                 Uri,
                 PublishedContent,
-                IsInternalRedirectPublishedContent,
+                IsInternalRedirect,
                 Template,
                 Domain,
                 Culture,
@@ -64,7 +73,7 @@ namespace Umbraco.Web.Routing
                 _cacheability);
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetCacheabilityNoCache(bool cacheability)
+        public IPublishedRequestBuilder SetNoCacheHeader(bool cacheability)
         {
             _cacheability = cacheability;
             return this;
@@ -88,6 +97,7 @@ namespace Umbraco.Web.Routing
         public IPublishedRequestBuilder SetDomain(DomainAndUri domain)
         {
             Domain = domain;
+            SetCulture(domain.Culture);
             return this;
         }
 
@@ -99,9 +109,25 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetInternalRedirectPublishedContent(IPublishedContent content)
+        public IPublishedRequestBuilder SetInternalRedirect(IPublishedContent content)
         {
-            _internalRedirectContent = content;
+            // unless a template has been set already by the finder,
+            // template should be null at that point.
+
+            // redirecting to self
+            if (PublishedContent != null && content.Id == PublishedContent.Id)
+            {
+                // no need to set PublishedContent, we're done
+                IsInternalRedirect = true;
+                return this;
+            }
+
+            // else
+
+            // set published content - this resets the template, and sets IsInternalRedirect to false
+            PublishedContent = content;
+            IsInternalRedirect = true;
+
             return this;
         }
 
@@ -109,6 +135,7 @@ namespace Umbraco.Web.Routing
         public IPublishedRequestBuilder SetPublishedContent(IPublishedContent content)
         {
             PublishedContent = content;
+            IsInternalRedirect = false;
             return this;
         }
 
@@ -152,7 +179,7 @@ namespace Umbraco.Web.Routing
             }
 
             // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
-            alias = alias.Replace(" ", "");
+            alias = alias.Replace(" ", string.Empty);
 
             ITemplate model = _fileService.GetTemplate(alias);
             if (model == null)

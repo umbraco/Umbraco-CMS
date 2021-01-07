@@ -49,10 +49,11 @@ namespace Umbraco.Web
         /// </summary>
         IDomainCache Domains { get; }
 
-        ///// <summary>
-        ///// Gets or sets the PublishedRequest object
-        ///// </summary>
-        //// TODO: Can we refactor this? The only nicer way would be to have a RouteRequest method directly on IUmbracoContext but that means adding another dep to the ctx
+        /// <summary>
+        /// Gets or sets the PublishedRequest object
+        /// </summary>
+        //// TODO: Can we refactor this so it's not a settable thing required for routing?
+        //// The only nicer way would be to have a RouteRequest method directly on IUmbracoContext but that means adding another dep to the ctx/factory.
         IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>

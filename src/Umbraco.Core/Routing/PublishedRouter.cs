@@ -271,9 +271,7 @@ namespace Umbraco.Web.Routing
                 // matching an existing domain
                 _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
 
-                request
-                    .SetDomain(domainAndUri)
-                    .SetCulture(domainAndUri.Culture);
+                request.SetDomain(domainAndUri);
 
                 // canonical? not implemented at the moment
                 // if (...)
@@ -368,7 +366,7 @@ namespace Umbraco.Web.Routing
             // so internal redirect, 404, etc has precedence over redirect
 
             // handle not-found, redirects, access...
-            HandlePublishedContent(request);
+            HandlePublishedContent(request, foundContentByFinders);
 
             // find a template
             FindTemplate(request, foundContentByFinders);
@@ -404,11 +402,13 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Handles the published content (if any).
         /// </summary>
+        /// <param name="request">The request builder.</param>
+        /// <param name="contentFoundByFinders">If the content was found by the finders, before anything such as 404, redirect... took place.</param>
         /// <remarks>
         /// Handles "not found", internal redirects, access validation...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
-        private void HandlePublishedContent(IPublishedRequestBuilder request)
+        private void HandlePublishedContent(IPublishedRequestBuilder request, bool contentFoundByFinders)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
@@ -435,7 +435,7 @@ namespace Umbraco.Web.Routing
 
                 // follow internal redirects as long as it's not running out of control ie infinite loop of some sort
                 j = 0;
-                while (FollowInternalRedirects(request) && j++ < maxLoop)
+                while (FollowInternalRedirects(request, contentFoundByFinders) && j++ < maxLoop)
                 { }
 
                 // we're running out of control
@@ -467,12 +467,14 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Follows internal redirections through the <c>umbracoInternalRedirectId</c> document property.
         /// </summary>
+        /// <param name="request">The request builder.</param>
+        /// <param name="contentFoundByFinders">If the content was found by the finders, before anything such as 404, redirect... took place.</param>
         /// <returns>A value indicating whether redirection took place and led to a new published document.</returns>
         /// <remarks>
         /// <para>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</para>
         /// <para>As per legacy, if the redirect does not work, we just ignore it.</para>
         /// </remarks>
-        private bool FollowInternalRedirects(IPublishedRequestBuilder request)
+        private bool FollowInternalRedirects(IPublishedRequestBuilder request, bool contentFoundByFinders)
         {
             if (request.PublishedContent == null)
             {
@@ -528,7 +530,18 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
+                // save since it will be cleared
+                ITemplate template = request.Template;
+
+                request.SetInternalRedirect(internalRedirectNode); // don't use .PublishedContent here
+
+                // must restore the template if it's an internal redirect & the config option is set
+                if (request.IsInternalRedirect && _webRoutingSettings.InternalRedirectPreservesTemplate)
+                {
+                    // restore
+                    request.SetTemplate(template);
+                }
+
                 redirect = true;
                 _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
             }
@@ -615,7 +628,7 @@ namespace Umbraco.Web.Routing
             // does not apply
             // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = contentFoundByFinders
-                || (_webRoutingSettings.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
+                || (_webRoutingSettings.InternalRedirectPreservesTemplate && request.IsInternalRedirect);
 
             var altTemplate = useAltTemplate
                 ? _requestAccessor.GetRequestValue(Constants.Conventions.Url.AltTemplate)
