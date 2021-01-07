@@ -96,11 +96,15 @@ namespace Umbraco.Web.Routing
             return request.Build().Success();
         }
 
-        private void SetVariationContext(string culture)
+        private void SetVariationContext(CultureInfo culture)
         {
-            var variationContext = _variationContextAccessor.VariationContext;
-            if (variationContext != null && variationContext.Culture == culture) return;
-            _variationContextAccessor.VariationContext = new VariationContext(culture);
+            VariationContext variationContext = _variationContextAccessor.VariationContext;
+            if (variationContext != null && variationContext.Culture == culture?.Name)
+            {
+                return;
+            }
+
+            _variationContextAccessor.VariationContext = new VariationContext(culture?.Name);
         }
 
         /// <inheritdoc />
@@ -123,7 +127,7 @@ namespace Umbraco.Web.Routing
             // set the culture on the thread - once, so it's set when running document lookups
             // TODO: Set this on HttpContext!
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
-            SetVariationContext(request.Culture.Name);
+            SetVariationContext(request.Culture);
 
             // find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
             // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
@@ -139,7 +143,7 @@ namespace Umbraco.Web.Routing
 
             // set the culture on the thread -- again, 'cos it might have changed due to a finder or wildcard domain
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
-            SetVariationContext(request.Culture.Name);
+            SetVariationContext(request.Culture);
 
             //// trigger the Prepared event - at that point it is still possible to change about anything
             //// even though the request might be flagged for redirection - we'll redirect _after_ the event
@@ -171,12 +175,14 @@ namespace Umbraco.Web.Routing
                 return frequest.Build();
             }
 
+            var result = frequest.Build();
+
             // set the culture on the thread -- again, 'cos it might have changed in the event handler
             // TODO: Set this on HttpContext!
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = frequest.Culture;
-            SetVariationContext(frequest.Culture.Name);
+            SetVariationContext(result.Culture);
 
-            return frequest.Build();
+            return result;
         }
 
         // TODO: This shouldn't be required and should be handled differently during route building

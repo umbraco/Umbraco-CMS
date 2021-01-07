@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
             IsInternalRedirectPublishedContent = isInternalRedirectPublishedContent;
             Template = template;
             Domain = domain;
-            Culture = culture ?? throw new ArgumentNullException(nameof(culture));
+            Culture = culture;
             RedirectUrl = redirectUrl;
             ResponseStatusCode = responseStatusCode;
             CacheExtensions = cacheExtensions;
