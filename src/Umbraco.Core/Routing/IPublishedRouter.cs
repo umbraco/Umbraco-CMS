@@ -33,16 +33,19 @@ namespace Umbraco.Web.Routing
         /// <returns>A value indicating whether the request can be routed to a document.</returns>
         Task<bool> TryRouteRequestAsync(IPublishedRequestBuilder request);
 
-        // TODO: This shouldn't be required and should be handled differently during route building
-        ///// <summary>
-        ///// Updates the request to "not found".
-        ///// </summary>
-        ///// <param name="request">The request.</param>
-        ///// <remarks>
-        ///// <para>This method is invoked when the pipeline decides it cannot render
-        ///// the request, for whatever reason, and wants to force it to be re-routed
-        ///// and rendered as if no document were found (404).</para>
-        ///// </remarks>
-        //void UpdateRequestToNotFound(IPublishedRequest request);
+        /// <summary>
+        /// Updates the request to "not found".
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <remarks>
+        /// <returns>A new <see cref="IPublishedRequestBuilder"/> based on values from the original <see cref="IPublishedRequest"/></returns>
+        /// <para>This method is invoked when the pipeline decides it cannot render
+        /// the request, for whatever reason, and wants to force it to be re-routed
+        /// and rendered as if no document were found (404).</para>
+        /// <para>This occurs if there is no template found and route hijacking was not matched.
+        /// In that case it's the same as if there was no content which means even if there was
+        /// content matched we want to run the request through the last chance finders.</para>
+        /// </remarks>
+        IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request);
     }
 }

@@ -119,15 +119,6 @@ namespace Umbraco.Web.Common.Controllers
         public virtual IActionResult Index() => CurrentTemplate(new ContentModel(CurrentPage));
 
         /// <summary>
-        /// The action that renders when there is no template assigned, templates are not disabled and there is no hijacked route
-        /// </summary>
-        /// <remarks>
-        /// This action renders even if there might be content found, but if there is no template assigned, templates are not disabled and there is no hijacked route
-        /// then we render the blank screen.
-        /// </remarks>
-        public IActionResult NoTemplate() => GetNoTemplateResult(UmbracoRouteValues.PublishedRequest);
-
-        /// <summary>
         /// Before the controller executes we will handle redirects and not founds
         /// </summary>
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

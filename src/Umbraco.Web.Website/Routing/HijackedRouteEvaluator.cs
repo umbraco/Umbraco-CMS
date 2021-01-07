@@ -30,6 +30,9 @@ namespace Umbraco.Web.Website.Routing
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
+        /// <summary>
+        /// Determines if a custom controller can hijack the current route
+        /// </summary>
         public HijackedRouteResult Evaluate(string controller, string action)
         {
             IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates(controller, action, DefaultActionName);

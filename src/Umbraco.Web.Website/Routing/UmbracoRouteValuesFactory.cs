@@ -1,12 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
@@ -20,28 +17,28 @@ namespace Umbraco.Web.Website.Routing
     /// </summary>
     public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
     {
-        private readonly ILogger<UmbracoRouteValuesFactory> _logger;
         private readonly IUmbracoRenderingDefaults _renderingDefaults;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoFeatures _umbracoFeatures;
         private readonly HijackedRouteEvaluator _hijackedRouteEvaluator;
+        private readonly IPublishedRouter _publishedRouter;
         private readonly Lazy<string> _defaultControllerName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValuesFactory"/> class.
         /// </summary>
         public UmbracoRouteValuesFactory(
-            ILogger<UmbracoRouteValuesFactory> logger,
             IUmbracoRenderingDefaults renderingDefaults,
             IShortStringHelper shortStringHelper,
             UmbracoFeatures umbracoFeatures,
-            HijackedRouteEvaluator hijackedRouteEvaluator)
+            HijackedRouteEvaluator hijackedRouteEvaluator,
+            IPublishedRouter publishedRouter)
         {
-            _logger = logger;
             _renderingDefaults = renderingDefaults;
             _shortStringHelper = shortStringHelper;
             _umbracoFeatures = umbracoFeatures;
             _hijackedRouteEvaluator = hijackedRouteEvaluator;
+            _publishedRouter = publishedRouter;
             _defaultControllerName = new Lazy<string>(() => ControllerExtensions.GetControllerName(_renderingDefaults.DefaultControllerType));
         }
 
@@ -89,21 +86,50 @@ namespace Umbraco.Web.Website.Routing
                 defaultControllerType,
                 templateName: customActionName);
 
+            def = CheckHijackedRoute(def);
+
+            def = CheckNoTemplate(def);
+
+            // store the route definition
+            values.TryAdd(Constants.Web.UmbracoRouteDefinitionDataToken, def);
+
+            return def;
+        }
+
+        /// <summary>
+        /// Check if the route is hijacked and return new route values
+        /// </summary>
+        /// <param name="def"></param>
+        /// <returns></returns>
+        private UmbracoRouteValues CheckHijackedRoute(UmbracoRouteValues def)
+        {
+            IPublishedRequest request = def.PublishedRequest;
+
             var customControllerName = request.PublishedContent?.ContentType.Alias;
             if (customControllerName != null)
             {
-                HijackedRouteResult hijackedResult = _hijackedRouteEvaluator.Evaluate(customControllerName, customActionName);
+                HijackedRouteResult hijackedResult = _hijackedRouteEvaluator.Evaluate(customControllerName, def.TemplateName);
                 if (hijackedResult.Success)
                 {
-                    def = new UmbracoRouteValues(
+                    return new UmbracoRouteValues(
                         request,
                         hijackedResult.ControllerName,
                         hijackedResult.ControllerType,
                         hijackedResult.ActionName,
-                        customActionName,
+                        def.TemplateName,
                         true);
                 }
             }
+
+            return def;
+        }
+
+        /// <summary>
+        /// Special check for when no template or hijacked route is done which needs to re-run through the routing pipeline again for last chance finders
+        /// </summary>
+        private UmbracoRouteValues CheckNoTemplate(UmbracoRouteValues def)
+        {
+            IPublishedRequest request = def.PublishedRequest;
 
             // Here we need to check if there is no hijacked route and no template assigned,
             // if this is the case we want to return a blank page.
@@ -113,21 +139,27 @@ namespace Umbraco.Web.Website.Routing
                 && !_umbracoFeatures.Disabled.DisableTemplates
                 && !def.HasHijackedRoute)
             {
-                // TODO: this is basically a 404, in v8 this will re-run the pipeline
-                // in order to see if a last chance finder finds some content
-                // At this point we're already done building the request and we have an immutable
-                // request. in v8 it was re-mutated :/ I really don't want to do that
+                Core.Models.PublishedContent.IPublishedContent content = request.PublishedContent;
 
-                // In this case we'll render the NoTemplate action
+                // This is basically a 404 even if there is content found.
+                // We then need to re-run this through the pipeline for the last
+                // chance finders to work.
+                IPublishedRequestBuilder builder = _publishedRouter.UpdateRequestToNotFound(request);
+                request = builder.Build();
+
                 def = new UmbracoRouteValues(
                         request,
-                        DefaultControllerName,
-                        defaultControllerType,
-                        nameof(RenderController.NoTemplate));
-            }
+                        def.ControllerName,
+                        def.ControllerType,
+                        def.ActionName,
+                        def.TemplateName);
 
-            // store the route definition
-            values.TryAdd(Constants.Web.UmbracoRouteDefinitionDataToken, def);
+                // if the content has changed, we must then again check for hijacked routes
+                if (content != request.PublishedContent)
+                {
+                    def = CheckHijackedRoute(def);
+                }
+            }
 
             return def;
         }

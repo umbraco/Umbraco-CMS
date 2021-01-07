@@ -205,40 +205,33 @@ namespace Umbraco.Web.Routing
             return result;
         }
 
-        // TODO: This shouldn't be required and should be handled differently during route building
-        ///// <inheritdoc />
-        //public void UpdateRequestToNotFound(IPublishedRequest request)
-        //{
-        //    // clear content
-        //    var content = request.PublishedContent;
-        //    request.PublishedContent = null;
+        /// <inheritdoc />
+        public IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request)
+        {
+            var builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
-        //    HandlePublishedContent(request); // will go 404
-        //    FindTemplate(request);
+            // clear content
+            IPublishedContent content = request.PublishedContent;
+            builder.SetPublishedContent(null);
 
-        //    // if request has been flagged to redirect then return
-        //    // whoever called us is in charge of redirecting
-        //    if (request.IsRedirect)
-        //    {
-        //        return;
-        //    }
+            HandlePublishedContent(builder); // will go 404
+            FindTemplate(builder, false);
 
-        //    if (request.HasPublishedContent == false)
-        //    {
-        //        // means the engine could not find a proper document to handle 404
-        //        // restore the saved content so we know it exists
-        //        request.PublishedContent = content;
-        //        return;
-        //    }
+            // if request has been flagged to redirect then return
+            if (request.IsRedirect())
+            {
+                return builder;
+            }
 
-        //    if (request.HasTemplate == false)
-        //    {
-        //        // means we may have a document, but we have no template
-        //        // at that point there isn't much we can do and there is no point returning
-        //        // to Mvc since Mvc can't do much either
-        //        return;
-        //    }
-        //}
+            if (!builder.HasPublishedContent())
+            {
+                // means the engine could not find a proper document to handle 404
+                // restore the saved content so we know it exists
+                builder.SetPublishedContent(content);
+            }
+
+            return builder;
+        }
 
         /// <summary>
         /// Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
