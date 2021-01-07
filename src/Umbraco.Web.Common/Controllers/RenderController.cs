@@ -119,6 +119,15 @@ namespace Umbraco.Web.Common.Controllers
         public virtual IActionResult Index() => CurrentTemplate(new ContentModel(CurrentPage));
 
         /// <summary>
+        /// The action that renders when there is no template assigned, templates are not disabled and there is no hijacked route
+        /// </summary>
+        /// <remarks>
+        /// This action renders even if there might be content found, but if there is no template assigned, templates are not disabled and there is no hijacked route
+        /// then we render the blank screen.
+        /// </remarks>
+        public IActionResult NoTemplate() => GetNoTemplateResult(UmbracoRouteValues.PublishedRequest);
+
+        /// <summary>
         /// Before the controller executes we will handle redirects and not founds
         /// </summary>
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -126,10 +135,10 @@ namespace Umbraco.Web.Common.Controllers
             IPublishedRequest pcr = UmbracoRouteValues.PublishedRequest;
 
             _logger.LogDebug(
-                "Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
-                pcr.IsRedirect() ? (pcr.IsRedirectPermanent() ? "permanent" : "redirect") : "none",
-                pcr.Is404() ? "true" : "false",
-                pcr.ResponseStatusCode);
+            "Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
+            pcr.IsRedirect() ? (pcr.IsRedirectPermanent() ? "permanent" : "redirect") : "none",
+            pcr.Is404() ? "true" : "false",
+            pcr.ResponseStatusCode);
 
             UmbracoRouteResult routeStatus = pcr.GetRouteResult();
             switch (routeStatus)
@@ -142,15 +151,37 @@ namespace Umbraco.Web.Common.Controllers
                         : Redirect(pcr.RedirectUrl);
                     break;
                 case UmbracoRouteResult.NotFound:
-
                     // set the redirect result and do not call next to short circuit
-                    context.Result = new PublishedContentNotFoundResult(UmbracoContext);
+                    context.Result = GetNoTemplateResult(pcr);
                     break;
                 case UmbracoRouteResult.Success:
                 default:
                     // continue normally
                     await next();
                     break;
+            }
+        }
+
+        private PublishedContentNotFoundResult GetNoTemplateResult(IPublishedRequest pcr)
+        {
+            // missing template, so we're in a 404 here
+            // so the content, if any, is a custom 404 page of some sort
+            if (!pcr.HasPublishedContent())
+            {
+                // means the builder could not find a proper document to handle 404
+                return new PublishedContentNotFoundResult(UmbracoContext);
+            }
+            else if (!pcr.HasTemplate())
+            {
+                // means the engine could find a proper document, but the document has no template
+                // at that point there isn't much we can do
+                return new PublishedContentNotFoundResult(
+                    UmbracoContext,
+                    "In addition, no template exists to render the custom 404.");
+            }
+            else
+            {
+                return new PublishedContentNotFoundResult(UmbracoContext);
             }
         }
     }

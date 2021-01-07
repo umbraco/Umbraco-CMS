@@ -22,7 +22,7 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContext = GetUmbracoContext("/test");
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
             var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
-            var result = publishedRouter.ConfigureRequest(request);
+            var result = publishedRouter.BuildRequest(request);
 
             Assert.IsFalse(result.Success());
         }
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.PublishedContent
             request.SetPublishedContent(content.Object);
             request.SetCulture(new CultureInfo("en-AU"));
             request.SetRedirect("/hello");
-            var result = publishedRouter.ConfigureRequest(request);
+            var result = publishedRouter.BuildRequest(request);
 
             Assert.IsFalse(result.Success());
         }

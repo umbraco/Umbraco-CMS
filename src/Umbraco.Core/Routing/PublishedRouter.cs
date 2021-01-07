@@ -177,12 +177,11 @@ namespace Umbraco.Web.Routing
             // to find out the appropriate template
 
             // complete the PCR and assign the remaining values
-            return ConfigureRequest(request);
+            return BuildRequest(request);
         }
 
         /// <summary>
-        /// Called by PrepareRequest once everything has been discovered, resolved and assigned to the PCR. This method
-        /// finalizes the PCR with the values assigned.
+        /// This method finalizes/builds the PCR with the values assigned.
         /// </summary>
         /// <returns>
         /// Returns false if the request was not successfully configured
@@ -191,14 +190,14 @@ namespace Umbraco.Web.Routing
         /// This method logic has been put into it's own method in case developers have created a custom PCR or are assigning their own values
         /// but need to finalize it themselves.
         /// </remarks>
-        internal IPublishedRequest ConfigureRequest(IPublishedRequestBuilder frequest)
+        internal IPublishedRequest BuildRequest(IPublishedRequestBuilder frequest)
         {
+            IPublishedRequest result = frequest.Build();
+
             if (!frequest.HasPublishedContent())
             {
-                return frequest.Build();
+                return result;
             }
-
-            IPublishedRequest result = frequest.Build();
 
             // set the culture -- again, 'cos it might have changed in the event handler
             SetVariationContext(result.Culture);
@@ -388,7 +387,7 @@ namespace Umbraco.Web.Routing
             // so internal redirect, 404, etc has precedence over redirect
 
             // handle not-found, redirects, access...
-            HandlePublishedContent(request, foundContentByFinders);
+            HandlePublishedContent(request);
 
             // find a template
             FindTemplate(request, foundContentByFinders);
@@ -425,12 +424,11 @@ namespace Umbraco.Web.Routing
         /// Handles the published content (if any).
         /// </summary>
         /// <param name="request">The request builder.</param>
-        /// <param name="contentFoundByFinders">If the content was found by the finders, before anything such as 404, redirect... took place.</param>
         /// <remarks>
         /// Handles "not found", internal redirects, access validation...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
-        private void HandlePublishedContent(IPublishedRequestBuilder request, bool contentFoundByFinders)
+        private void HandlePublishedContent(IPublishedRequestBuilder request)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
@@ -457,7 +455,7 @@ namespace Umbraco.Web.Routing
 
                 // follow internal redirects as long as it's not running out of control ie infinite loop of some sort
                 j = 0;
-                while (FollowInternalRedirects(request, contentFoundByFinders) && j++ < maxLoop)
+                while (FollowInternalRedirects(request) && j++ < maxLoop)
                 { }
 
                 // we're running out of control
@@ -490,13 +488,12 @@ namespace Umbraco.Web.Routing
         /// Follows internal redirections through the <c>umbracoInternalRedirectId</c> document property.
         /// </summary>
         /// <param name="request">The request builder.</param>
-        /// <param name="contentFoundByFinders">If the content was found by the finders, before anything such as 404, redirect... took place.</param>
         /// <returns>A value indicating whether redirection took place and led to a new published document.</returns>
         /// <remarks>
         /// <para>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</para>
         /// <para>As per legacy, if the redirect does not work, we just ignore it.</para>
         /// </remarks>
-        private bool FollowInternalRedirects(IPublishedRequestBuilder request, bool contentFoundByFinders)
+        private bool FollowInternalRedirects(IPublishedRequestBuilder request)
         {
             if (request.PublishedContent == null)
             {
