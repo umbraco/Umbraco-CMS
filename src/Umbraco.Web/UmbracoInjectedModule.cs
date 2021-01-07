@@ -135,8 +135,8 @@ namespace Umbraco.Web
 
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
-            var requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
-            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
+            var requestBuilder = _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl).Result;
+            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequestAsync(requestBuilder).Result;
 
             // NOTE: This has been ported to netcore
             // HandleHttpResponseStatus returns a value indicating that the request should

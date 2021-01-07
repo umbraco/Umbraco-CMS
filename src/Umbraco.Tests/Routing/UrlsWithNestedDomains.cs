@@ -13,6 +13,7 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Core.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void DoNotPolluteCache()
+        public async Task DoNotPolluteCache()
         {
             var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Routing
 
             // route a rogue URL
             var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             publishedRouter.FindDomain(frequest);
             Assert.IsTrue(frequest.HasDomain());

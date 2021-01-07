@@ -3,10 +3,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -16,6 +18,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Routing
 {
+
     /// <summary>
     /// Provides the default <see cref="IPublishedRouter"/> implementation.
     /// </summary>
@@ -35,6 +38,7 @@ namespace Umbraco.Web.Routing
         private readonly IContentTypeService _contentTypeService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -53,7 +57,8 @@ namespace Umbraco.Web.Routing
             IFileService fileService,
             IContentTypeService contentTypeService,
             IPublicAccessService publicAccessService,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IEventAggregator eventAggregator)
         {
             _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -69,31 +74,52 @@ namespace Umbraco.Web.Routing
             _contentTypeService = contentTypeService;
             _publicAccessService = publicAccessService;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _eventAggregator = eventAggregator;
         }
 
         /// <inheritdoc />
-        public IPublishedRequestBuilder CreateRequest(Uri uri) => new PublishedRequestBuilder(uri, _fileService);
+        public async Task<IPublishedRequestBuilder> CreateRequestAsync(Uri uri)
+        {
+            // trigger the Creating event - at that point the URL can be changed
+            // this is based on this old task here: https://issues.umbraco.org/issue/U4-7914 which was fulfiled by
+            // this PR https://github.com/umbraco/Umbraco-CMS/pull/1137
+            // It's to do with proxies, quote:
+
+            /*
+                "Thinking about another solution.
+                We already have an event, PublishedContentRequest.Prepared, which triggers once the request has been prepared and domain, content, template have been figured out -- but before it renders -- so ppl can change things before rendering.
+                Wondering whether we could have a event, PublishedContentRequest.Preparing, which would trigger before the request is prepared, and would let ppl change the value of the request's URI (which by default derives from the HttpContext request).
+                That way, if an in-between equipement changes the URI, you could replace it with the original, public-facing URI before we process the request, meaning you could register your HTTPS domain and it would work. And you would have to supply code for each equipment. Less magic in Core."
+             */
+
+            // but now we'll just have one event for creating so if people wish to change the URL here they can but nothing else
+            var creatingRequest = new CreatingRequestNotification(uri);
+            await _eventAggregator.PublishAsync(creatingRequest);
+
+            var publishedRequestBuilder = new PublishedRequestBuilder(creatingRequest.Url, _fileService);
+            return publishedRequestBuilder;
+        }
 
         /// <inheritdoc />
-        public bool TryRouteRequest(IPublishedRequestBuilder request)
+        public Task<bool> TryRouteRequestAsync(IPublishedRequestBuilder request)
         {
             FindDomain(request);
 
             // TODO: This was ported from v8 but how could it possibly have a redirect here?
             if (request.IsRedirect())
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             // TODO: This was ported from v8 but how could it possibly have content here?
             if (request.HasPublishedContent())
             {
-                return true;
+                return Task.FromResult(true);
             }
 
             FindPublishedContent(request);
 
-            return request.Build().Success();
+            return Task.FromResult(request.Build().Success());
         }
 
         private void SetVariationContext(CultureInfo culture)
@@ -112,12 +138,8 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public IPublishedRequest RouteRequest(IPublishedRequestBuilder request)
+        public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request)
         {
-            //// trigger the Preparing event - at that point anything can still be changed
-            //// the idea is that it is possible to change the uri
-            //request.OnPreparing();
-
             // find domain
             FindDomain(request);
 
@@ -146,10 +168,10 @@ namespace Umbraco.Web.Routing
             // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
             SetVariationContext(request.Culture);
 
-            //// trigger the Prepared event - at that point it is still possible to change about anything
-            //// even though the request might be flagged for redirection - we'll redirect _after_ the event
-            //// also, OnPrepared() will make the PublishedRequest readonly, so nothing can change
-            //request.OnPrepared();
+            // trigger the routing request (used to be called Prepared) event - at that point it is still possible to change about anything
+            // even though the request might be flagged for redirection - we'll redirect _after_ the event
+            var routingRequest = new RoutingRequestNotification(request);
+            await _eventAggregator.PublishAsync(routingRequest);
 
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template

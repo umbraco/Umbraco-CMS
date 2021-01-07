@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -114,7 +115,8 @@ namespace Umbraco.Tests.TestHelpers
                 container?.GetRequiredService<IFileService>() ?? Current.Factory.GetRequiredService<IFileService>(),
                 container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
                 container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>(),
-                umbracoContextAccessor
+                umbracoContextAccessor,
+                Mock.Of<IEventAggregator>()
             );
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
@@ -16,21 +17,21 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="uri">The current request Uri.</param>
         /// <returns>A published request builder.</returns>
-        IPublishedRequestBuilder CreateRequest(Uri uri);
+        Task<IPublishedRequestBuilder> CreateRequestAsync(Uri uri);
 
         /// <summary>
         /// Prepares a request for rendering.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A value indicating whether the request was successfully prepared and can be rendered.</returns>
-        IPublishedRequest RouteRequest(IPublishedRequestBuilder request);
+        Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request);
 
         /// <summary>
         /// Tries to route a request.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A value indicating whether the request can be routed to a document.</returns>
-        bool TryRouteRequest(IPublishedRequestBuilder request);
+        Task<bool> TryRouteRequestAsync(IPublishedRequestBuilder request);
 
         // TODO: This shouldn't be required and should be handled differently during route building
         ///// <summary>

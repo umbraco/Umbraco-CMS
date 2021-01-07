@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/1001-1", 10011)]
         [TestCase("http://domain1.com/1001-2/1001-2-1", 100121)]
 
-        public void Lookup_SingleDomain(string url, int expectedId)
+        public async Task Lookup_SingleDomain(string url, int expectedId)
         {
             SetDomains3();
 
@@ -134,7 +135,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("https://domain1.com/", 1001, "en-US")]
         [TestCase("https://domain3.com/", 1001, "")] // because domain3 is explicitely set on http
 
-        public void Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
+        public async Task Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
         {
             SetDomains4();
 
@@ -175,7 +176,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);

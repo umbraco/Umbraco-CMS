@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Routing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -45,11 +46,11 @@ namespace Umbraco.Tests.Routing
         [TestCase("/only/one/alias", 100111)]
         [TestCase("/ONLY/one/Alias", 100111)]
         [TestCase("/alias43", 100121)]
-        public void Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
+        public async Task Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var lookup =
                 new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
 

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Web.Mvc
         }
 
         [Test]
-        public void Mock_Current_Page()
+        public async Task Mock_Current_Page()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
             var httpContextAccessor = TestHelper.GetHttpContextAccessor();
@@ -152,7 +153,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var webRoutingSettings = new WebRoutingSettings();
             var publishedRouter = BaseWebTest.CreatePublishedRouter(umbracoContextAccessor, webRoutingSettings);
-            var frequest = publishedRouter.CreateRequest(new Uri("http://localhost/test"));
+            var frequest = await publishedRouter.CreateRequestAsync(new Uri("http://localhost/test"));
             frequest.SetPublishedContent(content);
 
             var routeDefinition = new RouteDefinition

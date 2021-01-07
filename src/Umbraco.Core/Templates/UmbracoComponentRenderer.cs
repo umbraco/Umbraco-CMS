@@ -43,7 +43,7 @@ namespace Umbraco.Core.Templates
             {
                 try
                 {
-                    _templateRenderer.Render(contentId, altTemplateId, sw);
+                    _templateRenderer.RenderAsync(contentId, altTemplateId, sw);
                 }
                 catch (Exception ex)
                 {

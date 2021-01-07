@@ -27,6 +27,7 @@ using Umbraco.Web.Runtime;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Routing
         /// Will route to the default controller and action since no custom controller is defined for this node route
         /// </summary>
         [Test]
-        public void Umbraco_Route_Umbraco_Defined_Controller_Action()
+        public async Task Umbraco_Route_Umbraco_Defined_Controller_Action()
         {
             var url = "~/dummy-page";
             var template = CreateTemplate("homePage");
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(url, template.Id, routeData);
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             frequest.SetPublishedContent(umbracoContext.Content.GetById(1174));
             frequest.SetTemplate(template);
 
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("homePage")]
         [TestCase("site1/template2")]
         [TestCase("site1\\template2")]
-        public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
+        public async Task Umbraco_Route_User_Defined_Controller_Action(string templateName)
         {
             // NOTE - here we create templates with crazy aliases... assuming that these
             // could exist in the database... yet creating templates should sanitize
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             frequest.SetPublishedContent(umbracoContext.Content.GetById(1172));
             frequest.SetTemplate(template);
 

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
@@ -14,12 +15,12 @@ namespace Umbraco.Tests.Routing
         [TestCase("/default.aspx?umbPageId=1046", 1046)] // TODO: Should this match??
         [TestCase("/some/other/page?umbPageId=1046", 1046)] // TODO: Should this match??
         [TestCase("/some/other/page.aspx?umbPageId=1046", 1046)] // TODO: Should this match??
-        public void Lookup_By_Page_Id(string urlAsString, int nodeMatch)
+        public async Task Lookup_By_Page_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
             var httpContext = GetHttpContextFactory(urlAsString).HttpContext;
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var mockRequestAccessor = new Mock<IRequestAccessor>();
             mockRequestAccessor.Setup(x => x.GetRequestValue("umbPageID")).Returns(httpContext.Request.QueryString["umbPageID"]);
 

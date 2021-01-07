@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -16,22 +17,22 @@ namespace Umbraco.Tests.PublishedContent
     public class PublishedRouterTests : BaseWebTest
     {
         [Test]
-        public void ConfigureRequest_Returns_False_Without_HasPublishedContent()
+        public async Task ConfigureRequest_Returns_False_Without_HasPublishedContent()
         {
             var umbracoContext = GetUmbracoContext("/test");
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var request = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var result = publishedRouter.ConfigureRequest(request);
 
             Assert.IsFalse(result.Success());
         }
 
         [Test]
-        public void ConfigureRequest_Returns_False_When_IsRedirect()
+        public async Task ConfigureRequest_Returns_False_When_IsRedirect()
         {
             var umbracoContext = GetUmbracoContext("/test");
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var request = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var content = GetPublishedContentMock();
             request.SetPublishedContent(content.Object);
             request.SetCulture(new CultureInfo("en-AU"));

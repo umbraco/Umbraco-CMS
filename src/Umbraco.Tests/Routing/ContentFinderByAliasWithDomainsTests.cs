@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -52,13 +53,13 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/bar/foo", "de-DE", 100111)] // ok
         [TestCase("http://domain1.com/en/bar/foo", "en-US", -100111)] // no, alias must include "en/"
         [TestCase("http://domain1.com/en/bar/nil", "en-US", 100111)] // ok, alias includes "en/"
-        public void Lookup_By_Url_Alias_And_Domain(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task Lookup_By_Url_Alias_And_Domain(string inputUrl, string expectedCulture, int expectedNode)
         {
             //SetDomains1();
 
             var umbracoContext = GetUmbracoContext(inputUrl);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var request = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var request = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             // must lookup domain
             publishedRouter.FindDomain(request);
 

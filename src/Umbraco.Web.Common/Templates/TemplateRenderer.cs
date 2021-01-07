@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -14,11 +15,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
@@ -41,7 +40,8 @@ namespace Umbraco.Web.Common.Templates
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor,
+        public TemplateRenderer(
+            IUmbracoContextAccessor umbracoContextAccessor,
             IPublishedRouter publishedRouter,
             IFileService fileService,
             ILocalizationService textService,
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Common.Templates
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
         }
 
-        public void Render(int pageId, int? altTemplateId, StringWriter writer)
+        public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
         {
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Common.Templates
             // instantiate a request and process
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
-            var requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var requestBuilder = await _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             var doc = umbracoContext.Content.GetById(pageId);
 

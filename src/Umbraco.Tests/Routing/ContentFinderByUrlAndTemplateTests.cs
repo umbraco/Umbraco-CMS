@@ -5,6 +5,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1/blah")]
         [TestCase("/Home/Sub1/Blah")] //different cases
         [TestCase("/home/Sub1.aspx/blah")]
-        public void Match_Document_By_Url_With_Template(string urlAsString)
+        public async Task Match_Document_By_Url_With_Template(string urlAsString)
         {
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Routing
             var template2 = CreateTemplate("blah");
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings: globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var reqBuilder = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var reqBuilder = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
             var lookup = new ContentFinderByUrlAndTemplate(
                 LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(),

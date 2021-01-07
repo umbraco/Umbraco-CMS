@@ -11,6 +11,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Routing;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Content_Not_Published()
+        public async Task Content_Not_Published()
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var content = MockedContent.CreateBasicContent(contentType);
@@ -67,13 +68,13 @@ namespace Umbraco.Tests.Routing
                 GetUmbracoContextAccessor(umbContext),
                 Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbContext)) }));
-            var urls = content.GetContentUrls(publishedRouter,
+            var urls = (await content.GetContentUrlsAsync(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
-                PublishedUrlProvider).ToList();
+                PublishedUrlProvider)).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("content/itemNotPublished", urls[0].Text);
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Invariant_Root_Content_Published_No_Domains()
+        public async Task Invariant_Root_Content_Published_No_Domains()
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var content = MockedContent.CreateBasicContent(contentType);
@@ -108,13 +109,13 @@ namespace Umbraco.Tests.Routing
                 umbracoContextAccessor,
                 Factory,
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), umbracoContextAccessor) }));
-            var urls = content.GetContentUrls(publishedRouter,
+            var urls = (await content.GetContentUrlsAsync(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
-                publishedUrlProvider).ToList();
+                publishedUrlProvider)).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/", urls[0].Text);
@@ -123,7 +124,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Invariant_Child_Content_Published_No_Domains()
+        public async Task Invariant_Child_Content_Published_No_Domains()
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var parent = MockedContent.CreateBasicContent(contentType);
@@ -155,14 +156,14 @@ namespace Umbraco.Tests.Routing
                 umbracoContextAccessor,
                 Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), umbracoContextAccessor) }));
-            var urls = child.GetContentUrls(publishedRouter,
+            var urls = (await child.GetContentUrlsAsync(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
                 LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
                 publishedUrlProvider
-                ).ToList();
+                )).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/sub1/", urls[0].Text);

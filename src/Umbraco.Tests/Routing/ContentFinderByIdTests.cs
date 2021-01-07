@@ -6,20 +6,20 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
     [TestFixture]
     public class ContentFinderByIdTests : BaseWebTest
     {
-
         [TestCase("/1046", 1046)]
         [TestCase("/1046.aspx", 1046)]
-        public void Lookup_By_Id(string urlAsString, int nodeMatch)
+        public async Task Lookup_By_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
             var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), LoggerFactory.CreateLogger<ContentFinderByIdPath>(), Factory.GetRequiredService<IRequestAccessor>(), GetUmbracoContextAccessor(umbracoContext));
 

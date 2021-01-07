@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -261,7 +262,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
         #endregion
-        public void DomainAndCulture(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainAndCulture(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains1();
 
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
@@ -306,7 +307,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("/1003/1003-1", "nl-NL", 10031)] // wildcard on 10031 applies
         [TestCase("/1003/1003-1/1003-1-1", "nl-NL", 100311)] // wildcard on 10031 applies
         #endregion
-        public void DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains2();
 
@@ -317,7 +318,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
@@ -363,14 +364,14 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
         #endregion
-        public void DomainGeneric(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainGeneric(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains3();
 
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);

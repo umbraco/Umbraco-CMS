@@ -102,7 +102,7 @@ namespace Umbraco.Web.Website.Routing
                 return await Task.FromResult(values);
             }
 
-            RouteRequest(_umbracoContextAccessor.UmbracoContext, out IPublishedRequest publishedRequest);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(_umbracoContextAccessor.UmbracoContext);
 
             UmbracoRouteValues routeDef = GetUmbracoRouteDefinition(httpContext, values, publishedRequest);
 
@@ -228,23 +228,19 @@ namespace Umbraco.Web.Website.Routing
             return descriptors;
         }
 
-        private bool RouteRequest(IUmbracoContext umbracoContext, out IPublishedRequest publishedRequest)
+        private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
         {
-            // TODO: I suspect one day this will be async
-
             // ok, process
 
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-            IPublishedRequestBuilder requestBuilder = _publishedRouter.CreateRequest(umbracoContext.CleanedUmbracoUrl);
+            IPublishedRequestBuilder requestBuilder = await _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // TODO: This is ugly with the re-assignment to umbraco context but at least its now
             // an immutable object. The only way to make this better would be to have a RouteRequest
             // as part of UmbracoContext but then it will require a PublishedRouter dependency so not sure that's worth it.
             // Maybe could be a one-time Set method instead?
-            publishedRequest = umbracoContext.PublishedRequest = _publishedRouter.RouteRequest(requestBuilder);
-
-            return publishedRequest.Success();
+            return umbracoContext.PublishedRequest = await _publishedRouter.RouteRequestAsync(requestBuilder);
 
             // // HandleHttpResponseStatus returns a value indicating that the request should
             // // not be processed any further, eg because it has been redirect. then, exit.
