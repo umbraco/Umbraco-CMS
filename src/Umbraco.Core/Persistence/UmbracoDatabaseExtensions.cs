@@ -48,6 +48,9 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public static DatabaseSchemaResult ValidateSchema(this IUmbracoDatabase database, ILogger logger)
         {
+            if (database is null) throw new ArgumentNullException(nameof(database));
+            if (logger is null) throw new ArgumentNullException(nameof(logger));
+
             var dbSchema = new DatabaseSchemaCreator(database, logger);
             var databaseSchemaValidationResult = dbSchema.ValidateSchema();            
             return databaseSchemaValidationResult;
@@ -61,6 +64,9 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public static bool IsUmbracoInstalled(this IUmbracoDatabase database, ILogger logger)
         {
+            if (database is null) throw new ArgumentNullException(nameof(database));
+            if (logger is null) throw new ArgumentNullException(nameof(logger));
+
             var databaseSchemaValidationResult = database.ValidateSchema(logger);
             return databaseSchemaValidationResult.DetermineHasInstalledVersion();
         }

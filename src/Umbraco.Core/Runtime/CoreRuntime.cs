@@ -174,7 +174,6 @@ namespace Umbraco.Core.Runtime
                 // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
-
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
 
@@ -329,8 +328,8 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        // internal for tests
-        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
+        // internal/virtual for tests (i.e. hack, do not port to netcore)
+        internal virtual void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
         {
             using (var timer = profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
