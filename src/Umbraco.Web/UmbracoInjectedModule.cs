@@ -36,7 +36,6 @@ namespace Umbraco.Web
         private readonly ILogger _logger;
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly RoutableDocumentFilter _routableDocumentLookup;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -45,7 +44,6 @@ namespace Umbraco.Web
             ILogger logger,
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            RoutableDocumentFilter routableDocumentLookup,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
@@ -53,7 +51,6 @@ namespace Umbraco.Web
             _logger = logger;
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
-            _routableDocumentLookup = routableDocumentLookup;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -157,14 +154,15 @@ namespace Umbraco.Web
 
             var reason = EnsureRoutableOutcome.IsRoutable;
 
-            // ensure this is a document request
-            if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
-            {
-                reason = EnsureRoutableOutcome.NotDocumentRequest;
-            }
+            //// ensure this is a document request
+            //if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
+            //{
+            //    reason = EnsureRoutableOutcome.NotDocumentRequest;
+            //}
+
             // ensure the runtime is in the proper state
             // and deal with needed redirects, etc
-            else if (!EnsureRuntime(httpContext, uri))
+            if (!EnsureRuntime(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotReady;
             }
