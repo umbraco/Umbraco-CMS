@@ -7,10 +7,9 @@ using System.Threading;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Common.Routing
 {
@@ -27,12 +26,10 @@ namespace Umbraco.Web.Common.Routing
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointDataSource _endpointDataSource;
         private readonly object _routeLocker = new object();
-
-#pragma warning disable IDE0044 // Add readonly modifier
+        private readonly List<string> _backOfficePaths;
         private object _initLocker = new object();
         private bool _isInit = false;
         private HashSet<string> _reservedList;
-#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutableDocumentFilter"/> class.

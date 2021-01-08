@@ -12,6 +12,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
+                new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 Mock.Of<ICookieManager>(),
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
+                new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 Mock.Of<ICookieManager>(),
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 publishedSnapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
+                new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 Mock.Of<ICookieManager>(),
@@ -149,7 +150,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
+                new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 Mock.Of<ICookieManager>(),

@@ -76,16 +76,41 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             RouteEndpoint endpoint1 = CreateEndpoint(
                 "Umbraco/RenderMvc/{action?}/{id?}",
                 new { controller = "RenderMvc" },
-                "Umbraco_default",
                 0);
 
             RouteEndpoint endpoint2 = CreateEndpoint(
                 "api/{controller?}/{id?}",
                 new { action = "Index" },
-                "WebAPI",
                 1);
 
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1, endpoint2);
+
+            var routableDocFilter = new RoutableDocumentFilter(
+                globalSettings,
+                GetHostingEnvironment(),
+                endpointDataSource);
+
+            Assert.AreEqual(
+                !isReserved, // not reserved if it's a document request
+                routableDocFilter.IsDocumentRequest(url));
+        }
+
+        [TestCase("/umbraco", true)]
+        [TestCase("/umbraco/", true)]
+        [TestCase("/umbraco/Default", true)]
+        [TestCase("/umbraco/default/", true)]
+        [TestCase("/umbraco/default/123", true)]
+        [TestCase("/umbraco/default/blah/123", false)]
+        public void Is_Reserved_By_Default_Back_Office_Route(string url, bool isReserved)
+        {
+            var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+
+            RouteEndpoint endpoint1 = CreateEndpoint(
+                "umbraco/{action}/{id?}",
+                new { controller = "BackOffice", action = "Default" },
+                0);
+
+            var endpointDataSource = new DefaultEndpointDataSource(endpoint1);
 
             var routableDocFilter = new RoutableDocumentFilter(
                 globalSettings,
@@ -101,12 +126,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         private RouteEndpoint CreateEndpoint(
             string template,
             object defaults = null,
-            string name = null,
             int order = 0) => new RouteEndpoint(
                 (httpContext) => Task.CompletedTask,
                 RoutePatternFactory.Parse(template, defaults, null),
                 order,
                 new EndpointMetadataCollection(Array.Empty<object>()),
-                name);
+                null);
     }
 }

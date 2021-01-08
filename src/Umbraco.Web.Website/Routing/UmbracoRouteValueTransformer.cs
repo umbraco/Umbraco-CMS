@@ -71,14 +71,6 @@ namespace Umbraco.Web.Website.Routing
                 return values;
             }
 
-            // Check for back office request
-            // TODO: This is how the module was doing it before but could just as easily be part of the RoutableDocumentFilter
-            // which still needs to be migrated.
-            if (httpContext.Request.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
-            {
-                return values;
-            }
-
             // Check if there is no existing content and return the no content controller
             if (!_umbracoContextAccessor.UmbracoContext.Content.HasContent())
             {

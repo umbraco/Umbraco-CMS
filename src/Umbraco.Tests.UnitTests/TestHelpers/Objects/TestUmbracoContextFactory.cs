@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
                 snapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Options.Create<GlobalSettings>(globalSettings),
+                new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 new AspNetCoreCookieManager(httpContextAccessor),

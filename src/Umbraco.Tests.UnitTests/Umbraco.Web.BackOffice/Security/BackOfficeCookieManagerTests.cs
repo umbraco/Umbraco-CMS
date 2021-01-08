@@ -2,11 +2,13 @@
 // See LICENSE for more details.
 
 using System;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Routing;
 using Umbraco.Extensions;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
@@ -26,10 +28,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(),
-                globalSettings);
+                new UmbracoRequestPaths(Options.Create(globalSettings), Mock.Of<IHostingEnvironment>()));
 
-            var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
+            var result = mgr.ShouldAuthenticateRequest("/umbraco");
 
             Assert.IsFalse(result);
         }
@@ -43,10 +44,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
-                globalSettings);
+                new UmbracoRequestPaths(
+                    Options.Create(globalSettings),
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco")));
 
-            var result = mgr.ShouldAuthenticateRequest(new Uri("http://localhost/umbraco"));
+            var result = mgr.ShouldAuthenticateRequest("/umbraco");
 
             Assert.IsTrue(result);
         }
@@ -63,13 +65,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings);
+                new UmbracoRequestPaths(
+                    Options.Create(globalSettings),
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")));
 
-            var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost{remainingTimeoutSecondsPath}"));
+            var result = mgr.ShouldAuthenticateRequest(remainingTimeoutSecondsPath);
             Assert.IsTrue(result);
 
-            result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost{isAuthPath}"));
+            result = mgr.ShouldAuthenticateRequest(isAuthPath);
             Assert.IsTrue(result);
         }
 
@@ -83,14 +86,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
-                globalSettings);
+                new UmbracoRequestPaths(
+                    Options.Create(globalSettings),
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")));
 
-            var result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/notbackoffice"));
+            var result = mgr.ShouldAuthenticateRequest("/notbackoffice");
             Assert.IsFalse(result);
-            result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/umbraco/api/notbackoffice"));
+            result = mgr.ShouldAuthenticateRequest("/umbraco/api/notbackoffice");
             Assert.IsFalse(result);
-            result = mgr.ShouldAuthenticateRequest(new Uri($"http://localhost/umbraco/surface/notbackoffice"));
+            result = mgr.ShouldAuthenticateRequest("/umbraco/surface/notbackoffice");
             Assert.IsFalse(result);
         }
 

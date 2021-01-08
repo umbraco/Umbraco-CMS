@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
+#pragma warning disable IDE0065 // Misplaced using directive
     using ICookieManager = Microsoft.AspNetCore.Authentication.Cookies.ICookieManager;
+#pragma warning restore IDE0065 // Misplaced using directive
 
     /// <summary>
     /// Used to validate a cookie against a user's session id
@@ -36,21 +37,24 @@ namespace Umbraco.Web.BackOffice.Security
         public const string CookieName = "UMB_UCONTEXT_C";
         private readonly ISystemClock _systemClock;
         private readonly GlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IBackOfficeUserManager _userManager;
 
-        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IBackOfficeUserManager userManager)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackOfficeSessionIdValidator"/> class.
+        /// </summary>
+        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptions<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
         {
             _systemClock = systemClock;
             _globalSettings = globalSettings.Value;
-            _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
         }
 
         public async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidatePrincipalContext context)
         {
-            if (!context.Request.IsBackOfficeRequest(_globalSettings, _hostingEnvironment))
+            if (!context.Request.IsBackOfficeRequest())
+            {
                 return;
+            }
 
             var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _systemClock, context.Properties.IssuedUtc, context.Principal.Identity as ClaimsIdentity);
 
@@ -81,7 +85,7 @@ namespace Umbraco.Web.BackOffice.Security
             DateTimeOffset? issuedUtc = null;
             var currentUtc = systemClock.UtcNow;
 
-            //read the last checked time from a custom cookie
+            // read the last checked time from a custom cookie
             var lastCheckedCookie = cookieManager.GetRequestCookie(httpContext, CookieName);
 
             if (lastCheckedCookie.IsNullOrWhiteSpace() == false)
@@ -92,7 +96,7 @@ namespace Umbraco.Web.BackOffice.Security
                 }
             }
 
-            //no cookie, use the issue time of the auth ticket
+            // no cookie, use the issue time of the auth ticket
             if (issuedUtc.HasValue == false)
             {
                 issuedUtc = authTicketIssueDate;
@@ -107,18 +111,24 @@ namespace Umbraco.Web.BackOffice.Security
             }
 
             if (validate == false)
+            {
                 return true;
+            }
 
             var userId = currentIdentity.GetUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
+                {
                 return false;
+            }
 
             var sessionId = currentIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
             if (await _userManager.ValidateSessionIdAsync(userId, sessionId) == false)
+            {
                 return false;
+            }
 
-            //we will re-issue the cookie last checked cookie
+            // we will re-issue the cookie last checked cookie
             cookieManager.AppendResponseCookie(
                 httpContext,
                 CookieName,
