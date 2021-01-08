@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
@@ -27,12 +28,9 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 
-            // Set the render & plugin view engines (Super complicated, but this allows us to use the IServiceCollection
-            // to inject dependencies into the viewEngines)
-            builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, RenderMvcViewOptionsSetup>();
-            builder.Services.AddSingleton<IRenderViewEngine, RenderViewEngine>();
-            builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, PluginMvcViewOptionsSetup>();
-            builder.Services.AddSingleton<IPluginViewEngine, PluginViewEngine>();
+            // Configure MVC startup options for custom view locations
+            builder.Services.AddTransient<IConfigureOptions<RazorViewEngineOptions>, RenderRazorViewEngineOptionsSetup>();
+            builder.Services.AddTransient<IConfigureOptions<RazorViewEngineOptions>, PluginRazorViewEngineOptionsSetup>();
 
             // Wraps all existing view engines in a ProfilerViewEngine
             builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, ProfilingViewEngineWrapperMvcViewOptionsSetup>();
