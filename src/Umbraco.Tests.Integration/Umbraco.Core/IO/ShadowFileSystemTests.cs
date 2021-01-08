@@ -53,7 +53,7 @@ namespace Umbraco.Tests.IO
 
         private static string NormPath(string path)
         {
-            return path.ToLowerInvariant().Replace("\\", "/");
+            return path.Replace('\\', Path.AltDirectorySeparatorChar);
         }
 
         [Test]
