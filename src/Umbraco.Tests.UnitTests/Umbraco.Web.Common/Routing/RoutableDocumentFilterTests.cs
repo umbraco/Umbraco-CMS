@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
@@ -15,7 +16,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
     [TestFixture]
     public class RoutableDocumentFilterTests
     {
-        private GlobalSettings GetGlobalSettings() => new GlobalSettings();
+        private IOptions<GlobalSettings> GetGlobalSettings() => Options.Create(new GlobalSettings());
 
         private IHostingEnvironment GetHostingEnvironment()
         {
@@ -86,7 +87,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1, endpoint2);
 
             var routableDocFilter = new RoutableDocumentFilter(
-                globalSettings,
+                Options.Create(globalSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);
 
@@ -113,7 +114,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1);
 
             var routableDocFilter = new RoutableDocumentFilter(
-                globalSettings,
+                Options.Create(globalSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);
 

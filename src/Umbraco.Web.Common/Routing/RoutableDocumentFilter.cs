@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -26,7 +27,6 @@ namespace Umbraco.Web.Common.Routing
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointDataSource _endpointDataSource;
         private readonly object _routeLocker = new object();
-        private readonly List<string> _backOfficePaths;
         private object _initLocker = new object();
         private bool _isInit = false;
         private HashSet<string> _reservedList;
@@ -34,9 +34,9 @@ namespace Umbraco.Web.Common.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutableDocumentFilter"/> class.
         /// </summary>
-        public RoutableDocumentFilter(GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
+        public RoutableDocumentFilter(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _endpointDataSource = endpointDataSource;
             _endpointDataSource.GetChangeToken().RegisterChangeCallback(EndpointsChanged, null);
