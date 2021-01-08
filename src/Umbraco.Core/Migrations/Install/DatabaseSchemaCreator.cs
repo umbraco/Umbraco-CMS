@@ -21,8 +21,13 @@ namespace Umbraco.Core.Migrations.Install
 
         public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger)
         {
-            _database = database;
-            _logger = logger;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (_database?.SqlContext?.SqlSyntax == null)
+            {
+                throw new InvalidOperationException("No SqlContext has been assigned to the database");
+            }
         }
 
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
@@ -143,7 +148,7 @@ namespace Umbraco.Core.Migrations.Install
 
         internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
         {
-            var result = new DatabaseSchemaResult(SqlSyntax);
+            var result = new DatabaseSchemaResult();
 
             result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition(x)));
@@ -445,14 +450,14 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             //Execute the Create Table sql
-            var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
+            _database.Execute(new Sql(createSql));
+            _logger.Info<DatabaseSchemaCreator>("Create Table {TableName}: \n {Sql}", tableName, createSql);
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
             {
-                var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
+                _database.Execute(new Sql(createPrimaryKeySql));
+                _logger.Info<DatabaseSchemaCreator>("Create Primary Key:\n {Sql}", createPrimaryKeySql);
             }
 
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
@@ -469,24 +474,24 @@ namespace Umbraco.Core.Migrations.Install
             //Loop through index statements and execute sql
             foreach (var sql in indexSql)
             {
-                var createdIndex = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
+                _database.Execute(new Sql(sql));
+                _logger.Info<DatabaseSchemaCreator>("Create Index:\n {Sql}", sql);
             }
 
             //Loop through foreignkey statements and execute sql
             foreach (var sql in foreignSql)
             {
-                var createdFk = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
+                _database.Execute(new Sql(sql));
+                _logger.Info<DatabaseSchemaCreator>("Create Foreign Key:\n {Sql}", sql);
             }
 
             if (overwrite)
             {
-                        _logger.Info<Database>("Table {TableName} was recreated", tableName);
+                _logger.Info<Database>("Table {TableName} was recreated", tableName);
             }
             else
             {
-                        _logger.Info<Database>("New table {TableName} was created", tableName);
+                _logger.Info<Database>("New table {TableName} was created", tableName);
 
             }
         }

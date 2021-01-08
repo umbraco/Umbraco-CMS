@@ -839,7 +839,7 @@
     <key alias="permissionsSettingUpPermissions">Sætter folderrettigheder op</key>
     <key alias="permissionsText">Umbraco har behov for 'write/modify' adgang til bestemte foldere, for at kunne gemme filer som billeder og PDF'er. Umbraco gemmer også midlertidige data (eksempelvis cachen) for at forbedre ydelsen på dit website.</key>
     <key alias="runwayFromScratch">Jeg har lyst til at begynde på bar bund</key>
-    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
     <key alias="runwayHeader">Du har lige opsat en ren Umbraco-platform. Hvad ønsker du nu at gøre?</key>
     <key alias="runwayInstalled">Runway er installeret</key>
     <key alias="runwayInstalledText"><![CDATA[Du har fundamentet på plads. Vælg hvilke moduler du ønsker at installere ovenpå det.<br/>Dette er vores liste over anbefalede moduler. Kryds dem af du ønsker at installere eller se den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulde liste af moduler</a>  ]]></key>
@@ -885,7 +885,7 @@
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
@@ -1054,10 +1054,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedInvalid"><![CDATA[
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
-        %0% kunne ikke publiceres, et 3. part tilføjelsesprogram annullerede handlingen.
-    ]]>
-    </key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
@@ -1106,7 +1102,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
-    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>
@@ -1682,13 +1677,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="validationRegExp">Indtast et regulært udtryk</key>
     <key alias="minCount">Du skal tilføje mindst</key>
     <key alias="maxCount">Du kan kun have</key>
+    <key alias="addUpTo">Tilføj op til </key>
     <key alias="items">elementer</key>
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
-    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
-    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>

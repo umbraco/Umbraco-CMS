@@ -40,6 +40,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("loginBackgroundImage")]
         internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
 
+        [ConfigurationProperty("loginLogoImage")]
+        internal InnerTextConfigurationElement<string> LoginLogoImage => GetOptionalTextElement("loginLogoImage", "assets/img/application/umbraco_logo_white.svg");
+
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
         bool IContentSection.DisableHtmlEmail => Notifications.DisableHtmlEmail;
@@ -61,5 +64,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
         string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
+
+        string IContentSection.LoginLogoImage => LoginLogoImage;
     }
 }

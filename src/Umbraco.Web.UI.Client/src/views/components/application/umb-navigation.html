@@ -15,7 +15,7 @@
                         </span>
                         <span>{{selectedLanguage.name}}</span>
                     </span>
-                    <umb-icon icon="{{page.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand icon-navigation-down" aria-hidden="true">&nbsp;</umb-icon>
+                    <umb-icon icon="{{page.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand" aria-hidden="true">&nbsp;</umb-icon>
                 </button>
                 <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
                     <button
@@ -45,15 +45,13 @@
 
         <div class="offset6" id="navOffset" style="z-index: 10">
 
-            <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-if="showContextMenu" ng-animate="'slide'">
-                <umb-context-menu
-                    menu-dialog-title="{{menuDialogTitle}}"
-                    current-section="{{currentSection}}"
-                    current-node="menuNode"
-                    menu-actions="menuActions">
-                </umb-context-menu>
-            </div>
+            <umb-context-menu
+                ng-if="showContextMenu"
+                menu-dialog-title="{{menuDialogTitle}}"
+                current-section="{{currentSection}}"
+                current-node="menuNode"
+                menu-actions="menuActions">
+            </umb-context-menu>
 
             <umb-context-dialog
                 ng-if="showContextMenuDialog"
