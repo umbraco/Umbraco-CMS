@@ -22,7 +22,7 @@ namespace Umbraco.Web.Common.Routing
     /// </remarks>
     public sealed class RoutableDocumentFilter
     {
-        private readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>();
+        private readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointDataSource _endpointDataSource;
@@ -143,6 +143,11 @@ namespace Umbraco.Web.Common.Routing
                 return true;
             }
 
+            // TODO: We have a problem here:
+            // For every page that is rendered we are storing the URL and if it's routable in _routeChecks which
+            // is a small memory leak. Not sure how we work around this since routes are all dynamic and we don't want
+            // to double route everything on each request. Maybe instead of a growing list it's a list with a max capacity?
+
             // check if the current request matches a route, if so then it is reserved.
             var hasRoute = _routeChecks.GetOrAdd(absPath, x => MatchesEndpoint(absPath));
             if (hasRoute)
@@ -168,13 +173,20 @@ namespace Umbraco.Web.Common.Routing
 
         private bool MatchesEndpoint(string absPath)
         {
-            // Borrowed from https://stackoverflow.com/a/59550580
+            // Borrowed and modified from https://stackoverflow.com/a/59550580
 
             // Return a collection of Microsoft.AspNetCore.Http.Endpoint instances.
-            IEnumerable<RouteEndpoint> routeEndpoints = _endpointDataSource?.Endpoints.Cast<RouteEndpoint>();
-            var routeValues = new RouteValueDictionary();
+            IEnumerable<RouteEndpoint> routeEndpoints = _endpointDataSource?.Endpoints
+                .OfType<RouteEndpoint>()
+                .Where(x =>
+                {
+                    // We don't want to include dynamic endpoints in this check since we would have no idea if that
+                    // matches since they will probably match everything.
+                    bool isDynamic = x.Metadata.OfType<IDynamicEndpointMetadata>().Any(x => x.IsDynamic);
+                    return !isDynamic;
+                });
 
-            // string localPath = new Uri(absPath).LocalPath;
+            var routeValues = new RouteValueDictionary();
 
             // To get the matchedEndpoint of the provide url
             RouteEndpoint matchedEndpoint = routeEndpoints
