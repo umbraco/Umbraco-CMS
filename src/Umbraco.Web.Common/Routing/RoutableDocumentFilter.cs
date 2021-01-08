@@ -147,6 +147,9 @@ namespace Umbraco.Web.Common.Routing
             // For every page that is rendered we are storing the URL and if it's routable in _routeChecks which
             // is a small memory leak. Not sure how we work around this since routes are all dynamic and we don't want
             // to double route everything on each request. Maybe instead of a growing list it's a list with a max capacity?
+            // BUT... then do we need to do this at all? So long as the catch all route is registered LAST shouldn't all other routes
+            // just match before it anyways and then we don't need to check? The strange part is that the "/umbraco" route doesn't automatically
+            // match so we need to investigate that first. 
 
             // check if the current request matches a route, if so then it is reserved.
             var hasRoute = _routeChecks.GetOrAdd(absPath, x => MatchesEndpoint(absPath));
