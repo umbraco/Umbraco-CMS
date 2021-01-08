@@ -99,8 +99,6 @@ namespace Umbraco.Web.Website.Routing
         /// <summary>
         /// Check if the route is hijacked and return new route values
         /// </summary>
-        /// <param name="def"></param>
-        /// <returns></returns>
         private UmbracoRouteValues CheckHijackedRoute(UmbracoRouteValues def)
         {
             IPublishedRequest request = def.PublishedRequest;
@@ -131,11 +129,12 @@ namespace Umbraco.Web.Website.Routing
         {
             IPublishedRequest request = def.PublishedRequest;
 
-            // Here we need to check if there is no hijacked route and no template assigned,
-            // if this is the case we want to return a blank page.
+            // Here we need to check if there is no hijacked route and no template assigned but there is a content item.
+            // If this is the case we want to return a blank page.
             // We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
             // for example for json rendering in headless.
-            if (!request.HasTemplate()
+            if (request.HasPublishedContent()
+                && !request.HasTemplate()
                 && !_umbracoFeatures.Disabled.DisableTemplates
                 && !def.HasHijackedRoute)
             {
