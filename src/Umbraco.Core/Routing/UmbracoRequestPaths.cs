@@ -18,6 +18,8 @@ namespace Umbraco.Core.Routing
         private readonly string _mvcArea;
         private readonly string _backOfficeMvcPath;
         private readonly string _previewMvcPath;
+        private readonly string _surfaceMvcPath;
+        private readonly string _apiMvcPath;
         private readonly string _installPath;
         private readonly string _appPath;
         private readonly List<string> _aspLegacyJsExt = new List<string> { ".asmx/", ".aspx/", ".ashx/", ".axd/", ".svc/" };
@@ -39,6 +41,8 @@ namespace Umbraco.Core.Routing
 
             _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
             _previewMvcPath = "/" + _mvcArea + "/Preview/";
+            _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
+            _apiMvcPath = "/" + _mvcArea + "/Api/";
             _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
         }
 
@@ -109,8 +113,8 @@ namespace Umbraco.Core.Routing
 
             // check for special front-end paths
             // TODO: These should be constants - will need to update when we do front-end routing
-            if (urlPath.InvariantStartsWith("/" + _mvcArea + "/Surface/")
-                || urlPath.InvariantStartsWith("/" + _mvcArea + "/Api/"))
+            if (urlPath.InvariantStartsWith(_surfaceMvcPath)
+                || urlPath.InvariantStartsWith(_apiMvcPath))
             {
                 return false;
             }
