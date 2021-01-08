@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ActionsResults;
@@ -70,12 +71,13 @@ namespace Umbraco.Web.Common.Controllers
                     return _umbracoRouteValues;
                 }
 
-                if (!ControllerContext.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var def))
+                _umbracoRouteValues = HttpContext.GetRouteValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken) as UmbracoRouteValues;
+
+                if (_umbracoRouteValues == null)
                 {
                     throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
                 }
 
-                _umbracoRouteValues = (UmbracoRouteValues)def;
                 return _umbracoRouteValues;
             }
         }
@@ -126,10 +128,10 @@ namespace Umbraco.Web.Common.Controllers
             IPublishedRequest pcr = UmbracoRouteValues.PublishedRequest;
 
             _logger.LogDebug(
-            "Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
-            pcr.IsRedirect() ? (pcr.IsRedirectPermanent() ? "permanent" : "redirect") : "none",
-            pcr.Is404() ? "true" : "false",
-            pcr.ResponseStatusCode);
+                "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}",
+                pcr.PublishedContent?.Id ?? -1,
+                pcr.ResponseStatusCode,
+                pcr.Culture);
 
             UmbracoRouteResult routeStatus = pcr.GetRouteResult();
             switch (routeStatus)

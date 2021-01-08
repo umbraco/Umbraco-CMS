@@ -37,10 +37,8 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
-        private readonly IRequestCache _requestCache;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
             IRuntimeState runtime,
@@ -48,8 +46,6 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             RoutableDocumentFilter routableDocumentLookup,
-            UriUtility uriUtility,
-            IRequestCache requestCache,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
@@ -58,8 +54,6 @@ namespace Umbraco.Web
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
-            _uriUtility = uriUtility;
-            _requestCache = requestCache;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
         }

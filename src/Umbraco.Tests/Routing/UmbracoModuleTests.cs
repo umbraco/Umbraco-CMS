@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -35,8 +35,6 @@ namespace Umbraco.Tests.Routing
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
                 new RoutableDocumentFilter(globalSettings, IOHelper),
-                UriUtility,
-                AppCaches.RequestCache,
                 globalSettings,
                 HostingEnvironment
             );

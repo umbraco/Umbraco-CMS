@@ -123,10 +123,6 @@ namespace Umbraco.Web.Routing
 
         private void SetVariationContext(CultureInfo culture)
         {
-            // set the culture on the thread - once, so it's set when running document lookups
-            // TODO: Set this on HttpContext!
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
-
             VariationContext variationContext = _variationContextAccessor.VariationContext;
             if (variationContext != null && variationContext.Culture == culture?.Name)
             {

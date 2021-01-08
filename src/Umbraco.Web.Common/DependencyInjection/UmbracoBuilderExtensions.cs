@@ -48,9 +48,11 @@ using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.Localization;
 using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Mvc;
 using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
@@ -226,6 +228,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             });
 
             builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
+            builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);
