@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 
@@ -16,27 +17,6 @@ namespace Umbraco.Web.Routing
     /// </summary>
     internal class NotFoundHandlerHelper
     {
-        /// <summary>
-        /// Returns the Umbraco page id to use as the Not Found page based on the configured 404 pages and the current request
-        /// </summary>
-        /// <param name="error404Collection"></param>
-        /// <param name="requestServerName">
-        /// The server name attached to the request, normally would be the source of HttpContext.Current.Request.ServerVariables["SERVER_NAME"]
-        /// </param>
-        /// <param name="entityService"></param>
-        /// <param name="publishedContentQuery"></param>
-        /// <param name="domainService"></param>
-        /// <returns></returns>
-        internal static int? GetCurrentNotFoundPageId(
-            ContentErrorPage[] error404Collection,
-            string requestServerName,
-            IEntityService entityService,
-            IPublishedContentQuery publishedContentQuery,
-            IDomainService domainService)
-        {
-            throw new NotImplementedException();
-        }
-
         internal static int? GetCurrentNotFoundPageId(
             ContentErrorPage[] error404Collection,
             IEntityService entityService,
@@ -46,13 +26,15 @@ namespace Umbraco.Web.Routing
             if (error404Collection.Length > 1)
             {
                 // test if a 404 page exists with current culture thread
-                var cultureErr = error404Collection.FirstOrDefault(x => x.Culture == errorCulture.Name)
+                ContentErrorPage cultureErr = error404Collection.FirstOrDefault(x => x.Culture == errorCulture.Name)
                     ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)
+                {
                     return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
+                }
             }
-            else
+            else if (error404Collection.Length == 1)
             {
                 return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery);
             }
@@ -63,25 +45,25 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Returns the content id based on the configured ContentErrorPage section.
         /// </summary>
-        /// <param name="errorPage"></param>
-        /// <param name="entityService"></param>
-        /// <param name="publishedContentQuery"></param>
-        /// <returns></returns>
         internal static int? GetContentIdFromErrorPageConfig(ContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
         {
-            if (errorPage.HasContentId) return errorPage.ContentId;
+            if (errorPage.HasContentId)
+            {
+                return errorPage.ContentId;
+            }
 
             if (errorPage.HasContentKey)
             {
-                //need to get the Id for the GUID
+                // need to get the Id for the GUID
                 // TODO: When we start storing GUIDs into the IPublishedContent, then we won't have to look this up
                 // but until then we need to look it up in the db. For now we've implemented a cached service for
                 // converting Int -> Guid and vice versa.
-                var found = entityService.GetId(errorPage.ContentKey, UmbracoObjectTypes.Document);
+                Attempt<int> found = entityService.GetId(errorPage.ContentKey, UmbracoObjectTypes.Document);
                 if (found)
                 {
                     return found.Result;
                 }
+
                 return null;
             }
 
@@ -89,21 +71,23 @@ namespace Umbraco.Web.Routing
             {
                 try
                 {
-                    //we have an xpath statement to execute
+                    // we have an xpath statement to execute
                     var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
                         xpathExpression: errorPage.ContentXPath,
                         nodeContextId: null,
                         getPath: nodeid =>
                         {
-                            var ent = entityService.Get(nodeid);
+                            Core.Models.Entities.IEntitySlim ent = entityService.Get(nodeid);
                             return ent.Path.Split(',').Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
-                    //now we'll try to execute the expression
-                    var nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
+                    // now we'll try to execute the expression
+                    IPublishedContent nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
                     if (nodeResult != null)
+                    {
                         return nodeResult.Id;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -111,6 +95,7 @@ namespace Umbraco.Web.Routing
                     return null;
                 }
             }
+
             return null;
         }
 
