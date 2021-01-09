@@ -347,9 +347,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8910</DevelopmentServerPort>
+          <DevelopmentServerPort>8101</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8910</IISUrl>
+          <IISUrl>http://localhost:8101</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -377,6 +377,7 @@
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\umbracoSettings.Release.config" DestinationFiles="$(ProjectDir)Config\umbracoSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\umbracoSettings.config')" />
     <!-- Create Serilog.config & serilog.user.config file from Templates if it doesn't exist -->
     <Message Text="Copy serilog.$(Configuration).config to serilog.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\serilog.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />

@@ -7,6 +7,25 @@ function elementTypeResource($q, $http, umbRequestHelper) {
 
     return {
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.elementTypeResource#getAll
+        * @methodOf umbraco.resources.elementTypeResource
+        *
+        * @description
+        * Gets a list of all element types
+        *
+        * ##usage
+        * <pre>
+        * elementTypeResource.getAll()
+        *    .then(function() {
+        *        alert('Found it!');
+        *    });
+        * </pre>
+        *
+        * @returns {Promise} resourcePromise object.
+        *
+        **/
         getAll: function () {
             
             return umbRequestHelper.resourcePromise(
