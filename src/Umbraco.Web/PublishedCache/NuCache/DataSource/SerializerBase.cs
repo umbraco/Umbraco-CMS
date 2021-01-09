@@ -57,11 +57,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         protected object ReadObject(Stream stream)
             => ReadObject(PrimitiveSerializer.Char.ReadFrom(stream), stream);
 
+        /// <summary>
+        /// Reads in a value based on its char type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will incur boxing because the result is an object but in most cases the value will be a struct.
+        /// When the type is known use the specific methods like <see cref="ReadInt(Stream)"/> instead
+        /// </remarks>
         protected object ReadObject(char type, Stream stream)
         {
-            // NOTE: This method is only called when reading property data, some boxing may occur but all other reads for structs are
-            // done with ReadStruct to reduce all boxing.
-
             switch (type)
             {
                 case PrefixNull:
@@ -93,11 +100,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
         }
 
+        /// <summary>
+        /// Writes a value to the stream ensuring it's char type is prefixed to the value for reading later
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="stream"></param>
+        /// <remarks>
+        /// This method will incur boxing if the value is a struct. When the type is known use the <see cref="PrimitiveSerializer"/>
+        /// to write the value directly.
+        /// </remarks>
         protected void WriteObject(object value, Stream stream)
         {
-            // NOTE: This method is only currently used to write 'string' information, all other writes are done directly with the PrimitiveSerializer
-            // so no boxing occurs. Though potentially we should write everything via this class just like we do for reads.
-
             if (value == null)
             {
                 PrimitiveSerializer.Char.WriteTo(PrefixNull, stream);
