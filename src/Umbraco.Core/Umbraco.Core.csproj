@@ -135,6 +135,8 @@
     <Compile Include="Migrations\Upgrade\V_8_9_0\AddCmsContentNuByteColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_9_0\UpgradedIncludeIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_8_0\ExternalLoginTableUserData.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
     <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
     <Compile Include="Models\Blocks\BlockItemData.cs" />

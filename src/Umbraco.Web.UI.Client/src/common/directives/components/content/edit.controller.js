@@ -2,7 +2,7 @@
     'use strict';
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
-        appState, contentResource, entityResource, navigationService, notificationsService,
+        appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
         $exceptionHandler) {
@@ -282,7 +282,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {
+            if ($scope.activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp)) {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
