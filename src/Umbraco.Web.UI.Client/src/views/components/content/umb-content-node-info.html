@@ -45,7 +45,7 @@
 
             <umb-box-header title="{{historyLabel}}">
                 <umb-button
-                    ng-hide="node.trashed"
+                    ng-hide="node.trashed || node.id === 0"
                     type="button"
                     button-style="outline"
                     action="openRollback()"
