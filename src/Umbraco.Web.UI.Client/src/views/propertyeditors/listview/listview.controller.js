@@ -147,6 +147,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
+        useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
@@ -800,6 +801,42 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function createBlank(entityType, docTypeAlias) {
+        if ($scope.options.useInfiniteEditor) {
+            
+            var editorModel = {
+                create: true,
+                submit: function(model) {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                },
+                close: function() {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                }
+            };
+
+            if (entityType == "content")
+            {
+                editorModel.parentId = $scope.contentId;
+                editorModel.documentTypeAlias = docTypeAlias;
+                editorService.contentEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "media")
+            {
+                editorService.mediaEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "member")
+            {
+                editorModel.doctype = docTypeAlias;
+                editorService.memberEditor(editorModel);
+                return;
+            }
+        }
+
         $location
             .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
             .search("doctype", docTypeAlias)
