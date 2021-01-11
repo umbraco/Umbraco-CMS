@@ -49,8 +49,9 @@ namespace Umbraco.Tests.Routing
 
             Assert.IsTrue(result);
             Assert.IsNotNull(frequest.PublishedContent);
-            Assert.IsNotNull(frequest.GetTemplateAlias());
-            Assert.AreEqual("blah".ToUpperInvariant(), frequest.GetTemplateAlias().ToUpperInvariant());
+            var templateAlias = frequest.GetTemplateAlias();
+            Assert.IsNotNull(templateAlias );
+            Assert.AreEqual("blah".ToUpperInvariant(), templateAlias.ToUpperInvariant());
         }
     }
 }
