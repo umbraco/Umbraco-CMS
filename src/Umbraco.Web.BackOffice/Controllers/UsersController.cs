@@ -129,9 +129,9 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [AppendUserModifiedHeader("id")]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
+        public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
         internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)

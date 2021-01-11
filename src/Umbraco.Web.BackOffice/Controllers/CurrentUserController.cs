@@ -16,12 +16,14 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
@@ -214,7 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// If the password is being reset it will return the newly reset password, otherwise will return an empty value
         /// </returns>
-        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
+        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel data)
         {
             // TODO: Why don't we inject this? Then we can just inject a logger
             var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
@@ -233,7 +235,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
         }
 
         // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController
