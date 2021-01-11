@@ -3,26 +3,31 @@
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Indicates that a composer should be disabled.
+    /// Indicates that an <see cref="IComposer" /> should be disabled.
     /// </summary>
     /// <remarks>
-    /// <para>Assembly-level <see cref="DisableComposerAttribute"/> has greater priority than <see cref="DisableAttribute"/>
-    /// attribute when it is marking the composer itself, but lower priority that when it is referencing another composer.</para>
+    /// This attribute has greater priority than the <see cref="EnableAttribute" /> when it's marking the composer itself, but lower priority when it's referencing another.
     /// </remarks>
+    /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     public class DisableComposerAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DisableComposerAttribute"/> class.
+        /// Gets the disabled type.
         /// </summary>
-        public DisableComposerAttribute(Type disabledType)
-        {
-            DisabledType = disabledType;
-        }
+        /// <value>
+        /// The disabled type.
+        /// </value>
+        public Type DisabledType { get; }
 
         /// <summary>
-        /// Gets the disabled type, or null if it is the composer marked with the attribute.
+        /// Initializes a new instance of the <see cref="DisableComposerAttribute" /> class.
         /// </summary>
-        public Type DisabledType { get; }
+        /// <param name="disabledType">The <see cref="IComposer" /> type to disable.</param>
+        /// <exception cref="System.ArgumentNullException">disabledType</exception>
+        public DisableComposerAttribute(Type disabledType)
+        {
+            this.DisabledType = disabledType ?? throw new ArgumentNullException(nameof(disabledType));
+        }
     }
 }
