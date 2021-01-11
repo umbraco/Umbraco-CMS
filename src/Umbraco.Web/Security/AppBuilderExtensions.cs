@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.SessionState;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -266,7 +269,7 @@ namespace Umbraco.Web.Security
             {
                 //Then our custom middlewares
                 app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, Current.UmbracoContextAccessor);
-                app.Use(typeof(FixWindowsAuthMiddlware));
+                app.Use(typeof(FixWindowsAuthMiddlware));                
             }
 
             //Marks all of the above middlewares to execute on Authenticate
@@ -374,6 +377,19 @@ namespace Umbraco.Web.Security
             if (stage < PipelineStage.PostAuthenticate)
                 throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
 
+            app.UseStageMarker(stage);
+            return app;
+        }
+
+        /// <summary>
+        /// Enable the back office to detect and handle errors registered with external login providers
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeExternalLoginErrors(this IAppBuilder app, PipelineStage stage = PipelineStage.Authorize)
+        {            
+            app.Use(typeof(BackOfficeExternalLoginProviderErrorMiddlware));
             app.UseStageMarker(stage);
             return app;
         }

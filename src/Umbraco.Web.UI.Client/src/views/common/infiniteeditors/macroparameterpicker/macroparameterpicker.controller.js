@@ -103,9 +103,6 @@
 
         function pickParameterEditor(selectedParameterEditor) {
 
-            console.log("pickParameterEditor", selectedParameterEditor);
-            console.log("$scope.model", $scope.model);
-
             $scope.model.parameter.editor = selectedParameterEditor.alias;
             $scope.model.parameter.dataTypeName = selectedParameterEditor.name;
             $scope.model.parameter.dataTypeIcon = selectedParameterEditor.icon;

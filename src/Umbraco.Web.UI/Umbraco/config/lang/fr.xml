@@ -245,9 +245,9 @@
     <key alias="parentNotPublished">Ce document est publié mais n'est pas visible car son parent '%0%' n'est pas publié</key>
     <key alias="parentCultureNotPublished">Cette culture est publiée mais n'est pas visible car elle n'est pas publiée pour le parent '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Ce document est publié mais n'est pas présent dans le cache</key>
-    <key alias="getUrlException">Oups: impossible d'obtenir cet url (erreur interne - voir fichier log)</key>
-    <key alias="routeError">Ce document est publié mais son url entrerait en collision avec le contenu %0%</key>
-    <key alias="routeErrorCannotRoute">Ce document est publié mais son url ne peut pas être routé</key>
+    <key alias="getUrlException">Oups: impossible d'obtenir cet URL (erreur interne - voir fichier log)</key>
+    <key alias="routeError">Ce document est publié mais son URL entrerait en collision avec le contenu %0%</key>
+    <key alias="routeErrorCannotRoute">Ce document est publié mais son URL ne peut pas être routé</key>
     <key alias="publish">Publier</key>
     <key alias="published">Publié</key>
     <key alias="publishedPendingChanges">Publié (changements en cours)</key>
@@ -443,7 +443,7 @@
     <key alias="recycleBinIsEmpty">La corbeille est maintenant vide</key>
     <key alias="recycleBinWarning">Les éléments supprimés de la corbeille seront supprimés définitivement</key>
     <key alias="regexSearchError"><![CDATA[Le webservice <a target='_blank' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.]]></key>
-    <key alias="regexSearchHelp">Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'url'</key>
+    <key alias="regexSearchHelp">Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Supprimer la macro</key>
     <key alias="requiredField">Champ obligatoire</key>
     <key alias="sitereindexed">Le site a été réindéxé</key>
@@ -742,7 +742,7 @@
     <key alias="update">Mettre à jour</key>
     <key alias="upgrade">Upgrader</key>
     <key alias="upload">Télécharger</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Utilisateur</key>
     <key alias="username">Nom d'utilisateur</key>
     <key alias="value">Valeur</key>
@@ -812,7 +812,7 @@
               <p>Pour poursuivre, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scroller jusqu'en bas, ajouter le "connection string" pour votre base de données dans la ligne avec la clé "umbracoDbDSN" et sauvegarder le fichier.</p>
               <p>
               Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour réaliser cette étape, vous devez d'abord connaître des informations concernant votre serveur de base de données ("connection string").<br />
         Veuillez contacter votre fournisseur de services internet si nécessaire.
@@ -860,7 +860,7 @@
     <key alias="runwayFromScratch">Je veux démarrer "from scratch"</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Votre site est vide pour le moment, ce qui est parfait si vous voulez commencer "from scratch" et créer vos propres types de documents et modèles d'affichage.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
         Vous pouvez toujours choisir d'installer Runway plus tard. Pour cela, allez dans la section "Développeur" et sélectionnez "Packages".
       ]]></key>
     <key alias="runwayHeader">Vous venez de mettre en place une plateforme Umbraco toute nette. Que voulez-vous faire ensuite ?</key>
@@ -928,7 +928,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="signInWith">Identifiez-vous avec</key>
     <key alias="timeout">La session a expiré</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Mot de passe oublié?</key>
     <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
     <key alias="requestPasswordResetConfirmation">Un email contenant les instructions de ré-initialisation de votre mot de passe sera envoyée à l'adresse spécifiée si elle correspond à nos informations.</key>
@@ -1370,6 +1370,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="validationFailedMessage">Les erreurs de validation doivent être corrigées avant de pouvoir sauvegarder l'élément</key>
     <key alias="operationFailedHeader">Echec</key>
     <key alias="operationSavedHeader">Sauvegardé</key>
+    <key alias="operationSavedHeaderReloadUser">Sauvegardé. Veuillez rafraîchir votre navigateur pour voir les changements</key>
     <key alias="invalidUserPermissionsText">Permissions utilisateur insuffisantes, l'opération n'a pas pu être complétée</key>
     <key alias="operationCancelledHeader">Annulation</key>
     <key alias="operationCancelledText">L'opération a été annulée par une extension tierce</key>
@@ -1990,7 +1991,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="validation">Validation</key>
     <key alias="validateAsEmail">Valider comme email</key>
     <key alias="validateAsNumber">Valider comme nombre</key>
-    <key alias="validateAsUrl">Valider comme Url</key>
+    <key alias="validateAsUrl">Valider comme URL</key>
     <key alias="enterCustomValidation">...ou introduisez une validation spécifique</key>
     <key alias="fieldIsMandatory">Champ obligatoire</key>
     <key alias="mandatoryMessage">Introduisez un message d'erreur de validation personnalisé (optionnel)</key>
@@ -2119,7 +2120,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="culture">Culture</key>
     <key alias="originalUrl">URL original</key>
     <key alias="redirectedTo">Redirigé Vers</key>
-    <key alias="redirectUrlManagement">Gestion des redirections d'Url</key>
+    <key alias="redirectUrlManagement">Gestion des redirections d'URL</key>
     <key alias="panelInformation">Les URLs suivants redirigent vers cet élément de contenu :</key>
     <key alias="noRedirects">Aucune redirection n'a été créée</key>
     <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
@@ -2320,7 +2321,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="trainingHeadline">Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
+        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
     ]]>
     </key>
     <key alias="getStarted">Pour démarrer</key>
@@ -2331,27 +2332,27 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="more">En savoir plus</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
+            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">outils d'amélioration de productivité et notre support commercial</a>
+            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">outils d'amélioration de productivité et notre support commercial</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">formations et certifications</a>
+            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>
         ]]>
     </key>
   </area>

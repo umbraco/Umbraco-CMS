@@ -372,7 +372,7 @@
     <key alias="recycleBinIsEmpty">Корзина пуста</key>
     <key alias="recycleBinWarning">Вы больше не сможете восстановить элементы, удаленные из корзины</key>
     <key alias="regexSearchError"><![CDATA[Сервис <a target='_blank' href='http://regexlib.com'>regexlib.com</a> испытывает в настоящее время некоторые трудности, не зависящие от нас. Просим извинить за причиненные неудобства.]]></key>
-    <key alias="regexSearchHelp">Используйте поиск регулярных выражений для добавления сервиса проверки к полю Вашей формы. Например: 'email, 'zip-code', 'url'</key>
+    <key alias="regexSearchHelp">Используйте поиск регулярных выражений для добавления сервиса проверки к полю Вашей формы. Например: 'email, 'zip-code', 'URL'</key>
     <key alias="removeMacro">Удалить макрос</key>
     <key alias="requiredField">Обязательное поле</key>
     <key alias="sitereindexed">Сайт переиндексирован</key>
@@ -783,8 +783,7 @@
 		<p>Для настройки откройте файл "web.config" с помощью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
 		затем сохраните файл.</p>
 		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7"
-		target="_blank">Более подробно о внесении изменений в файл "web.config" рассказано здесь.</a></p>]]></key>
+		<a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Более подробно о внесении изменений в файл "web.config" рассказано здесь</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно располагать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />
 		Пожалуйста, свяжитесь с Вашим хостинг-провайдером, если есть необходимость, а если устанавливаете на локальную рабочую станцию или сервер, то получите информацию у Вашего системного администратора.]]></key>
@@ -831,7 +830,7 @@
     <key alias="runwayFromScratchText"><![CDATA[
 		В настоящий момент Ваш сайт абсолютно пустой, что является наилучшим вариантом для старта
 		"с чистого листа", чтобы начать создавать свои собственные типы документов и шаблоны.
-		(<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Разработка" и выберите пункт "Пакеты".
+		(<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Разработка" и выберите пункт "Пакеты".
 		]]></key>
     <key alias="runwayHeader">Вы только что установили чистую платформу Umbraco. Какой шаг будет следующим?</key>
     <key alias="runwayInstalled">"Runway" установлен</key>
@@ -888,7 +887,7 @@
     <key alias="renewSession">Обновите сейчас, чтобы сохранить сделанные изменения</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
     <key alias="greeting0">Сегодня же выходной!</key>
     <key alias="greeting1">Понедельник — день тяжелый...</key>
     <key alias="greeting2">Вот уже вторник...</key>
@@ -1829,7 +1828,7 @@
     <key alias="validation">Валидация</key>
     <key alias="validateAsEmail">Валидация по формату email</key>
     <key alias="validateAsNumber">Валидация числового значения</key>
-    <key alias="validateAsUrl">Валидация по формату Url</key>
+    <key alias="validateAsUrl">Валидация по формату URL</key>
     <key alias="enterCustomValidation">...или указать свои правила валидации</key>
     <key alias="fieldIsMandatory">Обязательно к заполнению</key>
     <key alias="validationRegExp">Задайте регулярное выражение</key>

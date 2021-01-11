@@ -27,7 +27,7 @@
     <key alias="logout">Exit</key>
     <key alias="move">Move</key>
     <key alias="notify">Notifications</key>
-    <key alias="protect">Public access</key>
+    <key alias="protect">Restrict Public Access</key>
     <key alias="publish">Publish</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
@@ -72,7 +72,7 @@
     <key alias="create">Allow access to create nodes</key>
     <key alias="delete">Allow access to delete nodes</key>
     <key alias="move">Allow access to move a node</key>
-    <key alias="protect">Allow access to set and change public access for a node</key>
+    <key alias="protect">Allow access to set and change access restrictions for a node</key>
     <key alias="publish">Allow access to publish a node</key>
     <key alias="unpublish">Allow access to unpublish a node</key>
     <key alias="rights">Allow access to change permissions for a node</key>
@@ -254,12 +254,12 @@
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
-    <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
+    <key alias="getUrlException">Could not get the URL</key>
+    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
-    <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
+    <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="publishDescendantsHelp"><![CDATA[Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Publish variants and variants of same type underneath and thereby making their content publicly available.]]></key>
@@ -316,7 +316,7 @@
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
 
     <key alias="variantsWillBeSaved">All new variants will be saved.</key>
-    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToPublish">Which variants would you like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
     <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
@@ -472,7 +472,7 @@
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
-    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
     <key alias="sitereindexed">Site is reindexed</key>
@@ -781,7 +781,7 @@
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">User</key>
     <key alias="username">Username</key>
     <key alias="value">Value</key>
@@ -804,7 +804,6 @@
     <key alias="other">Other</key>
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
-    <key alias="clear">Clear</key>
     <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
@@ -857,8 +856,8 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
-              done.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              More information on editing web.config here.</a></p>]]></key>
+              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              More information on editing web.config here</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
         If you're installing on a local machine or server you might need information from your system administrator.]]></key>
@@ -905,7 +904,7 @@
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
@@ -973,7 +972,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
     <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
     <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
@@ -1366,7 +1365,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
-    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
@@ -1422,6 +1420,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationFailedMessage">Validation errors must be fixed before the item can be saved</key>
     <key alias="operationFailedHeader">Failed</key>
     <key alias="operationSavedHeader">Saved</key>
+      <key alias="operationSavedHeaderReloadUser">Saved.  To view the changes please reload your browser</key>
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
@@ -1716,6 +1715,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementCannotToggle">A document type cannot be changed to an element type once it has been used to create one or more content items.</key>
     <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
+    <key alias="displaySettingsHeadline">Appearance</key>
+    <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -1868,7 +1869,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="createDate">User created</key>
-    <key alias="changePassword">Change Your Password</key>
+    <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="noLockouts">hasn't been locked out</key>
@@ -2074,8 +2075,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="maxCount">You can only have</key>
     <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
-    <key alias="urls">url(s)</key>
-    <key alias="urlsSelected">url(s) selected</key>
+    <key alias="urls">URL(s)</key>
+    <key alias="urlsSelected">URL(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
@@ -2194,7 +2195,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="helpText">
         <![CDATA[
         <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
         ]]>
     </key>
   </area>
@@ -2204,7 +2205,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="culture">Culture</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Redirected To</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
+    <key alias="redirectUrlManagement">Redirect URL Management</key>
     <key alias="panelInformation">The following URLs redirect to this content item:</key>
     <key alias="noRedirects">No redirects have been made</key>
     <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
@@ -2276,7 +2277,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openCloseBackofficeProfileOptions">Open/Close your profile options</key>
     <key alias="assignDomainDescription">Setup Culture and Hostnames for %0%</key>
     <key alias="createDescription">Create new node under %0%</key>
-    <key alias="protectDescription">Setup Public access on %0%</key>
+    <key alias="protectDescription">Setup access restrictions on %0%</key>
     <key alias="rightsDescription">Setup Permissions on %0%</key>
     <key alias="sortDescription">Change sort order for %0%</key>
     <key alias="createblueprintDescription">Create Content Template based on %0%</key>
@@ -2297,9 +2298,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="name">Name</key>
     <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
-      <key alias="hasTranslation">Has translation</key>
-      <key alias="noTranslation">Missing translation</key>
-      <key alias="dictionaryListCaption">Dictionary items</key>
+    <key alias="searchOverlayTitle">Search the Umbraco backoffice</key>
+    <key alias="searchOverlayDescription">Search for content nodes, media nodes etc. across the backoffice.</key>
+    <key alias="searchInputDescription">When autocomplete results are available, press up and down arrows, or use the tab key and use the enter key to select.</key>
+    <key alias="path">Path: </key>
+    <key alias="foundIn">Found in</key>
+    <key alias="hasTranslation">Has translation</key>
+    <key alias="noTranslation">Missing translation</key>
+    <key alias="dictionaryListCaption">Dictionary items</key>
+    <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
+    <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
+    <key alias="addImageCaption">Add image caption</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2346,6 +2355,17 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
       <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
       <key alias="open">Open</key>
+      <key alias="polling">Polling</key>
+      <key alias="every2">Every 2 seconds</key>
+      <key alias="every5">Every 5 seconds</key>
+      <key alias="every10">Every 10 seconds</key>
+      <key alias="every20">Every 20 seconds</key>
+      <key alias="every30">Every 30 seconds</key>
+      <key alias="pollingEvery2">Polling every 2s</key>
+      <key alias="pollingEvery5">Polling every 5s</key>
+      <key alias="pollingEvery10">Polling every 10s</key>
+      <key alias="pollingEvery20">Polling every 20s</key>
+      <key alias="pollingEvery30">Polling every 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
@@ -2433,7 +2453,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="trainingHeadline">Hours of Umbraco training videos are only a click away</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
     ]]>
     </key>
     <key alias="getStarted">To get you started</key>
@@ -2444,27 +2464,27 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="more">Find out more</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">in the Documentation section</a> of Our Umbraco
+            Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+            Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)
+            Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutorial videos</a> (some are free, some require a subscription)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">productivity boosting tools and commercial support</a>
+            Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productivity boosting tools and commercial support</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training and certification</a> opportunities
+            Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training and certification</a> opportunities
         ]]>
     </key>
   </area>
@@ -2477,12 +2497,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Create new block</key>
-    <key alias="headlineAddSettingsElementType">Attach a settings section</key>
+    <key alias="headlineCreateBlock">Pick Element Type</key>
+    <key alias="headlineAddSettingsElementType">Attach a settings Element Type</key>
     <key alias="headlineAddCustomView">Select view</key>
     <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
     <key alias="headlineAddThumbnail">Choose thumbnail</key>
-    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
     <key alias="headlineEditorAppearance">Editor apperance</key>
@@ -2500,8 +2520,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete the content <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete the block configuration <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
@@ -2514,6 +2534,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
@@ -2531,5 +2553,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
     <key alias="manageHeadline">How do I manage Content Templates?</key>
     <key alias="manageDescription">You can edit and delete Content Templates from the "Content Templates" tree in the Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete it.</key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">End</key>
+    <key alias="endTitle">End preview mode</key>
+    <key alias="openWebsiteLabel">Preview website</key>
+    <key alias="openWebsiteTitle">Open website in preview mode</key>
+    <key alias="returnToPreviewHeadline">Preview website?</key>
+    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to enable it again to view the latest saved version of your website?</key>
+    <key alias="returnToPreviewAcceptButton">Preview latest version</key>
+    <key alias="returnToPreviewDeclineButton">View published version</key>
+    <key alias="viewPublishedContentHeadline">View published version?</key>
+    <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
+    <key alias="viewPublishedContentAcceptButton">View published version</key>
+    <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
   </area>
 </language>

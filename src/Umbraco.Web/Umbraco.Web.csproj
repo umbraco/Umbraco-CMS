@@ -91,7 +91,7 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.3.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -159,8 +159,10 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\ChallengeResult.cs" />
     <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
+    <Compile Include="Editors\Filters\DenyLocalLoginAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\IconController.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
+    <Compile Include="Install\InstallSteps\TelemetryIdentifierStep.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -194,7 +197,6 @@
     <Compile Include="Media\EmbedProviders\Twitter.cs" />
     <Compile Include="Media\EmbedProviders\Kickstarter.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
-    <Compile Include="Media\EmbedProviders\Instagram.cs" />
     <Compile Include="Media\EmbedProviders\Slideshare.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -283,12 +285,20 @@
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderOptions.cs" />
+    <Compile Include="Security\SignOutAuditEventArgs.cs" />
+    <Compile Include="Security\UserInviteEventArgs.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IconService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Telemetry\ReportSiteTask.cs" />
+    <Compile Include="Telemetry\TelemetryComponent.cs" />
+    <Compile Include="Telemetry\TelemetryComposer.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
     <Compile Include="Templates\HtmlUrlParser.cs" />

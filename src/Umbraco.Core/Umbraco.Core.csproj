@@ -91,7 +91,7 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="Serilog">
       <Version>2.8.0</Version>
@@ -129,9 +129,12 @@
     -->
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="Exceptions\UnattendedInstallException.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
     <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
     <Compile Include="Models\Blocks\BlockItemData.cs" />
@@ -143,6 +146,8 @@
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\Identity\ExternalLogin.cs" />
+    <Compile Include="Models\Identity\IExternalLogin.cs" />
     <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\InstallLog.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />

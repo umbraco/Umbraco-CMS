@@ -41,8 +41,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox });
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.DataTypes.RichtextEditor });
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox, LabelOnTop = true });
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.DataTypes.RichtextEditor, LabelOnTop = false });
 
             var metaCollection = new PropertyTypeCollection(true);
             metaCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "keywords", Name = "Meta Keywords", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox });
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.Trashed = false;
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88, LabelOnTop = true });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("author", randomizeAliases) , Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 

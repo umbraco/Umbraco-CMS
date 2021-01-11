@@ -62,9 +62,17 @@ namespace Umbraco.Web.Editors
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         [DisableBrowserCache]
-        public ActionResult Index()
+        public ActionResult Index(int? id = null)
         {
             var availableLanguages = _localizationService.GetAllLanguages();
+            if (id.HasValue)
+            {
+                var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(true, id.Value);
+                if (content is null)
+                    return HttpNotFound();
+
+                availableLanguages = availableLanguages.Where(language => content.Cultures.ContainsKey(language.IsoCode));
+            }
 
             var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages, _iconService);
 
@@ -79,7 +87,6 @@ namespace Umbraco.Web.Editors
 
             return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
-
         /// <summary>
         /// Returns the JavaScript file for preview
         /// </summary>
@@ -101,19 +108,24 @@ namespace Umbraco.Web.Editors
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
+            EnterPreview(id);
+
+            // use a numeric URL because content may not be in cache and so .Url would fail
+            var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
+            Response.Redirect($"../../{id}.aspx{query}", true);
+
+            return null;
+        }
+        public ActionResult EnterPreview(int id)
+        {
             var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 
             Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
 
-            // use a numeric url because content may not be in cache and so .Url would fail
-            var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
-            Response.Redirect($"../../{id}.aspx{query}", true);
-
             return null;
         }
-
         public ActionResult End(string redir = null)
         {
             var previewToken = Request.GetPreviewCookieValue();
@@ -121,6 +133,9 @@ namespace Umbraco.Web.Editors
             service.ExitPreview(previewToken);
 
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
+            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false

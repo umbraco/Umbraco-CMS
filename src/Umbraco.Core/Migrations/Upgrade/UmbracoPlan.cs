@@ -7,6 +7,8 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -175,25 +177,31 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
             // release-8.0.0
 
-            // to 8.0.1...
+            // to 8.0.1
             To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
             // release-8.0.1
 
-            // to 8.1.0...
+            // to 8.1.0
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
             To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
 
-            // to 8.6.0...
+            // to 8.6.0
             To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
             To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
             To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
-            // to 8.7.0...
+            // to 8.7.0
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
-            
+
+            // to 8.9.0
+            To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
+			
+            // to 8.10.0
+            To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
+
             //FINAL
         }
     }
