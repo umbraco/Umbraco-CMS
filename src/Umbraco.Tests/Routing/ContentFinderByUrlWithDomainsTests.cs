@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -126,20 +127,20 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/1001-1", 10011)]
         [TestCase("http://domain1.com/1001-2/1001-2-1", 100121)]
 
-        public void Lookup_SingleDomain(string url, int expectedId)
+        public async Task Lookup_SingleDomain(string url, int expectedId)
         {
             SetDomains3();
 
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("https://domain1.com/", 1001, "en-US")]
         [TestCase("https://domain3.com/", 1001, "")] // because domain3 is explicitely set on http
 
-        public void Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
+        public async Task Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
         {
             SetDomains4();
 
@@ -174,14 +175,14 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);

@@ -350,6 +350,8 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected IUmbracoContextAccessor GetUmbracoContextAccessor(IUmbracoContext ctx) => new TestUmbracoContextAccessor(ctx);
+
         protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, GlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -50,6 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // get cultures - new-ing instances to get proper display name,
             // in the current culture, and not the cached one
             // (see notes in Language class about culture info names)
+            // TODO: Fix this requirement, see https://github.com/umbraco/Umbraco-CMS/issues/3623
             return CultureInfo.GetCultures(CultureTypes.AllCultures)
                 .Where(x => !x.Name.IsNullOrWhiteSpace())
                 .Select(x => new CultureInfo(x.Name)) // important!
