@@ -22,7 +22,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         public void TestSetup()
         {
             _savedCulture = Thread.CurrentThread.CurrentCulture;
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-GB"); // make sure the dates parse correctly
         }
 
         [TearDown]

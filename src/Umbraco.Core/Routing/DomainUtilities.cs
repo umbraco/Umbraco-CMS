@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -51,8 +51,8 @@ namespace Umbraco.Web.Routing
             var rootContentId = domain?.ContentId ?? -1;
             var wcDomain = FindWildcardDomainInPath(umbracoContext.Domains.GetAll(true), contentPath, rootContentId);
 
-            if (wcDomain != null) return wcDomain.Culture.Name;
-            if (domain != null) return domain.Culture.Name;
+            if (wcDomain != null) return wcDomain.Culture;
+            if (domain != null) return domain.Culture;
             return umbracoContext.Domains.DefaultCulture;
         }
 
@@ -233,13 +233,13 @@ namespace Umbraco.Web.Routing
 
             if (culture != null) // try the supplied culture
             {
-                var cultureDomains = domainsAndUris.Where(x => x.Culture.Name.InvariantEquals(culture)).ToList();
+                var cultureDomains = domainsAndUris.Where(x => x.Culture.InvariantEquals(culture)).ToList();
                 if (cultureDomains.Count > 0) return cultureDomains;
             }
 
             if (defaultCulture != null) // try the defaultCulture culture
             {
-                var cultureDomains = domainsAndUris.Where(x => x.Culture.Name.InvariantEquals(defaultCulture)).ToList();
+                var cultureDomains = domainsAndUris.Where(x => x.Culture.InvariantEquals(defaultCulture)).ToList();
                 if (cultureDomains.Count > 0) return cultureDomains;
             }
 
@@ -254,13 +254,13 @@ namespace Umbraco.Web.Routing
 
             if (culture != null) // try the supplied culture
             {
-                domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture));
+                domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture));
                 if (domainAndUri != null) return domainAndUri;
             }
 
             if (defaultCulture != null) // try the defaultCulture culture
             {
-                domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(defaultCulture));
+                domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(defaultCulture));
                 if (domainAndUri != null) return domainAndUri;
             }
 

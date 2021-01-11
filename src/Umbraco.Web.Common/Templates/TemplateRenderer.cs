@@ -87,8 +87,8 @@ namespace Umbraco.Web.Common.Templates
                 var defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
 
                 requestBuilder.SetCulture(defaultLanguage == null
-                    ? CultureInfo.CurrentUICulture
-                    : defaultLanguage.CultureInfo);
+                    ? CultureInfo.CurrentUICulture.Name
+                    : defaultLanguage.CultureInfo.Name);
             }
             else
             {

@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
             _logger.LogDebug("Looking for a page to handle 404.");
 
             // try to find a culture as best as we can
-            CultureInfo errorCulture = CultureInfo.CurrentUICulture;
+            string errorCulture = CultureInfo.CurrentUICulture.Name;
             if (frequest.Domain != null)
             {
                 errorCulture = frequest.Domain.Culture;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = umbCtx.Content.GetByRoute(route, culture: frequest?.Culture?.Name);
+                    node = umbCtx.Content.GetByRoute(route, culture: frequest?.Culture);
                     if (node != null)
                     {
                         break;

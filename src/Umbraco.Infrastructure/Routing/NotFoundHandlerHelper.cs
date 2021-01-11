@@ -21,12 +21,12 @@ namespace Umbraco.Web.Routing
             ContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
-            CultureInfo errorCulture)
+            string errorCulture)
         {
             if (error404Collection.Length > 1)
             {
                 // test if a 404 page exists with current culture thread
-                ContentErrorPage cultureErr = error404Collection.FirstOrDefault(x => x.Culture == errorCulture.Name)
+                ContentErrorPage cultureErr = error404Collection.FirstOrDefault(x => x.Culture.InvariantEquals(errorCulture))
                     ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)

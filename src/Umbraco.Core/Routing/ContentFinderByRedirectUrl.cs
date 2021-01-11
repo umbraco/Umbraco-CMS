@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
                 ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
                 : frequest.Uri.GetAbsolutePathDecoded();
 
-            IRedirectUrl redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture.Name);
+            IRedirectUrl redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture);
 
             if (redirectUrl == null)
             {

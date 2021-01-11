@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
         /// </summary>
-        public PublishedRequest(Uri uri, IPublishedContent publishedContent, bool isInternalRedirect, ITemplate template, DomainAndUri domain, CultureInfo culture, string redirectUrl, int? responseStatusCode, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache, bool ignorePublishedContentCollisions)
+        public PublishedRequest(Uri uri, IPublishedContent publishedContent, bool isInternalRedirect, ITemplate template, DomainAndUri domain, string culture, string redirectUrl, int? responseStatusCode, IReadOnlyList<string> cacheExtensions, IReadOnlyDictionary<string, string> headers, bool cacheabilityNoCache, bool ignorePublishedContentCollisions)
         {
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
             PublishedContent = publishedContent;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
         public DomainAndUri Domain { get; }
 
         /// <inheritdoc/>
-        public CultureInfo Culture { get; }
+        public string Culture { get; }
 
         /// <inheritdoc/>
         public string RedirectUrl { get; }
