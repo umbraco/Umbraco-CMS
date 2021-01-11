@@ -665,7 +665,14 @@ namespace Umbraco.Web.Routing
                 var templateId = request.PublishedContent.TemplateId;
                 ITemplate template = GetTemplate(templateId);
                 request.SetTemplate(template);
-                _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                if (template != null)
+                {
+                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                }
+                else
+                {
+                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                }
             }
             else
             {
