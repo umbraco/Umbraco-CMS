@@ -116,9 +116,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
+        [AllowAnonymous] // Needed for users that is invited when the use the link from the mail they are not authorized
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id);
+            Attempt<int> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            return _passwordConfiguration.GetConfiguration(
+                currentUserId.Success
+                    ? currentUserId.Result != userId
+                    : true);
         }
 
         /// <summary>

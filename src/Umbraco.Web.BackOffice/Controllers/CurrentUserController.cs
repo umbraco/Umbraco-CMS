@@ -201,10 +201,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [AppendUserModifiedHeader]
-        public IActionResult PostSetAvatar(IList<IFormFile> files)
+        public IActionResult PostSetAvatar(IList<IFormFile> file)
         {
             //borrow the logic from the user controller
-            return UsersController.PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
         }
 
         /// <summary>
