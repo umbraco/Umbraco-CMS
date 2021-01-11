@@ -112,7 +112,6 @@ namespace Umbraco.Core.Routing
             }
 
             // check for special front-end paths
-            // TODO: These should be constants - will need to update when we do front-end routing
             if (urlPath.InvariantStartsWith(_surfaceMvcPath)
                 || urlPath.InvariantStartsWith(_apiMvcPath))
             {

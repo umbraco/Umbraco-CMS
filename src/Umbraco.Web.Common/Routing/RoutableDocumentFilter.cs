@@ -24,6 +24,7 @@ namespace Umbraco.Web.Common.Routing
     {
         private readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         private readonly GlobalSettings _globalSettings;
+        private readonly WebRoutingSettings _routingSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly EndpointDataSource _endpointDataSource;
         private readonly object _routeLocker = new object();
@@ -34,9 +35,10 @@ namespace Umbraco.Web.Common.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutableDocumentFilter"/> class.
         /// </summary>
-        public RoutableDocumentFilter(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
+        public RoutableDocumentFilter(IOptions<GlobalSettings> globalSettings, IOptions<WebRoutingSettings> routingSettings, IHostingEnvironment hostingEnvironment, EndpointDataSource endpointDataSource)
         {
             _globalSettings = globalSettings.Value;
+            _routingSettings = routingSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _endpointDataSource = endpointDataSource;
             _endpointDataSource.GetChangeToken().RegisterChangeCallback(EndpointsChanged, null);
@@ -67,20 +69,17 @@ namespace Umbraco.Web.Common.Routing
             // a document request should be
             // /foo/bar/nil
             // /foo/bar/nil/
-            // /foo/bar/nil.aspx
             // where /foo is not a reserved path
 
-            // TODO: Remove aspx checks
-
-            // if the path contains an extension that is not .aspx
+            // if the path contains an extension 
             // then it cannot be a document request
             var extension = Path.GetExtension(absPath);
-            if (maybeDoc && extension.IsNullOrWhiteSpace() == false && !extension.InvariantEquals(".aspx"))
+            if (maybeDoc && !extension.IsNullOrWhiteSpace())
             {
                 maybeDoc = false;
             }
 
-            // at that point, either we have no extension, or it is .aspx
+            // at that point we have no extension
 
             // if the path is reserved then it cannot be a document request
             if (maybeDoc && IsReservedPathOrUrl(absPath))
@@ -143,16 +142,9 @@ namespace Umbraco.Web.Common.Routing
                 return true;
             }
 
-            // TODO: We have a problem here:
-            // For every page that is rendered we are storing the URL and if it's routable in _routeChecks which
-            // is a small memory leak. Not sure how we work around this since routes are all dynamic and we don't want
-            // to double route everything on each request. Maybe instead of a growing list it's a list with a max capacity?
-            // BUT... then do we need to do this at all? So long as the catch all route is registered LAST shouldn't all other routes
-            // just match before it anyways and then we don't need to check? The strange part is that the "/umbraco" route doesn't automatically
-            // match so we need to investigate that first. 
-
-            // check if the current request matches a route, if so then it is reserved.
-            var hasRoute = _routeChecks.GetOrAdd(absPath, x => MatchesEndpoint(absPath));
+            // If configured, check if the current request matches a route, if so then it is reserved,
+            // else if not configured (default) proceed as normal since we assume the request is for an Umbraco content item.
+            var hasRoute = _routingSettings.TryMatchingEndpointsForAllPages && _routeChecks.GetOrAdd(absPath, x => MatchesEndpoint(absPath));
             if (hasRoute)
             {
                 return true;

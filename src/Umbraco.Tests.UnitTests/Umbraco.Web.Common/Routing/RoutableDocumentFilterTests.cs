@@ -18,6 +18,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
     {
         private IOptions<GlobalSettings> GetGlobalSettings() => Options.Create(new GlobalSettings());
 
+        private IOptions<WebRoutingSettings> GetWebRoutingSettings() => Options.Create(new WebRoutingSettings());
+
         private IHostingEnvironment GetHostingEnvironment()
         {
             var hostingEnv = new Mock<IHostingEnvironment>();
@@ -35,6 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         {
             var routableDocFilter = new RoutableDocumentFilter(
                 GetGlobalSettings(),
+                GetWebRoutingSettings(),
                 GetHostingEnvironment(),
                 new DefaultEndpointDataSource());
 
@@ -44,14 +47,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
         [TestCase("/base/somebasehandler")]
         [TestCase("/")]
-        [TestCase("/home.aspx")]
+        [TestCase("/home")]
         [TestCase("/umbraco-test")]
         [TestCase("/install-test")]
-        [TestCase("/install.aspx")]
         public void Is_Not_Reserved_Path_Or_Url(string url)
         {
             var routableDocFilter = new RoutableDocumentFilter(
                 GetGlobalSettings(),
+                GetWebRoutingSettings(),
                 GetHostingEnvironment(),
                 new DefaultEndpointDataSource());
 
@@ -73,6 +76,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         public void Is_Reserved_By_Route(string url, bool isReserved)
         {
             var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+            var routingSettings = new WebRoutingSettings { TryMatchingEndpointsForAllPages = true };
 
             RouteEndpoint endpoint1 = CreateEndpoint(
                 "Umbraco/RenderMvc/{action?}/{id?}",
@@ -88,6 +92,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
             var routableDocFilter = new RoutableDocumentFilter(
                 Options.Create(globalSettings),
+                Options.Create(routingSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);
 
@@ -105,16 +110,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
         public void Is_Reserved_By_Default_Back_Office_Route(string url, bool isReserved)
         {
             var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+            var routingSettings = new WebRoutingSettings { TryMatchingEndpointsForAllPages = true };
 
             RouteEndpoint endpoint1 = CreateEndpoint(
-                "umbraco/{action}/{id?}",
-                new { controller = "BackOffice", action = "Default" },
+                "umbraco/{action?}/{id?}",
+                new { controller = "BackOffice" },
                 0);
 
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1);
 
             var routableDocFilter = new RoutableDocumentFilter(
                 Options.Create(globalSettings),
+                Options.Create(routingSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);
 
