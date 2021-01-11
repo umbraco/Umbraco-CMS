@@ -34,9 +34,8 @@
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" 
-                        class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle flex items-center" style="margin-left: -2px;">
-                        <umb-icon icon="icon-wrong"></umb-icon>
+                    <button type="button" ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                        <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                     </button>
 
                 </div>
@@ -68,9 +67,8 @@
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" 
-                        class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle flex items-center" style="margin-left: -2px;">
-                        <umb-icon icon="icon-wrong"></umb-icon>
+                    <button type="button" ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                        <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                     </button>
 
                 </div>
@@ -118,9 +116,9 @@
                             <div class="date-wrapper-mini date-wrapper-mini--checkbox">
                                 <div class="date-wrapper-mini__date" ng-if="(variant.releaseDate || variant.save)">
 
-                                    <div class="flatpickr-label">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
+                                    <div style="font-size: 13px; margin-right: 5px;">Publish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.releaseDateFormatted}}</em></div>
 
-                                    <div class="btn-group flex" ng-if="variant.save">
+                                    <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;" ng-if="variant.save">
                                         <umb-date-time-picker ng-model="variant.releaseDate"
                                                        options="variant.datePickerConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
@@ -132,22 +130,21 @@
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
-                                                <button type="button" class="btn btn-reset umb-button--xxs btn-outline umb-outline" ng-hide="variant.releaseDate">
+                                                <button type="button" class="btn-reset" ng-hide="variant.releaseDate">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </button>
                                             </div>
                                         </umb-date-time-picker>
-                                        <button type="button" ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)"
-                                            class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline flex items-center" style="margin-left: -1px;">
-                                            <umb-icon icon="icon-wrong"></umb-icon>
+                                        <button type="button" ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
+                                            <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                                         </button>
                                     </div>
                                 </div>
 
                                 <div class="date-wrapper-mini__date" ng-if="variant.expireDate || variant.save">
-                                    <div class="flatpickr-label">Unpublish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.expireDateFormatted}}</em></div>
+                                    <div style="font-size: 13px; margin-right: 5px;">Unpublish:<em ng-show="!variant.save">&nbsp;&nbsp;{{variant.expireDateFormatted}}</em></div>
 
-                                    <div class="btn-group flex" ng-if="variant.save">
+                                    <div class="btn-group flex" style="font-size: 14px;" ng-if="variant.save">
                                         <umb-date-time-picker ng-model="variant.expireDate"
                                                        options="variant.datePickerConfig"
                                                        on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
@@ -159,14 +156,13 @@
                                                     {{variant.expireDateFormatted}}
                                                 </button>
 
-                                                <button type="button" class="btn btn-reset umb-button--xxs btn-outline umb-outline" ng-hide="variant.expireDate">
+                                                <button type="button" class="btn-reset" ng-hide="variant.expireDate">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </button>
                                             </div>
                                         </umb-date-time-picker>
-                                        <button type="button" ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" 
-                                            class="btn btn-reset umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline flex items-center" style="margin-left: -1px;">
-                                            <umb-icon icon="icon-wrong"></umb-icon>
+                                        <button type="button" ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn btn-reset umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
+                                            <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                                         </button>
                                     </div>
                                 </div>
