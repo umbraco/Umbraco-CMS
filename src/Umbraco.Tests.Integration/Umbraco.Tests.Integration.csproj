@@ -77,6 +77,7 @@
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+      <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
     </ItemGroup>
 
     <ItemGroup>

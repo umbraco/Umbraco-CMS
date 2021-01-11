@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
@@ -57,9 +58,10 @@ namespace Umbraco.Extensions
             // where we need to have UseAuthentication and UseAuthorization proceeding this call but before
             // endpoints are defined.
             app.UseRouting();
-            app.UseRequestLocalization();
             app.UseAuthentication();
             app.UseAuthorization();
+            // This must come after auth because the culture is based on the auth'd user
+            app.UseRequestLocalization();
 
             // Must be called after UseRouting and before UseEndpoints
             app.UseSession();

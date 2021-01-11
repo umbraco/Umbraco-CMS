@@ -27,7 +27,7 @@ namespace Umbraco.Web.Common.ModelBinders
                 return Task.CompletedTask;
             }
 
-            BindModel(bindingContext, umbracoRouteValues.PublishedContent, bindingContext.ModelType);
+            BindModel(bindingContext, umbracoRouteValues.PublishedRequest.PublishedContent, bindingContext.ModelType);
             return Task.CompletedTask;
         }
 

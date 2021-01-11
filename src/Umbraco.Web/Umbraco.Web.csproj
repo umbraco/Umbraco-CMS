@@ -233,7 +233,6 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />

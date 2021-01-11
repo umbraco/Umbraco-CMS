@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Templates
 {
@@ -7,6 +8,6 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public interface ITemplateRenderer
     {
-        void Render(int pageId, int? altTemplateId, StringWriter writer);
+        Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer);
     }
 }

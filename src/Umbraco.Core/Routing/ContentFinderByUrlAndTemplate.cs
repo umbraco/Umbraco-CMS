@@ -1,10 +1,10 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,8 +24,16 @@ namespace Umbraco.Web.Routing
         private readonly IContentTypeService _contentTypeService;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByUrlAndTemplate(ILogger<ContentFinderByUrlAndTemplate> logger, IFileService fileService, IContentTypeService contentTypeService, IOptions<WebRoutingSettings> webRoutingSettings)
-            : base(logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByUrlAndTemplate"/> class.
+        /// </summary>
+        public ContentFinderByUrlAndTemplate(
+            ILogger<ContentFinderByUrlAndTemplate> logger,
+            IFileService fileService,
+            IContentTypeService contentTypeService,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IOptions<WebRoutingSettings> webRoutingSettings)
+            : base(logger, umbracoContextAccessor)
         {
             _logger = logger;
             _fileService = fileService;
@@ -39,13 +47,14 @@ namespace Umbraco.Web.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
-        public override bool TryFindContent(IPublishedRequest frequest)
+        public override bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IPublishedContent node = null;
             var path = frequest.Uri.GetAbsolutePathDecoded();
 
-            if (frequest.HasDomain)
+            if (frequest.Domain != null)
+            {
                 path = DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, path);
+            }
 
             // no template if "/"
             if (path == "/")
@@ -59,7 +68,7 @@ namespace Umbraco.Web.Routing
             var templateAlias = path.Substring(pos + 1);
             path = pos == 0 ? "/" : path.Substring(0, pos);
 
-            var template = _fileService.GetTemplate(templateAlias);
+            ITemplate template = _fileService.GetTemplate(templateAlias);
 
             if (template == null)
             {
@@ -70,8 +79,8 @@ namespace Umbraco.Web.Routing
             _logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
 
             // look for node corresponding to the rest of the route
-            var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
-            node = FindContent(frequest, route); // also assigns to published request
+            var route = frequest.Domain != null ? (frequest.Domain.ContentId + path) : path;
+            IPublishedContent node = FindContent(frequest, route);
 
             if (node == null)
             {
@@ -83,12 +92,12 @@ namespace Umbraco.Web.Routing
             if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
             {
                 _logger.LogWarning("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
-                frequest.PublishedContent = null; // clear
+                frequest.SetPublishedContent(null); // clear
                 return false;
             }
 
             // got it
-            frequest.TemplateModel = template;
+            frequest.SetTemplate(template);
             return true;
         }
     }

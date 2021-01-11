@@ -1,17 +1,10 @@
 using System;
-using System.IO;
-using System.Text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Security;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -61,6 +54,13 @@ namespace Umbraco.Web
 
         private IUmbracoContext CreateUmbracoContext()
         {
+            // TODO: It is strange having the IVariationContextAccessor initialized here and piggy backing off of IUmbracoContext.
+            // There's no particular reason that IVariationContextAccessor needs to exist as part of IUmbracoContext.
+            // Making this change however basically means that anywhere EnsureUmbracoContext is called, the IVariationContextAccessor
+            // would most likely need to be initialized too. This can easily happen in middleware for each request, however
+            // EnsureUmbracoContext is called for running on background threads too and it would be annoying to have to also ensure
+            // IVariationContextAccessor. Hrm.
+
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
             {

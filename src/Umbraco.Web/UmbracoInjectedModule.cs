@@ -11,6 +11,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
+using RouteDirection = Umbraco.Web.Routing.RouteDirection;
 
 namespace Umbraco.Web
 {
@@ -36,10 +37,8 @@ namespace Umbraco.Web
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
-        private readonly IRequestCache _requestCache;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
             IRuntimeState runtime,
@@ -47,8 +46,6 @@ namespace Umbraco.Web
             IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
             RoutableDocumentFilter routableDocumentLookup,
-            UriUtility uriUtility,
-            IRequestCache requestCache,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
@@ -57,8 +54,6 @@ namespace Umbraco.Web
             _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
             _routableDocumentLookup = routableDocumentLookup;
-            _uriUtility = uriUtility;
-            _requestCache = requestCache;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -135,19 +130,18 @@ namespace Umbraco.Web
 
             // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
-            var request = _publishedRouter.CreateRequest(umbracoContext);
-            umbracoContext.PublishedRequest = request;
-            _publishedRouter.PrepareRequest(request);
+            var requestBuilder = _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl).Result;
+            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound)).Result;
 
+            // NOTE: This has been ported to netcore
             // HandleHttpResponseStatus returns a value indicating that the request should
             // not be processed any further, eg because it has been redirect. then, exit.
-            if (UmbracoModule.HandleHttpResponseStatus(httpContext, request, _logger))
-                return;
-
-            if (request.HasPublishedContent == false)
-                httpContext.RemapHandler(new PublishedContentNotFoundHandler());
-            else
-                RewriteToUmbracoHandler(httpContext, request);
+            //if (UmbracoModule.HandleHttpResponseStatus(httpContext, request, _logger))
+            //    return;
+            //if (request.HasPublishedContent() == false)
+            //    httpContext.RemapHandler(new PublishedContentNotFoundHandler());
+            //else
+            //    RewriteToUmbracoHandler(httpContext, request);
         }
 
         #endregion
@@ -257,40 +251,6 @@ namespace Umbraco.Web
             var urlRouting = new UrlRoutingModule();
             urlRouting.PostResolveRequestCache(context);
         }
-
-        /// <summary>
-        /// Rewrites to the Umbraco handler - we always send the request via our MVC rendering engine, this will deal with
-        /// requests destined for webforms.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
-        {
-            // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
-            // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
-            // rewritten URL, but this is not what we want!
-            // read: http://forums.iis.net/t/1146511.aspx
-
-            var query = pcr.Uri.Query.TrimStart('?');
-
-            // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.GetBackOfficePath(_hostingEnvironment).TrimEnd('/') + "/RenderMvc";
-            // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
-            context.RewritePath(rewritePath, "", query, false);
-
-            //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then re-parse the query strings, this would
-            //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
-            //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
-            // * Looks up the route based on the new rewritten URL
-            // * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
-            //we also cannot re-create this functionality because the setter for the HttpContext.Request.RequestContext is internal
-            //so really, this is pretty much the only way without using Server.TransferRequest and if we did that, we'd have to rethink
-            //a bunch of things!
-            var urlRouting = new UrlRoutingModule();
-            urlRouting.PostResolveRequestCache(context);
-        }
-
 
 
         #endregion
