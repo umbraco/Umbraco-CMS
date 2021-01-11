@@ -49,7 +49,7 @@ namespace Umbraco.Infrastructure.Security
 
         /// <inheritdoc />
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
-
+        
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>
