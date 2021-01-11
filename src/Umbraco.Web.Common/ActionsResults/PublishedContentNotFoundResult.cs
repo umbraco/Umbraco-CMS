@@ -52,7 +52,7 @@ namespace Umbraco.Web.Common.ActionsResults
                 await response.WriteAsync("<p>" + _message + "</p>");
             }
 
-            await response.WriteAsync("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
+            await response.WriteAsync("<p>This page can be replaced with a custom 404. Check the <a target='_blank' href='https://our.umbraco.com/documentation/tutorials/Custom-Error-Pages/'>documentation for \"custom 404\"</a>.</p>");
             await response.WriteAsync("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
             await response.WriteAsync("</body></html>");
         }
