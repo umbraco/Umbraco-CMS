@@ -1,4 +1,6 @@
-﻿
+
+using Umbraco.Core.Models.PublishedContent;
+
 namespace Umbraco.Web.Routing
 {
     /// <summary>
@@ -11,25 +13,37 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByPageIdQuery : IContentFinder
     {
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public ContentFinderByPageIdQuery(IRequestAccessor requestAccessor)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByPageIdQuery"/> class.
+        /// </summary>
+        public ContentFinderByPageIdQuery(IRequestAccessor requestAccessor, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _requestAccessor = requestAccessor;
+            _requestAccessor = requestAccessor ?? throw new System.ArgumentNullException(nameof(requestAccessor));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
         }
 
-        public bool TryFindContent(IPublishedRequest frequest)
+        /// <inheritdoc/>
+        public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            int pageId;
-            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out pageId))
+            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null)
             {
-                var doc = frequest.UmbracoContext.Content.GetById(pageId);
+                return false;
+            }
+
+            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out int pageId))
+            {
+                IPublishedContent doc = umbCtx.Content.GetById(pageId);
 
                 if (doc != null)
                 {
-                    frequest.PublishedContent = doc;
+                    frequest.SetPublishedContent(doc);
                     return true;
                 }
             }
+
             return false;
         }
     }

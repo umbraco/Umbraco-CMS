@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -284,9 +284,11 @@ namespace Umbraco.Web.Routing
             // we do our best, but can't do the impossible
             // get the "default" domain ie the first one for the culture, else the first one (exists, length > 0)
             if (qualifiedSites == null)
-                return domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture)) ??
-                       domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(defaultCulture)) ??
-                       domainAndUris.First();
+            {
+                return domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture))
+                    ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(defaultCulture))
+                    ?? domainAndUris.First();
+            }
 
             // find a site that contains the current authority
             var currentSite = qualifiedSites.FirstOrDefault(site => site.Value.Contains(currentAuthority));
@@ -308,7 +310,7 @@ namespace Umbraco.Web.Routing
                 .FirstOrDefault(domainAndUri => domainAndUri != null);
 
             // random, really
-            ret = ret ?? domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture)) ?? domainAndUris.First();
+            ret = ret ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture)) ?? domainAndUris.First();
 
             return ret;
         }

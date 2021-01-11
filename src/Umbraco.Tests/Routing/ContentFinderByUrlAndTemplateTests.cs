@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -25,24 +26,32 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1/blah")]
         [TestCase("/Home/Sub1/Blah")] //different cases
         [TestCase("/home/Sub1.aspx/blah")]
-        public void Match_Document_By_Url_With_Template(string urlAsString)
+        public async Task Match_Document_By_Url_With_Template(string urlAsString)
         {
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var template1 = CreateTemplate("test");
             var template2 = CreateTemplate("blah");
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings: globalSettings);
-            var publishedRouter = CreatePublishedRouter();
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var reqBuilder = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var webRoutingSettings = new WebRoutingSettings();
-            var lookup = new ContentFinderByUrlAndTemplate(LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(), ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+            var lookup = new ContentFinderByUrlAndTemplate(
+                LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(),
+                ServiceContext.FileService,
+                ServiceContext.ContentTypeService,
+                GetUmbracoContextAccessor(umbracoContext),
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
 
-            var result = lookup.TryFindContent(frequest);
+            var result = lookup.TryFindContent(reqBuilder);
+
+            IPublishedRequest frequest = reqBuilder.Build();
 
             Assert.IsTrue(result);
             Assert.IsNotNull(frequest.PublishedContent);
-            Assert.IsNotNull(frequest.TemplateAlias);
-            Assert.AreEqual("blah".ToUpperInvariant(), frequest.TemplateAlias.ToUpperInvariant());
+            var templateAlias = frequest.GetTemplateAlias();
+            Assert.IsNotNull(templateAlias );
+            Assert.AreEqual("blah".ToUpperInvariant(), templateAlias.ToUpperInvariant());
         }
     }
 }

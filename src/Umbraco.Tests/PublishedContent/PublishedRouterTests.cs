@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -15,30 +17,31 @@ namespace Umbraco.Tests.PublishedContent
     public class PublishedRouterTests : BaseWebTest
     {
         [Test]
-        public void ConfigureRequest_Returns_False_Without_HasPublishedContent()
+        public async Task ConfigureRequest_Returns_False_Without_HasPublishedContent()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var publishedRouter = CreatePublishedRouter();
-            var request = publishedRouter.CreateRequest(umbracoContext);
-            var result = publishedRouter.ConfigureRequest(request);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+            var result = publishedRouter.BuildRequest(request);
 
-            Assert.IsFalse(result);
+            Assert.IsFalse(result.Success());
         }
 
         [Test]
-        public void ConfigureRequest_Returns_False_When_IsRedirect()
+        public async Task ConfigureRequest_Returns_False_When_IsRedirect()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var publishedRouter = CreatePublishedRouter();
-            var request = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
+            var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var content = GetPublishedContentMock();
-            request.PublishedContent = content.Object;
-            request.Culture = new CultureInfo("en-AU");
+            request.SetPublishedContent(content.Object);
+            request.SetCulture("en-AU");
             request.SetRedirect("/hello");
-            var result = publishedRouter.ConfigureRequest(request);
+            var result = publishedRouter.BuildRequest(request);
 
-            Assert.IsFalse(result);
+            Assert.IsFalse(result.Success());
         }
+
         private Mock<IPublishedContent> GetPublishedContentMock()
         {
             var pc = new Mock<IPublishedContent>();

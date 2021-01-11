@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -86,7 +86,6 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Returns all key/values in storage for the given culture
         /// </summary>
-        /// <returns></returns>
         public IDictionary<string, string> GetAllStoredValues(CultureInfo culture)
         {
             if (culture == null) throw new ArgumentNullException("culture");
@@ -108,16 +107,18 @@ namespace Umbraco.Core.Services.Implement
                     return result;
                 }
 
-                //convert all areas + keys to a single key with a '/'
+                // convert all areas + keys to a single key with a '/'
                 result = GetStoredTranslations(xmlSource, culture);
 
-                //merge with the English file in case there's keys in there that don't exist in the local file
-                var englishCulture = new CultureInfo("en-US");
+                // merge with the English file in case there's keys in there that don't exist in the local file
+                var englishCulture = CultureInfo.GetCultureInfo("en-US");
                 if (culture.Equals(englishCulture) == false)
                 {
                     var englishResults = GetStoredTranslations(xmlSource, englishCulture);
                     foreach (var englishResult in englishResults.Where(englishResult => result.ContainsKey(englishResult.Key) == false))
+                    {
                         result.Add(englishResult.Key, englishResult.Value);
+                    }
                 }
             }
             else
@@ -128,13 +129,13 @@ namespace Umbraco.Core.Services.Implement
                     return result;
                 }
 
-                //convert all areas + keys to a single key with a '/'
+                // convert all areas + keys to a single key with a '/'
                 foreach (var area in _dictionarySource[culture])
                 {
                     foreach (var key in area.Value)
                     {
                         var dictionaryKey = string.Format("{0}/{1}", area.Key, key.Key);
-                        //i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
+                        // i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
                         if (result.ContainsKey(dictionaryKey) == false)
                         {
                             result.Add(dictionaryKey, key.Value);
