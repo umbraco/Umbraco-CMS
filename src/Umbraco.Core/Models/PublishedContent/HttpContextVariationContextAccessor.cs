@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
@@ -14,10 +14,7 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpContextVariationContextAccessor"/> class.
         /// </summary>
-        public HttpContextVariationContextAccessor(IRequestCache requestCache)
-        {
-            _requestCache = requestCache;
-        }
+        public HttpContextVariationContextAccessor(IRequestCache requestCache) => _requestCache = requestCache;
 
         /// <inheritdoc />
         public VariationContext VariationContext

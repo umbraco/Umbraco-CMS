@@ -1,25 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class SqlCeTableByTableTest : TestWithDatabaseBase
+    public class SqlServerTableByTableTest : UmbracoIntegrationTest
     {
-        public GlobalSettings GlobalSettings => new GlobalSettings();
+        private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
         private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
         [Test]
@@ -118,22 +112,6 @@ namespace Umbraco.Tests.Persistence
                 helper.CreateTable<ContentTypeDto>();
                 helper.CreateTable<ContentDto>();
                 helper.CreateTable<ContentVersionDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_cmsContentXml_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion);
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<ContentTypeDto>();
-                helper.CreateTable<ContentDto>();
-                helper.CreateTable<ContentXmlDto>();
 
                 scope.Complete();
             }
@@ -324,23 +302,6 @@ namespace Umbraco.Tests.Persistence
                 helper.CreateTable<NodeDto>();
                 helper.CreateTable<ContentTypeDto>();
                 helper.CreateTable<MemberPropertyTypeDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_cmsPreviewXml_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion);
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<ContentTypeDto>();
-                helper.CreateTable<ContentDto>();
-                helper.CreateTable<ContentVersionDto>();
-                helper.CreateTable<PreviewXmlDto>();
 
                 scope.Complete();
             }

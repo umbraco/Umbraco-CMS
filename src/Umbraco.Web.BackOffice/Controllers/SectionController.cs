@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
@@ -49,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
-        public IEnumerable<Section> GetSections()
+        public async Task<IEnumerable<Section>> GetSections()
         {
             var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -74,7 +75,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (hasDashboards) continue;
 
                 // get the first tree in the section and get its root node route path
-                var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
+                var sectionRoot = await appTreeController.GetApplicationTrees(section.Alias, null, null);
                 section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
             }
 

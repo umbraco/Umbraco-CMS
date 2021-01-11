@@ -44,7 +44,7 @@ namespace Umbraco.Web.Website.Controllers
                 }
 
                 var routeDef = routeDefAttempt.Result;
-                return routeDef.PublishedContent;
+                return routeDef.PublishedRequest.PublishedContent;
             }
         }
 

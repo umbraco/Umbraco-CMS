@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml.XPath;
 using Umbraco.Core;
@@ -7,6 +7,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Website
 {
@@ -95,13 +96,10 @@ namespace Umbraco.Web.Website
         /// <summary>
         /// Renders the template for the specified pageId and an optional altTemplateId
         /// </summary>
-        /// <param name="contentId"></param>
+        /// <param name="contentId">The content id</param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
-        /// <returns></returns>
-        public IHtmlEncodedString RenderTemplate(int contentId, int? altTemplateId = null)
-        {
-            return _componentRenderer.RenderTemplate(contentId, altTemplateId);
-        }
+        public async Task<IHtmlEncodedString> RenderTemplateAsync(int contentId, int? altTemplateId = null)
+            => await _componentRenderer.RenderTemplateAsync(contentId, altTemplateId);
 
         #region RenderMacro
 

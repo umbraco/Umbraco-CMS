@@ -4,6 +4,8 @@
     {
         public string ProviderName => Constants.DatabaseProviders.SqlServer;
 
+        public string ConnectionString { get; set; }
+
         public void Create()
         {
 

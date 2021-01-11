@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\linting\codeanalysis.tests.ruleset = ..\linting\codeanalysis.tests.ruleset
 		..\Directory.Build.props = ..\Directory.Build.props
 		..\Directory.Build.targets = ..\Directory.Build.targets
+		..\build\azure-pipelines.yml = ..\build\azure-pipelines.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
@@ -141,6 +142,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Integration", "Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{1B885D2F-1599-4557-A4EC-474CC74DEB10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +194,10 @@ Global
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B885D2F-1599-4557-A4EC-474CC74DEB10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B885D2F-1599-4557-A4EC-474CC74DEB10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B885D2F-1599-4557-A4EC-474CC74DEB10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B885D2F-1599-4557-A4EC-474CC74DEB10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -204,6 +211,7 @@ Global
 		{C7311C00-2184-409B-B506-52A5FAEA8736} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{1B885D2F-1599-4557-A4EC-474CC74DEB10} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

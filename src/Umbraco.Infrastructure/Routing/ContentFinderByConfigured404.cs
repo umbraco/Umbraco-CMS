@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Linq;
 using Examine;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -19,17 +19,23 @@ namespace Umbraco.Web.Routing
         private readonly IEntityService _entityService;
         private readonly ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
+        /// </summary>
         public ContentFinderByConfigured404(
             ILogger<ContentFinderByConfigured404> logger,
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
-            IExamineManager examineManager)
+            IExamineManager examineManager,
+            IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
             _contentSettings = contentConfigSettings.Value;
             _examineManager = examineManager;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>
@@ -37,13 +43,19 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(IPublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
+            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null)
+            {
+                return false;
+            }
+
             _logger.LogDebug("Looking for a page to handle 404.");
 
             // try to find a culture as best as we can
-            var errorCulture = CultureInfo.CurrentUICulture;
-            if (frequest.HasDomain)
+            string errorCulture = CultureInfo.CurrentUICulture.Name;
+            if (frequest.Domain != null)
             {
                 errorCulture = frequest.Domain.Culture;
             }
@@ -55,22 +67,29 @@ namespace Umbraco.Web.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = frequest.UmbracoContext.Content.GetByRoute(route, culture: frequest?.Culture?.Name);
-                    if (node != null) break;
+                    node = umbCtx.Content.GetByRoute(route, culture: frequest?.Culture);
+                    if (node != null)
+                    {
+                        break;
+                    }
+
                     pos = route.LastIndexOf('/');
                 }
+
                 if (node != null)
                 {
-                    var d = DomainUtilities.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
+                    Domain d = DomainUtilities.FindWildcardDomainInPath(umbCtx.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
                     if (d != null)
+                    {
                         errorCulture = d.Culture;
+                    }
                 }
             }
 
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(frequest.UmbracoContext.PublishedSnapshot, frequest.UmbracoContext.VariationContextAccessor, _examineManager),
+                new PublishedContentQuery(umbCtx.PublishedSnapshot, umbCtx.VariationContextAccessor, _examineManager),
                 errorCulture);
 
             IPublishedContent content = null;
@@ -79,7 +98,7 @@ namespace Umbraco.Web.Routing
             {
                 _logger.LogDebug("Got id={ErrorNodeId}.", error404.Value);
 
-                content = frequest.UmbracoContext.Content.GetById(error404.Value);
+                content = umbCtx.Content.GetById(error404.Value);
 
                 _logger.LogDebug(content == null
                     ? "Could not find content with that id."
@@ -90,8 +109,10 @@ namespace Umbraco.Web.Routing
                 _logger.LogDebug("Got nothing.");
             }
 
-            frequest.PublishedContent = content;
-            frequest.Is404 = true;
+            frequest
+                .SetPublishedContent(content)
+                .SetIs404();
+
             return content != null;
         }
     }

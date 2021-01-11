@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -199,13 +199,23 @@ namespace Umbraco.Web.BackOffice.Mapping
         private UrlInfo[] GetUrls(IContent source)
         {
             if (source.ContentType.IsElement)
+            {
                 return Array.Empty<UrlInfo>();
+            }
 
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
-            var urls = umbracoContext == null
-                ? new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") }
-                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _loggerFactory.CreateLogger<IContent>(), _uriUtility, _publishedUrlProvider).ToArray();
+            if (umbracoContext == null)
+            {
+                return new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") };
+            }
+
+            // NOTE: unfortunately we're not async, we'll use .Result and hope this won't cause a deadlock anywhere for now
+            var urls = source.GetContentUrlsAsync(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _loggerFactory.CreateLogger<IContent>(), _uriUtility, _publishedUrlProvider)
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult()
+                .ToArray();
 
             return urls;
         }

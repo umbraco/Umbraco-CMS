@@ -162,8 +162,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
             IPublishedContent content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
+            var builder = new PublishedRequestBuilder(umbracoContext.CleanedUmbracoUrl, Mock.Of<IFileService>());
+            builder.SetPublishedContent(content);
+            IPublishedRequest publishedRequest = builder.Build();
 
-            var routeDefinition = new UmbracoRouteValues(content);
+            var routeDefinition = new UmbracoRouteValues(publishedRequest);
 
             var routeData = new RouteData();
             routeData.Values.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);

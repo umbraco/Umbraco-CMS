@@ -3,8 +3,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Web.Common.Mvc
 {
+
     /// <summary>
     /// Options for globally configuring MVC for Umbraco
     /// </summary>

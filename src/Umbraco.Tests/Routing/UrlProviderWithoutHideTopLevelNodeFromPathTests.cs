@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -186,8 +186,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
+                        new Domain(2, "example.us", 9876, "en-US", false), //default
+                        new Domain(3, "example.fr", 9876, "fr-FR", false)
                     };
                 });
             domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);
@@ -240,8 +240,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
+                        new Domain(2, "example.us", 9876, "en-US", false), //default
+                        new Domain(3, "example.fr", 9876, "fr-FR", false)
                     };
                 });
             domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);

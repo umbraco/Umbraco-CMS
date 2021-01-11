@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,42 +13,36 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
-using Umbraco.Infrastructure.Runtime;
 using Umbraco.Net;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.Localization;
 using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Mvc;
 using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
@@ -130,8 +122,9 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             // Add supported databases
-            builder.AddUmbracoSqlCeSupport();
             builder.AddUmbracoSqlServerSupport();
+            builder.AddUmbracoSqlCeSupport();
+
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
@@ -226,6 +219,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             });
 
             builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
+            builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);

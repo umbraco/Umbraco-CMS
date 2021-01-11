@@ -23,8 +23,6 @@ namespace Umbraco.Web.Website.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<NoContentRoutes>();
-
             builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 
@@ -39,6 +37,8 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddDataProtection();
 
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
+            builder.Services.AddSingleton<HijackedRouteEvaluator>();
+            builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
 
             builder.AddDistributedCache();
