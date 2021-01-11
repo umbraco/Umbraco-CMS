@@ -64,7 +64,9 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(request);
 
             if (expectedNode > 0)
-                Assert.AreEqual(expectedCulture, request.Culture.Name);
+            {
+                Assert.AreEqual(expectedCulture, request.Culture);
+            }
 
             var finder = new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(request);

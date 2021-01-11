@@ -26,7 +26,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the <see cref="CultureInfo"/> assigned (if any)
         /// </summary>
-        CultureInfo Culture { get; }
+        string Culture { get; }
 
         /// <summary>
         /// Gets a value indicating whether the current published content has been obtained
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Sets the culture for the request
         /// </summary>
-        IPublishedRequestBuilder SetCulture(CultureInfo culture);
+        IPublishedRequestBuilder SetCulture(string culture);
 
         /// <summary>
         /// Sets the found <see cref="IPublishedContent"/> for the request

@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
                         if (!string.IsNullOrEmpty(cultureFromQuerystring))
                         {
                             // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.SetCulture(CultureInfo.GetCultureInfo(cultureFromQuerystring));
+                            frequest.SetCulture(cultureFromQuerystring);
                         }
 
                         frequest.SetPublishedContent(node);

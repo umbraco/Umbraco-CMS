@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -112,10 +112,10 @@ namespace Umbraco.Web.Routing
                     // if the property varies, get the variant value, URL is "<domain>/<variant-alias>"
 
                     // but! only if the culture is published, else ignore
-                    if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
+                    if (varies && !node.HasCulture(domainUri.Culture)) continue;
 
                     var umbracoUrlName = varies
-                        ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture)
                         : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
                     var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Routing
                     {
                         var path = "/" + alias;
                         var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(), domainUri.Culture.Name);
+                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(), domainUri.Culture);
                     }
                 }
             }

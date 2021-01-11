@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Routing
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
             var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = lookup.TryFindContent(frequest);

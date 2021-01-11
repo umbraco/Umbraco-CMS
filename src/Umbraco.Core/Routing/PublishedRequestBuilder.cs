@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
         public DomainAndUri Domain { get; private set; }
 
         /// <inheritdoc/>
-        public CultureInfo Culture { get; private set; }
+        public string Culture { get; private set; }
 
         /// <inheritdoc/>
         public ITemplate Template { get; private set; }
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetCulture(CultureInfo culture)
+        public IPublishedRequestBuilder SetCulture(string culture)
         {
             Culture = culture;
             return this;

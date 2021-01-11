@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Routing
             // lookup domain
             publishedRouter.FindDomain(frequest);
 
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
             var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.HandleWildcardDomains(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
         // domains such as "/en" are natively supported, and when instanciating
@@ -377,7 +377,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
             Assert.IsNotNull(frequest.Domain);
 
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
             var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);

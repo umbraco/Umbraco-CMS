@@ -45,7 +45,11 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the content request's culture.
         /// </summary>
-        CultureInfo Culture { get; }
+        /// <remarks>
+        /// This will get mapped to a CultureInfo eventually but CultureInfo are expensive to create so we want to leave that up to the
+        /// localization middleware to do. See https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Middleware/Localization/src/RequestLocalizationMiddleware.cs#L165.
+        /// </remarks>
+        string Culture { get; }
 
         /// <summary>
         /// Gets the url to redirect to, when the content request triggers a redirect.

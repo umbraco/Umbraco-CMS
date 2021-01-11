@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
@@ -19,20 +19,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         /// <inheritdoc />
-        public IEnumerable<Domain> GetAll(bool includeWildcards)
-        {
-            return _domainService.GetAll(includeWildcards)
+        public IEnumerable<Domain> GetAll(bool includeWildcards) => _domainService.GetAll(includeWildcards)
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
-        }
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, x.LanguageIsoCode, x.IsWildcard));
 
         /// <inheritdoc />
-        public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false)
-        {
-            return _domainService.GetAssignedDomains(documentId, includeWildcards)
+        public IEnumerable<Domain> GetAssigned(int documentId, bool includeWildcards = false) => _domainService.GetAssignedDomains(documentId, includeWildcards)
                  .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
-        }
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, x.LanguageIsoCode, x.IsWildcard));
 
         /// <inheritdoc />
         public bool HasAssigned(int documentId, bool includeWildcards = false)

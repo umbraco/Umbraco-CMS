@@ -48,7 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Web.Routing
 
             sut.SetDomain(
                 new DomainAndUri(
-                    new Domain(1, "test", 2, CultureInfo.GetCultureInfo("en-AU"), false), new Uri("https://example.com/en-au")));
+                    new Domain(1, "test", 2, "en-AU", false), new Uri("https://example.com/en-au")));
 
             Assert.IsNotNull(sut.Domain);
             Assert.IsNotNull(sut.Culture);
@@ -62,8 +62,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Web.Routing
             IPublishedContent content = Mock.Of<IPublishedContent>(x => x.Id == 1);
             ITemplate template = Mock.Of<ITemplate>(x => x.Id == 1);
             string[] cacheExt = new[] { "must-revalidate" };
-            var auCulture = CultureInfo.GetCultureInfo("en-AU");
-            var usCulture = CultureInfo.GetCultureInfo("en-US");
+            var auCulture = "en-AU";
+            var usCulture = "en-US";
             var domain = new DomainAndUri(
                     new Domain(1, "test", 2, auCulture, false), new Uri("https://example.com/en-au"));
             IReadOnlyDictionary<string, string> headers = new Dictionary<string, string> { ["Hello"] = "world" };

@@ -121,15 +121,15 @@ namespace Umbraco.Web.Routing
             return request.Build();
         }
 
-        private void SetVariationContext(CultureInfo culture)
+        private void SetVariationContext(string culture)
         {
             VariationContext variationContext = _variationContextAccessor.VariationContext;
-            if (variationContext != null && variationContext.Culture == culture?.Name)
+            if (variationContext != null && variationContext.Culture == culture)
             {
                 return;
             }
 
-            _variationContextAccessor.VariationContext = new VariationContext(culture?.Name);
+            _variationContextAccessor.VariationContext = new VariationContext(culture);
         }
 
         /// <inheritdoc />
@@ -272,7 +272,7 @@ namespace Umbraco.Web.Routing
                 }
 
                 // variant, ensure that the culture corresponding to the domain's language is published
-                return domainDocument.Cultures.ContainsKey(domain.Culture.Name);
+                return domainDocument.Cultures.ContainsKey(domain.Culture);
             }
 
             domains = domains.Where(IsPublishedContentDomain).ToList();
@@ -302,10 +302,10 @@ namespace Umbraco.Web.Routing
                 // not matching any existing domain
                 _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
 
-                request.SetCulture(defaultCulture == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultCulture));
+                request.SetCulture(defaultCulture ?? CultureInfo.CurrentUICulture.Name);
             }
 
-            _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture.Name);
+            _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture);
 
             return request.Domain != null;
         }
@@ -331,7 +331,7 @@ namespace Umbraco.Web.Routing
             if (domain != null)
             {
                 request.SetCulture(domain.Culture);
-                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture.Name);
+                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture);
             }
             else
             {
@@ -665,7 +665,14 @@ namespace Umbraco.Web.Routing
                 var templateId = request.PublishedContent.TemplateId;
                 ITemplate template = GetTemplate(templateId);
                 request.SetTemplate(template);
-                _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                if (template != null)
+                {
+                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                }
+                else
+                {
+                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                }
             }
             else
             {

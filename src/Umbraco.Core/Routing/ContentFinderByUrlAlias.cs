@@ -59,7 +59,7 @@ namespace Umbraco.Web.Routing
                 node = FindContentByAlias(
                     umbCtx.Content,
                     frequest.Domain != null ? frequest.Domain.ContentId : 0,
-                    frequest.Culture.Name,
+                    frequest.Culture,
                     frequest.Uri.GetAbsolutePathDecoded());
 
                 if (node != null)

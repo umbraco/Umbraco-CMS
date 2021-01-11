@@ -30,8 +30,8 @@ namespace Umbraco.Web.Common.Localization
                 options.RequestCultureProviders = new List<IRequestCultureProvider>();
             }
 
-            options.RequestCultureProviders.Insert(0, new UmbracoBackOfficeIdentityCultureProvider());
-            options.RequestCultureProviders.Insert(1, new UmbracoPublishedContentCultureProvider());
+            options.RequestCultureProviders.Insert(0, new UmbracoBackOfficeIdentityCultureProvider(options));
+            options.RequestCultureProviders.Insert(1, new UmbracoPublishedContentCultureProvider(options));
         }
     }
 }

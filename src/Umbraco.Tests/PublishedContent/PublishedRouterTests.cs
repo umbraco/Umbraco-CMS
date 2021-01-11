@@ -35,7 +35,7 @@ namespace Umbraco.Tests.PublishedContent
             var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var content = GetPublishedContentMock();
             request.SetPublishedContent(content.Object);
-            request.SetCulture(new CultureInfo("en-AU"));
+            request.SetCulture("en-AU");
             request.SetRedirect("/hello");
             var result = publishedRouter.BuildRequest(request);
 

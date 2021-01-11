@@ -212,7 +212,9 @@ namespace Umbraco.Web.BackOffice.Mapping
 
             // NOTE: unfortunately we're not async, we'll use .Result and hope this won't cause a deadlock anywhere for now
             var urls = source.GetContentUrlsAsync(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _variationContextAccessor, _loggerFactory.CreateLogger<IContent>(), _uriUtility, _publishedUrlProvider)
-                .Result
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult()
                 .ToArray();
 
             return urls;
