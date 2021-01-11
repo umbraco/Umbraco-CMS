@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -10,6 +9,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Routing;
 using Umbraco.Extensions;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Security;
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                new UmbracoRequestPaths(Options.Create(globalSettings), Mock.Of<IHostingEnvironment>()));
+                new UmbracoRequestPaths(Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
 
             var result = mgr.ShouldAuthenticateRequest("/umbraco");
 

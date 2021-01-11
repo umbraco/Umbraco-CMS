@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -8,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Routing;
 using Umbraco.Web.Common.AspNetCore;
+using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
 {
@@ -39,7 +38,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         [TestCase("/home.aspx", false)]
         public void Is_Client_Side_Request(string url, bool assert)
         {
-            var umbracoRequestPaths = new UmbracoRequestPaths(null, null);
+            IHostingEnvironment hostingEnvironment = CreateHostingEnvironment();
+            var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment);
 
             var uri = new Uri("http://test.com" + url);
             var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
@@ -49,7 +49,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
         {
-            var umbracoRequestPaths = new UmbracoRequestPaths(null, null);
+            IHostingEnvironment hostingEnvironment = CreateHostingEnvironment();
+            var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment);
 
             // This URL is invalid. Default to false when the extension cannot be determined
             var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");

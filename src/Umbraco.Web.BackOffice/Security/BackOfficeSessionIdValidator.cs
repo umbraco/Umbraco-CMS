@@ -1,3 +1,5 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
 using System;
 using System.Security.Claims;
@@ -13,10 +15,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
-#pragma warning disable IDE0065 // Misplaced using directive
-    using ICookieManager = Microsoft.AspNetCore.Authentication.Cookies.ICookieManager;
-#pragma warning restore IDE0065 // Misplaced using directive
-
     /// <summary>
     /// Used to validate a cookie against a user's session id
     /// </summary>
@@ -68,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Security
         private async Task<bool> ValidateSessionAsync(
             TimeSpan validateInterval,
             HttpContext httpContext,
-            ICookieManager cookieManager,
+            Microsoft.AspNetCore.Authentication.Cookies.ICookieManager cookieManager,
             ISystemClock systemClock,
             DateTimeOffset? authTicketIssueDate,
             ClaimsIdentity currentIdentity)
@@ -118,7 +116,7 @@ namespace Umbraco.Web.BackOffice.Security
             var userId = currentIdentity.GetUserId();
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                {
+            {
                 return false;
             }
 

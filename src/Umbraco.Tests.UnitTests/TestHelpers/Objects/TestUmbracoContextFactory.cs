@@ -9,6 +9,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.PublishedCache;
@@ -55,7 +56,8 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
             var snapshotService = new Mock<IPublishedSnapshotService>();
             snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
-            IHostingEnvironment hostingEnvironment = Mock.Of<IHostingEnvironment>();
+            IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
+
             var backofficeSecurityAccessorMock = new Mock<IBackOfficeSecurityAccessor>();
             backofficeSecurityAccessorMock.Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
 
