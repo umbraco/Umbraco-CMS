@@ -22,9 +22,7 @@ namespace Umbraco.Core.Routing
         private readonly string _apiMvcPath;
         private readonly string _installPath;
         private readonly string _appPath;
-        private readonly List<string> _aspLegacyJsExt = new List<string> { ".asmx/", ".aspx/", ".ashx/", ".axd/", ".svc/" };
-        private readonly List<string> _aspLegacyExt = new List<string> { ".asmx", ".aspx", ".ashx", ".axd", ".svc" };
-
+        private readonly List<string> _defaultUmbPaths;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestPaths"/> class.
@@ -38,7 +36,7 @@ namespace Umbraco.Core.Routing
                 .EnsureStartsWith('/').TrimStart(_appPath.EnsureStartsWith('/')).EnsureStartsWith('/');
 
             _mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-
+            _defaultUmbPaths = new List<string> { "/" + _mvcArea, "/" + _mvcArea + "/" };
             _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
             _previewMvcPath = "/" + _mvcArea + "/Preview/";
             _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
@@ -50,22 +48,25 @@ namespace Umbraco.Core.Routing
         /// Checks if the current uri is a back office request
         /// </summary>
         /// <remarks>
+        /// <para>
         /// There are some special routes we need to check to properly determine this:
-        ///
-        ///     If any route has an extension in the path like .aspx = back office
-        ///
+        /// </para>
+        /// <para>
         ///     These are def back office:
         ///         /Umbraco/BackOffice     = back office
         ///         /Umbraco/Preview        = back office
-        ///     If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
+        /// </para>
+        /// <para>
+        ///     If it's not any of the above then we cannot determine if it's back office or front-end
         ///     so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
         ///     but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
-        ///
+        /// </para>
+        /// <para>
         ///     These are def front-end:
         ///         /Umbraco/Surface        = front-end
         ///         /Umbraco/Api            = front-end
         ///     But if we've got this far we'll just have to assume it's front-end anyways.
-        ///
+        /// </para>
         /// </remarks>
         public bool IsBackOfficeRequest(string absPath)
         {
@@ -82,24 +83,7 @@ namespace Umbraco.Core.Routing
             }
 
             // if its the normal /umbraco path
-            if (urlPath.InvariantEquals("/" + _mvcArea)
-                || urlPath.InvariantEquals("/" + _mvcArea + "/"))
-            {
-                return true;
-            }
-
-            // check for a file extension
-            var extension = Path.GetExtension(absPath);
-
-            // has an extension, def back office
-            if (extension.IsNullOrWhiteSpace() == false)
-            {
-                return true;
-            }
-
-            // check for special case asp.net calls like:
-            // /umbraco/webservices/legacyAjaxCalls.asmx/js which will return a null file extension but are still considered requests with an extension
-            if (_aspLegacyJsExt.Any(x => urlPath.InvariantContains(x)))
+            if (_defaultUmbPaths.Any(x => urlPath.InvariantEquals(x)))
             {
                 return true;
             }
@@ -143,12 +127,7 @@ namespace Umbraco.Core.Routing
         public bool IsClientSideRequest(string absPath)
         {
             var ext = Path.GetExtension(absPath);
-            if (ext.IsNullOrWhiteSpace())
-            {
-                return false;
-            }
-
-            return _aspLegacyExt.Any(ext.InvariantEquals) == false;
+            return !ext.IsNullOrWhiteSpace();
         }
     }
 }
