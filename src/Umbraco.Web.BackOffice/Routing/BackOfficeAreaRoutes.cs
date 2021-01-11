@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.WebApi;
 
@@ -61,14 +62,16 @@ namespace Umbraco.Web.BackOffice.Routing
         /// <summary>
         /// Map the minimal routes required to load the back office login and auth
         /// </summary>
-        /// <param name="endpoints"></param>
         private void MapMinimalBackOffice(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapUmbracoRoute<BackOfficeController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea,
+            endpoints.MapUmbracoRoute<BackOfficeController>(
+                _umbracoPathSegment,
+                Constants.Web.Mvc.BackOfficeArea,
                 string.Empty,
                 "Default",
                 includeControllerNameInRoute: false,
                 constraints:
+
                     // Limit the action/id to only allow characters - this is so this route doesn't hog all other
                     // routes like: /umbraco/channels/word.aspx, etc...
                     // (Not that we have to worry about too many of those these days, there still might be a need for these constraints).
