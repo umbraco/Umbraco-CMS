@@ -928,16 +928,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
             }
         }
-
-        public IEnumerable<string> GetAllRoles()
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x => x.Name).Distinct();
-            }
-        }
-
+        
         /// <summary>
         /// Returns a strongly typed list of all member groups
         /// </summary>

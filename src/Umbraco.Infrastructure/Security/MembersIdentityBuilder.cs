@@ -7,7 +7,6 @@ namespace Umbraco.Infrastructure.Security
 {
     public class MembersIdentityBuilder : IdentityBuilder
     {
-
         public MembersIdentityBuilder(IServiceCollection services) : base(typeof(MembersIdentityUser), services)
         {
         }

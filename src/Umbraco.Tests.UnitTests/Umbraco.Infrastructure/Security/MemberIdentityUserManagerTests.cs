@@ -69,7 +69,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
                 _mockPasswordHasher.Object,
                 userValidators,
                 pwdValidators,
-                new BackOfficeLookupNormalizer(),
                 new BackOfficeIdentityErrorDescriber(),
                 _mockServiceProviders.Object,
                 new Mock<IHttpContextAccessor>().Object,

@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
@@ -8,6 +8,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Tests.Integration.TestServerTest

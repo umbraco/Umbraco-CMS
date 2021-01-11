@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
@@ -11,6 +11,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

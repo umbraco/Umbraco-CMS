@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     /// <summary>
     /// The identity user used for the back office

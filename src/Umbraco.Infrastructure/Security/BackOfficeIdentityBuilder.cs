@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     public class BackOfficeIdentityBuilder : IdentityBuilder
     {

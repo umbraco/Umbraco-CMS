@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Install;

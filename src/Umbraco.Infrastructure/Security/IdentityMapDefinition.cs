@@ -1,14 +1,13 @@
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {

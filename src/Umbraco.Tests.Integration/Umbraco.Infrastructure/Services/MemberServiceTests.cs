@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             MemberService.AddRole("MyTestRole");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole");
             MemberService.AddRole("MyTestRole");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole2");
             MemberService.AddRole("MyTestRole3");
 
-            var found = MemberService.GetAllRoles();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
 
             Assert.AreEqual(3, found.Count());
         }
@@ -298,7 +298,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             MemberService.DeleteRole("MyTestRole1", false);
 
-            var memberRoles = MemberService.GetAllRoles();
+            IEnumerable<IMemberGroup> memberRoles = MemberService.GetAllRolesTyped();
 
             Assert.AreEqual(0, memberRoles.Count());
         }

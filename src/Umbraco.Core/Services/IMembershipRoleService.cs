@@ -9,7 +9,6 @@ namespace Umbraco.Core.Services
         where T : class, IMembershipUser
     {
         void AddRole(string roleName);
-        IEnumerable<string> GetAllRoles();
         IEnumerable<IMemberGroup> GetAllRolesTyped();
         IEnumerable<string> GetAllRoles(int memberId);
         IEnumerable<string> GetAllRoles(string username);

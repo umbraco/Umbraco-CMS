@@ -435,7 +435,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     throw HttpResponseException.CreateNotificationValidationErrorResponse(validatePassword.Errors.ToErrorMessage());
                 }
 
-                string newPassword = _memberManager.GeneratePassword(contentItem.Password.NewPassword);
+                string newPassword = _memberManager.HashPassword(contentItem.Password.NewPassword);
                 identityMember.PasswordHash = newPassword;
             }
 

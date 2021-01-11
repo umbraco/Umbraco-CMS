@@ -14,8 +14,9 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
 {
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests

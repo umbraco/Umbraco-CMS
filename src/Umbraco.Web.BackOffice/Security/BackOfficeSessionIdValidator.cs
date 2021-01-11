@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {

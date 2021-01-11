@@ -24,6 +24,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;

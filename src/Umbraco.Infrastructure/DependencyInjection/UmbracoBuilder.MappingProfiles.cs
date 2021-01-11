@@ -3,6 +3,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Infrastructure.DependencyInjection

@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // CUSTOM:
-            services.TryAddScoped<BackOfficeLookupNormalizer>();
+            services.TryAddScoped<NoOpLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
             services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
@@ -79,7 +79,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
              * To validate the container the following registrations are required (dependencies of UserManager<T>)
              * Perhaps we shouldn't be registering UserManager<T> at all and only registering/depending the UmbracoBackOffice prefixed types.
              */
-            services.TryAddScoped<ILookupNormalizer, BackOfficeLookupNormalizer>();
+            services.TryAddScoped<ILookupNormalizer, NoOpLookupNormalizer>();
             services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);

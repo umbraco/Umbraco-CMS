@@ -5,6 +5,7 @@ using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Exceptions;

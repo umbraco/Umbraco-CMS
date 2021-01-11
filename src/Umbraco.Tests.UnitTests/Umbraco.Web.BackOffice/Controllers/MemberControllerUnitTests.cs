@@ -140,7 +140,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.GeneratePassword(It.IsAny<string>()))
+                .Setup(x => x.HashPassword(It.IsAny<string>()))
                 .Returns(password);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))

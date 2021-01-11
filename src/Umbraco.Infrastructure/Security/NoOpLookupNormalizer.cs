@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
 
     /// <summary>
     /// No-op lookup normalizer to maintain compatibility with ASP.NET Identity 2
     /// </summary>
-    public class BackOfficeLookupNormalizer : ILookupNormalizer
+    public class NoOpLookupNormalizer : ILookupNormalizer
     {
         // TODO: Do we need this?
 

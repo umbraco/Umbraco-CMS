@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 using Umbraco.Net;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
-
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
     /// </summary>
@@ -34,12 +34,11 @@ namespace Umbraco.Core.Security
             IPasswordHasher<TUser> passwordHasher,
             IEnumerable<IUserValidator<TUser>> userValidators,
             IEnumerable<IPasswordValidator<TUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
             IOptions<TPasswordConfig> passwordConfiguration)
-            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoOpLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
@@ -74,8 +73,8 @@ namespace Umbraco.Core.Security
         /// Used to validate a user's session
         /// </summary>
         /// <param name="userId">The user id</param>
-        /// <param name="sessionId">The sesion id</param>
-        /// <returns>True if the sesion is valid, else false</returns>
+        /// <param name="sessionId">The session id</param>
+        /// <returns>True if the session is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
             var userSessionStore = Store as IUserSessionStore<TUser>;
@@ -118,7 +117,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="password">The password to hash</param>
         /// <returns>The hashed password</returns>
-        public string GeneratePassword(string password)
+        public string HashPassword(string password)
         {
             IPasswordHasher<TUser> passwordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
 

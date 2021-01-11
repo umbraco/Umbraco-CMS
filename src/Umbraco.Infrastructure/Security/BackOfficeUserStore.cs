@@ -15,6 +15,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Core.Security
 {

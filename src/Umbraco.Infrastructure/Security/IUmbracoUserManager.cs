@@ -244,11 +244,11 @@ namespace Umbraco.Infrastructure.Security
         string GeneratePassword();
 
         /// <summary>
-        /// Generates a hashed password for a null user based on the default password hasher
+        /// Hashes a password for a null user based on the default password hasher
         /// </summary>
         /// <param name="password">The password to hash</param>
         /// <returns>The hashed password</returns>
-        string GeneratePassword(string password);
+        string HashPassword(string password);
 
         /// <summary>
         /// Used to validate the password without an identity user

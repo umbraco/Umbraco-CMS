@@ -307,8 +307,7 @@ namespace Umbraco.Infrastructure.Security
 
             return Task.FromResult((IList<UserLoginInfo>)user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.LoginProvider)).ToList());
         }
-
-
+        
         /// <inheritdoc />
         protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
