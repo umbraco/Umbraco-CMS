@@ -1041,6 +1041,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Mandatory = false,
                     SortOrder = 1,
                     DataTypeId = Constants.DataTypes.Textbox,
+                    LabelOnTop = true,
                     Variations = ContentVariation.Nothing
                 });
                 elementType.PropertyGroups.Add(new PropertyGroup(contentCollection) {Name = "Content", SortOrder = 1});
