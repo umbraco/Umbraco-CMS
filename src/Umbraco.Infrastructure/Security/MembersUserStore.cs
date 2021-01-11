@@ -475,7 +475,7 @@ namespace Umbraco.Infrastructure.Security
         /// <inheritdoc/>
         protected override Task<IdentityRole<string>> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            IMemberGroup group = _memberService.GetAllRolesTyped().SingleOrDefault(x => x.Name == normalizedRoleName);
+            IMemberGroup group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == normalizedRoleName);
             if (group == null)
             {
                 return Task.FromResult((IdentityRole<string>)null);

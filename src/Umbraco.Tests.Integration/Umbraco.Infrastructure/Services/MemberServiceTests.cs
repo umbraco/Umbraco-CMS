@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
@@ -28,6 +29,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class MemberServiceTests : UmbracoIntegrationTest
     {
         private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
         private IMemberService MemberService => GetRequiredService<IMemberService>();
 
         [SetUp]
@@ -64,11 +66,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_By_Username()
         {
-            var memberType = MemberTypeService.Get("member");
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
-            var member2 = MemberService.GetByUsername(member.Username);
+            IMember member2 = MemberService.GetByUsername(member.Username);
 
             Assert.IsNotNull(member2);
             Assert.AreEqual(member.Email, member2.Email);
@@ -77,8 +79,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Set_Last_Login_Date()
         {
-            var now = DateTime.Now;
-            var memberType = MemberTypeService.Get("member");
+            DateTime now = DateTime.Now;
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
             {
                 LastLoginDate = now,
@@ -86,7 +88,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             };
             MemberService.Save(member);
 
-            var newDate = now.AddDays(10);
+            DateTime newDate = now.AddDays(10);
             MemberService.SetLastLogin(member.Username, newDate);
 
             //re-get
@@ -99,7 +101,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Create_Member_With_Properties()
         {
-            var memberType = MemberTypeService.Get("member");
+            IMemberType memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
@@ -111,7 +113,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
             var variationContextAccessor = new TestVariationContextAccessor();
-            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
+            IPublishedContent pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
 
             // contains the umbracoMember... properties created when installing, on the member type
             // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
@@ -142,7 +144,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
 
-            var email = properties[aliases.IndexOf(nameof(IMember.Email))];
+            IPublishedProperty email = properties[aliases.IndexOf(nameof(IMember.Email))];
             Assert.AreEqual("xemail", email.GetSourceValue());
         }
 
@@ -155,7 +157,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(member);
 
             Assert.AreNotEqual(0, member.Id);
-            var foundMember = MemberService.GetById(member.Id);
+            IMember foundMember = MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreEqual("test@test.com", foundMember.Email);
         }
@@ -169,7 +171,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.Save(member);
 
             Assert.AreNotEqual(0, member.Id);
-            var foundMember = MemberService.GetById(member.Id);
+            IMember foundMember = MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreEqual("test@test.marketing", foundMember.Email);
         }
@@ -179,7 +181,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             MemberService.AddRole("MyTestRole");
 
-            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -191,7 +193,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole");
             MemberService.AddRole("MyTestRole");
 
-            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
             Assert.AreEqual("MyTestRole", found.Single());
@@ -204,19 +206,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole2");
             MemberService.AddRole("MyTestRole3");
 
-            IEnumerable<IMemberGroup> found = MemberService.GetAllRolesTyped();
-
-            Assert.AreEqual(3, found.Count());
-        }
-
-        [Test]
-        public void Can_Get_All_Roles_Typed()
-        {
-            MemberService.AddRole("MyTestRole1");
-            MemberService.AddRole("MyTestRole2");
-            MemberService.AddRole("MyTestRole3");
-
-            var found = MemberService.GetAllRolesTyped();
+            IEnumerable<IMemberGroup> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(3, found.Count());
         }
@@ -228,10 +218,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole2");
             MemberService.AddRole("MyTestRole3");
 
-            var found = MemberService.GetAllRolesIds();
+            IEnumerable<int> found = MemberService.GetAllRolesIds();
 
             Assert.AreEqual(3, found.Count());
         }
+
         [Test]
         public void Can_Get_All_Roles_By_Member_Id()
         {
@@ -245,11 +236,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRoles(member.Id);
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles(member.Id);
 
             Assert.AreEqual(2, memberRoles.Count());
 
         }
+
         [Test]
         public void Can_Get_All_Roles_Ids_By_Member_Id()
         {
@@ -263,11 +255,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRolesIds(member.Id);
+            IEnumerable<int> memberRoles = MemberService.GetAllRolesIds(member.Id);
 
             Assert.AreEqual(2, memberRoles.Count());
 
         }
+
         [Test]
         public void Can_Get_All_Roles_By_Member_Username()
         {
@@ -284,10 +277,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberService.AddRole("MyTestRole3");
             MemberService.AssignRoles(new[] { member.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-            var memberRoles = MemberService.GetAllRoles("test");
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles("test");
             Assert.AreEqual(2, memberRoles.Count());
 
-            var memberRoles2 = MemberService.GetAllRoles("test2@test.com");
+            IEnumerable<string> memberRoles2 = MemberService.GetAllRoles("test2@test.com");
             Assert.AreEqual(2, memberRoles2.Count());
         }
 
@@ -298,7 +291,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             MemberService.DeleteRole("MyTestRole1", false);
 
-            IEnumerable<IMemberGroup> memberRoles = MemberService.GetAllRolesTyped();
+            IEnumerable<IMemberGroup> memberRoles = MemberService.GetAllRoles();
 
             Assert.AreEqual(0, memberRoles.Count());
         }
@@ -322,7 +315,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             MemberService.AddRole("MyTestRole1");
             int roleId;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 roleId = scope.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
                 scope.Complete();
@@ -330,19 +323,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            Member member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
-            var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            Member member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             MemberService.Save(member2);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member1.Id });
                 scope.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
                 scope.Complete();
             }
 
-            var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
+            IEnumerable<IMember> membersInRole = MemberService.GetMembersInRole("MyTestRole1");
             Assert.AreEqual(2, membersInRole.Count());
         }
 

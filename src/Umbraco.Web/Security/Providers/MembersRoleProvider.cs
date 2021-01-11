@@ -48,7 +48,7 @@ namespace Umbraco.Web.Security.Providers
         /// </summary>
         /// <param name="roleName">Member role name</param>
         /// <returns>True if member role exists, otherwise false</returns>
-        public override bool RoleExists(string roleName) => _roleService.GetAllRolesTyped().Any(x => x.Name == roleName);
+        public override bool RoleExists(string roleName) => _roleService.GetAllRoles().Any(x => x.Name == roleName);
 
         public override void AddUsersToRoles(string[] usernames, string[] roleNames)
         {
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Security.Providers
         /// Gets all the member roles
         /// </summary>
         /// <returns>A list of member roles</returns>
-        public override string[] GetAllRoles() => _roleService.GetAllRolesTyped().Select(x => x.Name).ToArray();
+        public override string[] GetAllRoles() => _roleService.GetAllRoles().Select(x => x.Name).ToArray();
 
         public override string[] FindUsersInRole(string roleName, string usernameToMatch)
         {

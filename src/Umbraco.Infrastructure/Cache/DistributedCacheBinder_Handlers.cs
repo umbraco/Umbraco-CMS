@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Infrastructure.Services.Implement;
 
 namespace Umbraco.Web.Cache
 {
