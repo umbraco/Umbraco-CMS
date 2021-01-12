@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Collections
 {
+
     /// <summary>
     /// An ObservableDictionary
     /// </summary>
@@ -73,6 +76,14 @@ namespace Umbraco.Core.Collections
         }
 
         #endregion
+
+        // need to override to clear
+        public override event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        /// <summary>
+        /// Clears all <see cref="CollectionChanged"/> event handlers
+        /// </summary>
+        public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
         public bool ContainsKey(TKey key)
         {
