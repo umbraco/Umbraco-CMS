@@ -663,7 +663,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
         {
-            var parentId = GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true).Result.Value;
+            var parentId = (await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true)).Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
@@ -695,7 +695,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //get the string json from the request
-            var parentId = GetParentIdAsIntAsync(currentFolder, validatePermissions: true).Result.Value;
+            var parentId = (await GetParentIdAsIntAsync(currentFolder, validatePermissions: true)).Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");

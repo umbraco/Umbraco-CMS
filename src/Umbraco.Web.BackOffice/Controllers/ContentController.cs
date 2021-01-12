@@ -621,7 +621,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
@@ -641,7 +641,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     return display;
                 });
 
-            return contentItemDisplay.Value;
+            return contentItemDisplay;
         }
 
         /// <summary>
