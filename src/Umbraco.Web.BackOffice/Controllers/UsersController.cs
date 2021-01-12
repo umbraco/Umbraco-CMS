@@ -333,13 +333,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public async Task<UserDisplay> PostCreateUser(UserInvite userSave)
+        public async Task<ActionResult<UserDisplay>> PostCreateUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -356,7 +356,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
