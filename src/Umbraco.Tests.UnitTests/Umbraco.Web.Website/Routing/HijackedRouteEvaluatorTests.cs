@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -21,6 +19,7 @@ using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
+
     [TestFixture]
     public class HijackedRouteEvaluatorTests
     {
@@ -52,6 +51,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
                 },
                 new ControllerActionDescriptor
                 {
+                    ActionName = "Custom",
+                    ControllerName = ControllerExtensions.GetControllerName<Render1Controller>(),
+                    ControllerTypeInfo = typeof(Render1Controller).GetTypeInfo()
+                },
+                new ControllerActionDescriptor
+                {
                     ActionName = "Index",
                     ControllerName = ControllerExtensions.GetControllerName<Render2Controller>(),
                     ControllerTypeInfo = typeof(Render2Controller).GetTypeInfo()
@@ -61,6 +66,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         private class Render1Controller : ControllerBase, IRenderController
         {
             public IActionResult Index => Content("hello world");
+
+            public IActionResult Custom => Content("hello world");
         }
 
         private class Render2Controller : RenderController
@@ -71,12 +78,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
             }
         }
 
+        [TestCase("Index", "RenderNotFound", null, false)]
         [TestCase("index", "Render", "Index", true)]
         [TestCase("Index", "Render1", "Index", true)]
         [TestCase("Index", "render2", "Index", true)]
         [TestCase("NotFound", "Render", "Index", true)]
         [TestCase("NotFound", "Render1", "Index", true)]
         [TestCase("NotFound", "Render2", "Index", true)]
+        [TestCase("Custom", "Render1", "Custom", true)]
         public void Matches_Controller(string action, string controller, string resultAction, bool matches)
         {
             var evaluator = new HijackedRouteEvaluator(
