@@ -26,21 +26,28 @@ namespace Umbraco.Web.PropertyEditors
         {
             var output = new EyedropperColorPickerConfiguration();
 
+            var showAlpha = true;
+            var showPalette = true;
+
             if (editorValues.TryGetValue("showAlpha", out var alpha))
             {
                 var attempt = alpha.TryConvertTo<bool>();
                 if (attempt.Success)
-                    output.ShowAlpha = attempt.Result;
+                    showAlpha = attempt.Result;
             }
 
             if (editorValues.TryGetValue("showPalette", out var palette))
             {
                 var attempt = palette.TryConvertTo<bool>();
                 if (attempt.Success)
-                    output.ShowPalette = attempt.Result;
+                    showPalette = attempt.Result;
             }
 
-            return output;
+            return new EyedropperColorPickerConfiguration
+            {
+                ShowAlpha = showAlpha,
+                ShowPalette = showPalette
+            };
         }
     }
 }
