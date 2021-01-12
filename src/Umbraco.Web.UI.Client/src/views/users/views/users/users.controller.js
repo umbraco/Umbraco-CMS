@@ -104,7 +104,7 @@
             vm.defaultButton = getCreateUserButton();
         }
 
-            
+
 
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;
@@ -319,7 +319,7 @@
                 vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
-                        user.userState = 1;
+                        user.userState = "Disabled";
                     }
                 });
                 // show the correct badges
@@ -340,7 +340,7 @@
                 vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
-                        user.userState = 0;
+                        user.userState = "Active";
                     }
                 });
                 // show the correct badges
@@ -359,7 +359,7 @@
                 vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
-                        user.userState = 0;
+                        user.userState = "Active";
                     }
                 });
                 // show the correct badges
@@ -452,7 +452,7 @@
         }
 
         function areAllSelected() {
-            // we need to check if the current user is part of the selection and 
+            // we need to check if the current user is part of the selection and
             // subtract the user from the total selection to find out if all users are selected
             var includesCurrentUser = vm.users.some(function (user) { return user.isCurrentUser === true; });
 
@@ -727,7 +727,7 @@
 
         function setUserDisplayState(users) {
             users.forEach(function (user) {
-                user.userDisplayState = usersHelper.getUserStateFromValue(user.userState);
+                user.userDisplayState =  usersHelper.getUserStateByKey(user.userState);
             });
         }
 
