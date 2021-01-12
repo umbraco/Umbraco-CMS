@@ -66,7 +66,10 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_propertyTypes != null)
-                    _propertyTypes.CollectionChanged -= PropertyTypesChanged;
+                {
+                    _propertyTypes.ClearCollectionChangedEvents();
+                }
+                    
                 _propertyTypes = value;
 
                 // since we're adding this collection to this group,
@@ -100,7 +103,7 @@ namespace Umbraco.Core.Models
 
             if (clonedEntity._propertyTypes != null)
             {
-                clonedEntity._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
+                clonedEntity._propertyTypes.ClearCollectionChangedEvents();             //clear this event handler if any
                 clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
                 clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
             }
