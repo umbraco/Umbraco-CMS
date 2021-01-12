@@ -319,7 +319,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="nodeContextId"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic> GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
             // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
@@ -390,9 +390,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public EntityBasic GetById(int id, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic> GetById(int id, UmbracoEntityTypes type)
         {
-            return GetResultForId(id, type).Value;
+            return GetResultForId(id, type);
         }
 
         /// <summary>
@@ -402,9 +402,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public EntityBasic GetById(Guid id, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic> GetById(Guid id, UmbracoEntityTypes type)
         {
-            return GetResultForKey(id, type).Value;
+            return GetResultForKey(id, type);
         }
 
         /// <summary>
