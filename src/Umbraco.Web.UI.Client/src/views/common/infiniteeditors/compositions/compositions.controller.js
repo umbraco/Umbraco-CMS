@@ -64,24 +64,7 @@
             var contentType = compositeContentType.contentType;
 
             $scope.model.selectCompositeContentType(contentType).then(function (response) {
-
-                Utilities.forEach(vm.availableGroups, function (group) {
-
-                    Utilities.forEach(group.compositeContentTypes, function (obj) {
-                        if (obj.allowed === false) {
-                            obj.selected = false;
-                        }
-                    });
-                });
-
-                $timeout(function () {
-                    vm.loading = false;
-                }, 500);
-                
-            }, function () {
-                $timeout(function () {
-                    vm.loading = false;
-                }, 500);
+                vm.loading = false;
             });
 
             // Check if the template is already selected.
