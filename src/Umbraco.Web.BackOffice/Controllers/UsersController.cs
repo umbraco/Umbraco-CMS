@@ -354,6 +354,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             CheckUniqueEmail(userSave.Email, null);
 
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+            }
+
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
@@ -414,11 +419,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userSave.Message.IsNullOrWhiteSpace())
                 ModelState.AddModelError("Message", "Message cannot be empty");
 
-            if (ModelState.IsValid == false)
-            {
-                return new ValidationErrorResult(ModelState);
-            }
-
             IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
@@ -431,6 +431,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
             {
@@ -515,7 +520,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
             }
             return user;
         }
