@@ -128,6 +128,7 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
     <Compile Include="Exceptions\UnattendedInstallException.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />

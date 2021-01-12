@@ -162,7 +162,11 @@ namespace Umbraco.Core.Models
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
+        
+        /// <summary>
+        /// Clears all <see cref="CollectionChanged"/> event handlers
+        /// </summary>
+        public void ClearCollectionChangedEvents() => CollectionChanged = null;
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             CollectionChanged?.Invoke(this, args);
