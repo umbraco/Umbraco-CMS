@@ -62,16 +62,16 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
             if (string.IsNullOrEmpty(application))
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             var section = _sectionService.GetByAlias(application);
             if (section == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             //find all tree definitions that have the current application alias
             var groupedTrees = _treeService.GetBySectionGrouped(application, use);
@@ -93,13 +93,13 @@ namespace Umbraco.Web.BackOffice.Trees
                     : allTrees.FirstOrDefault(x => x.TreeAlias == tree);
 
                 if (t == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
 
                 var treeRootNode = await GetTreeRootNode(t, Constants.System.Root, queryStrings);
                 if (treeRootNode != null)
                     return treeRootNode;
 
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             // handle requests for all trees
@@ -219,7 +219,7 @@ namespace Umbraco.Web.BackOffice.Trees
             if (tree == null)
                 throw new ArgumentNullException(nameof(tree));
 
-            var controller = (TreeControllerBase)await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+            var controller = (TreeControllerBase)(await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring)).Value;
             var rootNode = controller.GetRootNode(querystring);
             if (rootNode == null)
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
@@ -241,7 +241,7 @@ namespace Umbraco.Web.BackOffice.Trees
             d["id"] = StringValues.Empty;
             var proxyQuerystring = new FormCollection(d);
 
-            var controller = (TreeControllerBase)await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
+            var controller = (TreeControllerBase)(await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring)).Value;
             return controller.GetNodes(id.ToInvariantString(), querystring);
         }
 
@@ -257,7 +257,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// and context etc. so it can execute the specified <paramref name="action"/>. Runs the authorization
         /// filters for that action, to ensure that the user has permission to execute it.</para>
         /// </remarks>
-        private async Task<object> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
+        private async Task<ActionResult<object>> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
         {
             // note: this is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" mvc into thinking that it is actually executing the proxied controller.
@@ -289,11 +289,9 @@ namespace Umbraco.Web.BackOffice.Trees
 
             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
             if (!isAllowed)
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                return Forbid();
 
             return controller;
         }
-
-
     }
 }

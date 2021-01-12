@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -75,7 +75,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                 // get the first tree in the section and get its root node route path
                 var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
+                section.RoutePath = GetRoutePathForFirstTree(sectionRoot.Value);
             }
 
             return sectionModels;

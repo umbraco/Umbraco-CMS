@@ -253,7 +253,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+        protected ActionResult<TContentType> PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
@@ -264,7 +264,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? getContentType(ctId) : null;
-            if (ctId > 0 && ct == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (ctId > 0 && ct == null) return NotFound();
 
             //Validate that there's no other ct with the same alias
             // it in fact cannot be the same as any content type alias (member, content or media) because

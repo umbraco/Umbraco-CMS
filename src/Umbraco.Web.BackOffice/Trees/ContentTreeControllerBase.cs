@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -211,7 +211,7 @@ namespace Umbraco.Web.BackOffice.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var entities = GetChildEntities(id, queryStrings).ToList();
+            var entities = GetChildEntities(id, queryStrings).Value.ToList();
 
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
@@ -257,7 +257,7 @@ namespace Umbraco.Web.BackOffice.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected virtual IEnumerable<IEntitySlim> GetChildEntities(string id, FormCollection queryStrings)
+        protected virtual ActionResult<IEnumerable<IEntitySlim>> GetChildEntities(string id, FormCollection queryStrings)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -265,7 +265,7 @@ namespace Umbraco.Web.BackOffice.Trees
             {
                 var entity = GetEntityFromId(id);
                 if (entity == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
 
                 entityId = entity.Id;
             }

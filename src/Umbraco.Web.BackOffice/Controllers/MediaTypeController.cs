@@ -280,7 +280,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 i => _mediaTypeService.Get(i),
                 type => _mediaTypeService.Save(type));
 
-            var display = _umbracoMapper.Map<MediaTypeDisplay>(savedCt);
+            var display = _umbracoMapper.Map<MediaTypeDisplay>(savedCt.Value);
 
             display.AddSuccessNotification(
                 _localizedTextService.Localize("speechBubbles/mediaTypeSavedHeader"),

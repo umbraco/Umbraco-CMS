@@ -230,7 +230,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 getContentType:             i => ct,
                 saveContentType:            type => _memberTypeService.Save(type));
 
-            var display =_umbracoMapper.Map<MemberTypeDisplay>(savedCt);
+            var display =_umbracoMapper.Map<MemberTypeDisplay>(savedCt.Value);
 
             display.AddSuccessNotification(
                 _localizedTextService.Localize("speechBubbles/memberTypeSavedHeader"),

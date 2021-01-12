@@ -404,7 +404,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 });
 
-            var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt);
+            var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt.Value);
 
             display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles/contentTypeSavedHeader"),

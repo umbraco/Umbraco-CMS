@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,6 +21,7 @@ using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Umbraco.Web.Trees;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Core.Trees;
 
@@ -236,7 +237,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormCollection queryStrings)
+        protected override ActionResult<IEnumerable<IEntitySlim>> GetChildEntities(string id, FormCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
             var culture = queryStrings["culture"].TryConvertTo<string>();
@@ -245,7 +246,7 @@ namespace Umbraco.Web.BackOffice.Trees
             var cultureVal = (culture.Success ? culture.Result : null) ?? _localizationService.GetDefaultLanguageIsoCode();
 
             // set names according to variations
-            foreach (var entity in result)
+            foreach (var entity in result.Value)
             {
                 EnsureName(entity, cultureVal);
             }
