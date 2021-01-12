@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -39,9 +38,6 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -133,9 +129,9 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [AppendUserModifiedHeader("id")]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
+        public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
         internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
@@ -337,13 +333,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public async Task<UserDisplay> PostCreateUser(UserInvite userSave)
+        public async Task<ActionResult<UserDisplay>> PostCreateUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -357,6 +353,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 CheckUniqueUsername(userSave.Username, null);
             }
             CheckUniqueEmail(userSave.Email, null);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
@@ -418,11 +419,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userSave.Message.IsNullOrWhiteSpace())
                 ModelState.AddModelError("Message", "Message cannot be empty");
 
-            if (ModelState.IsValid == false)
-            {
-                return new ValidationErrorResult(ModelState);
-            }
-
             IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
@@ -435,6 +431,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
             {
@@ -519,7 +520,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
             }
             return user;
         }
@@ -548,9 +548,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 token.ToUrlBase64());
 
             // Get an mvc helper to get the URL
-            var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.VerifyInvite),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
+                new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     invite = inviteToken
                 });
 
