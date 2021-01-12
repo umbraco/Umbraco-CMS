@@ -11,6 +11,7 @@ namespace Umbraco.Web.PropertyEditors
 
         }
 
+        /// <inheritdoc />
         public override Dictionary<string, object> ToConfigurationEditor(EyedropperColorPickerConfiguration configuration)
         {
             var showAlpha = configuration?.ShowAlpha ?? false;
@@ -21,6 +22,7 @@ namespace Umbraco.Web.PropertyEditors
             };
         }
 
+        /// <inheritdoc />
         public override EyedropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyedropperColorPickerConfiguration configuration)
         {
             var output = new EyedropperColorPickerConfiguration();

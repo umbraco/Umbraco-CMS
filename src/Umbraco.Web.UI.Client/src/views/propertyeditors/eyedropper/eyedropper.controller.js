@@ -4,12 +4,12 @@ function EyedropperColorPickerController($scope, angularHelper) {
 
     //setup the default config
     var config = {
-        items: [],
-        multiple: false
+        showAlpha: true,
+        allowEmpty: true
     };
     
     // map the user config
-    angular.extend(config, $scope.model.config);
+    Utilities.extend(config, $scope.model.config);
 
     // map back to the model
     $scope.model.config = config;
@@ -28,9 +28,8 @@ function EyedropperColorPickerController($scope, angularHelper) {
     $scope.validateMandatory = function () {
         var isValid = !$scope.model.validation.mandatory || (
             $scope.model.value != null
-            && $scope.model.value != ""
-            && (!$scope.model.value.hasOwnProperty("value") || $scope.model.value.value !== "")
-        );
+            && $scope.model.value != "");
+
         return {
             isValid: isValid,
             errorMsg: $scope.model.validation.mandatoryMessage || "Value cannot be empty",
