@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
@@ -83,7 +81,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ct = _mediaTypeService.Get(id);
             if (ct == null)
             {
-                return new ValidationErrorResult(ct, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(ct);
@@ -102,7 +100,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var mediaType = _mediaTypeService.Get(id);
             if (mediaType == null)
             {
-                return new ValidationErrorResult(mediaType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
@@ -120,12 +118,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var mediaType = _mediaTypeService.Get(guidUdi.Guid);
             if (mediaType == null)
             {
-                return new ValidationErrorResult(mediaType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
@@ -145,7 +143,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _mediaTypeService.Get(id);
             if (foundType == null)
             {
-                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -383,7 +381,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new ActionResult<IEnumerable<ContentTypeBasic>>(GetAllowedChildren(entity.Id));
             }
 
-            return new ValidationErrorResult(entity, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         /// <summary>
@@ -404,7 +402,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         #endregion

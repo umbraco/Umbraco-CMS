@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
@@ -92,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source = ContentTypeService.Get(contentTypeId);
-                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
+                        if (source == null) return NotFound();
                     }
                     allContentTypes = ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -101,7 +100,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source =MediaTypeService.Get(contentTypeId);
-                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
+                        if (source == null) return NotFound();
                     }
                     allContentTypes =MediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -110,7 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     if (contentTypeId > 0)
                     {
                         source = MemberTypeService.Get(contentTypeId);
-                        if (source == null) return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
+                        if (source == null) return NotFound();
                     }
                     allContentTypes = MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
@@ -205,7 +204,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
 
                 if (source == null)
-                    return new ValidationErrorResult(source, StatusCodes.Status404NotFound);
+                    return NotFound();
 
                 id = source.Id;
             }

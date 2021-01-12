@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -97,7 +95,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
-                return new ValidationErrorResult(dataType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
@@ -114,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
-                return new ValidationErrorResult(dataType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
@@ -130,12 +128,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var dataType = _dataTypeService.GetDataType(guidUdi.Guid);
             if (dataType == null)
             {
-                return new ValidationErrorResult(dataType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
@@ -153,7 +151,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _dataTypeService.GetDataType(id);
             if (foundType == null)
             {
-                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             _dataTypeService.Delete(foundType, currentUser.Id);
@@ -179,7 +177,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
             if (dt == null)
             {
-                return new ValidationErrorResult(dt, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
@@ -229,7 +227,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var dataType = _dataTypeService.GetDataType(dataTypeId);
             if (dataType == null)
             {
-                return new ValidationErrorResult(dataType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             //now, lets check if the data type has the current editor selected, if that is true

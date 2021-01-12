@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -10,7 +9,6 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
@@ -66,7 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
-                return new ValidationErrorResult(template, StatusCodes.Status404NotFound);
+                return NotFound();
 
             return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
         }
@@ -82,7 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
-                return new ValidationErrorResult(template, StatusCodes.Status404NotFound);
+                return NotFound();
 
             return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
         }
@@ -97,12 +95,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var template = _fileService.GetTemplate(guidUdi.Guid);
             if (template == null)
             {
-                return new ValidationErrorResult(template, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
@@ -119,7 +117,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
-                return new ValidationErrorResult(template, StatusCodes.Status404NotFound);
+                return NotFound();
 
             _fileService.DeleteTemplate(template.Alias);
             return Ok();
@@ -166,7 +164,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // update
                 var template = _fileService.GetTemplate(display.Id);
                 if (template == null)
-                    return new ValidationErrorResult(template, StatusCodes.Status404NotFound);
+                    return NotFound();
 
                 var changeMaster = template.MasterTemplateAlias != display.MasterTemplateAlias;
                 var changeAlias = template.Alias != display.Alias;
@@ -238,7 +236,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     master = _fileService.GetTemplate(display.MasterTemplateAlias);
                     if (master == null)
-                        return new ValidationErrorResult(master, StatusCodes.Status404NotFound);
+                        return NotFound();
                 }
 
                 // we need to pass the template name as alias to keep the template file casing consistent with templates created with content

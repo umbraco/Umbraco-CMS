@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,6 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Common.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
@@ -56,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (relationType == null)
             {
-                return new ValidationErrorResult(relationType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var display = _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
@@ -74,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var relationType = _relationService.GetRelationTypeById(id);
             if (relationType == null)
             {
-                return new ValidationErrorResult(relationType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
@@ -89,12 +87,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var relationType = _relationService.GetRelationTypeById(guidUdi.Guid);
             if (relationType == null)
             {
-                return new ValidationErrorResult(relationType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }

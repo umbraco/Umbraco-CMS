@@ -6,7 +6,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -384,7 +383,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return GetById(guidUdi.Guid);
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         /// <summary>
@@ -399,7 +398,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var contentType = _contentTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return GetEmpty(contentType, parentId);
@@ -417,7 +416,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var contentType = _contentTypeService.Get(contentTypeKey);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return GetEmpty(contentType, parentId);
@@ -446,7 +445,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
             {
-                return new ValidationErrorResult(blueprint, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             blueprint.Id = 0;
@@ -2022,14 +2021,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (model == null)
             {
-                return new ValidationErrorResult(model, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var contentService = _contentService;
             var toMove = contentService.GetById(model.Id);
             if (toMove == null)
             {
-                return new ValidationErrorResult(toMove, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             if (model.ParentId < 0)
             {
@@ -2045,7 +2044,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var parent = contentService.GetById(model.ParentId);
                 if (parent == null)
                 {
-                    return new ValidationErrorResult(parent, StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
                 var parentContentType = _contentTypeService.Get(parent.ContentTypeId);

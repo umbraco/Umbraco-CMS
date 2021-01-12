@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -173,13 +171,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMember emptyContent;
             if (contentTypeAlias == null)
             {
-                return new ValidationErrorResult(contentTypeAlias, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var contentType = _memberTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var passwordGenerator = new PasswordGenerator(_passwordConfig);
@@ -241,7 +239,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     break;
                 default:
                     //we don't support anything else for members
-                    return new ValidationErrorResult(contentItem.Action, StatusCodes.Status404NotFound);
+                    return NotFound();
             }
 
             //TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope

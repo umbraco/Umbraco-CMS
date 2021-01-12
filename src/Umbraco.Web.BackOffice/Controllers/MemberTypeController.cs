@@ -14,8 +14,6 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -70,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var mt = _memberTypeService.Get(id);
             if (mt == null)
             {
-                return new ValidationErrorResult(mt, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto =_umbracoMapper.Map<IMemberType, MemberTypeDisplay>(mt);
@@ -88,7 +86,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberType = _memberTypeService.Get(id);
             if (memberType == null)
             {
-                return new ValidationErrorResult(memberType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
@@ -105,12 +103,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var memberType = _memberTypeService.Get(guidUdi.Guid);
             if (memberType == null)
             {
-                return new ValidationErrorResult(memberType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
@@ -129,7 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _memberTypeService.Get(id);
             if (foundType == null)
             {
-                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -212,7 +210,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         if (ct.IsSensitiveProperty(foundOnContentType.Alias) && prop.IsSensitiveData == false)
                         {
                             //if these don't match, then we cannot continue, this user is not allowed to change this value
-                            return new ValidationErrorResult(ct, StatusCodes.Status403Forbidden);
+                            return Forbid();
                         }
                     }
                 }
@@ -221,7 +219,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     //if it is new, then we can just verify if any property has sensitive data turned on which is not allowed
                     if (props.Any(prop => prop.IsSensitiveData))
                     {
-                        return new ValidationErrorResult(props, StatusCodes.Status403Forbidden);
+                        return Forbid();
                     }
                 }
             }

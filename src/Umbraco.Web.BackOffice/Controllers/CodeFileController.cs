@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -258,10 +257,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                     snippets = _fileService.GetPartialViewSnippetNames();
                     break;
                 default:
-                    return new ValidationErrorResult(type, StatusCodes.Status404NotFound);
+                    return NotFound();
             }
 
-            return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet}).ToList();
+            return snippets.Select(snippet => new SnippetDisplay() { Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet }).ToList();
         }
 
         /// <summary>

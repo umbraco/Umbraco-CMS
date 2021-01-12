@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +17,6 @@ using Umbraco.Core.Trees;
 using Umbraco.Core.Xml;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models;
@@ -237,7 +236,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 return new ActionResult<IEnumerable<int>>(GetPath(guidUdi.Guid, type));
             }
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+
+            return NotFound();
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var intId = _entityService.GetId(udi);
             if (!intId.Success)
-                return new ValidationErrorResult(intId.Result, StatusCodes.Status404NotFound);
+                return NotFound();
             UmbracoEntityTypes entityType;
             switch (udi.EntityType)
             {
@@ -265,7 +265,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     entityType = UmbracoEntityTypes.Member;
                     break;
                 default:
-                    return new ValidationErrorResult(udi.EntityType, StatusCodes.Status404NotFound);
+                    return NotFound();
             }
             return GetUrl(intId.Result, entityType, culture);
         }
@@ -357,7 +357,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var intId = _entityService.GetId(id);
             if (!intId.Success)
-                return new ValidationErrorResult(intId.Result, StatusCodes.Status404NotFound);
+                return NotFound();
 
             return GetUrlAndAnchors(intId.Result, culture);
         }
@@ -422,7 +422,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return GetResultForKey(guidUdi.Guid, type);
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
         #endregion
 
@@ -443,7 +443,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (ids == null)
             {
-                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return new ActionResult<IEnumerable<EntityBasic>>(GetResultForIds(ids, type));
@@ -465,7 +465,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (ids == null)
             {
-                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return new ActionResult<IEnumerable<EntityBasic>>(GetResultForKeys(ids, type));
@@ -489,7 +489,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (ids == null)
             {
-                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             if (ids.Length == 0)
@@ -506,7 +506,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new ActionResult<IEnumerable<EntityBasic>>(GetResultForKeys(ids.Select(x => ((GuidUdi)x).Guid).ToArray(), type));
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
         #endregion
 
@@ -580,13 +580,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (Guid.TryParse(id, out _))
             {
                 //Not supported currently
-                return new ValidationErrorResult(id, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             if (UdiParser.TryParse(id, out _))
             {
                 //Not supported currently
-                return new ValidationErrorResult(id, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             //so we don't have an INT, GUID or UDI, it's just a string, so now need to check if it's a special id or a member type
@@ -635,9 +635,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
-                return new ValidationErrorResult(pageNumber, StatusCodes.Status404NotFound);
+                return NotFound();
             if (pageSize <= 0)
-                return new ValidationErrorResult(pageSize, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
@@ -735,9 +735,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             Guid? dataTypeKey = null)
         {
             if (pageNumber <= 0)
-                return new ValidationErrorResult(pageNumber, StatusCodes.Status404NotFound);
+                return NotFound();
             if (pageSize <= 0)
-                return new ValidationErrorResult(pageSize, StatusCodes.Status404NotFound);
+                return NotFound();
 
             // re-normalize since NULL can be passed in
             filter = filter ?? string.Empty;
@@ -980,7 +980,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var found = _entityService.Get(key, objectType.Value);
                 if (found == null)
                 {
-                    return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
                 return _umbracoMapper.Map<IEntitySlim, EntityBasic>(found);
             }
@@ -1012,7 +1012,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var found = _entityService.Get(id, objectType.Value);
                 if (found == null)
                 {
-                    return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
                 return MapEntity(found);
             }

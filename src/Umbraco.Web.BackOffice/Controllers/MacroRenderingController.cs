@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core;
@@ -68,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var macro = _macroService.GetById(macroId);
             if (macro == null)
             {
-                return new ValidationErrorResult(macro, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return new ActionResult<IEnumerable<MacroParameter>>(_umbracoMapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder));
@@ -116,7 +114,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
-                return new ValidationErrorResult(m, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var publishedContent = umbracoContext.Content.GetById(true, pageId);

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Semver;
@@ -50,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var package = _packagingService.GetCreatedPackageById(id);
             if (package == null)
-                return new ValidationErrorResult(package, StatusCodes.Status404NotFound);
+                return NotFound();
 
             return package;
         }
@@ -130,7 +129,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public ActionResult<PackageDefinition> GetInstalledPackageById(int id)
         {
             var pack = _packagingService.GetInstalledPackageById(id);
-            if (pack == null) return new ValidationErrorResult(pack, StatusCodes.Status404NotFound);
+            if (pack == null) return NotFound();
             return pack;
         }
 

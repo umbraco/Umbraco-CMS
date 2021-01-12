@@ -160,7 +160,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteById(int id)
+        public IActionResult DeleteById(int id)
         {
             var macro = _macroService.GetById(id);
 

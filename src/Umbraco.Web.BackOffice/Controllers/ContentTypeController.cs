@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Xml;
@@ -121,7 +120,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ct = _contentTypeService.Get(id);
             if (ct == null)
             {
-                return new ValidationErrorResult(ct, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(ct);
@@ -138,7 +137,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var contentType = _contentTypeService.Get(id);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -154,12 +153,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var contentType = _contentTypeService.Get(guidUdi.Guid);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -177,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _contentTypeService.Get(id);
             if (foundType == null)
             {
-                return new ValidationErrorResult(foundType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -254,7 +253,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (dataTypeDiff == null)
             {
-                return new ValidationErrorResult(dataTypeDiff, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var configuration = _dataTypeService.GetDataType(id).Configuration;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -126,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var contentType = _mediaTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                return new ValidationErrorResult(contentType, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
@@ -221,7 +220,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return GetById(guidUdi.Guid);
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         /// <summary>
@@ -392,7 +391,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
 
-            return new ValidationErrorResult(entity, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         /// <summary>
@@ -426,7 +425,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
             }
 
-            return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+            return NotFound();
         }
 
         #endregion
@@ -906,14 +905,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (model == null)
             {
-                return new ValidationErrorResult(model, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
 
             var toMove = _mediaService.GetById(model.Id);
             if (toMove == null)
             {
-                return new ValidationErrorResult(toMove, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             if (model.ParentId < 0)
             {
@@ -932,7 +931,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var parent = _mediaService.GetById(model.ParentId);
                 if (parent == null)
                 {
-                    return new ValidationErrorResult(parent, StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
                 //check if the item is allowed under this one

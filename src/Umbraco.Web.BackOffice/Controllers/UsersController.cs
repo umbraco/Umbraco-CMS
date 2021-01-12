@@ -125,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
-                return new ValidationErrorResult("Could not access Gravatar endpoint");
+                return BadRequest("Could not access Gravatar endpoint");
 
             return urls;
         }
@@ -141,7 +141,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (files is null)
             {
-                return new ValidationErrorResult(files, StatusCodes.Status415UnsupportedMediaType);
+                return new UnsupportedMediaTypeResult();
             }
 
             var root = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
@@ -229,7 +229,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = _userService.GetUserById(id);
             if (user == null)
             {
-                return new ValidationErrorResult(user, StatusCodes.Status404NotFound);
+                return NotFound();
             }
             var result = _umbracoMapper.Map<IUser, UserDisplay>(user);
             return result;
@@ -246,7 +246,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (ids == null)
             {
-                return new ValidationErrorResult(ids, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             if (ids.Length == 0)
@@ -255,7 +255,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var users = _userService.GetUsersById(ids);
             if (users == null)
             {
-                return new ValidationErrorResult(users, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var result = _umbracoMapper.MapEnumerable<IUser, UserDisplay>(users);
@@ -342,7 +342,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -361,7 +361,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
+                return Unauthorized(canSaveUser.Result);
             }
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
@@ -419,7 +419,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             IUser user;
@@ -518,7 +518,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             return new ActionResult<IUser>(user);
@@ -532,7 +532,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(
                     _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             return new ActionResult<IUser>(user);
@@ -594,13 +594,13 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var found = _userService.GetUserById(intId.Result);
             if (found == null)
-                return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
+                return NotFound();
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
+                return Unauthorized(canSaveUser.Result);
             }
 
             var hasErrors = false;
@@ -647,7 +647,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             if (hasErrors)
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
 
             //merge the save data onto the user
             var user = _umbracoMapper.Map(userSave, found);
@@ -671,19 +671,19 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             var intId = changingPasswordModel.Id.TryConvertTo<int>();
             if (intId.Success == false)
             {
-                return new ValidationErrorResult(intId, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var found = _userService.GetUserById(intId.Result);
             if (found == null)
             {
-                return new ValidationErrorResult(found, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             // TODO: Why don't we inject this? Then we can just inject a logger

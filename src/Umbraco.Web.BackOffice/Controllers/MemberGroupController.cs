@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
@@ -50,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -69,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -85,12 +83,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                return new ValidationErrorResult(guidUdi, StatusCodes.Status404NotFound);
+                return NotFound();
 
             var memberGroup = _memberGroupService.GetById(guidUdi.Guid);
             if (memberGroup == null)
             {
-                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
@@ -109,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
-                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             _memberGroupService.Delete(memberGroup);
@@ -135,7 +133,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
             {
-                return new ValidationErrorResult(memberGroup, StatusCodes.Status404NotFound);
+                return NotFound();
             }
 
             memberGroup.Name = saveModel.Name;
