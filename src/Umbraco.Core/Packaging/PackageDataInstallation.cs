@@ -362,10 +362,17 @@ namespace Umbraco.Core.Packaging
             // Handle Culture Specific NodeNames
             // https://github.com/umbraco/Umbraco.Cloud.Issues/issues/135
             const string nodeNamePrefix = "nodeName-";
+            // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
+            // We have to use ToLowerInvariant on the iso codes, because when we get them from contentbasee in EntityXmlSerializer they're all lowercase.
+            var installedCultures = _localizationService.GetAllLanguages().Select(l => l.IsoCode.ToLowerInvariant());
             foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.StartsWith(nodeNamePrefix)))
             {
                 var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
-                content.SetCultureName(localizedNodeName.Value, newCulture);
+                // Skip the culture if it does not exist in the current project
+                if (installedCultures.Contains(newCulture))
+                {
+                    content.SetCultureName(localizedNodeName.Value, newCulture);
+                }
             }
 
             //Here we make sure that we take composition properties in account as well
@@ -386,8 +393,13 @@ namespace Umbraco.Core.Packaging
 
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
-                        //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
+                        // set property value
+                        // Skip unsupported language variation, otherwise we'll get a "not supported error"
+                        // We allow null, because that's invariant
+                        if (content.AvailableCultures.Contains(propertyLang) || propertyLang is null)
+                        {
+                            content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
+                        }
                     }
                 }
             }
