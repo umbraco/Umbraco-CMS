@@ -156,6 +156,7 @@
     <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
+    <Compile Include="PropertyEditors\EyedropperColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ComplexPropertyEditorContentEventHandler.cs" />
     <Compile Include="Services\IIconService.cs" />
     <Compile Include="Services\Implement\InstallationService.cs" />
