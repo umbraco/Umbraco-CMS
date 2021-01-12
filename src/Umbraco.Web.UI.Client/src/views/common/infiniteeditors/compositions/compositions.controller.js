@@ -7,7 +7,7 @@
         var oldModel = null;
 
         vm.showConfirmSubmit = false;
-        vm.loading = false;
+        vm.loadingAlias = null;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
@@ -57,14 +57,13 @@
             $location.path(url);
         }
 
-        function selectCompositeContentType(compositeContentType) {  
-
-            vm.loading = true;
+        function selectCompositeContentType(compositeContentType) {
+            vm.loadingAlias = compositeContentType.contentType.alias
             
             var contentType = compositeContentType.contentType;
 
             $scope.model.selectCompositeContentType(contentType).then(function (response) {
-                vm.loading = false;
+                vm.loadingAlias = null;
             });
 
             // Check if the template is already selected.
