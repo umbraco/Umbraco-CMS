@@ -50,14 +50,22 @@ namespace Umbraco.Web.Website.Routing
                     && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerDescriptor.ControllerTypeInfo))
                 {
                     // now check if the custom action matches
-                    var customActionExists = action != null && customControllerCandidates.Any(x => x.ActionName.InvariantEquals(action));
+                    var resultingAction = DefaultActionName;
+                    if (action != null)
+                    {
+                        var found = customControllerCandidates.FirstOrDefault(x => x.ActionName.InvariantEquals(action))?.ActionName;
+                        if (found != null)
+                        {
+                            resultingAction = found;
+                        }
+                    }
 
                     // it's a hijacked route with a custom controller, so return the the values
                     return new HijackedRouteResult(
                         true,
                         controllerDescriptor.ControllerName,
                         controllerDescriptor.ControllerTypeInfo,
-                        customActionExists ? action : DefaultActionName);
+                        resultingAction);
                 }
                 else
                 {
