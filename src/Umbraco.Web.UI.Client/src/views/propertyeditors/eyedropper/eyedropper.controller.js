@@ -15,6 +15,8 @@ function EyedropperColorPickerController($scope, angularHelper) {
     // map back to the model
     $scope.model.config = config;
 
+    vm.options = $scope.model.config;
+
     vm.color = $scope.model.value || null;
 
     vm.selectColor = function (color) {
