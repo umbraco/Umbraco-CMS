@@ -161,13 +161,12 @@ namespace Umbraco.Core.Models
             return item.Alias;
         }
 
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         public void ClearCollectionChangedEvents() => CollectionChanged = null;
-
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             CollectionChanged?.Invoke(this, args);
