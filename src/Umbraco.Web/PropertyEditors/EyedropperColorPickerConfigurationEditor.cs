@@ -14,11 +14,10 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         public override Dictionary<string, object> ToConfigurationEditor(EyedropperColorPickerConfiguration configuration)
         {
-            var showAlpha = configuration?.ShowAlpha ?? false;
-
             return new Dictionary<string, object>
             {
-                { "showAlpha", showAlpha }
+                { "showAlpha", configuration.ShowAlpha },
+                { "showPalette", configuration.ShowPalette }
             };
         }
 
@@ -32,6 +31,13 @@ namespace Umbraco.Web.PropertyEditors
                 var attempt = alpha.TryConvertTo<bool>();
                 if (attempt.Success)
                     output.ShowAlpha = attempt.Result;
+            }
+
+            if (editorValues.TryGetValue("showPalette", out var palette))
+            {
+                var attempt = palette.TryConvertTo<bool>();
+                if (attempt.Success)
+                    output.ShowPalette = attempt.Result;
             }
 
             return output;

@@ -5,6 +5,7 @@ function EyedropperColorPickerController($scope, angularHelper) {
     //setup the default config
     var config = {
         showAlpha: true,
+        showPalette: true,
         allowEmpty: true
     };
     

@@ -7,5 +7,8 @@
     {
         [ConfigurationField("showAlpha", "Show alpha", "boolean", Description = "Allow alpha transparency selection.")]
         public bool ShowAlpha { get; set; }
+
+        [ConfigurationField("showPalette", "Show palette", "boolean", Description = "Show a palette next to the color picker.")]
+        public bool ShowPalette { get; set; }
     }
 }
