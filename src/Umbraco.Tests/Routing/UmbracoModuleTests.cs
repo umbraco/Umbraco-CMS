@@ -32,9 +32,7 @@ namespace Umbraco.Tests.Routing
             (
                 runtime,
                 logger,
-                null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                new RoutableDocumentFilter(globalSettings, IOHelper),
                 globalSettings,
                 HostingEnvironment
             );
@@ -76,28 +74,6 @@ namespace Umbraco.Tests.Routing
             var result = _module.EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             Assert.AreEqual(assert, result.Success);
-        }
-
-        [TestCase("/favicon.ico", true)]
-        [TestCase("/umbraco_client/Tree/treeIcons.css", true)]
-        [TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", true)]
-        [TestCase("/base/somebasehandler", false)]
-        [TestCase("/", false)]
-        [TestCase("/home.aspx", false)]
-        public void Is_Client_Side_Request(string url, bool assert)
-        {
-            var uri = new Uri("http://test.com" + url);
-            var result = uri.IsClientSideRequest();
-            Assert.AreEqual(assert, result);
-        }
-
-        [Test]
-        public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
-        {
-            //This URL is invalid. Default to false when the extension cannot be determined
-            var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
-            var result = uri.IsClientSideRequest();
-            Assert.AreEqual(false, result);
         }
 
         //NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much,

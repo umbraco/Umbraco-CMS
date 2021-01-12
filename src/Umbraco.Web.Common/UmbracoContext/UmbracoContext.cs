@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -14,7 +15,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
-        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
@@ -22,6 +22,7 @@ namespace Umbraco.Web
         private string _previewToken;
         private bool? _previewing;
         private readonly IBackOfficeSecurity _backofficeSecurity;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -30,7 +31,7 @@ namespace Umbraco.Web
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
             IBackOfficeSecurity backofficeSecurity,
-            GlobalSettings globalSettings,
+            UmbracoRequestPaths umbracoRequestPaths,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
@@ -43,7 +44,6 @@ namespace Umbraco.Web
             }
 
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -52,6 +52,7 @@ namespace Umbraco.Web
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
             _backofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
+            _umbracoRequestPaths = umbracoRequestPaths;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
@@ -140,7 +141,7 @@ namespace Umbraco.Web
         {
             Uri requestUrl = _requestAccessor.GetRequestUrl();
             if (requestUrl != null
-                && requestUrl.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
+                && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
                 && _backofficeSecurity.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty

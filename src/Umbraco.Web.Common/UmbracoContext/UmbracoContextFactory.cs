@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 
@@ -18,7 +19,7 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly GlobalSettings _globalSettings;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
@@ -33,7 +34,7 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IOptions<GlobalSettings> globalSettings,
+            UmbracoRequestPaths umbracoRequestPaths,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
             ICookieManager cookieManager,
@@ -44,7 +45,7 @@ namespace Umbraco.Web
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
-            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _umbracoRequestPaths = umbracoRequestPaths ?? throw new ArgumentNullException(nameof(umbracoRequestPaths));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _uriUtility = uriUtility ?? throw new ArgumentNullException(nameof(uriUtility));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
@@ -75,7 +76,7 @@ namespace Umbraco.Web
             return new UmbracoContext(
                 _publishedSnapshotService,
                 _backofficeSecurityAccessor.BackOfficeSecurity,
-                _globalSettings,
+                _umbracoRequestPaths,
                 _hostingEnvironment,
                 _variationContextAccessor,
                 _uriUtility,

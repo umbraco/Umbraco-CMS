@@ -34,6 +34,7 @@ namespace Umbraco.Web.Website.Routing
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoRouteValuesFactory _routeValuesFactory;
+        private readonly RoutableDocumentFilter _routableDocumentFilter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -45,7 +46,8 @@ namespace Umbraco.Web.Website.Routing
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtime,
-            IUmbracoRouteValuesFactory routeValuesFactory)
+            IUmbracoRouteValuesFactory routeValuesFactory,
+            RoutableDocumentFilter routableDocumentFilter)
         {
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -54,6 +56,7 @@ namespace Umbraco.Web.Website.Routing
             _hostingEnvironment = hostingEnvironment;
             _runtime = runtime;
             _routeValuesFactory = routeValuesFactory;
+            _routableDocumentFilter = routableDocumentFilter;
         }
 
         /// <inheritdoc/>
@@ -71,10 +74,7 @@ namespace Umbraco.Web.Website.Routing
                 return values;
             }
 
-            // Check for back office request
-            // TODO: This is how the module was doing it before but could just as easily be part of the RoutableDocumentFilter
-            // which still needs to be migrated.
-            if (httpContext.Request.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
+            if (!_routableDocumentFilter.IsDocumentRequest(httpContext.Request.Path))
             {
                 return values;
             }

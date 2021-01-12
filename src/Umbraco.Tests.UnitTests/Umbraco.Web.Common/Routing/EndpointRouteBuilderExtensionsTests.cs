@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Extensions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing

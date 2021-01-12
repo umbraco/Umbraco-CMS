@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Routing;
 
 namespace Umbraco.Web.Common.Install

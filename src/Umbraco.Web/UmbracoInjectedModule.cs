@@ -3,7 +3,6 @@ using System.Web;
 using System.Web.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
@@ -11,7 +10,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
-using RouteDirection = Umbraco.Web.Routing.RouteDirection;
 
 namespace Umbraco.Web
 {
@@ -34,42 +32,29 @@ namespace Umbraco.Web
     {
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
-        private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly RoutableDocumentFilter _routableDocumentLookup;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public UmbracoInjectedModule(
             IRuntimeState runtime,
             ILogger logger,
-            IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            RoutableDocumentFilter routableDocumentLookup,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
             _logger = logger;
-            _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
-            _routableDocumentLookup = routableDocumentLookup;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
         }
 
-        #region HttpModule event handlers
-
         /// <summary>
         /// Begins to process a request.
         /// </summary>
-        /// <param name="httpContext"></param>
         private void BeginRequest(HttpContextBase httpContext)
         {
-            // do not process if client-side request
-            if (httpContext.Request.Url.IsClientSideRequest())
-                return;
-
             // write the trace output for diagnostics at the end of the request
             httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
@@ -85,33 +70,16 @@ namespace Umbraco.Web
         /// <summary>
         /// Processes the Umbraco Request
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <remarks>
-        ///
         /// This will check if we are trying to route to the default back office page (i.e. ~/Umbraco/ or ~/Umbraco or ~/Umbraco/Default )
         /// and ensure that the MVC handler executes for that. This is required because the route for /Umbraco will never execute because
         /// files/folders exist there and we cannot set the RouteCollection.RouteExistingFiles = true since that will muck a lot of other things up.
         /// So we handle it here and explicitly execute the MVC controller.
-        ///
         /// </remarks>
         void ProcessRequest(HttpContextBase httpContext)
         {
-            // do not process if client-side request
-            if (httpContext.Request.Url.IsClientSideRequest())
-                return;
-
-            if (Current.UmbracoContext == null)
-                throw new InvalidOperationException("The Current.UmbracoContext is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
 
             var umbracoContext = Current.UmbracoContext;
-
-            // re-write for the default back office path
-            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
-            {
-                if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
-                    RewriteToBackOfficeHandler(httpContext);
-                return;
-            }
 
             // do not process if this request is not a front-end routable page
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
@@ -119,34 +87,7 @@ namespace Umbraco.Web
             // raise event here
             UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
-
-            httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
-
-            // ok, process
-
-            // note: requestModule.UmbracoRewrite also did some stripping of &umbPage
-            // from the querystring... that was in v3.x to fix some issues with pre-forms
-            // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
-
-            // instantiate, prepare and process the published content request
-            // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
-            var requestBuilder = _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl).Result;
-            var request = umbracoContext.PublishedRequest = _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound)).Result;
-
-            // NOTE: This has been ported to netcore
-            // HandleHttpResponseStatus returns a value indicating that the request should
-            // not be processed any further, eg because it has been redirect. then, exit.
-            //if (UmbracoModule.HandleHttpResponseStatus(httpContext, request, _logger))
-            //    return;
-            //if (request.HasPublishedContent() == false)
-            //    httpContext.RemapHandler(new PublishedContentNotFoundHandler());
-            //else
-            //    RewriteToUmbracoHandler(httpContext, request);
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Checks the current request and ensures that it is routable based on the structure of the request and URI
@@ -157,14 +98,15 @@ namespace Umbraco.Web
 
             var reason = EnsureRoutableOutcome.IsRoutable;
 
-            // ensure this is a document request
-            if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
-            {
-                reason = EnsureRoutableOutcome.NotDocumentRequest;
-            }
+            //// ensure this is a document request
+            //if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
+            //{
+            //    reason = EnsureRoutableOutcome.NotDocumentRequest;
+            //}
+
             // ensure the runtime is in the proper state
             // and deal with needed redirects, etc
-            else if (!EnsureRuntime(httpContext, uri))
+            if (!EnsureRuntime(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotReady;
             }
@@ -253,7 +195,6 @@ namespace Umbraco.Web
         }
 
 
-        #endregion
 
         #region IHttpModule
 
