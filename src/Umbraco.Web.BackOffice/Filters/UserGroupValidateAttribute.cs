@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,7 +7,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -86,7 +86,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 if (context.ModelState.IsValid == false)
                 {
                     //if it is not valid, do not continue and return the model state
-                    throw HttpResponseException.CreateValidationErrorResponse(context.ModelState);
+                    context.Result = new ValidationErrorResult(context.ModelState);
                 }
             }
 
