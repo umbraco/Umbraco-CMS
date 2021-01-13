@@ -43,10 +43,6 @@
                         <localize key="contentTypeEditor_compositionInUse"></localize>
                     </umb-empty-state>
 
-                    <div ng-show="vm.loading" style="min-height: 20px; position: absolute; left: 0; right: 0; z-index: 1;">
-                        <umb-load-indicator></umb-load-indicator>
-                    </div>
-
                     <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
                         <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
                         <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
@@ -69,18 +65,21 @@
                             </li>
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:searchTerm"
-                                ng-class="{'-disabled': compositeContentType.allowed === false || compositeContentType.inherited, '-selected': compositeContentType.selected}">
+                                ng-class="{'-disabled': (compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited, '-selected': compositeContentType.selected}">
 
                                 <div class="umb-checkbox-list__item-checkbox" ng-class="{'-selected': compositeContentType.selected }">
                                     <umb-checkbox input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
                                                   model="compositeContentType.selected"
                                                   on-change="vm.selectCompositeContentType(compositeContentType)"
-                                                  disabled="compositeContentType.allowed === false || compositeContentType.inherited">
+                                                  disabled="(compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited || vm.loadingAlias">
                                     </umb-checkbox>
                                 </div>
 
-                                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false}">
-                                    <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
+                                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false && !compositeContentType.selected}">
+                                    <div class="umb-checkbox-list__item-icon-wrapper">
+                                        <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon" ng-class="{'o-0': compositeContentType.contentType.alias === vm.loadingAlias}"></i>
+                                        <div ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></div>
+                                    </div>
                                     {{ compositeContentType.contentType.name }}
                                     <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
                                 </label>
