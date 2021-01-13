@@ -15,7 +15,7 @@ Simple icon
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon="icon-alert" class="another-class"></umb-icon>
+    <umb-icon icon="icon-alert" class="icon-class"></umb-icon>
 </pre>
 @example
  **/
