@@ -1,5 +1,3 @@
-using System;
-
 namespace Umbraco.Core.Hosting
 {
     public interface IUmbracoApplicationLifetime
@@ -13,8 +11,5 @@ namespace Umbraco.Core.Hosting
         /// Terminates the current application. The application restarts the next time a request is received for it.
         /// </summary>
         void Restart();
-
-        // TODO: Should be killed and replaced with UmbracoApplicationStarting notifications
-        event EventHandler ApplicationInit;
     }
 }

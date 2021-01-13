@@ -22,6 +22,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Diagnostics;
+using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -137,7 +138,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.AddCoreInitialServices();
 
             // aspnet app lifetime mgmt
-            builder.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
             builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             return builder;
@@ -166,15 +167,18 @@ namespace Umbraco.Web.Common.DependencyInjection
         }
 
         /// <summary>
-        /// Adds mini profiler services for Umbraco
+        /// Adds the Umbraco request profiler
         /// </summary>
-        public static IUmbracoBuilder AddMiniProfiler(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
         {
+            builder.Services.AddUnique<WebProfilerHtml>();
+
             builder.Services.AddMiniProfiler(options =>
 
                 // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
                 options.ShouldProfile = request => false);
 
+            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
             return builder;
         }
 

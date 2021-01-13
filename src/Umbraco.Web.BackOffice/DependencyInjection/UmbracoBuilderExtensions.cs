@@ -39,7 +39,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddBackOfficeAuthorizationPolicies()
-                .AddMiniProfiler()
+                .AddUmbracoProfiler()
                 .AddMvcAndRazor()
                 .AddWebServer()
                 .AddPreviewSupport()
