@@ -570,7 +570,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
             //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            HandleInvalidModelState(display);
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+            }
 
             //put the correct msgs in
             switch (contentItem.Action)

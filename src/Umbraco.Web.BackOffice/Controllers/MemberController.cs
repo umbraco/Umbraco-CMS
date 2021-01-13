@@ -7,6 +7,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -266,7 +267,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
 
             //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            HandleInvalidModelState(display);
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+            }
 
             var localizedTextService = _localizedTextService;
             //put the correct messages in
