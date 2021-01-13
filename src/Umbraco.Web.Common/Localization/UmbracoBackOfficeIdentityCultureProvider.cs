@@ -15,6 +15,7 @@ namespace Umbraco.Web.Common.Localization
     public class UmbracoBackOfficeIdentityCultureProvider : RequestCultureProvider
     {
         private readonly RequestLocalizationOptions _localizationOptions;
+        private readonly object _locker = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBackOfficeIdentityCultureProvider"/> class.
@@ -31,18 +32,21 @@ namespace Umbraco.Web.Common.Localization
                 return NullProviderCultureResult;
             }
 
-            // We need to dynamically change the supported cultures since we won't ever know what languages are used since
-            // they are dynamic within Umbraco.
-            var cultureExists = _localizationOptions.SupportedCultures.Contains(culture);
-
-            if (!cultureExists)
+            lock(_locker)
             {
-                // add this as a supporting culture
-                _localizationOptions.SupportedCultures.Add(culture);
-                _localizationOptions.SupportedUICultures.Add(culture);
-            }
+                // We need to dynamically change the supported cultures since we won't ever know what languages are used since
+                // they are dynamic within Umbraco.
+                var cultureExists = _localizationOptions.SupportedCultures.Contains(culture);
 
-            return Task.FromResult(new ProviderCultureResult(culture.Name));
+                if (!cultureExists)
+                {
+                    // add this as a supporting culture
+                    _localizationOptions.SupportedCultures.Add(culture);
+                    _localizationOptions.SupportedUICultures.Add(culture);
+                }
+
+                return Task.FromResult(new ProviderCultureResult(culture.Name));
+            }
         }
     }
 }
