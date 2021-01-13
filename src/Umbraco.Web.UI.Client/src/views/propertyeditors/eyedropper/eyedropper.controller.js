@@ -1,4 +1,4 @@
-function EyedropperColorPickerController($scope, angularHelper) {
+function EyeDropperColorPickerController($scope, angularHelper) {
 
     var vm = this;
 
@@ -41,4 +41,4 @@ function EyedropperColorPickerController($scope, angularHelper) {
     };
 }
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.EyedropperColorPickerController", EyedropperColorPickerController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.EyeDropperColorPickerController", EyeDropperColorPickerController);
