@@ -23,7 +23,7 @@ function EyeDropperColorPickerController($scope, angularHelper) {
         angularHelper.safeApply($scope, function () {
             vm.color = color ? color.toString() : null;
             $scope.model.value = vm.color;
-            //$scope.propertyForm.selectedColor.$setViewValue(vm.color);
+            $scope.propertyForm.selectedColor.$setViewValue(vm.color);
         });
     };
 
