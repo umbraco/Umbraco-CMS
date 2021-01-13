@@ -43,7 +43,7 @@
 
         <umb-box data-element="node-info-history">
 
-            <umb-box-header title="{{historyLabel}}">
+            <umb-box-header title-key="{{historyLabelKey}}" ng-if="historyLabelKey">
                 <umb-button
                     ng-hide="node.trashed"
                     type="button"
