@@ -19,6 +19,7 @@ namespace Umbraco.Web.Common.Localization
     public class UmbracoPublishedContentCultureProvider : RequestCultureProvider
     {
         private readonly RequestLocalizationOptions _localizationOptions;
+        private readonly object _locker = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPublishedContentCultureProvider"/> class.
@@ -33,19 +34,22 @@ namespace Umbraco.Web.Common.Localization
                 string culture = routeValues.PublishedRequest?.Culture;
                 if (culture != null)
                 {
-                    // We need to dynamically change the supported cultures since we won't ever know what languages are used since
-                    // they are dynamic within Umbraco.
-                    // This code to check existence is borrowed from aspnetcore to avoid creating a CultureInfo
-                    // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Middleware/Localization/src/RequestLocalizationMiddleware.cs#L165
-                    CultureInfo existingCulture = _localizationOptions.SupportedCultures.FirstOrDefault(supportedCulture =>
-                        StringSegment.Equals(supportedCulture.Name, culture, StringComparison.OrdinalIgnoreCase));
-
-                    if (existingCulture == null)
+                    lock (_locker)
                     {
-                        // add this as a supporting culture
-                        var ci = CultureInfo.GetCultureInfo(culture);
-                        _localizationOptions.SupportedCultures.Add(ci);
-                        _localizationOptions.SupportedUICultures.Add(ci);
+                        // We need to dynamically change the supported cultures since we won't ever know what languages are used since
+                        // they are dynamic within Umbraco.
+                        // This code to check existence is borrowed from aspnetcore to avoid creating a CultureInfo
+                        // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Middleware/Localization/src/RequestLocalizationMiddleware.cs#L165
+                        CultureInfo existingCulture = _localizationOptions.SupportedCultures.FirstOrDefault(supportedCulture =>
+                            StringSegment.Equals(supportedCulture.Name, culture, StringComparison.OrdinalIgnoreCase));
+
+                        if (existingCulture == null)
+                        {
+                            // add this as a supporting culture
+                            var ci = CultureInfo.GetCultureInfo(culture);
+                            _localizationOptions.SupportedCultures.Add(ci);
+                            _localizationOptions.SupportedUICultures.Add(ci);
+                        }
                     }
 
                     return Task.FromResult(new ProviderCultureResult(culture));
