@@ -11,6 +11,17 @@ namespace Umbraco.Core.Configuration.Models
     public class WebRoutingSettings
     {
         /// <summary>
+        /// Gets or sets a value indicating whether to check if any routed endpoints match a front-end request before
+        /// the Umbraco dynamic router tries to map the request to an Umbraco content item.
+        /// </summary>
+        /// <remarks>
+        /// This should not be necessary if the Umbraco catch-all/dynamic route is registered last like it's supposed to be. In that case
+        /// ASP.NET Core will automatically handle this in all cases. This is more of a backward compatible option since this is what v7/v8 used
+        /// to do.
+        /// </remarks>
+        public bool TryMatchingEndpointsForAllPages { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets a value indicating whether IIS custom errors should be skipped.
         /// </summary>
         public bool TrySkipIisCustomErrors { get; set; } = false;

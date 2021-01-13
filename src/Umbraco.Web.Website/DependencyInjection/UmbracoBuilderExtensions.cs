@@ -6,6 +6,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
+using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Website.Collections;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
@@ -23,8 +24,6 @@ namespace Umbraco.Web.Website.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<NoContentRoutes>();
-
             builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 
@@ -39,7 +38,10 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddDataProtection();
 
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
+            builder.Services.AddSingleton<HijackedRouteEvaluator>();
+            builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
+            builder.Services.AddSingleton<RoutableDocumentFilter>();
 
             builder.AddDistributedCache();
 

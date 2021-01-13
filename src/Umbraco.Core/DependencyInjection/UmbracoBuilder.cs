@@ -24,6 +24,7 @@ using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -146,6 +147,7 @@ namespace Umbraco.Core.DependencyInjection
             this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
 
             Services.AddSingleton<ManifestWatcher>();
+            Services.AddSingleton<UmbracoRequestPaths>();
             this.AddNotificationHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();

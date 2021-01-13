@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -24,49 +24,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
 
         private IWebHostEnvironment _hostEnvironment;
         private GlobalSettings _globalSettings;
-
-        [TestCase("http://www.domain.com/umbraco/preview/frame?id=1234", "", true)]
-        [TestCase("http://www.domain.com/umbraco", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/", "", true)]
-        [TestCase("http://www.domain.com/umbraco/default.aspx", "", true)]
-        [TestCase("http://www.domain.com/umbraco/test/test", "", false)]
-        [TestCase("http://www.domain.com/umbraco/test/test/test", "", false)]
-        [TestCase("http://www.domain.com/Umbraco/test/test.aspx", "", true)]
-        [TestCase("http://www.domain.com/umbraco/test/test.js", "", true)]
-        [TestCase("http://www.domain.com/umbrac", "", false)]
-        [TestCase("http://www.domain.com/test", "", false)]
-        [TestCase("http://www.domain.com/test/umbraco", "", false)]
-        [TestCase("http://www.domain.com/Umbraco/Backoffice/blah", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/anything", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/anything/", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/surface/blah", "", false)]
-        [TestCase("http://www.domain.com/umbraco/api/blah", "", false)]
-        [TestCase("http://www.domain.com/myvdir/umbraco/api/blah", "myvdir", false)]
-        [TestCase("http://www.domain.com/MyVdir/umbraco/api/blah", "/myvdir", false)]
-        [TestCase("http://www.domain.com/MyVdir/Umbraco/", "myvdir", true)]
-        [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
-        public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
-        {
-            var source = new Uri(input);
-            var hostingEnvironment = CreateHostingEnvironment(virtualPath);
-            Assert.AreEqual(expected, source.IsBackOfficeRequest(_globalSettings, hostingEnvironment));
-        }
-
-        [TestCase("http://www.domain.com/install", true)]
-        [TestCase("http://www.domain.com/Install/", true)]
-        [TestCase("http://www.domain.com/install/default.aspx", true)]
-        [TestCase("http://www.domain.com/install/test/test", true)]
-        [TestCase("http://www.domain.com/Install/test/test.aspx", true)]
-        [TestCase("http://www.domain.com/install/test/test.js", true)]
-        [TestCase("http://www.domain.com/instal", false)]
-        [TestCase("http://www.domain.com/umbraco", false)]
-        [TestCase("http://www.domain.com/umbraco/umbraco", false)]
-        public void Is_Installer_Request(string input, bool expected)
-        {
-            var source = new Uri(input);
-            var hostingEnvironment = CreateHostingEnvironment();
-            Assert.AreEqual(expected, source.IsInstallerRequest(hostingEnvironment));
-        }
 
         private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
         {

@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -14,7 +15,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
-        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
@@ -22,6 +22,7 @@ namespace Umbraco.Web
         private string _previewToken;
         private bool? _previewing;
         private readonly IBackOfficeSecurity _backofficeSecurity;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -30,7 +31,7 @@ namespace Umbraco.Web
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
             IBackOfficeSecurity backofficeSecurity,
-            GlobalSettings globalSettings,
+            UmbracoRequestPaths umbracoRequestPaths,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
@@ -43,7 +44,6 @@ namespace Umbraco.Web
             }
 
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -52,6 +52,7 @@ namespace Umbraco.Web
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
             _backofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
+            _umbracoRequestPaths = umbracoRequestPaths;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
@@ -62,107 +63,85 @@ namespace Umbraco.Web
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
             // the current domain during application startup.
             // see: http://issues.umbraco.org/issue/U4-1890
-            //
             OriginalRequestUrl = _requestAccessor.GetRequestUrl() ?? new Uri("http://localhost");
             CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
 
-        /// <summary>
-        /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
-        /// object is instantiated which in the web site is created during the BeginRequest phase.
-        /// We can then determine complete rendering time from that.
-        /// </summary>
+        /// <inheritdoc/>
         public DateTime ObjectCreated { get; }
 
         /// <summary>
-        /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
+        /// Gets the context Id
         /// </summary>
-        public Guid UmbracoRequestId { get; }
+        /// <remarks>
+        /// Used internally for debugging and also used to define anything required to distinguish this request from another.
+        /// </remarks>
+        internal Guid UmbracoRequestId { get; }
 
-        /// <summary>
-        /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
-        /// </summary>
+        /// <inheritdoc/>
         public Uri OriginalRequestUrl { get; }
 
-        /// <summary>
-        /// Gets the cleaned up url that is handled by Umbraco.
-        /// </summary>
-        /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
+        /// <inheritdoc/>
         public Uri CleanedUmbracoUrl { get; }
 
-        /// <summary>
-        /// Gets the published snapshot.
-        /// </summary>
+        /// <inheritdoc/>
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
-        /// <summary>
-        /// Gets the published content cache.
-        /// </summary>
+        /// <inheritdoc/>
         public IPublishedContentCache Content => PublishedSnapshot.Content;
 
-        /// <summary>
-        /// Gets the published media cache.
-        /// </summary>
+        /// <inheritdoc/>
         public IPublishedMediaCache Media => PublishedSnapshot.Media;
 
-        /// <summary>
-        /// Gets the domains cache.
-        /// </summary>
+        /// <inheritdoc/>
         public IDomainCache Domains => PublishedSnapshot.Domains;
 
-        /// <summary>
-        /// Gets/sets the PublishedRequest object
-        /// </summary>
+        /// <inheritdoc/>
         public IPublishedRequest PublishedRequest { get; set; }
 
-        /// <summary>
-        /// Gets the variation context accessor.
-        /// </summary>
+        /// <inheritdoc/>
         public IVariationContextAccessor VariationContextAccessor { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether the request has debugging enabled
-        /// </summary>
-        /// <value><c>true</c> if this instance is debug; otherwise, <c>false</c>.</value>
-        public bool IsDebug
-        {
-            get
-            {
-                //NOTE: the request can be null during app startup!
-                return _hostingEnvironment.IsDebugMode
+        /// <inheritdoc/>
+        public bool IsDebug => // NOTE: the request can be null during app startup!
+                _hostingEnvironment.IsDebugMode
                        && (string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebugshowtrace")) == false
                            || string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebug")) == false
                            || string.IsNullOrEmpty(_cookieManager.GetCookieValue("UMB-DEBUG")) == false);
-            }
-        }
 
-        /// <summary>
-        /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
-        /// </summary>
+        /// <inheritdoc/>
         public bool InPreviewMode
         {
             get
             {
-                if (_previewing.HasValue == false) DetectPreviewMode();
+                if (_previewing.HasValue == false)
+                {
+                    DetectPreviewMode();
+                }
+
                 return _previewing ?? false;
             }
             private set => _previewing = value;
         }
 
-        public string PreviewToken
+        internal string PreviewToken
         {
             get
             {
-                if (_previewing.HasValue == false) DetectPreviewMode();
+                if (_previewing.HasValue == false)
+                {
+                    DetectPreviewMode();
+                }
+
                 return _previewToken;
             }
         }
 
         private void DetectPreviewMode()
         {
-            var requestUrl = _requestAccessor.GetRequestUrl();
+            Uri requestUrl = _requestAccessor.GetRequestUrl();
             if (requestUrl != null
-                && requestUrl.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
+                && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
                 && _backofficeSecurity.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty
@@ -172,15 +151,17 @@ namespace Umbraco.Web
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
 
-        // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
-        // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
-        // default 'preview' mode - somehow we have to force it. and that could be recursive.
+        /// <inheritdoc/>
         public IDisposable ForcedPreview(bool preview)
         {
+            // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
+            // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
+            // default 'preview' mode - somehow we have to force it. and that could be recursive.
             InPreviewMode = preview;
             return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
         }
 
+        /// <inheritdoc/>
         protected override void DisposeResources()
         {
             // DisposableObject ensures that this runs only once
@@ -189,7 +170,9 @@ namespace Umbraco.Web
             // (but don't create caches just to dispose them)
             // context is not multi-threaded
             if (_publishedSnapshot.IsValueCreated)
+            {
                 _publishedSnapshot.Value.Dispose();
+            }
         }
     }
 }

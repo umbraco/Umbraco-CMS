@@ -128,8 +128,6 @@
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\DistributedCacheBinderTests.cs" />
-    <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
@@ -137,7 +135,6 @@
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
-    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Services\TestWithSomeContentBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
@@ -153,7 +150,6 @@
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
-    <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
@@ -179,7 +175,6 @@
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
-    <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
@@ -202,14 +197,11 @@
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
-    <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
-    <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
@@ -313,6 +305,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

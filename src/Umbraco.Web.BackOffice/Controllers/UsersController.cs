@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -38,9 +37,6 @@ using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -132,9 +128,9 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [AppendUserModifiedHeader("id")]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
+        public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
         internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
@@ -342,7 +338,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return BadRequest(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -356,6 +352,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 CheckUniqueUsername(userSave.Username, null);
             }
             CheckUniqueEmail(userSave.Email, null);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
@@ -417,11 +418,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userSave.Message.IsNullOrWhiteSpace())
                 ModelState.AddModelError("Message", "Message cannot be empty");
 
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
@@ -433,7 +429,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 //first validate the username if we're showing it
                 user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue).Value;
             }
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue).Value;
+            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
             {
@@ -512,16 +513,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             return display;
         }
 
-        private ActionResult<IUser> CheckUniqueEmail(string email, Func<IUser, bool> extraCheck)
+        private IUser CheckUniqueEmail(string email, Func<IUser, bool> extraCheck)
         {
             var user = _userService.GetByEmail(email);
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
-                return BadRequest(ModelState);
             }
-
-            return new ActionResult<IUser>(user);
+            return user;
         }
 
         private ActionResult<IUser> CheckUniqueUsername(string username, Func<IUser, bool> extraCheck)
@@ -549,9 +548,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 token.ToUrlBase64());
 
             // Get an mvc helper to get the URL
-            var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.VerifyInvite),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
+                new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     invite = inviteToken
                 });
 
@@ -584,12 +586,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(ModelState);
+                return BadRequest(ModelState);
             }
 
             var intId = userSave.Id.TryConvertTo<int>();
             if (intId.Success == false)
-                return new ValidationErrorResult(intId, StatusCodes.Status404NotFound);
+                return NotFound();
 
 
             var found = _userService.GetUserById(intId.Result);
@@ -860,5 +862,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             [DataMember(Name = "userStates")]
             public IDictionary<UserState, int> UserStates { get; set; }
         }
+
     }
 }

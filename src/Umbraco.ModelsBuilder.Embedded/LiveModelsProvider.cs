@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -11,6 +11,7 @@ using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Extensions;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -115,12 +116,16 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public void AppEndRequest(HttpContext context)
         {
-            var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
-
-            if (requestUri.IsClientSideRequest())
+            if (context.Request.IsClientSideRequest())
+            {
                 return;
+            }
 
-            if (!IsEnabled) return;
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             GenerateModelsIfRequested();
         }
     }

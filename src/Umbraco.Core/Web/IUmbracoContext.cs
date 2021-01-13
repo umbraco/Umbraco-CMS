@@ -9,10 +9,13 @@ namespace Umbraco.Web
     public interface IUmbracoContext : IDisposable
     {
         /// <summary>
-        /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
+        /// Gets the DateTime this instance was created.
+        /// </summary>
+        /// <remarks>
+        /// Used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
         /// object is instantiated which in the web site is created during the BeginRequest phase.
         /// We can then determine complete rendering time from that.
-        /// </summary>
+        /// </remarks>
         DateTime ObjectCreated { get; }
 
         /// <summary>
@@ -47,15 +50,16 @@ namespace Umbraco.Web
         IDomainCache Domains { get; }
 
         /// <summary>
-        /// Gets/sets the PublishedRequest object
+        /// Gets or sets the PublishedRequest object
         /// </summary>
-        // TODO: Can we refactor this and not expose this mutable object here? Instead just expose IPublishedContent? A bunch of stuff would need to change but would be better
+        //// TODO: Can we refactor this so it's not a settable thing required for routing?
+        //// The only nicer way would be to have a RouteRequest method directly on IUmbracoContext but that means adding another dep to the ctx/factory.
         IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Gets the variation context accessor.
         /// </summary>
-        IVariationContextAccessor VariationContextAccessor { get; }
+        IVariationContextAccessor VariationContextAccessor { get; } // TODO: This shouldn't expose the accessor should it? IUmbracoContext is basically the accessor to the VariationContext since IUmbracoContextFactory currently creates it?
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled
@@ -64,10 +68,14 @@ namespace Umbraco.Web
         bool IsDebug { get; }
 
         /// <summary>
-        /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
+        /// Gets a value indicating whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
         bool InPreviewMode { get; }
 
+        /// <summary>
+        /// Forces the context into preview
+        /// </summary>
+        /// <returns>A <see cref="IDisposable"/> instance to be disposed to exit the preview context</returns>
         IDisposable ForcedPreview(bool preview);
     }
 }

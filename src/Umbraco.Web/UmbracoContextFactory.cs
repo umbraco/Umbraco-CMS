@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
@@ -11,6 +11,8 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
+    // NOTE: This has been migrated to netcore
+
     /// <summary>
     /// Creates and manages <see cref="IUmbracoContext"/> instances.
     /// </summary>

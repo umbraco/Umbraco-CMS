@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.PublishedCache.NuCache;
 
@@ -59,10 +60,8 @@ namespace Umbraco.Web.Common.Middleware
         /// <inheritdoc/>
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
-
             // do not process if client-side request
-            if (requestUri.IsClientSideRequest())
+            if (context.Request.IsClientSideRequest())
             {
                 await next(context);
                 return;
@@ -75,12 +74,14 @@ namespace Umbraco.Web.Common.Middleware
 
             bool isFrontEndRequest = umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest();
 
+            var pathAndQuery = context.Request.GetEncodedPathAndQuery();
+
             try
             {
                 if (isFrontEndRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
+                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
                 }
 
                 try
@@ -109,12 +110,12 @@ namespace Umbraco.Web.Common.Middleware
                 if (isFrontEndRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
                 try
                 {
-                    DisposeRequestCacheItems(_logger, _requestCache, requestUri);
+                    DisposeRequestCacheItems(_logger, _requestCache, context.Request);
                 }
                 finally
                 {
@@ -126,10 +127,10 @@ namespace Umbraco.Web.Common.Middleware
         /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
-        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
+        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
         {
             // do not process if client-side request
-            if (requestUri.IsClientSideRequest())
+            if (request.IsClientSideRequest())
             {
                 return;
             }
@@ -143,6 +144,7 @@ namespace Umbraco.Web.Common.Middleware
                     keys.Add(i.Key);
                 }
             }
+
             // dispose each item and key that was found as disposable.
             foreach (var k in keys)
             {
@@ -154,6 +156,7 @@ namespace Umbraco.Web.Common.Middleware
                 {
                     logger.LogError("Could not dispose item with key " + k, ex);
                 }
+
                 try
                 {
                     k.DisposeIfDisposable();

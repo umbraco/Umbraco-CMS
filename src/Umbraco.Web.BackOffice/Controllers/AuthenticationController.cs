@@ -31,7 +31,6 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -115,11 +114,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
-        /// <returns></returns>        
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they are not authorized
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            Attempt<int> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            return _passwordConfiguration.GetConfiguration(
+                currentUserId.Success
+                    ? currentUserId.Result != userId
+                    : true);
         }
 
         /// <summary>
