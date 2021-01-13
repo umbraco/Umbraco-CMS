@@ -23,28 +23,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         [TestCase("http://LocalHost/Home/Sub1", "http://localhost/home/sub1")]
         [TestCase("http://LocalHost/Home/Sub1?x=y", "http://localhost/home/sub1?x=y")]
 
-        // same with .aspx
-        [TestCase("http://LocalHost/Home.aspx", "http://localhost/home")]
-        [TestCase("http://LocalHost/Home.aspx?x=y", "http://localhost/home?x=y")]
-        [TestCase("http://LocalHost/Home/Sub1.aspx", "http://localhost/home/sub1")]
-        [TestCase("http://LocalHost/Home/Sub1.aspx?x=y", "http://localhost/home/sub1?x=y")]
-
         // test that the trailing slash goes but not on hostname
         [TestCase("http://LocalHost/", "http://localhost/")]
         [TestCase("http://LocalHost/Home/", "http://localhost/home")]
         [TestCase("http://LocalHost/Home/?x=y", "http://localhost/home?x=y")]
         [TestCase("http://LocalHost/Home/Sub1/", "http://localhost/home/sub1")]
         [TestCase("http://LocalHost/Home/Sub1/?x=y", "http://localhost/home/sub1?x=y")]
-
-        // test that default.aspx goes, even with parameters
-        [TestCase("http://LocalHost/deFault.aspx", "http://localhost/")]
-        [TestCase("http://LocalHost/deFault.aspx?x=y", "http://localhost/?x=y")]
-
-        // test with inner .aspx
-        [TestCase("http://Localhost/Home/Sub1.aspx/Sub2", "http://localhost/home/sub1/sub2")]
-        [TestCase("http://Localhost/Home/Sub1.aspx/Sub2?x=y", "http://localhost/home/sub1/sub2?x=y")]
-        [TestCase("http://Localhost/Home.aspx/Sub1.aspx/Sub2?x=y", "http://localhost/home/sub1/sub2?x=y")]
-        [TestCase("http://Localhost/deFault.aspx/Home.aspx/deFault.aspx/Sub1.aspx", "http://localhost/home/default/sub1")]
         public void Uri_To_Umbraco(string sourceUrl, string expectedUrl)
         {
             // Arrange

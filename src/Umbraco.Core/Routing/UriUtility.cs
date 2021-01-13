@@ -55,9 +55,15 @@ namespace Umbraco.Web
         {
             if (virtualPath.InvariantStartsWith(_appPathPrefix)
                     && (virtualPath.Length == _appPathPrefix.Length || virtualPath[_appPathPrefix.Length] == '/'))
+            {
                 virtualPath = virtualPath.Substring(_appPathPrefix.Length);
+            }
+
             if (virtualPath.Length == 0)
+            {
                 virtualPath = "/";
+            }
+
             return virtualPath;
         }
 
@@ -88,9 +94,8 @@ namespace Umbraco.Web
         // ie no virtual directory, no .aspx, lowercase...
         public Uri UriToUmbraco(Uri uri)
         {
-            // TODO: Ideally we do this witout so many string allocations, we can use
-            // techniques like StringSegment and Span. This is critical code that executes on every request.
-            // not really sure we need ToLower.
+            // TODO: This is critical code that executes on every request, we should
+            // look into if all of this is necessary? not really sure we need ToLower?
 
             // note: no need to decode uri here because we're returning a uri
             // so it will be re-encoded anyway
