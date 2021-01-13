@@ -67,6 +67,8 @@ namespace Umbraco.Core
 
             // cannot get .AbsolutePath on relative uri (InvalidOperation)
             var s = uri.OriginalString;
+
+            // TODO: Shouldn't this just use Uri.GetLeftPart?
             var posq = s.IndexOf("?", StringComparison.Ordinal);
             var posf = s.IndexOf("#", StringComparison.Ordinal);
             var pos = posq > 0 ? posq : (posf > 0 ? posf : 0);
