@@ -49,7 +49,7 @@ namespace Umbraco.Web.Routing
         /// <remarks>If successful, also assigns the template.</remarks>
         public override bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            var path = frequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.AbsolutePathDecoded;
 
             if (frequest.Domain != null)
             {

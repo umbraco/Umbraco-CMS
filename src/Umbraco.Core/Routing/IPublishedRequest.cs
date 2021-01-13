@@ -18,6 +18,11 @@ namespace Umbraco.Web.Routing
         Uri Uri { get; }
 
         /// <summary>
+        /// Gets the URI decoded absolute path of the <see cref="Uri"/>
+        /// </summary>
+        string AbsolutePathDecoded { get; }
+
+        /// <summary>
         /// Gets a value indicating the requested content.
         /// </summary>
         IPublishedContent PublishedContent { get; }

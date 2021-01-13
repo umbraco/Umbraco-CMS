@@ -62,7 +62,6 @@ namespace Umbraco.Web
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
             // the current domain during application startup.
             // see: http://issues.umbraco.org/issue/U4-1890
-            //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }

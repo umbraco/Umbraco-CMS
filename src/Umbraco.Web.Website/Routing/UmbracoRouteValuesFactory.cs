@@ -103,7 +103,7 @@ namespace Umbraco.Web.Website.Routing
         {
             IPublishedRequest request = def.PublishedRequest;
 
-            var customControllerName = request.PublishedContent?.ContentType.Alias;
+            var customControllerName = request.PublishedContent?.ContentType?.Alias;
             if (customControllerName != null)
             {
                 HijackedRouteResult hijackedResult = _hijackedRouteEvaluator.Evaluate(customControllerName, def.TemplateName);
@@ -144,6 +144,12 @@ namespace Umbraco.Web.Website.Routing
                 // We then need to re-run this through the pipeline for the last
                 // chance finders to work.
                 IPublishedRequestBuilder builder = _publishedRouter.UpdateRequestToNotFound(request);
+
+                if (builder == null)
+                {
+                    throw new InvalidOperationException($"The call to {nameof(IPublishedRouter.UpdateRequestToNotFound)} cannot return null");
+                }
+
                 request = builder.Build();
 
                 def = new UmbracoRouteValues(

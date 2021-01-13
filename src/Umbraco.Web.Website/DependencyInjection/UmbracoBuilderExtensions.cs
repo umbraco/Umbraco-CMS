@@ -41,7 +41,7 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddSingleton<HijackedRouteEvaluator>();
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
-            builder.Services.AddSingleton<RoutableDocumentFilter>();
+            builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
             builder.AddDistributedCache();
 

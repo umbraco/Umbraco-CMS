@@ -34,7 +34,7 @@ namespace Umbraco.Web.Website.Routing
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoRouteValuesFactory _routeValuesFactory;
-        private readonly RoutableDocumentFilter _routableDocumentFilter;
+        private readonly IRoutableDocumentFilter _routableDocumentFilter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -47,16 +47,21 @@ namespace Umbraco.Web.Website.Routing
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtime,
             IUmbracoRouteValuesFactory routeValuesFactory,
-            RoutableDocumentFilter routableDocumentFilter)
+            IRoutableDocumentFilter routableDocumentFilter)
         {
-            _logger = logger;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _publishedRouter = publishedRouter;
+            if (globalSettings is null)
+            {
+                throw new System.ArgumentNullException(nameof(globalSettings));
+            }
+
+            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _publishedRouter = publishedRouter ?? throw new System.ArgumentNullException(nameof(publishedRouter));
             _globalSettings = globalSettings.Value;
-            _hostingEnvironment = hostingEnvironment;
-            _runtime = runtime;
-            _routeValuesFactory = routeValuesFactory;
-            _routableDocumentFilter = routableDocumentFilter;
+            _hostingEnvironment = hostingEnvironment ?? throw new System.ArgumentNullException(nameof(hostingEnvironment));
+            _runtime = runtime ?? throw new System.ArgumentNullException(nameof(runtime));
+            _routeValuesFactory = routeValuesFactory ?? throw new System.ArgumentNullException(nameof(routeValuesFactory));
+            _routableDocumentFilter = routableDocumentFilter ?? throw new System.ArgumentNullException(nameof(routableDocumentFilter));
         }
 
         /// <inheritdoc/>
@@ -113,9 +118,10 @@ namespace Umbraco.Web.Website.Routing
             // an immutable object. The only way to make this better would be to have a RouteRequest
             // as part of UmbracoContext but then it will require a PublishedRouter dependency so not sure that's worth it.
             // Maybe could be a one-time Set method instead?
-            IPublishedRequest publishedRequest = umbracoContext.PublishedRequest = await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound));
+            IPublishedRequest routedRequest = await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(RouteDirection.Inbound));
+            umbracoContext.PublishedRequest = routedRequest;
 
-            return publishedRequest;
+            return routedRequest;
         }
     }
 }

@@ -61,10 +61,14 @@ namespace Umbraco.Core
         public static string GetSafeAbsolutePath(this Uri uri)
         {
             if (uri.IsAbsoluteUri)
+            {
                 return uri.AbsolutePath;
+            }
 
             // cannot get .AbsolutePath on relative uri (InvalidOperation)
             var s = uri.OriginalString;
+
+            // TODO: Shouldn't this just use Uri.GetLeftPart?
             var posq = s.IndexOf("?", StringComparison.Ordinal);
             var posf = s.IndexOf("#", StringComparison.Ordinal);
             var pos = posq > 0 ? posq : (posf > 0 ? posf : 0);
