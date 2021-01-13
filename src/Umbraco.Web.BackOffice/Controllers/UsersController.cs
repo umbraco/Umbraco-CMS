@@ -121,7 +121,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
-                return BadRequest("Could not access Gravatar endpoint");
+                return new ValidationErrorResult("Could not access Gravatar endpoint");
 
             return urls;
         }
@@ -531,7 +531,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(
                     _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
-                return BadRequest(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             return new ActionResult<IUser>(user);
@@ -586,7 +586,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return BadRequest(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             var intId = userSave.Id.TryConvertTo<int>();
@@ -649,7 +649,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             if (hasErrors)
-                return BadRequest(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
 
             //merge the save data onto the user
             var user = _umbracoMapper.Map(userSave, found);
@@ -673,7 +673,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return BadRequest(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             var intId = changingPasswordModel.Id.TryConvertTo<int>();
