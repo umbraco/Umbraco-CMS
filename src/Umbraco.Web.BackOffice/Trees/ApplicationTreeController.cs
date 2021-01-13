@@ -160,25 +160,17 @@ namespace Umbraco.Web.BackOffice.Trees
         /// Tries to get the root node of a tree.
         /// </summary>
         /// <remarks>
-        /// <para>Returns null if the root node could not be obtained due to an HttpResponseException,
-        /// which probably indicates that the user isn't authorized to view that tree.</para>
+        /// <para>Returns null if the root node could not be obtained due to that
+        /// the user isn't authorized to view that tree. In this case since we are
+        /// loading multiple trees we will just return null so that it's not added
+        /// to the list</para>
         /// </remarks>
         private async Task<TreeNode> TryGetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null)
                 throw new ArgumentNullException(nameof(tree));
 
-            try
-            {
-                return await GetRootNode(tree, querystring);
-            }
-            catch (HttpResponseException)
-            {
-                // if this occurs its because the user isn't authorized to view that tree,
-                // in this case since we are loading multiple trees we will just return
-                // null so that it's not added to the list.
-                return null;
-            }
+            return await GetRootNode(tree, querystring);
         }
 
         /// <summary>
@@ -219,7 +211,15 @@ namespace Umbraco.Web.BackOffice.Trees
             if (tree == null)
                 throw new ArgumentNullException(nameof(tree));
 
-            var controller = (TreeControllerBase)(await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring)).Value;
+            var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+
+            // return null if the user isn't authorized to view that tree
+            if (!((ForbidResult)result.Result is null))
+            {
+                return null;
+            }
+
+            var controller = (TreeControllerBase)result.Value;
             var rootNode = controller.GetRootNode(querystring);
             if (rootNode == null)
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
