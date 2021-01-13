@@ -15,6 +15,7 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
@@ -224,7 +225,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
-                    return new ValidationErrorResult(ModelState);
+                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
                 }
 
                 dictionaryItem.ItemKey = dictionary.Name;

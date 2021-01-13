@@ -185,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // so that is why it is being used here.
                 ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
-                return new ValidationErrorResult(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             //They've successfully set their password, we can now update their user account to be approved

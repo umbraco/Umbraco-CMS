@@ -704,7 +704,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            return new ValidationErrorResult(ModelState);
+            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
         }
 
 

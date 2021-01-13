@@ -15,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
@@ -302,7 +303,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("Name", ex.Message);
-                return new ValidationErrorResult(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             // map back to display model, and return

@@ -10,9 +10,11 @@ using Microsoft.Net.Http.Headers;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
@@ -67,7 +69,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public ActionResult<PackageDefinition> PostSavePackage(PackageDefinition model)
         {
             if (ModelState.IsValid == false)
-                return new ValidationErrorResult(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
 
             //save it
             if (!_packagingService.SaveCreatedPackage(model))
