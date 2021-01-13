@@ -282,7 +282,8 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
+                var err = CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
+                return new ValidationErrorResult(err);
             }
 
             //filter out empty properties
@@ -304,11 +305,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 catch (Exception ex)
                 {
                     var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
-                    if (responseEx != null) throw responseEx;
+                    if (responseEx != null) return new ValidationErrorResult(responseEx);
                 }
 
                 var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, ct);
-                if (exResult != null) throw exResult;
+                if (exResult != null) return new ValidationErrorResult(exResult);
 
                 saveContentType(ct);
 
@@ -344,11 +345,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 catch (Exception ex)
                 {
                     var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
-                    throw responseEx ?? ex;
+                    if (responseEx is null)
+                        throw ex;
+                    
+                    return new ValidationErrorResult(responseEx);
                 }
 
                 var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, newCt);
-                if (exResult != null) throw exResult;
+                if (exResult != null) return new ValidationErrorResult(exResult);
 
                 //set id to null to ensure its handled as a new type
                 contentTypeSave.Id = null;
@@ -472,7 +476,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType composition)
+        private TContentTypeDisplay CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType composition)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
@@ -490,7 +494,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 //map the 'save' data on top
                 display = UmbracoMapper.Map(contentTypeSave, display);
                 display.Errors = ModelState.ToErrorDictionary();
-                throw HttpResponseException.CreateValidationErrorResponse(display);
+                return display;
             }
             return null;
         }
@@ -539,7 +543,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="ct"></param>
         /// <param name="ctId"></param>
         /// <returns></returns>
-        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+        private TContentTypeDisplay CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
@@ -557,7 +561,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (invalidCompositionException != null)
             {
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
-                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
+                return CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
             }
             return null;
         }
@@ -570,7 +574,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="ctId"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
-        private HttpResponseException CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
+        private TContentTypeDisplay CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave
         {
@@ -589,7 +593,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             forDisplay.Errors = ModelState.ToErrorDictionary();
-            return HttpResponseException.CreateValidationErrorResponse(forDisplay);
+            return forDisplay;
         }
     }
 }

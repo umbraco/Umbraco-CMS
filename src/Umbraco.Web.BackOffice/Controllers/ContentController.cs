@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -606,14 +607,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             return notificationModel;
         }
 
-        private void EnsureUniqueName(string name, IContent content, string modelName)
+        private bool EnsureUniqueName(string name, IContent content, string modelName)
         {
             var existing = _contentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name && x.Id != content.Id))
             {
                 ModelState.AddModelError(modelName, _localizedTextService.Localize("blueprints/duplicateBlueprintMessage"));
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -627,7 +630,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 contentItem,
                 content =>
                 {
-                    EnsureUniqueName(content.Name, content, "Name");
+                    if (!EnsureUniqueName(content.Name, content, "Name"))
+                    {
+                        return OperationResult.Cancel(new EventMessages());
+                    }
 
                     _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
@@ -839,8 +845,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                     v.Notifications.AddRange(n.Notifications);
             }
 
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             HandleInvalidModelState(display, cultureForInvariantErrors);
+
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display);
+            }
 
             if (wasCancelled)
             {
@@ -1915,9 +1927,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                     AddVariantValidationError(culture, segment, "speechBubbles/contentCultureValidationError");
                 }
             }
-
-            base.HandleInvalidModelState(display);
-
         }
 
         /// <summary>
