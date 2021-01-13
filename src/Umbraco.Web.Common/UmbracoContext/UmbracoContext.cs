@@ -16,6 +16,7 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly UriUtility _uriUtility;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
@@ -23,6 +24,8 @@ namespace Umbraco.Web
         private bool? _previewing;
         private readonly IBackOfficeSecurity _backofficeSecurity;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private Uri _originalRequestUrl;
+        private Uri _cleanedUmbracoUrl;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
@@ -43,8 +46,8 @@ namespace Umbraco.Web
                 throw new ArgumentNullException(nameof(publishedSnapshotService));
             }
 
-            VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
-
+            VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _uriUtility = uriUtility;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _requestAccessor = requestAccessor;
@@ -56,15 +59,6 @@ namespace Umbraco.Web
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
-
-            // set the urls...
-            // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
-            // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
-            // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
-            // the current domain during application startup.
-            // see: http://issues.umbraco.org/issue/U4-1890
-            OriginalRequestUrl = _requestAccessor.GetRequestUrl() ?? new Uri("http://localhost");
-            CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
 
         /// <inheritdoc/>
@@ -79,10 +73,17 @@ namespace Umbraco.Web
         internal Guid UmbracoRequestId { get; }
 
         /// <inheritdoc/>
-        public Uri OriginalRequestUrl { get; }
+        // set the urls lazily, no need to allocate until they are needed...
+        // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
+        // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
+        // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
+        // the current domain during application startup.
+        // see: http://issues.umbraco.org/issue/U4-1890
+        public Uri OriginalRequestUrl => _originalRequestUrl ?? (_originalRequestUrl = _requestAccessor.GetRequestUrl() ?? new Uri("http://localhost"));
 
         /// <inheritdoc/>
-        public Uri CleanedUmbracoUrl { get; }
+        // set the urls lazily, no need to allocate until they are needed...
+        public Uri CleanedUmbracoUrl => _cleanedUmbracoUrl ?? (_cleanedUmbracoUrl = _uriUtility.UriToUmbraco(OriginalRequestUrl));
 
         /// <inheritdoc/>
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;

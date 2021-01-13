@@ -61,7 +61,9 @@ namespace Umbraco.Core
         public static string GetSafeAbsolutePath(this Uri uri)
         {
             if (uri.IsAbsoluteUri)
+            {
                 return uri.AbsolutePath;
+            }
 
             // cannot get .AbsolutePath on relative uri (InvalidOperation)
             var s = uri.OriginalString;

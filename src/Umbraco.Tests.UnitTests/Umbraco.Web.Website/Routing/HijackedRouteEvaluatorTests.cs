@@ -79,13 +79,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         }
 
         [TestCase("Index", "RenderNotFound", null, false)]
-        [TestCase("index", "Render", "Index", true)]
-        [TestCase("Index", "Render1", "Index", true)]
-        [TestCase("Index", "render2", "Index", true)]
-        [TestCase("NotFound", "Render", "Index", true)]
-        [TestCase("NotFound", "Render1", "Index", true)]
-        [TestCase("NotFound", "Render2", "Index", true)]
-        [TestCase("Custom", "Render1", "Custom", true)]
+        [TestCase("index", "Render", nameof(RenderController.Index), true)]
+        [TestCase("Index", "Render1", nameof(RenderController.Index), true)]
+        [TestCase("Index", "render2", nameof(Render2Controller.Index), true)]
+        [TestCase("NotFound", "Render", nameof(RenderController.Index), true)]
+        [TestCase("NotFound", "Render1", nameof(Render1Controller.Index), true)]
+        [TestCase("NotFound", "Render2", nameof(Render2Controller.Index), true)]
+        [TestCase("Custom", "Render1", nameof(Render1Controller.Custom), true)]
         public void Matches_Controller(string action, string controller, string resultAction, bool matches)
         {
             var evaluator = new HijackedRouteEvaluator(

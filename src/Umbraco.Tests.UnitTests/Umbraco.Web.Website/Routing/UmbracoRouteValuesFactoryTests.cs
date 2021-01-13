@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
@@ -18,16 +18,17 @@ using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
+
     [TestFixture]
     public class UmbracoRouteValuesFactoryTests
     {
-        private UmbracoRouteValuesFactory GetFactory(IPublishedRouter router, out UmbracoRenderingDefaults renderingDefaults)
+        private UmbracoRouteValuesFactory GetFactory(out Mock<IPublishedRouter> publishedRouter, out UmbracoRenderingDefaults renderingDefaults)
         {
             var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
             builder.SetPublishedContent(Mock.Of<IPublishedContent>());
             IPublishedRequest request = builder.Build();
 
-            var publishedRouter = new Mock<IPublishedRouter>();
+            publishedRouter = new Mock<IPublishedRouter>();
             publishedRouter.Setup(x => x.UpdateRequestToNotFound(It.IsAny<IPublishedRequest>()))
                 .Returns((IPublishedRequest r) => builder)
                 .Verifiable();
@@ -53,12 +54,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
             builder.SetPublishedContent(Mock.Of<IPublishedContent>());
             IPublishedRequest request = builder.Build();
 
-            var publishedRouter = new Mock<IPublishedRouter>();
-            publishedRouter.Setup(x => x.UpdateRequestToNotFound(It.IsAny<IPublishedRequest>()))
-                .Returns((IPublishedRequest r) => builder)
-                .Verifiable();
-
-            UmbracoRouteValuesFactory factory = GetFactory(publishedRouter.Object, out _);
+            UmbracoRouteValuesFactory factory = GetFactory(out Mock<IPublishedRouter> publishedRouter, out _);
 
             UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), new RouteValueDictionary(), request);
 
@@ -74,7 +70,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
             builder.SetTemplate(Mock.Of<ITemplate>());
             IPublishedRequest request = builder.Build();
 
-            UmbracoRouteValuesFactory factory = GetFactory(Mock.Of<IPublishedRouter>(), out UmbracoRenderingDefaults renderingDefaults);
+            UmbracoRouteValuesFactory factory = GetFactory(out _, out UmbracoRenderingDefaults renderingDefaults);
 
             var routeVals = new RouteValueDictionary();
             UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), routeVals, request);

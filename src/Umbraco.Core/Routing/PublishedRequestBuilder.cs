@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -26,11 +27,15 @@ namespace Umbraco.Web.Routing
         public PublishedRequestBuilder(Uri uri, IFileService fileService)
         {
             Uri = uri;
+            AbsolutePathDecoded = uri.GetAbsolutePathDecoded();
             _fileService = fileService;
         }
 
         /// <inheritdoc/>
         public Uri Uri { get; }
+
+        /// <inheritdoc/>
+        public string AbsolutePathDecoded { get; }
 
         /// <inheritdoc/>
         public DomainAndUri Domain { get; private set; }

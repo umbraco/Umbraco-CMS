@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -88,6 +88,10 @@ namespace Umbraco.Web
         // ie no virtual directory, no .aspx, lowercase...
         public Uri UriToUmbraco(Uri uri)
         {
+            // TODO: Ideally we do this witout so many string allocations, we can use
+            // techniques like StringSegment and Span. This is critical code that executes on every request.
+            // not really sure we need ToLower.
+
             // note: no need to decode uri here because we're returning a uri
             // so it will be re-encoded anyway
             var path = uri.GetSafeAbsolutePath();
@@ -95,22 +99,10 @@ namespace Umbraco.Web
             path = path.ToLower();
             path = ToAppRelative(path); // strip vdir if any
 
-            //we need to check if the path is /default.aspx because this will occur when using a
-            //web server pre IIS 7 when requesting the root document
-            //if this is the case we need to change it to '/'
-            if (path.StartsWith("/default.aspx", StringComparison.InvariantCultureIgnoreCase))
-            {
-                string rempath = path.Substring("/default.aspx".Length, path.Length - "/default.aspx".Length);
-                path = rempath.StartsWith("/") ? rempath : "/" + rempath;
-            }
             if (path != "/")
             {
                 path = path.TrimEnd('/');
             }
-
-            //if any part of the path contains .aspx, replace it with nothing.
-            //sometimes .aspx is not at the end since we might have /home/sub1.aspx/customtemplate
-            path = path.Replace(".aspx", "");
 
             return uri.Rewrite(path);
         }
