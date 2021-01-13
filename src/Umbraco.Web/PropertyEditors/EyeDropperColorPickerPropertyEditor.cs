@@ -5,8 +5,8 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(
-        Constants.PropertyEditors.Aliases.EyeDropperColorPicker,
-        "EyeDropper Color Picker",
+        Constants.PropertyEditors.Aliases.ColorPickerEyeDropper,
+        "Eye Dropper Color Picker",
         "eyedropper",
         Icon = "icon-colorpicker",
         Group = Constants.PropertyEditors.Groups.Pickers)]
