@@ -32,7 +32,7 @@ namespace Umbraco.Web.Common.Localization
                 return NullProviderCultureResult;
             }
 
-            lock(_locker)
+            lock (_locker)
             {
                 // We need to dynamically change the supported cultures since we won't ever know what languages are used since
                 // they are dynamic within Umbraco.
