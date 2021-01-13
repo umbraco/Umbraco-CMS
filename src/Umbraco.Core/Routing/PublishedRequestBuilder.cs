@@ -67,6 +67,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc/>
         public IPublishedRequest Build() => new PublishedRequest(
                 Uri,
+                AbsolutePathDecoded,
                 PublishedContent,
                 IsInternalRedirect,
                 Template,
