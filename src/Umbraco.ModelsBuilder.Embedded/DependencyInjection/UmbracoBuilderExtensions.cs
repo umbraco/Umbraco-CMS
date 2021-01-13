@@ -1,23 +1,29 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.DependencyInjection;
 
-namespace Umbraco.ModelsBuilder.Embedded.Compose
+namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
 {
-    // TODO: We'll need to change this stuff to IUmbracoBuilder ext and control the order of things there
-    // This needs to execute before the AddNuCache call
-    public sealed class ModelsBuilderComposer : ICoreComposer
+    /// <summary>
+    /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
+    /// </summary>
+    public static class UmbracoBuilderExtensions
     {
-        public void Compose(IUmbracoBuilder builder)
+        /// <summary>
+        /// Adds umbraco's embedded model builder support
+        /// </summary>
+        public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
         {
-            builder.Components().Append<ModelsBuilderComponent>();
             builder.Services.AddSingleton<UmbracoServices>();
+            builder.Services.AddSingleton<ModelsBuilderNotificationHandler>();
             builder.Services.AddUnique<ModelsGenerator>();
             builder.Services.AddUnique<LiveModelsProvider>();
             builder.Services.AddUnique<OutOfDateModelsStatus>();
@@ -26,14 +32,15 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             builder.Services.AddUnique<PureLiveModelFactory>();
             builder.Services.AddUnique<IPublishedModelFactory>(factory =>
             {
-                var config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
+                ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)
                 {
                     return factory.GetRequiredService<PureLiveModelFactory>();
+
                     // the following would add @using statement in every view so user's don't
                     // have to do it - however, then noone understands where the @using statement
                     // comes from, and it cannot be avoided / removed --- DISABLED
-                    //
+
                     /*
                     // no need for @using in views
                     // note:
@@ -48,9 +55,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 }
                 else if (config.EnableFactory)
                 {
-                    var typeLoader = factory.GetRequiredService<TypeLoader>();
-                    var publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
-                    var types = typeLoader
+                    TypeLoader typeLoader = factory.GetRequiredService<TypeLoader>();
+                    IPublishedValueFallback publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
+                    IEnumerable<Type> types = typeLoader
                         .GetTypes<PublishedElementModel>() // element models
                         .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
                     return new PublishedModelFactory(types, publishedValueFallback);
@@ -59,6 +66,16 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 return null;
             });
 
+            return builder;
+        }
+
+        /// <summary>
+        /// Can be called if using an external models builder to remove the embedded models builder controller features
+        /// </summary>
+        public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();
+            return builder;
         }
     }
 }

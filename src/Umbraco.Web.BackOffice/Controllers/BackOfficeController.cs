@@ -63,6 +63,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+        private readonly ServerVariablesParser _serverVariables;
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
@@ -79,7 +80,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IJsonSerializer jsonSerializer,
             IBackOfficeExternalLoginProviders externalLogins,
             IHttpContextAccessor httpContextAccessor,
-            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
+            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+            ServerVariablesParser serverVariables)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -96,6 +98,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _externalLogins = externalLogins;
             _httpContextAccessor = httpContextAccessor;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+            _serverVariables = serverVariables;
         }
 
         [HttpGet]
@@ -266,13 +269,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [MinifyJavaScriptResult(Order = 1)]
         public async Task<JavaScriptResult> ServerVariables()
         {
-            //cache the result if debugging is disabled
-            var serverVars = ServerVariablesParser.Parse(await _backOfficeServerVariables.GetServerVariablesAsync());
+            // cache the result if debugging is disabled
+            var serverVars = await _serverVariables.ParseAsync(await _backOfficeServerVariables.GetServerVariablesAsync());
             var result = _hostingEnvironment.IsDebugMode
                 ? serverVars
                 : _appCaches.RuntimeCache.GetCacheItem<string>(
