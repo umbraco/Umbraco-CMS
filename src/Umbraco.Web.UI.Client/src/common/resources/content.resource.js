@@ -835,7 +835,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.contentResource
          *
          * @description
-         * Saves changes made to a content item to its current version, if the content item is new, the isNew paramater must be passed to force creation
+         * Saves changes made to a content item to its current version, if the content item is new, the isNew parameter must be passed to force creation
           * if the content item needs to have files attached, they must be provided as the files param and passed separately
           *
           *
@@ -871,7 +871,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         * @methodOf umbraco.resources.contentResource
         *
         * @description
-        * Saves changes made to a content blueprint item to its current version, if the content blueprint item is new, the isNew paramater must be passed to force creation
+        * Saves changes made to a content blueprint item to its current version, if the content blueprint item is new, the isNew parameter must be passed to force creation
         * if the content item needs to have files attached, they must be provided as the files param and passed separately
         *
         * ##usage
@@ -906,7 +906,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.contentResource
          *
          * @description
-         * Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew paramater must be passed to force creation
+         * Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew parameter must be passed to force creation
           * if the content item needs to have files attached, they must be provided as the files param and passed separately
           *
           *
@@ -942,7 +942,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         * @methodOf umbraco.resources.contentResource
         *
         * @description
-        * Saves and publishes changes made to a content item and its descendants to a new version, if the content item is new, the isNew paramater must be passed to force creation
+        * Saves and publishes changes made to a content item and its descendants to a new version, if the content item is new, the isNew parameter must be passed to force creation
         * if the content items needs to have files attached, they must be provided as the files param and passed separately
         *
         *
