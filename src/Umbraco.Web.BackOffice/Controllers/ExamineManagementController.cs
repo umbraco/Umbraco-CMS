@@ -68,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var msg = ValidateSearcher(searcherName, out var searcher);
             if (!msg.IsSuccessStatusCode())
-                return new ValidationErrorResult(msg);
+                return msg;
 
             // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
             var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
@@ -104,11 +104,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var validate = ValidateIndex(indexName, out var index);
 
             if (!validate.IsSuccessStatusCode())
-                return new ValidationErrorResult(validate);
+                return validate;
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
-                return new ValidationErrorResult(validate);
+                return validate;
 
             var cacheKey = "temp_indexing_op_" + indexName;
             var found = _runtimeCache.Get(cacheKey);
@@ -129,11 +129,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var validate = ValidateIndex(indexName, out var index);
             if (!validate.IsSuccessStatusCode())
-                return new ValidationErrorResult(validate);
+                return validate;
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
-                return new ValidationErrorResult(validate);
+                return validate;
 
             _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
