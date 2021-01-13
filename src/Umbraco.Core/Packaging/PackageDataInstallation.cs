@@ -364,12 +364,12 @@ namespace Umbraco.Core.Packaging
             const string nodeNamePrefix = "nodeName-";
             // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
             // We have to use ToLowerInvariant on the iso codes, because when we get them from contentbasee in EntityXmlSerializer they're all lowercase.
-            var installedCultures = _localizationService.GetAllLanguages().Select(l => l.IsoCode.ToLowerInvariant());
+            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode.ToLowerInvariant()).ToArray();
             foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.StartsWith(nodeNamePrefix)))
             {
                 var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
                 // Skip the culture if it does not exist in the current project
-                if (installedCultures.Contains(newCulture))
+                if (installedLanguages.Contains(newCulture))
                 {
                     content.SetCultureName(localizedNodeName.Value, newCulture);
                 }
@@ -381,6 +381,7 @@ namespace Umbraco.Core.Packaging
                 ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
                 : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
 
+            var foundLanguages = new HashSet<string>();
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -390,17 +391,25 @@ namespace Umbraco.Core.Packaging
 
                     // Handle properties language attributes
                     var propertyLang = property.Attribute(XName.Get("lang"))?.Value;
-
+                    foundLanguages.Add(propertyLang);
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
                         // set property value
                         // Skip unsupported language variation, otherwise we'll get a "not supported error"
                         // We allow null, because that's invariant
-                        if (content.AvailableCultures.Contains(propertyLang) || propertyLang is null)
+                        if (installedLanguages.Contains(propertyLang) || propertyLang is null)
                         {
                             content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                         }
                     }
+                }
+            }
+
+            foreach (var propertyLang in foundLanguages)
+            {
+                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && installedLanguages.Contains(propertyLang))
+                {
+                    content.SetCultureName(nodeName, propertyLang);
                 }
             }
 
