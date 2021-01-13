@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -125,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 

@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -52,7 +53,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return TreeNodeCollection.Empty;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             //doesn't have a menu, this is a full screen app without tree nodes
             return _menuItemCollectionFactory.Create();

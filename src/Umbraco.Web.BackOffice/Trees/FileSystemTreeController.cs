@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -148,7 +149,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return menu;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             //if root node no need to visit the filesystem so lets just create the menu and return it
             if (id == Constants.System.RootString)

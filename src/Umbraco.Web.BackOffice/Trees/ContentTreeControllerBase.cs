@@ -253,7 +253,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return parts.Length >= 2 && int.TryParse(parts[1], out id) ? id : 0;
         }
 
-        protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings);
+        protected abstract ActionResult<MenuItemCollection> PerformGetMenuForNode(string id, FormCollection queryStrings);
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
@@ -432,7 +432,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected sealed override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected sealed override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             if (RecycleBinId.ToInvariantString() == id)
             {

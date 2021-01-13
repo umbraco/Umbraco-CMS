@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Core;
@@ -10,6 +10,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Trees
@@ -34,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Trees
             _relationService = relationService;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 

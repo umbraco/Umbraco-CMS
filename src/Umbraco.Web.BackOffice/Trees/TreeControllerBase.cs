@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected abstract MenuItemCollection GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<MenuItemCollection> GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// The name to display on the root node
@@ -148,12 +148,12 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public MenuItemCollection GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<MenuItemCollection> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var menu = GetMenuForNode(id, queryStrings);
             //raise the event
-            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
+            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu.Value, queryStrings));
             return menu;
         }
 

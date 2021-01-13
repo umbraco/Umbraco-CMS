@@ -143,7 +143,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return null;
         }
 
-        protected override MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> PerformGetMenuForNode(string id, FormCollection queryStrings)
         {
             if (id == Constants.System.RootString)
             {
@@ -187,12 +187,12 @@ namespace Umbraco.Web.BackOffice.Trees
             int iid;
             if (int.TryParse(id, out iid) == false)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             var item = _entityService.Get(iid, UmbracoObjectTypes.Document);
             if (item == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //if the user has no path access for this node, all they can do is refresh
