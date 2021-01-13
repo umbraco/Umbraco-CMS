@@ -105,8 +105,6 @@ namespace Umbraco.Tests.Scoping
                 hostingEnvironment,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
-            //lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
-
             return snapshotService;
         }
 
