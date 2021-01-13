@@ -1,9 +1,9 @@
 ﻿namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents the configuration for the eyedropper picker value editor.
+    /// Represents the configuration for the Eye Dropper picker value editor.
     /// </summary>
-    public class EyedropperColorPickerConfiguration
+    public class EyeDropperColorPickerConfiguration
     {
         [ConfigurationField("showAlpha", "Show alpha", "boolean", Description = "Allow alpha transparency selection.")]
         public bool ShowAlpha { get; set; }

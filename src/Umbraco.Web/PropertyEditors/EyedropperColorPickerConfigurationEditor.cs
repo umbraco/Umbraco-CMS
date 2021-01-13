@@ -4,15 +4,15 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class EyedropperColorPickerConfigurationEditor : ConfigurationEditor<EyedropperColorPickerConfiguration>
+    internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<EyeDropperColorPickerConfiguration>
     {
-        public EyedropperColorPickerConfigurationEditor()
+        public EyeDropperColorPickerConfigurationEditor()
         {
 
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(EyedropperColorPickerConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration configuration)
         {
             return new Dictionary<string, object>
             {
@@ -22,9 +22,9 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override EyedropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyedropperColorPickerConfiguration configuration)
+        public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration configuration)
         {
-            var output = new EyedropperColorPickerConfiguration();
+            var output = new EyeDropperColorPickerConfiguration();
 
             var showAlpha = true;
             var showPalette = true;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
                     showPalette = attempt.Result;
             }
 
-            return new EyedropperColorPickerConfiguration
+            return new EyeDropperColorPickerConfiguration
             {
                 ShowAlpha = showAlpha,
                 ShowPalette = showPalette

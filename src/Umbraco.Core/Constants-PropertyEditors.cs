@@ -67,9 +67,9 @@ namespace Umbraco.Core
                 public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
 
                 /// <summary>
-                /// Eyedropper Color Picker.
+                /// EyeDropper Color Picker.
                 /// </summary>
-                public const string EyedropperColorPicker = "Umbraco.EyedropperColorPicker";
+                public const string EyeDropperColorPicker = "Umbraco.EyeDropperColorPicker";
 
                 /// <summary>
                 /// Grid.
