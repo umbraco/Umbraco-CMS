@@ -1,22 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Core.Services;
+using Umbraco.Core.Trees;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Search;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Core.Trees;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -39,7 +38,7 @@ namespace Umbraco.Web.BackOffice.Trees
             _entityService = entityService;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false) throw new InvalidOperationException("Id must be an integer");

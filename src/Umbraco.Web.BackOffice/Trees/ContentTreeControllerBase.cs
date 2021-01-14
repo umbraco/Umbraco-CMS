@@ -2,21 +2,18 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Core.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Web.Actions;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Security;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
@@ -98,9 +95,14 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var node = base.CreateRootNode(queryStrings);
+            var nodeResult = base.CreateRootNode(queryStrings);
+            if ((nodeResult.Result is null))
+            {
+                return nodeResult;
+            }
+            var node = nodeResult.Value;
 
             if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
             {
@@ -174,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         protected abstract int[] UserStartNodes { get; }
 
-        protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormCollection queryStrings)
+        protected virtual ActionResult<TreeNodeCollection> PerformGetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -211,7 +213,13 @@ namespace Umbraco.Web.BackOffice.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var entities = GetChildEntities(id, queryStrings).Value.ToList();
+            var entitiesResult = GetChildEntities(id, queryStrings);
+            if (!(entitiesResult.Result is null))
+            {
+                return entitiesResult.Result;
+            }
+
+            var entities = entitiesResult.Value.ToList();
 
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
@@ -325,7 +333,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <remarks>
         /// This method is overwritten strictly to render the recycle bin, it should serve no other purpose
         /// </remarks>
-        protected sealed override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected sealed override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //check if we're rendering the root
             if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
@@ -341,7 +349,13 @@ namespace Umbraco.Web.BackOffice.Trees
                     id = altStartId;
                 }
 
-                var nodes = GetTreeNodesInternal(id, queryStrings);
+                var nodesResult = GetTreeNodesInternal(id, queryStrings);
+                if (!(nodesResult.Result is null))
+                {
+                    return nodesResult.Result;
+                }
+
+                var nodes = nodesResult.Value;
 
                 //only render the recycle bin if we are not in dialog and the start id is still the root
                 //we need to check for the "application" key in the queryString because its value is required here,
@@ -410,7 +424,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <remarks>
         /// Currently this just checks if it is a container type, if it is we cannot render children. In the future this might check for other things.
         /// </remarks>
-        private TreeNodeCollection GetTreeNodesInternal(string id, FormCollection queryStrings)
+        private ActionResult<TreeNodeCollection> GetTreeNodesInternal(string id, FormCollection queryStrings)
         {
             var current = GetEntityFromId(id);
 

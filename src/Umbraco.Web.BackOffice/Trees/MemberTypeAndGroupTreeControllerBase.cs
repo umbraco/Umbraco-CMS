@@ -26,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Trees
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
             nodes.AddRange(GetTreeNodesFromService(id, queryStrings));

@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Trees
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? WebUtility.UrlDecode(id).TrimStart("/")
@@ -93,11 +93,22 @@ namespace Umbraco.Web.BackOffice.Trees
             return nodes;
         }
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
+
             //check if there are any children
-            root.HasChildren = GetTreeNodes(Constants.System.RootString, queryStrings).Any();
+            var treeNodesResult = GetTreeNodes(Constants.System.RootString, queryStrings);
+            if (!(treeNodesResult.Result is null))
+            {
+                return treeNodesResult.Result;
+            }
+            root.HasChildren = treeNodesResult.Value.Any();
             return root;
         }
 

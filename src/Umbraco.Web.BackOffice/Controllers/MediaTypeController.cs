@@ -176,9 +176,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType,
-                    filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement).Value
-                .Select(x => new
+            var actionResult = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId,
+                UmbracoObjectTypes.MediaType, filter.FilterContentTypes, filter.FilterPropertyTypes,
+                filter.IsElement);
+
+            if (!(actionResult.Result is null))
+            {
+                return actionResult.Result;
+            }
+
+            var result = actionResult.Value.Select(x => new
                 {
                     contentType = x.Item1,
                     allowed = x.Item2
@@ -273,14 +280,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-        public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
+        public ActionResult<MediaTypeDisplay> PostSave(MediaTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave,
                 i => _mediaTypeService.Get(i),
                 type => _mediaTypeService.Save(type));
 
+            if (!(savedCt.Result is null))
+            {
+                return savedCt.Result;
+            }
+
             var display = _umbracoMapper.Map<MediaTypeDisplay>(savedCt.Value);
+
 
             display.AddSuccessNotification(
                 _localizedTextService.Localize("speechBubbles/mediaTypeSavedHeader"),

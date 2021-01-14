@@ -33,7 +33,6 @@ using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -453,7 +452,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
-                return HandleContentNotFound(key, false);
+                return HandleContentNotFound(key);
             }
             _memberService.Delete(foundMember);
 

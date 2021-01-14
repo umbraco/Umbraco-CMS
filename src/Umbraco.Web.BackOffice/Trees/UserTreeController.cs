@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -32,9 +32,14 @@ namespace Umbraco.Web.BackOffice.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Users}/{Constants.Trees.Users}/users";
@@ -44,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return root;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //full screen app without tree nodes
             return TreeNodeCollection.Empty;

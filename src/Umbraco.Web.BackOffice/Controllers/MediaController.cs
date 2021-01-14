@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -443,7 +444,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundMedia == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             //if the current item is in the recycle bin
@@ -486,7 +487,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toMove = ValidateMoveOrCopy(move).Value;
+            var toMoveResult = ValidateMoveOrCopy(move);
+            var toMove = toMoveResult.Value;
+            if (toMove is null && toMoveResult is IConvertToActionResult convertToActionResult)
+            {
+                return convertToActionResult.Convert();
+            }
+
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
 
@@ -667,7 +674,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
         {
-            var parentId = (await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true)).Value;
+            var parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true);
+            if (!(parentIdResult.Result is null))
+            {
+                return new ActionResult<MediaItemDisplay>(parentIdResult.Result);
+            }
+            var parentId = parentIdResult.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
@@ -699,11 +711,18 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //get the string json from the request
-            var parentId = (await GetParentIdAsIntAsync(currentFolder, validatePermissions: true)).Value;
+            var parentIdResult = await GetParentIdAsIntAsync(currentFolder, validatePermissions:true);
+            if (!(parentIdResult.Result is null))
+            {
+                return parentIdResult.Result;
+            }
+
+            var parentId = parentIdResult.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
             }
+
             var tempFiles = new PostedFiles();
 
 

@@ -33,9 +33,14 @@ namespace Umbraco.Web.BackOffice.Trees
             _localizationService = localizationService;
         }
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
@@ -60,7 +65,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false)

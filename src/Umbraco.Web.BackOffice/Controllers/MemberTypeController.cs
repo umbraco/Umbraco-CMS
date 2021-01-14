@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
-using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Editors;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -152,7 +151,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             [FromQuery]string[] filterContentTypes,
             [FromQuery]string[] filterPropertyTypes)
         {
-            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false).Value
+            var actionResult = PerformGetAvailableCompositeContentTypes(contentTypeId,
+                UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes,
+                false);
+
+            if (!(actionResult.Result is null))
+            {
+                return actionResult.Result;
+            }
+
+            var result = actionResult.Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -229,6 +237,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => ct,
                 saveContentType:            type => _memberTypeService.Save(type));
+
+            if (!(savedCt.Result is null))
+            {
+                return savedCt.Result;
+            }
 
             var display =_umbracoMapper.Map<MemberTypeDisplay>(savedCt.Value);
 

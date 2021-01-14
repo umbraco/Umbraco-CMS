@@ -6,7 +6,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,7 +33,6 @@ using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -335,13 +333,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetById(int id)
+        public ActionResult<ContentItemDisplay> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
-                HandleContentNotFound(id);
-                return null;//irrelevant since the above throws
+                return HandleContentNotFound(id);
             }
             var content = MapToDisplay(foundContent);
             return content;
@@ -355,13 +352,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetById(Guid id)
+        public ActionResult<ContentItemDisplay> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
-                HandleContentNotFound(id);
-                return null;//irrelevant since the above throws
+                return HandleContentNotFound(id);
             }
 
             var content = MapToDisplay(foundContent);
@@ -590,9 +586,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var content = _contentService.GetById(contentId);
             if (content == null)
+            {
                 return NotFound();
+            }
 
-            EnsureUniqueName(name, content, nameof(name));
+            if (!EnsureUniqueName(name, content, nameof(name)))
+            {
+                return new ValidationErrorResult(ModelState.ToErrorDictionary());
+            }
 
             var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -1484,7 +1485,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             var publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
@@ -1507,7 +1508,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (found == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             _contentService.DeleteBlueprint(found);
@@ -1533,7 +1534,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             //if the current item is in the recycle bin
@@ -1639,7 +1640,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toMove = ValidateMoveOrCopy(move).Value;
+            var toMoveResult = ValidateMoveOrCopy(move);
+            if (!(toMoveResult is null))
+            {
+                return toMoveResult.Result;
+            }
+            var toMove = toMoveResult.Value;
 
             _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -1651,7 +1657,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
-        public async Task<IActionResult> PostCopy(MoveOrCopy copy)
+        public async Task<ActionResult<IContent>> PostCopy(MoveOrCopy copy)
         {
             // Authorize...
             var resource = new ContentPermissionsResource(_contentService.GetById(copy.ParentId), ActionCopy.ActionLetter);
@@ -1661,8 +1667,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toCopy = ValidateMoveOrCopy(copy).Value;
-
+            var toCopyResult = ValidateMoveOrCopy(copy);
+            if ((toCopyResult.Result is null))
+            {
+                return toCopyResult.Result;
+            }
+            var toCopy = toCopyResult.Value;
             var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return Content(c.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
@@ -1680,7 +1690,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                HandleContentNotFound(model.Id);
+                return HandleContentNotFound(model.Id);
             }
 
             // Authorize...

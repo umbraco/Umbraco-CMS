@@ -11,7 +11,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Trees;
 using Umbraco.Extensions;
 using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
@@ -19,7 +18,6 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -46,9 +44,15 @@ namespace Umbraco.Web.BackOffice.Trees
             _fileService = fileService;
         }
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
+
             //check if there are any templates
             root.HasChildren = _fileService.GetTemplates(-1).Any();
             return root;
@@ -65,7 +69,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 

@@ -427,7 +427,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             else
             {
                 //first validate the username if we're showing it
-                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue).Value;
+                var userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                if (!(userResult.Result is null))
+                {
+                    return userResult.Result;
+                }
+
+                user = userResult.Value;
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 

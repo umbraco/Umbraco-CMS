@@ -9,7 +9,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Trees;
 using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
@@ -39,15 +38,20 @@ namespace Umbraco.Web.BackOffice.Trees
             _entityService = entityService;
         }
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
             //check if there are any types
             root.HasChildren = _contentTypeService.GetAll().Any();
             return root;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
             if (intId == false) throw new InvalidOperationException("Id must be an integer");

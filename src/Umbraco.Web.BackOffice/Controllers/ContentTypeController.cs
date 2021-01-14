@@ -208,9 +208,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
+        public ActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement).Value
+            var actionResult = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId,
+                UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes,
+                filter.IsElement);
+
+            if (!(actionResult.Result is null))
+            {
+                return actionResult.Result;
+            }
+
+            var result = actionResult.Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -361,7 +370,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
+        public ActionResult<DocumentTypeDisplay> PostSave(DocumentTypeSave contentTypeSave)
         {
             //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
             //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
@@ -404,7 +413,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 });
 
+            if (!(savedCt.Result is null))
+            {
+                return savedCt.Result;
+            }
+
             var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt.Value);
+
 
             display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles/contentTypeSavedHeader"),

@@ -6,7 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Trees;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
@@ -47,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected abstract TreeNodeCollection GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
+        protected abstract ActionResult<TreeNodeCollection> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -88,10 +87,16 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public TreeNode GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
-            var node = CreateRootNode(queryStrings);
+            var nodeResult = CreateRootNode(queryStrings);
+            if (!(nodeResult.Result is null))
+            {
+                return nodeResult.Result;
+            }
+
+            var node = nodeResult.Value;
 
             //add the tree alias to the root
             node.AdditionalData["treeAlias"] = TreeAlias;
@@ -123,10 +128,17 @@ namespace Umbraco.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        public TreeNodeCollection GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNodeCollection> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
-            var nodes = GetTreeNodes(id, queryStrings);
+            var nodesResult = GetTreeNodes(id, queryStrings);
+
+            if (!(nodesResult.Result is null))
+            {
+                return nodesResult.Result;
+            }
+
+            var nodes = nodesResult.Value;
 
             foreach (var node in nodes)
                 AddQueryStringsToAdditionalData(node, queryStrings);
@@ -151,9 +163,15 @@ namespace Umbraco.Web.BackOffice.Trees
         public ActionResult<MenuItemCollection> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
-            var menu = GetMenuForNode(id, queryStrings);
+            var menuResult = GetMenuForNode(id, queryStrings);
+            if (!(menuResult.Result is null))
+            {
+                return menuResult.Result;
+            }
+
+            var menu = menuResult.Value;
             //raise the event
-            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu.Value, queryStrings));
+            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
             return menu;
         }
 
@@ -161,7 +179,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected virtual TreeNode CreateRootNode(FormCollection queryStrings)
+        protected virtual ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
             var rootNodeAsString = Constants.System.RootString;
             queryStrings.TryGetValue(TreeQueryStringParameters.Application, out var currApp);

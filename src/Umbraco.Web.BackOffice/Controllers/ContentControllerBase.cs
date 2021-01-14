@@ -11,7 +11,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -71,14 +70,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         protected ILocalizedTextService LocalizedTextService { get; }
 
-        protected NotFoundObjectResult HandleContentNotFound(object id, bool throwException = true)
+        protected NotFoundObjectResult HandleContentNotFound(object id)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
             var errorResponse = NotFound(ModelState);
-            if (throwException)
-            {
-                throw new HttpResponseException(errorResponse);
-            }
             return errorResponse;
         }
 

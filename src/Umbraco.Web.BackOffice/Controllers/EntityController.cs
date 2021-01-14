@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -201,11 +202,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<int> GetPath(int id, UmbracoEntityTypes type)
+        public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
         {
-            var foundContent = GetResultForId(id, type).Value;
+            var foundContentResult = GetResultForId(id, type);
+            var foundContent = foundContentResult.Value;
+            if (foundContent is null)
+            {
+                return foundContentResult;
+            }
 
-            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
         }
 
         /// <summary>
@@ -215,11 +221,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public IEnumerable<int> GetPath(Guid id, UmbracoEntityTypes type)
+        public IConvertToActionResult GetPath(Guid id, UmbracoEntityTypes type)
         {
-            var foundContent = GetResultForKey(id, type).Value;
+            var foundContentResult = GetResultForKey(id, type);
+            var foundContent = foundContentResult.Value;
+            if (foundContent is null)
+            {
+                return foundContentResult;
+            }
 
-            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
         }
 
         /// <summary>
@@ -229,12 +240,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public ActionResult<IEnumerable<int>> GetPath(Udi id, UmbracoEntityTypes type)
+        public IActionResult GetPath(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
-                return new ActionResult<IEnumerable<int>>(GetPath(guidUdi.Guid, type));
+                return GetPath(guidUdi.Guid, type).Convert();
             }
 
             return NotFound();
