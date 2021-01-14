@@ -1,11 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Making it kind of a waste to convert the Assembly types into MetadataReference
             // every time GetCompiledAssembly is called, so that's why I do it in the ctor
             _refs = new List<MetadataReference>();
-            foreach(var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
+            foreach (var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
             {
                 _refs.Add(MetadataReference.CreateFromFile(assembly.Location));
             };
@@ -54,13 +54,15 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, _parseOptions);
 
-            var compilation = CSharpCompilation.Create("ModelsGeneratedAssembly",
+            var compilation = CSharpCompilation.Create(
+                "ModelsGeneratedAssembly",
                 new[] { syntaxTree },
                 references: _refs,
-                options: new CSharpCompilationOptions(_outputKind,
-                optimizationLevel: OptimizationLevel.Release,
-                // Not entirely certain that assemblyIdentityComparer is nececary? 
-                assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
+                options: new CSharpCompilationOptions(
+                    _outputKind,
+                    optimizationLevel: OptimizationLevel.Release,
+                    // Not entirely certain that assemblyIdentityComparer is nececary?
+                    assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
             compilation.Emit(savePath);
 

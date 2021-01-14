@@ -5,9 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.PortableExecutable;
+using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -34,7 +38,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
-        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
+        //private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
@@ -43,6 +47,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly ApplicationPartManager _applicationPartManager;
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -53,7 +58,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             IOptions<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            IPublishedValueFallback publishedValueFallback)
+            IPublishedValueFallback publishedValueFallback,
+            ApplicationPartManager applicationPartManager)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -62,6 +68,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
+            _applicationPartManager = applicationPartManager;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -90,10 +97,22 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
+        /// <summary>
+        /// Gets the currently loaded pure live models assembly
+        /// </summary>
+        /// <remarks>
+        /// Can be null
+        /// </remarks>
+        public Assembly CurrentModelsAssembly { get; private set; }
+
+        public MetadataReference CurrentModelsMetadataReference { get; private set; }
+
         /// <inheritdoc />
         public object SyncRoot { get; } = new object();
 
-        // gets the RoslynCompiler
+        /// <summary>
+        /// Gets the RoslynCompiler
+        /// </summary>
         private RoslynCompiler RoslynCompiler
         {
             get
@@ -110,13 +129,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         /// <inheritdoc />
         public bool Enabled => _config.Enable;
-
-        /// <inheritdoc />
-        public void Refresh()
-        {
-            ResetModels();
-            EnsureModels();
-        }
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
@@ -263,6 +275,9 @@ namespace Umbraco.ModelsBuilder.Embedded
                 var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
                 var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
+                // TODO: Remove the old application part
+                var parts = _applicationPartManager.ApplicationParts;
+
                 if (File.Exists(dllPathFile))
                 {
                     File.Delete(dllPathFile);
@@ -307,15 +322,8 @@ namespace Umbraco.ModelsBuilder.Embedded
                 }
             }
 
-            var roslynLocked = false;
             try
             {
-                // TODO: DO NOT LOCK ON RoslynCompiler
-
-                // always take the BuildManager lock *before* taking the _locker lock
-                // to avoid possible deadlock situations (see notes above)
-                Monitor.Enter(RoslynCompiler, ref roslynLocked);
-
                 _locker.EnterUpgradeableReadLock();
 
                 if (_hasModels)
@@ -328,17 +336,18 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
-
                 using (_profilingLogger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
-                        Assembly assembly = GetModelsAssembly(_pendingRebuild);
+                        // TODO: We may have to copy this to a temp place?
+                        // string assemblyName = Path.GetRandomFileName();
 
-                        // the one below can be used to simulate an issue with BuildManager, ie it will register
-                        // the models with the factory but NOT with the BuildManager, which will not recompile views.
-                        // this is for U4-8043 which is an obvious issue but I cannot replicate
-                        // _modelsAssembly = _modelsAssembly ?? assembly;
+                        Assembly assembly = GetModelsAssembly(_pendingRebuild, out MetadataReference metadataReference);
+
+                        CurrentModelsAssembly = assembly;
+                        CurrentModelsMetadataReference = metadataReference;
+
                         IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
                         _errors.Clear();
@@ -353,6 +362,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                         }
                         finally
                         {
+                            CurrentModelsAssembly = null;
                             _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
                         }
                     }
@@ -374,38 +384,71 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     _locker.ExitUpgradeableReadLock();
                 }
-
-                if (roslynLocked)
-                {
-                    Monitor.Exit(RoslynCompiler);
-                }
             }
         }
 
-        private Assembly ReloadAssembly(string pathToAssembly)
+        private static MetadataReference CreateMetadataReference(string path)
         {
-            // If there's a current AssemblyLoadContext, unload it before creating a new one.
-            if (!(_currentAssemblyLoadContext is null))
+            using (FileStream stream = File.OpenRead(path))
             {
-                _currentAssemblyLoadContext.Unload();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
+                var moduleMetadata = ModuleMetadata.CreateFromStream(stream, PEStreamOptions.PrefetchMetadata);
+                var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
 
-            // We must create a new assembly load context
-            // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
-
-            // Use filestream to load in the new assembly, otherwise it'll be locked
-            // See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
-            using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
-            {
-                return _currentAssemblyLoadContext.LoadFromStream(fs);
+                return assemblyMetadata.GetReference(filePath: path);
             }
         }
 
-        private Assembly GetModelsAssembly(bool forceRebuild)
+        private Assembly ReloadAssembly(string pathToAssembly, out MetadataReference metadataReference)
         {
+            // TODO: We should look into removing the old application part
+
+            //// If there's a current AssemblyLoadContext, unload it before creating a new one.
+            //if (!(_currentAssemblyLoadContext is null))
+            //{
+            //    _currentAssemblyLoadContext.Unload();
+            //    GC.Collect();
+            //    GC.WaitForPendingFinalizers();
+            //}
+
+            //// We must create a new assembly load context
+            //// as long as theres a reference to the assembly load context we can't delete the assembly it loaded
+            //_currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+
+            // Need to work on a temp file so that it's not locked
+            var tempFile = Path.GetTempFileName();
+            File.Copy(pathToAssembly, tempFile, true);
+            // Load it in
+            Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(tempFile);
+            // Create a metadata ref, TODO: This is actually not required and doesn't really work so we can remove that
+            metadataReference = CreateMetadataReference(tempFile);
+
+            // Add the assembly to the application parts - this is required because this is how
+            // the razor ReferenceManager resolves what to load, see
+            // https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L53
+            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
+            foreach (ApplicationPart applicationPart in partFactory.GetApplicationParts(assembly))
+            {
+                _applicationPartManager.ApplicationParts.Add(applicationPart);
+            }
+
+            return assembly;
+
+            //// Use filestream to load in the new assembly, otherwise it'll be locked
+            //// See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
+            //using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
+            //{
+            //    Assembly assembly = _currentAssemblyLoadContext.LoadFromStream(fs);
+            //    //fs.Position = 0;
+            //    //metadataReference = MetadataReference.CreateFromStream(fs, filePath: null);
+            //    //metadataReference = CreateMetadataReference(fs, pathToAssembly);
+            //    return assembly;
+            //}
+        }
+
+        private Assembly GetModelsAssembly(bool forceRebuild, out MetadataReference metadataReference)
+        {
+            metadataReference = null;
+
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
             {
@@ -458,7 +501,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
-                        assembly = ReloadAssembly(dllPath);
+                        assembly = ReloadAssembly(dllPath, out MetadataReference mdr);
 
                         ModelsBuilderAssemblyAttribute attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
@@ -470,6 +513,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                             _skipver = assembly.GetName().Version.Revision;
 
                             _logger.LogDebug("Loading cached models (dll).");
+                            metadataReference = mdr;
                             return assembly;
                         }
 
@@ -504,7 +548,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     var assemblyPath = GetOutputAssemblyPath(currentHash);
                     RoslynCompiler.CompileToFile(projFile, assemblyPath);
-                    assembly = ReloadAssembly(assemblyPath);
+                    assembly = ReloadAssembly(assemblyPath, out metadataReference);
                     File.WriteAllText(dllPathFile, assembly.Location);
                     File.WriteAllText(modelsHashFile, currentHash);
                     TryDeleteUnusedAssemblies(dllPathFile);
@@ -547,7 +591,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 var assemblyPath = GetOutputAssemblyPath(currentHash);
                 RoslynCompiler.CompileToFile(projFile, assemblyPath);
-                assembly = ReloadAssembly(assemblyPath);
+                assembly = ReloadAssembly(assemblyPath, out metadataReference);
                 File.WriteAllText(dllPathFile, assemblyPath);
                 File.WriteAllText(modelsHashFile, currentHash);
                 TryDeleteUnusedAssemblies(dllPathFile);
@@ -778,12 +822,16 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // always ignore our own file changes
             if (s_ourFiles.Contains(changed))
+            {
                 return;
+            }
 
             _logger.LogInformation("Detected files changes.");
 
             lock (SyncRoot) // don't reset while being locked
+            {
                 ResetModels();
+            }
         }
 
         public void Stop(bool immediate)

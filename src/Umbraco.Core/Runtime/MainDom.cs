@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -54,6 +54,7 @@ namespace Umbraco.Core.Runtime
 
         #endregion
 
+        /// <inheritdoc/>
         public bool Acquire(IApplicationShutdownRegistry hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
