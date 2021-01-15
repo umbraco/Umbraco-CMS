@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,20 +22,18 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Infrastructure.Services.Implement;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -208,17 +206,17 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias">The content type</param>
         /// <returns>The empty member for display</returns>
         [OutgoingEditorModelEvent]
-        public MemberDisplay GetEmpty(string contentTypeAlias = null)
+        public ActionResult<MemberDisplay> GetEmpty(string contentTypeAlias = null)
         {
             if (contentTypeAlias == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             IMemberType contentType = _memberTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             string newPassword = _memberManager.GeneratePassword();
@@ -260,34 +258,38 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 MemberDisplay forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
-                throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
+                return new ValidationErrorResult(forDisplay);
             }
-            
+
             // Depending on the action we need to first do a create or update using the membership manager
             // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
 
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    await UpdateMemberAsync(contentItem);
+                    Task<ActionResult<bool>> updateSuccessful = UpdateMemberAsync(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
-                    await CreateMemberAsync(contentItem);
+                    Task<ActionResult<bool>> createSuccessful = CreateMemberAsync(contentItem);
                     break;
                 default:
                     // we don't support anything else for members
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
             }
 
             // TODO: There's 3 things saved here and we should do this all in one transaction,
             // which we can do here by wrapping in a scope
             // but it would be nicer to have this taken care of within the Save method itself
-            
+
             // return the updated model
             MemberDisplay display = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
 
             // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            HandleInvalidModelState(display);
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+            }
 
             ILocalizedTextService localizedTextService = _localizedTextService;
 
@@ -337,7 +339,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem">Member content data</param>
         /// <returns>The identity result of the created member</returns>
-        private async Task CreateMemberAsync(MemberSave contentItem)
+        private async Task<ActionResult<bool>> CreateMemberAsync(MemberSave contentItem)
         {
             IMemberType memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
             if (memberType == null)
@@ -356,7 +358,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (created.Succeeded == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+                return new ValidationErrorResult(created.Errors.ToErrorMessage());
             }
 
             // now re-look the member back up which will now exist
@@ -373,6 +375,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             contentItem.PersistedContent = member;
 
             AddOrUpdateRoles(contentItem);
+            return true;
         }
 
         /// <summary>
@@ -380,7 +383,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
         /// </summary>
         /// <param name="contentItem">The member to save</param>
-        private async Task UpdateMemberAsync(MemberSave contentItem)
+        private async Task<ActionResult<bool>> UpdateMemberAsync(MemberSave contentItem)
         {
             contentItem.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
 
@@ -425,7 +428,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Member was not found");
+                return new ValidationErrorResult("Member was not found");
             }
 
             if (contentItem.Password != null)
@@ -433,7 +436,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
                 if (validatePassword.Succeeded == false)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(validatePassword.Errors.ToErrorMessage());
+                    return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
                 }
 
                 string newPassword = _memberManager.HashPassword(contentItem.Password.NewPassword);
@@ -444,7 +447,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (updatedResult.Succeeded == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(updatedResult.Errors.ToErrorMessage());
+                return new ValidationErrorResult(updatedResult.Errors.ToErrorMessage());
             }
 
             contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
@@ -452,6 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberService.Save(contentItem.PersistedContent);
 
             AddOrUpdateRoles(contentItem);
+            return true;
         }
 
         private async Task<bool> ValidateMemberDataAsync(MemberSave contentItem)
@@ -555,7 +559,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
-                return HandleContentNotFound(key, false);
+                return HandleContentNotFound(key);
             }
 
             _memberService.Delete(foundMember);

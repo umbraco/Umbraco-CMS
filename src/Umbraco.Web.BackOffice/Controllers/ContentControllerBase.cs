@@ -11,8 +11,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -78,15 +76,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id">The content ID to find</param>
         /// <param name="throwException">Whether to throw an exception</param>
         /// <returns>The error response</returns>
-        protected NotFoundObjectResult HandleContentNotFound(object id, bool throwException = true)
+        protected NotFoundObjectResult HandleContentNotFound(object id)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
             NotFoundObjectResult errorResponse = NotFound(ModelState);
 
-            if (throwException)
-            {
-                throw new HttpResponseException(errorResponse);
-            }
 
             return errorResponse;
         }
@@ -162,20 +156,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     savePropertyValue(contentItem, property, value);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Handles if the state is invalid
-        /// </summary>
-        /// <param name="display">The model state to display</param>
-        protected virtual void HandleInvalidModelState(IErrorModel display)
-        {
-            // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            if (!ModelState.IsValid)
-            {
-                display.Errors = ModelState.ToErrorDictionary();
-                throw HttpResponseException.CreateValidationErrorResponse(display);
             }
         }
 

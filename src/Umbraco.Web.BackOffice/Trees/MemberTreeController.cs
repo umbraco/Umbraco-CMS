@@ -1,28 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Trees;
 using Umbraco.Extensions;
 using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Core.Trees;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -102,7 +98,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return node;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -126,7 +122,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 

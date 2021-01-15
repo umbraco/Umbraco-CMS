@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -60,7 +60,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
                 if (parts.Length < 2)
                 {
                     bindingContext.HttpContext.SetReasonPhrase( "The request was not formatted correctly the file name's must be underscore delimited");
-                    throw new HttpResponseException(HttpStatusCode.BadRequest);
+                    return null;
                 }
                 var propAlias = parts[1];
 

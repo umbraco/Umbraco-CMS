@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Routing
     /// <remarks>
     /// There are various checks to determine if this is a front-end request such as checking if the request is part of any reserved paths or existing MVC routes.
     /// </remarks>
-    public sealed class RoutableDocumentFilter
+    public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
     {
         private readonly ConcurrentDictionary<string, bool> _routeChecks = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         private readonly GlobalSettings _globalSettings;

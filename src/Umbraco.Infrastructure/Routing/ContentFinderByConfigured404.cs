@@ -61,7 +61,7 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                var route = frequest.Uri.GetAbsolutePathDecoded();
+                var route = frequest.AbsolutePathDecoded;
                 var pos = route.LastIndexOf('/');
                 IPublishedContent node = null;
                 while (pos > 1)

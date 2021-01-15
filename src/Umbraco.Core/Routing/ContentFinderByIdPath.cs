@@ -49,7 +49,7 @@ namespace Umbraco.Web.Routing
             }
 
             IPublishedContent node = null;
-            var path = frequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.AbsolutePathDecoded;
 
             var nodeId = -1;
 

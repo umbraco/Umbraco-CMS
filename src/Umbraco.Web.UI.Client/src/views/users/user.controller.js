@@ -94,7 +94,7 @@
                   vm.changePasswordModel.config = data;
 
                     //the user has a password if they are not states: Invited, NoCredentials
-                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== "Invited" && vm.user.userState !== "Inactive";
 
                     vm.changePasswordModel.config.disableToggle = true;
 
@@ -207,7 +207,7 @@
                     vm.changePasswordModel.value = {};
 
                     //the user has a password if they are not states: Invited, NoCredentials
-                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== "Invited" && vm.user.userState !== "Inactive";
                 }, err => {
                     contentEditingHelper.handleSaveError({
                         err: err,
@@ -363,7 +363,7 @@
         function disableUser() {
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 1;
+                vm.user.userState = "Disabled";
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
 
@@ -376,7 +376,7 @@
         function enableUser() {
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 0;
+                vm.user.userState = "Active";
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
             }, function (error) {
@@ -387,7 +387,7 @@
         function unlockUser() {
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
-                vm.user.userState = 0;
+                vm.user.userState = "Active";
                 vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
@@ -540,7 +540,7 @@
         }
 
         function setUserDisplayState() {
-            vm.user.userDisplayState = usersHelper.getUserStateFromValue(vm.user.userState);
+            vm.user.userDisplayState = usersHelper.getUserStateByKey(vm.user.userState);
         }
 
         function formatDatesToLocal(user) {

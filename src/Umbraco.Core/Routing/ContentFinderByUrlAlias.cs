@@ -60,7 +60,7 @@ namespace Umbraco.Web.Routing
                     umbCtx.Content,
                     frequest.Domain != null ? frequest.Domain.ContentId : 0,
                     frequest.Culture,
-                    frequest.Uri.GetAbsolutePathDecoded());
+                    frequest.AbsolutePathDecoded);
 
                 if (node != null)
                 {

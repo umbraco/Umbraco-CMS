@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,12 +18,13 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -54,14 +55,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             MapDefinitionCollection memberMapDefinition,
             PropertyEditorCollection propertyEditorCollection,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IBackOfficeSecurity backOfficeSecurity)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             // arrange
             Member member = SetupMemberTestData(memberMapDefinition, out UmbracoMapper mapper, out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
             sut.ModelState.AddModelError("key", "Invalid model state");
-
 
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
@@ -74,10 +73,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             string reason = "Validation failed";
 
             // act
-            HttpResponseException exception = Assert.ThrowsAsync<HttpResponseException>(() => sut.PostSave(fakeMemberData));
+            ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
+            var validation = result.Result as ValidationErrorResult;
 
             // assert
-            AssertExpectedException(exception, value, reason);
+            Assert.IsNotNull(result.Result);
+            Assert.IsNull(result.Value);
+            Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
         }
 
 
@@ -111,10 +113,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
 
             // act
-            ActionResult<MemberDisplay> actualResult = await sut.PostSave(fakeMemberData);
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
 
             // assert
-            Assert.AreEqual(memberDisplay, actualResult.Value);
+            Assert.IsNull(result.Result);
+            Assert.AreEqual(memberDisplay, result.Value);
         }
 
         [Test]
@@ -156,15 +159,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
 
             // act
-            ActionResult<MemberDisplay> actualResult = await sut.PostSave(fakeMemberData);
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
 
             // assert
-            Assert.AreEqual(memberDisplay, actualResult.Value);
+            Assert.IsNull(result.Result);
+            Assert.AreEqual(memberDisplay, result.Value);
         }
 
         [Test]
         [AutoMoqData]
-        public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectSuccessResponse(
+        public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectFailResponse(
             [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
@@ -181,35 +185,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
 
             Mock.Get(memberService).SetupSequence(
                     x => x.GetByEmail(It.IsAny<string>()))
                 .Returns(() => member);
 
             MemberController sut = CreateSut(mapper, memberService, memberTypeService, umbracoMembersUserManager, dataTypeService, propertyEditorCollection, backOfficeSecurityAccessor);
-            var value = new MemberDisplay();
             string reason = "Validation failed";
 
             // act
-            HttpResponseException exception = Assert.ThrowsAsync<HttpResponseException>(() => sut.PostSave(fakeMemberData));
+            ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
+            var validation = result.Result as ValidationErrorResult;
 
             // assert
-            AssertExpectedException(exception, value, reason);
-        }
-
-        private void AssertExpectedException(HttpResponseException exception, object value, string reason)
-        {
-            var expectedException = new HttpResponseException(HttpStatusCode.BadRequest, value)
-            {
-                AdditionalHeaders =
-                {
-                    ["X-Status-Reason"] = reason
-                }
-            };
-
-            Assert.That(exception.AdditionalHeaders, Is.EqualTo(expectedException.AdditionalHeaders));
-            Assert.That(exception.Value, Is.EqualTo(expectedException.Value));
-            Assert.That(exception.Status, Is.EqualTo(expectedException.Status));
+            Assert.IsNotNull(result.Result);
+            Assert.IsNull(result.Value);
+            Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
         }
 
         /// <summary>

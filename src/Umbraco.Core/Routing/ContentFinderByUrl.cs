@@ -44,11 +44,11 @@ namespace Umbraco.Web.Routing
             string route;
             if (frequest.Domain != null)
             {
-                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
             }
             else
             {
-                route = frequest.Uri.GetAbsolutePathDecoded();
+                route = frequest.AbsolutePathDecoded;
             }
 
             IPublishedContent node = FindContent(frequest, route);

@@ -1,11 +1,9 @@
-using System;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
-    public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime, IUmbracoApplicationLifetimeManager
+    public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
@@ -21,13 +19,5 @@ namespace Umbraco.Web.Common.AspNetCore
             IsRestarting = true;
             _hostApplicationLifetime.StopApplication();
         }
-
-        public void InvokeApplicationInit()
-        {
-            ApplicationInit?.Invoke(this, EventArgs.Empty);
-        }
-
-        // TODO: Should be killed and replaced with UmbracoApplicationStarting notifications
-        public event EventHandler ApplicationInit;
     }
 }

@@ -1,9 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +13,8 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Templates;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -63,15 +61,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Note that ALL logged in users have access to this method because editors will need to insert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
-        public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
+        public ActionResult<IEnumerable<MacroParameter>> GetMacroParameters(int macroId)
         {
             var macro = _macroService.GetById(macroId);
             if (macro == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
-            return _umbracoMapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder);
+            return new ActionResult<IEnumerable<MacroParameter>>(_umbracoMapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder));
         }
 
         /// <summary>
@@ -116,7 +114,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var publishedContent = umbracoContext.Content.GetById(true, pageId);

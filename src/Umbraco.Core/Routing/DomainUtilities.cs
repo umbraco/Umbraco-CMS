@@ -364,9 +364,7 @@ namespace Umbraco.Web.Routing
         /// <returns>The path part relative to the uri of the domain.</returns>
         /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
         public static string PathRelativeToDomain(Uri domainUri, string path)
-        {
-            return path.Substring(domainUri.GetAbsolutePathDecoded().Length).EnsureStartsWith('/');
-        }
+            => path.Substring(domainUri.GetAbsolutePathDecoded().Length).EnsureStartsWith('/');
 
         #endregion
     }

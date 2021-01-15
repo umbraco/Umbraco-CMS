@@ -2,13 +2,14 @@
 // See LICENSE for more details.
 
 using AutoFixture.NUnit3;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Security;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Exceptions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
@@ -28,7 +29,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(user);
 
-            Assert.ThrowsAsync<HttpResponseException>(() => sut.PostUnlockUsers(userIds));
+            var result = sut.PostUnlockUsers(userIds).Result as ObjectResult;
+            Assert.AreEqual(StatusCodes.Status400BadRequest, result.StatusCode);
         }
     }
 }
