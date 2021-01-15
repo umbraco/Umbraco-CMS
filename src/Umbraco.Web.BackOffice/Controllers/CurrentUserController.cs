@@ -26,7 +26,6 @@ using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -173,7 +172,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// This only works when the user is logged in (partially)
         /// </remarks>
         [AllowAnonymous]
-        public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
+        public async Task<ActionResult<UserDetail>> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
             if (user == null) throw new InvalidOperationException("Could not find user");
@@ -186,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // so that is why it is being used here.
                 ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             //They've successfully set their password, we can now update their user account to be approved

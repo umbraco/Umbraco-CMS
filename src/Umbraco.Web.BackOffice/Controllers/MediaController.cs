@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -36,9 +36,9 @@ using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -121,12 +121,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="parentId"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
+        public ActionResult<MediaItemDisplay> GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _mediaTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
@@ -213,14 +213,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public MediaItemDisplay GetById(Udi id)
+        public ActionResult<MediaItemDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
                 return GetById(guidUdi.Guid);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return NotFound();
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
         [DetermineAmbiguousActionByPassingParameters]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Guid id,
+        public ActionResult<PagedResult<ContentItemBasic<ContentPropertyBasic>>> GetChildren(Guid id,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -390,7 +391,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return NotFound();
         }
 
         /// <summary>
@@ -406,7 +408,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
         [DetermineAmbiguousActionByPassingParameters]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Udi id,
+        public ActionResult<PagedResult<ContentItemBasic<ContentPropertyBasic>>> GetChildren(Udi id,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -424,7 +426,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return NotFound();
         }
 
         #endregion
@@ -442,7 +444,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundMedia == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             //if the current item is in the recycle bin
@@ -453,7 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 }
             }
             else
@@ -463,7 +465,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 }
             }
 
@@ -485,7 +487,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toMove = ValidateMoveOrCopy(move);
+            var toMoveResult = ValidateMoveOrCopy(move);
+            var toMove = toMoveResult.Value;
+            if (toMove is null && toMoveResult is IConvertToActionResult convertToActionResult)
+            {
+                return convertToActionResult.Convert();
+            }
+
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
 
@@ -493,11 +501,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (sourceParentID == destinationParentID)
             {
-                throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
+                return new ValidationErrorResult(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
-                throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                return new ValidationErrorResult(new SimpleNotificationModel());
             }
             else
             {
@@ -512,7 +520,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [MediaItemSaveValidation]
         [OutgoingEditorModelEvent]
-        public MediaItemDisplay PostSave(
+        public ActionResult<MediaItemDisplay> PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
         {
@@ -558,7 +566,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     // add the model state to the outgoing object and throw validation response
                     var forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
+                    return new ValidationErrorResult(forDisplay);
                 }
             }
 
@@ -569,7 +577,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
             //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            HandleInvalidModelState(display);
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+            }
 
             //put the correct msgs in
             switch (contentItem.Action)
@@ -591,7 +603,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // is no Id to redirect to!
                         if (saveStatus.Result.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
                         {
-                            throw HttpResponseException.CreateValidationErrorResponse(display);
+                            return new ValidationErrorResult(display);
                         }
                     }
 
@@ -649,7 +661,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (_mediaService.Sort(sortedMedia) == false)
                 {
                     _logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
-                    throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
+                    return new ValidationErrorResult("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Ok();
             }
@@ -662,7 +674,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
         {
-            var parentId = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true);
+            var parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true);
+            if (!(parentIdResult.Result is null))
+            {
+                return new ActionResult<MediaItemDisplay>(parentIdResult.Result);
+            }
+            var parentId = parentIdResult.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
@@ -694,11 +711,18 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //get the string json from the request
-            var parentId = await GetParentIdAsIntAsync(currentFolder, validatePermissions: true);
+            var parentIdResult = await GetParentIdAsIntAsync(currentFolder, validatePermissions:true);
+            if (!(parentIdResult.Result is null))
+            {
+                return parentIdResult.Result;
+            }
+
+            var parentId = parentIdResult.Value;
             if (!parentId.HasValue)
             {
                 return NotFound("The passed id doesn't exist");
             }
+
             var tempFiles = new PostedFiles();
 
 
@@ -842,7 +866,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// and if that check fails an unauthorized exception will occur
         /// </param>
         /// <returns></returns>
-        private async Task<int?> GetParentIdAsIntAsync(string parentId, bool validatePermissions)
+        private async Task<ActionResult<int?>> GetParentIdAsIntAsync(string parentId, bool validatePermissions)
         {
             int intParentId;
 
@@ -871,7 +895,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 else
                 {
-                    throw HttpResponseException.CreateValidationErrorResponse("The request was not formatted correctly, the parentId is not an integer, Guid or UDI");
+                    return new ValidationErrorResult("The request was not formatted correctly, the parentId is not an integer, Guid or UDI");
                 }
             }
 
@@ -883,12 +907,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var authorizationResult = await _authorizationService.AuthorizeAsync(User, new MediaPermissionsResource(_mediaService.GetById(intParentId)), requirement);
                 if (!authorizationResult.Succeeded)
                 {
-                    throw new HttpResponseException(
-                    HttpStatusCode.Forbidden,
+                    return new ValidationErrorResult(
                     new SimpleNotificationModel(new BackOfficeNotification(
                         _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
                         _localizedTextService.Localize("speechBubbles/invalidUserPermissionsText"),
-                        NotificationStyle.Warning)));
+                        NotificationStyle.Warning)),
+                        StatusCodes.Status403Forbidden);
                 }
             }
 
@@ -900,18 +924,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        private IMedia ValidateMoveOrCopy(MoveOrCopy model)
+        private ActionResult<IMedia> ValidateMoveOrCopy(MoveOrCopy model)
         {
             if (model == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
 
             var toMove = _mediaService.GetById(model.Id);
             if (toMove == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             if (model.ParentId < 0)
             {
@@ -922,7 +946,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedAtRoot"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 }
             }
             else
@@ -930,7 +954,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var parent = _mediaService.GetById(model.ParentId);
                 if (parent == null)
                 {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
                 }
 
                 //check if the item is allowed under this one
@@ -940,7 +964,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByContentType"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 }
 
                 // Check on paths
@@ -948,14 +972,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 }
             }
 
-            return toMove;
+            return new ActionResult<IMedia>(toMove);
         }
-
-
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {

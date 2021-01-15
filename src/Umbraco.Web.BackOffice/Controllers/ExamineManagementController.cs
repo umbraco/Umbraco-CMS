@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -10,8 +9,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Examine;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
@@ -62,14 +61,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             return model;
         }
 
-        public SearchResults GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
+        public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
             if (query.IsNullOrWhiteSpace())
                 return SearchResults.Empty();
 
             var msg = ValidateSearcher(searcherName, out var searcher);
             if (!msg.IsSuccessStatusCode())
-                throw new HttpResponseException(msg);
+                return msg;
 
             // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
             var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
@@ -105,11 +104,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var validate = ValidateIndex(indexName, out var index);
 
             if (!validate.IsSuccessStatusCode())
-                throw new HttpResponseException(validate);
+                return validate;
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
-                throw new HttpResponseException(validate);
+                return validate;
 
             var cacheKey = "temp_indexing_op_" + indexName;
             var found = _runtimeCache.Get(cacheKey);
@@ -130,11 +129,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var validate = ValidateIndex(indexName, out var index);
             if (!validate.IsSuccessStatusCode())
-                throw new HttpResponseException(validate);
+                return validate;
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
-                throw new HttpResponseException(validate);
+                return validate;
 
             _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 

@@ -1,28 +1,26 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Search;
 using Umbraco.Core.Security;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.WebApi;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Web.Trees;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
+using Umbraco.Core.Services;
 using Umbraco.Core.Trees;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Search;
+using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -142,7 +140,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return null;
         }
 
-        protected override MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> PerformGetMenuForNode(string id, FormCollection queryStrings)
         {
             if (id == Constants.System.RootString)
             {
@@ -186,12 +184,12 @@ namespace Umbraco.Web.BackOffice.Trees
             int iid;
             if (int.TryParse(id, out iid) == false)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             var item = _entityService.Get(iid, UmbracoObjectTypes.Document);
             if (item == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //if the user has no path access for this node, all they can do is refresh
@@ -236,16 +234,22 @@ namespace Umbraco.Web.BackOffice.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormCollection queryStrings)
+        protected override ActionResult<IEnumerable<IEntitySlim>> GetChildEntities(string id, FormCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
+
+            if (!(result.Result is null))
+            {
+                return result.Result;
+            }
+
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
             var cultureVal = (culture.Success ? culture.Result : null) ?? _localizationService.GetDefaultLanguageIsoCode();
 
             // set names according to variations
-            foreach (var entity in result)
+            foreach (var entity in result.Value)
             {
                 EnsureName(entity, cultureVal);
             }

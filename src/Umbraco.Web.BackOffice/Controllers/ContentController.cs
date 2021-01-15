@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
@@ -24,23 +24,19 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Extensions;
+using Umbraco.Web.Actions;
+using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Models.Mapping;
-using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.BackOffice.Authorization;
-using System.Threading.Tasks;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -337,13 +333,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetById(int id)
+        public ActionResult<ContentItemDisplay> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
-                HandleContentNotFound(id);
-                return null;//irrelevant since the above throws
+                return HandleContentNotFound(id);
             }
             var content = MapToDisplay(foundContent);
             return content;
@@ -357,13 +352,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetById(Guid id)
+        public ActionResult<ContentItemDisplay> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
-                HandleContentNotFound(id);
-                return null;//irrelevant since the above throws
+                return HandleContentNotFound(id);
             }
 
             var content = MapToDisplay(foundContent);
@@ -378,7 +372,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetById(Udi id)
+        public ActionResult<ContentItemDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -386,7 +380,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return GetById(guidUdi.Guid);
             }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return NotFound();
         }
 
         /// <summary>
@@ -396,12 +390,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
+        public ActionResult<ContentItemDisplay> GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             return GetEmpty(contentType, parentId);
@@ -414,12 +408,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeKey"></param>
         /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
+        public ActionResult<ContentItemDisplay> GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeKey);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             return GetEmpty(contentType, parentId);
@@ -443,12 +437,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [OutgoingEditorModelEvent]
         [DetermineAmbiguousActionByPassingParameters]
-        public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
+        public ActionResult<ContentItemDisplay> GetEmpty(int blueprintId, int parentId)
         {
             var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             blueprint.Id = 0;
@@ -592,9 +586,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var content = _contentService.GetById(contentId);
             if (content == null)
+            {
                 return NotFound();
+            }
 
-            EnsureUniqueName(name, content, nameof(name));
+            if (!EnsureUniqueName(name, content, nameof(name)))
+            {
+                return new ValidationErrorResult(ModelState.ToErrorDictionary());
+            }
 
             var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -609,14 +608,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             return notificationModel;
         }
 
-        private void EnsureUniqueName(string name, IContent content, string modelName)
+        private bool EnsureUniqueName(string name, IContent content, string modelName)
         {
             var existing = _contentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name && x.Id != content.Id))
             {
                 ModelState.AddModelError(modelName, _localizedTextService.Localize("blueprints/duplicateBlueprintMessage"));
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -624,13 +625,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public async Task<ContentItemDisplay> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
                 content =>
                 {
-                    EnsureUniqueName(content.Name, content, "Name");
+                    if (!EnsureUniqueName(content.Name, content, "Name"))
+                    {
+                        return OperationResult.Cancel(new EventMessages());
+                    }
 
                     _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
@@ -653,7 +657,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [OutgoingEditorModelEvent]
-        public async Task<ContentItemDisplay> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
@@ -663,7 +667,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return contentItemDisplay;
         }
 
-        private async Task<ContentItemDisplay> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
+        private async Task<ActionResult<ContentItemDisplay>> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
             // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -696,7 +700,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     // add the model state to the outgoing object and throw a validation message
                     var forDisplay = mapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw HttpResponseException.CreateValidationErrorResponse(forDisplay);
+                    return new ValidationErrorResult(forDisplay);
                 }
 
                 // if there's only one variant and the model state is not valid we cannot publish so change it to save
@@ -842,8 +846,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                     v.Notifications.AddRange(n.Notifications);
             }
 
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             HandleInvalidModelState(display, cultureForInvariantErrors);
+
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                return new ValidationErrorResult(display);
+            }
 
             if (wasCancelled)
             {
@@ -853,7 +863,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     //If the item is new and the operation was cancelled, we need to return a different
                     // status code so the UI can handle it since it won't be able to redirect since there
                     // is no Id to redirect to!
-                    throw HttpResponseException.CreateValidationErrorResponse(display);
+                    return new ValidationErrorResult(display);
                 }
             }
 
@@ -1475,7 +1485,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             var publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
@@ -1483,7 +1493,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var notificationModel = new SimpleNotificationModel();
                 AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
-                throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                return new ValidationErrorResult(notificationModel);
             }
 
             return Ok();
@@ -1498,7 +1508,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (found == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             _contentService.DeleteBlueprint(found);
@@ -1524,7 +1534,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                return HandleContentNotFound(id, false);
+                return HandleContentNotFound(id);
             }
 
             //if the current item is in the recycle bin
@@ -1535,7 +1545,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 }
             }
             else
@@ -1545,7 +1555,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 }
             }
 
@@ -1603,7 +1613,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
                     // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
-                    throw HttpResponseException.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
+                    return new ValidationErrorResult("Content sorting failed, this was probably caused by an event being cancelled");
                 }
 
                 return Ok();
@@ -1630,7 +1640,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toMove = ValidateMoveOrCopy(move);
+            var toMoveResult = ValidateMoveOrCopy(move);
+            if (!(toMoveResult is null))
+            {
+                return toMoveResult.Result;
+            }
+            var toMove = toMoveResult.Value;
 
             _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -1642,7 +1657,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
-        public async Task<IActionResult> PostCopy(MoveOrCopy copy)
+        public async Task<ActionResult<IContent>> PostCopy(MoveOrCopy copy)
         {
             // Authorize...
             var resource = new ContentPermissionsResource(_contentService.GetById(copy.ParentId), ActionCopy.ActionLetter);
@@ -1652,8 +1667,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return Forbid();
             }
 
-            var toCopy = ValidateMoveOrCopy(copy);
-
+            var toCopyResult = ValidateMoveOrCopy(copy);
+            if ((toCopyResult.Result is null))
+            {
+                return toCopyResult.Result;
+            }
+            var toCopy = toCopyResult.Value;
             var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return Content(c.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
@@ -1671,7 +1690,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (foundContent == null)
             {
-                HandleContentNotFound(model.Id);
+                return HandleContentNotFound(model.Id);
             }
 
             // Authorize...
@@ -1693,7 +1712,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (!unpublishResult.Success)
                 {
                     AddCancelMessage(content);
-                    throw HttpResponseException.CreateValidationErrorResponse(content);
+                    return new ValidationErrorResult(content);
                 }
                 else
                 {
@@ -1765,7 +1784,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 catch (UriFormatException)
                 {
-                    throw HttpResponseException.CreateValidationErrorResponse(_localizedTextService.Localize("assignDomain/invalidDomain"));
+                    return new ValidationErrorResult(_localizedTextService.Localize("assignDomain/invalidDomain"));
                 }
             }
 
@@ -1918,9 +1937,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                     AddVariantValidationError(culture, segment, "speechBubbles/contentCultureValidationError");
                 }
             }
-
-            base.HandleInvalidModelState(display);
-
         }
 
         /// <summary>
@@ -2020,25 +2036,25 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        private IContent ValidateMoveOrCopy(MoveOrCopy model)
+        private ActionResult<IContent> ValidateMoveOrCopy(MoveOrCopy model)
         {
             if (model == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var contentService = _contentService;
             var toMove = contentService.GetById(model.Id);
             if (toMove == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             if (model.ParentId < 0)
             {
                 //cannot move if the content item is not allowed at the root
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedAtRoot"));
                 }
             }
@@ -2047,7 +2063,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var parent = contentService.GetById(model.ParentId);
                 if (parent == null)
                 {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
                 }
 
                 var parentContentType = _contentTypeService.Get(parent.ContentTypeId);
@@ -2055,19 +2071,19 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedByContentType"));
                 }
 
                 // Check on paths
-                if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                if ($",{parent.Path},".IndexOf($",{toMove.Id},", StringComparison.Ordinal) > -1)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 }
             }
 
-            return toMove;
+            return new ActionResult<IContent>(toMove);
         }
 
         /// <summary>
@@ -2392,7 +2408,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     break;
             }
 
-            throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+            return new ValidationErrorResult(notificationModel);
         }
 
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]

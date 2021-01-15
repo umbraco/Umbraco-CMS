@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,7 +21,6 @@ using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
@@ -84,13 +83,19 @@ namespace Umbraco.Web.BackOffice.Controllers
                     var view = new PartialView(PartialViewType.PartialView, display.VirtualPath);
                     view.Content = display.Content;
                     var result = _fileService.CreatePartialView(view, display.Snippet, currentUser.Id);
-                    return result.Success == true ? Ok() : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+                    if (result.Success)
+                        return Ok();
+                    else
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
 
                 case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath);
                     viewMacro.Content = display.Content;
                     var resultMacro = _fileService.CreatePartialViewMacro(viewMacro, display.Snippet, currentUser.Id);
-                    return resultMacro.Success == true ? Ok() : throw HttpResponseException.CreateNotificationValidationErrorResponse(resultMacro.Exception.Message);
+                    if (resultMacro.Success)
+                        return Ok();
+                    else
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult(resultMacro.Exception.Message);
 
                 case Core.Constants.Trees.Scripts:
                     var script = new Script(display.VirtualPath);
@@ -116,7 +121,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (name.ContainsAny(Path.GetInvalidPathChars())) {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(_localizedTextService.Localize("codefile/createFolderIllegalChars"));
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(_localizedTextService.Localize("codefile/createFolderIllegalChars"));
             }
 
             // if the parentId is root (-1) then we just need an empty string as we are
@@ -233,7 +238,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="type">This is a string but will be 'partialViews', 'partialViewMacros'</param>
         /// <returns>Returns a list of <see cref="SnippetDisplay"/> if a correct type is sent</returns>
-        public IEnumerable<SnippetDisplay> GetSnippets(string type)
+        public ActionResult<IEnumerable<SnippetDisplay>> GetSnippets(string type)
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
 
@@ -252,10 +257,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                     snippets = _fileService.GetPartialViewSnippetNames();
                     break;
                 default:
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return NotFound();
             }
 
-            return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet});
+            return snippets.Select(snippet => new SnippetDisplay() { Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet }).ToList();
         }
 
         /// <summary>

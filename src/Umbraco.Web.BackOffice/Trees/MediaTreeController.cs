@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,6 +21,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Core.Trees;
 
@@ -97,7 +98,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return node;
         }
 
-        protected override MenuItemCollection PerformGetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> PerformGetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = MenuItemCollectionFactory.Create();
 
@@ -122,12 +123,12 @@ namespace Umbraco.Web.BackOffice.Trees
 
             if (int.TryParse(id, out var iid) == false)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             var item = _entityService.Get(iid, UmbracoObjectTypes.Media);
             if (item == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //if the user has no path access for this node, all they can do is refresh
