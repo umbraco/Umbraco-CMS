@@ -33,6 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly LinkGenerator _linkGenerator;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
+        private readonly ContentModelBinder _modelBinder;
 
         public ModelsBuilderNotificationHandler(
             IOptions<ModelsBuilderSettings> config,
@@ -40,7 +41,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             LiveModelsProvider liveModelsProvider,
             OutOfDateModelsStatus outOfDateModels,
             LinkGenerator linkGenerator,
-            IUmbracoRequestLifetime umbracoRequestLifetime)
+            IUmbracoRequestLifetime umbracoRequestLifetime,
+            ContentModelBinder modelBinder)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
@@ -49,6 +51,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             _shortStringHelper = shortStringHelper;
             _linkGenerator = linkGenerator;
             _umbracoRequestLifetime = umbracoRequestLifetime;
+            _modelBinder = modelBinder;
         }
 
         /// <summary>
@@ -60,7 +63,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // note: UmbracoApiController instances are automatically registered
             _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
 
-            ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
+            _modelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
             if (_config.Enable)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -42,8 +44,6 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
 
-        private ContentModelBinder ContentModelBinder => new ContentModelBinder();
-
         /// <summary>
         /// Gets the <see cref="IUmbracoContext"/>
         /// </summary>
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Common.AspNetCore
             {
                 // Here we do the magic model swap
                 ViewContext ctx = value;
-                ctx.ViewData = BindViewData(ctx.ViewData);
+                ctx.ViewData = BindViewData(ctx.HttpContext, ctx.ViewData);
                 base.ViewContext = ctx;
             }
         }
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Common.AspNetCore
         /// <see cref="IContentModel"/> or <see cref="IPublishedContent"/>. This will use the <see cref="ContentModelBinder"/> to bind the models
         /// to the correct output type.
         /// </remarks>
-        protected ViewDataDictionary BindViewData(ViewDataDictionary viewData)
+        protected ViewDataDictionary BindViewData(HttpContext context, ViewDataDictionary viewData)
         {
             // check if it's already the correct type and continue if it is
             if (viewData is ViewDataDictionary<TModel> vdd)
@@ -153,8 +153,9 @@ namespace Umbraco.Web.Common.AspNetCore
             viewData = MapViewDataDictionary(viewData, typeof(TModel));
 
             // bind the model
+            var contentModelBinder = context.RequestServices.GetRequiredService<ContentModelBinder>();
             var bindingContext = new DefaultModelBindingContext();
-            ContentModelBinder.BindModel(bindingContext, viewDataModel, typeof(TModel));
+            contentModelBinder.BindModel(bindingContext, viewDataModel, typeof(TModel));
 
             viewData.Model = bindingContext.Result.Model;
 

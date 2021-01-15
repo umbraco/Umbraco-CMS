@@ -11,14 +11,19 @@ namespace Umbraco.ModelsBuilder.Embedded
 {
     public class RoslynCompiler
     {
+        public const string GeneratedAssemblyName = "ModelsGeneratedAssembly";
+
         private OutputKind _outputKind;
         private CSharpParseOptions _parseOptions;
         private List<MetadataReference> _refs;
 
         /// <summary>
-        /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
+        /// Initializes a new instance of the <see cref="RoslynCompiler"/> class.
         /// </summary>
         /// <param name="referenceAssemblies">Referenced assemblies used in the source file</param>
+        /// <remarks>
+        /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
+        /// </remarks>
         public RoslynCompiler(IEnumerable<Assembly> referenceAssemblies)
         {
             _outputKind = OutputKind.DynamicallyLinkedLibrary;
@@ -55,7 +60,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, _parseOptions);
 
             var compilation = CSharpCompilation.Create(
-                "ModelsGeneratedAssembly",
+                GeneratedAssemblyName,
                 new[] { syntaxTree },
                 references: _refs,
                 options: new CSharpCompilationOptions(

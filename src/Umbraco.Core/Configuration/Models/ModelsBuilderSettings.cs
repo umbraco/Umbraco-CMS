@@ -21,12 +21,19 @@ namespace Umbraco.Core.Configuration.Models
         ///     <para>If this is false then absolutely nothing happens.</para>
         ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
-        public bool Enable { get; set; } = false;
+        // TODO: This setting makes no sense at all, this basically just disables haveing models be able to reset dynamically
+        // and configure some dashboards but the models are all still built and active!
+        // Can this be truly disabled or not?
+        // Then there's other ways to disable things - EnableFactory also causes odd flags but again, how can this be disabled?
+        // The other ways that flags change are ModelsMode.
+        // TODO: Make these make sense and test what is possible
+        // Confirmed A) Enabled = false, ModelsMode = Nothing, EnabledFagtory = false == EXPLODES, null refs because these things are needed unless you replace nucache.
+        public bool Enable { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.Nothing;
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.PureLive;
 
         /// <summary>
         /// Gets or sets a value for models namespace.

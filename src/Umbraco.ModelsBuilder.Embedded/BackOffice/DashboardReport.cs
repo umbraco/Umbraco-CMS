@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
@@ -41,9 +41,13 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             sb.Append("<ul>");
 
             sb.Append("<li>The <strong>models factory</strong> is ");
+
+            // TODO: Test this - if models factory is entirely disabled will umbraco work at all?
+            // if not, is there a point to this?
             sb.Append(_config.EnableFactory || _config.ModelsMode == ModelsMode.PureLive
                 ? "enabled"
                 : "not enabled. Umbraco will <em>not</em> use models");
+
             sb.Append(".</li>");
 
             sb.Append(_config.ModelsMode != ModelsMode.Nothing

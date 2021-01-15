@@ -38,7 +38,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
-        //private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
+        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
@@ -93,7 +93,11 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // get it here, this need to be fast
             _debugLevel = _config.DebugLevel;
+
+            AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
         }
+
+        public event EventHandler ModelsChanged;
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -129,6 +133,16 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         /// <inheritdoc />
         public bool Enabled => _config.Enable;
+
+        /// <summary>
+        /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
+        /// </summary>
+        /// <remarks>
+        /// This is required because the razor engine will only try to load things from the default context, it doesn't know anything
+        /// about our context so we need to proxy.
+        /// </remarks>
+        private Assembly OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
+            => _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName);
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
@@ -188,7 +202,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <inheritdoc />
         public void Reset()
         {
-            if (_config.Enable)
+            if (Enabled)
             {
                 ResetModels();
             }
@@ -275,9 +289,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                 var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
                 var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
-                // TODO: Remove the old application part
-                var parts = _applicationPartManager.ApplicationParts;
-
                 if (File.Exists(dllPathFile))
                 {
                     File.Delete(dllPathFile);
@@ -340,13 +351,18 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     try
                     {
-                        // TODO: We may have to copy this to a temp place?
-                        // string assemblyName = Path.GetRandomFileName();
-
                         Assembly assembly = GetModelsAssembly(_pendingRebuild, out MetadataReference metadataReference);
 
+                        bool hasAssembly = CurrentModelsAssembly != null;
                         CurrentModelsAssembly = assembly;
                         CurrentModelsMetadataReference = metadataReference;
+
+                        // raise the event that they've changed.
+                        // don't raise on the initial call, only when it's actually changed.
+                        if (hasAssembly)
+                        {
+                            ModelsChanged?.Invoke(this, new EventArgs());
+                        }
 
                         IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
@@ -391,36 +407,63 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             using (FileStream stream = File.OpenRead(path))
             {
-                var moduleMetadata = ModuleMetadata.CreateFromStream(stream, PEStreamOptions.PrefetchMetadata);
-                var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
-
-                return assemblyMetadata.GetReference(filePath: path);
+                return CreateMetadataReference(stream, path);
             }
         }
 
+        private static MetadataReference CreateMetadataReference(Stream stream, string path)
+        {
+            var moduleMetadata = ModuleMetadata.CreateFromStream(stream, PEStreamOptions.PrefetchMetadata);
+            var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
+            return assemblyMetadata.GetReference(filePath: path);
+        }
+
+        // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly, out MetadataReference metadataReference)
         {
-            // TODO: We should look into removing the old application part
+            // If there's a current AssemblyLoadContext, unload it before creating a new one.
+            if (!(_currentAssemblyLoadContext is null))
+            {
+                _currentAssemblyLoadContext.Unload();
 
-            //// If there's a current AssemblyLoadContext, unload it before creating a new one.
-            //if (!(_currentAssemblyLoadContext is null))
-            //{
-            //    _currentAssemblyLoadContext.Unload();
-            //    GC.Collect();
-            //    GC.WaitForPendingFinalizers();
-            //}
+                // we need to remove the current part too
+                ApplicationPart currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
+                if (currentPart != null)
+                {
+                    _applicationPartManager.ApplicationParts.Remove(currentPart);
+                }
+            }
 
-            //// We must create a new assembly load context
-            //// as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            //_currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+            // We must create a new assembly load context
+            // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
+            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
 
-            // Need to work on a temp file so that it's not locked
+            // We cannot use in-memory assemblies due to the way the razor engine works which must use
+            // application parts in order to add references to it's own CSharpCompiler.
+            // These parts must have real paths since that is how the references are loaded. In that
+            // case we'll need to work on temp files so that the assembly isn't locked.
+
+            // Get a temp file path
+            // TODO: Not sure if the process always has access to a temp path?
             var tempFile = Path.GetTempFileName();
             File.Copy(pathToAssembly, tempFile, true);
+
             // Load it in
-            Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(tempFile);
-            // Create a metadata ref, TODO: This is actually not required and doesn't really work so we can remove that
+            Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
+
+            // Create a metadata ref
             metadataReference = CreateMetadataReference(tempFile);
+
+            //// Use filestream to load in the new assembly, otherwise it'll be locked
+            //// See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
+            //using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
+            //{
+            //    assembly = _currentAssemblyLoadContext.LoadFromStream(fs);
+
+            //    // reset stream so it can be used for the reference (the call to CreateMetadataReference will close the stream)
+            //    fs.Position = 0;
+            //    metadataReference = CreateMetadataReference(fs, pathToAssembly);
+            //}
 
             // Add the assembly to the application parts - this is required because this is how
             // the razor ReferenceManager resolves what to load, see
@@ -432,19 +475,9 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
 
             return assembly;
-
-            //// Use filestream to load in the new assembly, otherwise it'll be locked
-            //// See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
-            //using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
-            //{
-            //    Assembly assembly = _currentAssemblyLoadContext.LoadFromStream(fs);
-            //    //fs.Position = 0;
-            //    //metadataReference = MetadataReference.CreateFromStream(fs, filePath: null);
-            //    //metadataReference = CreateMetadataReference(fs, pathToAssembly);
-            //    return assembly;
-            //}
         }
 
+        // This is NOT thread safe but it is only called from within a lock
         private Assembly GetModelsAssembly(bool forceRebuild, out MetadataReference metadataReference)
         {
             metadataReference = null;

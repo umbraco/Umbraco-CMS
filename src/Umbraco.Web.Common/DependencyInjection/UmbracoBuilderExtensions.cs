@@ -269,6 +269,8 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
             builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
+            builder.Services.AddSingleton<ContentModelBinder>();
+
             builder.AddHttpClients();
 
             // TODO: Does this belong in web components??
