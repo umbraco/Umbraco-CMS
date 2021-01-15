@@ -264,6 +264,8 @@
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
+    <key alias="variantsToPublish">Hvilke varianter vil du publicere?</key>
+    <key alias="variantsToSave">Vælg hvilke varianter der skal gemmes.</key>
     <key alias="unpublish">Afpublicér</key>
     <key alias="unpublished">Afpubliceret</key>
     <key alias="notCreated">Ikke oprettet</key>
