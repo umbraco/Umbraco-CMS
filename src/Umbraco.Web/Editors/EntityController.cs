@@ -24,6 +24,7 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Search;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
@@ -702,6 +703,7 @@ namespace Umbraco.Web.Editors
                 IEnumerable<IUmbracoEntity> entities;
                 long totalRecords;
 
+                var allowedTypes = GetAllowedTypesForMultiNodeTreePicker(dataTypeKey);
                 if (id == Constants.System.Root)
                 {
                     // root is special: we reduce it to start nodes
@@ -712,10 +714,10 @@ namespace Umbraco.Web.Editors
                     entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
                         ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
-                            Ordering.By(orderBy, orderDirection), includeTrashed: false)
+                            Ordering.By(orderBy, orderDirection), includeTrashed: false).Where(x => IsAllowedEntityType(allowedTypes, x))
                         : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
-                            Ordering.By(orderBy, orderDirection));
+                            Ordering.By(orderBy, orderDirection)).Where(x => IsAllowedEntityType(allowedTypes, x));
                 }
                 else
                 {
@@ -753,6 +755,31 @@ namespace Umbraco.Web.Editors
 
         private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeKey) => dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
 
+        private List<string> GetAllowedTypesForMultiNodeTreePicker(Guid? dataTypeKey)
+        {
+            if (!dataTypeKey.HasValue) return null;
+
+            var dataType = Services.DataTypeService.GetDataType(dataTypeKey.Value);
+
+            if (dataType == null) return null;
+
+            if (!dataType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker)) return null;
+
+            var multiNodeTreePickerConfiguration = dataType.ConfigurationAs<MultiNodePickerConfiguration>();
+
+            var allowedTypes = multiNodeTreePickerConfiguration?.Filter?.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            return allowedTypes;
+        }
+
+        private bool IsAllowedEntityType(List<string> allowedTypes, IUmbracoEntity entity)
+        {
+            if (!(entity is ContentEntitySlim contentEntity)) return true;
+
+            //If allowed types is null - it means that we don't have the restrictions that were set in the tree picker,
+            //otherwise - check if entity type is contained in the array
+            return allowedTypes?.Any() != true || allowedTypes.Contains(contentEntity.ContentTypeAlias);
+        }
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
