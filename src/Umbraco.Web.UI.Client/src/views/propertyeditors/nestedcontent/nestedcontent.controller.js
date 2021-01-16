@@ -352,7 +352,7 @@
                         item["$index"] = (idx + 1);
 
                         var newName = contentType.nameExp(item);
-                        if (newName && (newName = $.trim(newName))) {
+                        if (newName && (newName = newName.trim())) {
                             name = newName;
                         }
 

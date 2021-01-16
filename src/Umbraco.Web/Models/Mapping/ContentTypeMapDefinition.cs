@@ -242,6 +242,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Alias = source.Alias;
             target.Description = source.Description;
             target.SortOrder = source.SortOrder;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // no MapAll - take care
@@ -353,6 +354,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Label = source.Label;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
@@ -373,6 +375,7 @@ namespace Umbraco.Web.Models.Mapping
             target.MemberCanViewProperty = source.MemberCanViewProperty;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
