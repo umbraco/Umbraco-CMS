@@ -40,7 +40,7 @@
 (function () {
     'use strict';
 
-    function UmbRadiobuttonController($timeout) {
+    function UmbRadiobuttonController($timeout,localizationService) {
 
         var vm = this;
 
