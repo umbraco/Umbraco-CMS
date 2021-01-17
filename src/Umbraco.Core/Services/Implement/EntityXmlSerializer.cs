@@ -363,6 +363,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("MandatoryMessage", propertyType.MandatoryMessage),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
                                                    new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
+                                                   new XElement("LabelOnTop", propertyType.LabelOnTop),
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
@@ -491,6 +492,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
                                                    propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
                                                    propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
