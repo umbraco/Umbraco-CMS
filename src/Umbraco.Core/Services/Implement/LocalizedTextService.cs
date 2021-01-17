@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,7 +18,6 @@ namespace Umbraco.Core.Services.Implement
         private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
         private readonly IDictionary<CultureInfo, IDictionary<string, string>> _noAreaDictionarySource;
         private readonly char[] _splitter = new[] { '/' };
-
         /// <summary>
         /// Initializes with a file sources instance
         /// </summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 var areaAliaValue = GetAreaStoredTranslations(source, xmlSource.Key);
                 cultureDictionary.Add(xmlSource.Key, areaAliaValue);
-                var aliasValue = new Dictionary<string, string>();
+                var aliasValue = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var area in areaAliaValue)
                 {
                     foreach (var alias in area.Value)
@@ -118,19 +118,10 @@ namespace Umbraco.Core.Services.Implement
         public string Localize(string area, string alias, CultureInfo culture, IDictionary<string, string> tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            try
-            {
                 // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
                 culture = ConvertToSupportedCultureWithRegionCode(culture);
 
                 return GetFromDictionarySource(culture, area, alias, tokens);
-            }
-            finally
-            {
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine($"Localize {area}/{alias} ({tokens?.Count}) ({sw.ElapsedTicks})");
-            }
         }
 
         /// <summary>
@@ -172,11 +163,11 @@ namespace Umbraco.Core.Services.Implement
 
         private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
-            var overallResult = new Dictionary<string, IDictionary<string, string>>();
+            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCultureIgnoreCase);
             var areas = xmlSource[cult].Value.XPathSelectElements("//area");
             foreach (var area in areas)
             {
-                var result = new Dictionary<string, string>();
+                var result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 var keys = area.XPathSelectElements("./key");
                 foreach (var key in keys)
                 {
@@ -192,12 +183,12 @@ namespace Umbraco.Core.Services.Implement
         }
         private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
         {
-            var overallResult = new Dictionary<string, IDictionary<string, string>>();
+            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCultureIgnoreCase);
             var areaDict = dictionarySource[cult];
 
             foreach (var area in areaDict)
             {
-                var result = new Dictionary<string, string>();
+                var result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 var keys = area.Value.Keys;
                 foreach (var key in keys)
                 {
