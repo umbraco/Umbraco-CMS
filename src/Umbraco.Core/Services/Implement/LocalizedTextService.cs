@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 var areaAliaValue = GetAreaStoredTranslations(source, xmlSource.Key);
                 cultureDictionary.Add(xmlSource.Key, areaAliaValue);
-                var aliasValue = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                var aliasValue = new Dictionary<string, string>(StringComparer.InvariantCulture);
                 foreach (var area in areaAliaValue)
                 {
                     foreach (var alias in area.Value)
@@ -173,11 +173,11 @@ namespace Umbraco.Core.Services.Implement
 
         private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
-            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCultureIgnoreCase);
+            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areas = xmlSource[cult].Value.XPathSelectElements("//area");
             foreach (var area in areas)
             {
-                var result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
                 var keys = area.XPathSelectElements("./key");
                 foreach (var key in keys)
                 {
@@ -193,12 +193,12 @@ namespace Umbraco.Core.Services.Implement
         }
         private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
         {
-            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCultureIgnoreCase);
+            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areaDict = dictionarySource[cult];
 
             foreach (var area in areaDict)
             {
-                var result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
                 var keys = area.Value.Keys;
                 foreach (var key in keys)
                 {
