@@ -110,6 +110,11 @@ namespace Umbraco.Core.Services.Implement
         public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
+
+            //This is what the legacy ui service did
+            if (string.IsNullOrEmpty(key))
+                return string.Empty;
+
             var keyParts = key.Split(_splitter, StringSplitOptions.RemoveEmptyEntries);
             var area = keyParts.Length > 1 ? keyParts[0] : null;
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
@@ -118,8 +123,13 @@ namespace Umbraco.Core.Services.Implement
         public string Localize(string area, string alias, CultureInfo culture, IDictionary<string, string> tokens = null)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
-                // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
-                culture = ConvertToSupportedCultureWithRegionCode(culture);
+
+            //This is what the legacy ui service did
+            if (string.IsNullOrEmpty(alias))
+                return string.Empty;
+
+            // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            culture = ConvertToSupportedCultureWithRegionCode(culture);
 
                 return GetFromDictionarySource(culture, area, alias, tokens);
         }
