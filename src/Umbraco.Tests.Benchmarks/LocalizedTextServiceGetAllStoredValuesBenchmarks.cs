@@ -82,6 +82,24 @@ namespace Umbraco.Tests.Benchmarks
                 var result = _xmlService.Localize("language", culture);
             }
         }
+        [Benchmark]
+        public void OptimizedXmlGetAll()
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                var result = _optimized.GetAllStoredValues(culture);
+            }
+
+        }
+        [Benchmark]
+        public void OptimizedDictGetAll()
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                var result = _optimizedDict.GetAllStoredValues(culture);
+            }
+        }
+
         [Benchmark()]
         public void OptimizedXmlLocalize()
         {
