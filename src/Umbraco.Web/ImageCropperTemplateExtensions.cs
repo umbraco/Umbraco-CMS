@@ -253,26 +253,26 @@ namespace Umbraco.Web
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(imageUrl, Current.ImageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
 
-
+        private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
-            var imageCrops = new ImageCropperValue();
+            ImageCropperValue imageCrops = new ImageCropperValue();
             if (json.DetectIsJson())
             {
                 try
                 {
-                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
+                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, ImageCropperValueJsonSerializerSettings);
                 }
                 catch (Exception ex)
                 {
                     Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
                 }
             }
-
+            imageCrops = imageCrops ?? new ImageCropperValue();
             return imageCrops;
         }
     }
