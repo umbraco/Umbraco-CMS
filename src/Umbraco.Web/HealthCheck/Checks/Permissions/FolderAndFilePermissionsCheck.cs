@@ -135,22 +135,20 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             // Return error if any required paths fail the check, or warning if any optional ones do
             var resultType = StatusResultType.Success;
-            var messageKey = string.Format("healthcheck/{0}PermissionsCheckMessage",
-                checkingFor == PermissionCheckFor.Folder ? "folder" : "file");
-            var message = _textService.Localize(messageKey);
+            var messageArea = "healthcheck";
+            var messageAlias = string.Concat(checkingFor == PermissionCheckFor.Folder ? "folder" : "file", "PermissionsCheckMessage");
+            var message = _textService.Localize(messageArea, messageAlias);
             if (requiredPathCheckResult == false)
             {
                 resultType = StatusResultType.Error;
-                messageKey = string.Format("healthcheck/required{0}PermissionFailed",
-                    checkingFor == PermissionCheckFor.Folder ? "Folder" : "File");
-                message = GetMessageForPathCheckFailure(messageKey, requiredFailedPaths);
+                messageAlias = string.Concat("required", checkingFor == PermissionCheckFor.Folder ? "Folder" : "File", "PermissionFailed");
+                message = GetMessageForPathCheckFailure(messageArea, messageAlias, requiredFailedPaths);
             }
             else if (optionalPathCheckResult == false)
             {
                 resultType = StatusResultType.Warning;
-                messageKey = string.Format("healthcheck/optional{0}PermissionFailed",
-                    checkingFor == PermissionCheckFor.Folder ? "Folder" : "File");
-                message = GetMessageForPathCheckFailure(messageKey, optionalFailedPaths);
+                messageAlias = string.Concat("optional", checkingFor == PermissionCheckFor.Folder ? "Folder" : "File", "PermissionFailed");
+                message = GetMessageForPathCheckFailure(messageArea, messageAlias, optionalFailedPaths);
             }
 
             var actions = new List<HealthCheckAction>();
@@ -162,12 +160,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 };
         }
 
-        private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)
+        private string GetMessageForPathCheckFailure(string messageArea,string messageAlias, IEnumerable<string> failedPaths)
         {
             var rootFolder = IOHelper.MapPath("/");
             var failedFolders = failedPaths
                 .Select(x => ParseFolderFromFullPath(rootFolder, x));
-            return _textService.Localize(messageKey,
+            return _textService.Localize(messageArea, messageAlias,
                 new[] { string.Join(", ", failedFolders) });
         }
 

@@ -12,12 +12,75 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
-        public static string Localize(this ILocalizedTextService manager, string area, string key)
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture)
         {
-            var fullKey = string.Join("/", area, key);
+            if(manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, culture);
+            }
+            var fullKey = string.Concat(area, "/", alias);
+            return manager.Localize(fullKey, culture);
+        }
+        public static string Localize(this ILocalizedTextService manager, string area, string alias)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture);
+            }
+            var fullKey = string.Concat(area, "/", alias);
             return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
         }
+        /// <summary>
+        /// Localize using the current thread culture
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, string[] tokens)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
+            }
+            return manager.Localize(string.Join("/",area, alias), Thread.CurrentThread.CurrentUICulture, tokens);
+        }
+        /// <summary>
+        /// Localize using the current thread culture
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, IDictionary<string, string> tokens = null)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
+            }
+            return manager.Localize(string.Join("/", area, alias), Thread.CurrentThread.CurrentUICulture, tokens);
+        }
 
+
+        /// <summary>
+        /// Localize a key without any variables
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="culture"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string[] tokens)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
+            }
+            return manager.Localize(string.Join("/", area, alias), culture, ConvertToDictionaryVars(tokens));
+        }
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>

@@ -30,7 +30,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/customErrorsCheckSuccessMessage", new[] { CurrentValue });
+                return TextService.Localize("healthcheck", "customErrorsCheckSuccessMessage", new[] { CurrentValue });
             }
         }
 
@@ -38,7 +38,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/customErrorsCheckErrorMessage",
+                return TextService.Localize("healthcheck", "customErrorsCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/customErrorsCheckRectifySuccessMessage",
+                return TextService.Localize("healthcheck", "customErrorsCheckRectifySuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value });
             }
         }

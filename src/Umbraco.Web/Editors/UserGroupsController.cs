@@ -78,7 +78,7 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "operationSavedHeader"), Services.TextService.Localize("speechBubbles", "editUserGroupSaved"));
             return display;
         }
 
@@ -163,9 +163,9 @@ namespace Umbraco.Web.Editors
             }
             if (userGroups.Length > 1)
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+                    Services.TextService.Localize("speechBubbles", "deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
+                Services.TextService.Localize("speechBubbles", "deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

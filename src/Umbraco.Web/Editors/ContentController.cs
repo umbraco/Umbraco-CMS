@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
                     new ContentVariantDisplay
                     {
                         CreateDate = DateTime.Now,
-                        Name = Services.TextService.Localize("general/recycleBin")
+                        Name = Services.TextService.Localize("general","recycleBin")
                     }
                 },
                 ContentApps = apps
@@ -567,8 +567,8 @@ namespace Umbraco.Web.Editors
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
-                Services.TextService.Localize("blueprints/createdBlueprintHeading"),
-                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[] { content.Name })
+                Services.TextService.Localize("blueprints", "createdBlueprintHeading"),
+                Services.TextService.Localize("blueprints", "createdBlueprintMessage", new[] { content.Name })
             );
 
             return notificationModel;
@@ -579,7 +579,7 @@ namespace Umbraco.Web.Editors
             var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name && x.Id != content.Id))
             {
-                ModelState.AddModelError(modelName, Services.TextService.Localize("blueprints/duplicateBlueprintMessage"));
+                ModelState.AddModelError(modelName, Services.TextService.Localize("blueprints", "duplicateBlueprintMessage"));
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
         }
@@ -741,15 +741,15 @@ namespace Umbraco.Web.Editors
                                 var variantName = GetVariantName(culture, segment);
 
                                 AddSuccessNotification(notifications, culture, segment,
-                                    Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                    Services.TextService.Localize("speechBubbles/editVariantSendToPublishText", new[] { variantName }));
+                                    Services.TextService.Localize("speechBubbles", "editContentSendToPublish"),
+                                    Services.TextService.Localize("speechBubbles", "editVariantSendToPublishText", new[] { variantName }));
                             }
                         }
                         else if (ModelState.IsValid)
                         {
                             globalNotifications.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
+                                Services.TextService.Localize("speechBubbles", "editContentSendToPublish"),
+                                Services.TextService.Localize("speechBubbles", "editContentSendToPublishText"));
                         }
                     }
                     break;
@@ -766,8 +766,8 @@ namespace Umbraco.Web.Editors
                         if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
                         {
                             globalNotifications.AddErrorNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/invalidPublishBranchPermissions"));
+                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
                         }
@@ -782,8 +782,8 @@ namespace Umbraco.Web.Editors
                         if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
                         {
                             globalNotifications.AddErrorNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/invalidPublishBranchPermissions"));
+                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
                         }
@@ -873,7 +873,7 @@ namespace Umbraco.Web.Editors
                         //if there's more than 1 variant, then we need to add the culture specific error
                         //messages based on the variants in error so that the messages show in the publish/save dialog
                         if (variants.Count > 1)
-                            AddVariantValidationError(variant.Culture, variant.Segment, "publish/contentPublishedFailedByMissingName");
+                            AddVariantValidationError(variant.Culture, variant.Segment, "publish","contentPublishedFailedByMissingName");
                         else
                             return false; //It's invariant and is missing critical data, it cannot be saved
                     }
@@ -911,14 +911,14 @@ namespace Umbraco.Web.Editors
         /// <param name="notifications"></param>
         /// <param name="globalNotifications"></param>
         /// <param name="invariantSavedLocalizationKey"></param>
-        /// <param name="variantSavedLocalizationKey"></param>
+        /// <param name="variantSavedLocalizationAlias"></param>
         /// <param name="wasCancelled"></param>
         /// <remarks>
         /// Method is used for normal Saving and Scheduled Publishing
         /// </remarks>
         private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string invariantSavedLocalizationKey, string variantSavedLocalizationKey, string cultureForInvariantErrors,
+            string invariantSavedLocalizationKey, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
             out bool wasCancelled)
         {
             var saveResult = saveMethod(contentItem.PersistedContent);
@@ -938,14 +938,14 @@ namespace Umbraco.Web.Editors
                         var variantName = GetVariantName(culture, segment);
 
                         AddSuccessNotification(notifications, culture, segment,
-                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize(variantSavedLocalizationKey, new[] { variantName }));
+                            Services.TextService.Localize("speechBubbles", "editContentSavedHeader"),
+                            Services.TextService.Localize(null,variantSavedLocalizationAlias, new[] { variantName }));
                     }
                 }
                 else if (ModelState.IsValid)
                 {
                     globalNotifications.AddSuccessNotification(
-                        Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                        Services.TextService.Localize("speechBubbles", "editContentSavedHeader"),
                         Services.TextService.Localize(invariantSavedLocalizationKey));
                 }
             }
@@ -1073,7 +1073,7 @@ namespace Umbraco.Web.Editors
                 {
                     //can't continue, a mandatory variant is not published and not scheduled for publishing
                     // TODO: Add segment
-                    AddVariantValidationError(culture, null, "speechBubbles/scheduleErrReleaseDate2");
+                    AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate2");
                     isValid = false;
                     continue;
                 }
@@ -1081,7 +1081,7 @@ namespace Umbraco.Web.Editors
                 {
                     //can't continue, a mandatory variant is not published and it's scheduled for publishing after a non-mandatory
                     // TODO: Add segment
-                    AddVariantValidationError(culture, null, "speechBubbles/scheduleErrReleaseDate3");
+                    AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate3");
                     isValid = false;
                     continue;
                 }
@@ -1095,7 +1095,7 @@ namespace Umbraco.Web.Editors
                 //1) release date cannot be less than now
                 if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
                 {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrReleaseDate1");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrReleaseDate1");
                     isValid = false;
                     continue;
                 }
@@ -1103,7 +1103,7 @@ namespace Umbraco.Web.Editors
                 //2) expire date cannot be less than now
                 if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
                 {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrExpireDate1");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate1");
                     isValid = false;
                     continue;
                 }
@@ -1111,7 +1111,7 @@ namespace Umbraco.Web.Editors
                 //3) expire date cannot be less than release date
                 if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
                 {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrExpireDate2");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate2");
                     isValid = false;
                     continue;
                 }
@@ -1360,19 +1360,19 @@ namespace Umbraco.Web.Editors
                 if (r.publishing && !r.isValid)
                 {
                     //flagged for publishing but the mandatory culture is invalid
-                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish/contentPublishedFailedReqCultureValidationError");
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish", "contentPublishedFailedReqCultureValidationError");
                     canPublish = false;
                 }
                 else if (r.publishing && r.isValid && firstInvalidMandatoryCulture != null)
                 {
                     //in this case this culture also cannot be published because another mandatory culture is invalid
-                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish/contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish", "contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
                     canPublish = false;
                 }
                 else if (!r.publishing)
                 {
                     //cannot continue publishing since a required culture that is not currently being published isn't published
-                    AddVariantValidationError(r.model.Culture, r.model.Segment, "speechBubbles/contentReqCulturePublishError");
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "speechBubbles", "contentReqCulturePublishError");
                     canPublish = false;
                 }
             }
@@ -1397,7 +1397,7 @@ namespace Umbraco.Web.Editors
                 var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
                 if (!valid)
                 {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/contentCultureValidationError");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");
                     return false;
                 }
             }
@@ -1414,12 +1414,12 @@ namespace Umbraco.Web.Editors
         /// <param name="cultureToken">
         /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used.
         /// </param>
-        private void AddVariantValidationError(string culture, string segment, string localizationKey, string cultureToken = null)
+        private void AddVariantValidationError(string culture, string segment, string localizationArea,string localizationAlias, string cultureToken = null)
         {
             var cultureToUse = cultureToken ?? culture;
             var variantName = GetVariantName(cultureToUse, segment);
 
-            var errMsg = Services.TextService.Localize(localizationKey, new[] { variantName });
+            var errMsg = Services.TextService.Localize(localizationArea, localizationAlias, new[] { variantName });
 
             ModelState.AddVariantValidationError(culture, segment, errMsg);
         }
@@ -1554,7 +1554,7 @@ namespace Umbraco.Web.Editors
         {
             Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs", "recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -1662,8 +1662,8 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     content.AddSuccessNotification(
-                        Services.TextService.Localize("content/unpublish"),
-                        Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                        Services.TextService.Localize("content", "unpublish"),
+                        Services.TextService.Localize("speechBubbles", "contentUnpublished"));
                     return content;
                 }
             }
@@ -1688,8 +1688,8 @@ namespace Umbraco.Web.Editors
                 if (results.Any(x => x.Value.Result == PublishResultType.SuccessUnpublishMandatoryCulture))
                 {
                     content.AddSuccessNotification(
-                           Services.TextService.Localize("content/unpublish"),
-                           Services.TextService.Localize("speechBubbles/contentMandatoryCultureUnpublished"));
+                           Services.TextService.Localize("content", "unpublish"),
+                           Services.TextService.Localize("speechBubbles", "contentMandatoryCultureUnpublished"));
                     return content;
                 }
 
@@ -1697,8 +1697,8 @@ namespace Umbraco.Web.Editors
                 foreach (var r in results)
                 {
                     content.AddSuccessNotification(
-                           Services.TextService.Localize("content/unpublish"),
-                           Services.TextService.Localize("speechBubbles/contentCultureUnpublished", new[] { _allLangs.Value[r.Key].CultureName }));
+                           Services.TextService.Localize("conten", "unpublish"),
+                           Services.TextService.Localize("speechBubbles", "contentCultureUnpublished", new[] { _allLangs.Value[r.Key].CultureName }));
                 }
                 return content;
 
@@ -1729,7 +1729,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (UriFormatException)
                 {
-                    var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
+                    var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain", "invalidDomain"));
                     throw new HttpResponseException(response);
                 }
             }
@@ -1887,7 +1887,7 @@ namespace Umbraco.Web.Editors
 
                 foreach (var (culture, segment) in variantErrors)
                 {
-                    AddVariantValidationError(culture, segment, "speechBubbles/contentCultureValidationError");
+                    AddVariantValidationError(culture, segment, "speechBubbles", "contentCultureValidationError");
                 }
             }
 
@@ -2012,7 +2012,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
-                                    Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
+                                    Services.TextService.Localize("moveOrCopy", "notAllowedAtRoot")));
                 }
             }
             else
@@ -2030,7 +2030,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
-                                    Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
+                                    Services.TextService.Localize("moveOrCopy", "notAllowedByContentType")));
                 }
 
                 // Check on paths
@@ -2038,7 +2038,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
-                                    Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
+                                    Services.TextService.Localize("moveOrCopy", "notAllowedByPath")));
                 }
             }
 
@@ -2107,16 +2107,16 @@ namespace Umbraco.Web.Editors
                                 {
                                     //either invariant single publish, or bulk publish where all statuses are already published
                                     display.AddSuccessNotification(
-                                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                        Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                                        Services.TextService.Localize("speechBubbles", "editContentPublishedHeader"),
+                                        Services.TextService.Localize("speechBubbles", "editContentPublishedText"));
                                 }
                                 else
                                 {
                                     foreach (var c in successfulCultures)
                                     {
                                         display.AddSuccessNotification(
-                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                            Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                            Services.TextService.Localize("speechBubbles", "editContentPublishedHeader"),
+                                            Services.TextService.Localize("speechBubbles", "editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
                                     }
                                 }
                             }
@@ -2132,20 +2132,20 @@ namespace Umbraco.Web.Editors
                             if (successfulCultures == null)
                             {
                                 display.AddSuccessNotification(
-                                    Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                    Services.TextService.Localize("speechBubbles", "editContentPublishedHeader"),
                                     totalStatusCount > 1
-                                        ? Services.TextService.Localize("speechBubbles/editMultiContentPublishedText", new[] { itemCount.ToInvariantString() })
-                                        : Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                                        ? Services.TextService.Localize("speechBubbles", "editMultiContentPublishedText", new[] { itemCount.ToInvariantString() })
+                                        : Services.TextService.Localize("speechBubbles", "editContentPublishedText"));
                             }
                             else
                             {
                                 foreach (var c in successfulCultures)
                                 {
                                     display.AddSuccessNotification(
-                                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                        Services.TextService.Localize("speechBubbles", "editContentPublishedHeader"),
                                         totalStatusCount > 1
-                                            ? Services.TextService.Localize("speechBubbles/editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
-                                            : Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                            ? Services.TextService.Localize("speechBubbles", "editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
+                                            : Services.TextService.Localize("speechBubbles", "editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
                                 }
                             }
                         }
@@ -2155,8 +2155,8 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/contentPublishedFailedByParent",
+                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize("publish", "contentPublishedFailedByParent",
                                     new[] { names }).Trim());
                         }
                         break;
@@ -2172,8 +2172,8 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                    Services.TextService.Localize("publish"),
-                                    Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
+                                    Services.TextService.Localize(null,"publish"),
+                                    Services.TextService.Localize("publish", "contentPublishedFailedAwaitingRelease",
                                         new[] { names }).Trim());
                         }
                         break;
@@ -2182,8 +2182,8 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize("publish", "contentPublishedFailedExpired",
                                     new[] { names }).Trim());
                         }
                         break;
@@ -2192,8 +2192,8 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize("publish"),
-                                Services.TextService.Localize("publish/contentPublishedFailedIsTrashed",
+                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize("publish", "contentPublishedFailedIsTrashed",
                                     new[] { names }).Trim());
                         }
                         break;
@@ -2203,8 +2203,8 @@ namespace Umbraco.Web.Editors
                             {
                                 var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                                 display.AddWarningNotification(
-                                    Services.TextService.Localize("publish"),
-                                    Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                    Services.TextService.Localize(null,"publish"),
+                                    Services.TextService.Localize("publish", "contentPublishedFailedInvalid",
                                         new[] { names }).Trim());
                             }
                             else
@@ -2213,8 +2213,8 @@ namespace Umbraco.Web.Editors
                                 {
                                     var names = string.Join(", ", status.Select(x => $"'{(x.Content.ContentType.VariesByCulture() ? x.Content.GetCultureName(c) : x.Content.Name)}'"));
                                     display.AddWarningNotification(
-                                        Services.TextService.Localize("publish"),
-                                        Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                        Services.TextService.Localize(null,"publish"),
+                                        Services.TextService.Localize("publish", "contentPublishedFailedInvalid",
                                             new[] { names }).Trim());
                                 }
                             }
@@ -2222,7 +2222,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         display.AddWarningNotification(
-                            Services.TextService.Localize("publish"),
+                            Services.TextService.Localize(null,"publish"),
                             "publish/contentPublishedFailedByCulture");
                         break;
                     default:
@@ -2355,13 +2355,13 @@ namespace Umbraco.Web.Editors
                 case OperationResultType.NoOperation:
                 default:
                     notificationModel.AddErrorNotification(
-                                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                                    Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
                                     null); // TODO: There is no specific failed to save error message AFAIK
                     break;
                 case OperationResultType.FailedCancelledByEvent:
                     notificationModel.AddErrorNotification(
-                                    Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
-                                    Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                                    Services.TextService.Localize("speechBubbles", "operationCancelledHeader"),
+                                    Services.TextService.Localize("speechBubbles", "operationCancelledText"));
                     break;
             }
 

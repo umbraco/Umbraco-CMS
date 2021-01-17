@@ -384,7 +384,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<DocumentTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "contentTypeSavedHeader"),
                             string.Empty);
 
             return display;
@@ -666,8 +666,8 @@ namespace Umbraco.Web.Editors
             else
             {
                 model.Notifications.Add(new Notification(
-                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                    Services.TextService.Localize("media/disallowedFileType"),
+                    Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
+                    Services.TextService.Localize("media", "disallowedFileType"),
                     NotificationStyle.Warning));
             }
 

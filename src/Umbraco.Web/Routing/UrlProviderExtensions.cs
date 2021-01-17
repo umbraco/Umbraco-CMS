@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
 
             if (content.Published == false)
             {
-                yield return UrlInfo.Message(textService.Localize("content/itemNotPublished"));
+                yield return UrlInfo.Message(textService.Localize("content", "itemNotPublished"));
                 yield break;
             }
 
@@ -126,7 +126,7 @@ namespace Umbraco.Web.Routing
 
                     // deal with exceptions
                     case "#ex":
-                        yield return UrlInfo.Message(textService.Localize("content/getUrlException"), culture);
+                        yield return UrlInfo.Message(textService.Localize("content", "getUrlException"), culture);
                         break;
 
                     // got a URL, deal with collisions, add URL
@@ -152,13 +152,13 @@ namespace Umbraco.Web.Routing
             while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 
             if (parent == null) // oops, internal error
-                return UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
 
             else if (!parent.Published) // totally not published
-                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] {parent.Name}), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] {parent.Name}), culture);
 
             else // culture not published
-                return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentCultureNotPublished", new[] {parent.Name}), culture);
         }
 
         private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Routing
 
             if (pcr.HasPublishedContent == false)
             {
-                urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
+                urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
                 return true;
             }
 
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Routing
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                 urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
+                 urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
                 return true;
             }
 

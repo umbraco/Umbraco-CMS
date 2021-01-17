@@ -99,7 +99,7 @@ namespace Umbraco.Web.Trees
 
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions", "rename"))
                 {
                     Icon = "icon icon-edit"
                 });

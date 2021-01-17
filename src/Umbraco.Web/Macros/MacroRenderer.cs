@@ -340,14 +340,14 @@ namespace Umbraco.Web.Macros
                         $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                         "Executed PartialView.",
                         () => ExecutePartialView(model, content),
-                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                        () => textService.Localize("errors", "macroErrorLoadingPartialView", new[] { model.MacroSource }));
 
                 default:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Execute macro with unsupported type \"{model.MacroType}\".",
                         "Executed.",
                         () => { throw new Exception("Unsupported macro type."); },
-                        () => textService.Localize("errors/macroErrorUnsupportedType"));
+                        () => textService.Localize("errors", "macroErrorUnsupportedType"));
             }
         }
 

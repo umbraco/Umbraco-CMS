@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
             var label = $"[{tree.TreeAlias}]";
 
             // try to look up a the localized tree header matching the tree alias
-            var localizedLabel = textService.Localize("treeHeaders/" + tree.TreeAlias);
+            var localizedLabel = textService.Localize("treeHeader", tree.TreeAlias);
 
             // if the localizedLabel returns [alias] then return the title if it's defined
             if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
