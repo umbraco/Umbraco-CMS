@@ -35,6 +35,8 @@
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
 
+    'js/utilities.js',
+
     'js/app.js',
 
     'js/umbraco.resources.js',
@@ -44,5 +46,5 @@
     'js/umbraco.interceptors.js',
     'js/umbraco.controllers.js',
     'js/routes.js',
-    'js/init.js'
+    'js/init.js'    
 ]

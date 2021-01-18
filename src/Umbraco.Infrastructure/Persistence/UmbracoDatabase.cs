@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.FaultHandling;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -25,6 +24,7 @@ namespace Umbraco.Core.Persistence
     {
         private readonly ILogger<UmbracoDatabase> _logger;
         private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
+        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private readonly Guid _instanceGuid = Guid.NewGuid();
@@ -39,13 +39,14 @@ namespace Umbraco.Core.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
 
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
 
@@ -177,7 +178,20 @@ namespace Umbraco.Core.Persistence
 
         }
 
+        /// <summary>
+        /// Returns the <see cref="DatabaseSchemaResult"/> for the database
+        /// </summary>
+        public DatabaseSchemaResult ValidateSchema()
+        {
+            var dbSchema = _databaseSchemaCreatorFactory.Create(this);
+            var databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            return databaseSchemaValidationResult;
+        }
 
+        /// <summary>
+        /// Returns true if Umbraco database tables are detected to be installed
+        /// </summary>
+        public bool IsUmbracoInstalled() => ValidateSchema().DetermineHasInstalledVersion();
 
         #endregion
 

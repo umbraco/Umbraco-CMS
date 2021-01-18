@@ -94,10 +94,15 @@ namespace Umbraco.Core.Configuration.Models
         public bool InstallMissingDatabase { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets a value indicating whether to install the database when it is empty.
+        /// Gets or sets a value indicating whether unattended installs are enabled.
         /// </summary>
-        public bool InstallEmptyDatabase { get; set; } = false;
-
+        /// <remarks>
+        /// <para>By default, when a database connection string is configured and it is possible to connect to
+        /// the database, but the database is empty, the runtime enters the <c>Install</c> level.
+        /// If this option is set to <c>true</c> an unattended install will be performed and the runtime enters
+        /// the <c>Run</c> level.</para>
+        /// </remarks>
+        public bool InstallUnattended { get; set; } = false;
         /// <summary>
         /// Gets or sets a value indicating whether to disable the election for a single server.
         /// </summary>
@@ -112,6 +117,7 @@ namespace Umbraco.Core.Configuration.Models
         /// Gets or sets a value for the main dom lock.
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;
+        public string Id { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets a value for the path to the no content view.

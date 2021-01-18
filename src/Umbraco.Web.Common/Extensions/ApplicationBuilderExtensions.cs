@@ -60,6 +60,7 @@ namespace Umbraco.Extensions
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
             // This must come after auth because the culture is based on the auth'd user
             app.UseRequestLocalization();
 

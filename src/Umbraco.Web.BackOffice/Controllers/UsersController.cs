@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -664,7 +666,16 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/operationSavedHeader"), _localizedTextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var userHasChangedOwnLanguage =
+                user.Id == currentUser.Id && currentUser.Language != user.Language;
+
+            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(_localizedTextService.Localize(textToLocalise, culture), _localizedTextService.Localize("speechBubbles/editUserSaved", culture));
             return display;
         }
 

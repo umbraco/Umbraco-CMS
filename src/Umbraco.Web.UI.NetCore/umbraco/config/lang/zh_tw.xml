@@ -507,7 +507,7 @@
               <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
               <p>
               點選<strong>重試</strong>按鈕當上述步驟完成。<br />
-              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
         若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
@@ -553,7 +553,7 @@
     <key alias="runwayFromScratch">我要從頭開始</key>
     <key alias="runwayFromScratchText"><![CDATA[
         您的網站目前完全沒有資料，所以如果您想要從頭開始並增添您自己的文檔種類和範本，現在正是絕佳時機。
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">學習該怎麼做</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">學習該怎麼做</a>)
         您晚點仍可以選擇安裝Runway，請至開發者區域選擇安裝。
       ]]></key>
     <key alias="runwayHeader">您剛剛安裝了一個乾淨的系統，要繼續嗎？</key>
@@ -619,7 +619,7 @@
     <key alias="instruction">下方登入</key>
     <key alias="signInWith">登入使用</key>
     <key alias="timeout">連線時間過了</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">忘記密碼？</key>
     <key alias="forgottenPasswordInstruction">一封內有重設密碼連結的電子郵件已經寄出給您</key>
     <key alias="requestPasswordResetConfirmation">一封內有重設密碼連結的電子郵件已經寄到此信箱</key>

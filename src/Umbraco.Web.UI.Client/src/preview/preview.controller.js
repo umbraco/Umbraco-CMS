@@ -117,6 +117,13 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             }
         }
 
+        function fixExternalLinks(iframe) {
+            // Make sure external links don't open inside the iframe
+            Array.from(iframe.contentDocument.getElementsByTagName("a"))
+                .filter(a => a.hostname !== location.hostname && !a.target)
+                .forEach(a => a.target = "_top");
+        }
+
         var isInit = getParameterByName("init");
         if (isInit === "true") {
             //do not continue, this is the first load of this new window, if this is passed in it means it's been
@@ -443,6 +450,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
             $scope.frameLoaded = true;
             configureSignalR(iframe);
+            fixExternalLinks(iframe);
 
             $scope.currentCultureIso = $location.search().culture || null;
         };

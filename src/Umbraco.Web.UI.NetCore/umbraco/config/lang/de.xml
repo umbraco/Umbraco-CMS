@@ -709,7 +709,6 @@
     <key alias="off">Aus</key>
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
-    <key alias="options">Optionen</key>
     <key alias="on">An</key>
     <!--???-->
     <key alias="or">oder</key>
@@ -821,9 +820,11 @@
     </key>
     <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseNotFound">
-      &lt;p&gt;Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.&lt;/p&gt;
-      &lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
-      &lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="https://our.umbraco.com/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
+        <![CDATA[
+      <p>Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.</p>
+      <p>Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.</p>
+      <p>Klicken Sie nach erfolgter Anpassung auf <strong>Wiederholen</strong>.<br />Wenn Sie weitere technische Informationen benötigen, besuchen Sie <a href="https://our.umbraco.com/wiki" target="_blank" rel="noopener">The Umbraco documentation wik</a>.</p>
+    ]]>
     </key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
     <key alias="databaseUpgrade">
@@ -865,7 +866,7 @@
     <key alias="runwayFromScratch">Ich möchte mit einem leeren System ohne Inhalte und Vorgaben starten</key>
     <key alias="runwayFromScratchText">
       Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit.
-      (&lt;a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
+      (&lt;a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
       Sie können "Runway" auch jederzeit später installieren. Verwenden Sie hierzu den Punkt "Pakete" im Entwickler-Bereich.
     </key>
     <key alias="runwayHeader">Die Einrichtung von Umbraco ist abgeschlossen und das Content-Management-System steht bereit. Wie soll es weitergehen?</key>
@@ -926,7 +927,7 @@
     <key alias="instruction">Hier anmelden:</key>
     <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="https://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="forgottenPassword">Kennwort vergessen?</key>
     <key alias="forgottenPasswordInstruction">Es wird eine E-Mail mit einem Kennwort-Zurücksetzen-Link an die angegebene Adresse geschickt.</key>
     <key alias="requestPasswordResetConfirmation">Es wird eine E-Mail mit Anweisungen zum Zurücksetzen des Kennwortes an die angegebene Adresse geschickt sofern diese im Datenbestand gefunden wurde.</key>
@@ -1492,9 +1493,6 @@
     <key alias="addRule">Neuer Stil</key>
     <key alias="editRule">Stil bearbeiten</key>
     <key alias="editorRules">Rich text editor Stile</key>
-    <key alias="editorRulesHelp">
-      Definiere die Stile, die im 'Rich-Text-Editor' verfügbar sein sollen.
-    </key>
     <key alias="editorRulesHelp">Definiere die Styles, die im Rich-Text-Editor dieses Stylesheets verfügbar sein sollen.</key>
     <key alias="editstylesheet">Stylesheet bearbeiten</key>
     <key alias="editstylesheetproperty">Stylesheet-Regel bearbeiten</key>

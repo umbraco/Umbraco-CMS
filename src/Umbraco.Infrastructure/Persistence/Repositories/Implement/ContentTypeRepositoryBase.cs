@@ -467,8 +467,14 @@ AND umbracoNode.id <> @id",
                     // The composed property is only considered segment variant when the base content type is also segment variant.
                     // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
                     var target = newContentTypeVariation & composedPropertyType.Variations;
+                    // Determine the previous variation
+                    // We have to compare with the old content type variation because the composed property might already have changed
+                    // Example: A property with variations in an element type with variations is used in a document without
+                    //          when you enable variations the property has already enabled variations from the element type,
+                    //          but it's still a change from nothing because the document did not have variations, but it does now.
+                    var from = oldContentTypeVariation & composedPropertyType.Variations;
 
-                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (from, target);
                 }
             }
 

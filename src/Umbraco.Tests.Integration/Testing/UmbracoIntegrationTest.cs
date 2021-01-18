@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Integration.Testing
         [SetUp]
         public virtual void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallEmptyDatabase)] = "true";
+            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();

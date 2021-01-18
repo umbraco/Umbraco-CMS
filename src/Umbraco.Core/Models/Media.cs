@@ -77,7 +77,7 @@ namespace Umbraco.Core.Models
             else
                 Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
 
-            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
+            Properties.ClearCollectionChangedEvents(); // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
     }

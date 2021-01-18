@@ -91,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -394,6 +394,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
+                        {"loginLogoImage", _contentSettings.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"showAllowSegmentationForDocumentTypes", false},

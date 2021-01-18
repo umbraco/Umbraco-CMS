@@ -194,11 +194,12 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
+                var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
 
                 return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
+                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment, databaseSchemaCreatorFactory)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });
 

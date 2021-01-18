@@ -12,6 +12,7 @@ using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NPoco.Linq;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -112,6 +113,9 @@ namespace Umbraco.Tests.Testing
         public int SqlCount { get; }
 
         public int BulkInsertRecords<T>(IEnumerable<T> records) => throw new NotImplementedException();
+        public bool IsUmbracoInstalled() => true;
+
+        public DatabaseSchemaResult ValidateSchema() => throw new NotImplementedException();
 
         public DbParameter CreateParameter() => throw new NotImplementedException();
 

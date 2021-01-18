@@ -5,6 +5,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -21,19 +22,22 @@ namespace Umbraco.Tests.Integration.Testing
         private readonly IOptions<ConnectionStrings> _connectionStrings;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
+        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
         public TestUmbracoDatabaseFactoryProvider(
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
             IOptions<ConnectionStrings> connectionStrings,
             Lazy<IMapperCollection> mappers,
-            IDbProviderFactoryCreator dbProviderFactoryCreator)
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             _loggerFactory = loggerFactory;
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings;
             _mappers = mappers;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
 
         public IUmbracoDatabaseFactory Create()
@@ -45,7 +49,8 @@ namespace Umbraco.Tests.Integration.Testing
                 _globalSettings.Value,
                 _connectionStrings.Value,
                 _mappers,
-                _dbProviderFactoryCreator);
+                _dbProviderFactoryCreator,
+                _databaseSchemaCreatorFactory);
         }
     }
 }
