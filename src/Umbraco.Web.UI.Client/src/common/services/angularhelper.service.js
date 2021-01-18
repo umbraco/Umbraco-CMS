@@ -11,6 +11,11 @@ function angularHelper($q) {
     var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
 
     function collectAllFormErrorsRecursively(formCtrl, allErrors) {
+        // skip if the control is already added to the array
+        if (allErrors.indexOf(formCtrl) !== -1) {
+            return
+        }
+
         // loop over the error dictionary (see https://docs.angularjs.org/api/ng/type/form.FormController#$error)
         var keys = Object.keys(formCtrl.$error);
         if (keys.length === 0) {
