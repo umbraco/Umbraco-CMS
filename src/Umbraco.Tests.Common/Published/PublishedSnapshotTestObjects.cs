@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -7,13 +10,13 @@ namespace Umbraco.Tests.Published
 {
     public class PublishedSnapshotTestObjects
     {
-
         [PublishedModel("element1")]
         public class TestElementModel1 : PublishedElementModel
         {
             public TestElementModel1(IPublishedElement content, IPublishedValueFallback fallback)
                 : base(content)
-            { }
+            {
+            }
 
             public string Prop1 => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop1");
         }
@@ -23,7 +26,8 @@ namespace Umbraco.Tests.Published
         {
             public TestElementModel2(IPublishedElement content, IPublishedValueFallback fallback)
                 : base(content)
-            { }
+            {
+            }
 
             public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>(Mock.Of<IPublishedValueFallback>(), "prop2");
         }
@@ -33,7 +37,8 @@ namespace Umbraco.Tests.Published
         {
             public TestContentModel1(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
-            { }
+            {
+            }
 
             public string Prop1 => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop1");
         }
@@ -43,10 +48,10 @@ namespace Umbraco.Tests.Published
         {
             public TestContentModel2(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
-            { }
+            {
+            }
 
             public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>(Mock.Of<IPublishedValueFallback>(), "prop2");
         }
-
     }
 }

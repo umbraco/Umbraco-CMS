@@ -1,4 +1,7 @@
-﻿using Umbraco.Web;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Common
 {
