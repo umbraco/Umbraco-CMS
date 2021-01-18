@@ -1,6 +1,9 @@
-﻿using System;
-using NUnit.Framework;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Microsoft.Extensions.Logging;
+using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -17,10 +20,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void CanSetAndGet()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             // Insert new key/value
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var keyValue = new KeyValue
                 {
@@ -28,26 +31,26 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                     Value = "bar",
                     UpdateDate = DateTime.Now,
                 };
-                var repo = CreateRepository(provider);
+                IKeyValueRepository repo = CreateRepository(provider);
                 repo.Save(keyValue);
                 scope.Complete();
             }
 
             // Retrieve key/value
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var keyValue = repo.Get("foo");
+                IKeyValueRepository repo = CreateRepository(provider);
+                IKeyValue keyValue = repo.Get("foo");
                 scope.Complete();
 
                 Assert.AreEqual("bar", keyValue.Value);
             }
 
             // Update value
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var keyValue = repo.Get("foo");
+                IKeyValueRepository repo = CreateRepository(provider);
+                IKeyValue keyValue = repo.Get("foo");
                 keyValue.Value = "buzz";
                 keyValue.UpdateDate = DateTime.Now;
                 repo.Save(keyValue);
@@ -55,19 +58,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             }
 
             // Retrieve key/value again
-            using (var scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
-                var repo = CreateRepository(provider);
-                var keyValue = repo.Get("foo");
+                IKeyValueRepository repo = CreateRepository(provider);
+                IKeyValue keyValue = repo.Get("foo");
                 scope.Complete();
 
                 Assert.AreEqual("buzz", keyValue.Value);
             }
         }
 
-        private IKeyValueRepository CreateRepository(IScopeProvider provider)
-        {
-            return new KeyValueRepository((IScopeAccessor) provider, LoggerFactory.CreateLogger<KeyValueRepository>());
-        }
+        private IKeyValueRepository CreateRepository(IScopeProvider provider) => new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>());
     }
 }

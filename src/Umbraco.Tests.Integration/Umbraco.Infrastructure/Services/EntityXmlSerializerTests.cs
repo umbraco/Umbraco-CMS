@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
@@ -23,15 +26,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Export_Macro()
         {
             // Arrange
-            var macroService = GetRequiredService<IMacroService>();
-            var macro = new MacroBuilder()
+            IMacroService macroService = GetRequiredService<IMacroService>();
+            Macro macro = new MacroBuilder()
                 .WithAlias("test1")
                 .WithName("Test")
                 .Build();
             macroService.Save(macro);
 
             // Act
-            var element = Serializer.Serialize(macro);
+            XElement element = Serializer.Serialize(macro);
 
             // Assert
             Assert.That(element, Is.Not.Null);
@@ -45,14 +48,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // Arrange
             CreateDictionaryData();
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            IDictionaryItem dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+            XElement dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
             // Act
-            var xml = Serializer.Serialize(new[] { dictionaryItem });
+            XElement xml = Serializer.Serialize(new[] { dictionaryItem });
 
             // Assert
             Assert.That(xml.ToString(), Is.EqualTo(dictionaryItemsElement.ToString()));
@@ -62,24 +65,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Export_Languages()
         {
             // Arrange
-            var localizationService = GetRequiredService<ILocalizationService>();
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
 
-            var languageNbNo = new LanguageBuilder()
+            ILanguage languageNbNo = new LanguageBuilder()
                 .WithCultureInfo("nb-NO")
                 .WithCultureName("Norwegian")
                 .Build();
             localizationService.Save(languageNbNo);
 
-            var languageEnGb = new LanguageBuilder()
+            ILanguage languageEnGb = new LanguageBuilder()
                 .WithCultureInfo("en-GB")
                 .Build();
             localizationService.Save(languageEnGb);
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var languageItemsElement = newPackageXml.Elements("Languages").First();
+            XElement languageItemsElement = newPackageXml.Elements("Languages").First();
 
             // Act
-            var xml = Serializer.Serialize(new[] { languageNbNo, languageEnGb });
+            XElement xml = Serializer.Serialize(new[] { languageNbNo, languageEnGb });
 
             // Assert
             Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
@@ -87,15 +90,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private void CreateDictionaryData()
         {
-            var localizationService = GetRequiredService<ILocalizationService>();
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
 
-            var languageNbNo = new LanguageBuilder()
+            ILanguage languageNbNo = new LanguageBuilder()
                 .WithCultureInfo("nb-NO")
                 .WithCultureName("Norwegian")
                 .Build();
             localizationService.Save(languageNbNo);
 
-            var languageEnGb = new LanguageBuilder()
+            ILanguage languageEnGb = new LanguageBuilder()
                 .WithCultureInfo("en-GB")
                 .Build();
             localizationService.Save(languageEnGb);

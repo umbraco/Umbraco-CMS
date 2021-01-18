@@ -1,4 +1,6 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using NUnit.Framework;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
@@ -9,39 +11,39 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     {
         public void Name_Is_Suffixed()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Zulu" }
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Zulu");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Zulu");
             Assert.AreEqual("Zulu (1)", res);
         }
 
         [Test]
         public void Suffixed_Name_Is_Incremented()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Zulu" },
                 new SimilarNodeName { Id = 2, Name = "Kilo (1)" },
                 new SimilarNodeName { Id = 3, Name = "Kilo" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Kilo (1)");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Kilo (1)");
             Assert.AreEqual("Kilo (2)", res);
         }
 
         [Test]
         public void Lower_Number_Suffix_Is_Inserted()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Golf" },
                 new SimilarNodeName { Id = 2, Name = "Golf (2)" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Golf");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Golf");
             Assert.AreEqual("Golf (1)", res);
         }
 
@@ -50,13 +52,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [TestCase(0, "alpha", "alpha (3)")]
         public void Case_Is_Ignored(int nodeId, string nodeName, string expected)
         {
-            var names = new[]
-             {
+            SimilarNodeName[] names = new[]
+            {
                 new SimilarNodeName { Id = 1, Name = "Alpha" },
                 new SimilarNodeName { Id = 2, Name = "Alpha (1)" },
                 new SimilarNodeName { Id = 3, Name = "Alpha (2)" },
             };
-            var res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
+            string res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
 
             Assert.AreEqual(expected, res);
         }
@@ -66,7 +68,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         {
             var names = new SimilarNodeName[] { };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Charlie");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Charlie");
 
             Assert.AreEqual("Charlie", res);
         }
@@ -78,7 +80,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         {
             var names = new SimilarNodeName[] { };
 
-            var res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
+            string res = SimilarNodeName.GetUniqueName(names, nodeId, nodeName);
 
             Assert.AreEqual(expected, res);
         }
@@ -86,14 +88,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Matching_NoedId_Causes_No_Change()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Kilo (1)" },
                 new SimilarNodeName { Id = 2, Name = "Yankee" },
                 new SimilarNodeName { Id = 3, Name = "Kilo" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 1, "Kilo (1)");
+            string res = SimilarNodeName.GetUniqueName(names, 1, "Kilo (1)");
 
             Assert.AreEqual("Kilo (1)", res);
         }
@@ -103,16 +105,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         {
             // Sequesnce is: Test, Test (1), Test (2)
             // Ignore: Test (1) (1)
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
-                new SimilarNodeName { Id = 2, Name = "Test" },
-                new SimilarNodeName { Id = 3, Name = "Test (1)" },
-                new SimilarNodeName { Id = 4, Name = "Test (2)" },
-                new SimilarNodeName { Id = 5, Name = "Test (1) (1)" },
+               new SimilarNodeName { Id = 2, Name = "Test" },
+               new SimilarNodeName { Id = 3, Name = "Test (1)" },
+               new SimilarNodeName { Id = 4, Name = "Test (2)" },
+               new SimilarNodeName { Id = 5, Name = "Test (1) (1)" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
             Assert.AreEqual("Test (3)", res);
         }
@@ -120,12 +122,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Matched_Name_Is_Suffixed()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Test" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
             Assert.AreEqual("Test (1)", res);
         }
@@ -136,13 +138,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // "Test (1)" is treated as the "original" version of the name.
             // "Test (1) (1)" is the suffixed result of a copy, and therefore is incremented
             // Hence this test result should be the same as Suffixed_Name_Is_Incremented
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Test (1)" },
                 new SimilarNodeName { Id = 2, Name = "Test (1) (1)" },
             };
 
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Test (1) (1)");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Test (1) (1)");
 
             Assert.AreEqual("Test (1) (2)", res);
         }
@@ -150,31 +152,28 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Suffixed_Name_Causes_Secondary_Suffix()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 6, Name = "Alpha (1)" }
             };
-            var res = SimilarNodeName.GetUniqueName(names, 0, "Alpha (1)");
+            string res = SimilarNodeName.GetUniqueName(names, 0, "Alpha (1)");
 
             Assert.AreEqual("Alpha (1) (1)", res);
         }
-
 
         [TestCase("Test (0)", "Test (0) (1)")]
         [TestCase("Test (-1)", "Test (-1) (1)")]
         [TestCase("Test (1) (-1)", "Test (1) (-1) (1)")]
         public void NonPositive_Suffix_Is_Ignored(string suffix, string expected)
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 6, Name = suffix }
             };
-            var res = SimilarNodeName.GetUniqueName(names, 0, suffix);
+            string res = SimilarNodeName.GetUniqueName(names, 0, suffix);
 
             Assert.AreEqual(expected, res);
         }
-
-
 
         /* Original Tests - Can be deleted, as new tests cover all cases */
 
@@ -183,15 +182,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [TestCase(0, "Golf", "Golf (1)")]
         [TestCase(0, "Kilo", "Kilo (2)")]
         [TestCase(0, "Alpha", "Alpha (3)")]
-        //[TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
-        [TestCase(0, "Kilo (1)", "Kilo (2)")] // names[] contains "Kilo" AND "Kilo (1)", which implies that result should be "Kilo (2)" 
+        //// [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
+        [TestCase(0, "Kilo (1)", "Kilo (2)")] // names[] contains "Kilo" AND "Kilo (1)", which implies that result should be "Kilo (2)"
         [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
         [TestCase(0, "alpha", "alpha (3)")]
         [TestCase(0, "", " (1)")]
         [TestCase(0, null, " (1)")]
         public void Test(int nodeId, string nodeName, string expected)
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
                 new SimilarNodeName { Id = 2, Name = "Alpha" },
@@ -212,7 +211,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Explicit("This test fails! We need to fix up the logic")]
         public void TestMany()
         {
-            var names = new[]
+            SimilarNodeName[] names = new[]
             {
                 new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
                 new SimilarNodeName { Id = 2, Name = "Test" },
@@ -221,7 +220,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 new SimilarNodeName { Id = 22, Name = "Test (1) (1)" },
             };
 
-            //fixme - this will yield "Test (2)" which is already in use
+            // fixme - this will yield "Test (2)" which is already in use
             Assert.AreEqual("Test (3)", SimilarNodeName.GetUniqueName(names, 0, "Test"));
         }
     }

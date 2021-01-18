@@ -1,4 +1,8 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -18,6 +22,7 @@ namespace Umbraco.Tests.Services
     public class ExternalLoginServiceTests : UmbracoIntegrationTest
     {
         private IUserService UserService => GetRequiredService<IUserService>();
+
         private IExternalLoginService ExternalLoginService => GetRequiredService<IExternalLoginService>();
 
         [Test]
@@ -26,11 +31,11 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var providerKey = Guid.NewGuid().ToString("N");
-            var latest = DateTime.Now.AddDays(-1);
-            var oldest = DateTime.Now.AddDays(-10);
+            string providerKey = Guid.NewGuid().ToString("N");
+            DateTime latest = DateTime.Now.AddDays(-1);
+            DateTime oldest = DateTime.Now.AddDays(-10);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 // insert duplicates manuall
                 scope.Database.Insert(new ExternalLoginDto
@@ -50,7 +55,7 @@ namespace Umbraco.Tests.Services
             }
 
             // try to save 2 other duplicates
-            var externalLogins = new[]
+            ExternalLogin[] externalLogins = new[]
             {
                 new ExternalLogin("test2", providerKey),
                 new ExternalLogin("test2", providerKey),
@@ -64,7 +69,7 @@ namespace Umbraco.Tests.Services
             // duplicates will be removed, keeping the latest entries
             Assert.AreEqual(2, logins.Count);
 
-            var test1 = logins.Single(x => x.LoginProvider == "test1");
+            IIdentityUserLogin test1 = logins.Single(x => x.LoginProvider == "test1");
             Assert.Greater(test1.CreateDate, latest);
         }
 
@@ -74,8 +79,8 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var providerKey = Guid.NewGuid().ToString("N");
-            var externalLogins = new[]
+            string providerKey = Guid.NewGuid().ToString("N");
+            ExternalLogin[] externalLogins = new[]
             {
                 new ExternalLogin("test1", providerKey),
                 new ExternalLogin("test1", providerKey)
@@ -99,7 +104,7 @@ namespace Umbraco.Tests.Services
             };
             ExternalLoginService.Save(extLogin);
 
-            var found = ExternalLoginService.GetAll(user.Id);
+            IEnumerable<IIdentityUserLogin> found = ExternalLoginService.GetAll(user.Id);
 
             Assert.AreEqual(1, found.Count());
             Assert.IsTrue(extLogin.HasIdentity);
@@ -132,9 +137,9 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var providerKey1 = Guid.NewGuid().ToString("N");
-            var providerKey2 = Guid.NewGuid().ToString("N");
-            var extLogins = new[]
+            string providerKey1 = Guid.NewGuid().ToString("N");
+            string providerKey2 = Guid.NewGuid().ToString("N");
+            ExternalLogin[] extLogins = new[]
             {
                 new ExternalLogin("test1", providerKey1, "hello"),
                 new ExternalLogin("test2", providerKey2, "world")
@@ -160,9 +165,9 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var providerKey1 = Guid.NewGuid().ToString("N");
-            var providerKey2 = Guid.NewGuid().ToString("N");
-            var extLogins = new[]
+            string providerKey1 = Guid.NewGuid().ToString("N");
+            string providerKey2 = Guid.NewGuid().ToString("N");
+            ExternalLogin[] extLogins = new[]
             {
                 new ExternalLogin("test1", providerKey1, "hello"),
                 new ExternalLogin("test2", providerKey2, "world")
@@ -173,7 +178,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(1, found.Count);
             var asExtended = found.ToList();
             Assert.AreEqual(1, found.Count);
-
         }
 
         [Test]
@@ -182,7 +186,7 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var externalLogins = new[]
+            ExternalLogin[] externalLogins = new[]
             {
                 new ExternalLogin("test1", Guid.NewGuid().ToString("N")),
                 new ExternalLogin("test2", Guid.NewGuid().ToString("N"))
@@ -205,7 +209,7 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var externalLogins = new[]
+            ExternalLogin[] externalLogins = new[]
             {
                 new ExternalLogin("test1", Guid.NewGuid().ToString("N")),
                 new ExternalLogin("test2", Guid.NewGuid().ToString("N")),
@@ -237,7 +241,7 @@ namespace Umbraco.Tests.Services
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
             UserService.Save(user);
 
-            var externalLogins = new[]
+            ExternalLogin[] externalLogins = new[]
             {
                 new ExternalLogin("test1", Guid.NewGuid().ToString("N"), "hello world")
             };
@@ -247,7 +251,6 @@ namespace Umbraco.Tests.Services
             var logins = ExternalLoginService.GetAll(user.Id).ToList();
 
             Assert.AreEqual("hello world", logins[0].UserData);
-
         }
     }
 }

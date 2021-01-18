@@ -1,28 +1,30 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     // FIXME: npoco - is this still appropriate?
-    //
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class NPocoBulkInsertTests : UmbracoIntegrationTest
     {
-        private TestHelper _testHelper = new TestHelper();
+        private readonly TestHelper _testHelper = new TestHelper();
+
         private IProfilingLogger ProfilingLogger => _testHelper.ProfilingLogger;
 
         [NUnit.Framework.Ignore("Ignored because you need to configure your own SQL Server to test this with")]
@@ -33,15 +35,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             // prob not what we want, this is not a real database, but hey, the test is ignored anyways
             // we'll fix this when we have proper testing infrastructure
             // var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new NullLogger<UmbracoDatabase>());
-            var provider = ScopeProvider;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 // Still no what we want, but look above.
-                var dbSqlServer = scope.Database;
-                //drop the table
+                IUmbracoDatabase dbSqlServer = scope.Database;
+
+                // drop the table
                 dbSqlServer.Execute("DROP TABLE [umbracoServer]");
 
-                //re-create it
+                // re-create it
                 dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
     [id] [int] IDENTITY(1,1) NOT NULL,
     [address] [nvarchar](500) NOT NULL,
@@ -56,7 +58,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 )");
                 var data = new List<ServerRegistrationDto>();
-                for (var i = 0; i < 1000; i++)
+                for (int i = 0; i < 1000; i++)
                 {
                     data.Add(new ServerRegistrationDto
                     {
@@ -68,7 +70,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
                     });
                 }
 
-                using (var tr = dbSqlServer.GetTransaction())
+                using (ITransaction tr = dbSqlServer.GetTransaction())
                 {
                     dbSqlServer.BulkInsertRecords(data);
                     tr.Complete();
@@ -83,7 +85,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts()
         {
             var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 servers.Add(new ServerRegistrationDto
                 {
@@ -98,7 +100,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             // Act
             using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
-                using (var scope = ScopeProvider.CreateScope())
+                using (IScope scope = ScopeProvider.CreateScope())
                 {
                     scope.Database.BulkInsertRecords(servers);
                     scope.Complete();
@@ -106,7 +108,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             }
 
             // Assert
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
             }
@@ -116,7 +118,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
         public void Can_Bulk_Insert_Native_Sql_Bulk_Inserts_Transaction_Rollback()
         {
             var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 servers.Add(new ServerRegistrationDto
                 {
@@ -131,15 +133,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             // Act
             using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
             {
-                using (var scope = ScopeProvider.CreateScope())
+                using (IScope scope = ScopeProvider.CreateScope())
                 {
                     scope.Database.BulkInsertRecords(servers);
-                    //don't call complete here - the trans will be rolled back
+
+                    // Don't call complete here - the transaction will be rolled back.
                 }
             }
 
             // Assert
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
             }
@@ -149,7 +152,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
         public void Generate_Bulk_Import_Sql()
         {
             var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 servers.Add(new ServerRegistrationDto
                 {
@@ -162,23 +165,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             }
 
             IDbCommand[] commands;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
                 scope.Complete();
             }
 
             // Assert
-            Assert.That(commands[0].CommandText,
-                        Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isMaster]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
+            Assert.That(
+                commands[0].CommandText,
+                Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isMaster]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
         }
-
 
         [Test]
         public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
         {
             var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1500; i++)
+            for (int i = 0; i < 1500; i++)
             {
                 servers.Add(new ServerRegistrationDto
                 {
@@ -192,7 +195,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             }
 
             IDbCommand[] commands;
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 commands = scope.Database.GenerateBulkInsertCommands(servers.ToArray());
                 scope.Complete();
@@ -200,7 +203,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 
             // Assert
             Assert.That(commands.Length, Is.EqualTo(5));
-            foreach (var s in commands.Select(x => x.CommandText))
+            foreach (string s in commands.Select(x => x.CommandText))
             {
                 Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
             }

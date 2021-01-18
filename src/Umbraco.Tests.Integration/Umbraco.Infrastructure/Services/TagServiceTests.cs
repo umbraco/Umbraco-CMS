@@ -1,4 +1,7 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -15,8 +18,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
     /// <summary>
     /// Tests covering methods in the TagService class.
-    /// This is more of an integration test as it involves multiple layers
-    /// as well as configuration.
+    /// Involves multiple layers as well as configuration.
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -24,18 +26,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class TagServiceTests : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private IFileService FileService => GetRequiredService<IFileService>();
+
         private ITagService TagService => GetRequiredService<ITagService>();
+
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
+
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
         private IContentType _contentType;
 
         [SetUp]
         public void CreateTestData()
         {
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             _contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", defaultTemplateId: template.Id);
@@ -56,7 +65,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // change
             content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "elephant" }, true);
-            content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer,"tags", new[] { "cow" });
+            content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
             ContentService.SaveAndPublish(content1);
 
             // more changes
@@ -67,14 +76,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             // get it back
             content1 = ContentService.GetById(content1.Id);
-            var tagsValue = content1.GetValue("tags").ToString();
-            var tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
+            string tagsValue = content1.GetValue("tags").ToString();
+            string[] tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
             Assert.AreEqual(3, tagsValues.Length);
             Assert.Contains("pig", tagsValues);
             Assert.Contains("goat", tagsValues);
             Assert.Contains("elephant", tagsValues);
 
-            var tags = TagService.GetTagsForProperty(content1.Id, "tags").ToArray();
+            ITag[] tags = TagService.GetTagsForProperty(content1.Id, "tags").ToArray();
             Assert.IsTrue(tags.All(x => x.Group == "default"));
             tagsValues = tags.Select(x => x.Text).ToArray();
 
@@ -87,15 +96,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void TagList_Contains_NodeCount()
         {
-            var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
+            Content content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig", "goat" });
             ContentService.SaveAndPublish(content1);
 
-            var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2", -1);
+            Content content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2", -1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig" });
             ContentService.SaveAndPublish(content2);
 
-            var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3", -1);
+            Content content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3", -1);
             content3.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
             ContentService.SaveAndPublish(content3);
 

@@ -1,6 +1,10 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -19,10 +23,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
-        [Test, Explicit]
+        [Test]
+        [Explicit]
         public void List_Ambiguous_Events()
         {
-            var memberGroup = new MemberGroupBuilder()
+            MemberGroup memberGroup = new MemberGroupBuilder()
                 .WithName(string.Empty)
                 .Build();
             Assert.Throws<InvalidOperationException>(() => MemberGroupService.Save(memberGroup));

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -21,8 +24,7 @@ namespace Umbraco.Tests.Integration.Testing
         public virtual void CreateTestData()
         {
             // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
-
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
             // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)

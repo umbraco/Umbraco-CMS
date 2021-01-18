@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -23,27 +27,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class ContentServicePerformanceTest : UmbracoIntegrationTest
     {
         protected DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+
         protected IFileService FileService => GetRequiredService<IFileService>();
+
         protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         protected IContentService ContentService => GetRequiredService<IContentService>();
 
         protected IContentType ContentType { get; set; }
 
         [SetUp]
-        public void SetUpData()
-        {
-            CreateTestData();
-        }
+        public void SetUpData() => CreateTestData();
 
         [Test]
-        public void Profiler()
-        {
-            Assert.IsInstanceOf<TestProfiler>(GetRequiredService<IProfiler>());
-        }
+        public void Profiler() => Assert.IsInstanceOf<TestProfiler>(GetRequiredService<IProfiler>());
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-
             var profiler = new TestProfiler();
             return new ProfilingLogger(new NullLogger<ProfilingLogger>(), profiler);
         }
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Retrieving_All_Content_In_Site()
         {
-            //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
+            // NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
             // the old way takes 143795ms, the new above way takes:
             // 14249ms
             //
@@ -62,13 +62,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             //
             // ... NOPE, made even more nice changes, it is now...
             // 4452ms !!!!!!!
-
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", defaultTemplateId: template.Id);
-            var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", defaultTemplateId: template.Id);
-            var contentType3 = ContentTypeBuilder.CreateTextPageContentType("test3", "test3", defaultTemplateId: template.Id);
+            ContentType contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", defaultTemplateId: template.Id);
+            ContentType contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", defaultTemplateId: template.Id);
+            ContentType contentType3 = ContentTypeBuilder.CreateTextPageContentType("test3", "test3", defaultTemplateId: template.Id);
             ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
             contentType1.AllowedContentTypes = new[]
             {
@@ -87,13 +86,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             };
             ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 
-            var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
+            IEnumerable<Content> roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
             ContentService.Save(roots);
-            foreach (var root in roots)
+            foreach (Content root in roots)
             {
-                var item1 = ContentBuilder.CreateTextpageContent(contentType1, root.Id, 10);
-                var item2 = ContentBuilder.CreateTextpageContent(contentType2, root.Id, 10);
-                var item3 = ContentBuilder.CreateTextpageContent(contentType3, root.Id, 10);
+                IEnumerable<Content> item1 = ContentBuilder.CreateTextpageContent(contentType1, root.Id, 10);
+                IEnumerable<Content> item2 = ContentBuilder.CreateTextpageContent(contentType2, root.Id, 10);
+                IEnumerable<Content> item3 = ContentBuilder.CreateTextpageContent(contentType3, root.Id, 10);
 
                 ContentService.Save(item1.Concat(item2).Concat(item3));
             }
@@ -104,10 +103,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 TestProfiler.Enable();
                 total.AddRange(ContentService.GetRootContent());
-                foreach (var content in total.ToArray())
+                foreach (IContent content in total.ToArray())
                 {
-                    total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                    total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out long _));
                 }
+
                 TestProfiler.Disable();
                 StaticApplicationLogging.Logger.LogInformation("Returned {Total} items", total.Count);
             }
@@ -117,14 +117,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Creating_100_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
 
             // Act
-            Stopwatch watch = Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
             ContentService.Save(pages, 0);
             watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+            long elapsed = watch.ElapsedMilliseconds;
 
             Debug.Print("100 content items saved in {0} ms", elapsed);
 
@@ -136,14 +136,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Creating_1000_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
 
             // Act
-            Stopwatch watch = Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
             ContentService.Save(pages, 0);
             watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+            long elapsed = watch.ElapsedMilliseconds;
 
             Debug.Print("100 content items saved in {0} ms", elapsed);
 
@@ -155,20 +155,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Getting_100_Uncached_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
             ContentService.Save(pages, 0);
 
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = DocumentRepository;
+                DocumentRepository repository = DocumentRepository;
 
                 // Act
-                Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetMany();
+                var watch = Stopwatch.StartNew();
+                IEnumerable<IContent> contents = repository.GetMany();
                 watch.Stop();
-                var elapsed = watch.ElapsedMilliseconds;
+                long elapsed = watch.ElapsedMilliseconds;
 
                 Debug.Print("100 content items retrieved in {0} ms without caching", elapsed);
 
@@ -176,33 +176,31 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
                 Assert.That(contents.Any(x => x == null), Is.False);
             }
-
-
         }
 
         [Test]
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
             ContentService.Save(pages, 0);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = DocumentRepository;
+                DocumentRepository repository = DocumentRepository;
 
                 // Act
-                Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetMany();
+                var watch = Stopwatch.StartNew();
+                IEnumerable<IContent> contents = repository.GetMany();
                 watch.Stop();
-                var elapsed = watch.ElapsedMilliseconds;
+                long elapsed = watch.ElapsedMilliseconds;
 
                 Debug.Print("1000 content items retrieved in {0} ms without caching", elapsed);
 
                 // Assert
-                //Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
-                //Assert.That(contents.Any(x => x == null), Is.False);
+                // Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
+                // Assert.That(contents.Any(x => x == null), Is.False);
             }
         }
 
@@ -210,21 +208,21 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Getting_100_Cached_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
             ContentService.Save(pages, 0);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = DocumentRepository;
+                DocumentRepository repository = DocumentRepository;
 
                 // Act
-                var contents = repository.GetMany();
+                IEnumerable<IContent> contents = repository.GetMany();
 
-                Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetMany();
+                var watch = Stopwatch.StartNew();
+                IEnumerable<IContent> contentsCached = repository.GetMany();
                 watch.Stop();
-                var elapsed = watch.ElapsedMilliseconds;
+                long elapsed = watch.ElapsedMilliseconds;
 
                 Debug.Print("100 content items retrieved in {0} ms with caching", elapsed);
 
@@ -239,38 +237,37 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Getting_1000_Cached_Items()
         {
             // Arrange
-            var contentType = ContentTypeService.Get(ContentType.Id);
-            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
+            IContentType contentType = ContentTypeService.Get(ContentType.Id);
+            IEnumerable<Content> pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
             ContentService.Save(pages, 0);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = DocumentRepository;
+                DocumentRepository repository = DocumentRepository;
 
                 // Act
-                var contents = repository.GetMany();
+                IEnumerable<IContent> contents = repository.GetMany();
 
-                Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetMany();
+                var watch = Stopwatch.StartNew();
+                IEnumerable<IContent> contentsCached = repository.GetMany();
                 watch.Stop();
-                var elapsed = watch.ElapsedMilliseconds;
+                long elapsed = watch.ElapsedMilliseconds;
 
                 Debug.Print("1000 content items retrieved in {0} ms with caching", elapsed);
 
                 // Assert
-                //Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
-                //Assert.That(contentsCached.Any(x => x == null), Is.False);
-                //Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
+                // Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
+                // Assert.That(contentsCached.Any(x => x == null), Is.False);
+                // Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
             }
         }
 
         public void CreateTestData()
         {
-
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            //Create and Save ContentType "textpage" -> ContentType.Id
+            // Create and Save ContentType "textpage" -> ContentType.Id
             ContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(ContentType);
         }

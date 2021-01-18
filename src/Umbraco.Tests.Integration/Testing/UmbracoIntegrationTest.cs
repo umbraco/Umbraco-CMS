@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -5,6 +8,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,7 +43,6 @@ using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.Testing
 {
-
     /// <summary>
     /// Abstract class for integration tests
     /// </summary>
@@ -51,7 +54,7 @@ namespace Umbraco.Tests.Integration.Testing
     public abstract class UmbracoIntegrationTest
     {
         private List<Action> _testTeardown = null;
-        private List<Action> _fixtureTeardown = new List<Action>();
+        private readonly List<Action> _fixtureTeardown = new List<Action>();
 
         public void OnTestTearDown(Action tearDown)
         {
@@ -68,7 +71,7 @@ namespace Umbraco.Tests.Integration.Testing
         [OneTimeTearDown]
         public void FixtureTearDown()
         {
-            foreach (var a in _fixtureTeardown)
+            foreach (Action a in _fixtureTeardown)
             {
                 a();
             }
@@ -79,7 +82,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             if (_testTeardown != null)
             {
-                foreach (var a in _testTeardown)
+                foreach (Action a in _testTeardown)
                 {
                     a();
                 }
@@ -96,22 +99,18 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         [TearDown]
-        public virtual void TearDown_Logging()
-        {
+        public virtual void TearDown_Logging() =>
             TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
-        }
 
         [SetUp]
-        public virtual void SetUp_Logging()
-        {
+        public virtual void SetUp_Logging() =>
             TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
-        }
 
         [SetUp]
         public virtual void Setup()
         {
             InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallEmptyDatabase)] = "true";
-            var hostBuilder = CreateHostBuilder();
+            IHostBuilder hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();
             BeforeHostStart(host);
@@ -127,8 +126,6 @@ namespace Umbraco.Tests.Integration.Testing
             UseTestDatabase(Services);
         }
 
-        #region Generic Host Builder and Runtime
-
         private ILoggerFactory CreateLoggerFactory()
         {
             try
@@ -140,7 +137,7 @@ namespace Umbraco.Tests.Integration.Testing
                     case UmbracoTestOptions.Logger.Serilog:
                         return Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
                         {
-                            var path = Path.Combine(TestHelper.WorkingDirectory, "logs", "umbraco_integration_tests_.txt");
+                            string path = Path.Combine(TestHelper.WorkingDirectory, "logs", "umbraco_integration_tests_.txt");
 
                             Log.Logger = new LoggerConfiguration()
                                 .WriteTo.File(path, rollingInterval: RollingInterval.Day)
@@ -149,7 +146,7 @@ namespace Umbraco.Tests.Integration.Testing
                             builder.AddSerilog(Log.Logger);
                         });
                     case UmbracoTestOptions.Logger.Console:
-                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
+                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddConsole());
                 }
             }
             catch
@@ -165,12 +162,13 @@ namespace Umbraco.Tests.Integration.Testing
         /// </summary>
         public virtual IHostBuilder CreateHostBuilder()
         {
-            var hostBuilder = Host.CreateDefaultBuilder()
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
                 // create separate Host instances. So instead of UseStartup, we just call ConfigureServices/Configure ourselves,
                 // and in the case of the UmbracoTestServerTestBase it will use the ConfigureWebHost to Configure the IApplicationBuilder directly.
-                //.ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup(GetType()); })
+                // .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup(GetType()); })
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
@@ -194,18 +192,15 @@ namespace Umbraco.Tests.Integration.Testing
             return hostBuilder;
         }
 
-        #endregion
-
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
-            var webHostEnvironment = TestHelper.GetWebHostEnvironment();
+            IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
-
-            var typeLoader = services.AddTypeLoader(
+            Core.Composing.TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
                 webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
@@ -241,11 +236,10 @@ namespace Umbraco.Tests.Integration.Testing
             builder.Build();
         }
 
-        protected virtual AppCaches GetAppCaches()
-        {
+        protected virtual AppCaches GetAppCaches() =>
+
             // Disable caches for integration tests
-            return AppCaches.NoCache;
-        }
+            AppCaches.NoCache;
 
         public virtual void Configure(IApplicationBuilder app)
         {
@@ -258,18 +252,16 @@ namespace Umbraco.Tests.Integration.Testing
             app.UseUmbracoCore(); // This no longer starts CoreRuntime, it's very fast
         }
 
-        #region LocalDb
-
-        private static readonly object _dbLocker = new object();
-        private static ITestDatabase _dbInstance;
-        private static TestDbMeta _fixtureDbMeta;
+        private static readonly object s_dbLocker = new object();
+        private static ITestDatabase s_dbInstance;
+        private static TestDbMeta s_fixtureDbMeta;
 
         protected void UseTestDatabase(IServiceProvider serviceProvider)
         {
-            var state = serviceProvider.GetRequiredService<IRuntimeState>();
-            var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
-            var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            IRuntimeState state = serviceProvider.GetRequiredService<IRuntimeState>();
+            TestUmbracoDatabaseFactoryProvider testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
+            IUmbracoDatabaseFactory databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
+            ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
             // This will create a db, install the schema and ensure the app is configured to run
             SetupTestDatabase(testDatabaseFactoryProvider, databaseFactory, loggerFactory, state, TestHelper.WorkingDirectory);
@@ -283,16 +275,16 @@ namespace Umbraco.Tests.Integration.Testing
         /// </remarks>
         private static ITestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
-            lock (_dbLocker)
+            lock (s_dbLocker)
             {
-                if (_dbInstance != null)
+                if (s_dbInstance != null)
                 {
-                    return _dbInstance;
+                    return s_dbInstance;
                 }
 
-                _dbInstance = TestDatabaseFactory.Create(filesPath, loggerFactory, dbFactory);
+                s_dbInstance = TestDatabaseFactory.Create(filesPath, loggerFactory, dbFactory);
 
-                return _dbInstance;
+                return s_dbInstance;
             }
         }
 
@@ -314,9 +306,9 @@ namespace Umbraco.Tests.Integration.Testing
             // need to manually register this factory
             DbProviderFactories.RegisterFactory(Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
-            var dbFilePath = Path.Combine(workingDirectory, "LocalDb");
+            string dbFilePath = Path.Combine(workingDirectory, "LocalDb");
 
-            var db = GetOrCreateDatabase(dbFilePath, loggerFactory, testUmbracoDatabaseFactoryProvider);
+            ITestDatabase db = GetOrCreateDatabase(dbFilePath, loggerFactory, testUmbracoDatabaseFactoryProvider);
 
             switch (TestOptions.Database)
             {
@@ -352,13 +344,13 @@ namespace Umbraco.Tests.Integration.Testing
                     {
                         // New DB + Schema
                         TestDbMeta newSchemaFixtureDbMeta = db.AttachSchema();
-                        _fixtureDbMeta = newSchemaFixtureDbMeta;
+                        s_fixtureDbMeta = newSchemaFixtureDbMeta;
 
                         // Add teardown callback
                         OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
                     }
 
-                    ConfigureTestDatabaseFactory(_fixtureDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState);
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
@@ -369,13 +361,13 @@ namespace Umbraco.Tests.Integration.Testing
                     {
                         // New DB + Schema
                         TestDbMeta newEmptyFixtureDbMeta = db.AttachEmpty();
-                        _fixtureDbMeta = newEmptyFixtureDbMeta;
+                        s_fixtureDbMeta = newEmptyFixtureDbMeta;
 
                         // Add teardown callback
                         OnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
                     }
 
-                    ConfigureTestDatabaseFactory(_fixtureDbMeta, databaseFactory, runtimeState);
+                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState);
 
                     break;
                 default:
@@ -396,8 +388,6 @@ namespace Umbraco.Tests.Integration.Testing
             log.LogInformation($"ConfigureTestDatabaseFactory - Determined RuntimeLevel: [{state.Level}]");
         }
 
-        #endregion
-
         protected UmbracoTestAttribute TestOptions => TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
@@ -411,22 +401,22 @@ namespace Umbraco.Tests.Integration.Testing
         protected virtual void CustomTestSetup(IUmbracoBuilder builder) { }
 
         /// <summary>
-        /// Returns the DI container
+        /// Gets or sets the DI container.
         /// </summary>
         protected IServiceProvider Services { get; set; }
 
         /// <summary>
-        /// Returns the <see cref="IScopeProvider"/>
+        /// Gets the <see cref="IScopeProvider"/>
         /// </summary>
         protected IScopeProvider ScopeProvider => Services.GetRequiredService<IScopeProvider>();
 
         /// <summary>
-        /// Returns the <see cref="IScopeAccessor"/>
+        /// Gets the <see cref="IScopeAccessor"/>
         /// </summary>
         protected IScopeAccessor ScopeAccessor => Services.GetRequiredService<IScopeAccessor>();
 
         /// <summary>
-        /// Returns the <see cref="ILoggerFactory"/>
+        /// Gets the <see cref="ILoggerFactory"/>
         /// </summary>
         protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
@@ -440,12 +430,8 @@ namespace Umbraco.Tests.Integration.Testing
 
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
-        #region Builders
-
         protected UserBuilder UserBuilderInstance = new UserBuilder();
         protected UserGroupBuilder UserGroupBuilderInstance = new UserGroupBuilder();
-
-        #endregion
 
         protected static bool FirstTestInSession = true;
 

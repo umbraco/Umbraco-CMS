@@ -1,4 +1,7 @@
-﻿using System.Threading;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
@@ -13,6 +16,4 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public Task WaitForStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
-
-   
 }

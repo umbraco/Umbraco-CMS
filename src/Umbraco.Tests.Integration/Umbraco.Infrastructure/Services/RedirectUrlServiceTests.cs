@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -53,7 +56,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 scope.Complete();
             }
         }
-
 
         [Test]
         public void Can_Get_Most_Recent_RedirectUrl()

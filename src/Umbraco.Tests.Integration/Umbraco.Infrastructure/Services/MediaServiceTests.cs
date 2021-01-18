@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -6,6 +10,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common.Builders;
@@ -21,8 +26,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class MediaServiceTests : UmbracoIntegrationTest
     {
         private IMediaService MediaService => GetRequiredService<IMediaService>();
-        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         [Test]
         public void Can_Update_Media_Property_Values()
@@ -51,22 +56,30 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
-        [Test, Explicit]
+        [Test]
+        [Explicit]
         public void List_Ambiguous_Events()
         {
-            var events = MediaService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
-            var typedEventHandler = typeof(TypedEventHandler<,>);
-            foreach (var e in events)
+            EventInfo[] events = MediaService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
+            Type typedEventHandler = typeof(TypedEventHandler<,>);
+            foreach (EventInfo e in events)
             {
-                //only continue if this is a TypedEventHandler
-                if (!e.EventHandlerType.IsGenericType) continue;
-                var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
-                if (typedEventHandler != typeDef) continue;
+                // only continue if this is a TypedEventHandler
+                if (!e.EventHandlerType.IsGenericType)
+                {
+                    continue;
+                }
 
-                //get the event arg type
-                var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
+                Type typeDef = e.EventHandlerType.GetGenericTypeDefinition();
+                if (typedEventHandler != typeDef)
+                {
+                    continue;
+                }
 
-                var found = EventNameExtractor.FindEvent(typeof(MediaService), eventArgType, EventNameExtractor.MatchIngNames);
+                // get the event arg type
+                Type eventArgType = e.EventHandlerType.GenericTypeArguments[1];
+
+                Attempt<EventNameExtractorResult> found = EventNameExtractor.FindEvent(typeof(MediaService), eventArgType, EventNameExtractor.MatchIngNames);
                 if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
                 {
                     Console.WriteLine($"Ambiguous event, source: {typeof(MediaService)}, args: {eventArgType}");
@@ -77,31 +90,38 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_Paged_Children_With_Media_Type_Filter()
         {
-            var mediaType1 = MediaTypeBuilder.CreateImageMediaType("Image2");
+            MediaType mediaType1 = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType1);
-            var mediaType2 = MediaTypeBuilder.CreateImageMediaType("Image3");
+            MediaType mediaType2 = MediaTypeBuilder.CreateImageMediaType("Image3");
             MediaTypeService.Save(mediaType2);
 
-            for (var i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                var m1 = MediaBuilder.CreateMediaImage(mediaType1, -1);
+                Media m1 = MediaBuilder.CreateMediaImage(mediaType1, -1);
                 MediaService.Save(m1);
-                var m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
+                Media m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
                 MediaService.Save(m2);
             }
 
-            long total;
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var result = MediaService.GetPagedChildren(-1, 0, 11, out total,
+                IEnumerable<IMedia> result = MediaService.GetPagedChildren(
+                    -1,
+                    0,
+                    11,
+                    out long total,
                     provider.SqlContext.Query<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(11, result.Count());
                 Assert.AreEqual(20, total);
 
-                result = MediaService.GetPagedChildren(-1, 1, 11, out total,
+                result = MediaService.GetPagedChildren(
+                    -1,
+                    1,
+                    11,
+                    out total,
                     provider.SqlContext.Query<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
@@ -114,8 +134,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Move_Media()
         {
             // Arrange
-            var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item3.Id);
+            Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> mediaItems = CreateTrashedTestMedia();
+            IMedia media = MediaService.GetById(mediaItems.Item3.Id);
 
             // Act
             MediaService.Move(media, mediaItems.Item2.Id);
@@ -129,8 +149,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Move_Media_To_RecycleBin()
         {
             // Arrange
-            var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item1.Id);
+            Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> mediaItems = CreateTrashedTestMedia();
+            IMedia media = MediaService.GetById(mediaItems.Item1.Id);
 
             // Act
             MediaService.MoveToRecycleBin(media);
@@ -144,12 +164,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Move_Media_From_RecycleBin()
         {
             // Arrange
-            var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item4.Id);
+            Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> mediaItems = CreateTrashedTestMedia();
+            IMedia media = MediaService.GetById(mediaItems.Item4.Id);
 
             // Act - moving out of recycle bin
             MediaService.Move(media, mediaItems.Item1.Id);
-            var mediaChild = MediaService.GetById(mediaItems.Item5.Id);
+            IMedia mediaChild = MediaService.GetById(mediaItems.Item5.Id);
 
             // Assert
             Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item1.Id));
@@ -162,13 +182,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_Media_With_Empty_Name()
         {
             // Arrange
-            var mediaType = MediaTypeBuilder.CreateVideoMediaType();
+            MediaType mediaType = MediaTypeBuilder.CreateVideoMediaType();
             MediaTypeService.Save(mediaType);
-            var media = MediaService.CreateMedia(string.Empty, -1, "video");
+            IMedia media = MediaService.CreateMedia(string.Empty, -1, "video");
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => MediaService.Save(media));
         }
+
         /*
         [Test]
         public void Ensure_Content_Xml_Created()
@@ -188,14 +209,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_Media_By_Path()
         {
-            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
+            MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
 
-            var media = MediaBuilder.CreateMediaImage(mediaType, -1);
+            Media media = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaService.Save(media);
 
-            var mediaPath = "/media/test-image.png";
-            var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+            string mediaPath = "/media/test-image.png";
+            IMedia resolvedMedia = MediaService.GetMediaByPath(mediaPath);
 
             Assert.IsNotNull(resolvedMedia);
             Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
@@ -204,14 +225,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_Media_With_Crop_By_Path()
         {
-            var mediaType = MediaTypeBuilder.CreateImageMediaTypeWithCrop("Image2");
+            MediaType mediaType = MediaTypeBuilder.CreateImageMediaTypeWithCrop("Image2");
             MediaTypeService.Save(mediaType);
 
-            var media = MediaBuilder.CreateMediaImageWithCrop(mediaType, -1);
+            Media media = MediaBuilder.CreateMediaImageWithCrop(mediaType, -1);
             MediaService.Save(media);
 
-            var mediaPath = "/media/test-image.png";
-            var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+            string mediaPath = "/media/test-image.png";
+            IMedia resolvedMedia = MediaService.GetMediaByPath(mediaPath);
 
             Assert.IsNotNull(resolvedMedia);
             Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
@@ -220,18 +241,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_Paged_Children()
         {
-            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
+            MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
-            for (var i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                var c1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media c1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaService.Save(c1);
             }
 
-            var service = MediaService;
+            IMediaService service = MediaService;
 
-            long total;
-            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            IMedia[] entities = service.GetPagedChildren(-1, 0, 6, out long total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
@@ -242,37 +262,37 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_Paged_Children_Dont_Get_Descendants()
         {
-            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
+            MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
-            // only add 9 as we also add a folder with children
-            for (var i = 0; i < 9; i++)
+
+            // Only add 9 as we also add a folder with children.
+            for (int i = 0; i < 9; i++)
             {
-                var m1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media m1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaService.Save(m1);
             }
 
-            var mediaTypeForFolder = MediaTypeBuilder.CreateImageMediaType("Folder2");
+            MediaType mediaTypeForFolder = MediaTypeBuilder.CreateImageMediaType("Folder2");
             MediaTypeService.Save(mediaTypeForFolder);
-            var mediaFolder = MediaBuilder.CreateMediaFolder(mediaTypeForFolder, -1);
+            Media mediaFolder = MediaBuilder.CreateMediaFolder(mediaTypeForFolder, -1);
             MediaService.Save(mediaFolder);
-            for (var i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                var m1 = MediaBuilder.CreateMediaImage(mediaType, mediaFolder.Id);
+                Media m1 = MediaBuilder.CreateMediaImage(mediaType, mediaFolder.Id);
                 MediaService.Save(m1);
             }
 
-            var service = MediaService;
+            IMediaService service = MediaService;
 
-            long total;
-            // children in root including the folder - not the descendants in the folder
-            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            // Children in root including the folder - not the descendants in the folder.
+            IMedia[] entities = service.GetPagedChildren(-1, 0, 6, out long total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
 
-            // children in folder
+            // Children in folder.
             entities = service.GetPagedChildren(mediaFolder.Id, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
@@ -283,27 +303,27 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
         {
-            //Create and Save folder-Media -> 1050
-            var folderMediaType = MediaTypeService.Get(1031);
-            var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+            // Create and Save folder-Media -> 1050
+            IMediaType folderMediaType = MediaTypeService.Get(1031);
+            Media folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
             MediaService.Save(folder);
 
-            //Create and Save folder-Media -> 1051
-            var folder2 = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+            // Create and Save folder-Media -> 1051
+            Media folder2 = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
             MediaService.Save(folder2);
 
-            //Create and Save image-Media  -> 1052
-            var imageMediaType = MediaTypeService.Get(1032);
-            var image = MediaBuilder.CreateMediaImage(imageMediaType, 1050);
+            // Create and Save image-Media  -> 1052
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
+            Media image = MediaBuilder.CreateMediaImage(imageMediaType, 1050);
             MediaService.Save(image);
 
-            //Create and Save folder-Media that is trashed -> 1053
-            var folderTrashed = MediaBuilder.CreateMediaFolder(folderMediaType, -21);
+            // Create and Save folder-Media that is trashed -> 1053
+            Media folderTrashed = MediaBuilder.CreateMediaFolder(folderMediaType, -21);
             folderTrashed.Trashed = true;
             MediaService.Save(folderTrashed);
 
-            //Create and Save image-Media child of folderTrashed -> 1054
-            var imageTrashed = MediaBuilder.CreateMediaImage(imageMediaType, folderTrashed.Id);
+            // Create and Save image-Media child of folderTrashed -> 1054
+            Media imageTrashed = MediaBuilder.CreateMediaImage(imageMediaType, folderTrashed.Id);
             imageTrashed.Trashed = true;
             MediaService.Save(imageTrashed);
 
