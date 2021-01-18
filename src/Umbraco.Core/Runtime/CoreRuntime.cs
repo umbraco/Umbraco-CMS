@@ -302,12 +302,12 @@ namespace Umbraco.Core.Runtime
         private void DoUnattendedUpgrade(DatabaseBuilder databaseBuilder)
         {
             var plan = new UmbracoPlan();
-            Logger.Info<CoreRuntime>("Starting unattended upgrade.");
-            var result = databaseBuilder.UpgradeSchemaAndData(plan);
-            Logger.Info<CoreRuntime>("Unattended upgrade completed.");
-
-            if (result.Success == false)
-                throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
+            using (ProfilingLogger.TraceDuration<CoreRuntime>("Starting unattended upgrade.", "Unattended upgrade completed."))
+            {
+                var result = databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
+            }
         }
 
         protected virtual void ConfigureUnhandledException()
