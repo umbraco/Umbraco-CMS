@@ -46,8 +46,6 @@ namespace Umbraco.Web.Runtime
                 return new UmbracoHelper();
             });
 
-            builder.Services.AddUnique<RoutableDocumentFilter>();
-
             // configure the container for web
             //composition.ConfigureForWeb();
 

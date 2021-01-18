@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Net;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Manifest
 {

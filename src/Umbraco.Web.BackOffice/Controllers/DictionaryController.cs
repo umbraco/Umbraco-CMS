@@ -1,24 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -101,7 +99,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public ActionResult<int> Create(int parentId, string key)
         {
             if (string.IsNullOrEmpty(key))
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Key can not be empty."); // TODO: translate
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Key can not be empty."); // TODO: translate
 
             if (_localizationService.DictionaryItemExists(key))
             {
@@ -109,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                      "dictionaryItem/changeKeyError",
                      _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
                      new Dictionary<string, string> { { "0", key } });
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(message);
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(message);
             }
 
             try
@@ -130,7 +128,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating dictionary item");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Error creating dictionary item");
             }
         }
 
@@ -141,11 +139,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The id.
         /// </param>
         /// <returns>
-        /// The <see cref="DictionaryDisplay"/>.
+        /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        /// <exception cref="HttpResponseException">
-        ///  Returns a not found response when dictionary item does not exist
-        /// </exception>
         [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(int id)
         {
@@ -163,11 +158,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The id.
         /// </param>
         /// <returns>
-        /// The <see cref="DictionaryDisplay"/>.
+        /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        /// <exception cref="HttpResponseException">
-        ///  Returns a not found response when dictionary item does not exist
-        /// </exception>
         [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(Guid id)
         {
@@ -185,11 +177,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// The id.
         /// </param>
         /// <returns>
-        /// The <see cref="DictionaryDisplay"/>.
+        /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        /// <exception cref="HttpResponseException">
-        ///  Returns a not found response when dictionary item does not exist
-        /// </exception>
         [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(Udi id)
         {
@@ -213,13 +202,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
         /// </returns>
-        public DictionaryDisplay PostSave(DictionarySave dictionary)
+        public ActionResult<DictionaryDisplay> PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =
                 _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
 
             if (dictionaryItem == null)
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Dictionary item does not exist");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Dictionary item does not exist");
 
             var userCulture = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
 
@@ -236,7 +225,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
-                    throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
                 }
 
                 dictionaryItem.ItemKey = dictionary.Name;
@@ -263,7 +252,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Something went wrong saving dictionary");
             }
         }
 

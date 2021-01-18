@@ -12,9 +12,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
@@ -211,9 +213,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         /// </summary>
         private ModelBindingContext CreateBindingContextForUmbracoRequest(Type modelType, IPublishedContent publishedContent)
         {
+            var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
+            builder.SetPublishedContent(publishedContent);
+            IPublishedRequest publishedRequest = builder.Build();
+
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
-            routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedContent));
+            routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedRequest));
             {
             }
 

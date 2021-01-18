@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Scoping
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
-            Builder.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
+            Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
         }
@@ -298,6 +299,10 @@ namespace Umbraco.Tests.Scoping
             public LocalServerMessenger()
                 : base(false)
             { }
+
+            public override void SendMessages() { }
+
+            public override void Sync() { }
 
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {

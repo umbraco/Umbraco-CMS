@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Core.Trees
 {
     public interface ISearchableTree : IDiscoverable
     {

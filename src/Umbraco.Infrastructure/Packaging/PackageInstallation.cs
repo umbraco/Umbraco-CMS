@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,16 +17,11 @@ namespace Umbraco.Core.Packaging
         private readonly IPackageActionRunner _packageActionRunner;
         private readonly DirectoryInfo _applicationRootFolder;
 
+
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="PackageInstallation"/> class.
         /// </summary>
-        /// <param name="packageDataInstallation"></param>
-        /// <param name="packageFileInstallation"></param>
-        /// <param name="parser"></param>
-        /// <param name="packageActionRunner"></param>
-        /// <param name="hostingEnvironment"></param>
-        public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner,
-            IHostingEnvironment hostingEnvironment)
+        public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner, IHostingEnvironment hostingEnvironment)
         {
             _packageExtraction = new PackageExtraction();
             _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));

@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.SignalR;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Routing;
 
 namespace Umbraco.Web.BackOffice.Routing

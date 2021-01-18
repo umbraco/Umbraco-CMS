@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Models;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -44,53 +44,53 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public int GetNumberOfErrors([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
+        public ActionResult<int> GetNumberOfErrors([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Unable to view logs, due to size");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
             }
 
             return _logViewer.GetNumberOfErrors(logTimePeriod);
         }
 
         [HttpGet]
-        public LogLevelCounts GetLogLevelCounts([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
+        public ActionResult<LogLevelCounts> GetLogLevelCounts([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Unable to view logs, due to size");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
             }
 
             return _logViewer.GetLogLevelCounts(logTimePeriod);
         }
 
         [HttpGet]
-        public IEnumerable<LogTemplate> GetMessageTemplates([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
+        public ActionResult<IEnumerable<LogTemplate>> GetMessageTemplates([FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Unable to view logs, due to size");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
             }
 
-            return _logViewer.GetMessageTemplates(logTimePeriod);
+            return new ActionResult<IEnumerable<LogTemplate>>(_logViewer.GetMessageTemplates(logTimePeriod));
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery(Name = "logLevels[]")]string[] logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
+        public ActionResult<PagedResult<LogMessage>> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery(Name = "logLevels[]")]string[] logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
 
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("Unable to view logs, due to size");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
             }
 
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;

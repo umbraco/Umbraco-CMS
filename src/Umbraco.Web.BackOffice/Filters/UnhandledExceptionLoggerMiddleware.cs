@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -21,9 +22,8 @@ namespace Umbraco.Web.BackOffice.Filters
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
             // If it's a client side request just call next and don't try to log anything
-            if (requestUri.IsClientSideRequest())
+            if (context.Request.IsClientSideRequest())
             {
                 await next(context);
             }
@@ -36,7 +36,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Unhandled controller exception occurred for request '{RequestUrl}'", requestUri.AbsoluteUri);
+                    _logger.LogError(e, "Unhandled controller exception occurred for request '{RequestUrl}'", context.Request.GetEncodedPathAndQuery());
                     // Throw the error again, just in case it gets handled
                     throw;
                 }

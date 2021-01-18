@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -2317,7 +2317,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // This sleep ensures the save is called on later ticks then the SetValue and SetCultureName. Therefore
             // we showcase the currect lack of handling dirty on variants on save. When this is implemented the sleep
             // helps showcase the functionality is actually working
-            Thread.Sleep(1);
+            Thread.Sleep(5);
             ContentService.Save(page);
             int versionId5 = page.VersionId;
 

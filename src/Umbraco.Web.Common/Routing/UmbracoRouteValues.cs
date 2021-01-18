@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Routing
         /// Initializes a new instance of the <see cref="UmbracoRouteValues"/> class.
         /// </summary>
         public UmbracoRouteValues(
-            IPublishedContent publishedContent,
+            IPublishedRequest publishedRequest,
             string controllerName = null,
             Type controllerType = null,
             string actionName = DefaultActionName,
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Common.Routing
         {
             ControllerName = controllerName ?? ControllerExtensions.GetControllerName<RenderController>();
             ControllerType = controllerType ?? typeof(RenderController);
-            PublishedContent = publishedContent;
+            PublishedRequest = publishedRequest;
             HasHijackedRoute = hasHijackedRoute;
             ActionName = actionName;
             TemplateName = templateName;
@@ -56,9 +56,9 @@ namespace Umbraco.Web.Common.Routing
         public Type ControllerType { get; }
 
         /// <summary>
-        /// Gets the <see cref="IPublishedContent"/>
+        /// Gets the <see cref="IPublishedRequest"/>
         /// </summary>
-        public IPublishedContent PublishedContent { get; }
+        public IPublishedRequest PublishedRequest { get; }
 
         /// <summary>
         /// Gets a value indicating whether the current request has a hijacked route/user controller routed for it

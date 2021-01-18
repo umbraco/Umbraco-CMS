@@ -38,8 +38,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddNuCache();
-
         protected override void BeforeHostStart(IHost host)
         {
             base.BeforeHostStart(host);

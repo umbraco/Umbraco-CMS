@@ -1,4 +1,3 @@
-﻿using Umbraco.Core;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 

@@ -7,6 +7,7 @@ using MimeKit;
 using MimeKit.Text;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Models;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 

@@ -8,9 +8,10 @@ namespace Umbraco.Persistance.SqlCe
     {
         public string ProviderName => Constants.DatabaseProviders.SqlCe;
 
+        public string ConnectionString { get; set; } = DatabaseBuilder.EmbeddedDatabaseConnectionString;
         public void Create()
         {
-            var engine = new System.Data.SqlServerCe.SqlCeEngine(DatabaseBuilder.EmbeddedDatabaseConnectionString);
+            var engine = new System.Data.SqlServerCe.SqlCeEngine(ConnectionString);
             engine.CreateDatabase();
         }
     }

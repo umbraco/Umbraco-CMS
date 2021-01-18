@@ -57,9 +57,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
 
             try
             {
-                // TouchServer uses a proper unit of work etc underneath so even in a
-                // background task it is safe to call it without dealing with any scope.
-                _serverRegistrationService.TouchServer(serverAddress, _serverRegistrationService.CurrentServerIdentity, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
+                _serverRegistrationService.TouchServer(serverAddress, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
             }
             catch (Exception ex)
             {

@@ -7,7 +7,7 @@ namespace Umbraco.Extensions
 {
     public static class WebMappingProfiles
     {
-        public static IUmbracoBuilder ComposeWebMappingProfiles(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddWebMappingProfiles(this IUmbracoBuilder builder)
         {
             builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<ContentMapDefinition>()

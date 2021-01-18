@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
@@ -11,9 +11,8 @@ namespace Umbraco.Core.Services
         /// Touches a server to mark it as active; deactivate stale servers.
         /// </summary>
         /// <param name="serverAddress">The server URL.</param>
-        /// <param name="serverIdentity">The server unique identity.</param>
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
-        void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout);
+        void TouchServer(string serverAddress, TimeSpan staleTimeout);
 
         /// <summary>
         /// Deactivates a server.
@@ -37,11 +36,6 @@ namespace Umbraco.Core.Services
         /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
         /// from the database.</remarks>
         IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false);
-
-        /// <summary>
-        /// Gets the current server identity.
-        /// </summary>
-        string CurrentServerIdentity { get; }
 
         /// <summary>
         /// Gets the role of the current server.

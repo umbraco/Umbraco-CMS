@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +15,11 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 
@@ -92,13 +91,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public DataTypeDisplay GetById(int id)
+        public ActionResult<DataTypeDisplay> GetById(int id)
         {
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
+
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
@@ -108,13 +108,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public DataTypeDisplay GetById(Guid id)
+        public ActionResult<DataTypeDisplay> GetById(Guid id)
         {
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
+
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
@@ -124,17 +125,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
-        public DataTypeDisplay GetById(Udi id)
+        public ActionResult<DataTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             var dataType = _dataTypeService.GetDataType(guidUdi.Guid);
             if (dataType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
+
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
@@ -150,7 +152,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _dataTypeService.GetDataType(id);
             if (foundType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             _dataTypeService.Delete(foundType, currentUser.Id);
@@ -171,12 +173,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns>a DataTypeDisplay</returns>
-        public DataTypeDisplay GetCustomListView(string contentTypeAlias)
+        public ActionResult<DataTypeDisplay> GetCustomListView(string contentTypeAlias)
         {
             var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
             if (dt == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             return _umbracoMapper.Map<IDataType, DataTypeDisplay>(dt);
@@ -208,7 +210,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="editorAlias"></param>
         /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
         /// <returns></returns>
-        public IEnumerable<DataTypeConfigurationFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
+        public ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
             var propEd = _propertyEditors[editorAlias];
             if (propEd == null)
@@ -219,14 +221,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (dataTypeId == -1)
             {
                 //this is a new data type, so just return the field editors with default values
-                return _umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd));
             }
 
             //we have a data type associated
             var dataType = _dataTypeService.GetDataType(dataTypeId);
             if (dataType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             //now, lets check if the data type has the current editor selected, if that is true
@@ -235,11 +237,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (dataType.EditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
-                return _umbracoMapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType);
+                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType));
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return _umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+            return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd));
         }
 
         /// <summary>
@@ -263,9 +265,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var result = _dataTypeService.CreateContainer(parentId, name, currentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         /// <summary>
@@ -300,7 +303,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("Name", ex.Message);
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             // map back to display model, and return
@@ -335,11 +338,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
-                    throw HttpResponseException.CreateValidationErrorResponse(new SimpleNotificationModel());
+                    return new ValidationErrorResult(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    throw HttpResponseException.CreateValidationErrorResponse(notificationModel);
+                    return new ValidationErrorResult(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -350,9 +353,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var result = _dataTypeService.RenameContainer(id, name, currentUser.Id);
 
-            return result
-                ? Ok(result.Result)
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result);
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         /// <summary>

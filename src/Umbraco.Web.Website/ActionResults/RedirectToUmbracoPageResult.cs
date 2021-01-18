@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +12,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {
+
     /// <summary>
     /// Redirects to an Umbraco page by Id or Entity
     /// </summary>

@@ -13,6 +13,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 {
+    [TestFixture]
     public class EventAggregatorTests
     {
         private const int A = 3;

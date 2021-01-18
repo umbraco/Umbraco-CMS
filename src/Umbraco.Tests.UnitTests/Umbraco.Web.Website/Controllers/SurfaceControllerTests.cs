@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -16,13 +15,12 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Routing;
 using CoreConstants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
@@ -44,17 +42,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             var globalSettings = new GlobalSettings();
 
-            var umbracoContextFactory = new UmbracoContextFactory(
-                _umbracoContextAccessor,
-                Mock.Of<IPublishedSnapshotService>(),
-                new TestVariationContextAccessor(),
-                new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
-                hostingEnvironment,
-                new UriUtility(hostingEnvironment),
-                Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>(),
-                backofficeSecurityAccessor);
+            var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
 
             UmbracoContextReference umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             IUmbracoContext umbracoContext = umbracoContextReference.UmbracoContext;
@@ -75,17 +63,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             IHostingEnvironment hostingEnvironment = Mock.Of<IHostingEnvironment>();
             IBackOfficeSecurityAccessor backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-            var umbracoContextFactory = new UmbracoContextFactory(
-                _umbracoContextAccessor,
-                Mock.Of<IPublishedSnapshotService>(),
-                new TestVariationContextAccessor(),
-                new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
-                hostingEnvironment,
-                new UriUtility(hostingEnvironment),
-                Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>(),
-                backofficeSecurityAccessor);
+            var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
 
             UmbracoContextReference umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             IUmbracoContext umbCtx = umbracoContextReference.UmbracoContext;
@@ -110,17 +88,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             IHostingEnvironment hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var globalSettings = new GlobalSettings();
 
-            var umbracoContextFactory = new UmbracoContextFactory(
-                _umbracoContextAccessor,
-                publishedSnapshotService.Object,
-                new TestVariationContextAccessor(),
-                new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
-                hostingEnvironment,
-                new UriUtility(hostingEnvironment),
-                Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>(),
-                backofficeSecurityAccessor);
+            var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
 
             UmbracoContextReference umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             IUmbracoContext umbracoContext = umbracoContextReference.UmbracoContext;
@@ -144,17 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             IHostingEnvironment hostingEnvironment = Mock.Of<IHostingEnvironment>();
             IBackOfficeSecurityAccessor backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-            var umbracoContextFactory = new UmbracoContextFactory(
-                _umbracoContextAccessor,
-                Mock.Of<IPublishedSnapshotService>(),
-                new TestVariationContextAccessor(),
-                new TestDefaultCultureAccessor(),
-                Options.Create(globalSettings),
-                hostingEnvironment,
-                new UriUtility(hostingEnvironment),
-                Mock.Of<ICookieManager>(),
-                Mock.Of<IRequestAccessor>(),
-                backofficeSecurityAccessor);
+            var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
 
             UmbracoContextReference umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             IUmbracoContext umbracoContext = umbracoContextReference.UmbracoContext;
@@ -162,8 +120,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
             IPublishedContent content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
+            var builder = new PublishedRequestBuilder(umbracoContext.CleanedUmbracoUrl, Mock.Of<IFileService>());
+            builder.SetPublishedContent(content);
+            IPublishedRequest publishedRequest = builder.Build();
 
-            var routeDefinition = new UmbracoRouteValues(content);
+            var routeDefinition = new UmbracoRouteValues(publishedRequest);
 
             var routeData = new RouteData();
             routeData.Values.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);

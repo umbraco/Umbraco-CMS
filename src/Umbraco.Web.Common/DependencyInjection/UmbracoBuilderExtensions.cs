@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,31 +13,45 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.IO;
+using Umbraco.Core.Diagnostics;
+using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Infrastructure.Runtime;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
+using Umbraco.Net;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.DependencyInjection;
+using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Common.Install;
+using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.Localization;
+using Umbraco.Web.Common.Macros;
+using Umbraco.Web.Common.Middleware;
+using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Web.Common.Mvc;
 using Umbraco.Web.Common.Profiler;
+using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Security;
+using Umbraco.Web.Common.Templates;
+using Umbraco.Web.Macros;
+using Umbraco.Web.Security;
 using Umbraco.Web.Telemetry;
+using Umbraco.Web.Templates;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.Common.DependencyInjection
@@ -50,6 +63,9 @@ namespace Umbraco.Web.Common.DependencyInjection
     /// </summary>
     public static class UmbracoBuilderExtensions
     {
+        /// <summary>
+        /// Creates an <see cref="IUmbracoBuilder"/> and registers basic Umbraco services
+        /// </summary>
         public static IUmbracoBuilder AddUmbraco(
             this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
@@ -91,6 +107,9 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// <summary>
         /// Adds core Umbraco services
         /// </summary>
+        /// <remarks>
+        /// This will not add any composers/components
+        /// </remarks>
         public static IUmbracoBuilder AddUmbracoCore(this IUmbracoBuilder builder)
         {
             if (builder is null)
@@ -98,12 +117,17 @@ namespace Umbraco.Web.Common.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddLazySupport();
+            // Add ASP.NET specific services
+            builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
+            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
+            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
             // Add supported databases
-            builder.AddUmbracoSqlCeSupport();
             builder.AddUmbracoSqlServerSupport();
+            builder.AddUmbracoSqlCeSupport();
 
+
+            // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
@@ -111,107 +135,11 @@ namespace Umbraco.Web.Common.DependencyInjection
                 factory.GetServices<IEmbeddedDatabaseCreator>()
             ));
 
-            builder.Services.AddUnique(factory =>
-            {
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
-                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-
-                var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
-
-                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment)
-                    : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
-            });
-
-            builder.Services.AddUnique<IIOHelper>(factory =>
-            {
-                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    return new IOHelperLinux(hostingEnvironment);
-                }
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    return new IOHelperOSX(hostingEnvironment);
-                }
-
-                return new IOHelperWindows(hostingEnvironment);
-            }
-
-                );
-            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RuntimeCache);
-            builder.Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
-            builder.Services.AddUnique<IProfilingLogger, ProfilingLogger>();
-            builder.Services.AddUnique<IBackOfficeInfo, AspNetCoreBackOfficeInfo>();
-            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-            builder.Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
-            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
-            builder.Services.AddUnique<IHostingEnvironment, AspNetCoreHostingEnvironment>();
-            builder.Services.AddUnique<IMainDom, MainDom>();
-
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
-            builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
-
             builder.AddCoreInitialServices();
-            builder.AddComposers();
 
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Umbraco composers for plugins
-        /// </summary>
-        public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
-        {
-            IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<IComposer>();
-            IEnumerable<Attribute> enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
-            new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Add Umbraco configuration services and options
-        /// </summary>
-        public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
-        {
-            // Register configuration validators.
-            builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
-            builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
-            builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
-            builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
-
-            // Register configuration sections.
-            builder.Services.Configure<ActiveDirectorySettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigActiveDirectory));
-            builder.Services.Configure<ConnectionStrings>(builder.Config.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            builder.Services.Configure<ContentSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigContent));
-            builder.Services.Configure<CoreDebugSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigCoreDebug));
-            builder.Services.Configure<ExceptionFilterSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigExceptionFilter));
-            builder.Services.Configure<GlobalSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigGlobal));
-            builder.Services.Configure<HealthChecksSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigHealthChecks));
-            builder.Services.Configure<HostingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigHosting));
-            builder.Services.Configure<ImagingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigImaging));
-            builder.Services.Configure<IndexCreatorSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigExamine));
-            builder.Services.Configure<KeepAliveSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigKeepAlive));
-            builder.Services.Configure<LoggingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigLogging));
-            builder.Services.Configure<MemberPasswordConfigurationSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigMemberPassword));
-            builder.Services.Configure<ModelsBuilderSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
-            builder.Services.Configure<NuCacheSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigNuCache));
-            builder.Services.Configure<RequestHandlerSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigRequestHandler));
-            builder.Services.Configure<RuntimeSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigRuntime));
-            builder.Services.Configure<SecuritySettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigSecurity));
-            builder.Services.Configure<TourSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigTours));
-            builder.Services.Configure<TypeFinderSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigTypeFinder));
-            builder.Services.Configure<UserPasswordConfigurationSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigUserPassword));
-            builder.Services.Configure<WebRoutingSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigWebRouting));
-            builder.Services.Configure<UmbracoPluginSettings>(builder.Config.GetSection(Core.Constants.Configuration.ConfigPlugins));
+            // aspnet app lifetime mgmt
+            builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             return builder;
         }
@@ -232,23 +160,25 @@ namespace Umbraco.Web.Common.DependencyInjection
             return builder;
         }
 
-        // TODO: Not sure this needs to exist and/or be public?
-        public static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
+        private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
         {
             builder.Services.AddHttpClient();
             return builder;
         }
 
         /// <summary>
-        /// Adds mini profiler services for Umbraco
+        /// Adds the Umbraco request profiler
         /// </summary>
-        public static IUmbracoBuilder AddMiniProfiler(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
         {
+            builder.Services.AddUnique<WebProfilerHtml>();
+
             builder.Services.AddMiniProfiler(options =>
 
                 // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
                 options.ShouldProfile = request => false);
 
+            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
             return builder;
         }
 
@@ -278,6 +208,9 @@ namespace Umbraco.Web.Common.DependencyInjection
             return builder;
         }
 
+        /// <summary>
+        /// Adds all web based services required for Umbraco to run
+        /// </summary>
         public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
         {
             // Add service session
@@ -290,9 +223,60 @@ namespace Umbraco.Web.Common.DependencyInjection
             });
 
             builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
+            builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);
+
+            // AspNetCore specific services
+            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
+
+            // The umbraco request lifetime
+            builder.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+
+            // Password hasher
+            builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
+
+            builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+            builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
+            builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
+
+            builder.Services.AddMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+
+            builder.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
+
+            builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
+
+            builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+
+            // register the umbraco context factory
+
+            builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+
+            var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+            builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(umbracoApiControllerTypes);
+
+            builder.Services.AddUnique<InstallAreaRoutes>();
+
+            builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddUnique<UmbracoRequestMiddleware>();
+            builder.Services.AddUnique<BootFailedMiddleware>();
+
+            builder.Services.AddUnique<UmbracoJsonModelBinder>();
+
+            builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
+            builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+
+            builder.AddHttpClients();
+
+            // TODO: Does this belong in web components??
+            builder.AddNuCache();
 
             return builder;
         }
@@ -377,7 +361,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             {
                 // should let it be null, that's how MiniProfiler is meant to work,
                 // but our own IProfiler expects an instance so let's get one
-                return new VoidProfiler();
+                return new NoopProfiler();
             }
 
             var webProfiler = new WebProfiler();

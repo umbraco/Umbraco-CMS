@@ -1,23 +1,16 @@
 using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -77,14 +70,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         protected ILocalizedTextService LocalizedTextService { get; }
 
-        protected NotFoundObjectResult HandleContentNotFound(object id, bool throwException = true)
+        protected NotFoundObjectResult HandleContentNotFound(object id)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
             var errorResponse = NotFound(ModelState);
-            if (throwException)
-            {
-                throw new HttpResponseException(errorResponse);
-            }
             return errorResponse;
         }
 
@@ -148,16 +137,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 else
                     savePropertyValue(contentItem, property, value);
-            }
-        }
-
-        protected virtual void HandleInvalidModelState(IErrorModel display)
-        {
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
-            if (!ModelState.IsValid)
-            {
-                display.Errors = ModelState.ToErrorDictionary();
-                throw HttpResponseException.CreateValidationErrorResponse(display);
             }
         }
 

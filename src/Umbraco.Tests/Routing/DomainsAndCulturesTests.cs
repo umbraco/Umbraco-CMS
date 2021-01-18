@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using System.Threading.Tasks;
 
 namespace Umbraco.Tests.Routing
 {
@@ -261,22 +262,22 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
         #endregion
-        public void DomainAndCulture(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainAndCulture(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains1();
 
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
 
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);
@@ -306,7 +307,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("/1003/1003-1", "nl-NL", 10031)] // wildcard on 10031 applies
         [TestCase("/1003/1003-1/1003-1-1", "nl-NL", 100311)] // wildcard on 10031 applies
         #endregion
-        public void DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains2();
 
@@ -316,21 +317,21 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
 
             // find document
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
             publishedRouter.HandleWildcardDomains(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
         // domains such as "/en" are natively supported, and when instanciating
@@ -363,22 +364,22 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
         #endregion
-        public void DomainGeneric(string inputUrl, string expectedCulture, int expectedNode)
+        public async Task DomainGeneric(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains3();
 
             var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(Factory);
-            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // lookup domain
             publishedRouter.FindDomain(frequest);
             Assert.IsNotNull(frequest.Domain);
 
-            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+            Assert.AreEqual(expectedCulture, frequest.Culture);
 
-            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);

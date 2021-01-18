@@ -1,19 +1,16 @@
-using System;
 using System.Threading;
 using System.Web;
-using Umbraco.Net;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.AspNet
 {
-    public class AspNetUmbracoApplicationLifetime : IUmbracoApplicationLifetime, IUmbracoApplicationLifetimeManager
+    public class AspNetUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AspNetUmbracoApplicationLifetime(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
-
-            UmbracoApplicationBase.ApplicationInit += ApplicationInit;
         }
 
         public bool IsRestarting { get; set; }
@@ -32,12 +29,6 @@ namespace Umbraco.Web.AspNet
 
             Thread.CurrentPrincipal = null;
             HttpRuntime.UnloadAppDomain();
-        }
-
-        public event EventHandler ApplicationInit;
-        public void InvokeApplicationInit()
-        {
-            ApplicationInit?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Common.AspNetCore
 
         public Uri GetApplicationUrl()
         {
-            //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+            // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
             // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
 

@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public IProfilingLogger ProfilingLogger { get; private set; }
 
-        public IProfiler Profiler { get; } = new VoidProfiler();
+        public IProfiler Profiler { get; } = new NoopProfiler();
 
         public IHttpContextAccessor GetHttpContextAccessor() => _httpContextAccessor;
 

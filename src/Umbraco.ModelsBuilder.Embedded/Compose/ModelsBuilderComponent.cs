@@ -12,7 +12,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Net;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
@@ -26,12 +25,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly LinkGenerator _linkGenerator;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
         public ModelsBuilderComponent(IOptions<ModelsBuilderSettings> config, IShortStringHelper shortStringHelper,
             LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
-            IUmbracoRequestLifetime umbracoRequestLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+            IUmbracoRequestLifetime umbracoRequestLifetime)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
@@ -40,7 +38,6 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             _shortStringHelper = shortStringHelper;
             _linkGenerator = linkGenerator;
             _umbracoRequestLifetime = umbracoRequestLifetime;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         public void Initialize()
@@ -48,7 +45,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
             InstallServerVars();
-            _umbracoApplicationLifetime.ApplicationInit += InitializeApplication;
+            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
@@ -69,10 +66,6 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             FileService.SavingTemplate -= FileService_SavingTemplate;
         }
 
-        private void InitializeApplication(object sender, EventArgs args)
-        {
-            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
-        }
 
         private void InstallServerVars()
         {

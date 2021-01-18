@@ -8,7 +8,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -18,16 +20,14 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Scoping
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Builder.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Builder.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
+            Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
         }
@@ -104,8 +104,6 @@ namespace Umbraco.Tests.Scoping
                 new NoopPublishedModelFactory(),
                 hostingEnvironment,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
-
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             return snapshotService;
         }
