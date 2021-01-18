@@ -35,6 +35,7 @@
         vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
         vm.toggleMemberCanEdit = toggleMemberCanEdit;
         vm.toggleIsSensitiveData = toggleIsSensitiveData;
+        vm.toggleLabelOnTop = toggleLabelOnTop;
 
         function onInit() {
 
@@ -42,23 +43,24 @@
                 vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
             });
 
-            //make the default the same as the content type            
+            //make the default the same as the content type
             if (!$scope.model.property.dataTypeId) {
                 $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
             }
-            
+
             loadValidationTypes();
-            
+
         }
 
         function loadValidationTypes() {
 
             var labels = [
-                "validation_validateAsEmail", 
-                "validation_validateAsNumber", 
-                "validation_validateAsUrl", 
+                "validation_validateAsEmail",
+                "validation_validateAsNumber",
+                "validation_validateAsUrl",
                 "validation_enterCustomValidation",
-                "validation_fieldIsMandatory"
+                "validation_fieldIsMandatory",
+                "contentTypeEditor_displaySettingsLabelOnTop"
             ];
 
             localizationService.localizeMany(labels)
@@ -69,6 +71,7 @@
                     vm.labels.validateAsUrl = data[2];
                     vm.labels.customValidation = data[3];
                     vm.labels.fieldIsMandatory = data[4];
+                    vm.labels.displaySettingsLabelOnTop = data[5];
 
                     vm.validationTypes = [
                         {
@@ -121,7 +124,7 @@
                     $scope.model.updateSameDataTypes = model.updateSameDataTypes;
 
                     vm.focusOnMandatoryField = true;
-    
+
                     // update property
                     property.config = model.property.config;
                     property.editor = model.property.editor;
@@ -179,7 +182,7 @@
             if(event && event.keyCode === 13) {
                 submit();
             }
-        } 
+        }
 
         function submit() {
             if($scope.model.submit) {
@@ -245,28 +248,31 @@
             return !settingValue;
         }
 
-        function toggleAllowCultureVariants() {            
+        function toggleAllowCultureVariants() {
             $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
         }
 
-        function toggleAllowSegmentVariants() {            
+        function toggleAllowSegmentVariants() {
             $scope.model.property.allowSegmentVariant = toggleValue($scope.model.property.allowSegmentVariant);
         }
 
         function toggleValidation() {
-            $scope.model.property.validation.mandatory = toggleValue($scope.model.property.validation.mandatory);            
+            $scope.model.property.validation.mandatory = toggleValue($scope.model.property.validation.mandatory);
         }
 
         function toggleShowOnMemberProfile() {
-            $scope.model.property.showOnMemberProfile = toggleValue($scope.model.property.showOnMemberProfile);           
+            $scope.model.property.showOnMemberProfile = toggleValue($scope.model.property.showOnMemberProfile);
         }
 
         function toggleMemberCanEdit() {
-            $scope.model.property.memberCanEdit = toggleValue($scope.model.property.memberCanEdit);            
+            $scope.model.property.memberCanEdit = toggleValue($scope.model.property.memberCanEdit);
         }
 
         function toggleIsSensitiveData() {
-            $scope.model.property.isSensitiveData = toggleValue($scope.model.property.isSensitiveData);             
+            $scope.model.property.isSensitiveData = toggleValue($scope.model.property.isSensitiveData);
+        }
+        function toggleLabelOnTop() {
+            $scope.model.property.labelOnTop = toggleValue($scope.model.property.labelOnTop);
         }
 
         onInit();
