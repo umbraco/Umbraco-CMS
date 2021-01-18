@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Web;
 using System.Web.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
@@ -33,48 +32,29 @@ namespace Umbraco.Web
     {
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
-        private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly RoutableDocumentFilter _routableDocumentLookup;
-        private readonly IRequestCache _requestCache;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly UriUtility _uriUtility;
 
         public UmbracoInjectedModule(
             IRuntimeState runtime,
             ILogger logger,
-            IPublishedRouter publishedRouter,
             IUmbracoContextFactory umbracoContextFactory,
-            RoutableDocumentFilter routableDocumentLookup,
-            UriUtility uriUtility,
-            IRequestCache requestCache,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
             _logger = logger;
-            _publishedRouter = publishedRouter;
             _umbracoContextFactory = umbracoContextFactory;
-            _routableDocumentLookup = routableDocumentLookup;
-            _uriUtility = uriUtility;
-            _requestCache = requestCache;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
         }
 
-        #region HttpModule event handlers
-
         /// <summary>
         /// Begins to process a request.
         /// </summary>
-        /// <param name="httpContext"></param>
         private void BeginRequest(HttpContextBase httpContext)
         {
-            // do not process if client-side request
-            if (httpContext.Request.Url.IsClientSideRequest())
-                return;
-
             // write the trace output for diagnostics at the end of the request
             httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
@@ -90,33 +70,16 @@ namespace Umbraco.Web
         /// <summary>
         /// Processes the Umbraco Request
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <remarks>
-        ///
         /// This will check if we are trying to route to the default back office page (i.e. ~/Umbraco/ or ~/Umbraco or ~/Umbraco/Default )
         /// and ensure that the MVC handler executes for that. This is required because the route for /Umbraco will never execute because
         /// files/folders exist there and we cannot set the RouteCollection.RouteExistingFiles = true since that will muck a lot of other things up.
         /// So we handle it here and explicitly execute the MVC controller.
-        ///
         /// </remarks>
         void ProcessRequest(HttpContextBase httpContext)
         {
-            // do not process if client-side request
-            if (httpContext.Request.Url.IsClientSideRequest())
-                return;
-
-            if (Current.UmbracoContext == null)
-                throw new InvalidOperationException("The Current.UmbracoContext is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
 
             var umbracoContext = Current.UmbracoContext;
-
-            // re-write for the default back office path
-            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings, _hostingEnvironment))
-            {
-                if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
-                    RewriteToBackOfficeHandler(httpContext);
-                return;
-            }
 
             // do not process if this request is not a front-end routable page
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
@@ -124,56 +87,26 @@ namespace Umbraco.Web
             // raise event here
             UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
-
-            httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
-
-            // ok, process
-
-            // note: requestModule.UmbracoRewrite also did some stripping of &umbPage
-            // from the querystring... that was in v3.x to fix some issues with pre-forms
-            // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
-
-            // instantiate, prepare and process the published content request
-            // important to use CleanedUmbracoUrl - lowercase path-only version of the current URL
-            var request = _publishedRouter.CreateRequest(umbracoContext);
-            umbracoContext.PublishedRequest = request;
-            _publishedRouter.PrepareRequest(request);
-
-            // HandleHttpResponseStatus returns a value indicating that the request should
-            // not be processed any further, eg because it has been redirect. then, exit.
-            if (UmbracoModule.HandleHttpResponseStatus(httpContext, request, _logger))
-                return;
-
-            if (request.HasPublishedContent == false)
-                httpContext.RemapHandler(new PublishedContentNotFoundHandler());
-            else
-                RewriteToUmbracoHandler(httpContext, request);
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Checks the current request and ensures that it is routable based on the structure of the request and URI
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
         internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(IUmbracoContext context, HttpContextBase httpContext)
         {
             var uri = context.OriginalRequestUrl;
 
             var reason = EnsureRoutableOutcome.IsRoutable;
 
-            // ensure this is a document request
-            if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
-            {
-                reason = EnsureRoutableOutcome.NotDocumentRequest;
-            }
+            //// ensure this is a document request
+            //if (!_routableDocumentLookup.IsDocumentRequest(httpContext, context.OriginalRequestUrl))
+            //{
+            //    reason = EnsureRoutableOutcome.NotDocumentRequest;
+            //}
+
             // ensure the runtime is in the proper state
             // and deal with needed redirects, etc
-            else if (!EnsureRuntime(httpContext, uri))
+            if (!EnsureRuntime(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotReady;
             }
@@ -186,8 +119,8 @@ namespace Umbraco.Web
             return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
         }
 
-
-
+        // TODO: Where should this execute in netcore? This will have to be a middleware
+        // executing before UseRouting so that it is done before any endpoint routing takes place.
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
             var level = _runtime.Level;
@@ -261,42 +194,7 @@ namespace Umbraco.Web
             urlRouting.PostResolveRequestCache(context);
         }
 
-        /// <summary>
-        /// Rewrites to the Umbraco handler - we always send the request via our MVC rendering engine, this will deal with
-        /// requests destined for webforms.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
-        {
-            // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
-            // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
-            // rewritten URL, but this is not what we want!
-            // read: http://forums.iis.net/t/1146511.aspx
 
-            var query = pcr.Uri.Query.TrimStart('?');
-
-            // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.GetBackOfficePath(_hostingEnvironment).TrimEnd('/') + "/RenderMvc";
-            // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
-            context.RewritePath(rewritePath, "", query, false);
-
-            //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then re-parse the query strings, this would
-            //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
-            //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
-            // * Looks up the route based on the new rewritten URL
-            // * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
-            //we also cannot re-create this functionality because the setter for the HttpContext.Request.RequestContext is internal
-            //so really, this is pretty much the only way without using Server.TransferRequest and if we did that, we'd have to rethink
-            //a bunch of things!
-            var urlRouting = new UrlRoutingModule();
-            urlRouting.PostResolveRequestCache(context);
-        }
-
-
-
-        #endregion
 
         #region IHttpModule
 

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Language"/>
     /// </summary>
-    internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
+    internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
     {
         private readonly GlobalSettings _globalSettings;
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,Language>
+        #region Overrides of EntityRepositoryBase<int,Language>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

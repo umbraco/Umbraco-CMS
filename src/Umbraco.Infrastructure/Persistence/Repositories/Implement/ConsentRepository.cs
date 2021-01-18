@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using NPoco;
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the NPoco implementation of <see cref="IConsentRepository"/>.
     /// </summary>
-    internal class ConsentRepository : NPocoRepositoryBase<int, IConsent>, IConsentRepository
+    internal class ConsentRepository : EntityRepositoryBase<int, IConsent>, IConsentRepository
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsentRepository"/> class.

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -19,20 +22,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         public void TestSetup()
         {
             _savedCulture = Thread.CurrentThread.CurrentCulture;
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-GB"); // make sure the dates parse correctly
         }
 
         [TearDown]
-        public void TestTearDown()
-        {
-            Thread.CurrentThread.CurrentCulture = _savedCulture;
-        }
+        public void TestTearDown() => Thread.CurrentThread.CurrentCulture = _savedCulture;
 
         [Test]
         public void Can_Convert_List_To_Enumerable()
         {
-            var list = new List<string> {"hello", "world", "awesome"};
-            var result = list.TryConvertTo<IEnumerable<string>>();
+            var list = new List<string> { "hello", "world", "awesome" };
+            Attempt<IEnumerable<string>> result = list.TryConvertTo<IEnumerable<string>>();
             Assert.IsTrue(result.Success);
             Assert.AreEqual(3, result.Result.Count());
         }
@@ -40,16 +40,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ObjectExtensions_Object_To_Dictionary()
         {
-            //Arrange
-
+            // Arrange
             var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
 
-            //Act
+            // Act
+            IDictionary<string, string> d = obj.ToDictionary<string>();
 
-            var d = obj.ToDictionary<string>();
-
-            //Assert
-
+            // Assert
             Assert.IsTrue(d.Keys.Contains("Key1"));
             Assert.IsTrue(d.Keys.Contains("Key2"));
             Assert.IsTrue(d.Keys.Contains("Key3"));
@@ -61,8 +58,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void CanConvertIntToNullableInt()
         {
-            var i = 1;
-            var result = i.TryConvertTo<int?>();
+            int i = 1;
+            Attempt<int?> result = i.TryConvertTo<int?>();
             Assert.That(result.Success, Is.True);
         }
 
@@ -70,7 +67,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         public void CanConvertNullableIntToInt()
         {
             int? i = 1;
-            var result = i.TryConvertTo<int>();
+            Attempt<int> result = i.TryConvertTo<int>();
             Assert.That(result.Success, Is.True);
         }
 
@@ -79,20 +76,20 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         {
             var testCases = new Dictionary<string, bool>
                 {
-                    {"TRUE", true},
-                    {"True", true},
-                    {"true", true},
-                    {"1", true},
-                    {"FALSE", false},
-                    {"False", false},
-                    {"false", false},
-                    {"0", false},
-                    {"", false}
+                    { "TRUE", true },
+                    { "True", true },
+                    { "true", true },
+                    { "1", true },
+                    { "FALSE", false },
+                    { "False", false },
+                    { "false", false },
+                    { "0", false },
+                    { string.Empty, false }
                 };
 
-            foreach (var testCase in testCases)
+            foreach (KeyValuePair<string, bool> testCase in testCases)
             {
-                var result = testCase.Key.TryConvertTo<bool>();
+                Attempt<bool> result = testCase.Key.TryConvertTo<bool>();
 
                 Assert.IsTrue(result.Success, testCase.Key);
                 Assert.AreEqual(testCase.Value, result.Result, testCase.Key);
@@ -113,7 +110,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         {
             var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
 
-            var result = date.TryConvertTo<DateTime>();
+            Attempt<DateTime> result = date.TryConvertTo<DateTime>();
 
             Assert.IsTrue(result.Success, date);
             Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
@@ -122,7 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public virtual void CanConvertBlankStringToNullDateTime()
         {
-            var result = "".TryConvertTo<DateTime?>();
+            Attempt<DateTime?> result = string.Empty.TryConvertTo<DateTime?>();
             Assert.IsTrue(result.Success);
             Assert.IsNull(result.Result);
         }
@@ -130,7 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public virtual void CanConvertBlankStringToNullBool()
         {
-            var result = "".TryConvertTo<bool?>();
+            Attempt<bool?> result = string.Empty.TryConvertTo<bool?>();
             Assert.IsTrue(result.Success);
             Assert.IsNull(result.Result);
         }
@@ -138,7 +135,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public virtual void CanConvertBlankStringToDateTime()
         {
-            var result = "".TryConvertTo<DateTime>();
+            Attempt<DateTime> result = string.Empty.TryConvertTo<DateTime>();
             Assert.IsTrue(result.Success);
             Assert.AreEqual(DateTime.MinValue, result.Result);
         }
@@ -146,7 +143,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public virtual void CanConvertObjectToString_Using_ToString_Overload()
         {
-            var result = new MyTestObject().TryConvertTo<string>();
+            Attempt<string> result = new MyTestObject().TryConvertTo<string>();
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual("Hello world", result.Result);
@@ -156,7 +153,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         public virtual void CanConvertObjectToSameObject()
         {
             var obj = new MyTestObject();
-            var result = obj.TryConvertTo<object>();
+            Attempt<object> result = obj.TryConvertTo<object>();
 
             Assert.AreEqual(obj, result.Result);
         }
@@ -164,7 +161,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ConvertToIntegerTest()
         {
-            var conv = "100".TryConvertTo<int>();
+            Attempt<int> conv = "100".TryConvertTo<int>();
             Assert.IsTrue(conv);
             Assert.AreEqual(100, conv.Result);
 
@@ -198,7 +195,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ConvertToDecimalTest()
         {
-            var conv = "100".TryConvertTo<decimal>();
+            Attempt<decimal> conv = "100".TryConvertTo<decimal>();
             Assert.IsTrue(conv);
             Assert.AreEqual(100m, conv.Result);
 
@@ -234,7 +231,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ConvertToNullableDecimalTest()
         {
-            var conv = "100".TryConvertTo<decimal?>();
+            Attempt<decimal?> conv = "100".TryConvertTo<decimal?>();
             Assert.IsTrue(conv);
             Assert.AreEqual(100m, conv.Result);
 
@@ -270,7 +267,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ConvertToDateTimeTest()
         {
-            var conv = "2016-06-07".TryConvertTo<DateTime>();
+            Attempt<DateTime> conv = "2016-06-07".TryConvertTo<DateTime>();
             Assert.IsTrue(conv);
             Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
         }
@@ -278,7 +275,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void ConvertToNullableDateTimeTest()
         {
-            var conv = "2016-06-07".TryConvertTo<DateTime?>();
+            Attempt<DateTime?> conv = "2016-06-07".TryConvertTo<DateTime?>();
             Assert.IsTrue(conv);
             Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
         }
@@ -286,19 +283,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
         {
-            var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
+            DataValueEditor valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
-            var result = valueEditor.TryConvertValueToCrlType(12.34d);
+            Attempt<object> result = valueEditor.TryConvertValueToCrlType(12.34d);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(12.34d, result.Result);
         }
 
         private class MyTestObject
         {
-            public override string ToString()
-            {
-                return "Hello world";
-            }
+            public override string ToString() => "Hello world";
         }
     }
 }

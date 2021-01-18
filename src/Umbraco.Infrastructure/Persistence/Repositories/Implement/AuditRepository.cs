@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -12,7 +12,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class AuditRepository : NPocoRepositoryBase<int, IAuditItem>, IAuditRepository
+    internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
     {
         public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)

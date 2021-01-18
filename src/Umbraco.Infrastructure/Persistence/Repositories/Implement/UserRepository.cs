@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
-    internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
+    internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
         private readonly GlobalSettings _globalSettings;
@@ -376,7 +376,7 @@ ORDER BY colName";
 
         #endregion
 
-        #region Overrides of NPocoRepositoryBase<int,IUser>
+        #region Overrides of EntityRepositoryBase<int,IUser>
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

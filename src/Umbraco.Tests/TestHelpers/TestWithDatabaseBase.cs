@@ -32,6 +32,7 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
 using Umbraco.Core.Security;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -348,6 +349,8 @@ namespace Umbraco.Tests.TestHelpers
                 onFail?.Invoke(ex);
             }
         }
+
+        protected IUmbracoContextAccessor GetUmbracoContextAccessor(IUmbracoContext ctx) => new TestUmbracoContextAccessor(ctx);
 
         protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, GlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {

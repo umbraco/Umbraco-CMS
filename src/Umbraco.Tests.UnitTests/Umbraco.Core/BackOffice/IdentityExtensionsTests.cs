@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
@@ -20,9 +23,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         public void ToErrorMessage_When_Single_Error_Expect_Error_Description()
         {
             const string expectedError = "invalid something";
-            var errors = new List<IdentityError> {new IdentityError {Code = "1", Description = expectedError}};
+            var errors = new List<IdentityError> { new IdentityError { Code = "1", Description = expectedError } };
 
-            var errorMessage = errors.ToErrorMessage();
+            string errorMessage = errors.ToErrorMessage();
 
             Assert.AreEqual(expectedError, errorMessage);
         }
@@ -34,11 +37,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             const string error2 = "invalid something else";
             var errors = new List<IdentityError>
             {
-                new IdentityError {Code = "1", Description = error1},
-                new IdentityError {Code = "2", Description = error2}
+                new IdentityError { Code = "1", Description = error1 },
+                new IdentityError { Code = "2", Description = error2 }
             };
 
-            var errorMessage = errors.ToErrorMessage();
+            string errorMessage = errors.ToErrorMessage();
 
             Assert.AreEqual($"{error1}, {error2}", errorMessage);
         }

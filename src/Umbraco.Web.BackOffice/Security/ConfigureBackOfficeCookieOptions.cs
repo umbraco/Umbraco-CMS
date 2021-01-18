@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Routing;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigureBackOfficeCookieOptions"/> class.
@@ -60,7 +62,8 @@ namespace Umbraco.Web.BackOffice.Security
             IDataProtectionProvider dataProtection,
             IUserService userService,
             IIpResolver ipResolver,
-            ISystemClock systemClock)
+            ISystemClock systemClock,
+            UmbracoRequestPaths umbracoRequestPaths)
         {
             _serviceProvider = serviceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -72,6 +75,7 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _systemClock = systemClock;
+            _umbracoRequestPaths = umbracoRequestPaths;
         }
 
         /// <inheritdoc />
@@ -115,8 +119,7 @@ namespace Umbraco.Web.BackOffice.Security
             options.CookieManager = new BackOfficeCookieManager(
                 _umbracoContextAccessor,
                 _runtimeState,
-                _hostingEnvironment,
-                _globalSettings); // _explicitPaths); TODO: Implement this once we do OAuth somehow
+                _umbracoRequestPaths); 
 
             options.Events = new CookieAuthenticationEvents
             {

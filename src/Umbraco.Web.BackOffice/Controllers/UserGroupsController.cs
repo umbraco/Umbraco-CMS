@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -9,15 +10,13 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -52,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [UserGroupValidate]
-        public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
+        public ActionResult<UserGroupDisplay> PostSaveUserGroup(UserGroupSave userGroupSave)
         {
             if (userGroupSave == null) throw new ArgumentNullException(nameof(userGroupSave));
 
@@ -62,14 +61,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
+                return Unauthorized(isAuthorized.Result);
 
             //if sections were added we need to check that the current user has access to that section
             isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
+                return Unauthorized(isAuthorized.Result);
 
             //if start nodes were changed we need to check that the current user has access to them
             isAuthorized = authHelper.AuthorizeStartNodeChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
@@ -78,7 +77,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 userGroupSave.PersistedUserGroup.StartMediaId,
                 userGroupSave.StartMediaId);
             if (isAuthorized == false)
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
+                return Unauthorized(isAuthorized.Result);
 
             //need to ensure current user is in a group if not an admin to avoid a 401
             EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);

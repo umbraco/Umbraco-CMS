@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Web.Common.ModelBinding;
 using System.Linq;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.ApplicationModels
 {

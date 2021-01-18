@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,10 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
     {
         protected IFileSystem _fileSystem;
 
-        protected AbstractFileSystemTests(IFileSystem fileSystem)
-        {
-            _fileSystem = fileSystem;
-        }
+        protected AbstractFileSystemTests(IFileSystem fileSystem) => _fileSystem = fileSystem;
 
         [Test]
         public void Can_Create_And_Delete_Files()
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
 
             _fileSystem.DeleteFile("test.txt");
 
-           Assert.IsFalse(_fileSystem.FileExists("test.txt"));
+            Assert.IsFalse(_fileSystem.FileExists("test.txt"));
         }
 
         [Test]
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             _fileSystem.AddFile("test/test.txt", CreateStream());
             _fileSystem.AddFile("test/test.txt", CreateStream());
 
-            var files = _fileSystem.GetFiles("test");
+            IEnumerable<string> files = _fileSystem.GetFiles("test");
 
             Assert.AreEqual(1, files.Count());
 
@@ -50,16 +51,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
         }
 
         [Test]
-        public void Cant_Overwrite_File()
-        {
+        public void Cant_Overwrite_File() =>
             Assert.Throws<InvalidOperationException>(() =>
-            {
-                _fileSystem.AddFile("test.txt", CreateStream());
-                _fileSystem.AddFile("test.txt", CreateStream(), false);
+                {
+                    _fileSystem.AddFile("test.txt", CreateStream());
+                    _fileSystem.AddFile("test.txt", CreateStream(), false);
 
-                _fileSystem.DeleteFile("test.txt");
-            });
-        }
+                    _fileSystem.DeleteFile("test.txt");
+                });
 
         [Test]
         public void Can_Get_Files()
@@ -69,7 +68,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             _fileSystem.AddFile("test/test3.txt", CreateStream());
             _fileSystem.AddFile("test/test4.bak", CreateStream());
 
-            var files = _fileSystem.GetFiles("test");
+            IEnumerable<string> files = _fileSystem.GetFiles("test");
 
             Assert.AreEqual(4, files.Count());
 
@@ -85,7 +84,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
         {
             _fileSystem.AddFile("test.txt", CreateStream("hello world"));
 
-            var stream = _fileSystem.OpenFile("test.txt");
+            Stream stream = _fileSystem.OpenFile("test.txt");
             var reader = new StreamReader(stream);
             var contents = reader.ReadToEnd();
             reader.Close();
@@ -102,7 +101,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             _fileSystem.AddFile("test/sub2/test.txt", CreateStream());
             _fileSystem.AddFile("test/sub3/test.txt", CreateStream());
 
-            var dirs = _fileSystem.GetDirectories("test");
+            IEnumerable<string> dirs = _fileSystem.GetDirectories("test");
 
             Assert.AreEqual(3, dirs.Count());
             Assert.IsTrue(_fileSystem.DirectoryExists("test/sub1"));
@@ -119,8 +118,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
 
             _fileSystem.AddFile("test.txt", CreateStream());
 
-            var created = _fileSystem.GetCreated("test.txt");
-            var modified = _fileSystem.GetLastModified("test.txt");
+            DateTimeOffset created = _fileSystem.GetCreated("test.txt");
+            DateTimeOffset modified = _fileSystem.GetLastModified("test.txt");
 
             Assert.AreEqual(DateTime.UtcNow.Year, created.Year);
             Assert.AreEqual(DateTime.UtcNow.Month, created.Month);
@@ -142,7 +141,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
 
             Assert.AreEqual(ConstructUrl("test.txt"), url);
 
-             _fileSystem.DeleteFile("test.txt");
+            _fileSystem.DeleteFile("test.txt");
         }
 
         [Test]
@@ -165,7 +164,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
         [Test]
         public void Can_Get_Size()
         {
-            var stream = CreateStream();
+            Stream stream = CreateStream();
             var streamLength = stream.Length;
             _fileSystem.AddFile("test.txt", stream);
 
@@ -174,12 +173,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
             _fileSystem.DeleteFile("test.txt");
         }
 
-        #region Helper Methods
-
         protected Stream CreateStream(string contents = null)
         {
             if (string.IsNullOrEmpty(contents))
+            {
                 contents = "test";
+            }
 
             var bytes = Encoding.UTF8.GetBytes(contents);
             var stream = new MemoryStream(bytes);
@@ -188,7 +187,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
         }
 
         protected abstract string ConstructUrl(string path);
-
-        #endregion
     }
 }

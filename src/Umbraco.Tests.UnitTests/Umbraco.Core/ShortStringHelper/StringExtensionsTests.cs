@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,10 +22,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("hello-world.png", "Hello World")]
         [TestCase("hello-world .png", "Hello World")]
         [TestCase("_hello-world __1.png", "Hello World 1")]
-        public void To_Friendly_Name(string first, string second)
-        {
-            Assert.AreEqual(first.ToFriendlyName(), second);
-        }
+        public void To_Friendly_Name(string first, string second) => Assert.AreEqual(first.ToFriendlyName(), second);
 
         [TestCase("hello", "world", false)]
         [TestCase("hello", "hello", true)]
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("/Test.js function(){return true;}", false)]
         public void Detect_Is_JavaScript_Path(string input, bool result)
         {
-            var output = input.DetectIsJavaScriptPath(Mock.Of<IIOHelper>());
+            Attempt<string> output = input.DetectIsJavaScriptPath(Mock.Of<IIOHelper>());
             Assert.AreEqual(result, output.Success);
         }
 
@@ -114,6 +114,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase("Hello this is hello my string", "hello", "replaced", "replaced this is replaced my string", StringComparison.CurrentCultureIgnoreCase)]
         [TestCase("Hello this is my string", "nonexistent", "replaced", "Hello this is my string", StringComparison.CurrentCultureIgnoreCase)]
         [TestCase("Hellohello this is my string", "hello", "replaced", "replacedreplaced this is my string", StringComparison.CurrentCultureIgnoreCase)]
+
         // Ensure replacing with the same string doesn't cause infinite loop.
         [TestCase("Hello this is my string", "hello", "hello", "hello this is my string", StringComparison.CurrentCultureIgnoreCase)]
         public void ReplaceWithStringComparison(string input, string oldString, string newString, string shouldBe, StringComparison stringComparison)
@@ -161,7 +162,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         [TestCase(" ", true)]
         [TestCase("\r\n\r\n", true)]
         [TestCase("\r\n", true)]
-        [TestCase(@"
+        [TestCase(
+            @"
         Hello
         ", false)]
         [TestCase(null, true)]
@@ -300,6 +302,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             var output = input.ReplaceMany(toReplace.ToArray(), replacement);
             Assert.AreEqual(expected, output);
         }
-
     }
 }

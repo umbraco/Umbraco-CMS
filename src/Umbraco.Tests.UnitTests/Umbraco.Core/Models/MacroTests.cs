@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -14,15 +18,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private MacroBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new MacroBuilder();
-        }
+        public void SetUp() => _builder = new MacroBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var macro = _builder
+            Macro macro = _builder
                 .WithId(1)
                 .WithUseInEditor(true)
                 .WithCacheDuration(3)
@@ -58,13 +59,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreNotSame(clone.AddedProperties, macro.AddedProperties);
             Assert.AreNotSame(clone.RemovedProperties, macro.RemovedProperties);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(macro, null));
+            }
 
-            //need to ensure the event handlers are wired
-
+            // Need to ensure the event handlers are wired.
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));

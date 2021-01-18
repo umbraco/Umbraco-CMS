@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Install
         private readonly string[] _packagesPermissionsDirs;
 
         // ensure Umbraco can write to these files (the directories must exist)
-        private readonly string[] _permissionFiles = { };
+        private readonly string[] _permissionFiles = Array.Empty<string>();
         private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -49,26 +49,13 @@ namespace Umbraco.Web.Install
             if (EnsureFiles(_permissionFiles, out errors) == false)
                 report["File writing failed"] = errors.ToList();
 
-            if (TestPublishedSnapshotService(out errors) == false)
-                report["Published snapshot environment check failed"] = errors.ToList();
-
             if (EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors) == false)
                 report["Media folder creation failed"] = errors.ToList();
 
             return report.Count == 0;
         }
 
-        /// <summary>
-        /// This will test the directories for write access
-        /// </summary>
-        /// <param name="dirs"></param>
-        /// <param name="errors"></param>
-        /// <param name="writeCausesRestart">
-        /// If this is false, the easiest way to test for write access is to write a temp file, however some folder will cause
-        /// an App Domain restart if a file is written to the folder, so in that case we need to use the ACL APIs which aren't as
-        /// reliable but we cannot write a file since it will cause an app domain restart.
-        /// </param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
         {
             List<string> temp = null;
@@ -96,9 +83,16 @@ namespace Umbraco.Web.Install
             foreach (var file in files)
             {
                 var canWrite = TryWriteFile(file);
-                if (canWrite) continue;
+                if (canWrite)
+                {
+                    continue;
+                }
 
-                if (temp == null) temp = new List<string>();
+                if (temp == null)
+                {
+                    temp = new List<string>();
+                }
+
                 temp.Add(file);
                 success = false;
             }
@@ -128,11 +122,6 @@ namespace Umbraco.Web.Install
 
             errors = success ? Enumerable.Empty<string>() : temp;
             return success;
-        }
-
-        public bool TestPublishedSnapshotService(out IEnumerable<string> errors)
-        {
-            return _publishedSnapshotService.EnsureEnvironment(out errors);
         }
 
         // tries to create a sub-directory

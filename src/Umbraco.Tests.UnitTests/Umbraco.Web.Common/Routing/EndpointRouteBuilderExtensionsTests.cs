@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Http.Features;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using System;
-using System.Linq;
-using System.Text;
 using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Extensions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
-
     [TestFixture]
     public class EndpointRouteBuilderExtensionsTests
     {
@@ -37,31 +36,45 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpoints = new TestRouteBuilder();
             endpoints.MapUmbracoRoute<Testing1Controller>(umbracoPath, area, prefix, defaultAction, includeControllerName);
 
-            var route = endpoints.DataSources.First();
+            EndpointDataSource route = endpoints.DataSources.First();
             var endpoint = (RouteEndpoint)route.Endpoints[0];
 
-            var controllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
-            var controllerNamePattern = controllerName.ToLowerInvariant();
+            string controllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
+            string controllerNamePattern = controllerName.ToLowerInvariant();
 
             if (includeControllerName)
             {
                 if (prefix.IsNullOrWhiteSpace())
+                {
                     Assert.AreEqual($"{umbracoPath}/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
                 else
+                {
                     Assert.AreEqual($"{umbracoPath}/{prefix}/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
             }
             else
             {
                 if (prefix.IsNullOrWhiteSpace())
+                {
                     Assert.AreEqual($"{umbracoPath}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
                 else
+                {
                     Assert.AreEqual($"{umbracoPath}/{prefix}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
             }
 
             if (!area.IsNullOrWhiteSpace())
+            {
                 Assert.AreEqual(area, endpoint.RoutePattern.Defaults["area"]);
+            }
+
             if (!defaultAction.IsNullOrWhiteSpace())
-                Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);            
+            {
+                Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);
+            }
+
             Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults["controller"]);
         }
 
@@ -78,38 +91,51 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpoints = new TestRouteBuilder();
             endpoints.MapUmbracoApiRoute<Testing1Controller>(umbracoPath, area, isBackOffice, defaultAction);
 
-            var route = endpoints.DataSources.First();
+            EndpointDataSource route = endpoints.DataSources.First();
             var endpoint = (RouteEndpoint)route.Endpoints[0];
 
-            var controllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
-            var controllerNamePattern = controllerName.ToLowerInvariant();
-            var areaPattern = area?.ToLowerInvariant();
+            string controllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
+            string controllerNamePattern = controllerName.ToLowerInvariant();
+            string areaPattern = area?.ToLowerInvariant();
 
             if (isBackOffice)
             {
                 if (area.IsNullOrWhiteSpace())
+                {
                     Assert.AreEqual($"{umbracoPath}/backoffice/api/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
                 else
+                {
                     Assert.AreEqual($"{umbracoPath}/backoffice/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
             }
             else
             {
                 if (area.IsNullOrWhiteSpace())
+                {
                     Assert.AreEqual($"{umbracoPath}/api/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
                 else
+                {
                     Assert.AreEqual($"{umbracoPath}/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}", endpoint.RoutePattern.RawText);
+                }
             }
 
             if (!area.IsNullOrWhiteSpace())
+            {
                 Assert.AreEqual(area, endpoint.RoutePattern.Defaults["area"]);
+            }
+
             if (!defaultAction.IsNullOrWhiteSpace())
+            {
                 Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);
+            }
+
             Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults["controller"]);
         }
 
         private class Testing1Controller : ControllerBase
         {
-
         }
     }
 }

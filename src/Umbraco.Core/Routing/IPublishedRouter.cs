@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Routing
 {
@@ -9,46 +8,34 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public interface IPublishedRouter
     {
-        // TODO: consider this and RenderRouteHandler - move some code around?
-
         /// <summary>
         /// Creates a published request.
         /// </summary>
-        /// <param name="umbracoContext">The current Umbraco context.</param>
-        /// <param name="uri">The (optional) request Uri.</param>
-        /// <returns>A published request.</returns>
-        IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null);
+        /// <param name="uri">The current request Uri.</param>
+        /// <returns>A published request builder.</returns>
+        Task<IPublishedRequestBuilder> CreateRequestAsync(Uri uri);
 
         /// <summary>
-        /// Prepares a request for rendering.
+        /// Sends a <see cref="IPublishedRequestBuilder"/> through the routing pipeline and builds a result.
         /// </summary>
         /// <param name="request">The request.</param>
-        /// <returns>A value indicating whether the request was successfully prepared and can be rendered.</returns>
-        bool PrepareRequest(IPublishedRequest request);
-
-        /// <summary>
-        /// Tries to route a request.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <returns>A value indicating whether the request can be routed to a document.</returns>
-        bool TryRouteRequest(IPublishedRequest request);
-
-        /// <summary>
-        /// Gets a template.
-        /// </summary>
-        /// <param name="alias">The template alias</param>
-        /// <returns>The template.</returns>
-        ITemplate GetTemplate(string alias);
+        /// <param name="options">The options.</param>
+        /// <returns>The built <see cref="IPublishedRequest"/> instance.</returns>
+        Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request, RouteRequestOptions options);
 
         /// <summary>
         /// Updates the request to "not found".
         /// </summary>
         /// <param name="request">The request.</param>
         /// <remarks>
+        /// <returns>A new <see cref="IPublishedRequestBuilder"/> based on values from the original <see cref="IPublishedRequest"/></returns>
         /// <para>This method is invoked when the pipeline decides it cannot render
         /// the request, for whatever reason, and wants to force it to be re-routed
         /// and rendered as if no document were found (404).</para>
+        /// <para>This occurs if there is no template found and route hijacking was not matched.
+        /// In that case it's the same as if there was no content which means even if there was
+        /// content matched we want to run the request through the last chance finders.</para>
         /// </remarks>
-        void UpdateRequestToNotFound(IPublishedRequest request);
+        IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request);
     }
 }

@@ -15,7 +15,7 @@ using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class TagRepository : NPocoRepositoryBase<int, ITag>, ITagRepository
+    internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
     {
         public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
             : base(scopeAccessor, cache, logger)

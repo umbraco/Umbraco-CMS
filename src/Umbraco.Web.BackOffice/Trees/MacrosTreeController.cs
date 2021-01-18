@@ -1,15 +1,15 @@
-﻿using System.Linq;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -28,15 +28,21 @@ namespace Umbraco.Web.BackOffice.Trees
             _macroService = macroService;
         }
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
+
             //check if there are any macros
             root.HasChildren = _macroService.GetAll().Any();
             return root;
         }
 
-        protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
 
@@ -57,7 +63,7 @@ namespace Umbraco.Web.BackOffice.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             var menu = _menuItemCollectionFactory.Create();
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Xml;
@@ -21,9 +20,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -114,16 +113,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(int id)
+        public ActionResult<DocumentTypeDisplay> GetById(int id)
         {
             var ct = _contentTypeService.Get(id);
             if (ct == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(ct);
@@ -133,16 +130,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given guid
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(Guid id)
+        public ActionResult<DocumentTypeDisplay> GetById(Guid id)
         {
             var contentType = _contentTypeService.Get(id);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -152,20 +147,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given udi
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetById(Udi id)
+        public ActionResult<DocumentTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             var contentType = _contentTypeService.Get(guidUdi.Guid);
             if (contentType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
@@ -175,8 +168,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -185,7 +176,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var foundType = _contentTypeService.Get(id);
             if (foundType == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
@@ -195,7 +186,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all user defined properties.
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
@@ -205,7 +195,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets all the standard fields.
         /// </summary>
-        /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
         public IEnumerable<string> GetAllStandardFields()
         {
@@ -217,13 +206,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public IActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
+        public ActionResult GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
+            var actionResult = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId,
+                UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes,
+                filter.IsElement);
+
+            if (!(actionResult.Result is null))
+            {
+                return actionResult.Result;
+            }
+
+            var result = actionResult.Value
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -235,7 +231,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns true if any content types have culture variation enabled
         /// </summary>
-        /// <returns></returns>
         [HttpGet]
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         public bool AllowsCultureVariation()
@@ -248,13 +243,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns where a particular composition has been used
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType)
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType).Value
                 .Select(x => new
                 {
                     contentType = x
@@ -263,13 +256,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessAnyContentOrTypes)]
-        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
+        public ActionResult<ContentPropertyDisplay> GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = _dataTypeService.GetDataType(id);
 
             if (dataTypeDiff == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var configuration = _dataTypeService.GetDataType(id).Configuration;
@@ -287,8 +280,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Deletes a document type container with a given ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -304,9 +295,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -314,9 +306,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
-            return result
-                ? Ok(result.Result) //return the id
-                : throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Exception.Message);
+            if (result.Success)
+                return Ok(result.Result); //return the id
+            else
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -377,7 +370,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
+        public ActionResult<DocumentTypeDisplay> PostSave(DocumentTypeSave contentTypeSave)
         {
             //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
             //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
@@ -420,7 +413,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                     }
                 });
 
-            var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt);
+            if (!(savedCt.Result is null))
+            {
+                return savedCt.Result;
+            }
+
+            var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt.Value);
+
 
             display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles/contentTypeSavedHeader"),

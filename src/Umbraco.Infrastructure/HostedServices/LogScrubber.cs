@@ -23,7 +23,7 @@ namespace Umbraco.Infrastructure.HostedServices
     public class LogScrubber : RecurringHostedServiceBase
     {
         private readonly IMainDom _mainDom;
-        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IAuditService _auditService;
         private readonly LoggingSettings _settings;
         private readonly IProfilingLogger _profilingLogger;
@@ -42,7 +42,7 @@ namespace Umbraco.Infrastructure.HostedServices
         /// <param name="profilingLogger">The profiling logger.</param>
         public LogScrubber(
             IMainDom mainDom,
-            IServerRegistrar serverRegistrar,
+            IServerRoleAccessor serverRegistrar,
             IAuditService auditService,
             IOptions<LoggingSettings> settings,
             IScopeProvider scopeProvider,
@@ -61,7 +61,7 @@ namespace Umbraco.Infrastructure.HostedServices
 
         internal override Task PerformExecuteAsync(object state)
         {
-            switch (_serverRegistrar.GetCurrentServerRole())
+            switch (_serverRegistrar.CurrentServerRole)
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");

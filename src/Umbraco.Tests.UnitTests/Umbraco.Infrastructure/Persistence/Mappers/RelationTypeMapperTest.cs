@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
 
@@ -30,7 +33,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_ChildObjectType_Property()
         {
-
             // Act
             string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("ChildObjectType");
 
@@ -41,7 +43,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
         [Test]
         public void Can_Map_IsBidirectional_Property()
         {
-
             // Act
             string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("IsBidirectional");
 

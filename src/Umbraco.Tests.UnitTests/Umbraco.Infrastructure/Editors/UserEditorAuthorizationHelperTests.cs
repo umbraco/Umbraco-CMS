@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -19,8 +22,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         [Test]
         public void Admin_Is_Authorized()
         {
-            var currentUser = CreateAdminUser();
-            var savingUser = CreateUser();
+            IUser currentUser = CreateAdminUser();
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -32,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
                 mediaService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -40,8 +43,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         [Test]
         public void Non_Admin_Cannot_Save_Admin()
         {
-            var currentUser = CreateUser();
-            var savingUser = CreateAdminUser();
+            IUser currentUser = CreateUser();
+            IUser savingUser = CreateAdminUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -53,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
                 mediaService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -61,8 +64,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         [Test]
         public void Cannot_Grant_Group_Membership_Without_Being_A_Member()
         {
-            var currentUser = CreateUser(withGroup: true);
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(withGroup: true);
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -74,7 +77,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
                 mediaService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] {"FunGroup"});
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "FunGroup" });
 
             Assert.IsFalse(result.Success);
         }
@@ -82,8 +85,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         [Test]
         public void Can_Grant_Group_Membership_With_Being_A_Member()
         {
-            var currentUser = CreateUser(withGroup: true);
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(withGroup: true);
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -95,7 +98,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
                 mediaService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
 
             Assert.IsTrue(result.Success);
         }
@@ -105,14 +108,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startContentIds: new[] { 9876 });
-            var savingUser = CreateUser(startContentIds: new[] { 1234 });
+            IUser currentUser = CreateUser(startContentIds: new[] { 9876 });
+            IUser savingUser = CreateUser(startContentIds: new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -121,18 +124,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath {Path = nodePaths[x], Id = x});
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
+            // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -142,14 +142,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startContentIds: new[] { 9876 });
-            var savingUser = CreateUser(startContentIds: new[] { 1234, 4567 });
+            IUser currentUser = CreateUser(startContentIds: new[] { 9876 });
+            IUser savingUser = CreateUser(startContentIds: new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -158,18 +158,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
+            // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -179,14 +176,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startContentIds: new[] { 9876 });
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(startContentIds: new[] { 9876 });
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -195,18 +192,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 1234 but currentUser doesn't have access to it ... nope
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new []{1234}, new int[0], new string[0]);
+            // adding 1234 but currentUser doesn't have access to it ... nope
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -216,14 +210,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startContentIds: new[] { 9876 });
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(startContentIds: new[] { 9876 });
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -232,18 +226,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
+            // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -253,15 +244,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-
-            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -270,18 +260,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 1234 but currentUser doesn't have access to it ... nope
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] {1234}, new string[0]);
+            // adding 1234 but currentUser doesn't have access to it ... nope
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -291,14 +278,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
-            var savingUser = CreateUser();
+            IUser currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            IUser savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -307,18 +294,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
+            // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -328,14 +312,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
-            var savingUser = CreateUser(startMediaIds: new[] { 1234 });
+            IUser currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            IUser savingUser = CreateUser(startMediaIds: new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -344,18 +328,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
+            // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -365,14 +346,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var nodePaths = new Dictionary<int, string>
             {
-                {1234, "-1,1234"},
-                {9876, "-1,9876"},
-                {5555, "-1,9876,5555"},
-                {4567, "-1,4567"},
+                { 1234, "-1,1234" },
+                { 9876, "-1,9876" },
+                { 5555, "-1,9876,5555" },
+                { 4567, "-1,4567" },
             };
 
-            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
-            var savingUser = CreateUser(startMediaIds: new[] { 1234, 4567 });
+            IUser currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            IUser savingUser = CreateUser(startMediaIds: new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -381,27 +362,24 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var userService = new Mock<IUserService>();
             var entityService = new Mock<IEntityService>();
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) =>
-                {
-                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
-                });
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x }));
 
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
                 entityService.Object);
 
-            //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
+            // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
+            Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
 
         private static IUser CreateUser(bool withGroup = false, int[] startContentIds = null, int[] startMediaIds = null)
         {
-            var builder = new UserBuilder()
-                .WithStartContentIds(startContentIds != null ? startContentIds : new int[0])
-                .WithStartMediaIds(startMediaIds != null ? startMediaIds : new int[0]);
+            UserBuilder<object> builder = new UserBuilder()
+                .WithStartContentIds(startContentIds ?? (new int[0]))
+                .WithStartMediaIds(startMediaIds ?? (new int[0]));
             if (withGroup)
             {
                 builder = (UserBuilder)builder
@@ -414,15 +392,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
             return builder.Build();
         }
 
-        private static IUser CreateAdminUser()
-        {
-            return new UserBuilder()
+        private static IUser CreateAdminUser() =>
+            new UserBuilder()
                 .AddUserGroup()
                     .WithId(1)
                     .WithName("Admin")
                     .WithAlias(Constants.Security.AdminGroupAlias)
                     .Done()
                 .Build();
-        }
     }
 }

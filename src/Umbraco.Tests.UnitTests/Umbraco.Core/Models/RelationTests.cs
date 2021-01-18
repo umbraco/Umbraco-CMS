@@ -1,5 +1,9 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,17 +18,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private RelationBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new RelationBuilder();
-        }
+        public void SetUp() => _builder = new RelationBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var relation = BuildRelation();
+            Relation relation = BuildRelation();
 
-            var clone = (Relation) relation.DeepClone();
+            var clone = (Relation)relation.DeepClone();
 
             Assert.AreNotSame(clone, relation);
             Assert.AreEqual(clone, relation);
@@ -39,9 +40,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.RelationTypeId, relation.RelationTypeId);
             Assert.AreEqual(clone.UpdateDate, relation.UpdateDate);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(relation, null));
             }
@@ -50,15 +51,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var relation = BuildRelation();
+            Relation relation = BuildRelation();
 
             var json = JsonConvert.SerializeObject(relation);
             Debug.Print(json);
         }
 
-        private Relation BuildRelation()
-        {
-            return _builder
+        private Relation BuildRelation() =>
+            _builder
                 .BetweenIds(9, 8)
                 .WithId(4)
                 .WithComment("test comment")
@@ -74,6 +74,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                     .WithChildObjectType(Guid.NewGuid())
                     .Done()
                 .Build();
-        }
     }
 }

@@ -1,4 +1,6 @@
-﻿
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +49,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s = d.CreateSnapshot();
             Assert.AreEqual(1, s.Gen);
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -67,7 +69,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
         public void MissingReturnsNull()
         {
             var d = new SnapDictionary<int, string>();
-            var s = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s = d.CreateSnapshot();
 
             Assert.IsNull(s.Get(1));
         }
@@ -80,13 +82,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             // gen 1
             d.Set(1, "one");
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
             Assert.AreEqual("one", s1.Get(1));
 
             // gen 2
             d.Clear(1);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
             Assert.IsNull(s2.Get(1));
 
             Assert.AreEqual("one", s1.Get(1));
@@ -110,7 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -125,7 +127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -140,7 +142,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var tv = d.Test.GetValues(1);
+            SnapDictionary<int, string>.TestHelper.GenVal[] tv = d.Test.GetValues(1);
             Assert.AreEqual(3, tv[0].Gen);
             Assert.AreEqual(2, tv[1].Gen);
             Assert.AreEqual(1, tv[2].Gen);
@@ -185,7 +187,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
 
-            for (var i = 0; i < 32; i++)
+            for (int i = 0; i < 32; i++)
             {
                 d.Set(i, i.ToString());
                 d.CreateSnapshot().Dispose();
@@ -201,8 +203,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(0, d.SnapCount);
             Assert.AreEqual(32, d.Count);
 
-            for (var i = 0; i < 32; i++)
+            for (int i = 0; i < 32; i++)
+            {
                 d.Set(i, null);
+            }
 
             d.CreateSnapshot().Dispose();
 
@@ -237,7 +241,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -252,7 +256,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -269,7 +273,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var tv = d.Test.GetValues(1);
+            SnapDictionary<int, string>.TestHelper.GenVal[] tv = d.Test.GetValues(1);
             Assert.AreEqual(3, tv[0].Gen);
             Assert.AreEqual(2, tv[1].Gen);
             Assert.AreEqual(1, tv[2].Gen);
@@ -334,11 +338,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.IsTrue(d.Test.NextGen);
 
             await d.CollectAsync();
-            var tv = d.Test.GetValues(1);
+            SnapDictionary<int, string>.TestHelper.GenVal[] tv = d.Test.GetValues(1);
             Assert.AreEqual(1, tv.Length);
             Assert.AreEqual(1, tv[0].Gen);
 
-            var s = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s = d.CreateSnapshot();
             Assert.AreEqual("one", s.Get(1));
 
             Assert.AreEqual(1, d.Test.LiveGen);
@@ -391,7 +395,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             // collect liveGen
             GC.Collect();
 
-            Assert.IsTrue(d.Test.GenObjs.TryPeek(out var genObj));
+            Assert.IsTrue(d.Test.GenObjs.TryPeek(out global::Umbraco.Web.PublishedCache.NuCache.Snap.GenObj genObj));
             genObj = null;
 
             // in Release mode, it works, but in Debug mode, the weak reference is still alive
@@ -426,7 +430,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -438,7 +442,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -450,7 +454,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s3 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
 
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -486,7 +490,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -498,7 +502,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -510,7 +514,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s3 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
 
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
@@ -539,14 +543,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             d.Set(1, "one");
             d.Set(2, "two");
 
-            var s1 = d.CreateSnapshot();
-            var v1 = s1.Get(1);
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
+            string v1 = s1.Get(1);
             Assert.AreEqual("one", v1);
 
             d.Set(1, "uno");
 
-            var s2 = d.CreateSnapshot();
-            var v2 = s2.Get(1);
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
+            string v2 = s2.Get(1);
             Assert.AreEqual("uno", v2);
 
             v1 = s1.Get(1);
@@ -586,14 +590,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             d.Set(1, "one");
             d.Set(2, "two");
 
-            var s1 = d.CreateSnapshot();
-            var v1 = s1.Get(1);
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
+            string v1 = s1.Get(1);
             Assert.AreEqual("one", v1);
 
             d.Clear(1);
 
-            var s2 = d.CreateSnapshot();
-            var v2 = s2.Get(1);
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
+            string v2 = s2.Get(1);
             Assert.AreEqual(null, v2);
 
             v1 = s1.Get(1);
@@ -638,7 +642,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
             using (d.GetScopedWriteLock(GetScopeProvider()))
             {
-                var s1 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
                 Assert.AreEqual(0, s1.Gen);
                 Assert.AreEqual(1, d.Test.LiveGen);
@@ -646,7 +650,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.IsNull(s1.Get(1));
             }
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(1, s2.Gen);
             Assert.AreEqual(1, d.Test.LiveGen);
@@ -667,7 +671,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, s1.Gen);
             Assert.AreEqual(1, d.Test.LiveGen);
@@ -682,7 +686,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual(2, d.Test.LiveGen);
@@ -699,7 +703,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.AreEqual(3, d.Test.LiveGen);
                 Assert.IsTrue(d.Test.NextGen);
 
-                var s3 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
 
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual(3, d.Test.LiveGen);
@@ -707,7 +711,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.AreEqual("uno", s3.Get(1));
             }
 
-            var s4 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s4 = d.CreateSnapshot();
 
             Assert.AreEqual(3, s4.Gen);
             Assert.AreEqual(3, d.Test.LiveGen);
@@ -719,16 +723,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
         public void NestedWriteLocking1()
         {
             var d = new SnapDictionary<int, string>();
-            var t = d.Test;
+            SnapDictionary<int, string>.TestHelper t = d.Test;
             t.CollectAuto = false;
 
             Assert.AreEqual(0, d.CreateSnapshot().Gen);
 
             // no scope context: writers nest, last one to be disposed commits
+            IScopeProvider scopeProvider = GetScopeProvider();
 
-            var scopeProvider = GetScopeProvider();
-
-            using (var w1 = d.GetScopedWriteLock(scopeProvider))
+            using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider))
             {
                 Assert.AreEqual(1, t.LiveGen);
                 Assert.IsTrue(t.IsLocked);
@@ -736,7 +739,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    using (var w2 = d.GetScopedWriteLock(scopeProvider))
+                    using (IDisposable w2 = d.GetScopedWriteLock(scopeProvider))
                     {
                     }
                 });
@@ -764,16 +767,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(0, d.CreateSnapshot().Gen);
 
             // scope context: writers enlist
-
             var scopeContext = new ScopeContext();
-            var scopeProvider = GetScopeProvider(scopeContext);
+            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
 
-            using (var w1 = d.GetScopedWriteLock(scopeProvider))
+            using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider))
             {
                 // This one is interesting, although we don't allow recursive locks, since this is
-                // using the same ScopeContext/key, the lock acquisition is only done once
-
-                using (var w2 = d.GetScopedWriteLock(scopeProvider))
+                // using the same ScopeContext/key, the lock acquisition is only done once.
+                using (IDisposable w2 = d.GetScopedWriteLock(scopeProvider))
                 {
                     Assert.AreSame(w1, w2);
 
@@ -786,16 +787,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
         public void NestedWriteLocking3()
         {
             var d = new SnapDictionary<int, string>();
-            var t = d.Test;
+            SnapDictionary<int, string>.TestHelper t = d.Test;
             t.CollectAuto = false;
 
             Assert.AreEqual(0, d.CreateSnapshot().Gen);
 
             var scopeContext = new ScopeContext();
-            var scopeProvider1 = GetScopeProvider();
-            var scopeProvider2 = GetScopeProvider(scopeContext);
+            IScopeProvider scopeProvider1 = GetScopeProvider();
+            IScopeProvider scopeProvider2 = GetScopeProvider(scopeContext);
 
-            using (var w1 = d.GetScopedWriteLock(scopeProvider1))
+            using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider1))
             {
                 Assert.AreEqual(1, t.LiveGen);
                 Assert.IsTrue(t.IsLocked);
@@ -803,11 +804,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    using (var w2 = d.GetScopedWriteLock(scopeProvider2))
+                    using (IDisposable w2 = d.GetScopedWriteLock(scopeProvider2))
                     {
                     }
                 });
-
             }
         }
 
@@ -824,7 +824,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
 
             Assert.AreEqual(1, s1.Gen);
             Assert.AreEqual(1, d.Test.LiveGen);
@@ -839,15 +839,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual(2, d.Test.LiveGen);
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("uno", s2.Get(1));
 
-
-            var scopeProvider = GetScopeProvider();
+            IScopeProvider scopeProvider = GetScopeProvider();
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // gen 3
@@ -858,7 +857,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.AreEqual(3, d.Test.LiveGen);
                 Assert.IsTrue(d.Test.NextGen);
 
-                var s3 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
 
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual(3, d.Test.LiveGen);
@@ -866,7 +865,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.AreEqual("uno", s3.Get(1));
             }
 
-            var s4 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s4 = d.CreateSnapshot();
 
             Assert.AreEqual(3, s4.Gen);
             Assert.AreEqual(3, d.Test.LiveGen);
@@ -880,35 +879,34 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
 
-
             // gen 1
             d.Set(1, "one");
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
             Assert.AreEqual(1, s1.Gen);
             Assert.AreEqual("one", s1.Get(1));
 
             d.Set(1, "uno");
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            var scopeProvider = GetScopeProvider();
+            IScopeProvider scopeProvider = GetScopeProvider();
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
                 d.SetLocked(1, "ein");
-                var s3 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
 
                 // but live snapshot contains changes
-                var ls = d.Test.LiveSnapshot;
+                SnapDictionary<int, string>.Snapshot ls = d.Test.LiveSnapshot;
                 Assert.AreEqual("ein", ls.Get(1));
                 Assert.AreEqual(3, ls.Gen);
             }
 
-            var s4 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s4 = d.CreateSnapshot();
             Assert.AreEqual(3, s4.Gen);
             Assert.AreEqual("ein", s4.Get(1));
         }
@@ -921,39 +919,39 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
             // gen 1
             d.Set(1, "one");
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
             Assert.AreEqual(1, s1.Gen);
             Assert.AreEqual("one", s1.Get(1));
 
             d.Set(1, "uno");
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
             var scopeContext = new ScopeContext();
-            var scopeProvider = GetScopeProvider(scopeContext);
+            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
                 d.SetLocked(1, "ein");
-                var s3 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
 
                 // but live snapshot contains changes
-                var ls = d.Test.LiveSnapshot;
+                SnapDictionary<int, string>.Snapshot ls = d.Test.LiveSnapshot;
                 Assert.AreEqual("ein", ls.Get(1));
                 Assert.AreEqual(3, ls.Gen);
             }
 
-            var s4 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s4 = d.CreateSnapshot();
             Assert.AreEqual(2, s4.Gen);
             Assert.AreEqual("uno", s4.Get(1));
 
             scopeContext.ScopeExit(true);
 
-            var s5 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s5 = d.CreateSnapshot();
             Assert.AreEqual(3, s5.Gen);
             Assert.AreEqual("ein", s5.Get(1));
         }
@@ -962,17 +960,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
         public void ScopeLocking2()
         {
             var d = new SnapDictionary<int, string>();
-            var t = d.Test;
+            SnapDictionary<int, string>.TestHelper t = d.Test;
             t.CollectAuto = false;
 
             // gen 1
             d.Set(1, "one");
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
             Assert.AreEqual(1, s1.Gen);
             Assert.AreEqual("one", s1.Get(1));
 
             d.Set(1, "uno");
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
@@ -980,13 +978,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.IsFalse(t.NextGen);
 
             var scopeContext = new ScopeContext();
-            var scopeProvider = GetScopeProvider(scopeContext);
+            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
                 // it uses the previous snapshot, so new snapshot created only on release
                 d.SetLocked(1, "ein");
-                var s3 = d.CreateSnapshot();
+                SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
                 Assert.AreEqual(2, s3.Gen);
                 Assert.AreEqual("uno", s3.Get(1));
 
@@ -996,7 +994,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
                 Assert.IsTrue(t.IsLocked);
 
                 // but live snapshot contains changes
-                var ls = t.LiveSnapshot;
+                SnapDictionary<int, string>.Snapshot ls = t.LiveSnapshot;
                 Assert.AreEqual("ein", ls.Get(1));
                 Assert.AreEqual(3, ls.Gen);
             }
@@ -1007,7 +1005,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.IsTrue(t.IsLocked);
 
             // no changes until exit
-            var s4 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s4 = d.CreateSnapshot();
             Assert.AreEqual(2, s4.Gen);
             Assert.AreEqual("uno", s4.Get(1));
 
@@ -1019,7 +1017,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.IsFalse(t.IsLocked);
 
             // no changes since not completed
-            var s5 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s5 = d.CreateSnapshot();
             Assert.AreEqual(2, s5.Gen);
             Assert.AreEqual("uno", s5.Get(1));
         }
@@ -1037,14 +1035,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             d.Set(3, "three");
             d.Set(4, "four");
 
-            var s1 = d.CreateSnapshot();
-            var all = s1.GetAll().ToArray();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
+            string[] all = s1.GetAll().ToArray();
             Assert.AreEqual(4, all.Length);
             Assert.AreEqual("one", all[0]);
             Assert.AreEqual("four", all[3]);
 
             d.Set(1, "uno");
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             all = s1.GetAll().ToArray();
             Assert.AreEqual(4, all.Length);
@@ -1071,7 +1069,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsNull(d.Test.GenObj);
 
-            var s1 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s1 = d.CreateSnapshot();
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual(1, d.Test.LiveGen);
             Assert.IsNotNull(d.Test.GenObj);
@@ -1087,13 +1085,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(1, d.Test.GenObj.Gen);
 
             var scopeContext = new ScopeContext();
-            var scopeProvider = GetScopeProvider(scopeContext);
+            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
 
             // scopeProvider.Context == scopeContext -> writer is scoped
             // writer is scope contextual and scoped
             //  when disposed, nothing happens
             //  when the context exists, the writer is released
-
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 d.SetLocked(1, "ein");
@@ -1113,7 +1110,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
 
             // panic!
-            var s2 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s2 = d.CreateSnapshot();
 
             Assert.IsTrue(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
@@ -1130,7 +1127,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
             Assert.AreEqual(3, d.Test.LiveGen);
             Assert.IsTrue(d.Test.NextGen);
 
-            var s3 = d.CreateSnapshot();
+            SnapDictionary<int, string>.Snapshot s3 = d.CreateSnapshot();
 
             Assert.IsFalse(d.Test.IsLocked);
             Assert.IsNotNull(d.Test.GenObj);
@@ -1141,7 +1138,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
         private IScopeProvider GetScopeProvider(ScopeContext scopeContext = null)
         {
-            var scopeProvider = Mock.Of<IScopeProvider>();
+            IScopeProvider scopeProvider = Mock.Of<IScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.Context).Returns(scopeContext);
             return scopeProvider;
@@ -1182,7 +1179,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
 
         private static IScopeProvider GetScopeProvider()
         {
-            var scopeProvider = Mock.Of<IScopeProvider>();
+            IScopeProvider scopeProvider = Mock.Of<IScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.Context).Returns(() => null);
             return scopeProvider;

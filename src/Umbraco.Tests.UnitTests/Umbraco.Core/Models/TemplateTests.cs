@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -16,15 +19,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private TemplateBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new TemplateBuilder();
-        }
+        public void SetUp() => _builder = new TemplateBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
-            var template = BuildTemplate();
+            ITemplate template = BuildTemplate();
 
             var clone = (Template)template.DeepClone();
 
@@ -42,15 +42,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.UpdateDate, template.UpdateDate);
 
             // clone.Content should be null but getting it would lazy-load
-            var type = clone.GetType();
-            var contentField = type.BaseType.GetField("_content", BindingFlags.Instance | BindingFlags.NonPublic);
+            Type type = clone.GetType();
+            FieldInfo contentField = type.BaseType.GetField("_content", BindingFlags.Instance | BindingFlags.NonPublic);
             var value = contentField.GetValue(clone);
             Assert.IsNull(value);
 
             // this double verifies by reflection
             // need to exclude content else it would lazy-load
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps.Where(x => x.Name != "Content"))
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps.Where(x => x.Name != "Content"))
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(template, null));
             }
@@ -59,15 +59,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var template = BuildTemplate();
+            ITemplate template = BuildTemplate();
 
             var json = JsonConvert.SerializeObject(template);
             Debug.Print(json);
         }
 
-        private ITemplate BuildTemplate()
-        {
-            return _builder
+        private ITemplate BuildTemplate() =>
+            _builder
                 .WithId(3)
                 .WithAlias("test")
                 .WithName("Test")
@@ -77,6 +76,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 .WithContent("blah")
                 .AsMasterTemplate("master", 88)
                 .Build();
-        }
     }
 }

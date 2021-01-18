@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,6 @@ using NUnit.Framework;
 using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.IO;
@@ -25,11 +25,17 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.DependencyInjection;
+using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.BackOffice.DependencyInjection;
+using Umbraco.Web.Common.DependencyInjection;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -50,7 +56,10 @@ namespace Umbraco.Tests.Integration.Testing
         public void OnTestTearDown(Action tearDown)
         {
             if (_testTeardown == null)
+            {
                 _testTeardown = new List<Action>();
+            }
+
             _testTeardown.Add(tearDown);
         }
 
@@ -60,16 +69,20 @@ namespace Umbraco.Tests.Integration.Testing
         public void FixtureTearDown()
         {
             foreach (var a in _fixtureTeardown)
+            {
                 a();
+            }
         }
 
         [TearDown]
-        public virtual void TearDown()
+        public async Task TearDownAsync()
         {
             if (_testTeardown != null)
             {
                 foreach (var a in _testTeardown)
+                {
                     a();
+                }
             }
 
             _testTeardown = null;
@@ -78,7 +91,8 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
-            host.StopAsync().GetAwaiter().GetResult();
+            await host.StopAsync();
+            host.Dispose();
         }
 
         [TearDown]
@@ -107,7 +121,7 @@ namespace Umbraco.Tests.Integration.Testing
             Configure(app);
         }
 
-        protected void BeforeHostStart(IHost host)
+        protected virtual void BeforeHostStart(IHost host)
         {
             Services = host.Services;
             UseTestDatabase(Services);
@@ -149,7 +163,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
-        /// <returns></returns>
         public virtual IHostBuilder CreateHostBuilder()
         {
             var hostBuilder = Host.CreateDefaultBuilder()
@@ -183,8 +196,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #endregion
 
-        #region IStartup
-
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
@@ -204,28 +215,30 @@ namespace Umbraco.Tests.Integration.Testing
                 TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
 
-
             builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
-                .AddUmbracoCore();
+                .AddUmbracoCore()
+                .AddWebComponents()
+                .AddRuntimeMinifier()
+                .AddBackOfficeAuthentication()
+                .AddBackOfficeIdentity()
+                .AddTestServices(TestHelper, GetAppCaches());
 
-            builder.Services.AddUnique<AppCaches>(GetAppCaches());
-            builder.Services.AddUnique<IUmbracoBootPermissionChecker>(Mock.Of<IUmbracoBootPermissionChecker>());
-            builder.Services.AddUnique<IMainDom>(TestHelper.MainDom);
+            if (TestOptions.Mapper)
+            {
+                // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
+                builder
+                    .AddCoreMappingProfiles()
+                    .AddWebMappingProfiles();
+            }
 
             services.AddSignalR();
-
-            builder.AddWebComponents();
-            builder.AddRuntimeMinifier();
-            builder.AddBackOffice();
-            builder.AddBackOfficeIdentity();
-
             services.AddMvc();
 
-            builder.Build();
+            CustomTestSetup(builder);
 
-            CustomTestSetup(services);
+            builder.Build();
         }
 
         protected virtual AppCaches GetAppCaches()
@@ -244,8 +257,6 @@ namespace Umbraco.Tests.Integration.Testing
 
             app.UseUmbracoCore(); // This no longer starts CoreRuntime, it's very fast
         }
-
-        #endregion
 
         #region LocalDb
 
@@ -387,8 +398,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #endregion
 
-        #region Common services
-
         protected UmbracoTestAttribute TestOptions => TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
@@ -397,9 +406,9 @@ namespace Umbraco.Tests.Integration.Testing
 
         public IConfiguration Configuration { get; protected set; }
 
-        public TestHelper TestHelper = new TestHelper();
+        public TestHelper TestHelper { get; } = new TestHelper();
 
-        protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
+        protected virtual void CustomTestSetup(IUmbracoBuilder builder) { }
 
         /// <summary>
         /// Returns the DI container
@@ -420,13 +429,16 @@ namespace Umbraco.Tests.Integration.Testing
         /// Returns the <see cref="ILoggerFactory"/>
         /// </summary>
         protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
-        protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
-        protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
-        protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
-        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
-        protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
-        #endregion
+        protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
+
+        protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
+
+        protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
+
+        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+        protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
         #region Builders
 

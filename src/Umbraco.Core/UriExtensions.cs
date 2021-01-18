@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -13,157 +13,6 @@ namespace Umbraco.Core
     /// </summary>
     public static class UriExtensions
     {
-        ///  <summary>
-        ///  Checks if the current uri is a back office request
-        ///  </summary>
-        ///  <param name="url"></param>
-        ///  <param name="globalSettings"></param>
-        ///  <param name="hostingEnvironment"></param>
-        ///  <returns></returns>
-        ///  <remarks>
-        ///  There are some special routes we need to check to properly determine this:
-        ///
-        ///      If any route has an extension in the path like .aspx = back office
-        ///
-        ///      These are def back office:
-        ///          /Umbraco/BackOffice     = back office
-        ///          /Umbraco/Preview        = back office
-        ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
-        ///      so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
-        ///      but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
-        ///
-        ///      These are def front-end:
-        ///          /Umbraco/Surface        = front-end
-        ///          /Umbraco/Api            = front-end
-        ///      But if we've got this far we'll just have to assume it's front-end anyways.
-        ///
-        ///  </remarks>
-        public static bool IsBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        {
-            var applicationPath = hostingEnvironment.ApplicationVirtualPath;
-
-            var fullUrlPath = url.AbsolutePath.TrimStart(new[] {'/'});
-            var appPath = applicationPath.TrimStart(new[] {'/'});
-            var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
-
-            //check if this is in the umbraco back office
-            var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
-            var isUmbracoPath = urlPath.InvariantStartsWith(backOfficePath.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
-            //if not, then def not back office
-            if (isUmbracoPath == false) return false;
-
-            var mvcArea = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
-            //if its the normal /umbraco path
-            if (urlPath.InvariantEquals("/" + mvcArea)
-                || urlPath.InvariantEquals("/" + mvcArea + "/"))
-            {
-                return true;
-            }
-
-            //check for a file extension
-            var extension = Path.GetExtension(url.LocalPath);
-            //has an extension, def back office
-            if (extension.IsNullOrWhiteSpace() == false) return true;
-            //check for special case asp.net calls like:
-            //  /umbraco/webservices/legacyAjaxCalls.asmx/js which will return a null file extension but are still considered requests with an extension
-            if (urlPath.InvariantContains(".asmx/")
-                || urlPath.InvariantContains(".aspx/")
-                || urlPath.InvariantContains(".ashx/")
-                || urlPath.InvariantContains(".axd/")
-                || urlPath.InvariantContains(".svc/"))
-            {
-                return true;
-            }
-
-            //check for special back office paths
-            if (urlPath.InvariantStartsWith("/" + mvcArea + "/BackOffice/")
-                || urlPath.InvariantStartsWith("/" + mvcArea + "/Preview/"))
-            {
-                return true;
-            }
-
-            //check for special front-end paths
-            // TODO: These should be constants - will need to update when we do front-end routing
-            if (urlPath.InvariantStartsWith("/" + mvcArea + "/Surface/")
-                || urlPath.InvariantStartsWith("/" + mvcArea + "/Api/"))
-            {
-                return false;
-            }
-
-            //if its none of the above, we will have to try to detect if it's a PluginController route, we can detect this by
-            // checking how many parts the route has, for example, all PluginController routes will be routed like
-            // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
-            // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a
-            // plugin controller for the front-end.
-            if (urlPath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
-            {
-                return false;
-            }
-
-            //if its anything else we can assume it's back office
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the current uri is an install request
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <returns></returns>
-        public static bool IsInstallerRequest(this Uri url, IHostingEnvironment hostingEnvironment)
-        {
-            var authority = url.GetLeftPart(UriPartial.Authority);
-            var afterAuthority = url.GetLeftPart(UriPartial.Query)
-                                    .TrimStart(authority)
-                                    .TrimStart("/");
-
-            //check if this is in the umbraco back office
-            return afterAuthority.InvariantStartsWith(hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install).TrimStart("/"));
-        }
-
-        /// <summary>
-        /// Checks if the uri is a request for the default back office page
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        {
-            var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
-            if (url.AbsolutePath.InvariantEquals(backOfficePath.TrimEnd("/"))
-                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/'))
-                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/') + "Default")
-                || url.AbsolutePath.InvariantEquals(backOfficePath.EnsureEndsWith('/') + "Default/"))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// This is a performance tweak to check if this not an ASP.Net server file
-        /// .Net will pass these requests through to the module when in integrated mode.
-        /// We want to ignore all of these requests immediately.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static bool IsClientSideRequest(this Uri url)
-        {
-            try
-            {
-                var ext = Path.GetExtension(url.LocalPath);
-                if (ext.IsNullOrWhiteSpace()) return false;
-                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
-                return toInclude.Any(ext.InvariantEquals) == false;
-            }
-            catch (ArgumentException)
-            {
-                StaticApplicationLogging.Logger.LogDebug("Failed to determine if request was client side (invalid chars in path \"{Path}\"?)", url.LocalPath);
-                return false;
-            }
-        }
-
         /// <summary>
         /// Rewrites the path of uri.
         /// </summary>
@@ -212,10 +61,14 @@ namespace Umbraco.Core
         public static string GetSafeAbsolutePath(this Uri uri)
         {
             if (uri.IsAbsoluteUri)
+            {
                 return uri.AbsolutePath;
+            }
 
             // cannot get .AbsolutePath on relative uri (InvalidOperation)
             var s = uri.OriginalString;
+
+            // TODO: Shouldn't this just use Uri.GetLeftPart?
             var posq = s.IndexOf("?", StringComparison.Ordinal);
             var posf = s.IndexOf("#", StringComparison.Ordinal);
             var pos = posq > 0 ? posq : (posf > 0 ? posf : 0);

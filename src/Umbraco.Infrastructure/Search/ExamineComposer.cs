@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;

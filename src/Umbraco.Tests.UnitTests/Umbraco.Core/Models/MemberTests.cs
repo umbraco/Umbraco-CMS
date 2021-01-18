@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,16 +18,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private MemberBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new MemberBuilder();
-        }
+        public void SetUp() => _builder = new MemberBuilder();
 
         [Test]
         public void Can_Deep_Clone()
         {
             // Arrange
-            var member = BuildMember();
+            Member member = BuildMember();
 
             // Act
             var clone = (Member)member.DeepClone();
@@ -66,24 +67,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
             // this can be the same, it is immutable
             Assert.AreSame(clone.ContentType, member.ContentType);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            // This double verifies by reflection
+            PropertyInfo[] allProps = clone.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in allProps)
+            {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(member, null));
+            }
         }
 
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var member = BuildMember();
+            Member member = BuildMember();
 
             var json = JsonConvert.SerializeObject(member);
             Debug.Print(json);
         }
 
-        private Member BuildMember()
-        {
-            return _builder
+        private Member BuildMember() =>
+            _builder
                 .AddMemberType()
                     .WithId(99)
                     .WithAlias("memberType")
@@ -117,7 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 .WithEmail("email@email.com")
                 .WithFailedPasswordAttempts(22)
                 .WithIsApproved(true)
-                .WithIsLockedOut(true)        
+                .WithIsLockedOut(true)
                 .WithTrashed(false)
                 .AddMemberGroups()
                     .WithValue("Group 1")
@@ -134,6 +136,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                     .WithKeyValue("author", "John Doe")
                     .Done()
                 .Build();
-        }
     }
 }

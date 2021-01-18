@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Mail;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -27,12 +27,10 @@ using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -116,11 +114,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
         /// </summary>
-        /// <returns></returns>        
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they are not authorized
+        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            Attempt<int> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            return _passwordConfiguration.GetConfiguration(
+                currentUserId.Success
+                    ? currentUserId.Result != userId
+                    : true);
         }
 
         /// <summary>
@@ -151,7 +153,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.Succeeded == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Errors.ToErrorMessage());
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Errors.ToErrorMessage());
             }
 
             await _signInManager.SignOutAsync();
@@ -207,7 +209,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             else
             {
                 AddModelErrors(result);
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
         }
 
@@ -350,7 +352,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // by our angular helper because it thinks that we need to re-perform the request once we are
             // authorized and we don't want to return a 403 because angular will show a warning message indicating
             // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-            throw new HttpResponseException(HttpStatusCode.BadRequest);
+            return BadRequest();
         }
 
         /// <summary>
@@ -468,7 +470,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (ModelState.IsValid == false)
             {
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();

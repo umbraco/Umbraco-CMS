@@ -1,10 +1,14 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
@@ -20,14 +24,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Appends_Header_When_No_User_Parameter_Provider()
         {
             // Arrange
-            var context = CreateContext();
+            ActionExecutingContext context = CreateContext();
             var attribute = new AppendUserModifiedHeaderAttribute();
 
             // Act
             attribute.OnActionExecuting(context);
 
             // Assert
-            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out var headerValue);
+            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out StringValues headerValue);
             Assert.AreEqual("1", headerValue[0]);
         }
 
@@ -35,14 +39,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Does_Not_Append_Header_If_Already_Exists()
         {
             // Arrange
-            var context = CreateContext(headerValue: "0");
+            ActionExecutingContext context = CreateContext(headerValue: "0");
             var attribute = new AppendUserModifiedHeaderAttribute();
 
             // Act
             attribute.OnActionExecuting(context);
 
             // Assert
-            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out var headerValue);
+            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out StringValues headerValue);
             Assert.AreEqual("0", headerValue[0]);
         }
 
@@ -50,7 +54,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Does_Not_Append_Header_When_User_Id_Parameter_Provided_And_Does_Not_Match_Current_User()
         {
             // Arrange
-            var context = CreateContext(actionArgument: new KeyValuePair<string, object>("UserId", 99));
+            ActionExecutingContext context = CreateContext(actionArgument: new KeyValuePair<string, object>("UserId", 99));
             var userIdParameter = "UserId";
             var attribute = new AppendUserModifiedHeaderAttribute(userIdParameter);
 
@@ -65,7 +69,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
         public void Appends_Header_When_User_Id_Parameter_Provided_And_Does_Not_Match_Current_User()
         {
             // Arrange
-            var context = CreateContext(actionArgument: new KeyValuePair<string, object>("UserId", 100));
+            ActionExecutingContext context = CreateContext(actionArgument: new KeyValuePair<string, object>("UserId", 100));
             var userIdParameter = "UserId";
             var attribute = new AppendUserModifiedHeaderAttribute(userIdParameter);
 
@@ -73,7 +77,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
             attribute.OnActionExecuting(context);
 
             // Assert
-            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out var headerValue);
+            context.HttpContext.Response.Headers.TryGetValue("X-Umb-User-Modified", out StringValues headerValue);
             Assert.AreEqual("1", headerValue[0]);
         }
 
@@ -95,11 +99,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 .SetupGet(x => x.CurrentUser)
                 .Returns(currentUserMock.Object);
 
+            var backofficeSecurityAccessorMock = new Mock<IBackOfficeSecurityAccessor>();
+            backofficeSecurityAccessorMock
+                .SetupGet(x => x.BackOfficeSecurity)
+                .Returns(backofficeSecurityMock.Object);
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IBackOfficeSecurity)))
-                .Returns(backofficeSecurityMock.Object);
+                .Setup(x => x.GetService(typeof(IBackOfficeSecurityAccessor)))
+                .Returns(backofficeSecurityAccessorMock.Object);
 
             httpContext.RequestServices = serviceProviderMock.Object;
 

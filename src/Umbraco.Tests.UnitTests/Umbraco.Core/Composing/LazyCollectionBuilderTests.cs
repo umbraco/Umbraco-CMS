@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -6,33 +9,30 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
+    /// <summary>
+    /// Tests for lazy collection builder.
+    /// </summary>
+    /// <remarks>
+    /// Lazy collection builder does not throw on duplicate, just uses distinct types
+    /// so we don't have a test for duplicates as we had with resolvers in v7.
+    /// </remarks>
     [TestFixture]
     public class LazyCollectionBuilderTests
     {
-        private IServiceCollection CreateRegister()
-        {
-            return TestHelper.GetServiceCollection();
-        }
-
-        // note
-        // lazy collection builder does not throw on duplicate, just uses distinct types
-        // so we don't have a test for duplicates as we had with resolvers in v7
+        private IServiceCollection CreateRegister() => TestHelper.GetServiceCollection();
 
         [Test]
         public void LazyCollectionBuilderHandlesTypes()
         {
-            var container = CreateRegister();
+            IServiceCollection container = CreateRegister();
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
-
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -40,52 +40,50 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add<TransientObject3>()
                 .Add<TransientObject1>();
 
-            var factory = composition.CreateServiceProvider();
+            IServiceProvider factory = composition.CreateServiceProvider();
 
-            var values = factory.GetRequiredService<TestCollection>();
+            TestCollection values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetRequiredService<TestCollection>();
+            TestCollection other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
-            var o1 = other.FirstOrDefault(x => x is TransientObject1);
+            ITestInterface o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
         [Test]
         public void LazyCollectionBuilderHandlesProducers()
         {
-            var container = CreateRegister();
+            IServiceCollection container = CreateRegister();
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
-
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var factory = composition.CreateServiceProvider();
+            IServiceProvider factory = composition.CreateServiceProvider();
 
-            var values = factory.GetRequiredService<TestCollection>();
+            TestCollection values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetRequiredService<TestCollection>();
+            TestCollection other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
-            var o1 = other.FirstOrDefault(x => x is TransientObject1);
+            ITestInterface o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
         [Test]
         public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
-            var container = CreateRegister();
+            IServiceCollection container = CreateRegister();
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
-
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -93,31 +91,31 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var factory = composition.CreateServiceProvider();
+            IServiceProvider factory = composition.CreateServiceProvider();
 
-            var values = factory.GetRequiredService<TestCollection>();
+            TestCollection values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetRequiredService<TestCollection>();
+            TestCollection other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
-            var o1 = other.FirstOrDefault(x => x is TransientObject1);
+            ITestInterface o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
         [Test]
         public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
-            var container = CreateRegister();
+            IServiceCollection container = CreateRegister();
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
 
                 // illegal, does not implement the interface!
-                //.Add<TransientObject4>()
+                ////.Add<TransientObject4>()
 
                 // legal so far...
                 .Add(() => new[] { typeof(TransientObject4)  });
@@ -125,14 +123,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.Throws<InvalidOperationException>(() =>
             {
                 // but throws here when trying to register the types, right before creating the factory
-                var factory = composition.CreateServiceProvider();
+                IServiceProvider factory = composition.CreateServiceProvider();
             });
         }
 
         [Test]
         public void LazyCollectionBuilderCanExcludeTypes()
         {
-            var container = CreateRegister();
+            IServiceCollection container = CreateRegister();
             var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
@@ -140,9 +138,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();
 
-            var factory = composition.CreateServiceProvider();
+            IServiceProvider factory = composition.CreateServiceProvider();
 
-            var values = factory.GetRequiredService<TestCollection>();
+            TestCollection values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(2, values.Count());
             Assert.IsFalse(values.Select(x => x.GetType())
@@ -150,28 +148,31 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }));
 
-            var other = factory.GetRequiredService<TestCollection>();
+            TestCollection other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
-            var o1 = other.FirstOrDefault(x => x is TransientObject1);
+            ITestInterface o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
-        #region Test Objects
-
         private interface ITestInterface
-        { }
+        {
+        }
 
         private class TransientObject1 : ITestInterface
-        { }
+        {
+        }
 
         private class TransientObject2 : ITestInterface
-        { }
+        {
+        }
 
         private class TransientObject3 : ITestInterface
-        { }
+        {
+        }
 
         private class TransientObject4
-        { }
+        {
+        }
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilder : LazyCollectionBuilderBase<TestCollectionBuilder, TestCollection, ITestInterface>
@@ -186,9 +187,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         {
             public TestCollection(IEnumerable<ITestInterface> items)
                 : base(items)
-            { }
+            {
+            }
         }
-
-        #endregion
     }
 }

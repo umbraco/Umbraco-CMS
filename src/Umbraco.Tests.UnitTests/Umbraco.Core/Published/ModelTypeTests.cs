@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -27,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         [Test]
         public void TypeToStringTests()
         {
-            var type = typeof(int);
+            Type type = typeof(int);
             Assert.AreEqual("System.Int32", type.ToString());
             Assert.AreEqual("System.Int32[]", type.MakeArrayType().ToString());
             Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
@@ -36,10 +39,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         [Test]
         public void TypeFullNameTests()
         {
-            var type = typeof(int);
+            Type type = typeof(int);
             Assert.AreEqual("System.Int32", type.FullName);
             Assert.AreEqual("System.Int32[]", type.MakeArrayType().FullName);
-            // note the inner assembly qualified name
+
+            // Note the inner assembly qualified name
             Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[System.Int32[], System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
         }
 
@@ -48,17 +52,21 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
         {
             var map = new Dictionary<string, Type>
             {
-                { "alias1", typeof (PublishedSnapshotTestObjects.TestElementModel1) },
-                { "alias2", typeof (PublishedSnapshotTestObjects.TestElementModel2) },
+                { "alias1", typeof(PublishedSnapshotTestObjects.TestElementModel1) },
+                { "alias2", typeof(PublishedSnapshotTestObjects.TestElementModel2) },
             };
 
-            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1",
+            Assert.AreEqual(
+                "Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1",
                 ModelType.Map(ModelType.For("alias1"), map).ToString());
-            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
+            Assert.AreEqual(
+                "Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
                 ModelType.Map(ModelType.For("alias1").MakeArrayType(), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1]",
+            Assert.AreEqual(
+                "System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
+            Assert.AreEqual(
+                "System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()), map).ToString());
         }
     }

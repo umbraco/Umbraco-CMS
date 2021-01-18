@@ -12,24 +12,19 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
-    /// <summary>
-    /// Class that encapsulates Umbraco information of a specific HTTP request
-    /// </summary>
+    // NOTE: has all been ported to netcore but exists here just to keep the build working for tests
+
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly GlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ICookieManager _cookieManager;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
-        private string _previewToken;
-        private bool? _previewing;
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
+        internal UmbracoContext(
+            IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IBackOfficeSecurity backofficeSecurity,
             GlobalSettings globalSettings,
@@ -43,9 +38,6 @@ namespace Umbraco.Web
             if (backofficeSecurity == null) throw new ArgumentNullException(nameof(backofficeSecurity));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _httpContextAccessor = httpContextAccessor;
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _hostingEnvironment = hostingEnvironment;
-            _cookieManager = cookieManager;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -70,7 +62,6 @@ namespace Umbraco.Web
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
             // the current domain during application startup.
             // see: http://issues.umbraco.org/issue/U4-1890
-            //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
@@ -124,11 +115,6 @@ namespace Umbraco.Web
         public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
-        /// Boolean value indicating whether the current request is a front-end umbraco request
-        /// </summary>
-        public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         public IPublishedRequest PublishedRequest { get; set; }
@@ -138,68 +124,17 @@ namespace Umbraco.Web
         /// </summary>
         public IVariationContextAccessor VariationContextAccessor { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether the request has debugging enabled
-        /// </summary>
-        /// <value><c>true</c> if this instance is debug; otherwise, <c>false</c>.</value>
-        public bool IsDebug
-        {
-            get
-            {
-                var request = GetRequestFromContext();
-                //NOTE: the request can be null during app startup!
-                return Current.HostingEnvironment.IsDebugMode
-                       && request != null
-                       && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
-                           || string.IsNullOrEmpty(request["umbdebug"]) == false
-                           || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
-            }
-        }
+        // NOTE: has been ported to netcore
+        public bool IsDebug => false;
 
-        /// <summary>
-        /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
-        /// </summary>
-        public bool InPreviewMode
-        {
-            get
-            {
-                if (_previewing.HasValue == false) DetectPreviewMode();
-                return _previewing ?? false;
-            }
-            private set => _previewing = value;
-        }
+        // NOTE: has been ported to netcore
+        public bool InPreviewMode => false;
 
-        public string PreviewToken
-        {
-            get
-            {
-                if (_previewing.HasValue == false) DetectPreviewMode();
-                return _previewToken;
-            }
-        }
+        // NOTE: has been ported to netcore
+        public string PreviewToken => null;
 
-        private void DetectPreviewMode()
-        {
-            var request = GetRequestFromContext();
-            if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
-                && Security.CurrentUser != null)
-            {
-                var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty
-                _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
-            }
-
-            _previewing = _previewToken.IsNullOrWhiteSpace() == false;
-        }
-
-        // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
-        // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
-        // default 'preview' mode - somehow we have to force it. and that could be recursive.
-        public IDisposable ForcedPreview(bool preview)
-        {
-            InPreviewMode = preview;
-            return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
-        }
+        // NOTE: has been ported to netcore
+        public IDisposable ForcedPreview(bool preview) => null;
 
         private HttpRequestBase GetRequestFromContext()
         {
@@ -213,17 +148,7 @@ namespace Umbraco.Web
             }
         }
 
-        protected override void DisposeResources()
-        {
-            // DisposableObject ensures that this runs only once
-
-            Security.DisposeIfDisposable();
-
-            // help caches release resources
-            // (but don't create caches just to dispose them)
-            // context is not multi-threaded
-            if (_publishedSnapshot.IsValueCreated)
-                _publishedSnapshot.Value.Dispose();
-        }
+        // NOTE: has been ported to netcore
+        protected override void DisposeResources() { }
     }
 }

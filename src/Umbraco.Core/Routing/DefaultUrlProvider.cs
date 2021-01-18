@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -83,7 +83,9 @@ namespace Umbraco.Web.Routing
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
+            {
                 yield break;
+            }
 
             // look for domains, walking up the tree
             var n = node;
@@ -96,17 +98,19 @@ namespace Umbraco.Web.Routing
 
             // no domains = exit
             if (domainUris ==null)
+            {
                 yield break;
+            }
 
             foreach (var d in domainUris)
             {
-                var culture = d?.Culture?.Name;
+                var culture = d?.Culture;
 
-                //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
+                // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
                 var route = umbracoContext.Content.GetRouteById(id, culture);
                 if (route == null) continue;
 
-                //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
+                // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
                 var pos = route.IndexOf('/');
                 var path = pos == 0 ? route : route.Substring(pos);
 

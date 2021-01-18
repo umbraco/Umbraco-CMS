@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,7 +17,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
         [Test]
         public void Content_Display_To_Json()
         {
-            //create 3 tabs with 3 properties each
+            // create 3 tabs with 3 properties each
             var tabs = new List<Tab<ContentPropertyDisplay>>();
             for (var tabIndex = 0; tabIndex < 3; tabIndex++)
             {
@@ -33,6 +36,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
                         HideLabel = false
                     });
                 }
+
                 tabs.Add(new Tab<ContentPropertyDisplay>()
                 {
                     Alias = "Tab" + tabIndex,
@@ -60,7 +64,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 
             Assert.AreEqual("1234", jObject["id"].ToString());
             Assert.AreEqual("Test", jObject["variants"][0]["name"].ToString());
-            var jsonTabs = jObject["variants"][0]["tabs"];
+
+            JToken jsonTabs = jObject["variants"][0]["tabs"];
             Assert.AreEqual(3, jsonTabs.Count());
             for (var tab = 0; tab < jsonTabs.Count(); tab++)
             {
@@ -79,6 +84,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
                 }
             }
         }
-
     }
 }

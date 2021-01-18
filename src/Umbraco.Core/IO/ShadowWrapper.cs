@@ -89,9 +89,9 @@ namespace Umbraco.Core.IO
                     Directory.Delete(dir, true);
 
                     // shadowPath make be path/to/dir, remove each
-                    dir = dir.Replace("/", "\\");
+                    dir = dir.Replace('/', Path.DirectorySeparatorChar);
                     var min = _hostingEnvironment.MapPathContentRoot(ShadowFsPath).Length;
-                    var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                    var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                     while (pos > min)
                     {
                         dir = dir.Substring(0, pos);
@@ -99,7 +99,7 @@ namespace Umbraco.Core.IO
                             Directory.Delete(dir, true);
                         else
                             break;
-                        pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
+                        pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                     }
                 }
                 catch

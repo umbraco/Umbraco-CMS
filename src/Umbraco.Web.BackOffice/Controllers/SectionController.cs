@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
@@ -7,12 +9,10 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -49,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
-        public IEnumerable<Section> GetSections()
+        public async Task<ActionResult<IEnumerable<Section>>> GetSections()
         {
             var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
@@ -74,8 +74,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (hasDashboards) continue;
 
                 // get the first tree in the section and get its root node route path
-                var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
+                var sectionRoot = await appTreeController.GetApplicationTrees(section.Alias, null, null);
+
+                if (!(sectionRoot.Result is null))
+                {
+                    return sectionRoot.Result;
+                }
+                section.RoutePath = GetRoutePathForFirstTree(sectionRoot.Value);
             }
 
             return sectionModels;

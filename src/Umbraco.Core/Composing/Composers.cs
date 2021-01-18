@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -70,7 +70,6 @@ namespace Umbraco.Core.Composing
 
             foreach (var composer in composers)
             {
-                var componentType = composer.GetType();
                 composer.Compose(_builder);
             }
         }

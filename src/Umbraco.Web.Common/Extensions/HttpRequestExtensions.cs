@@ -1,44 +1,47 @@
-﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Core.Routing;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// Extension methods for <see cref="HttpRequest"/>
+    /// </summary>
     public static class HttpRequestExtensions
     {
-
         /// <summary>
         /// Check if a preview cookie exist
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
         public static bool HasPreviewCookie(this HttpRequest request)
+            => request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
+
+        /// <summary>
+        /// Returns true if the request is a back office request
+        /// </summary>
+        public static bool IsBackOfficeRequest(this HttpRequest request)
         {
-            return request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
+            PathString absPath = request.Path;
+            UmbracoRequestPaths umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
+            return umbReqPaths.IsBackOfficeRequest(absPath);
         }
 
-        public static bool IsBackOfficeRequest(this HttpRequest request, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        {
-            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);
-        }
-
+        /// <summary>
+        /// Returns true if the request is for a client side extension
+        /// </summary>
         public static bool IsClientSideRequest(this HttpRequest request)
         {
-            return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsClientSideRequest();
+            PathString absPath = request.Path;
+            UmbracoRequestPaths umbReqPaths = request.HttpContext.RequestServices.GetService<UmbracoRequestPaths>();
+            return umbReqPaths.IsClientSideRequest(absPath);
         }
 
         public static string ClientCulture(this HttpRequest request)
-        {
-            return request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
-        }
+            => request.Headers.TryGetValue("X-UMB-CULTURE", out var values) ? values[0] : null;
 
         /// <summary>
         /// Determines if a request is local.

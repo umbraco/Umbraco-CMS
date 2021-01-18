@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// Holds a list of callbacks associated with implementations of <see cref="IBatchedDatabaseServerMessenger"/>.
+    /// Holds a list of callbacks associated with implementations of <see cref="IServerMessenger"/>.
     /// </summary>
     public class DatabaseServerMessengerCallbacks
     {

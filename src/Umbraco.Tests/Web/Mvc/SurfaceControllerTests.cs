@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Web.Mvc
         }
 
         [Test]
-        public void Mock_Current_Page()
+        public async Task Mock_Current_Page()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
             var httpContextAccessor = TestHelper.GetHttpContextAccessor();
@@ -151,17 +152,17 @@ namespace Umbraco.Tests.Web.Mvc
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
             var webRoutingSettings = new WebRoutingSettings();
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(webRoutingSettings);
-            var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
-            frequest.PublishedContent = content;
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(umbracoContextAccessor, webRoutingSettings);
+            var frequest = await publishedRouter.CreateRequestAsync(new Uri("http://localhost/test"));
+            frequest.SetPublishedContent(content);
 
             var routeDefinition = new RouteDefinition
             {
-                PublishedRequest = frequest
+                PublishedRequest = frequest.Build()
             };
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
+            routeData.Values.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>());
             ctrl.ControllerContext = new ControllerContext(Mock.Of<HttpContextBase>(), routeData, ctrl);

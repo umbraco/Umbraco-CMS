@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     {
         private EntityRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
-            var entityRepository = new EntityRepository(scopeAccessor);
+            var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
             return entityRepository;
         }
 

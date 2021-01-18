@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
@@ -15,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectTypeId = Constants.ObjectTypes.DataType;
+            var nodeObjectTypeId = Constants.ObjectTypes.DataType;
 
             var expected = new Sql();
             expected.Select("*")
@@ -28,7 +31,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
                .From<DataTypeDto>()
                .InnerJoin<NodeDto>()
                .On<DataTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

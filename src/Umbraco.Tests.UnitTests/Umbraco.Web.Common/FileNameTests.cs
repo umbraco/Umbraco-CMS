@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Tests.UnitTests.AutoFixture;
@@ -48,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = await sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
 
-            var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
+            IEnumerable<string> views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
 
@@ -63,7 +65,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult);
 
-            var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
+            IEnumerable<string> views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
@@ -80,24 +82,24 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
             Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
 
-
             sut.TempData = tempDataDictionary;
 
             var viewResult = await sut.Default() as ViewResult;
             var fileName = GetViewName(viewResult);
-            var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
+            IEnumerable<string> views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
 
-
         [Test]
         public void LanguageFilesAreLowercase()
         {
-            var files = GetUiFiles(new[] { "umbraco", "config", "lang" });
+            IEnumerable<string> files = GetUiFiles(new[] { "umbraco", "config", "lang" });
             foreach (var fileName in files)
             {
-                Assert.AreEqual(fileName.ToLower(), fileName,
+                Assert.AreEqual(
+                    fileName.ToLower(),
+                    fileName,
                     $"Language files must be all lowercase but {fileName} is not lowercase.");
             }
         }

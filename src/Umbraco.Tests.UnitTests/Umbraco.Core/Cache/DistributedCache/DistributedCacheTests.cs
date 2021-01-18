@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -15,16 +18,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
     {
         private global::Umbraco.Web.Cache.DistributedCache _distributedCache;
 
-        private IServerRegistrar ServerRegistrar { get; set; }
+        private IServerRoleAccessor ServerRegistrar { get; set; }
+
         private TestServerMessenger ServerMessenger { get; set; }
 
         [SetUp]
         public void Setup()
         {
-            ServerRegistrar =  new TestServerRegistrar();
-            ServerMessenger =  new TestServerMessenger();
+            ServerRegistrar = new TestServerRegistrar();
+            ServerMessenger = new TestServerMessenger();
 
-            var cacheRefresherCollection = new CacheRefresherCollection(new []
+            var cacheRefresherCollection = new CacheRefresherCollection(new[]
             {
                 new TestCacheRefresher()
             });
@@ -51,7 +55,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
                 _distributedCache.Refresh(
                     Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"),
                     x => x.Id,
-                    new TestObjectWithId{Id = i});
+                    new TestObjectWithId { Id = i });
             }
 
             Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
@@ -90,8 +94,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
             Assert.AreEqual(13, ServerMessenger.CountOfFullRefreshes);
         }
 
-        #region Internal test classes
-
         internal class TestObjectWithId
         {
             public int Id { get; set; }
@@ -105,99 +107,76 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
 
             public string Name => "Test Cache Refresher";
 
-            public void RefreshAll() { }
+            public void RefreshAll()
+            {
+            }
 
-            public void Refresh(int id) { }
+            public void Refresh(int id)
+            {
+            }
 
-            public void Remove(int id) { }
+            public void Remove(int id)
+            {
+            }
 
-            public void Refresh(Guid id) { }
+            public void Refresh(Guid id)
+            {
+            }
         }
 
         internal class TestServerMessenger : IServerMessenger
         {
-            //used for tests
-            public List<int> IntIdsRefreshed = new List<int>();
-            public List<Guid> GuidIdsRefreshed = new List<Guid>();
-            public List<int> IntIdsRemoved = new List<int>();
-            public List<string> PayloadsRemoved = new List<string>();
-            public List<string> PayloadsRefreshed = new List<string>();
-            public int CountOfFullRefreshes = 0;
+            // Used for tests
+            public List<int> IntIdsRefreshed { get; } = new List<int>();
+            public List<Guid> GuidIdsRefreshed { get; } = new List<Guid>();
+            public List<int> IntIdsRemoved { get; } = new List<int>();
+            public List<string> PayloadsRemoved { get; } = new List<string>();
+            public List<string> PayloadsRefreshed { get; } = new List<string>();
+            public int CountOfFullRefreshes { get; private set; } = 0;
 
-            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+            public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
                 // doing nothing
             }
 
-            public void PerformRefresh(ICacheRefresher refresher, string jsonPayload)
-            {
-                PayloadsRefreshed.Add(jsonPayload);
-            }
+            public void PerformRefresh(ICacheRefresher refresher, string jsonPayload) => PayloadsRefreshed.Add(jsonPayload);
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
-            {
-                IntIdsRefreshed.AddRange(instances.Select(getNumericId));
-            }
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRefreshed.AddRange(instances.Select(getNumericId));
 
-            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
-            {
-                GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
-            }
+            public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances) => GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
 
-            public void PerformRemove(ICacheRefresher refresher, string jsonPayload)
-            {
-                PayloadsRemoved.Add(jsonPayload);
-            }
+            public void PerformRemove(ICacheRefresher refresher, string jsonPayload) => PayloadsRemoved.Add(jsonPayload);
 
-            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
-            {
-                IntIdsRemoved.AddRange(instances.Select(getNumericId));
-            }
+            public void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances) => IntIdsRemoved.AddRange(instances.Select(getNumericId));
 
-            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
-            {
-                IntIdsRemoved.AddRange(numericIds);
-            }
+            public void QueueRemove(ICacheRefresher refresher, params int[] numericIds) => IntIdsRemoved.AddRange(numericIds);
 
-            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
-            {
-                IntIdsRefreshed.AddRange(numericIds);
-            }
+            public void QueueRefresh(ICacheRefresher refresher, params int[] numericIds) => IntIdsRefreshed.AddRange(numericIds);
 
-            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
-            {
-                GuidIdsRefreshed.AddRange(guidIds);
-            }
+            public void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds) => GuidIdsRefreshed.AddRange(guidIds);
 
-            public void PerformRefreshAll(ICacheRefresher refresher)
-            {
-                CountOfFullRefreshes++;
-            }
+            public void QueueRefreshAll(ICacheRefresher refresher) => CountOfFullRefreshes++;
+
+            public void Sync() { }
+
+            public void SendMessages() { }
         }
 
-        internal class TestServerRegistrar : IServerRegistrar
+        internal class TestServerRegistrar : IServerRoleAccessor
         {
             public IEnumerable<IServerAddress> Registrations => new List<IServerAddress>
             {
                 new TestServerAddress("localhost")
             };
 
-            public ServerRole GetCurrentServerRole()
-            {
-                throw new NotImplementedException();
-            }
+            public ServerRole CurrentServerRole => throw new NotImplementedException();
         }
 
         public class TestServerAddress : IServerAddress
         {
-            public TestServerAddress(string address)
-            {
-                ServerAddress = address;
-            }
+            public TestServerAddress(string address) => ServerAddress = address;
 
             public string ServerAddress { get; private set; }
         }
-
-        #endregion
     }
 }

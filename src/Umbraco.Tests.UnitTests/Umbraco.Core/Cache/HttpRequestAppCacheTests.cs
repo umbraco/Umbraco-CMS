@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 
@@ -13,7 +16,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
         public override void Setup()
         {
             base.Setup();
-            _httpContext = new DefaultHttpContext();;
+            _httpContext = new DefaultHttpContext();
             _appCache = new HttpRequestAppCache(() => _httpContext.Items);
         }
 

@@ -12,7 +12,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
+    internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
         public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RedirectUrlRepository> logger)
             : base(scopeAccessor, cache, logger)

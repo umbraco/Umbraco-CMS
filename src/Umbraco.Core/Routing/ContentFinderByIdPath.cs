@@ -1,11 +1,9 @@
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -19,13 +17,22 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger<ContentFinderByIdPath> _logger;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByIdPath(IOptions<WebRoutingSettings> webRoutingSettings, ILogger<ContentFinderByIdPath> logger, IRequestAccessor requestAccessor)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderByIdPath"/> class.
+        /// </summary>
+        public ContentFinderByIdPath(
+            IOptions<WebRoutingSettings> webRoutingSettings,
+            ILogger<ContentFinderByIdPath> logger,
+            IRequestAccessor requestAccessor,
+            IUmbracoContextAccessor umbracoContextAccessor)
         {
             _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
-            _requestAccessor = requestAccessor;
+            _requestAccessor = requestAccessor ?? throw new System.ArgumentNullException(nameof(requestAccessor));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
         }
 
         /// <summary>
@@ -33,43 +40,48 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(IPublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-
-            if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
-                && _webRoutingSettings.DisableFindContentByIdPath)
+            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
+            if (umbCtx == null || (umbCtx != null && umbCtx.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath))
+            {
                 return false;
+            }
 
             IPublishedContent node = null;
-            var path = frequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.AbsolutePathDecoded;
 
             var nodeId = -1;
-            if (path != "/") // no id if "/"
+
+            // no id if "/"
+            if (path != "/")
             {
                 var noSlashPath = path.Substring(1);
 
                 if (int.TryParse(noSlashPath, out nodeId) == false)
+                {
                     nodeId = -1;
+                }
 
                 if (nodeId > 0)
                 {
                     _logger.LogDebug("Id={NodeId}", nodeId);
-                    node = frequest.UmbracoContext.Content.GetById(nodeId);
+                    node = umbCtx.Content.GetById(nodeId);
 
                     if (node != null)
                     {
 
                         var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
 
-                        //if we have a node, check if we have a culture in the query string
+                        // if we have a node, check if we have a culture in the query string
                         if (!string.IsNullOrEmpty(cultureFromQuerystring))
                         {
-                            //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(cultureFromQuerystring);
+                            // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
+                            frequest.SetCulture(cultureFromQuerystring);
                         }
 
-                        frequest.PublishedContent = node;
-                        _logger.LogDebug("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+                        frequest.SetPublishedContent(node);
+                        _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
                     }
                     else
                     {
@@ -79,7 +91,9 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
+            {
                 _logger.LogDebug("Not a node id");
+            }
 
             return node != null;
         }

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -10,13 +13,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         // The parameterless constructor of the base class creates a
         // KeyedCollection with an internal dictionary. For this code
         // example, no other constructors are exposed.
-        //
-        public SimpleOrder() : base() { }
-
-        public SimpleOrder(IEnumerable<OrderItem> properties)
+        public SimpleOrder()
+            : base()
         {
-            Reset(properties);
         }
+
+        public SimpleOrder(IEnumerable<OrderItem> properties) => Reset(properties);
 
         // This is the only method that absolutely must be overridden,
         // because without it the KeyedCollection cannot extract the
@@ -24,17 +26,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
         // second generic type argument, in this case OrderItem, and
         // the return value type is the first generic type argument,
         // in this case int.
-        //
-        protected override int GetKeyForItem(OrderItem item)
-        {
+        protected override int GetKeyForItem(OrderItem item) =>
+
             // In this example, the key is the part number.
-            return item.PartNumber;
-        }
+            item.PartNumber;
 
         internal void Reset(IEnumerable<OrderItem> properties)
         {
             Clear();
-            foreach (var property in properties) Add(property);
+            foreach (OrderItem property in properties)
+            {
+                Add(property);
+            }
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
@@ -46,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
 
         protected override void RemoveItem(int index)
         {
-            var removed = this[index];
+            OrderItem removed = this[index];
             base.RemoveItem(index);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
@@ -63,16 +67,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        public new bool Contains(int partNumber)
-        {
-            return this.Any(x => x.PartNumber == partNumber);
-        }
+        public new bool Contains(int partNumber) => this.Any(x => x.PartNumber == partNumber);
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            CollectionChanged?.Invoke(this, args);
-        }
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
     }
 }

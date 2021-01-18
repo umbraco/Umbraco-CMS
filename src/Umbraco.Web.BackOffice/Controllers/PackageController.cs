@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,12 +10,14 @@ using Microsoft.Net.Http.Headers;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -45,11 +47,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _packagingService.GetAllCreatedPackages();
         }
 
-        public PackageDefinition GetCreatedPackageById(int id)
+        public ActionResult<PackageDefinition> GetCreatedPackageById(int id)
         {
             var package = _packagingService.GetCreatedPackageById(id);
             if (package == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             return package;
         }
@@ -64,14 +66,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public PackageDefinition PostSavePackage(PackageDefinition model)
+        public ActionResult<PackageDefinition> PostSavePackage(PackageDefinition model)
         {
             if (ModelState.IsValid == false)
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
 
             //save it
             if (!_packagingService.SaveCreatedPackage(model))
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(
                         model.Id == default
                             ? $"A package with the name {model.Name} already exists"
                             : $"The package with id {model.Id} was not found");
@@ -105,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var fullPath = _hostingEnvironment.MapPathWebRoot(package.PackagePath);
             if (!System.IO.File.Exists(fullPath))
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("No file found for path " + package.PackagePath);
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("No file found for path " + package.PackagePath);
 
             var fileName = Path.GetFileName(package.PackagePath);
 
@@ -126,10 +128,10 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         }
 
-        public PackageDefinition GetInstalledPackageById(int id)
+        public ActionResult<PackageDefinition> GetInstalledPackageById(int id)
         {
             var pack = _packagingService.GetInstalledPackageById(id);
-            if (pack == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (pack == null) return NotFound();
             return pack;
         }
 

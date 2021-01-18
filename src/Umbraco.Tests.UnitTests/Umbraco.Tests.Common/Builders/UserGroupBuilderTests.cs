@@ -1,5 +1,9 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -24,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new UserGroupBuilder();
 
             // Act
-            var userGroup = builder                
+            IUserGroup userGroup = builder
                 .WithId(testId)
                 .WithAlias(testAlias)
                 .WithName(testName)

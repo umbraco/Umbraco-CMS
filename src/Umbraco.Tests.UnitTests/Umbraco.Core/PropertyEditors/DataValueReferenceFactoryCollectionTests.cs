@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -20,18 +23,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
     [TestFixture]
     public class DataValueReferenceFactoryCollectionTests
     {
-        IDataTypeService DataTypeService { get; } = Mock.Of<IDataTypeService>();
+        private IDataTypeService DataTypeService { get; } = Mock.Of<IDataTypeService>();
+
         private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
-        ILocalizedTextService LocalizedTextService { get; } = Mock.Of<ILocalizedTextService>();
-        ILocalizationService LocalizationService { get; } = Mock.Of<ILocalizationService>();
-        IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
-        IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
+
+        private ILocalizedTextService LocalizedTextService { get; } = Mock.Of<ILocalizedTextService>();
+
+        private ILocalizationService LocalizationService { get; } = Mock.Of<ILocalizationService>();
+
+        private IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
+
+        private IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
 
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
         {
             var collection = new DataValueReferenceFactoryCollection(new TestDataValueReferenceFactory().Yield());
-
 
             // label does not implement IDataValueReference
             var labelEditor = new LabelPropertyEditor(
@@ -41,8 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 LocalizedTextService,
                 LocalizationService,
                 ShortStringHelper,
-                JsonSerializer
-            );
+                JsonSerializer);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(labelEditor.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -72,13 +78,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         Segment = "A",
                         EditedValue = trackedUdi3
                     },
+
                     // Ignored (no culture)
                     new PropertyValue
                     {
                         Segment = "A",
                         EditedValue = trackedUdi4
                     },
-                    // duplicate
+
+                    // Duplicate
                     new PropertyValue
                     {
                         Culture = "en-US",
@@ -91,7 +99,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             {
                 property
             };
-            var result = collection.GetAllReferences(properties, propertyEditors);
+            IEnumerable<UmbracoEntityReference> result = collection.GetAllReferences(properties, propertyEditors);
 
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
@@ -111,8 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 IOHelper,
                 ShortStringHelper,
                 LocalizedTextService,
-                JsonSerializer
-            );
+                JsonSerializer);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -142,13 +149,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         Segment = "A",
                         EditedValue = trackedUdi3
                     },
+
                     // Ignored (no culture)
                     new PropertyValue
                     {
                         Segment = "A",
                         EditedValue = trackedUdi4
                     },
-                    // duplicate
+
+                    // Duplicate
                     new PropertyValue
                     {
                         Culture = "en-US",
@@ -161,7 +170,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             {
                 property
             };
-            var result = collection.GetAllReferences(properties, propertyEditors);
+            IEnumerable<UmbracoEntityReference> result = collection.GetAllReferences(properties, propertyEditors);
 
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
@@ -181,8 +190,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 IOHelper,
                 ShortStringHelper,
                 LocalizedTextService,
-                JsonSerializer
-            );
+                JsonSerializer);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -200,12 +208,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                     {
                         EditedValue = trackedUdi1
                     },
+
                     // Ignored (has culture)
                     new PropertyValue
                     {
                         Culture = "en-US",
                         EditedValue = trackedUdi2
                     },
+
                     // Ignored (has culture)
                     new PropertyValue
                     {
@@ -218,7 +228,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         Segment = "A",
                         EditedValue = trackedUdi4
                     },
-                    // duplicate
+
+                    // Duplicate
                     new PropertyValue
                     {
                         Segment = "B",
@@ -230,7 +241,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             {
                 property
             };
-            var result = collection.GetAllReferences(properties, propertyEditors);
+            IEnumerable<UmbracoEntityReference> result = collection.GetAllReferences(properties, propertyEditors);
 
             Assert.AreEqual(2, result.Count());
             Assert.AreEqual(trackedUdi1, result.ElementAt(0).Udi.ToString());
@@ -247,14 +258,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
             {
                 public IEnumerable<UmbracoEntityReference> GetReferences(object value)
                 {
-                    // This is the same as the media picker, it will just try to parse the value directly as a UDI
-
+                    // This is the same as the media picker, it will just try to parse the value directly as a UDI.
                     var asString = value is string str ? str : value?.ToString();
 
-                    if (string.IsNullOrEmpty(asString)) yield break;
+                    if (string.IsNullOrEmpty(asString))
+                    {
+                        yield break;
+                    }
 
-                    if (UdiParser.TryParse(asString, out var udi))
+                    if (UdiParser.TryParse(asString, out Udi udi))
+                    {
                         yield return new UmbracoEntityReference(udi);
+                    }
                 }
             }
         }

@@ -36,7 +36,7 @@ namespace Umbraco.Tests.PublishedContent
             Builder.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Clear()
                 .Append<DatePickerValueConverter>()
-                .Append<TinyMceValueConverter>()
+                .Append<SimpleTinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
         }
 

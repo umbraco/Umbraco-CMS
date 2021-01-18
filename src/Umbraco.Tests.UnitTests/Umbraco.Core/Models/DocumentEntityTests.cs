@@ -1,6 +1,10 @@
-﻿using System.Diagnostics;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Diagnostics;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
@@ -12,15 +16,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         private DocumentEntitySlimBuilder _builder;
 
         [SetUp]
-        public void SetUp()
-        {
-            _builder = new DocumentEntitySlimBuilder();
-        }
+        public void SetUp() => _builder = new DocumentEntitySlimBuilder();
 
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = _builder
+            DocumentEntitySlim item = _builder
                 .WithId(3)
                 .WithCreatorId(4)
                 .WithName("Test")

@@ -16,7 +16,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
     [TestFixture]
     public class InstructionProcessTaskTests
     {
-        private Mock<IDatabaseServerMessenger> _mockDatabaseServerMessenger;
+        private Mock<IServerMessenger> _mockDatabaseServerMessenger;
 
         [TestCase(RuntimeLevel.Boot)]
         [TestCase(RuntimeLevel.Install)]
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
 
             var mockLogger = new Mock<ILogger<InstructionProcessTask>>();
 
-            _mockDatabaseServerMessenger = new Mock<IDatabaseServerMessenger>();
+            _mockDatabaseServerMessenger = new Mock<IServerMessenger>();
 
             var settings = new GlobalSettings();
 

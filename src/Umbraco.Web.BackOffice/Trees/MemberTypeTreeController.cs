@@ -2,11 +2,11 @@
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Core.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
@@ -39,9 +39,15 @@ namespace Umbraco.Web.BackOffice.Trees
         }
 
 
-        protected override TreeNode CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var rootResult = base.CreateRootNode(queryStrings);
+            if (!(rootResult.Result is null))
+            {
+                return rootResult;
+            }
+            var root = rootResult.Value;
+
             //check if there are any member types
             root.HasChildren = _memberTypeService.GetAll().Any();
             return root;
