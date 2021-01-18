@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Tests.Common
 {

@@ -58,8 +58,7 @@ namespace Umbraco.Tests.Common.Builders
                 Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IJsonSerializer>()
-            )
+                Mock.Of<IJsonSerializer>())
             {
                 Configuration = configuration,
                 View = view,

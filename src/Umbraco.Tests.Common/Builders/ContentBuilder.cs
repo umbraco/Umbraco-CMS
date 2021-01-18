@@ -220,7 +220,6 @@ namespace Umbraco.Tests.Common.Builders
                 .WithName(name)
                 .WithParent(parent);
 
-
             if (!(culture is null))
             {
                 builder = builder.WithCultureName(culture, name);
