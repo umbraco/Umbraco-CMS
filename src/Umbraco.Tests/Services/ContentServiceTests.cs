@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Services
             }
 
             // Assert
-            Assert.AreEqual(24, contentService.Count());
+            Assert.AreEqual(25, contentService.Count());
         }
 
         [Test]
@@ -1687,7 +1687,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
             Assert.IsFalse(descendants.Any(x => x.Trashed));
 
@@ -1700,7 +1700,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(-20, content.ParentId);
             Assert.IsTrue(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
             Assert.True(descendants.All(x => x.Trashed));
 
@@ -1987,7 +1987,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
@@ -1997,7 +1997,7 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, contentService.CountChildren(copy.Id));
+            Assert.AreEqual(3, contentService.CountChildren(copy.Id));
 
             var child = contentService.GetById(NodeDto.NodeIdSeed + 3);
             var childCopy = contentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
@@ -2013,7 +2013,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, false, Constants.Security.SuperUserId);

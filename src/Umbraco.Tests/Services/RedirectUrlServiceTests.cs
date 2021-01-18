@@ -46,14 +46,14 @@ namespace Umbraco.Tests.Services
                     Url = _url,
                     Culture = _cultureEnglish
                 });
-
+                Thread.Sleep(1000); //Added delay to ensure timestamp difference as sometimes they seem to have the same timestamp
                 repository.Save(new RedirectUrl
                 {
                     ContentKey = _secondSubPage.Key,
                     Url = _url,
                     Culture = _cultureGerman
                 });
-
+                Thread.Sleep(1000);
                 repository.Save(new RedirectUrl
                 {
                     ContentKey = _thirdSubPage.Key,
