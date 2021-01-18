@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -341,9 +340,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
             protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {
             }
-
-            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null) =>
-                throw new NotImplementedException();
         }
     }
 }
