@@ -130,7 +130,7 @@ namespace Umbraco.Core
         {
             var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = SemanticVersion; // the executing code version
-            
+
             if (localVersion == null)
             {
                 // there is no local version, we are not installed
@@ -202,7 +202,7 @@ namespace Umbraco.Core
                         // although the files version matches the code version, the database version does not
                         // which means the local files have been upgraded but not the database - need to upgrade
                         _logger.Debug<RuntimeState>("Has not reached the final upgrade step, need to upgrade Umbraco.");
-                        Level = RuntimeLevel.Upgrade;
+                        Level = RuntimeOptions.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
                         Reason = RuntimeLevelReason.UpgradeMigrations;
                     }
                     break;

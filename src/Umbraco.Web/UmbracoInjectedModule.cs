@@ -357,15 +357,13 @@ namespace Umbraco.Web
                 // there's nothing we can do really
                 app.BeginRequest += (sender, args) =>
                 {
-                    // would love to avoid throwing, and instead display a customized Umbraco 500
-                    // page - however if we don't throw here, something else might go wrong, and
-                    // it's this later exception that would be reported. could not figure out how
-                    // to prevent it, either with httpContext.Response.End() or .ApplicationInstance
-                    // .CompleteRequest()
+                    // if we don't throw here, something else might go wrong,
+                    // and it's this later exception that would be reported.
 
                     // also, if something goes wrong with our DI setup, the logging subsystem may
                     // not even kick in, so here we try to give as much detail as possible
 
+                    // the exception is handled in UmbracoApplication which shows a custom error page
                     BootFailedException.Rethrow(Core.Composing.Current.RuntimeState.BootFailedException);
                 };
                 return;
