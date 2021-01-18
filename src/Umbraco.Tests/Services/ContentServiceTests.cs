@@ -1415,7 +1415,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 6);
 
             // Act
             var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
