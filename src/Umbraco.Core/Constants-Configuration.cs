@@ -16,10 +16,10 @@
             public const string ConfigCorePrefix = ConfigPrefix + "Core:";
             public const string ConfigCustomErrorsPrefix = ConfigPrefix + "CustomErrors:";
             public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
+            public const string ConfigGlobalId = ConfigGlobalPrefix + "Id";
             public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
             public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
             public const string ConfigSecurityPrefix = ConfigPrefix + "Security:";
-
             public const string ConfigContentNotificationsEmail = ConfigContentNotificationsPrefix + "Email";
             public const string ConfigContentMacroErrors = ConfigContentPrefix + "MacroErrors";
             public const string ConfigGlobalUseHttps = ConfigGlobalPrefix + "UseHttps";

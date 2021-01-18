@@ -17,6 +17,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddScoped<InstallSetupStep, NewInstallStep>();
             builder.Services.AddScoped<InstallSetupStep, UpgradeStep>();
             builder.Services.AddScoped<InstallSetupStep, FilePermissionsStep>();
+            builder.Services.AddScoped<InstallSetupStep, TelemetryIdentifierStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseConfigureStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseInstallStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseUpgradeStep>();

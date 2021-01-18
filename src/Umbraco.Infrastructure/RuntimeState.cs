@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 
@@ -20,6 +21,7 @@ namespace Umbraco.Core
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
+        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -33,12 +35,18 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(IOptions<GlobalSettings> globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger<RuntimeState> logger)
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
 
 
@@ -79,9 +87,119 @@ namespace Umbraco.Core
                 return;
             }
 
-            // else, keep going,
-            // anything other than install wants a database - see if we can connect
-            // (since this is an already existing database, assume localdb is ready)
+            // Check the database state, whether we can connect or if it's in an upgrade or empty state, etc...
+
+            switch (GetUmbracoDatabaseState(_databaseFactory))
+            {
+                     case UmbracoDatabaseState.CannotConnect:
+                    {
+                        // cannot connect to configured database, this is bad, fail
+                        _logger.LogDebug("Could not connect to database.");
+
+                        if (_globalSettings.InstallMissingDatabase)
+                        {
+                            // ok to install on a configured but missing database
+                            Level = RuntimeLevel.Install;
+                            Reason = RuntimeLevelReason.InstallMissingDatabase;
+                            return;
+                        }
+
+                        // else it is bad enough that we want to throw
+                        Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
+                        throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                    }
+                case UmbracoDatabaseState.NotInstalled:
+                    {
+                        // ok to install on an empty database
+                        Level = RuntimeLevel.Install;
+                        Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                        return;
+                    }
+                case UmbracoDatabaseState.NeedsUpgrade:
+                    {
+                        // the db version does not match... but we do have a migration table
+                        // so, at least one valid table, so we quite probably are installed & need to upgrade
+
+                        // although the files version matches the code version, the database version does not
+                        // which means the local files have been upgraded but not the database - need to upgrade
+                        _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
+                        Level = RuntimeLevel.Upgrade;
+                        Reason = RuntimeLevelReason.UpgradeMigrations;
+                    }
+                    break;
+                case UmbracoDatabaseState.Ok:
+                default:
+                    {
+                        // if we already know we want to upgrade, exit here
+                        if (Level == RuntimeLevel.Upgrade)
+                            return;
+
+                        // the database version matches the code & files version, all clear, can run
+                        Level = RuntimeLevel.Run;
+                        Reason = RuntimeLevelReason.Run;
+                    }
+                    break;
+            }
+        }
+
+        private enum UmbracoDatabaseState
+        {
+            Ok,
+            CannotConnect,
+            NotInstalled,
+            NeedsUpgrade
+        }
+
+        private UmbracoDatabaseState GetUmbracoDatabaseState(IUmbracoDatabaseFactory databaseFactory)
+        {
+            try
+            {
+                if (!TryDbConnect(databaseFactory))
+                {
+                    return UmbracoDatabaseState.CannotConnect;
+                }
+
+                // no scope, no service - just directly accessing the database
+                using (var database = databaseFactory.CreateDatabase())
+                {
+                    if (!database.IsUmbracoInstalled())
+                    {
+                        return UmbracoDatabaseState.NotInstalled;
+                    }
+
+                    if (DoesUmbracoRequireUpgrade(database))
+                    {
+                        return UmbracoDatabaseState.NeedsUpgrade;
+                    }
+                }
+
+                return UmbracoDatabaseState.Ok;
+            }
+            catch (Exception e)
+            {
+                // can connect to the database so cannot check the upgrade state... oops
+                _logger.LogWarning(e, "Could not check the upgrade state.");
+
+                // else it is bad enough that we want to throw
+                Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
+                throw new BootFailedException("Could not check the upgrade state.", e);
+            }
+        }
+
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
+        {
+            Level = level;
+            Reason = reason;
+        }
+
+        public void DoUnattendedInstall()
+        {
+             // unattended install is not enabled
+            if (_globalSettings.InstallUnattended == false) return;
+
+            // no connection string set
+            if (_databaseFactory.Configured == false) return;
+
             var connect = false;
             var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
@@ -92,79 +210,37 @@ namespace Umbraco.Core
                 Thread.Sleep(1000);
             }
 
-            if (connect == false)
-            {
-                // cannot connect to configured database, this is bad, fail
-                _logger.LogDebug("Could not connect to database.");
+            // could not connect to the database
+            if (connect == false) return;
 
-                if (_globalSettings.InstallMissingDatabase)
+            using (var database = _databaseFactory.CreateDatabase())
+            {
+                var hasUmbracoTables = database.IsUmbracoInstalled();
+
+                // database has umbraco tables, assume Umbraco is already installed
+                if (hasUmbracoTables) return;
+
+                // all conditions fulfilled, do the install
+                _logger.LogInformation("Starting unattended install.");
+
+                try
                 {
-                    // ok to install on a configured but missing database
-                    Level = RuntimeLevel.Install;
-                    Reason = RuntimeLevelReason.InstallMissingDatabase;
-                    return;
+                    database.BeginTransaction();
+                    var creator = _databaseSchemaCreatorFactory.Create(database);
+                    creator.InitializeDatabaseSchema();
+                    database.CompleteTransaction();
+                    _logger.LogInformation("Unattended install completed.");
                 }
-
-                // else it is bad enough that we want to throw
-                Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
-            }
-
-            // if we already know we want to upgrade,
-            // still run EnsureUmbracoUpgradeState to get the states
-            // (v7 will just get a null state, that's ok)
-
-            // else
-            // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
-            bool noUpgrade;
-            try
-            {
-                noUpgrade = EnsureUmbracoUpgradeState(_databaseFactory, _logger);
-            }
-            catch (Exception e)
-            {
-                // can connect to the database but cannot check the upgrade state... oops
-                _logger.LogWarning(e, "Could not check the upgrade state.");
-
-                if (_globalSettings.InstallEmptyDatabase)
+                catch (Exception ex)
                 {
-                    // ok to install on an empty database
-                    Level = RuntimeLevel.Install;
-                    Reason = RuntimeLevelReason.InstallEmptyDatabase;
-                    return;
+                    _logger.LogInformation(ex, "Error during unattended install.");
+                    database.AbortTransaction();
+
+                    throw new UnattendedInstallException(
+                        "The database configuration failed with the following message: " + ex.Message
+                        + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
                 }
-
-                // else it is bad enough that we want to throw
-                Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
-                throw new BootFailedException("Could not check the upgrade state.", e);
             }
-
-            // if we already know we want to upgrade, exit here
-            if (Level == RuntimeLevel.Upgrade)
-                return;
-
-            if (noUpgrade)
-            {
-                // the database version matches the code & files version, all clear, can run
-                Level = RuntimeLevel.Run;
-                Reason = RuntimeLevelReason.Run;
-                return;
-            }
-
-            // the db version does not match... but we do have a migration table
-            // so, at least one valid table, so we quite probably are installed & need to upgrade
-
-            // although the files version matches the code version, the database version does not
-            // which means the local files have been upgraded but not the database - need to upgrade
-            _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
-            Level = RuntimeLevel.Upgrade;
-            Reason = RuntimeLevelReason.UpgradeMigrations;
-        }
-
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
-        {
-            Level = level;
-            Reason = reason;
         }
 
         private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
@@ -183,5 +259,36 @@ namespace Umbraco.Core
 
             return CurrentMigrationState == FinalMigrationState;
         }
+        private bool DoesUmbracoRequireUpgrade(IUmbracoDatabase database)
+        {
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+            var stateValueKey = upgrader.StateValueKey;
+
+            CurrentMigrationState = database.GetFromKeyValueTable(stateValueKey);
+            FinalMigrationState = upgrader.Plan.FinalState;
+
+            _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
+
+            return CurrentMigrationState != FinalMigrationState;
+        }
+
+        private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)
+        {
+            // anything other than install wants a database - see if we can connect
+            // (since this is an already existing database, assume localdb is ready)
+            bool canConnect;
+            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
+            for (var i = 0; ;)
+            {
+                canConnect = databaseFactory.CanConnect;
+                if (canConnect || ++i == tries) break;
+                _logger.LogDebug("Could not immediately connect to database, trying again.");
+                Thread.Sleep(1000);
+            }
+
+            return canConnect;
+        }
+
+
     }
 }

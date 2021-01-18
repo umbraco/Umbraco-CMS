@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Runtime;
 
 namespace Umbraco.Core.Persistence
 {
@@ -27,5 +27,33 @@ namespace Umbraco.Core.Persistence
                 .Where<KeyValueDto>(x => x.Key == key);
             return database.FirstOrDefault<KeyValueDto>(sql)?.Value;
         }
+
+
+        /// <summary>
+        /// Returns true if the database contains the specified table
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static bool HasTable(this IUmbracoDatabase database, string tableName)
+        {
+            try
+            {
+                return database.SqlContext.SqlSyntax.GetTablesInSchema(database).Any(table => table.InvariantEquals(tableName));
+            }
+            catch (Exception)
+            {
+                return false; // will occur if the database cannot connect
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the database contains no tables
+        /// </summary>
+        /// <param name="database"></param>
+        /// <returns></returns>
+        public static bool IsDatabaseEmpty(this IUmbracoDatabase database)
+            => database.SqlContext.SqlSyntax.GetTablesInSchema(database).Any() == false;
+
     }
 }

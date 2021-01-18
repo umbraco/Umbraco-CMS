@@ -30,4 +30,12 @@
       <Content Include="TestHelpers\Assets\UmbracoTraceLog.UNITTEST.20181112.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="umbraco\Data\TEMP\TypesCache" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="umbraco\Data\TEMP\TypesCache\umbraco-types.DESKTOP-EU212M2.hash" />
+    </ItemGroup>
+
 </Project>

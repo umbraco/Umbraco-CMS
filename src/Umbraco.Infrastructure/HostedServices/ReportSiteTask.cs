@@ -1,15 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Infrastructure.HostedServices;
 
 namespace Umbraco.Web.Telemetry
@@ -17,71 +16,43 @@ namespace Umbraco.Web.Telemetry
     public class ReportSiteTask : RecurringHostedServiceBase
     {
         private readonly ILogger<ReportSiteTask> _logger;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IOptions<GlobalSettings> _globalSettings;
         private static HttpClient s_httpClient;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
-            IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IOptions<GlobalSettings> globalSettings)
             : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
-            _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
+            _globalSettings = globalSettings;
             s_httpClient = new HttpClient();
         }
 
         /// <summary>
-        /// Runs the background task to send the anynomous ID
+        /// Runs the background task to send the anonymous ID
         /// to telemetry service
         /// </summary>
         internal override async Task PerformExecuteAsync(object state)
         {
-             // Try & find file at '/umbraco/telemetrics-id.umb'
-            var telemetricsFilePath = _hostingEnvironment.MapPathContentRoot(SystemFiles.TelemetricsIdentifier);
-
-            if (File.Exists(telemetricsFilePath) == false)
-            {
-                // Some users may have decided to not be tracked by deleting/removing the marker file
-                _logger.LogWarning("No telemetry marker file found at '{filePath}' and will not report site to telemetry service", telemetricsFilePath);
-
-                return;
-            }
-
-
-            string telemetricsFileContents;
-            try
-            {
-                // Open file & read its contents
-                // It may throw due to file permissions or file locking
-                telemetricsFileContents = File.ReadAllText(telemetricsFilePath);
-            }
-            catch (Exception ex)
-            {
-                // Silently swallow ex - but lets log it (ReadAllText throws a ton of different types of ex)
-                // Hence the use of general exception type
-                _logger.LogError(ex, "Error in reading file contents of telemetry marker file found at '{filePath}'", telemetricsFilePath);
-
-                // Exit out early, but mark this task to be repeated in case its a file lock so it can be rechecked the next time round
-                return;
-            }
-
+            // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
+            var backofficeIdentifierRaw = _globalSettings.Value.Id;
 
             // Parse as a GUID & verify its a GUID and not some random string
             // In case of users may have messed or decided to empty the file contents or put in something random
-            if (Guid.TryParse(telemetricsFileContents, out var telemetrySiteIdentifier) == false)
+            if (Guid.TryParse(backofficeIdentifierRaw, out var telemetrySiteIdentifier) == false)
             {
-                // Some users may have decided to mess with file contents
-                _logger.LogWarning("The telemetry marker file found at '{filePath}' with '{telemetrySiteId}' is not a valid identifier for the telemetry service", telemetricsFilePath, telemetrySiteIdentifier);
+                // Some users may have decided to mess with the XML attribute and put in something else
+                _logger.LogWarning("No telemetry marker found");
 
                 return;
             }
 
             try
             {
-
                 // Send data to LIVE telemetry
                 s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
@@ -112,11 +83,10 @@ namespace Umbraco.Web.Telemetry
             {
                 // Silently swallow
                 // The user does not need the logs being polluted if our service has fallen over or is down etc
-                // Hence only loggigng this at a more verbose level (Which users should not be using in prod)
+                // Hence only logging this at a more verbose level (which users should not be using in production)
                 _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
             }
         }
-
         [DataContract]
         private class TelemetryReportData
         {

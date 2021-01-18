@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -78,7 +79,8 @@ namespace Umbraco.Tests.TestHelpers
                     globalSettings,
                     connectionStrings,
                     new Lazy<IMapperCollection>(() => mappers),
-                    TestHelper.DbProviderFactoryCreator);
+                    TestHelper.DbProviderFactoryCreator,
+                    new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(),loggerFactory, new UmbracoVersion()));
             }
 
             fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());

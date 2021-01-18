@@ -193,8 +193,15 @@ namespace Umbraco.Core.Configuration.Models
         public bool ShowDeprecatedPropertyEditors { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets a value for the pate to the login screen background image.
+        /// Gets or sets a value for the path to the login screen background image.
         /// </summary>
         public string LoginBackgroundImage { get; set; } = "assets/img/login.jpg";
+
+        /// <summary>
+        /// Gets or sets a value for the path to the login screen logo image.
+        /// </summary>
+        public string LoginLogoImage { get; set; } = "assets/img/application/umbraco_logo_white.svg";
+
+
     }
 }

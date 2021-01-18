@@ -15,11 +15,13 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
@@ -43,7 +45,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             ILogger logger = loggerFactory.CreateLogger("GenericLogger");
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
-            var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
+            var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator,
+                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion()));
             var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
             IMediaFileSystem mediaFileSystem = Mock.Of<IMediaFileSystem>();

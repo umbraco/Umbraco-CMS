@@ -98,10 +98,15 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_schedule != null)
-                    _schedule.CollectionChanged -= ScheduleCollectionChanged;
+                {
+                    _schedule.ClearCollectionChangedEvents();
+                }
+                    
                 SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
+                {
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
+                }   
             }
         }
 
@@ -223,10 +228,16 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                if (_publishInfos != null) _publishInfos.CollectionChanged -= PublishNamesCollectionChanged;
+                if (_publishInfos != null)
+                {
+                    _publishInfos.ClearCollectionChangedEvents();
+                }
+
                 _publishInfos = value;
                 if (_publishInfos != null)
+                {
                     _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+                }   
             }
         }
 
@@ -321,7 +332,7 @@ namespace Umbraco.Core.Models
             else
                 Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
 
-            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
+            Properties.ClearCollectionChangedEvents(); // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
 
@@ -438,7 +449,7 @@ namespace Umbraco.Core.Models
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)
             {
-                clonedContent._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
+                clonedContent._publishInfos.ClearCollectionChangedEvents();          //clear this event handler if any
                 clonedContent._publishInfos = (ContentCultureInfosCollection)_publishInfos.DeepClone(); //manually deep clone
                 clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
@@ -446,7 +457,7 @@ namespace Umbraco.Core.Models
             //if properties exist then deal with event bindings
             if (clonedContent._schedule != null)
             {
-                clonedContent._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
+                clonedContent._schedule.ClearCollectionChangedEvents();         //clear this event handler if any
                 clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
                 clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
