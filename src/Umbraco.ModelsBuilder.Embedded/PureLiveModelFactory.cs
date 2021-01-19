@@ -132,7 +132,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         /// <inheritdoc />
-        public bool Enabled => _config.Enable;
+        public bool Enabled => _config.ModelsMode == ModelsMode.PureLive;
 
         /// <summary>
         /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one

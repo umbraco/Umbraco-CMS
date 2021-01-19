@@ -11,11 +11,6 @@ namespace Umbraco.Core
     public static class PublishedModelFactoryExtensions
     {
         /// <summary>
-        /// Returns true if the current <see cref="IPublishedModelFactory"/> is an implementation of <see cref="ILivePublishedModelFactory"/>
-        /// </summary>
-        public static bool IsLiveFactory(this IPublishedModelFactory factory) => factory is ILivePublishedModelFactory;
-
-        /// <summary>
         /// Returns true if the current <see cref="IPublishedModelFactory"/> is an implementation of <see cref="ILivePublishedModelFactory2"/> and is enabled
         /// </summary>
         public static bool IsLiveFactoryEnabled(this IPublishedModelFactory factory)

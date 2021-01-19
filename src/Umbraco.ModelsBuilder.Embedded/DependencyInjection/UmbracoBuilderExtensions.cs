@@ -105,7 +105,7 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                 {
                     return factory.GetRequiredService<PureLiveModelFactory>();
                 }
-                else if (config.EnableFactory)
+                else
                 {
                     TypeLoader typeLoader = factory.GetRequiredService<TypeLoader>();
                     IPublishedValueFallback publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
@@ -114,8 +114,6 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                         .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
                     return new PublishedModelFactory(types, publishedValueFallback);
                 }
-
-                return null;
             });
 
             return builder;

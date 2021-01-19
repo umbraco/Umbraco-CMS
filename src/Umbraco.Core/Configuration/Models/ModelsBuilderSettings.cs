@@ -15,22 +15,6 @@ namespace Umbraco.Core.Configuration.Models
         private static string DefaultModelsDirectory => "~/umbraco/models";
 
         /// <summary>
-        /// Gets or sets a value indicating whether the whole models experience is enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>If this is false then absolutely nothing happens.</para>
-        ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
-        /// </remarks>
-        // TODO: This setting makes no sense at all, this basically just disables haveing models be able to reset dynamically
-        // and configure some dashboards but the models are all still built and active!
-        // Can this be truly disabled or not?
-        // Then there's other ways to disable things - EnableFactory also causes odd flags but again, how can this be disabled?
-        // The other ways that flags change are ModelsMode.
-        // TODO: Make these make sense and test what is possible
-        // Confirmed A) Enabled = false, ModelsMode = Nothing, EnabledFagtory = false == EXPLODES, null refs because these things are needed unless you replace nucache.
-        public bool Enable { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
         public ModelsMode ModelsMode { get; set; } = ModelsMode.PureLive;
@@ -40,12 +24,6 @@ namespace Umbraco.Core.Configuration.Models
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
         public string ModelsNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether we should enable the models factory.
-        /// </summary>
-        /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public bool EnableFactory { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether we should flag out-of-date models.

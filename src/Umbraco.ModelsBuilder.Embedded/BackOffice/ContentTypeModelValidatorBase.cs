@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
@@ -17,62 +18,75 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     {
         private readonly IOptions<ModelsBuilderSettings> _config;
 
-        public ContentTypeModelValidatorBase(IOptions<ModelsBuilderSettings> config)
-        {
-            _config = config;
-        }
+        public ContentTypeModelValidatorBase(IOptions<ModelsBuilderSettings> config) => _config = config;
 
         protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
-            //don't do anything if we're not enabled
-            if (!_config.Value.Enable) yield break;
+            // don't do anything if we're not enabled
+            if (_config.Value.ModelsMode == ModelsMode.Nothing)
+            {
+                yield break;
+            }
 
-            //list of reserved/disallowed aliases for content/media/member types - more can be added as the need arises
+            // list of reserved/disallowed aliases for content/media/member types - more can be added as the need arises
             var reservedModelAliases = new[] { "system" };
-            if(reservedModelAliases.Contains(model.Alias, StringComparer.OrdinalIgnoreCase))
+            if (reservedModelAliases.Contains(model.Alias, StringComparer.OrdinalIgnoreCase))
             {
                 yield return new ValidationResult($"The model alias {model.Alias} is a reserved term and cannot be used", new[] { "Alias" });
             }
 
-            var properties = model.Groups.SelectMany(x => x.Properties)
+            TProperty[] properties = model.Groups.SelectMany(x => x.Properties)
                 .Where(x => x.Inherited == false)
                 .ToArray();
 
-            foreach (var prop in properties)
+            foreach (TProperty prop in properties)
             {
-                var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
+                PropertyGroupBasic<TProperty> propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
 
                 if (model.Alias.ToLowerInvariant() == prop.Alias.ToLowerInvariant())
-                    yield return new ValidationResult(string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias), new[]
-                    {
-                        $"Groups[{model.Groups.IndexOf(propertyGroup)}].Properties[{propertyGroup.Properties.IndexOf(prop)}].Alias"
-                    });
+                {
+                    string[] memberNames = new[]
+                        {
+                            $"Groups[{model.Groups.IndexOf(propertyGroup)}].Properties[{propertyGroup.Properties.IndexOf(prop)}].Alias"
+                        };
 
-                //we need to return the field name with an index so it's wired up correctly
+                    yield return new ValidationResult(
+                        string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias),
+                        memberNames);
+                }
+
+                // we need to return the field name with an index so it's wired up correctly
                 var groupIndex = model.Groups.IndexOf(propertyGroup);
                 var propertyIndex = propertyGroup.Properties.IndexOf(prop);
 
-                var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
+                ValidationResult validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
                 if (validationResult != null)
+                {
                     yield return validationResult;
+                }
             }
         }
 
         private ValidationResult ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
         {
-            //don't let them match any properties or methods in IPublishedContent
-            //TODO: There are probably more!
+            // don't let them match any properties or methods in IPublishedContent
+            // TODO: There are probably more!
             var reservedProperties = typeof(IPublishedContent).GetProperties().Select(x => x.Name).ToArray();
             var reservedMethods = typeof(IPublishedContent).GetMethods().Select(x => x.Name).ToArray();
 
             var alias = property.Alias;
 
             if (reservedProperties.InvariantContains(alias) || reservedMethods.InvariantContains(alias))
-                return new ValidationResult(
-                    $"The alias {alias} is a reserved term and cannot be used", new[]
+            {
+                string[] memberNames = new[]
                     {
                         $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias"
-                    });
+                    };
+
+                return new ValidationResult(
+                    $"The alias {alias} is a reserved term and cannot be used",
+                    memberNames);
+            }
 
             return null;
         }

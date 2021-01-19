@@ -1,34 +1,31 @@
 using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
-using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Extensions;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     // supports LiveAppData - but not PureLive
     public sealed class LiveModelsProvider
     {
-        private static Mutex _mutex;
-        private static int _req;
+        private static Mutex s_mutex;
+        private static int s_req;
         private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        // we do not manage pure live here
-        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LiveModelsProvider"/> class.
+        /// </summary>
         public LiveModelsProvider(ILogger<LiveModelsProvider> logger, IOptions<ModelsBuilderSettings> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
@@ -38,18 +35,23 @@ namespace Umbraco.ModelsBuilder.Embedded
             _hostingEnvironment = hostingEnvironment;
         }
 
+        // we do not manage pure live here
+        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
+
         internal void Install()
         {
             // just be sure
             if (!IsEnabled)
+            {
                 return;
+            }
 
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
             // name is system-wide and must be less than 260 chars
             var name = _hostingEnvironment.ApplicationId + "/UmbracoLiveModelsProvider";
 
-            _mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
+            s_mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
 
             // anything changes, and we want to re-generate models.
             ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
@@ -72,13 +74,13 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             //HttpContext.Current.Items[this] = true;
             _logger.LogDebug("Requested to generate models.");
-            Interlocked.Exchange(ref _req, 1);
+            Interlocked.Exchange(ref s_req, 1);
         }
 
         public void GenerateModelsIfRequested()
         {
             //if (HttpContext.Current.Items[this] == null) return;
-            if (Interlocked.Exchange(ref _req, 0) == 0) return;
+            if (Interlocked.Exchange(ref s_req, 0) == 0) return;
 
             // cannot use a simple lock here because we don't want another AppDomain
             // to generate while we do... and there could be 2 AppDomains if the app restarts.
@@ -87,7 +89,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 _logger.LogDebug("Generate models...");
                 const int timeout = 2 * 60 * 1000; // 2 mins
-                _mutex.WaitOne(timeout); // wait until it is safe, and acquire
+                s_mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 _logger.LogInformation("Generate models now.");
                 GenerateModels();
                 _mbErrors.Clear();
@@ -104,7 +106,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
             finally
             {
-                _mutex.ReleaseMutex(); // release
+                s_mutex.ReleaseMutex(); // release
             }
         }
 

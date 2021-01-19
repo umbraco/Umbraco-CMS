@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -65,7 +66,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             _modelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            if (_config.Enable)
+            if (_config.ModelsMode != ModelsMode.Nothing)
             {
                 FileService.SavingTemplate += FileService_SavingTemplate;
             }
@@ -126,7 +127,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var settings = new Dictionary<string, object>
             {
-                {"enabled", _config.Enable}
+                {"mode", _config.ModelsMode.ToString()}
             };
 
             return settings;
@@ -138,13 +139,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// </summary>
         private void FileService_SavingTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
-            // don't do anything if the factory is not enabled
-            // because, no factory = no models (even if generation is enabled)
-            if (!_config.EnableFactory)
-            {
-                return;
-            }
-
             // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType"))
             {

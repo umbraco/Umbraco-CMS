@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
@@ -98,17 +99,14 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             return GetDashboardResult();
         }
 
-        private Dashboard GetDashboardResult()
+        private Dashboard GetDashboardResult() => new Dashboard
         {
-            return new Dashboard
-            {
-                Enable = _config.Enable,
-                Text = _dashboardReport.Text(),
-                CanGenerate = _dashboardReport.CanGenerate(),
-                OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),
-                LastError = _dashboardReport.LastError(),
-            };
-        }
+            Mode = _config.ModelsMode,
+            Text = _dashboardReport.Text(),
+            CanGenerate = _dashboardReport.CanGenerate(),
+            OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),
+            LastError = _dashboardReport.LastError(),
+        };
 
         [DataContract]
         public class BuildResult
@@ -122,8 +120,8 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         [DataContract]
         public class Dashboard
         {
-            [DataMember(Name = "enable")]
-            public bool Enable;
+            [DataMember(Name = "mode")]
+            public ModelsMode Mode;
             [DataMember(Name = "text")]
             public string Text;
             [DataMember(Name = "canGenerate")]
