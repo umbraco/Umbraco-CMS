@@ -189,9 +189,9 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     if ($scope.model.filter.startsWith("{")) {
                         $scope.model.filterAdvanced = true;
 
-                        if ($scope.model.filterByMetadata && !angular.isFunction($scope.model.filter))
+                        if ($scope.model.filterByMetadata && !Utilities.isFunction($scope.model.filter))
                         {
-                            var filter = angular.fromJson($scope.model.filter);
+                            var filter = Utilities.fromJson($scope.model.filter);
                             $scope.model.filter = function (node){ return _.isMatch(node.metaData, filter);};
                         }            
                         else
