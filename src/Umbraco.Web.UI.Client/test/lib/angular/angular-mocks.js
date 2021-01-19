@@ -699,7 +699,7 @@ angular.mock.dump = function (object) {
             });
             out = '[ ' + out.join(', ') + ' ]';
         } else if (Utilities.isObject(object)) {
-            if (angular.isFunction(object.$eval) && angular.isFunction(object.$apply)) {
+            if (Utilities.isFunction(object.$eval) && Utilities.isFunction(object.$apply)) {
                 out = serializeScope(object);
             } else if (object instanceof Error) {
                 out = object.stack || ('' + object.name + ': ' + object.message);
@@ -927,7 +927,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         responsesPush = angular.bind(responses, responses.push);
 
     function createResponse(status, data, headers) {
-        if (angular.isFunction(status)) return status;
+        if (Utilities.isFunction(status)) return status;
 
         return function () {
             return angular.isNumber(status)
@@ -943,7 +943,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
             wasExpected = false;
 
         function prettyPrint(data) {
-            return (Utilities.isString(data) || angular.isFunction(data) || data instanceof RegExp)
+            return (Utilities.isString(data) || Utilities.isFunction(data) || data instanceof RegExp)
                 ? data
                 : angular.toJson(data);
         }
@@ -1372,20 +1372,20 @@ function MockHttpExpectation(method, url, data, headers) {
 
     this.matchUrl = function (u) {
         if (!url) return true;
-        if (angular.isFunction(url.test)) return url.test(u);
+        if (Utilities.isFunction(url.test)) return url.test(u);
         return url == u;
     };
 
     this.matchHeaders = function (h) {
         if (Utilities.isUndefined(headers)) return true;
-        if (angular.isFunction(headers)) return headers(h);
+        if (Utilities.isFunction(headers)) return headers(h);
         return Utilities.equals(headers, h);
     };
 
     this.matchData = function (d) {
         if (Utilities.isUndefined(data)) return true;
-        if (data && angular.isFunction(data.test)) return data.test(d);
-        if (data && !Utilities.isString(data)) return angular.toJson(data) == d;
+        if (data && Utilities.isFunction(data.test)) return data.test(d);
+        if (data && !Utilities.isString(data)) return Utilities.toJson(data) == d;
         return data == d;
     };
 
@@ -1484,7 +1484,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
 
     function formatPendingTasksAsString(tasks) {
         var result = [];
-        angular.forEach(tasks, function (task) {
+        Utilities.forEach(tasks, function (task) {
             result.push('{id: ' + task.id + ', ' + 'time: ' + task.time + '}');
         });
 
