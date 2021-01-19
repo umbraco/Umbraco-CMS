@@ -48,8 +48,8 @@
                                umb-auto-focus
                                focus-on-filled="true"
                                val-server-field="Name"
-                               required
-                               aria-required="true"
+                               ng-required="nameRequired != null ? nameRequired : true"
+                               aria-required="{{nameRequired != null ? nameRequired : true}}"
                                aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
                                autocomplete="off"
                                maxlength="255"/>

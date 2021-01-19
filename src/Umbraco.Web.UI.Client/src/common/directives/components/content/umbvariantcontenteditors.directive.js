@@ -38,6 +38,8 @@
         vm.selectAppAnchor = selectAppAnchor;
         vm.requestSplitView = requestSplitView;
 
+        vm.getScope = getScope;// used by property editors to get a scope that is the root of split view, content apps etc.
+
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
 
@@ -244,6 +246,10 @@
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
+        function getScope() {
+            return $scope;
+        }
+
     }
 
     angular.module('umbraco.directives').component('umbVariantContentEditors', umbVariantContentEditors);

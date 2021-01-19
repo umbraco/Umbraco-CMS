@@ -1,7 +1,11 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, overlayService) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource,
+        userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
+        usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
+
+        var currentLoggedInUser = null;
 
         var vm = this;
 
@@ -29,6 +33,7 @@
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
+        vm.editSelectedItem = editSelectedItem;
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
@@ -38,9 +43,12 @@
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
+        vm.allowGroupEdit = allowGroupEdit;
 
         vm.changePassword = changePassword;
         vm.toggleChangePassword = toggleChangePassword;
+
+        vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
 
         function init() {
 
@@ -168,7 +176,9 @@
                         extendedSave(saved).then(function (result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope });
-                        }, Utilities.noop);
+                        }, function () {
+                            formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        });
 
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -179,7 +189,7 @@
                         vm.page.saveButtonState = "success";
 
                     }, function (err) {
-
+                        formHelper.resetForm({ scope: $scope, hasErrors: true });
                         contentEditingHelper.handleSaveError({
                             err: err,
                             showNotifications: true
@@ -345,6 +355,21 @@
             }
         }
 
+        function editSelectedItem(index, selection) {
+            var group = selection[index];
+            const editor = {
+                id: group.id,
+                submit: function (model) {
+                    selection[index] = model;
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.userGroupEditor(editor);
+        }
+
         function removeSelectedItem(index, selection) {
             selection.splice(index, 1);
         }
@@ -437,8 +462,7 @@
 
         function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
-                formHelper.showNotifications(data);
-                goToPage(vm.breadcrumbs[0]);
+               goToPage(vm.breadcrumbs[0]);
             }, function (error) {
                 vm.deleteNotLoggedInUserButtonState = "error";
                 formHelper.showNotifications(error.data);
@@ -536,12 +560,24 @@
         function formatDatesToLocal(user) {
             // get current backoffice user and format dates
             userService.getCurrentUser().then(function (currentUser) {
+                currentLoggedInUser = currentUser;
+
                 user.formattedLastLogin = getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
                 user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
                 user.formattedCreateDate = getLocalDate(user.createDate, currentUser.locale, "LLL");
                 user.formattedUpdateDate = getLocalDate(user.updateDate, currentUser.locale, "LLL");
                 user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
             });
+        }
+
+        function allowGroupEdit(group) {
+            if (!currentLoggedInUser) {
+                return false;
+            }
+            if (currentLoggedInUser.userGroups.indexOf(group.alias) === -1 && currentLoggedInUser.userGroups.indexOf("admin") === -1) {
+                return false;
+            }
+            return true;
         }
 
         init();

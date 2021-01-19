@@ -20,7 +20,7 @@
                         <div class="umb-forms-settings form-horizontal">
 
                             <p>
-                                <localize key="grid_addGridLayoutDetail"/>
+                                <localize key="grid_addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</localize>
                             </p>
 
                             <umb-control-group label="@general_name">
@@ -33,17 +33,23 @@
                                 <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
                                     <div class="tr">
 
-                                        <a class="td uSky-templates-column"
+                                        <button type="button" class="btn-reset td uSky-templates-column"
                                            ng-class="{last:$last, selected:section==currentSection}"
                                            ng-repeat="section in currentLayout.sections"
                                            ng-click="configureSection(section, currentLayout)"
                                            ng-style="{width: percentage(section.grid) +'%'}">
-                                        </a>
+                                           <span class="sr-only">
+                                            <localize key="grid_editGridLayout">Edit grid layout</localize>
+                                        </span>
+                                        </button>
 
-                                        <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
+                                        <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                                            ng-click="configureSection(undefined, currentLayout)"
                                            ng-style="{width: percentage(availableLayoutSpace) + '%'}">
-                                            <i class="icon icon-add"></i>
+                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                            <span class="sr-only">
+                                                <localize key="grid_addGridLayout">Add grid layout</localize>
+                                            </span>
                                         </a>
 
                                     </div>
@@ -102,27 +108,27 @@
                                                                       on-change="selectRow(currentSection, row)">
                                                         </umb-checkbox>
 
-                                                        <div
+                                                        <button
                                                             ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
-                                                            class="flex flex-auto cursor-pointer">
+                                                            class="btn-reset flex flex-auto">
 
-                                                            <div class="preview-rows columns" style="margin-top: auto;">
-                                                                <div class="preview-row">
-                                                                    <div class="preview-col"
+                                                            <span class="preview-rows columns" style="margin-top: auto;">
+                                                                <span class="preview-row">
+                                                                    <span class="preview-col"
                                                                          ng-class="{last:$last}"
                                                                          ng-repeat="area in row.areas"
                                                                          ng-style="{width: percentage(area.grid) + '%'}">
 
-                                                                        <div class="preview-cell"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                                        <span class="preview-cell"></span>
+                                                                    </span>
+                                                                </span>
+                                                            </span>
 
-                                                            <div>
+                                                            <span>
                                                                 {{row.name}}<br/>
                                                                 <small>{{row.areas.length}} cells</small>
-                                                            </div>
-                                                        </div>
+                                                            </span>
+                                                        </button>
 
                                                     </div>
 

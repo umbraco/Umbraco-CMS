@@ -151,7 +151,7 @@ h6.-black {
     }
 }
 
-.umb-property:last-of-type .umb-control-group {
+umb-property:last-of-type .umb-control-group {
     &::after {
         margin-top: 0px;
         height: 0;
@@ -208,6 +208,13 @@ h6.-black {
     .control-description {
         display: block;
         clear: both;
+        overflow-wrap: break-word;
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
 
@@ -221,6 +228,7 @@ h6.-black {
     padding-top: 5px;
     padding-bottom: 0;
     text-align: left;
+    margin-bottom: 5px;
 
     .control-label {
         width: auto;
@@ -230,7 +238,7 @@ h6.-black {
 
     .control-description {
         max-width:480px;// avoiding description becoming too wide when its placed on top of property.
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 }
 @media (max-width: 767px) {
@@ -238,9 +246,27 @@ h6.-black {
     .form-horizontal .umb-control-group .control-header {
         float: none;
         width: 100%;
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     }
     
-
+}
+.form-horizontal .umb-control-group.--label-on-top > .umb-el-wrap {
+    & > .control-header {
+        float: none;
+        width: 100%;
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    }
+    & > .controls {
+        margin-left: 0;
+    }
 }
 
 /* LABELS*/
@@ -272,6 +298,7 @@ label:not([for]) {
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
+    font-weight: 900;
 }
 
 .controls-row {

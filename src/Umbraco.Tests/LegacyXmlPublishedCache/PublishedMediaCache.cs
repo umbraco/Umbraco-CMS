@@ -28,7 +28,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// <remarks>
     /// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
     /// </remarks>
-    internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache
+    internal class PublishedMediaCache : PublishedCacheBase, IPublishedMediaCache2
     {
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
@@ -612,15 +612,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Media, id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Media, alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Media, key);
 
         public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {

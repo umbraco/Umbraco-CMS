@@ -19,19 +19,18 @@
 
                         <div class="umb-mediapicker-upload">
                             <div class="form-search">
-                                <i class="icon-search" aria-hidden="true"></i>
-                                <input type="text"
-                                    class="umb-search-field search-query -full-width-input"
-                                       ng-model="vm.searchOptions.filter"
-                                       localize="placeholder"
-                                       placeholder="@placeholders_search"
-                                       ng-change="vm.changeSearch()"
-                                       umb-auto-focus
-                                    no-dirty-check />
+                                <umb-search-filter
+                                    input-id="datatype-search"
+                                    model="vm.searchOptions.filter"
+                                    label-key="placeholders_search"
+                                    text="Type to search"
+                                    on-change="vm.changeSearch()"
+                                    css-class="w-100"
+                                    auto-focus="true">
+                                </umb-search-filter>
 
                                 <div class="form-search__toggle">
-                                    <umb-checkbox
-                                                  model="filterOptions.excludeSubFolders"
+                                    <umb-checkbox model="filterOptions.excludeSubFolders"
                                                   on-change="vm.toggle()"
                                                   text="Include subfolders in search"
                                                   label-key="general_excludeFromSubFolders">
@@ -40,8 +39,7 @@
                             </div>
 
                             <div class="upload-button">
-                                <umb-button
-                                            type="button"
+                                <umb-button type="button"
                                             label-key="general_upload"
                                             action="vm.upload()"
                                             disabled="lockedFolder"
@@ -67,7 +65,7 @@
                                                  on-layout-select="vm.selectLayout(layout)">
                             </umb-layout-selector>
                         </div>
-                       
+
                         <ul class="umb-breadcrumbs">
                             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                                 <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder()" ng-class="{'--current':path.length === 0}">

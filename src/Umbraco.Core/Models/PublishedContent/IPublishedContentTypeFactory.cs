@@ -1,5 +1,6 @@
 ﻿namespace Umbraco. Core.Models.PublishedContent
 {
+
     /// <summary>
     /// Creates published content types.
     /// </summary>

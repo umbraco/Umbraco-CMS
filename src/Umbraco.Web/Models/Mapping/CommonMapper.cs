@@ -49,18 +49,9 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
         {
-            // TODO: We can resolve the UmbracoContext from the IValueResolver options!
-            // OMG
-            if (HttpContext.Current != null && Composing.Current.UmbracoContext != null && Composing.Current.UmbracoContext.Security.CurrentUser != null
-                && Composing.Current.UmbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-            {
-                var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
-                var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
-
-                return contentTypeBasic;
-            }
-            //no access
-            return null;
+            var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
+            var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
+            return contentTypeBasic;
         }
 
         public string GetTreeNodeUrl<TController>(IContentBase source)

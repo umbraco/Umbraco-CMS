@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Represents a collection of property values.
     /// </summary>
@@ -167,6 +168,8 @@ namespace Umbraco.Core.Models
         /// Occurs when the collection changes.
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {

@@ -190,11 +190,18 @@ angular.module("umbraco.directives")
 
             var evts = [];
 
-            //listen for section changes
+            // Listen for section changes
             evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
                 if (args.key === "currentSection") {
                     //when the section changes disable all delete animations
                     scope.node.deleteAnimations = false;
+                }
+            }));
+
+            // Update tree icon if changed
+            evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {          
+                if (args.icon !== scope.node.icon && args.id === scope.node.id) {
+                    scope.node.icon = args.icon;
                 }
             }));
 

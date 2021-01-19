@@ -95,8 +95,6 @@ body.touch .umb-tree {
             position: relative;
             width: auto;
             height: auto;
-            margin: 0 5px 0 auto;
-            padding: 7px 5px;
             overflow: visible;
             clip: auto;
         }
@@ -157,6 +155,14 @@ body.touch .umb-tree {
         &-link {
             display: block;
         }
+
+        &-name {
+            display: flex;
+
+            &__text {
+                margin: 1px 0 0;
+            }
+        }
     }
 
     &-link {
@@ -170,7 +176,9 @@ body.touch .umb-tree {
 .umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class^="icon-"],
 .umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class*=" icon-"],
 .umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class^="icon-"],
-.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class*=" icon-"] {
+.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class*=" icon-"], 
+.umb-tree .umb-tree-node-checked > i[class^="icon-"],
+.umb-tree .umb-tree-node-checked > i[class*="icon-"] {
     font-family: 'icomoon' !important;
     color: @green !important;
 
@@ -185,11 +193,15 @@ body.touch .umb-tree {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
-    padding: 7px 5px;
     text-align: center;
-    margin: 0 5px 0 auto;
+    margin: 0 10px 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
+    transition: background-color 120ms;
+
+    .umb-button-ellipsis {
+        padding: 3px 5px;
+    }
 
     i {
         height: 5px !important;
@@ -205,7 +217,7 @@ body.touch .umb-tree {
     }
 
     &:hover {
-        background: rgba(255, 255, 255, .5);
+        background-color: rgba(255, 255, 255, .8);
 
         i {
             background: @ui-active-type-hover;
@@ -245,6 +257,7 @@ body.touch .umb-tree {
     > .umb-tree-item__inner > i.icon,
     > .umb-tree-item__inner > a {
         cursor: not-allowed;
+        opacity: 0.4;
     }
 }
 

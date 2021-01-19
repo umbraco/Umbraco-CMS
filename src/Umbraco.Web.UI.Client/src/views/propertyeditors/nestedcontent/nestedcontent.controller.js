@@ -22,18 +22,18 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
-        
-        clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
+
+        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
 
 
         function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
 
-            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property inside a NestedContent property.
+            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
 
                 for (var i = 0; i < prop.length; i++) {
@@ -44,13 +44,13 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
-        
-        clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
+
+        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
     }]);
 
     angular
@@ -65,7 +65,7 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
         var vm = this;
         var model = $scope.$parent.$parent.model;
@@ -130,7 +130,7 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
-                clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
             });
         }
 
@@ -167,8 +167,7 @@
             icon: 'trash',
             method: removeAllEntries,
             isDisabled: true
-        }
-
+        };
         // helper to force the current form into the dirty state
         function setDirty() {
             if ($scope.$parent.$parent.propertyForm) {
@@ -211,7 +210,7 @@
                 size: availableItems.length > 6 ? "medium" : "small",
                 availableItems: availableItems,
                 clickPasteItem: function (item) {
-                    if (item.type === "elementTypeArray") {
+                    if (Array.isArray(item.data)) {
                         _.each(item.data, function (entry) {
                             pasteFromClipboard(entry);
                         });
@@ -239,35 +238,29 @@
 
             dialog.pasteItems = [];
 
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
-            _.each(singleEntriesForPaste, function (entry) {
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            _.each(entriesForPaste, function (entry) {
                 dialog.pasteItems.push({
-                    type: "elementType",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
                 });
             });
 
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
-            _.each(arrayEntriesForPaste, function (entry) {
-                dialog.pasteItems.push({
-                    type: "elementTypeArray",
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
+            dialog.pasteItems.sort( (a, b) => {
+                return b.date - a.date
             });
 
             dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            dialog.hideHeader = dialog.pasteItems.length > 0;
 
             dialog.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
-                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
-                clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
                 dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                dialog.overlayMenu.hideHeader = false;
+                dialog.hideHeader = false;
             };
 
             if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
@@ -294,14 +287,22 @@
             return (vm.nodes.length > vm.minItems)
                 ? true
                 : model.config.contentTypes.length > 1;
-        }
+        };
 
         function deleteNode(idx) {
-            vm.nodes.splice(idx, 1);
+            var removed = vm.nodes.splice(idx, 1);
+
             setDirty();
+
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                serverValidationManager.removePropertyError(x.key, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
             updateModel();
             validate();
         };
+
         vm.requestDeleteNode = function (idx) {
             if (!vm.canDeleteNode(idx)) {
                 return;
@@ -351,7 +352,7 @@
                         item["$index"] = (idx + 1);
 
                         var newName = contentType.nameExp(item);
-                        if (newName && (newName = $.trim(newName))) {
+                        if (newName && (newName = newName.trim())) {
                             name = newName;
                         }
 
@@ -389,10 +390,11 @@
 
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "move",
             handle: '.umb-nested-content__header-bar',
             distance: 10,
@@ -440,6 +442,26 @@
         function clearNodeForCopy(clonedData) {
             delete clonedData.key;
             delete clonedData.$$hashKey;
+
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
         }
 
         vm.showCopy = clipboardService.isSupported();
@@ -449,7 +471,7 @@
 
             syncCurrentNode();
 
-            clipboardService.copy("elementType", node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
             $event.stopPropagation();
         }
 
@@ -460,8 +482,19 @@
                 return;
             }
 
+            newNode = clipboardService.parseContentForPaste(newNode, clipboardService.TYPES.ELEMENT_TYPE);
+
             // generate a new key.
             newNode.key = String.CreateGuid();
+
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    extendPropertyWithNCData(tab.properties[p]);
+                }
+            }
 
             vm.nodes.push(newNode);
             setDirty();
@@ -471,7 +504,7 @@
         }
 
         function checkAbilityToPasteContent() {
-            vm.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases) || clipboardService.hasEntriesOfType("elementTypeArray", contentTypeAliases);
+            vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
@@ -479,7 +512,8 @@
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper"
+            "Umbraco.ImageCropper",
+            "Umbraco.BlockList"
         ];
 
         // Initialize
@@ -572,6 +606,30 @@
             }
         }
 
+        function extendPropertyWithNCData(prop) {
+
+            if (prop.propertyAlias === undefined) {
+                // store the original alias before we change below, see notes
+                prop.propertyAlias = prop.alias;
+
+                // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                prop.alias = model.alias + "___" + prop.alias;
+            }
+
+            // TODO: Do we need to deal with this separately?
+            // Force validation to occur server side as this is the
+            // only way we can have consistency between mandatory and
+            // regex validation messages. Not ideal, but it works.
+            if(prop.ncMandatory === undefined) {
+                prop.ncMandatory = prop.validation.mandatory;
+                prop.validation = {
+                    mandatory: false,
+                    pattern: ""
+                };
+            }
+        }
+
         function createNode(scaffold, fromNcEntry) {
             var node = Utilities.copy(scaffold);
 
@@ -585,16 +643,7 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    prop.propertyAlias = prop.alias;
-                    prop.alias = model.alias + "___" + prop.alias;
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.ncMandatory = prop.validation.mandatory;
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
+                    extendPropertyWithNCData(prop);
 
                     if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
                         prop.value = fromNcEntry[prop.propertyAlias];
@@ -661,8 +710,8 @@
         ];
 
         this.$onInit = function () {
-            if (this.umbProperty) {
-                this.umbProperty.setPropertyActions(propertyActions);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
             }
         };
 

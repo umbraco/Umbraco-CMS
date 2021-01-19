@@ -171,7 +171,7 @@ angular.mock.$Browser.prototype = {
                 }
             }
         } else {
-            if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
+            if (!Utilities.equals(this.cookieHash, this.lastCookieHash)) {
                 this.lastCookieHash = Utilities.copy(this.cookieHash);
                 this.cookieHash = Utilities.copy(this.cookieHash);
             }
@@ -1377,15 +1377,15 @@ function MockHttpExpectation(method, url, data, headers) {
     };
 
     this.matchHeaders = function (h) {
-        if (angular.isUndefined(headers)) return true;
+        if (Utilities.isUndefined(headers)) return true;
         if (Utilities.isFunction(headers)) return headers(h);
-        return angular.equals(headers, h);
+        return Utilities.equals(headers, h);
     };
 
     this.matchData = function (d) {
-        if (angular.isUndefined(data)) return true;
+        if (Utilities.isUndefined(data)) return true;
         if (data && Utilities.isFunction(data.test)) return data.test(d);
-        if (data && !Utilities.isString(data)) return angular.toJson(data) == d;
+        if (data && !Utilities.isString(data)) return Utilities.toJson(data) == d;
         return data == d;
     };
 
@@ -1484,7 +1484,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
 
     function formatPendingTasksAsString(tasks) {
         var result = [];
-        angular.forEach(tasks, function (task) {
+        Utilities.forEach(tasks, function (task) {
             result.push('{id: ' + task.id + ', ' + 'time: ' + task.time + '}');
         });
 

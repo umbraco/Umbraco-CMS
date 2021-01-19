@@ -37,9 +37,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private LinkedNode<ContentNode> _root;
-        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
+
+        // We must keep separate dictionaries for by id and by alias because we track these in snapshot/layers
+        // and it is possible that the alias of a content type can be different for the same id in another layer
+        // whereas the GUID -> INT cross reference can never be different
+        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;       
         private readonly ConcurrentDictionary<string, LinkedNode<IPublishedContentType>> _contentTypesByAlias;
-        private readonly ConcurrentDictionary<Guid, int> _xmap;
+        private readonly ConcurrentDictionary<Guid, int> _contentTypeKeyToIdMap;
+        private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
 
         private readonly ILogger _logger;
         private BPlusTree<int, ContentNodeKit> _localDb;
@@ -73,7 +78,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _root = new LinkedNode<ContentNode>(new ContentNode(), 0);
             _contentTypesById = new ConcurrentDictionary<int, LinkedNode<IPublishedContentType>>();
             _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<IPublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
-            _xmap = new ConcurrentDictionary<Guid, int>();
+            _contentTypeKeyToIdMap = new ConcurrentDictionary<Guid, int>();
+            _contentKeyToIdMap = new ConcurrentDictionary<Guid, int>();
 
             _genObjs = new ConcurrentQueue<GenObj>();
             _genObj = null; // no initial gen exists
@@ -136,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
-            lock(_rlocko)
+            lock (_rlocko)
             {
                 // see SnapDictionary
                 try { }
@@ -152,7 +158,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _nextGen = true;
                     }
                 }
-            }           
+            }
         }
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
@@ -291,8 +297,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var type in types)
             {
-                SetValueLocked(_contentTypesById, type.Id, type);
-                SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                SetContentTypeLocked(type);
             }
         }
 
@@ -318,8 +323,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var type in index.Values)
             {
-                SetValueLocked(_contentTypesById, type.Id, type);
-                SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                SetContentTypeLocked(type);
             }
 
             foreach (var link in _contentNodes.Values)
@@ -354,8 +358,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // set all new content types
             foreach (var type in types)
             {
-                SetValueLocked(_contentTypesById, type.Id, type);
-                SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                SetContentTypeLocked(type);
             }
 
             // beware! at that point the cache is inconsistent,
@@ -419,8 +422,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // perform update of refreshed content types
             foreach (var type in refreshedTypesA)
             {
-                SetValueLocked(_contentTypesById, type.Id, type);
-                SetValueLocked(_contentTypesByAlias, type.Alias, type);
+                SetContentTypeLocked(type);
             }
 
             // perform update of content with refreshed content type - from the kits
@@ -638,7 +640,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 kit.Node.PreviousSiblingContentId = existing.PreviousSiblingContentId;
             }
 
-            _xmap[kit.Node.Uid] = kit.Node.Id;
+            _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
 
             return true;
         }
@@ -734,7 +736,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // this node becomes the previous node
                 previousNode = thisNode;
 
-                _xmap[kit.Node.Uid] = kit.Node.Id;
+                _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
@@ -757,7 +759,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             EnsureLocked();
 
             var ok = true;
-            
+
             ClearLocked(_contentNodes);
             ClearRootLocked();
 
@@ -778,7 +780,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                 AddTreeNodeLocked(kit.Node, parent);
 
-                _xmap[kit.Node.Uid] = kit.Node.Id;
+                _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
@@ -807,7 +809,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             EnsureLocked();
 
             var ok = true;
-            
+
             // get existing
             _contentNodes.TryGetValue(rootContentId, out var link);
             var existing = link?.Value;
@@ -833,7 +835,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                 AddTreeNodeLocked(kit.Node, parent);
 
-                _xmap[kit.Node.Uid] = kit.Node.Id;
+                _contentKeyToIdMap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
@@ -885,11 +887,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // This should never be null, all code that calls this method is null checking but we've seen
             // issues of null ref exceptions in issue reports so we'll double check here
             if (content == null) throw new ArgumentNullException(nameof(content));
-            
+
             SetValueLocked(_contentNodes, content.Id, null);
             if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
 
-            _xmap.TryRemove(content.Uid, out _);
+            _contentKeyToIdMap.TryRemove(content.Uid, out _);
 
             var id = content.FirstChildContentId;
             while (id > 0)
@@ -913,10 +915,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_contentNodes.TryGetValue(id, out var link))
             {
-                link = GetLinkedNodeGen(link, gen);                
+                link = GetLinkedNodeGen(link, gen);
                 if (link != null && link.Value != null)
                     return link;
-            }   
+            }
 
             throw new PanicException($"failed to get {description} with id={id}");
         }
@@ -929,13 +931,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (content.ParentContentId < 0)
             {
-                var root = GetLinkedNodeGen(_root, gen);                
+                var root = GetLinkedNodeGen(_root, gen);
                 return root;
             }
 
             if (_contentNodes.TryGetValue(content.ParentContentId, out var link))
                 link = GetLinkedNodeGen(link, gen);
-                
+
             return link;
         }
 
@@ -1154,6 +1156,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        private void SetContentTypeLocked(IPublishedContentType type)
+        {
+            SetValueLocked(_contentTypesById, type.Id, type);
+            SetValueLocked(_contentTypesByAlias, type.Alias, type);
+            // ensure the key/id map is accurate
+            if (type.TryGetKey(out var key))
+                _contentTypeKeyToIdMap[key] = type.Id;
+        }
+
         // set a node (just the node, not the tree)
         private void SetValueLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key, TValue value)
             where TValue : class
@@ -1211,14 +1222,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public ContentNode Get(Guid uid, long gen)
         {
-            return _xmap.TryGetValue(uid, out var id)
+            return _contentKeyToIdMap.TryGetValue(uid, out var id)
                 ? GetValue(_contentNodes, id, gen)
                 : null;
         }
 
         public IEnumerable<ContentNode> GetAtRoot(long gen)
         {
-            var root = GetLinkedNodeGen(_root, gen);            
+            var root = GetLinkedNodeGen(_root, gen);
             if (root == null)
                 yield break;
 
@@ -1274,13 +1285,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return GetValue(_contentTypesByAlias, alias, gen);
         }
 
+        public IPublishedContentType GetContentType(Guid key, long gen)
+        {
+            if (!_contentTypeKeyToIdMap.TryGetValue(key, out var id))
+                return null;
+            return GetContentType(id, gen);
+        }
+
         #endregion
 
         #region Snapshots
 
         public Snapshot CreateSnapshot()
         {
-            lock(_rlocko)
+            lock (_rlocko)
             {
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
@@ -1362,7 +1380,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _collectTask = null;
                 }
-            }, TaskContinuationOptions.ExecuteSynchronously);
+            },
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+            TaskScheduler.Default);
             // ReSharper restore InconsistentlySynchronizedField
 
             return task;
@@ -1604,6 +1626,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetContentType(alias, _gen);
+            }
+
+            public IPublishedContentType GetContentType(Guid key)
+            {
+                if (_gen < 0)
+                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                return _store.GetContentType(key, _gen);
             }
 
             // this code is here just so you don't try to implement it

@@ -208,7 +208,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 if (dto.EditData == null)
                 {
                     if (Debugger.IsAttached)
-                        throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                        throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
                     Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
@@ -235,7 +235,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 if (dto.PubData == null)
                 {
                     if (Debugger.IsAttached)
-                        throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
+                        throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
                     Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
@@ -274,7 +274,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private static ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
         {
             if (dto.EditData == null)
-                throw new Exception("No data for media " + dto.Id);
+                throw new InvalidOperationException("No data for media " + dto.Id);
 
             var nested = DeserializeNestedData(dto.EditData);
 
