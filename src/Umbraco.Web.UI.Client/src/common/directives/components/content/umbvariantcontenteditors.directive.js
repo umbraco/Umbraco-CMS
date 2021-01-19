@@ -70,7 +70,7 @@
         /** Allows us to deep watch whatever we want - executes on every digest cycle */
         function doCheck() {
             if (!Utilities.equals(vm.content.updateDate, prevContentDateUpdated)) {
-                setActiveCulture();
+                setActiveVariant();
                 prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             }
         }
