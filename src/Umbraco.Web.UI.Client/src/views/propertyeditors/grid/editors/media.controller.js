@@ -18,12 +18,12 @@ angular.module("umbraco")
         }
 
         $scope.setImage = function() {
-            var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
+            var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : null;
 
             var mediaPicker = {
                 startNodeId: startNodeId,
-                startNodeIsVirtual: startNodeId ? $scope.model.config.startNodeIsVirtual : undefined,
-                cropSize: $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined,
+                startNodeIsVirtual: startNodeId ? $scope.model.config.startNodeIsVirtual : null,
+                cropSize: $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : null,
                 showDetails: true,
                 disableFolderSelect: true,
                 onlyImages: true,
@@ -47,9 +47,7 @@ angular.module("umbraco")
                     updateControlValue(model.target);
                     editorService.close();
                 },
-                close: function () {
-                    editorService.close();
-                }
+                close: () => editorService.close()                
             };
 
             localizationService.localize('defaultdialogs_editSelectedMedia').then(value => {
