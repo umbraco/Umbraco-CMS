@@ -17,6 +17,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentTypeMapDefinition : IMapDefinition
     {
+        private readonly CommonMapper _commonMapper;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
@@ -25,10 +26,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
 
-        public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
+        public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
             ILogger logger)
         {
+            _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
@@ -121,6 +123,8 @@ namespace Umbraco.Web.Models.Mapping
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
             target.AllowCultureVariant = source.VariesByCulture();
+            target.AllowSegmentVariant = source.VariesBySegment();
+            target.ContentApps = _commonMapper.GetContentApps(source);
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
@@ -227,7 +231,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ValidationRegExp = source.Validation.Pattern;
             target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
-            
+            target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
+
             if (source.Id > 0)
                 target.Id = source.Id;
 
@@ -237,6 +242,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Alias = source.Alias;
             target.Description = source.Description;
             target.SortOrder = source.SortOrder;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // no MapAll - take care
@@ -333,11 +339,12 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(PropertyTypeBasic source, PropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -347,13 +354,15 @@ namespace Umbraco.Web.Models.Mapping
             target.Label = source.Label;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(MemberPropertyTypeBasic source, MemberPropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -366,6 +375,7 @@ namespace Umbraco.Web.Models.Mapping
             target.MemberCanViewProperty = source.MemberCanViewProperty;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
@@ -399,6 +409,7 @@ namespace Umbraco.Web.Models.Mapping
             if (!(target is IMemberType))
             {
                 target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+                target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
             }
 
             // handle property groups and property types

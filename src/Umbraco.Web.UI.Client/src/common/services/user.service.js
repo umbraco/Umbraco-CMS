@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $window, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -128,7 +128,7 @@ angular.module('umbraco.services')
         function setUserTimeoutInternal(newTimeout) {
 
             var asNumber = parseFloat(newTimeout);
-            if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
+            if (!isNaN(asNumber) && currentUser && Utilities.isNumber(asNumber)) {
                 currentUser.remainingAuthSeconds = newTimeout;
                 lastServerTimeoutSet = new Date();
             }
@@ -166,7 +166,7 @@ angular.module('umbraco.services')
             },
 
             /** Internal method to retry all request after sucessfull login */
-            _retryRequestQueue: function(success) {
+            _retryRequestQueue: function (success) {
                 retryRequestQueue(success)
             },
 
@@ -185,7 +185,23 @@ angular.module('umbraco.services')
             authenticate: function (login, password) {
 
                 return authResource.performLogin(login, password)
-                    .then(this.setAuthenticationSuccessful);
+                    .then(function (data) {
+
+                        // Check if user has a start node set.
+                        if (data.startContentIds.length === 0 && data.startMediaIds.length === 0) {
+                            var errorMsg = "User has no start-nodes";
+                            var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };
+                            eventsService.emit("app.notAuthenticated", result);
+                            // TODO: How does this make sense? How can you throw from a promise? Does this get caught by the rejection?
+                            // If so then return $q.reject should be used.
+                            throw result;
+                        }
+
+                        return data;
+
+                    }, function (err) {
+                        return $q.reject(err);
+                    }).then(this.setAuthenticationSuccessful);
             },
             setAuthenticationSuccessful: function (data) {
 
@@ -206,8 +222,14 @@ angular.module('umbraco.services')
                 return authResource.performLogout()
                     .then(function (data) {
                         userAuthExpired();
-                        //done!
-                        return null;
+
+                        if (data && data.signOutRedirectUrl) {
+                            $window.location.replace(data.signOutRedirectUrl);
+                        }
+                        else {
+                            //done!
+                            return null;
+                        }
                     });
             },
 
@@ -223,9 +245,9 @@ angular.module('umbraco.services')
                         setCurrentUser(data);
 
                         deferred.resolve(currentUser);
-                    }, function () {
+                    }, function (err) {
                         //it failed, so they are not logged in
-                        deferred.reject();
+                        deferred.reject(err);
                     });
 
                 return deferred.promise;
@@ -233,7 +255,7 @@ angular.module('umbraco.services')
 
             /** Returns the current user object in a promise  */
             getCurrentUser: function (args) {
-                
+
                 if (!currentUser) {
                     return authResource.getCurrentUser()
                         .then(function (data) {
@@ -248,9 +270,9 @@ angular.module('umbraco.services')
                             setCurrentUser(data);
 
                             return $q.when(currentUser);
-                        }, function () {
+                        }, function (err) {
                             //it failed, so they are not logged in
-                            return $q.reject(currentUser);
+                            return $q.reject(err);
                         });
 
                 }

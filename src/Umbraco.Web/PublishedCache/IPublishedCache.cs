@@ -7,6 +7,16 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
+    public interface IPublishedCache2 : IPublishedCache
+    {
+        /// <summary>
+        /// Gets a content type identified by its alias.
+        /// </summary>
+        /// <param name="key">The content type key.</param>
+        /// <returns>The content type, or null.</returns>
+        IPublishedContentType GetContentType(Guid key);
+    }
+
     /// <summary>
     /// Provides access to cached contents.
     /// </summary>

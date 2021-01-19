@@ -118,7 +118,7 @@ angular.module('umbraco')
         }
 
         function populate(data) {
-            if (angular.isArray(data)) {
+            if (Utilities.isArray(data)) {
                 _.each(data, function (item, i) {
                     $scope.add(item);
                 });

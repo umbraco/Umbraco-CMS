@@ -9,7 +9,7 @@
     'use strict';
 
     function tourService(eventsService, currentUserResource, $q, tourResource) {
-        
+
         var tours = [];
         var currentTour = null;
 
@@ -18,14 +18,16 @@
          */
         function registerAllTours() {
             tours = [];
-            return tourResource.getTours().then(function(tourFiles) {
-                angular.forEach(tourFiles, function (tourFile) {
-                    angular.forEach(tourFile.tours, function(newTour) {
+            return tourResource.getTours().then(function (tourFiles) {
+                Utilities.forEach(tourFiles, tourFile => {
+
+                    Utilities.forEach(tourFile.tours, newTour => {
                         validateTour(newTour);
                         validateTourRegistration(newTour);
-                        tours.push(newTour);    
+                        tours.push(newTour);
                     });
                 });
+
                 eventsService.emit("appState.tour.updatedTours", tours);
             });
         }
@@ -74,7 +76,7 @@
             tour.disabled = true;
             currentUserResource
                 .saveTourStatus({ alias: tour.alias, disabled: tour.disabled, completed: tour.completed }).then(
-                    function() {
+                    function () {
                         eventsService.emit("appState.tour.end", tour);
                         currentTour = null;
                         deferred.resolve(tour);
@@ -96,7 +98,7 @@
             tour.completed = true;
             currentUserResource
                 .saveTourStatus({ alias: tour.alias, disabled: tour.disabled, completed: tour.completed }).then(
-                    function() {
+                    function () {
                         eventsService.emit("appState.tour.complete", tour);
                         currentTour = null;
                         deferred.resolve(tour);
@@ -130,10 +132,10 @@
         function getGroupedTours() {
             var deferred = $q.defer();
             var tours = getTours();
-            setTourStatuses(tours).then(function() {
+            setTourStatuses(tours).then(function () {
                 var groupedTours = [];
                 tours.forEach(function (item) {
-                    
+
                     if (item.contentType === null || item.contentType === '') {
                         var groupExists = false;
                         var newGroup = {
@@ -149,9 +151,9 @@
                                 }
                                 groupExists = true;
 
-                            if(item.hidden === false){
-                                group.tours.push(item);
-                            }
+                                if (item.hidden === false) {
+                                    group.tours.push(item);
+                                }
                             }
                         });
 
@@ -162,7 +164,7 @@
                                 newGroup.groupOrder = item.groupOrder;
                             }
 
-                            if(item.hidden === false){
+                            if (item.hidden === false) {
                                 newGroup.tours.push(item);
                                 groupedTours.push(newGroup);
                             }
@@ -242,14 +244,14 @@
                 throw "Tour " + tour.alias + " is missing the required sections";
             }
         }
-        
+
         /**
          * Validates a tour before it gets registered in the service
          * @param {any} tour
          */
         function validateTourRegistration(tour) {
             // check for existing tours with the same alias
-            angular.forEach(tours, function (existingTour) {
+            Utilities.forEach(tours, existingTour => {
                 if (existingTour.alias === tour.alias) {
                     throw "A tour with the alias " + tour.alias + " is already registered";
                 }
@@ -265,16 +267,17 @@
             var deferred = $q.defer();
             currentUserResource.getTours().then(function (storedTours) {
 
-                angular.forEach(storedTours, function (storedTour) {
+                Utilities.forEach(storedTours, storedTour => {
+
                     if (storedTour.completed === true) {
-                        angular.forEach(tours, function (tour) {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.completed = true;
                             }
                         });
                     }
                     if (storedTour.disabled === true) {
-                        angular.forEach(tours, function (tour) {
+                        Utilities.forEach(tours, tour => {
                             if (storedTour.alias === tour.alias) {
                                 tour.disabled = true;
                             }
@@ -296,7 +299,7 @@
             getCurrentTour: getCurrentTour,
             getGroupedTours: getGroupedTours,
             getTourByAlias: getTourByAlias,
-            getToursForDoctype : getToursForDoctype
+            getToursForDoctype: getToursForDoctype
         };
 
         return service;

@@ -3,16 +3,19 @@
  * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
  * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
  * @param {any} $scope
+ * @param {any} $q
+ * @param {any} $routeParams
+ * @param {any} $location
  * @param {any} entityResource
  * @param {any} editorState
  * @param {any} iconHelper
- * @param {any} $routeParams
  * @param {any} angularHelper
  * @param {any} navigationService
- * @param {any} $location
  * @param {any} localizationService
+ * @param {any} editorService
+ * @param {any} userService
  */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
+function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService, overlayService) {
 
     var vm = {
         labels: {
@@ -113,6 +116,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
     };
 
+    var removeAllEntriesAction = {
+        labelKey: 'clipboard_labelForRemoveAllEntries',
+        labelTokens: [],
+        icon: 'trash',
+        method: removeAllEntries,
+        isDisabled: true
+    };
+
     if ($scope.model.config) {
         //special case, if the `startNode` is falsy on the server config delete it entirely so the default value is merged in
         if (!$scope.model.config.startNode) {
@@ -125,6 +136,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         // that way the minCount/maxCount validation handles the mandatory as well
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
+        }
+        
+        if ($scope.model.config.multiPicker === true && $scope.umbProperty) {
+            var propertyActions = [
+                removeAllEntriesAction
+            ];
+
+            $scope.umbProperty.setPropertyActions(propertyActions);
         }
     }
 
@@ -139,7 +158,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    $scope.allowOpenButton = entityType === "Document";
+    
+    $scope.allowOpenButton = false;
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
@@ -152,7 +172,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dataTypeKey: $scope.model.dataTypeKey,
         currentNode: editorState ? editorState.current : null,
         callback: function (data) {
-            if (angular.isArray(data)) {
+            if (Utilities.isArray(data)) {
                 _.each(data, function (item, i) {
                     $scope.add(item);
                 });
@@ -233,7 +253,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.currentPicker = dialogOptions;
 
         $scope.currentPicker.submit = function (model) {
-            if (angular.isArray(model.selection)) {
+            if (Utilities.isArray(model.selection)) {
                 _.each(model.selection, function (item, i) {
                     $scope.add(item);
                 });
@@ -271,6 +291,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             angularHelper.getCurrentForm($scope).$setDirty();
             $scope.model.value = currIds.join();
         }
+
+        removeAllEntriesAction.isDisabled = currIds.length === 0;
     };
 
     $scope.showNode = function (index) {
@@ -297,22 +319,33 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             currIds.push(itemId);
             $scope.model.value = currIds.join();
         }
+
+        removeAllEntriesAction.isDisabled = false;
     };
 
     $scope.clear = function () {
         $scope.model.value = null;
+        removeAllEntriesAction.isDisabled = true;
     };
 
-    $scope.openContentEditor = function (node) {
-        var contentEditor = {
-            id: node.id,
+    $scope.openEditor = function (item) {
+        var editor = {
+            id: entityType === "Member" ? item.key : item.id,
             submit: function (model) {
+
+                var node = entityType === "Member" ? model.memberNode :
+                           entityType === "Media" ? model.mediaNode :
+                                                    model.contentNode;
+                
                 // update the node
-                node.name = model.contentNode.name;
-                node.published = model.contentNode.hasPublishedVersion;
+                item.name = node.name;
+
                 if (entityType !== "Member") {
-                    entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                        node.url = data;
+                    if (entityType === "Document") {
+                        item.published = node.hasPublishedVersion;
+                    }
+                    entityResource.getUrl(node.id, entityType).then(function (data) {
+                        item.url = data;
                     });
                 }
                 editorService.close();
@@ -321,7 +354,18 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 editorService.close();
             }
         };
-        editorService.contentEditor(contentEditor);
+
+        switch (entityType) {
+            case "Document":
+                editorService.contentEditor(editor);
+                break;
+            case "Media":
+                editorService.mediaEditor(editor);
+                break;
+            case "Member":
+                editorService.memberEditor(editor);
+                break;
+        }
     };
 
     //when the scope is destroyed we need to unsubscribe
@@ -338,6 +382,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
         //sync the sortable model
         $scope.sortableModel = valueIds;
+
+        removeAllEntriesAction.isDisabled = valueIds.length === 0;
 
         //load current data if anything selected
         if (valueIds.length > 0) {
@@ -423,7 +469,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         if (entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function (data) {
                 // update url
-                angular.forEach($scope.renderModel, function (item) {
+                $scope.renderModel.forEach(function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = vm.labels.general_recycleBin;
@@ -466,6 +512,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
+            "key": item.key,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct
@@ -483,7 +530,43 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
     }
 
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+            overlayService.confirmDelete({
+                title: data[1],
+                content: data[0],
+                close: function () {
+                    overlayService.close();
+                },
+                submit: function () {
+                    $scope.clear();
+                    overlayService.close();
+                }
+            });
+        });
+    }
+
     function init() {
+        
+        userService.getCurrentUser().then(function (user) {
+            switch (entityType) {
+                case "Document":
+                    var hasAccessToContent = user.allowedSections.indexOf("content") !== -1;
+                    $scope.allowOpenButton = hasAccessToContent;
+                    break;
+                case "Media":
+                    var hasAccessToMedia = user.allowedSections.indexOf("media") !== -1;
+                    $scope.allowOpenButton = hasAccessToMedia;
+                    break;
+                case "Member":
+                    var hasAccessToMember = user.allowedSections.indexOf("member") !== -1;
+                    $scope.allowOpenButton = hasAccessToMember;
+                    break;
+
+                default:
+            }
+        });
+
         localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];

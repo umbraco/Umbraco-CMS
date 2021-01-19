@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $injector, eventsService, umbModelMapper, treeService, appState, backdropService) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -26,60 +26,63 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         navReadyPromise.resolve(mainTreeApi);
     });
 
-    
+    eventsService.on('appState.backdrop', function(e, args){
+        var element = $(args.element);
+        element.addClass('above-backdrop');
+    });
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture", "lq", "sr"];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
     var retainedQueryStrings = ["mculture"];
-    
+
     function setMode(mode) {
         switch (mode) {
-        case 'tree':
-            appState.setGlobalState("navMode", "tree");
-            appState.setGlobalState("showNavigation", true);
-            appState.setMenuState("showMenu", false);
-            appState.setMenuState("showMenuDialog", false);
-            appState.setGlobalState("stickyNavigation", false);
-            appState.setGlobalState("showTray", false);
-            break;
-        case 'menu':
-            appState.setGlobalState("navMode", "menu");
-            appState.setGlobalState("showNavigation", true);
-            appState.setMenuState("showMenu", true);
-            appState.setMenuState("showMenuDialog", false);
-            appState.setGlobalState("stickyNavigation", true);
-            break;
-        case 'dialog':
-            appState.setGlobalState("navMode", "dialog");
-            appState.setGlobalState("stickyNavigation", true);
-            appState.setGlobalState("showNavigation", true);
-            appState.setMenuState("showMenu", false);
-            appState.setMenuState("showMenuDialog", true);
-            appState.setMenuState("allowHideMenuDialog", true);
-            break;
-        case 'search':
-            appState.setGlobalState("navMode", "search");
-            appState.setGlobalState("stickyNavigation", false);
-            appState.setGlobalState("showNavigation", true);
-            appState.setMenuState("showMenu", false);
-            appState.setSectionState("showSearchResults", true);
-            appState.setMenuState("showMenuDialog", false);
-            break;
-        default:
-            appState.setGlobalState("navMode", "default");
-            appState.setMenuState("showMenu", false);
-            appState.setMenuState("showMenuDialog", false);
-            appState.setMenuState("allowHideMenuDialog", true);
-            appState.setSectionState("showSearchResults", false);
-            appState.setGlobalState("stickyNavigation", false);
-            appState.setGlobalState("showTray", false);
-			appState.setMenuState("currentNode", null);
+            case 'tree':
+                appState.setGlobalState("navMode", "tree");
+                appState.setGlobalState("showNavigation", true);
+                appState.setMenuState("showMenu", false);
+                appState.setMenuState("showMenuDialog", false);
+                appState.setGlobalState("stickyNavigation", false);
+                appState.setGlobalState("showTray", false);
+                break;
+            case 'menu':
+                appState.setGlobalState("navMode", "menu");
+                appState.setGlobalState("showNavigation", true);
+                appState.setMenuState("showMenu", true);
+                appState.setMenuState("showMenuDialog", false);
+                appState.setGlobalState("stickyNavigation", true);
+                break;
+            case 'dialog':
+                appState.setGlobalState("navMode", "dialog");
+                appState.setGlobalState("stickyNavigation", true);
+                appState.setGlobalState("showNavigation", true);
+                appState.setMenuState("showMenu", false);
+                appState.setMenuState("showMenuDialog", true);
+                appState.setMenuState("allowHideMenuDialog", true);
+                break;
+            case 'search':
+                appState.setGlobalState("navMode", "search");
+                appState.setGlobalState("stickyNavigation", false);
+                appState.setGlobalState("showNavigation", true);
+                appState.setMenuState("showMenu", false);
+                appState.setSectionState("showSearchResults", true);
+                appState.setMenuState("showMenuDialog", false);
+                break;
+            default:
+                appState.setGlobalState("navMode", "default");
+                appState.setMenuState("showMenu", false);
+                appState.setMenuState("showMenuDialog", false);
+                appState.setMenuState("allowHideMenuDialog", true);
+                appState.setSectionState("showSearchResults", false);
+                appState.setGlobalState("stickyNavigation", false);
+                appState.setGlobalState("showTray", false);
+                appState.setMenuState("currentNode", null);
 
-            if (appState.getGlobalState("isTablet") === true) {
-                appState.setGlobalState("showNavigation", false);
-            }
+                if (appState.getGlobalState("isTablet") === true) {
+                    appState.setGlobalState("showNavigation", false);
+                }
 
-            break;
+                break;
         }
     }
 
@@ -88,7 +91,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
      * @param {any} requestPath
      */
     function pathToRouteParts(requestPath) {
-        if (!angular.isString(requestPath)) {
+        if (!Utilities.isString(requestPath)) {
             throw "The value for requestPath is not a string";
         }
         var pathAndQuery = requestPath.split("#")[1];
@@ -113,8 +116,26 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         }
     }
 
+    function closeBackdrop() {
+        var aboveClass = 'above-backdrop';
+        var leftColumn = $('#leftcolumn');
+        var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
+
+        if(isLeftColumnOnTop){
+            backdropService.close();
+            leftColumn.removeClass(aboveClass);
+        }
+    }
+
+    function showBackdrop() {
+        var backDropOptions = {
+            'element': $('#leftcolumn')[0]
+        };
+        backdropService.open(backDropOptions);
+    }
+
     var service = {
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#isRouteChangingNavigation
@@ -130,11 +151,11 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          */
         isRouteChangingNavigation: function (currUrlParams, nextUrlParams) {
 
-            if (angular.isString(currUrlParams)) {
+            if (Utilities.isString(currUrlParams)) {
                 currUrlParams = pathToRouteParts(currUrlParams);
             }
 
-            if (angular.isString(nextUrlParams)) {
+            if (Utilities.isString(nextUrlParams)) {
                 nextUrlParams = pathToRouteParts(nextUrlParams);
             }
 
@@ -151,11 +172,11 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var nextRoutingKeys = _.difference(_.keys(nextUrlParams), nonRoutingQueryStrings);
             var diff1 = _.difference(currRoutingKeys, nextRoutingKeys);
             var diff2 = _.difference(nextRoutingKeys, currRoutingKeys);
-            
+
             //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
             if (diff1.length === 0 && diff2.length === 0) {
                 var partsChanged = 0;
-                _.each(currRoutingKeys, function (k) {
+                currRoutingKeys.forEach(k => {
                     if (currUrlParams[k] != nextUrlParams[k]) {
                         partsChanged++;
                     }
@@ -192,7 +213,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
-            _.each(toRetain, function (k) {
+
+            toRetain.forEach(k => {
                 if (currentSearch[k]) {
                     $location.search(k, currentSearch[k]);
                 }
@@ -223,10 +245,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * @param {Object} nextRouteParams The next route parameters
          */
         retainQueryStrings: function (currRouteParams, nextRouteParams) {
-            var toRetain = angular.copy(nextRouteParams);
+            var toRetain = Utilities.copy(nextRouteParams);
             var updated = false;
 
-            _.each(retainedQueryStrings, function (r) {
+            retainedQueryStrings.forEach(r => {
                 // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
                 if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
@@ -260,7 +282,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * and load the dashboard related to the section
          * @param {string} sectionAlias The alias of the section
          */
-        changeSection: function(sectionAlias, force) {
+        changeSection: function (sectionAlias, force) {
             setMode("default-opensection");
 
             if (force && appState.getSectionState("currentSection") === sectionAlias) {
@@ -360,19 +382,19 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
             TODO: Delete this if not required
         */
-        _syncPath: function(path, forceReload) {
+        _syncPath: function (path, forceReload) {
             return navReadyPromise.promise.then(function () {
                 return mainTreeApi.syncTree({ path: path, forceReload: forceReload });
             });
         },
-        
-        reloadNode: function(node) {
+
+        reloadNode: function (node) {
             return navReadyPromise.promise.then(function () {
                 return mainTreeApi.reloadNode(node);
             });
         },
-        
-        reloadSection: function(sectionAlias) {
+
+        reloadSection: function (sectionAlias) {
             return navReadyPromise.promise.then(function () {
                 treeService.clearCache({ section: sectionAlias });
                 return mainTreeApi.load(sectionAlias);
@@ -387,11 +409,11 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * @description
          * Hides the tree by hiding the containing dom element
          */
-        hideTree: function() {
+        hideTree: function () {
 
             if (appState.getGlobalState("isTablet") === true && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
-				appState.setSectionState("currentSection", $routeParams.section);
+                appState.setSectionState("currentSection", $routeParams.section);
 
                 setMode("default-hidesectiontree");
             }
@@ -409,19 +431,18 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          *
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
-        showMenu: function(args) {
-            
+        showMenu: function (args) {
             var self = this;
 
             return treeService.getMenu({ treeNode: args.node })
-                .then(function(data) {
-
+                .then(function (data) {
+                    showBackdrop();
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
                     if (data.defaultAlias && !args.skipDefault) {
 
-                        var found = _.find(data.menuItems, function(item) {
+                        var found = _.find(data.menuItems, function (item) {
                             return item.alias = data.defaultAlias;
                         });
 
@@ -450,7 +471,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
                     return $q.resolve();
                 });
-            
+
         },
 
         /**
@@ -461,11 +482,12 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * @description
          * Hides the menu by hiding the containing dom element
          */
-        hideMenu: function() {
+        hideMenu: function () {
             //SD: Would we ever want to access the last action'd node instead of clearing it here?
             appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
+            closeBackdrop();
         },
 
         /** Executes a given menu action */
@@ -483,14 +505,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
             appState.setMenuState("currentNode", node);
 
-            if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
+            if (action.metaData && action.metaData["actionRoute"] && Utilities.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
                 $location.path(parts[0]).search(parts.length > 1 ? parts[1] : "");
                 this.hideNavigation();
                 return;
             }
-            else if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
+            else if (action.metaData && action.metaData["jsAction"] && Utilities.isString(action.metaData["jsAction"])) {
 
                 //we'll try to get the jsAction from the injector
                 var menuAction = action.metaData["jsAction"].split('.');
@@ -525,6 +547,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 }
             }
             else {
+                showBackdrop();
                 service.showDialog({
                     node: node,
                     action: action,
@@ -532,7 +555,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 });
             }
         },
-        
+
 
         /**
          * @ngdoc method
@@ -553,7 +576,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * @param {Scope} args.scope current scope passed to the dialog
          * @param {Object} args.action the clicked action containing `name` and `alias`
          */
-        showDialog: function(args) {
+        showDialog: function (args) {
 
             if (!args) {
                 throw "showDialog is missing the args parameter";
@@ -578,20 +601,20 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (args.action.metaData["actionView"]) {
                 templateUrl = args.action.metaData["actionView"];
             }
-            else {                
+            else {
                 var treeAlias = treeService.getTreeAlias(args.node);
                 if (!treeAlias) {
                     throw "Could not get tree alias for node " + args.node.id;
-                }                            
+                }
                 templateUrl = this.getTreeTemplateUrl(treeAlias, args.action.alias);
             }
 
             setMode("dialog");
 
-            if(templateUrl) {
+            if (templateUrl) {
                 appState.setMenuState("dialogTemplateUrl", templateUrl);
             }
-            
+
         },
         /**
           * @ngdoc method
@@ -607,7 +630,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
           * for example: /App_Plugins/{mypackage}/backoffice/{treetype}/create.html
           */
-        getTreeTemplateUrl: function(treeAlias, action) {
+        getTreeTemplateUrl: function (treeAlias, action) {
             var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
             if (packageTreeFolder) {
                 return Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
@@ -650,6 +673,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (showMenu) {
                 this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             } else {
+                closeBackdrop();
                 setMode("default");
             }
         },
@@ -661,7 +685,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * @description
           * shows the search pane
           */
-        showSearch: function() {
+        showSearch: function () {
             setMode("search");
         },
         /**
@@ -672,7 +696,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * @description
           * hides the search pane
         */
-        hideSearch: function() {
+        hideSearch: function () {
             setMode("default-hidesearch");
         },
         /**
@@ -683,8 +707,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * @description
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
-        hideNavigation: function() {
+        hideNavigation: function () {
             appState.setMenuState("menuActions", []);
+            closeBackdrop();
             setMode("default");
         }
     };

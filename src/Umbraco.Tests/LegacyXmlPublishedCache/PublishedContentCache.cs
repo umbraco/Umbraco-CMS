@@ -14,7 +14,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
-    internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
+    internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache2
     {
         private readonly IAppCache _appCache;
         private readonly IGlobalSettings _globalSettings;
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             // so we have a route that maps to a content... say "1234/path/to/content" - however, there could be a
             // domain set on "to" and route "4567/content" would also map to the same content - and due to how
-            // urls computing work (by walking the tree up to the first domain we find) it is that second route
+            // URLs computing work (by walking the tree up to the first domain we find) it is that second route
             // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
             // longer one - so make sure we don't cache the wrong route
 
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             if (node == null) return null;
 
             // walk up from that node until we hit a node with a domain,
-            // or we reach the content root, collecting urls in the way
+            // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
             var n = node;
             var hasDomains = _domainCache.HasAssigned(n.Id);
@@ -532,15 +532,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Content, id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Content, id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Content, alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Content, alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Content, key);
 
         #endregion
     }

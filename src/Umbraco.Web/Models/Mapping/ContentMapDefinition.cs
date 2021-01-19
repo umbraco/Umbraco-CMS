@@ -52,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(localizedTextService);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
-            _contentVariantMapper = new ContentVariantMapper(_localizationService);
+            _contentVariantMapper = new ContentVariantMapper(_localizationService, localizedTextService);
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -76,6 +76,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
+            target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
@@ -104,7 +105,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentDto.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Segment -Language
+        // Umbraco.Code.MapAll -Segment -Language -DisplayName
         private void Map(IContent source, ContentVariantDisplay target, MapperContext context)
         {
             target.CreateDate = source.CreateDate;
@@ -172,7 +173,7 @@ namespace Umbraco.Web.Models.Mapping
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null
-                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
+                ? new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") }
                 : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _logger).ToArray();
 
             return urls;

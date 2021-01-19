@@ -45,8 +45,11 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (string.IsNullOrEmpty(asString)) yield break;
 
-                if (Udi.TryParse(asString, out var udi))
-                    yield return new UmbracoEntityReference(udi);
+                foreach (var udiStr in asString.Split(','))
+                {
+                    if (Udi.TryParse(udiStr, out var udi))
+                        yield return new UmbracoEntityReference(udi);
+                }
             }
         }
     }

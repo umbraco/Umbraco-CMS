@@ -80,6 +80,10 @@ body.umb-drawer-is-visible #mainwrapper{
   float: left;
   position: absolute;
   top: 0;
+
+  &.above-backdrop{
+      z-index: 7501;
+  }
 }
 
 #navigation {
@@ -167,13 +171,13 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 @media (min-width: 1101px) {
-  #contentwrapper, #speechbubble {left: 360px;}
-  .emptySection #contentwrapper {left:0px;}
+  #contentwrapper, #speechbubble { left: 360px; } 
+  .emptySection #contentwrapper { left: 0 !important; }
 }
 
 //empty section modification
-.emptySection #speechbubble {left: 0;}
-.emptySection #navigation {display: none}
+.emptySection #speechbubble { left: 0; }
+.emptySection #navigation { display: none }
 
 .login-only #speechbubble {
     z-index: 10000;

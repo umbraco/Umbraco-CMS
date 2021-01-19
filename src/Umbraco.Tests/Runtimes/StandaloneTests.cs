@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Runtimes
             coreRuntime.Compose(composition);
 
             // determine actual runtime level
-            runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
+            runtimeState.DetermineRuntimeLevel(databaseFactory);
             Console.WriteLine(runtimeState.Level);
             // going to be Install BUT we want to force components to be there (nucache etc)
             runtimeState.Level = RuntimeLevel.Run;
@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", pcontent.Name());
             Assert.IsTrue(pcontent.IsDraft());
 
-            // no published url
+            // no published URL
             Assert.AreEqual("#", pcontent.Url());
 
             // now publish the document + make some unpublished changes
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", pcontent.Name());
             Assert.IsFalse(pcontent.IsDraft());
 
-            // but the url is the published one - no draft url
+            // but the URL is the published one - no draft URL
             Assert.AreEqual("/test/", pcontent.Url());
 
             // and also an updated draft document
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("testx", pcontent.Name());
             Assert.IsTrue(pcontent.IsDraft());
 
-            // and the published document has a url
+            // and the published document has a URL
             Assert.AreEqual("/test/", pcontent.Url());
 
             umbracoContextReference.Dispose();

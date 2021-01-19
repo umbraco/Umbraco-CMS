@@ -1,5 +1,6 @@
-<div>
+<div class="umb-tags-editor">
     <ng-form name="vm.tagEditorForm">
+
         <div ng-if="vm.isLoading">
             <localize key="loading">Loading</localize>...
         </div>
@@ -26,6 +27,8 @@
                    ng-model="vm.tagToAdd"
                    ng-keydown="vm.addTagOnEnter($event)"
                    ng-blur="vm.addTag()"
+                   ng-maxlength="200"
+                   maxlength="200"
                    localize="placeholder"
                    placeholder="@placeholders_enterTags" />
 

@@ -29,6 +29,7 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.SortOrder), nameof(PropertyTypeDto.SortOrder));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExp), nameof(PropertyTypeDto.ValidationRegExp));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExpMessage), nameof(PropertyTypeDto.ValidationRegExpMessage));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.LabelOnTop), nameof(PropertyTypeDto.LabelOnTop));
             DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.PropertyEditorAlias), nameof(DataTypeDto.EditorAlias));
             DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.ValueStorageType), nameof(DataTypeDto.DbType));
         }

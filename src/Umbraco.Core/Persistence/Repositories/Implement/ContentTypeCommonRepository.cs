@@ -303,7 +303,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 SortOrder = dto.SortOrder,
                 ValidationRegExp = dto.ValidationRegExp,
                 ValidationRegExpMessage = dto.ValidationRegExpMessage,
-                Variations = (ContentVariation)dto.Variations
+                Variations = (ContentVariation)dto.Variations,
+                LabelOnTop = dto.LabelOnTop
             };
         }
     }

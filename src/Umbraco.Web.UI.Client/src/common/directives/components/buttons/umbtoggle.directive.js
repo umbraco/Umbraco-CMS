@@ -78,7 +78,8 @@
                 scope.inputId = scope.inputId || "umb-toggle_" + String.CreateGuid();
 
                 setLabelText();
-                // must wait until the current digest cycle is finished before we emit this event on init, 
+
+                // Must wait until the current digest cycle is finished before we emit this event on init, 
                 // otherwise other property editors might not yet be ready to receive the event
                 $timeout(function () {
                     eventsService.emit("toggleValue", { value: scope.checked });
@@ -86,22 +87,28 @@
             }
 
             function setLabelText() {
-
-                // set default label for "on"
+                
                 if (scope.labelOn) {
                     scope.displayLabelOn = scope.labelOn;
-                } else {
-                    localizationService.localize("general_on").then(function (value) {
-                        scope.displayLabelOn = value;
-                    });
                 }
-
-                // set default label for "Off"
+                
                 if (scope.labelOff) {
                     scope.displayLabelOff = scope.labelOff;
-                } else {
-                    localizationService.localize("general_off").then(function (value) {
-                        scope.displayLabelOff = value;
+                }
+
+                if (scope.displayLabelOn.length === 0 && scope.displayLabelOff.length === 0)
+                {
+                    var labelKeys = [
+                        "general_on",
+                        "general_off"
+                    ];
+
+                    localizationService.localizeMany(labelKeys).then(function (data) {
+                        // Set default label for "On"
+                        scope.displayLabelOn = data[0];
+
+                        // Set default label for "Off"
+                        scope.displayLabelOff = data[1];
                     });
                 }
 
@@ -115,7 +122,6 @@
             };
 
             onInit();
-
         }
 
         var directive = {

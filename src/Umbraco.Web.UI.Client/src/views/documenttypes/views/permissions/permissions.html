@@ -43,8 +43,8 @@
             <div class="sub-view-columns">
 
                 <div class="sub-view-column-left">
-                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
-                    <small><localize key="contentTypeEditor_variantsDescription" /></small>
+                    <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>
+                    <small><localize key="contentTypeEditor_cultureVariantDescription" /></small>
                 </div>
 
                 <div class="sub-view-column-right">
@@ -52,6 +52,23 @@
                                 checked="model.allowCultureVariant"
                                 on-click="vm.toggleAllowCultureVariants()"
                                 hotkey="alt+shift+v">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+
+            <div class="sub-view-columns" ng-if="vm.showAllowSegmentationOption">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_segmentVariantHeading" /></h5>
+                    <small><localize key="contentTypeEditor_segmentVariantDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowSegmentVariant"
+                                on-click="vm.toggleAllowSegmentVariants()">
                     </umb-toggle>
                 </div>
 

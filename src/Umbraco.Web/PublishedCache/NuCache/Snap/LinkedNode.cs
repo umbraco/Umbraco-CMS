@@ -11,7 +11,7 @@
     {
         public LinkedNode(TValue value, long gen, LinkedNode<TValue> next = null)
         {
-            Value = value;
+            Value = value; // This is allowed to be null, we actually explicitly set this to null in ClearLocked
             Gen = gen;
             Next = next;
         }

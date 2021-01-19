@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -858,7 +859,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            if (_publishedModelFactory.IsLiveFactory())
+            if (_publishedModelFactory.IsLiveFactoryEnabled())
             {
                 //In the case of Pure Live - we actually need to refresh all of the content and the media
                 //see https://github.com/umbraco/Umbraco-CMS/issues/5671
@@ -866,11 +867,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //into a new DLL for the application which includes both content types and media types.
                 //Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
                 //to use the newest version of the class.
+
+                // NOTE: Ideally this can be run on background threads here which would prevent blocking the UI
+                // as is the case when saving a content type. Intially one would think that it won't be any different
+                // between running this here or in another background thread immediately after with regards to how the
+                // UI will respond because we already know between calling `WithSafeLiveFactoryReset` to reset the PureLive models
+                // and this code here, that many front-end requests could be attempted to be processed. If that is the case, those pages are going to get a
+                // model binding error and our ModelBindingExceptionFilter is going to to its magic to reload those pages so the end user is none the wiser.
+                // So whether or not this executes 'here' or on a background thread immediately wouldn't seem to make any difference except that we can return
+                // execution to the UI sooner.
+                // BUT!... there is a difference IIRC. There is still execution logic that continues after this call on this thread with the cache refreshers
+                // and those cache refreshers need to have the up-to-date data since other user cache refreshers will be expecting the data to be 'live'. If
+                // we ran this on a background thread then those cache refreshers are going to not get 'live' data when they query the content cache which
+                // they require.
+
+                // These can be run side by side in parallel.
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
+                {
+                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                }
+
                 using (_mediaStore.GetScopedWriteLock(_scopeProvider))
                 {
-                    NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var draftChanged, out var publishedChanged);
-                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out var anythingChanged);
+                    NotifyLocked(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
                 }
             }
 

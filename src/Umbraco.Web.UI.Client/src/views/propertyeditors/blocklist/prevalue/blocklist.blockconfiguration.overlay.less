@@ -1,0 +1,100 @@
+.umb-block-list-block-configuration-overlay {
+
+
+    .umb-node-preview {
+        flex-grow: 1;
+    }
+
+    .__control-actions {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top:0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+    .control-group:hover,
+    .control-group:focus,
+    .control-group:focus-within {
+        .__control-actions {
+            opacity: 1;
+        }
+    }
+    .__control-actions-btn {
+        position: relative;
+        color: @ui-action-discreet-type;
+        height: 32px;
+        width: 26px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+        &:last-of-type {
+            margin-right: 7px;
+        }
+    }
+    
+    .umb-node-preview {
+        border-bottom: none;
+    }
+
+    .__settings-input {
+        position: relative;
+        padding: 5px 8px;
+        margin-bottom: 10px;
+        color: @ui-action-discreet-type;
+        border: 1px dashed @ui-action-discreet-border;
+        width: 100%;
+        font-weight: bold;
+        display: inline-flex;
+        flex-flow: row nowrap;
+
+        localize {
+            width: 100%;
+        }
+
+        .umb-node-preview {
+            padding: 3px 0;
+            margin-left: 5px;
+            overflow: hidden;
+        }
+
+        &.--noValue {
+            text-align: center;
+            border-radius: @baseBorderRadius;
+            color: white;
+            transition: color 120ms;
+            &:hover, &:focus {
+                color: @ui-action-discreet-type-hover;
+                border-color: @ui-action-discreet-border-hover;
+            }
+        }
+
+        &.--hasValue {
+            border: 1px solid @inputBorder;
+            padding: 0;
+        }
+    }
+
+    .__add-button {
+        width:100%;
+        color: @ui-action-discreet-type;
+        border: 1px dashed @ui-action-discreet-border;
+        border-radius: @baseBorderRadius;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 15px;
+        box-sizing: border-box;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+    
+    .__add-button:hover {
+        color: @ui-action-discreet-type-hover;
+        border-color: @ui-action-discreet-border-hover;
+    }
+
+}

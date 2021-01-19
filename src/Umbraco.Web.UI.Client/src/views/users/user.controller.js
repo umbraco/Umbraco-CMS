@@ -1,14 +1,18 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, overlayService) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource,
+        userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
+        usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
+
+        var currentLoggedInUser = null;
 
         var vm = this;
 
         vm.page = {};
         vm.page.rootIcon = "icon-folder";
         vm.user = {
-          changePassword: null
+            changePassword: null
         };
         vm.breadcrumbs = [];
         vm.showBackButton = true;
@@ -17,18 +21,19 @@
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
-        
+
         //create the initial model for change password
         vm.changePasswordModel = {
-          config: {},
-          isChanging: false,
-          value: {}
+            config: {},
+            isChanging: false,
+            value: {}
         };
 
         vm.goToPage = goToPage;
         vm.openUserGroupPicker = openUserGroupPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
+        vm.editSelectedItem = editSelectedItem;
         vm.removeSelectedItem = removeSelectedItem;
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
@@ -38,9 +43,12 @@
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
-        
+        vm.allowGroupEdit = allowGroupEdit;
+
         vm.changePassword = changePassword;
         vm.toggleChangePassword = toggleChangePassword;
+
+        vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
 
         function init() {
 
@@ -83,40 +91,40 @@
 
                 //go get the config for the membership provider and add it to the model
                 authResource.getMembershipProviderConfig().then(function (data) {
-                  vm.changePasswordModel.config = data;
+                    vm.changePasswordModel.config = data;
 
-                  //the user has a password if they are not states: Invited, NoCredentials
-                  vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+                    //the user has a password if they are not states: Invited, NoCredentials
+                    vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
 
-                  vm.changePasswordModel.config.disableToggle = true;
+                    vm.changePasswordModel.config.disableToggle = true;
 
-                  //this is only relavent for membership providers now (it's basically obsolete)
-                  vm.changePasswordModel.config.enableReset = false;
+                    //this is only relavent for membership providers now (it's basically obsolete)
+                    vm.changePasswordModel.config.enableReset = false;
 
-                  //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
-                  //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
-                  //the authorization check is also done on the server side when submitted.
-                    
-                  // only update the setting if not the current logged in user, otherwise leave the value as it is
-                  // currently set in the web.config
-                  if (!vm.user.isCurrentUser)
-                  {
-                      vm.changePasswordModel.config.allowManuallyChangingPassword = true;
-                  }
-                    
-                  vm.loading = false;
+                    //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
+                    //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
+                    //the authorization check is also done on the server side when submitted.
+
+                    // only update the setting if not the current logged in user, otherwise leave the value as it is
+                    // currently set in the web.config
+                    if (!vm.user.isCurrentUser) {
+                        vm.changePasswordModel.config.allowManuallyChangingPassword = true;
+                    }
+
+                    $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
+                    vm.loading = false;
                 });
             });
         }
-        
+
         function getLocalDate(date, culture, format) {
-            if(date) {
+            if (date) {
                 var dateVal;
                 var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
                 var localOffset = new Date().getTimezoneOffset();
                 var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
 
-                if(serverTimeNeedsOffsetting) {
+                if (serverTimeNeedsOffsetting) {
                     dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
                 } else {
                     dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
@@ -144,11 +152,11 @@
                         submit: model => {
                             overlayService.close();
                             vm.changePasswordModel.value = model.changePassword;
-                            changePassword();                            
+                            changePassword();
                         }
                     };
                     overlayService.open(overlay);
-              });
+                });
         }
 
         function save() {
@@ -165,26 +173,28 @@
                     .then(function (saved) {
 
                         //if the user saved, then try to execute all extended save options
-                        extendedSave(saved).then(function(result) {
+                        extendedSave(saved).then(function (result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope });
-                        }, Utilities.noop);
-                        
+                        }, function () {
+                            formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        });
+
                         vm.user = _.omit(saved, "navigation");
                         //restore
                         vm.user.navigation = currentNav;
                         setUserDisplayState();
-                        formatDatesToLocal(vm.user);                        
+                        formatDatesToLocal(vm.user);
 
                         vm.page.saveButtonState = "success";
 
                     }, function (err) {
-
+                        formHelper.resetForm({ scope: $scope, hasErrors: true });
                         contentEditingHelper.handleSaveError({
                             err: err,
                             showNotifications: true
                         });
-                        
+
                         vm.page.saveButtonState = "error";
                     });
             }
@@ -201,15 +211,15 @@
                 //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
                 vm.changePasswordModel.value.reset = (!vm.changePasswordModel.value.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
             }
-            
+
             // since we don't send the entire user model, the id is required
             vm.changePasswordModel.value.id = vm.user.id;
-            
+
             usersResource.changePassword(vm.changePasswordModel.value)
                 .then(() => {
                     vm.changePasswordModel.isChanging = false;
                     vm.changePasswordModel.value = {};
-                
+
                     //the user has a password if they are not states: Invited, NoCredentials
                     vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
                 }, err => {
@@ -219,7 +229,7 @@
                     });
                 });
         }
-        
+
         /**
          * Used to emit the save event and await any async operations being performed by editor extensions
          * @param {any} savedUser
@@ -228,7 +238,7 @@
 
             //used to track any promises added by the event handlers to be awaited
             var promises = [];
-            
+
             var args = {
                 //getPromise: getPromise,
                 user: savedUser,
@@ -240,10 +250,10 @@
 
             //emit the event
             eventsService.emit("editors.user.editController.save", args);
-            
+
             //await all promises to complete
             var resultPromise = $q.all(promises);
-            
+
             return resultPromise;
         }
 
@@ -253,7 +263,7 @@
 
         function openUserGroupPicker() {
             var currentSelection = [];
-            angular.copy(vm.user.userGroups, currentSelection);
+            Utilities.copy(vm.user.userGroups, currentSelection);
             var userGroupPicker = {
                 selection: currentSelection,
                 submit: function (model) {
@@ -263,7 +273,7 @@
                     }
                     editorService.close();
                 },
-                close: function () {        
+                close: function () {
                     editorService.close();
                 }
             };
@@ -281,7 +291,7 @@
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function (item) {
+                        model.selection.forEach(function (item) {
                             if (item.id === "-1") {
                                 item.name = vm.labels.contentRoot;
                                 item.icon = "icon-folder";
@@ -310,7 +320,7 @@
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function (item) {
+                        model.selection.forEach(function (item) {
                             if (item.id === "-1") {
                                 item.name = vm.labels.mediaRoot;
                                 item.icon = "icon-folder";
@@ -333,7 +343,7 @@
             var found = false;
             // check if item is already in the selected list
             if (selection.length > 0) {
-                angular.forEach(selection, function (selectedItem) {
+                selection.forEach(function (selectedItem) {
                     if (selectedItem.udi === item.udi) {
                         found = true;
                     }
@@ -343,6 +353,21 @@
             if (!found) {
                 selection.push(item);
             }
+        }
+
+        function editSelectedItem(index, selection) {
+            var group = selection[index];
+            const editor = {
+                id: group.id,
+                submit: function (model) {
+                    selection[index] = model;
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.userGroupEditor(editor);
         }
 
         function removeSelectedItem(index, selection) {
@@ -355,10 +380,10 @@
                 vm.user.userState = 1;
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
-                
+
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                
+
             });
         }
 
@@ -380,7 +405,7 @@
                 vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
-                
+
             }, function (error) {
                 vm.unlockUserButtonState = "error";
             });
@@ -437,8 +462,7 @@
 
         function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
-                formHelper.showNotifications(data);
-                goToPage(vm.breadcrumbs[0]);
+               goToPage(vm.breadcrumbs[0]);
             }, function (error) {
                 vm.deleteNotLoggedInUserButtonState = "error";
                 formHelper.showNotifications(error.data);
@@ -448,7 +472,7 @@
         function clearAvatar() {
             // get user
             usersResource.clearAvatar(vm.user.id).then(function (data) {
-              vm.user.avatars = data;
+                vm.user.avatars = data;
             });
         }
 
@@ -469,15 +493,15 @@
             }).progress(function (evt) {
 
                 if (vm.avatarFile.uploadStatus !== "done" && vm.avatarFile.uploadStatus !== "error") {
-                  // set uploading status on file
-                  vm.avatarFile.uploadStatus = "uploading";
+                    // set uploading status on file
+                    vm.avatarFile.uploadStatus = "uploading";
 
-                  // calculate progress in percentage
-                  var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                    // calculate progress in percentage
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 
-                  // set percentage property on file
-                  vm.avatarFile.uploadProgress = progressPercentage;
-                }               
+                    // set percentage property on file
+                    vm.avatarFile.uploadProgress = progressPercentage;
+                }
 
             }).success(function (data, status, headers, config) {
 
@@ -536,12 +560,24 @@
         function formatDatesToLocal(user) {
             // get current backoffice user and format dates
             userService.getCurrentUser().then(function (currentUser) {
+                currentLoggedInUser = currentUser;
+
                 user.formattedLastLogin = getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
                 user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
                 user.formattedCreateDate = getLocalDate(user.createDate, currentUser.locale, "LLL");
                 user.formattedUpdateDate = getLocalDate(user.updateDate, currentUser.locale, "LLL");
                 user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
             });
+        }
+
+        function allowGroupEdit(group) {
+            if (!currentLoggedInUser) {
+                return false;
+            }
+            if (currentLoggedInUser.userGroups.indexOf(group.alias) === -1 && currentLoggedInUser.userGroups.indexOf("admin") === -1) {
+                return false;
+            }
+            return true;
         }
 
         init();
