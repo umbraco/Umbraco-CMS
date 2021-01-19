@@ -475,9 +475,19 @@
     }
 }
 
+// Control states 
+.umb-grid-media--controls {
+    display:none;
+    position: absolute;
+    bottom:0.5rem;
+    right:0.5rem;    
+}
 
-
-
+.umb-grid .umb-row .umb-control.-active {
+    .umb-grid-media--controls {
+        display:flex;
+    }
+}
 
 // Title bar and tools
 .umb-grid .umb-row-title-bar {
