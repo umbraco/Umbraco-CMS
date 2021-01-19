@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
@@ -61,7 +62,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 
             if (_config.ModelsMode != ModelsMode.Nothing)
             {
-                sb.Append($"<li>Models namespace is {_config.ModelsNamespace}.</li>");
+                sb.Append($"<li>Models namespace is {_config.ModelsNamespace ?? Constants.ModelsBuilder.DefaultModelsNamespace}.</li>");
 
                 sb.Append("<li>Tracking of <strong>out-of-date models</strong> is ");
                 sb.Append(_config.FlagOutOfDateModels ? "enabled" : "not enabled");

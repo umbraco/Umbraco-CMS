@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Reflection.PortableExecutable;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -109,8 +108,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// </remarks>
         public Assembly CurrentModelsAssembly { get; private set; }
 
-        public MetadataReference CurrentModelsMetadataReference { get; private set; }
-
         /// <inheritdoc />
         public object SyncRoot { get; } = new object();
 
@@ -208,65 +205,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-
-        #region Compilation
-        // deadlock note
-        //
-        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
-        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
-        // and now wants to lock _locker.
-        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
-        // requires that the BuildManager can Monitor.Enter-ed itself.
-        // so:
-        //
-        // T1 - needs to ensure models, locks _locker
-        // T2 - needs to compile a view, locks BuildManager
-        //      hits RazorBuildProvider_CodeGenerationStarted
-        //      wants to lock _locker, wait
-        // T1 - needs to compile models, using BuildManager
-        //      wants to lock itself, wait
-        // <deadlock>
-        //
-        // until ASP.NET kills the long-running request (thread abort)
-        //
-        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
-        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
-        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
-        //
-        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
-        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
-        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
-        //
-        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
-
-        // private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
-        // {
-        //     try
-        //     {
-        //         _locker.EnterReadLock();
-        //
-        //         // just be safe - can happen if the first view is not an Umbraco view,
-        //         // or if something went wrong and we don't have an assembly at all
-        //         if (_modelsAssembly == null) return;
-        //
-        //         if (_debugLevel > 0)
-        //             _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-        //         if (!(sender is RazorBuildProvider provider)) return;
-        //
-        //         // add the assembly, and add a dependency to a text file that will change on each
-        //         // compilation as in some environments (could not figure which/why) the BuildManager
-        //         // would not re-compile the views when the models assembly is rebuilt.
-        //         provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
-        //         provider.AddVirtualPathDependency(ProjVirt);
-        //     }
-        //     finally
-        //     {
-        //         if (_locker.IsReadLockHeld)
-        //             _locker.ExitReadLock();
-        //     }
-        // }
-
-
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
@@ -351,11 +289,10 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     try
                     {
-                        Assembly assembly = GetModelsAssembly(_pendingRebuild, out MetadataReference metadataReference);
+                        Assembly assembly = GetModelsAssembly(_pendingRebuild);
 
                         bool hasAssembly = CurrentModelsAssembly != null;
                         CurrentModelsAssembly = assembly;
-                        CurrentModelsMetadataReference = metadataReference;
 
                         // raise the event that they've changed.
                         // don't raise on the initial call, only when it's actually changed.
@@ -403,23 +340,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-        private static MetadataReference CreateMetadataReference(string path)
-        {
-            using (FileStream stream = File.OpenRead(path))
-            {
-                return CreateMetadataReference(stream, path);
-            }
-        }
-
-        private static MetadataReference CreateMetadataReference(Stream stream, string path)
-        {
-            var moduleMetadata = ModuleMetadata.CreateFromStream(stream, PEStreamOptions.PrefetchMetadata);
-            var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
-            return assemblyMetadata.GetReference(filePath: path);
-        }
-
         // This is NOT thread safe but it is only called from within a lock
-        private Assembly ReloadAssembly(string pathToAssembly, out MetadataReference metadataReference)
+        private Assembly ReloadAssembly(string pathToAssembly)
         {
             // If there's a current AssemblyLoadContext, unload it before creating a new one.
             if (!(_currentAssemblyLoadContext is null))
@@ -452,9 +374,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Load it in
             Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
 
-            // Create a metadata ref
-            metadataReference = CreateMetadataReference(tempFile);
-
             // Add the assembly to the application parts - this is required because this is how
             // the razor ReferenceManager resolves what to load, see
             // https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L53
@@ -468,10 +387,8 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         // This is NOT thread safe but it is only called from within a lock
-        private Assembly GetModelsAssembly(bool forceRebuild, out MetadataReference metadataReference)
+        private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            metadataReference = null;
-
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
             {
@@ -524,7 +441,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
-                        assembly = ReloadAssembly(dllPath, out MetadataReference mdr);
+                        assembly = ReloadAssembly(dllPath);
 
                         ModelsBuilderAssemblyAttribute attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
@@ -536,7 +453,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                             _skipver = assembly.GetName().Version.Revision;
 
                             _logger.LogDebug("Loading cached models (dll).");
-                            metadataReference = mdr;
                             return assembly;
                         }
 
@@ -571,7 +487,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     var assemblyPath = GetOutputAssemblyPath(currentHash);
                     RoslynCompiler.CompileToFile(projFile, assemblyPath);
-                    assembly = ReloadAssembly(assemblyPath, out metadataReference);
+                    assembly = ReloadAssembly(assemblyPath);
                     File.WriteAllText(dllPathFile, assembly.Location);
                     File.WriteAllText(modelsHashFile, currentHash);
                     TryDeleteUnusedAssemblies(dllPathFile);
@@ -614,7 +530,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 var assemblyPath = GetOutputAssemblyPath(currentHash);
                 RoslynCompiler.CompileToFile(projFile, assemblyPath);
-                assembly = ReloadAssembly(assemblyPath, out metadataReference);
+                assembly = ReloadAssembly(assemblyPath);
                 File.WriteAllText(dllPathFile, assemblyPath);
                 File.WriteAllText(modelsHashFile, currentHash);
                 TryDeleteUnusedAssemblies(dllPathFile);
@@ -881,7 +797,5 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             public Func<IList> ListCtor { get; set; }
         }
-
-        #endregion
     }
 }
