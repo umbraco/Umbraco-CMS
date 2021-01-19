@@ -27,6 +27,47 @@ using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
 using Umbraco.Web.WebAssets;
 
+/*
+ * OVERVIEW:
+ * 
+ * The CSharpCompiler is responsible for the actual compilation of razor at runtime.
+ * It creates a CSharpCompilation instance to do the compilation. This is where DLL references
+ * are applied. However, the way this works is not flexible for dynamic assemblies since the references
+ * are only discovered and loaded once before the first compilation occurs. This is done here:
+ * https://github.com/dotnet/aspnetcore/blob/114f0f6d1ef1d777fb93d90c87ac506027c55ea0/src/Mvc/Mvc.Razor.RuntimeCompilation/src/CSharpCompiler.cs#L79
+ * The CSharpCompiler is internal and cannot be replaced or extended, however it's references come from:
+ * RazorReferenceManager. Unfortunately this is also internal and cannot be replaced, though it can be extended
+ * using MvcRazorRuntimeCompilationOptions, except this is the place where references are only loaded once which
+ * is done with a LazyInitializer. See https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L35.
+ * 
+ * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
+ * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
+ * requirement, we add the MB assembly to the assembly parts manager within the PureLiveModelFactory when the assembly
+ * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
+ * have already been resolved with the LazyInitializer in the RazorReferenceManager.
+ * 
+ * The services that can be replaced are: IViewCompilerProvider (default is the internal RuntimeViewCompilerProvider) and
+ * IViewCompiler (default is the internal RuntimeViewCompiler).
+ * 
+ * There are caches at several levels, all of which are not publicly accessible APIs (apart from RazorViewEngine.ViewLookupCache).
+ * For this to work, several caches must be cleared:
+ * - RazorViewEngine.ViewLookupCache
+ * - RazorReferencesManager._compilationReferences
+ * - RazorPageActivator._activationInfo (though this one may be optional)
+ * - RuntimeViewCompiler._cache
+ * 
+ * What are our options?
+ * 
+ * a) We can copy a ton of code into our application: CSharpCompiler, RuntimeViewCompilerProvider, RuntimeViewCompiler and
+ *    RazorReferenceManager (probably more depending on the extent of Internal references).
+ * b) We can use reflection to try to access all of the above resources and try to forcefully clear caches and reset initialization flags.
+ * c) We hack these replace-able services with our own implementations that wrap the default services. To do this
+ *    requires re-resolving the original services from a pre-built DI container. In effect this re-creates these
+ *    services from scratch which means there is no caches.
+ *
+ * ... Option C works, we will use that but need to verify how this affects memory since ideally the old services will be GC'd.
+ */
+
 // This is the insanity that allows you to customize the RazorProjectEngineBuilder
 [assembly: ProvideRazorExtensionInitializer("ModelsBuilderPureLive", typeof(ModelsBuilderRazorProjectBuilderExtension))]
 
@@ -60,22 +101,6 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                 if (config.ModelsMode == ModelsMode.PureLive)
                 {
                     return factory.GetRequiredService<PureLiveModelFactory>();
-
-                    // the following would add @using statement in every view so user's don't
-                    // have to do it - however, then noone understands where the @using statement
-                    // comes from, and it cannot be avoided / removed --- DISABLED
-
-                    /*
-                    // no need for @using in views
-                    // note:
-                    //  we are NOT using the in-code attribute here, config is required
-                    //  because that would require parsing the code... and what if it changes?
-                    //  we can AddGlobalImport not sure we can remove one anyways
-                    var modelsNamespace = Configuration.Config.ModelsNamespace;
-                    if (string.IsNullOrWhiteSpace(modelsNamespace))
-                        modelsNamespace = Configuration.Config.DefaultModelsNamespace;
-                    System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
-                    */
                 }
                 else if (config.EnableFactory)
                 {
@@ -123,28 +148,28 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                 builder.Services
             };
 
-            builder.Services.AddSingleton<RazorProjectEngine>(
-                s => new RefreshingRazorProjectEngine(defaultRazorProjectEngine, s, s.GetRequiredService<PureLiveModelFactory>()));
+            //builder.Services.AddSingleton<RazorProjectEngine>(
+            //    s => new RefreshingRazorProjectEngine(defaultRazorProjectEngine, s, s.GetRequiredService<PureLiveModelFactory>()));
 
-            builder.Services.AddSingleton<IViewCompilerProvider>(
-                s => new RefreshingRuntimeViewCompilerProvider(
-                        () =>
-                        {
-                            // re-create the original container so that a brand new IViewCompilerProvider
-                            // is produced, if we don't re-create the container then it will just return the same instance.
-                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-                            return recreatedServices.GetRequiredService<IViewCompilerProvider>();
-                        }, s.GetRequiredService<PureLiveModelFactory>()));
+            //builder.Services.AddSingleton<IViewCompilerProvider>(
+            //    s => new RefreshingRuntimeViewCompilerProvider(
+            //            () =>
+            //            {
+            //                // re-create the original container so that a brand new IViewCompilerProvider
+            //                // is produced, if we don't re-create the container then it will just return the same instance.
+            //                ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+            //                return recreatedServices.GetRequiredService<IViewCompilerProvider>();
+            //            }, s.GetRequiredService<PureLiveModelFactory>()));
 
-            builder.Services.AddSingleton<IRazorPageActivator>(
-                s => new RefreshingRazorPageActivator(
-                        () =>
-                        {
-                            // re-create the original container so that a brand new IRazorPageActivator
-                            // is produced, if we don't re-create the container then it will just return the same instance.
-                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-                            return recreatedServices.GetRequiredService<IRazorPageActivator>();
-                        }, s.GetRequiredService<PureLiveModelFactory>()));
+            //builder.Services.AddSingleton<IRazorPageActivator>(
+            //    s => new RefreshingRazorPageActivator(
+            //            () =>
+            //            {
+            //                // re-create the original container so that a brand new IRazorPageActivator
+            //                // is produced, if we don't re-create the container then it will just return the same instance.
+            //                ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+            //                return recreatedServices.GetRequiredService<IRazorPageActivator>();
+            //            }, s.GetRequiredService<PureLiveModelFactory>()));
 
             builder.Services.AddSingleton<IRazorViewEngine>(
                 s => new RefreshingRazorViewEngine(
@@ -155,6 +180,8 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
                             return recreatedServices.GetRequiredService<IRazorViewEngine>();
                         }, s.GetRequiredService<PureLiveModelFactory>()));
+
+            //builder.Services.AddSingleton<IRazorViewEngine, RefreshingRazorViewEngine>();
 
             return builder;
         }
@@ -171,7 +198,22 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
 
             // Now... customize
 
-            // TODO: BUT This is called before all of the default options are done, argh! so you can't replace anything here anyways
+            builder.Phases.Add(new CustomRazorPhase());
+
+            // NOTE: This is called before all of the default options that are applied
+            // in AddRazorRuntimeCompilation, see https://github.com/dotnet/aspnetcore/blob/336e05577cd8bec2000ffcada926189199e4cef0/src/Mvc/Mvc.Razor.RuntimeCompilation/src/DependencyInjection/RazorRuntimeCompilationMvcCoreBuilderExtensions.cs#L88
+            // are done so you can't replace anything here that is added by the default razor runtime compilation.
+        }
+    }
+
+    internal class CustomRazorPhase : RazorEnginePhaseBase, IRazorEnginePhase
+    {
+        protected override void ExecuteCore(RazorCodeDocument codeDocument)
+        {
+            // it's possible to modify the razor generated document with custom phases.
+            // like possibly setting default import statements, etc..
+            // there's no documentation on this so you'll need to read the source code to figure
+            // that one out if we ever wanted it.
         }
     }
 
@@ -184,38 +226,60 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
         public IServiceProvider ServiceProvider { get; }
     }
 
-    // The default razor page activator keeps an internal cache of activations, this allows clearning that cache
-    // TODO: Find out if we really need to clear this cache or not? Or if just clearing the view engine cache is enough?
-    internal class RefreshingRazorPageActivator : IRazorPageActivator
-    {
-        private readonly Func<IRazorPageActivator> _defaultRazorPageActivatorFactory;
-        private readonly PureLiveModelFactory _pureLiveModelFactory;
-        private IRazorPageActivator _current;
+    //// The default razor page activator keeps an internal cache of activations, this allows clearning that cache
+    //// TODO: Find out if we really need to clear this cache or not? Or if just clearing the view engine cache is enough?
+    //internal class RefreshingRazorPageActivator : IRazorPageActivator
+    //{
+    //    private readonly Func<IRazorPageActivator> _defaultRazorPageActivatorFactory;
+    //    private readonly PureLiveModelFactory _pureLiveModelFactory;
+    //    private IRazorPageActivator _current;
 
-        public RefreshingRazorPageActivator(
-            Func<IRazorPageActivator> defaultRazorPageActivatorFactory,
-            PureLiveModelFactory pureLiveModelFactory)
-        {
-            _pureLiveModelFactory = pureLiveModelFactory;
-            _defaultRazorPageActivatorFactory = defaultRazorPageActivatorFactory;
-            _current = _defaultRazorPageActivatorFactory();
-            _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
-        }
+    //    public RefreshingRazorPageActivator(
+    //        Func<IRazorPageActivator> defaultRazorPageActivatorFactory,
+    //        PureLiveModelFactory pureLiveModelFactory)
+    //    {
+    //        _pureLiveModelFactory = pureLiveModelFactory;
+    //        _defaultRazorPageActivatorFactory = defaultRazorPageActivatorFactory;
+    //        _current = _defaultRazorPageActivatorFactory();
+    //        _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
+    //    }
 
-        // TODO: Do we need to lock?
-        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = _defaultRazorPageActivatorFactory();
+    //    // TODO: Do we need to lock?
+    //    private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = _defaultRazorPageActivatorFactory();
 
-        public void Activate(IRazorPage page, ViewContext context) => _current.Activate(page, context);
-    }
+    //    public void Activate(IRazorPage page, ViewContext context) => _current.Activate(page, context);
+    //}
 
     // We need to have a refreshing razor view engine - the default keeps an in memory cache of views and it cannot be cleared because
     // the cache key instance is internal and would require manually tracking all keys since it cannot be iterated.
     // So like other 'Refreshing' intances, we just create a brand new one and let the old one die therefore clearing the cache.
-    internal class RefreshingRazorViewEngine : IRazorViewEngine
+
+    // TODO: It looks like dynamic recompile works just fine with "only" the refreshing razor view engine BUT
+    // that's also because it creates a new instance of the IRazorPageActivator since when resolving the engine
+    // again it's of course going to resolve all dependencies as well which is a few:
+    // https://github.com/dotnet/aspnetcore/blob/e37ddbcdbc445a65c6f51549775d5924423880e4/src/Mvc/Mvc.Razor/src/RazorViewEngine.cs#L51
+    // which isn't ideal.
+    // There's no real way to clear the cache since we cannot iterate and have no access to the cache key instance
+
+    internal class RefreshingRazorViewEngine : /*RazorViewEngine,*/ IRazorViewEngine
     {
         private IRazorViewEngine _current;
         private readonly PureLiveModelFactory _pureLiveModelFactory;
         private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
+
+        //public RefreshingRazorViewEngine(
+        //    PureLiveModelFactory pureLiveModelFactory,
+        //    IRazorPageFactoryProvider pageFactory,
+        //    IRazorPageActivator pageActivator,
+        //    HtmlEncoder htmlEncoder,
+        //    IOptions<RazorViewEngineOptions> optionsAccessor,
+        //    ILoggerFactory loggerFactory,
+        //    DiagnosticListener diagnosticListener)
+        //    : base(pageFactory, pageActivator, htmlEncoder, optionsAccessor, loggerFactory, diagnosticListener)
+        //{
+        //    _pureLiveModelFactory = pureLiveModelFactory;
+        //    _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
+        //}
 
         public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, PureLiveModelFactory pureLiveModelFactory)
         {
@@ -226,7 +290,15 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
         }
 
         // TODO: Do we need to lock?
-        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = _defaultRazorViewEngineFactory();
+        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e)
+        {
+            //var cache = (Microsoft.Extensions.Caching.Memory.MemoryCache)ViewLookupCache;
+            //// clear 100% of the cache.
+            //// TODO: This seems to work but need to verify
+            //cache.Compact(100);
+
+            _current = _defaultRazorViewEngineFactory();
+        }
 
         public RazorPageResult FindPage(ActionContext context, string pageName) => _current.FindPage(context, pageName);
 
@@ -239,31 +311,31 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
         public ViewEngineResult GetView(string executingFilePath, string viewPath, bool isMainPage) => _current.GetView(executingFilePath, viewPath, isMainPage);
     }
 
-    // The default view compiler creates the compiler once and only once. That compiler will have a stale list of references
-    // to build against so it needs to be re-created. The only way to do that due to internals is to wrap it and re-create
-    // the default instance therefore resetting the compiler references. 
-    // TODO: Find out if we really need to clear this cache or not? Or if just clearing the view engine cache is enough?
-    internal class RefreshingRuntimeViewCompilerProvider : IViewCompilerProvider
-    {
-        private IViewCompilerProvider _current;
-        private readonly Func<IViewCompilerProvider> _defaultViewCompilerProviderFactory;
-        private readonly PureLiveModelFactory _pureLiveModelFactory;
+    //// The default view compiler creates the compiler once and only once. That compiler will have a stale list of references
+    //// to build against so it needs to be re-created. The only way to do that due to internals is to wrap it and re-create
+    //// the default instance therefore resetting the compiler references.
+    //// TODO: Find out if we really need to clear this cache or not? Or if just clearing the view engine cache is enough?
+    //internal class RefreshingRuntimeViewCompilerProvider : IViewCompilerProvider
+    //{
+    //    private IViewCompilerProvider _current;
+    //    private readonly Func<IViewCompilerProvider> _defaultViewCompilerProviderFactory;
+    //    private readonly PureLiveModelFactory _pureLiveModelFactory;
 
-        public RefreshingRuntimeViewCompilerProvider(
-            Func<IViewCompilerProvider> defaultViewCompilerProviderFactory,
-            PureLiveModelFactory pureLiveModelFactory)
-        {
-            _defaultViewCompilerProviderFactory = defaultViewCompilerProviderFactory;
-            _pureLiveModelFactory = pureLiveModelFactory;
-            _current = _defaultViewCompilerProviderFactory();
-            _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
-        }
+    //    public RefreshingRuntimeViewCompilerProvider(
+    //        Func<IViewCompilerProvider> defaultViewCompilerProviderFactory,
+    //        PureLiveModelFactory pureLiveModelFactory)
+    //    {
+    //        _defaultViewCompilerProviderFactory = defaultViewCompilerProviderFactory;
+    //        _pureLiveModelFactory = pureLiveModelFactory;
+    //        _current = _defaultViewCompilerProviderFactory();
+    //        _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
+    //    }
 
-        // TODO: Do we need to lock?
-        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = _defaultViewCompilerProviderFactory();
+    //    // TODO: Do we need to lock?
+    //    private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = _defaultViewCompilerProviderFactory();
 
-        public IViewCompiler GetCompiler() => _current.GetCompiler();
-    }
+    //    public IViewCompiler GetCompiler() => _current.GetCompiler();
+    //}
 
     // TODO: Need to review this to see if this service is actually one we need to clear or not?
     // Does it hold cache? etc... I originally said "so that all of the underlying services are cleared"
@@ -309,6 +381,18 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
         public override RazorEngine Engine => _current.Engine;
 
         public override IReadOnlyList<IRazorProjectEngineFeature> ProjectFeatures => _current.ProjectFeatures;
+
+        public override RazorCodeDocument Process(RazorProjectItem projectItem) => base.Process(projectItem);
+
+        public override RazorCodeDocument Process(RazorSourceDocument source, string fileKind, IReadOnlyList<RazorSourceDocument> importSources, IReadOnlyList<TagHelperDescriptor> tagHelpers) => base.Process(source, fileKind, importSources, tagHelpers);
+
+        public override RazorCodeDocument ProcessDeclarationOnly(RazorProjectItem projectItem) => base.ProcessDeclarationOnly(projectItem);
+
+        public override RazorCodeDocument ProcessDeclarationOnly(RazorSourceDocument source, string fileKind, IReadOnlyList<RazorSourceDocument> importSources, IReadOnlyList<TagHelperDescriptor> tagHelpers) => base.ProcessDeclarationOnly(source, fileKind, importSources, tagHelpers);
+
+        public override RazorCodeDocument ProcessDesignTime(RazorProjectItem projectItem) => base.ProcessDesignTime(projectItem);
+
+        public override RazorCodeDocument ProcessDesignTime(RazorSourceDocument source, string fileKind, IReadOnlyList<RazorSourceDocument> importSources, IReadOnlyList<TagHelperDescriptor> tagHelpers) => base.ProcessDesignTime(source, fileKind, importSources, tagHelpers);
 
         // TODO: Do we need to lock?
         private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _current = CreateNew();
@@ -377,7 +461,6 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
 
         protected override void ProcessCore(RazorCodeDocument codeDocument)
             => _processCore.Invoke(_current, new[] { codeDocument });
-
     }
 
     /// <summary>
@@ -390,7 +473,7 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
     /// So in order to have multiple, we need to have a wrapper.
     /// </para>
     /// </remarks>
-    public class MetadataReferenceFeatureWrapper : IMetadataReferenceFeature
+    internal class MetadataReferenceFeatureWrapper : IMetadataReferenceFeature
     {
         private readonly IReadOnlyList<IMetadataReferenceFeature> _metadataReferenceFeatures;
         private RazorEngine _engine;
@@ -421,42 +504,48 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
     }
 
     /// <summary>
-    /// A custom <see cref="IMetadataReferenceFeature"/> that will dynamically resolve a reference for razor based on the current PureLive assembly.
+    /// A custom <see cref="IMetadataReferenceFeature"/> that will dynamically resolve a reference for razor (tag helpers) based on the current PureLive assembly.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// The default implementation of IMetadataReferenceFeature is https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/LazyMetadataReferenceFeature.cs
-    /// which uses a ReferenceManager https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs
-    /// to resolve it's references. This is done using ApplicationParts which would be nice and simple to use if we could, but the Razor engine ONLY works
-    /// with application part assemblies that have physical files with physical paths. We don't want to load in our PureLive assemblies on physical paths because
-    /// those files will be locked. Instead we load them in via bytes but this is not supported and we'll get an exception if we add them to application parts.
-    /// The other problem with LazyMetadataReferenceFeature is that it doesn't support dynamic assemblies, it will just check what in application parts once and
-    /// that's it which will not work for us in Pure Live.
-    /// </para>
-    /// </remarks>
     internal class PureLiveMetadataReferenceFeature : IMetadataReferenceFeature
     {
-        // TODO: Even though I was hoping this would work and this does allow you to return a metadata reference dynamically at runtime, it doesn't make any
-        // difference because the CSharpCompiler for razor only loads in it's references one time based on the initial reference checks:
-        // https://github.com/dotnet/aspnetcore/blob/100ab02ea0214d49535fa56f33a77acd61fe039c/src/Mvc/Mvc.Razor.RuntimeCompilation/src/CSharpCompiler.cs#L84
-        // Since ReferenceManager resolves them once lazily and that's it. 
+        /*
+         * TODO:
+         * This is the only public API available to 'refresh' without hacking is the IMetadataReferenceFeature but
+         * it's not clear what this does since it's only used by a single service in aspnetcore.
+         * It is not responsible for recompiling views, but is for tag helpers.
+         * Used in the CompilationTagHelperFeature which ends up setting the 'Compilation' on the TagDescriptorProviderContext and
+         * the result of GetDescriptors() is used in the DefaultRazorTagHelperBinderPhase.
+         * This is all about compiling tag helpers. 
+         * So am thinking we'll need to 'refresh' this feature as well as the normal razor views.
+         */
 
         private readonly PureLiveModelFactory _pureLiveModelFactory;
+        private MetadataReference[] _pureLiveReferences;
 
-        public PureLiveMetadataReferenceFeature(PureLiveModelFactory pureLiveModelFactory) => _pureLiveModelFactory = pureLiveModelFactory;
+        public PureLiveMetadataReferenceFeature(PureLiveModelFactory pureLiveModelFactory)
+        {
+            _pureLiveModelFactory = pureLiveModelFactory;
+            _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
+        }
 
         /// <inheritdoc/>
         public IReadOnlyList<MetadataReference> References
         {
             get
             {
-                // TODO: This won't really work based on how the CSharp compiler works
-                //if (_pureLiveModelFactory.CurrentModelsMetadataReference != null)
-                //{
-                //    //var reference = MetadataReference.CreateFromStream(null);
-                //    //reference.
-                //    return new[] { _pureLiveModelFactory.CurrentModelsMetadataReference };
-                //}
+                // return the reference if we have one
+                if (_pureLiveReferences != null)
+                {
+                    return _pureLiveReferences;
+                }
+
+                // else check if we need to create the reference
+                if (_pureLiveModelFactory.CurrentModelsMetadataReference != null)
+                {
+                    _pureLiveReferences = new[] { _pureLiveModelFactory.CurrentModelsMetadataReference };
+
+                    return _pureLiveReferences;
+                }
 
                 return Array.Empty<MetadataReference>();
             }
@@ -464,5 +553,11 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
 
         /// <inheritdoc/>
         public RazorEngine Engine { get; set; }
+
+        /// <summary>
+        /// When the models change, clear our references
+        /// </summary>
+        // TODO: Determine what happens without locking this, will it matter?
+        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e) => _pureLiveReferences = null;
     }
 }

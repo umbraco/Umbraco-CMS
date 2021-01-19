@@ -126,7 +126,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     return _roslynCompiler;
                 }
 
-                _roslynCompiler = new RoslynCompiler(System.Runtime.Loader.AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
+                _roslynCompiler = new RoslynCompiler(AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
                 return _roslynCompiler;
             }
         }
@@ -438,14 +438,15 @@ namespace Umbraco.ModelsBuilder.Embedded
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
             _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
 
-            // We cannot use in-memory assemblies due to the way the razor engine works which must use
+            // NOTE: We cannot use in-memory assemblies due to the way the razor engine works which must use
             // application parts in order to add references to it's own CSharpCompiler.
             // These parts must have real paths since that is how the references are loaded. In that
             // case we'll need to work on temp files so that the assembly isn't locked.
 
             // Get a temp file path
-            // TODO: Not sure if the process always has access to a temp path?
-            var tempFile = Path.GetTempFileName();
+            // NOTE: We cannot use Path.GetTempFileName(), see this issue:
+            // https://github.com/dotnet/AspNetCore.Docs/issues/3589 which can cause issues, this is recommended instead
+            var tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             File.Copy(pathToAssembly, tempFile, true);
 
             // Load it in
@@ -453,17 +454,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // Create a metadata ref
             metadataReference = CreateMetadataReference(tempFile);
-
-            //// Use filestream to load in the new assembly, otherwise it'll be locked
-            //// See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
-            //using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
-            //{
-            //    assembly = _currentAssemblyLoadContext.LoadFromStream(fs);
-
-            //    // reset stream so it can be used for the reference (the call to CreateMetadataReference will close the stream)
-            //    fs.Position = 0;
-            //    metadataReference = CreateMetadataReference(fs, pathToAssembly);
-            //}
 
             // Add the assembly to the application parts - this is required because this is how
             // the razor ReferenceManager resolves what to load, see
