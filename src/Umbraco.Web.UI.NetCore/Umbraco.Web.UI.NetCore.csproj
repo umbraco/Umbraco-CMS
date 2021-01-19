@@ -24,9 +24,6 @@
   <ItemGroup>
     <Folder Include="App_Plugins" />
     <Folder Include="scripts" />
-    <Folder Include="umbraco\MediaCache\2\c\6\9\3\a\6\5" />
-    <Folder Include="umbraco\MediaCache\a\e\e\1\9\e\4\b" />
-    <Folder Include="umbraco\MediaCache\c\3\b\5\0\9\f\9" />
     <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
     <Folder Include="Views" />
