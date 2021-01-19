@@ -171,7 +171,7 @@ angular.mock.$Browser.prototype = {
                 }
             }
         } else {
-            if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
+            if (!Utilities.equals(this.cookieHash, this.lastCookieHash)) {
                 this.lastCookieHash = Utilities.copy(this.cookieHash);
                 this.cookieHash = Utilities.copy(this.cookieHash);
             }
@@ -1379,7 +1379,7 @@ function MockHttpExpectation(method, url, data, headers) {
     this.matchHeaders = function (h) {
         if (Utilities.isUndefined(headers)) return true;
         if (angular.isFunction(headers)) return headers(h);
-        return angular.equals(headers, h);
+        return Utilities.equals(headers, h);
     };
 
     this.matchData = function (d) {
