@@ -38,6 +38,7 @@ namespace Umbraco.Core.Events
                 throw new ArgumentNullException(nameof(notification));
             }
 
+            PublishNotification(notification);
             return PublishNotificationAsync(notification, cancellationToken);
         }
     }
