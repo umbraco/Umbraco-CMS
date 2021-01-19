@@ -78,6 +78,7 @@ namespace Umbraco.Infrastructure.Runtime
 
             AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
 
+            DoUnattendedInstall();
             DetermineRuntimeLevel();
 
             if (State.Level <= RuntimeLevel.BootFailed)
@@ -98,6 +99,11 @@ namespace Umbraco.Infrastructure.Runtime
 
             // create & initialize the components
             _components.Initialize();
+        }
+
+        private void DoUnattendedInstall()
+        {
+            State.DoUnattendedInstall();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

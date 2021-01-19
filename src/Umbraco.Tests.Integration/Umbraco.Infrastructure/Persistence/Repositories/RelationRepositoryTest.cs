@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
@@ -48,10 +52,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IFileService FileService => GetRequiredService<IFileService>();
 
         [SetUp]
-        public void SetUp()
-        {
-            CreateTestData();
-        }
+        public void SetUp() => CreateTestData();
 
         private RelationRepository CreateRepository(IScopeProvider provider, out RelationTypeRepository relationTypeRepository)
         {
@@ -72,7 +73,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 var relation = new Relation(_textpage.Id, _subpage.Id, relationType);
                 repository.Save(relation);
 
-
                 // Assert
                 Assert.That(relation, Is.Not.Null);
                 Assert.That(relation.HasIdentity, Is.True);
@@ -91,7 +91,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 IRelation relation = repository.Get(1);
                 relation.Comment = "This relation has been updated";
                 repository.Save(relation);
-
 
                 IRelation relationUpdated = repository.Get(1);
 
@@ -114,8 +113,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 IRelation relation = repository.Get(2);
                 repository.Delete(relation);
 
-
-                var exists = repository.Exists(2);
+                bool exists = repository.Exists(2);
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -187,10 +185,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                RelationRepository repository = CreateRepository(ScopeProvider, out var relationTypeRepository);
+                RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository relationTypeRepository);
 
                 // Get parent entities for child id
-                var parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out var totalRecords).ToList();
+                var parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out long totalRecords).ToList();
                 Assert.AreEqual(6, totalRecords);
                 Assert.AreEqual(6, parents.Count);
 
@@ -232,10 +230,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                RelationRepository repository = CreateRepository(ScopeProvider, out var relationTypeRepository);
+                RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository relationTypeRepository);
 
                 // Get parent entities for child id
-                var parents = repository.GetPagedParentEntitiesByChildId(media.Id, 0, 10, out var totalRecords).ToList();
+                var parents = repository.GetPagedParentEntitiesByChildId(media.Id, 0, 10, out long totalRecords).ToList();
                 Assert.AreEqual(1, totalRecords);
                 Assert.AreEqual(1, parents.Count);
 
@@ -249,14 +247,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Get_Paged_Child_Entities_By_Parent_Id()
         {
-            CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out _);
+            CreateTestDataForPagingTests(out List<IContent> createdContent, out List<IMember> createdMembers, out _);
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 RelationRepository repository = CreateRepository(ScopeProvider, out _);
 
                 // Get parent entities for child id
-                var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out var totalRecords).ToList();
+                var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out long totalRecords).ToList();
                 Assert.AreEqual(3, totalRecords);
                 Assert.AreEqual(3, parents.Count);
 
@@ -293,7 +291,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             ContentTypeService.Save(contentType);
             for (int i = 0; i < 3; i++)
             {
-                var c1 = ContentBuilder.CreateBasicContent(contentType);
+                Content c1 = ContentBuilder.CreateBasicContent(contentType);
                 ContentService.Save(c1);
                 createdContent.Add(c1);
             }
@@ -340,13 +338,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
+                RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
 
                 // Act
-                var exists = repository.Exists(2);
-                var doesntExist = repository.Exists(5);
+                bool exists = repository.Exists(2);
+                bool doesntExist = repository.Exists(5);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -358,12 +356,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
+                RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
 
                 // Act
-                var query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == _textpage.Id);
+                IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == _textpage.Id);
                 int count = repository.Count(query);
 
                 // Assert
@@ -380,7 +378,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
 
                 // Act
-                global::Umbraco.Core.Persistence.Querying.IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == _relateContent.Id);
+                IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == _relateContent.Id);
                 IEnumerable<IRelation> relations = repository.Get(query);
 
                 // Assert
@@ -403,8 +401,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 ContentService.Delete(content, 0);
 
                 // Act
-                var shouldntExist = repository.Exists(1);
-                var shouldExist = repository.Exists(2);
+                bool shouldntExist = repository.Exists(1);
+                bool shouldExist = repository.Exists(2);
 
                 // Assert
                 Assert.That(shouldntExist, Is.False);
@@ -440,6 +438,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
+
                 // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
                 _contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
 

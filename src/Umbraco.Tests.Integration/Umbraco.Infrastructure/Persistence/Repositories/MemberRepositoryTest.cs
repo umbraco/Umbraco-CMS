@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -29,32 +33,35 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class MemberRepositoryTest : UmbracoIntegrationTest
     {
         private IPasswordHasher PasswordHasher => GetRequiredService<IPasswordHasher>();
+
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private IMemberTypeRepository MemberTypeRepository => GetRequiredService<IMemberTypeRepository>();
+
         private IMemberGroupRepository MemberGroupRepository => GetRequiredService<IMemberGroupRepository>();
+
         private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         private MemberRepository CreateRepository(IScopeProvider provider)
         {
-            var accessor = (IScopeAccessor) provider;
-            var tagRepo = GetRequiredService<ITagRepository>();
-            var relationTypeRepository = GetRequiredService<IRelationTypeRepository>();
-            var relationRepository = GetRequiredService<IRelationRepository>();
+            var accessor = (IScopeAccessor)provider;
+            ITagRepository tagRepo = GetRequiredService<ITagRepository>();
+            IRelationTypeRepository relationTypeRepository = GetRequiredService<IRelationTypeRepository>();
+            IRelationRepository relationRepository = GetRequiredService<IRelationRepository>();
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
-            return repository;
+            return new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
         }
 
         [Test]
         public void GetMember()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var member = CreateTestMember();
+                IMember member = CreateTestMember();
 
                 member = repository.Get(member.Id);
 
@@ -66,16 +73,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void GetMembers()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var type = CreateTestMemberType();
-                var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
-                var m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
+                IMemberType type = CreateTestMemberType();
+                IMember m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
+                IMember m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
 
-                var members = repository.GetMany(m1.Id, m2.Id);
+                IEnumerable<IMember> members = repository.GetMany(m1.Id, m2.Id);
 
                 Assert.That(members, Is.Not.Null);
                 Assert.That(members.Count(), Is.EqualTo(2));
@@ -87,18 +94,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void GetAllMembers()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var type = CreateTestMemberType();
-                for (var i = 0; i < 5; i++)
+                IMemberType type = CreateTestMemberType();
+                for (int i = 0; i < 5; i++)
                 {
                     CreateTestMember(type, "Test " + i, "test" + i + "@test.com", "pass" + i, "test" + i);
                 }
 
-                var members = repository.GetMany();
+                IEnumerable<IMember> members = repository.GetMany();
 
                 Assert.That(members, Is.Not.Null);
                 Assert.That(members.Any(x => x == null), Is.False);
@@ -111,17 +118,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void QueryMember()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
                 var key = Guid.NewGuid();
-                var member = CreateTestMember(key: key);
+                IMember member = CreateTestMember(key: key);
 
                 // Act
-                var query = scope.SqlContext.Query<IMember>().Where(x => x.Key == key);
-                var result = repository.Get(query);
+                IQuery<IMember> query = scope.SqlContext.Query<IMember>().Where(x => x.Key == key);
+                IEnumerable<IMember> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -132,14 +139,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void SaveMember()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var member = CreateTestMember();
+                IMember member = CreateTestMember();
 
-                var sut = repository.Get(member.Id);
+                IMember sut = repository.Get(member.Id);
 
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.HasIdentity, Is.True);
@@ -148,33 +155,33 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
                 Assert.That(sut.Username, Is.EqualTo("hefty"));
 
-                TestHelper.AssertPropertyValuesAreEqual(sut, member, "yyyy-MM-dd HH:mm:ss");
+                TestHelper.AssertPropertyValuesAreEqual(sut, member);
             }
         }
 
         [Test]
         public void MemberHasBuiltinProperties()
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+                MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
                 MemberTypeRepository.Save(memberType);
 
-                var member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
+                Member member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
 
-                var sut = repository.Get(member.Id);
+                IMember sut = repository.Get(member.Id);
 
                 Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
                 Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
-                var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
+                PropertyGroup grp = memberType.CompositionPropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
                 Assert.IsNotNull(grp);
-                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key).ToArray();
-                foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
+                string[] aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key).ToArray();
+                foreach (IPropertyType p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
                 {
                     Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
                 }
@@ -185,21 +192,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void SavingPreservesPassword()
         {
             IMember sut;
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+                MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
                 MemberTypeRepository.Save(memberType);
 
-
-                var member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
+                Member member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
 
-
                 sut = repository.Get(member.Id);
-                //when the password is null it will not overwrite what is already there.
+
+                // When the password is null it will not overwrite what is already there.
                 sut.RawPasswordValue = null;
                 repository.Save(sut);
 
@@ -213,18 +219,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void SavingUpdatesNameAndEmail()
         {
             IMember sut;
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+                MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
                 MemberTypeRepository.Save(memberType);
 
-
-                var member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
+                Member member = MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.Save(member);
-
 
                 sut = repository.Get(member.Id);
                 sut.Username = "This is new";
@@ -241,16 +245,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void QueryMember_WithSubQuery()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
-            var query = provider.SqlContext.Query<IMember>().Where(x =>
-                        ((Member) x).LongStringPropertyValue.Contains("1095") &&
-                        ((Member) x).PropertyTypeAlias == "headshot");
+            IQuery<IMember> query = provider.SqlContext.Query<IMember>().Where(x =>
+                        ((Member)x).LongStringPropertyValue.Contains("1095") &&
+                        ((Member)x).PropertyTypeAlias == "headshot");
 
-            var sqlSubquery = GetSubquery();
+            Sql<ISqlContext> sqlSubquery = GetSubquery();
             var translator = new SqlTranslator<IMember>(sqlSubquery, query);
-            var subquery = translator.Translate();
-            var sql = GetBaseQuery(false)
+            Sql<ISqlContext> subquery = translator.Translate();
+            Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
@@ -261,19 +265,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
                 if (memberType == null)
                 {
                     memberType = MemberTypeBuilder.CreateSimpleMemberType();
                     MemberTypeRepository.Save(memberType);
-
                 }
 
-                var member = MemberBuilder.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
+                Member member = MemberBuilder.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
                 repository.Save(member);
                 scope.Complete();
 
@@ -283,12 +286,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         private IMemberType CreateTestMemberType(string alias = null)
         {
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                MemberRepository repository = CreateRepository(provider);
 
-                var memberType = MemberTypeBuilder.CreateSimpleMemberType(alias);
+                MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType(alias);
                 MemberTypeRepository.Save(memberType);
                 scope.Complete();
                 return memberType;
@@ -297,10 +300,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         private Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             if (isCount)
             {
-                var sqlCount = provider.SqlContext.Sql()
+                Sql<ISqlContext> sqlCount = provider.SqlContext.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -311,17 +314,33 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 return sqlCount;
             }
 
-            var sql = provider.SqlContext.Sql();
-            sql.Select("umbracoNode.*", $"{Constants.DatabaseSchema.Tables.Content}.contentTypeId", "cmsContentType.alias AS ContentTypeAlias", $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionId",
-                $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionDate", "cmsMember.Email",
-                "cmsMember.LoginName", "cmsMember.Password",
-                Constants.DatabaseSchema.Tables.PropertyData + ".id AS PropertyDataId", Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid",
-                Constants.DatabaseSchema.Tables.PropertyData + ".dateValue", Constants.DatabaseSchema.Tables.PropertyData + ".intValue",
-                Constants.DatabaseSchema.Tables.PropertyData + ".textValue", Constants.DatabaseSchema.Tables.PropertyData + ".varcharValue",
-                "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
-                "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
-                "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
-                "cmsPropertyType.dataTypeId", "cmsDataType.propertyEditorAlias", "cmsDataType.dbType")
+            Sql<ISqlContext> sql = provider.SqlContext.Sql();
+            sql.Select(
+                    "umbracoNode.*",
+                    $"{Constants.DatabaseSchema.Tables.Content}.contentTypeId",
+                    "cmsContentType.alias AS ContentTypeAlias",
+                    $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionId",
+                    $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionDate",
+                    "cmsMember.Email",
+                    "cmsMember.LoginName",
+                    "cmsMember.Password",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".id AS PropertyDataId",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".dateValue",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".intValue",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".textValue",
+                    Constants.DatabaseSchema.Tables.PropertyData + ".varcharValue",
+                    "cmsPropertyType.id",
+                    "cmsPropertyType.Alias",
+                    "cmsPropertyType.Description",
+                    "cmsPropertyType.Name",
+                    "cmsPropertyType.mandatory",
+                    "cmsPropertyType.validationRegExp",
+                    "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
+                    "cmsPropertyType.propertyTypeGroupId",
+                    "cmsPropertyType.dataTypeId",
+                    "cmsDataType.propertyEditorAlias",
+                    "cmsDataType.dbType")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
@@ -337,8 +356,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         private Sql<ISqlContext> GetSubquery()
         {
-            var provider = ScopeProvider;
-            var sql = provider.SqlContext.Sql();
+            IScopeProvider provider = ScopeProvider;
+            Sql<ISqlContext> sql = provider.SqlContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

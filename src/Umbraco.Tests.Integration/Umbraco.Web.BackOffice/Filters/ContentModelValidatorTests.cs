@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -44,13 +47,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
                 ContentTypes = new[]
                 {
                       new NestedContentConfiguration.ContentType { Alias = "feature" }
-                  }
+                }
             };
 
-            var complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
-            var testEditor = Services.GetRequiredService<TestEditor>();
-            var dataTypeService = Services.GetRequiredService<IDataTypeService>();
-            var serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
+            ComplexTestEditor complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
+            TestEditor testEditor = Services.GetRequiredService<TestEditor>();
+            IDataTypeService dataTypeService = Services.GetRequiredService<IDataTypeService>();
+            IConfigurationEditorJsonSerializer serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();
 
             var complexDataType = new DataType(complexTestEditor, serializer)
             {
@@ -65,85 +68,84 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             dataTypeService.Save(complexDataType);
             dataTypeService.Save(testDataType);
 
-            var fileService = Services.GetRequiredService<IFileService>();
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            IFileService fileService = Services.GetRequiredService<IFileService>();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             fileService.SaveTemplate(template);
 
             _contentType = ContentTypeBuilder.CreateTextPageContentType(ContentTypeAlias, defaultTemplateId: template.Id);
 
             // add complex editor
-            foreach (var pt in _contentType.PropertyTypes)
+            foreach (IPropertyType pt in _contentType.PropertyTypes)
             {
                 pt.DataTypeId = testDataType.Id;
             }
 
             _contentType.AddPropertyType(
-                new PropertyType(_shortStringHelper, "complexTest", ValueStorageType.Ntext) { Alias = "complex", Name = "Complex", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = complexDataType.Id },
+                new PropertyType(_shortStringHelper, "complexTest", ValueStorageType.Ntext) { Alias = "complex", Name = "Complex", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = complexDataType.Id },
                 "Content");
 
             // make them all validate with a regex rule that will not pass
-            foreach (var prop in _contentType.PropertyTypes)
+            foreach (IPropertyType prop in _contentType.PropertyTypes)
             {
                 prop.ValidationRegExp = "^donotmatch$";
                 prop.ValidationRegExpMessage = "Does not match!";
             }
 
-            var contentTypeService = Services.GetRequiredService<IContentTypeService>();
+            IContentTypeService contentTypeService = Services.GetRequiredService<IContentTypeService>();
             contentTypeService.Save(_contentType);
         }
 
-        //
-        // protected override void Compose()
-        // {
-        //     base.Compose();
-        //
-        //     var complexEditorConfig = new NestedContentConfiguration
-        //     {
-        //         ContentTypes = new[]
-        //         {
-        //             new NestedContentConfiguration.ContentType { Alias = "feature" }
-        //         }
-        //     };
-        //     var dataTypeService = new Mock<IDataTypeService>();
-        //     dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-        //         .Returns((int id) => id == ComplexDataTypeId
-        //                 ? Mock.Of<IDataType>(x => x.Configuration == complexEditorConfig)
-        //                 : Mock.Of<IDataType>());
-        //
-        //     var contentTypeService = new Mock<IContentTypeService>();
-        //     contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>()))
-        //         .Returns(() => new List<IContentType>
-        //         {
-        //             _contentType
-        //         });
-        //
-        //     var textService = new Mock<ILocalizedTextService>();
-        //     textService.Setup(x => x.Localize("validation/invalidPattern", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns(() => "invalidPattern");
-        //     textService.Setup(x => x.Localize("validation/invalidNull", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidNull");
-        //     textService.Setup(x => x.Localize("validation/invalidEmpty", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidEmpty");
-        //
-        //     composition.Services.AddUnique(x => Mock.Of<IDataTypeService>(x => x.GetDataType(It.IsAny<int>()) == Mock.Of<IDataType>()));
-        //     composition.Services.AddUnique(x => dataTypeService.Object);
-        //     composition.Services.AddUnique(x => contentTypeService.Object);
-        //     composition.Services.AddUnique(x => textService.Object);
-        //
-        //     Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
-        //         .Add<TestEditor>()
-        //         .Add<ComplexTestEditor>();
-        // }
+        //// protected override void Compose()
+        //// {
+        ////     base.Compose();
+        ////
+        ////     var complexEditorConfig = new NestedContentConfiguration
+        ////     {
+        ////         ContentTypes = new[]
+        ////         {
+        ////             new NestedContentConfiguration.ContentType { Alias = "feature" }
+        ////         }
+        ////     };
+        ////     var dataTypeService = new Mock<IDataTypeService>();
+        ////     dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+        ////         .Returns((int id) => id == ComplexDataTypeId
+        ////                 ? Mock.Of<IDataType>(x => x.Configuration == complexEditorConfig)
+        ////                 : Mock.Of<IDataType>());
+        ////
+        ////     var contentTypeService = new Mock<IContentTypeService>();
+        ////     contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>()))
+        ////         .Returns(() => new List<IContentType>
+        ////         {
+        ////             _contentType
+        ////         });
+        ////
+        ////     var textService = new Mock<ILocalizedTextService>();
+        ////     textService.Setup(x => x.Localize("validation/invalidPattern", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns(() => "invalidPattern");
+        ////     textService.Setup(x => x.Localize("validation/invalidNull", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidNull");
+        ////     textService.Setup(x => x.Localize("validation/invalidEmpty", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("invalidEmpty");
+        ////
+        ////     composition.Services.AddUnique(x => Mock.Of<IDataTypeService>(x => x.GetDataType(It.IsAny<int>()) == Mock.Of<IDataType>()));
+        ////     composition.Services.AddUnique(x => dataTypeService.Object);
+        ////     composition.Services.AddUnique(x => contentTypeService.Object);
+        ////     composition.Services.AddUnique(x => textService.Object);
+        ////
+        ////     Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
+        ////         .Add<TestEditor>()
+        ////         .Add<ComplexTestEditor>();
+        //// }
 
         [Test]
         public void Validating_ContentItemSave()
         {
-            var logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
-            var backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
+            ILogger<ContentSaveModelValidator> logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
+            IBackOfficeSecurityFactory backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
             backofficeSecurityFactory.EnsureBackOfficeSecurity();
-            var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
-            var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
+            IPropertyValidationService propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
+            UmbracoMapper umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
             var validator = new ContentSaveModelValidator(logger, propertyValidationService);
 
-            var content = ContentBuilder.CreateTextpageContent(_contentType, "test", -1);
+            Content content = ContentBuilder.CreateTextpageContent(_contentType, "test", -1);
 
             var id1 = new Guid("c8df5136-d606-41f0-9134-dea6ae0c2fd9");
             var id2 = new Guid("f916104a-4082-48b2-a515-5c4bf2230f38");
@@ -151,7 +153,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
 
             // TODO: Ok now test with a 4th level complex nested editor
 
-            var complexValue = @"[{
+            string complexValue = @"[{
              		""key"": """ + id1.ToString() + @""",
              		""name"": ""Hello world"",
              		""ncContentTypeAlias"": """ + ContentTypeAlias + @""",
@@ -175,7 +177,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             content.SetValue("complex", complexValue);
 
             // map the persisted properties to a model representing properties to save
-            //var saveProperties = content.Properties.Select(x => Mapper.Map<ContentPropertyBasic>(x)).ToList();
+            // var saveProperties = content.Properties.Select(x => Mapper.Map<ContentPropertyBasic>(x)).ToList();
             var saveProperties = content.Properties.Select(x =>
             {
                 return new ContentPropertyBasic
@@ -214,13 +216,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             ContentItemBinder.BindModel(save, content, _modelBinderHelper, umbracoMapper);
 
             var modelState = new ModelStateDictionary();
-            var isValid = validator.ValidatePropertiesData(save, saveVariants[0], saveVariants[0].PropertyCollectionDto, modelState);
+            bool isValid = validator.ValidatePropertiesData(save, saveVariants[0], saveVariants[0].PropertyCollectionDto, modelState);
 
             // list results for debugging
-            foreach (var state in modelState)
+            foreach (KeyValuePair<string, ModelStateEntry> state in modelState)
             {
                 Console.WriteLine(state.Key);
-                foreach (var error in state.Value.Errors)
+                foreach (ModelError error in state.Value.Errors)
                 {
                     Console.WriteLine("\t" + error.ErrorMessage);
                 }
@@ -231,26 +233,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             Assert.AreEqual(11, modelState.Keys.Count());
             const string complexPropertyKey = "_Properties.complex.invariant.null";
             Assert.IsTrue(modelState.Keys.Contains(complexPropertyKey));
-            foreach (var state in modelState.Where(x => x.Key != complexPropertyKey))
+            foreach (KeyValuePair<string, ModelStateEntry> state in modelState.Where(x => x.Key != complexPropertyKey))
             {
-                foreach (var error in state.Value.Errors)
+                foreach (ModelError error in state.Value.Errors)
                 {
                     Assert.IsFalse(error.ErrorMessage.DetectIsJson()); // non complex is just an error message
                 }
             }
-            var complexEditorErrors = modelState.Single(x => x.Key == complexPropertyKey).Value.Errors;
-            Assert.AreEqual(1, complexEditorErrors.Count);
-            var nestedError = complexEditorErrors[0];
-            var jsonError = JsonConvert.DeserializeObject<JArray>(nestedError.ErrorMessage);
 
-            var modelStateKeys = new[] { "_Properties.title.invariant.null.innerFieldId", "_Properties.title.invariant.null.value", "_Properties.bodyText.invariant.null.innerFieldId", "_Properties.bodyText.invariant.null.value" };
+            ModelErrorCollection complexEditorErrors = modelState.Single(x => x.Key == complexPropertyKey).Value.Errors;
+            Assert.AreEqual(1, complexEditorErrors.Count);
+            ModelError nestedError = complexEditorErrors[0];
+            JArray jsonError = JsonConvert.DeserializeObject<JArray>(nestedError.ErrorMessage);
+
+            string[] modelStateKeys = new[] { "_Properties.title.invariant.null.innerFieldId", "_Properties.title.invariant.null.value", "_Properties.bodyText.invariant.null.innerFieldId", "_Properties.bodyText.invariant.null.value" };
             AssertNestedValidation(jsonError, 0, id1, modelStateKeys);
             AssertNestedValidation(jsonError, 1, id2, modelStateKeys.Concat(new[] { "_Properties.complex.invariant.null.innerFieldId", "_Properties.complex.invariant.null.value" }).ToArray());
             var nestedJsonError = jsonError.SelectToken("$[1].complex") as JArray;
             Assert.IsNotNull(nestedJsonError);
             AssertNestedValidation(nestedJsonError, 0, id3, modelStateKeys);
-
-
         }
 
         private void AssertNestedValidation(JArray jsonError, int index, Guid id, string[] modelStateKeys)
@@ -259,7 +260,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             Assert.AreEqual(id.ToString(), jsonError.SelectToken("$[" + index + "].$id").Value<string>());
             Assert.AreEqual("textPage", jsonError.SelectToken("$[" + index + "].$elementTypeAlias").Value<string>());
             Assert.IsNotNull(jsonError.SelectToken("$[" + index + "].ModelState"));
-            foreach (var key in modelStateKeys)
+            foreach (string key in modelStateKeys)
             {
                 var error = jsonError.SelectToken("$[" + index + "].ModelState['" + key + "']") as JArray;
                 Assert.IsNotNull(error);
@@ -267,38 +268,45 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
             }
         }
 
-        //[HideFromTypeFinder]
+        // [HideFromTypeFinder]
         [DataEditor("complexTest", "test", "test")]
         public class ComplexTestEditor : NestedContentPropertyEditor
         {
-             public ComplexTestEditor(ILoggerFactory loggerFactory, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizationService localizationService,
-                IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
-                 : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService, jsonSerializer)
+            public ComplexTestEditor(
+               ILoggerFactory loggerFactory,
+               Lazy<PropertyEditorCollection> propertyEditors,
+               IDataTypeService dataTypeService,
+               IContentTypeService contentTypeService,
+               ILocalizationService localizationService,
+               IIOHelper ioHelper,
+               ILocalizedTextService localizedTextService,
+               IShortStringHelper shortStringHelper,
+               IJsonSerializer jsonSerializer)
+                : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService, jsonSerializer)
             {
             }
 
             protected override IDataValueEditor CreateValueEditor()
             {
-                var editor = base.CreateValueEditor();
+                IDataValueEditor editor = base.CreateValueEditor();
                 editor.Validators.Add(new NeverValidateValidator());
                 return editor;
             }
         }
 
-         //[HideFromTypeFinder]
-         [DataEditor("test", "test", "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
-         public class TestEditor : DataEditor
-         {
-             public TestEditor(
-                 ILoggerFactory loggerFactory,
-                 IDataTypeService dataTypeService,
-                 ILocalizationService localizationService,
-                 ILocalizedTextService localizedTextService,
-                 IShortStringHelper shortStringHelper,
-                 IJsonSerializer jsonSerializer)
-                 : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+        // [HideFromTypeFinder]
+        [DataEditor("test", "test", "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
+        public class TestEditor : DataEditor
+        {
+            public TestEditor(
+                ILoggerFactory loggerFactory,
+                IDataTypeService dataTypeService,
+                ILocalizationService localizationService,
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer)
+                : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
             {
-
             }
 
             protected override IDataValueEditor CreateValueEditor() => new TestValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
@@ -316,7 +324,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
                 {
                     Validators.Add(new NeverValidateValidator());
                 }
-
             }
         }
 
@@ -327,6 +334,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
                 yield return new ValidationResult("WRONG!", new[] { "innerFieldId" });
             }
         }
-
     }
 }

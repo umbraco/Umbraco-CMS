@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -28,20 +31,19 @@ namespace Umbraco.Tests.Common.PublishedContent
 
         public IDomainCache Domains => null;
 
-        public IDisposable ForcedPreview(bool forcedPreview, Action<bool> callback = null)
-        {
-            throw new NotImplementedException();
-        }
+        public IDisposable ForcedPreview(bool forcedPreview, Action<bool> callback = null) => throw new NotImplementedException();
 
         public void Resync()
-        { }
+        {
+        }
 
         public IAppCache SnapshotCache => null;
 
         public IAppCache ElementsCache => null;
 
         public void Dispose()
-        { }
+        {
+        }
     }
 
     public class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
@@ -50,121 +52,56 @@ namespace Umbraco.Tests.Common.PublishedContent
 
         public SolidPublishedContentCache()
             : base(false)
-        { }
-
-        public void Add(SolidPublishedContent content)
         {
-            _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
         }
 
-        public void Clear()
-        {
-            _content.Clear();
-        }
+        public void Add(SolidPublishedContent content) => _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
-        {
-            throw new NotImplementedException();
-        }
+        public void Clear() => _content.Clear();
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
-        {
-            throw new NotImplementedException();
-        }
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null) => throw new NotImplementedException();
 
-        public string GetRouteById(bool preview, int contentId, string culture = null)
-        {
-            throw new NotImplementedException();
-        }
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null) => throw new NotImplementedException();
 
-        public string GetRouteById(int contentId, string culture = null)
-        {
-            throw new NotImplementedException();
-        }
+        public string GetRouteById(bool preview, int contentId, string culture = null) => throw new NotImplementedException();
 
-        public override IPublishedContent GetById(bool preview, int contentId)
-        {
-            return _content.ContainsKey(contentId) ? _content[contentId] : null;
-        }
+        public string GetRouteById(int contentId, string culture = null) => throw new NotImplementedException();
 
-        public override IPublishedContent GetById(bool preview, Guid contentId)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContent GetById(bool preview, int contentId) => _content.ContainsKey(contentId) ? _content[contentId] : null;
 
-        public override IPublishedContent GetById(bool preview, Udi nodeId)
-            => throw new NotSupportedException();
+        public override IPublishedContent GetById(bool preview, Guid contentId) => throw new NotImplementedException();
 
-        public override bool HasById(bool preview, int contentId)
-        {
-            return _content.ContainsKey(contentId);
-        }
+        public override IPublishedContent GetById(bool preview, Udi nodeId) => throw new NotSupportedException();
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
-        {
-            return _content.Values.Where(x => x.Parent == null);
-        }
+        public override bool HasById(bool preview, int contentId) => _content.ContainsKey(contentId);
 
-        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            throw new NotImplementedException();
-        }
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null) => _content.Values.Where(x => x.Parent == null);
 
-        public override IPublishedContent GetSingleByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContent GetSingleByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars)
-        {
-            throw new NotImplementedException();
-        }
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override System.Xml.XPath.XPathNavigator CreateNavigator(bool preview)
-        {
-            throw new NotImplementedException();
-        }
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override System.Xml.XPath.XPathNavigator CreateNodeNavigator(int id, bool preview)
-        {
-            throw new NotImplementedException();
-        }
+        public override System.Xml.XPath.XPathNavigator CreateNavigator(bool preview) => throw new NotImplementedException();
 
-        public override bool HasContent(bool preview)
-        {
-            return _content.Count > 0;
-        }
+        public override System.Xml.XPath.XPathNavigator CreateNodeNavigator(int id, bool preview) => throw new NotImplementedException();
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool HasContent(bool preview) => _content.Count > 0;
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContentType GetContentType(int id) => throw new NotImplementedException();
 
-        public override IPublishedContentType GetContentType(Guid key)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContentType GetContentType(string alias) => throw new NotImplementedException();
 
-        public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
-        {
-            throw new NotImplementedException();
-        }
+        public override IPublishedContentType GetContentType(Guid key) => throw new NotImplementedException();
+
+        public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) => throw new NotImplementedException();
     }
 
     public class SolidPublishedContent : IPublishedContent
     {
-        #region Constructor
-
         public SolidPublishedContent(IPublishedContentType contentType)
         {
             // initialize boring stuff
@@ -176,68 +113,67 @@ namespace Umbraco.Tests.Common.PublishedContent
             ContentType = contentType;
         }
 
-        #endregion
-
-        #region Content
-
         private Dictionary<string, PublishedCultureInfo> _cultures;
 
-        private Dictionary<string, PublishedCultureInfo> GetCultures()
-        {
-            return new Dictionary<string, PublishedCultureInfo> { { "", new PublishedCultureInfo("", Name, UrlSegment, UpdateDate) } };
-        }
+        private Dictionary<string, PublishedCultureInfo> GetCultures() => new Dictionary<string, PublishedCultureInfo> { { string.Empty, new PublishedCultureInfo(string.Empty, Name, UrlSegment, UpdateDate) } };
 
         public int Id { get; set; }
+
         public Guid Key { get; set; }
+
         public int? TemplateId { get; set; }
+
         public int SortOrder { get; set; }
+
         public string Name { get; set; }
+
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
+
         public string UrlSegment { get; set; }
+
         public int WriterId { get; set; }
+
         public int CreatorId { get; set; }
+
         public string Path { get; set; }
+
         public DateTime CreateDate { get; set; }
+
         public DateTime UpdateDate { get; set; }
+
         public Guid Version { get; set; }
+
         public int Level { get; set; }
 
         public PublishedItemType ItemType => PublishedItemType.Content;
+
         public bool IsDraft(string culture = null) => false;
+
         public bool IsPublished(string culture = null) => true;
 
-        #endregion
-
-        #region Tree
-
         public int ParentId { get; set; }
+
         public IEnumerable<int> ChildIds { get; set; }
 
         public IPublishedContent Parent { get; set; }
+
         public IEnumerable<IPublishedContent> Children { get; set; }
+
         public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
-
-        #endregion
-
-        #region ContentType
 
         public IPublishedContentType ContentType { get; set; }
 
-        #endregion
-
-        #region Properties
-
         public IEnumerable<IPublishedProperty> Properties { get; set; }
 
-        public IPublishedProperty GetProperty(string alias)
-        {
-            return Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
-        }
+        public IPublishedProperty GetProperty(string alias) => Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 
         public IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            var property = GetProperty(alias);
-            if (recurse == false) return property;
+            IPublishedProperty property = GetProperty(alias);
+            if (recurse == false)
+            {
+                return property;
+            }
 
             IPublishedContent content = this;
             while (content != null && (property == null || property.HasValue() == false))
@@ -257,22 +193,28 @@ namespace Umbraco.Tests.Common.PublishedContent
                 return property == null || property.HasValue() == false ? null : property.GetValue();
             }
         }
-
-        #endregion
     }
 
     public class SolidPublishedProperty : IPublishedProperty
     {
         public IPublishedPropertyType PropertyType { get; set; }
+
         public string Alias { get; set; }
+
         public object SolidSourceValue { get; set; }
+
         public object SolidValue { get; set; }
+
         public bool SolidHasValue { get; set; }
+
         public object SolidXPathValue { get; set; }
 
         public virtual object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
+
         public virtual object GetValue(string culture = null, string segment = null) => SolidValue;
+
         public virtual object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
+
         public virtual bool HasValue(string culture = null, string segment = null) => SolidHasValue;
     }
 
@@ -355,13 +297,10 @@ namespace Umbraco.Tests.Common.PublishedContent
     [PublishedModel("ContentType2")]
     public class ContentType2 : PublishedContentModel
     {
-        #region Plumbing
-
         public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
-        { }
-
-        #endregion
+        {
+        }
 
         public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
     }
@@ -369,20 +308,18 @@ namespace Umbraco.Tests.Common.PublishedContent
     [PublishedModel("ContentType2Sub")]
     public class ContentType2Sub : ContentType2
     {
-        #region Plumbing
-
         public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content, fallback)
-        { }
-
-        #endregion
+        {
+        }
     }
 
     public class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
-        { }
+        {
+        }
 
         public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
     }
@@ -391,7 +328,8 @@ namespace Umbraco.Tests.Common.PublishedContent
     {
         public PublishedContentStrong1Sub(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content, fallback)
-        { }
+        {
+        }
 
         public int AnotherValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "anotherValue");
     }
@@ -400,7 +338,8 @@ namespace Umbraco.Tests.Common.PublishedContent
     {
         public PublishedContentStrong2(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
-        { }
+        {
+        }
 
         public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
     }
@@ -415,9 +354,18 @@ namespace Umbraco.Tests.Common.PublishedContent
             var jsonSerializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
 
-            var dataType = new DataType(new VoidEditor(Mock.Of<ILoggerFactory>(), dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), jsonSerializer), configurationEditorJsonSerializer)
-                { Id = 666 };
+            var dataType = new DataType(
+                new VoidEditor(
+                    Mock.Of<ILoggerFactory>(),
+                    dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    jsonSerializer),
+                configurationEditorJsonSerializer)
+                {
+                    Id = 666
+                };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeServiceMock.Object);
@@ -426,23 +374,27 @@ namespace Umbraco.Tests.Common.PublishedContent
 
         public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
-        { }
+        {
+        }
 
         public AutoPublishedContentType(Guid key, int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
             : base(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
-        { }
+        {
+        }
 
         public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
-        { }
+        {
+        }
 
         public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
             : base(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
-        { }
+        {
+        }
 
         public override IPublishedPropertyType GetPropertyType(string alias)
         {
-            var propertyType = base.GetPropertyType(alias);
+            IPublishedPropertyType propertyType = base.GetPropertyType(alias);
             return propertyType ?? Default;
         }
     }

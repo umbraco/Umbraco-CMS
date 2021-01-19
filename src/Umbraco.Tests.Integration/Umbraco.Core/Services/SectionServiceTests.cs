@@ -1,4 +1,7 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
@@ -19,13 +22,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Services
     public class SectionServiceTests : UmbracoIntegrationTest
     {
         private ISectionService SectionService => GetRequiredService<ISectionService>();
+
         private IUserService UserService => GetRequiredService<IUserService>();
 
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {
             // Arrange
-            var user = CreateTestUser();
+            IUser user = CreateTestUser();
 
             // Act
             var result = SectionService.GetAllowedSections(user.Id).ToList();
@@ -52,6 +56,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Services
             };
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
+
             // TODO: This is failing the test
             UserService.Save(userGroupA, new[] { user.Id }, false);
 

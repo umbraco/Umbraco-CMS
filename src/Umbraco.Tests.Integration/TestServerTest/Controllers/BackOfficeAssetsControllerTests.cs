@@ -1,7 +1,10 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
@@ -13,10 +16,10 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         public async Task EnsureSuccessStatusCode()
         {
             // Arrange
-            var url = PrepareUrl<BackOfficeAssetsController>(x=>x.GetSupportedLocales());
+            string url = PrepareUrl<BackOfficeAssetsController>(x => x.GetSupportedLocales());
 
             // Act
-            var response = await Client.GetAsync(url);
+            HttpResponseMessage response = await Client.GetAsync(url);
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);

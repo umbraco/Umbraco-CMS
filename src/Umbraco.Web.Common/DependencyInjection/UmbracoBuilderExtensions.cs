@@ -25,6 +25,7 @@ using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Security;
@@ -125,7 +126,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             // Add supported databases
             builder.AddUmbracoSqlServerSupport();
             builder.AddUmbracoSqlCeSupport();
-
+            builder.Services.AddUnique<DatabaseSchemaCreatorFactory>();
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
             builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(

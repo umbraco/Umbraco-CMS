@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Runtime.InteropServices;
 
 namespace Umbraco.Tests.Common.TestHelpers
 {
@@ -6,8 +9,8 @@ namespace Umbraco.Tests.Common.TestHelpers
     {
         public static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-        public  static bool IsOSX => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        public static bool IsOSX => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
-        public  static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     }
 }

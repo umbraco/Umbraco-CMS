@@ -1,9 +1,14 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Testing;
@@ -16,24 +21,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class RelationTypeRepositoryTest : UmbracoIntegrationTest
     {
         [SetUp]
-        public void SetUp()
-        {
-            CreateTestData();
-        }
+        public void SetUp() => CreateTestData();
 
-        private RelationTypeRepository CreateRepository(IScopeProvider provider)
-        {
-            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
-        }
+        private RelationTypeRepository CreateRepository(IScopeProvider provider) =>
+            new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
         [Test]
         public void Can_Perform_Add_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
                 var relateMemberToContent = new RelationType("Relate Member to Content", "relateMemberToContent", true, Constants.ObjectTypes.Member, Constants.ObjectTypes.Document);
@@ -50,18 +50,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var relationType = repository.Get(3);
-                relationType.Alias = relationType.Alias + "Updated";
-                relationType.Name = relationType.Name + " Updated";
+                IRelationType relationType = repository.Get(3);
+                relationType.Alias += "Updated";
+                relationType.Name += " Updated";
                 repository.Save(relationType);
 
-                var relationTypeUpdated = repository.Get(3);
+                IRelationType relationTypeUpdated = repository.Get(3);
 
                 // Assert
                 Assert.That(relationTypeUpdated, Is.Not.Null);
@@ -75,16 +75,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var relationType = repository.Get(3);
+                IRelationType relationType = repository.Get(3);
                 repository.Delete(relationType);
 
-                var exists = repository.Exists(3);
+                bool exists = repository.Exists(3);
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -95,13 +95,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Get_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var relationType = repository.Get(8);
+                IRelationType relationType = repository.Get(8);
 
                 // Assert
                 Assert.That(relationType, Is.Not.Null);
@@ -118,13 +118,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetAll_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var relationTypes = repository.GetMany();
+                IEnumerable<IRelationType> relationTypes = repository.GetMany();
 
                 // Assert
                 Assert.That(relationTypes, Is.Not.Null);
@@ -138,13 +138,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetAll_With_Params_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var relationTypes = repository.GetMany(2, 3);
+                IEnumerable<IRelationType> relationTypes = repository.GetMany(2, 3);
 
                 // Assert
                 Assert.That(relationTypes, Is.Not.Null);
@@ -158,14 +158,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Exists_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var exists = repository.Exists(3);
-                var doesntExist = repository.Exists(9);
+                bool exists = repository.Exists(3);
+                bool doesntExist = repository.Exists(9);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -177,13 +177,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Count_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var query = scope.SqlContext.Query<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
+                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -195,15 +195,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetByQuery_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                var childObjType = Constants.ObjectTypes.DocumentType;
-                var query = scope.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
-                var result = repository.Get(query);
+                System.Guid childObjType = Constants.ObjectTypes.DocumentType;
+                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
+                IEnumerable<IRelationType> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -219,14 +219,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentType);
             var relateContentMedia = new RelationType("Relate Content to Media", "relateContentToMedia", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
 
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+                var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
-                repository.Save(relateContent);//Id 2
-                repository.Save(relateContentType);//Id 3
-                repository.Save(relateContentMedia);//Id 4
+                repository.Save(relateContent); // Id 2
+                repository.Save(relateContentType); // Id 3
+                repository.Save(relateContentMedia); // Id 4
                 scope.Complete();
             }
         }

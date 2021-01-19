@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -8,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
@@ -66,9 +70,9 @@ namespace Umbraco.Tests.Integration.DependencyInjection
         /// </summary>
         private static ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
         {
-            var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
-            var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
-            var appCaches = factory.GetRequiredService<AppCaches>();
+            IOptions<GlobalSettings> globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+            ILoggerFactory loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+            AppCaches appCaches = factory.GetRequiredService<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
                 new Lazy<LocalizedTextServiceFileSources>(() =>
@@ -79,14 +83,14 @@ namespace Umbraco.Tests.Integration.DependencyInjection
                     {
                         currFolder = currFolder.Parent;
                     }
-                    var netcoreUI = currFolder.GetDirectories("Umbraco.Web.UI.NetCore", SearchOption.TopDirectoryOnly).First();
+
+                    DirectoryInfo netcoreUI = currFolder.GetDirectories("Umbraco.Web.UI.NetCore", SearchOption.TopDirectoryOnly).First();
                     var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
                         loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                         appCaches,
                         mainLangFolder);
-
                 }),
                 loggerFactory.CreateLogger<LocalizedTextService>());
 
@@ -110,52 +114,44 @@ namespace Umbraco.Tests.Integration.DependencyInjection
         private class NoopServerMessenger : IServerMessenger
         {
             public NoopServerMessenger()
-            { }
+            {
+            }
 
             public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
-
             }
 
             public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
-
             }
 
             public void QueueRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
-
             }
 
             public void QueueRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
-
             }
 
             public void QueueRemove(ICacheRefresher refresher, params int[] numericIds)
             {
-
             }
 
             public void QueueRefresh(ICacheRefresher refresher, params int[] numericIds)
             {
-
             }
 
             public void QueueRefresh(ICacheRefresher refresher, params Guid[] guidIds)
             {
-
             }
 
             public void QueueRefreshAll(ICacheRefresher refresher)
             {
-
             }
 
             public void Sync() { }
 
             public void SendMessages() { }
         }
-
     }
 }

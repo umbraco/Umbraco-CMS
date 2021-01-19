@@ -37,9 +37,11 @@ using File = System.IO.File;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Mail;
+using Umbraco.Core.Migrations.Install;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -59,6 +61,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator();
+            public DatabaseSchemaCreatorFactory DatabaseSchemaCreatorFactory { get; } = new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(), NullLoggerFactory.Instance, new UmbracoVersion());
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
 
@@ -99,6 +102,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IJsonSerializer JsonSerializer => _testHelperInternal.JsonSerializer;
         public static IVariationContextAccessor VariationContextAccessor => _testHelperInternal.VariationContextAccessor;
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => _testHelperInternal.DbProviderFactoryCreator;
+        public static DatabaseSchemaCreatorFactory DatabaseSchemaCreatorFactory => _testHelperInternal.DatabaseSchemaCreatorFactory;
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => _testHelperInternal.BulkSqlInsertProvider;
         public static IMarchal Marchal => _testHelperInternal.Marchal;
         public static CoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;

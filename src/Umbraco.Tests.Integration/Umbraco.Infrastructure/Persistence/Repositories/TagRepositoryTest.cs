@@ -1,4 +1,8 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -18,18 +22,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class TagRepositoryTest : UmbracoIntegrationTest
     {
         private IFileService FileService => GetRequiredService<IFileService>();
+
         private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
+
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+
         private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+
         private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
         [Test]
         public void Can_Perform_Add_On_Repository()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
 
                 var tag = new Tag
                 {
@@ -46,10 +54,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
 
                 var tag = new Tag
                 {
@@ -76,29 +84,31 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Create_Tag_Relations()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                    tags,
+                    false);
 
                 Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
             }
@@ -107,38 +117,42 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Append_Tag_Relations()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                    {
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"},
-                    }, false);
+                    tags2,
+                    false);
 
                 Assert.AreEqual(4, repository.GetTagsForEntity(content.Id).Count());
             }
@@ -147,40 +161,44 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Replace_Tag_Relations()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                    {
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"},
-                    }, true);
+                    tags2,
+                    true);
 
-                var result = repository.GetTagsForEntity(content.Id).ToArray();
+                ITag[] result = repository.GetTagsForEntity(content.Id).ToArray();
                 Assert.AreEqual(2, result.Length);
                 Assert.AreEqual("tag3", result[0].Text);
                 Assert.AreEqual("tag4", result[1].Text);
@@ -190,40 +208,44 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Merge_Tag_Relations()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                    {
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" },
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                    }, false);
+                    tags2,
+                    false);
 
-                var result = repository.GetTagsForEntity(content.Id);
+                IEnumerable<ITag> result = repository.GetTagsForEntity(content.Id);
                 Assert.AreEqual(3, result.Count());
             }
         }
@@ -231,36 +253,39 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Clear_Tag_Relations()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
                     {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                    };
+                repository.Assign(
+                    content.Id,
+                    contentType.PropertyTypes.First().Id,
+                    tags,
+                    false);
 
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    Enumerable.Empty<ITag>(), true);
+                    Enumerable.Empty<ITag>(),
+                    true);
 
-                var result = repository.GetTagsForEntity(content.Id);
+                IEnumerable<ITag> result = repository.GetTagsForEntity(content.Id);
                 Assert.AreEqual(0, result.Count());
             }
         }
@@ -268,42 +293,45 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Remove_Specific_Tags_From_Property()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content = ContentBuilder.CreateSimpleContent(contentType);
+                Content content = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" }
+                    };
                 repository.Assign(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tagsToRemove = new[]
+                    {
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" }
+                    };
                 repository.Remove(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    });
+                    tagsToRemove);
 
-                var result = repository.GetTagsForEntity(content.Id).ToArray();
+                ITag[] result = repository.GetTagsForEntity(content.Id).ToArray();
                 Assert.AreEqual(2, result.Length);
                 Assert.AreEqual("tag1", result[0].Text);
                 Assert.AreEqual("tag4", result[1].Text);
@@ -313,44 +341,48 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Content_By_Id()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" }
+                    };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" }
+                    };
                 repository.Assign(
                     content2.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result = repository.GetTagsForEntity(content2.Id);
+                IEnumerable<ITag> result = repository.GetTagsForEntity(content2.Id);
                 Assert.AreEqual(2, result.Count());
             }
         }
@@ -358,45 +390,49 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Content_By_Key()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" }
+                    };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" }
+                    };
                 repository.Assign(
                     content2.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
-                //get by key
-                var result = repository.GetTagsForEntity(content2.Key);
+                // get by key
+                IEnumerable<ITag> result = repository.GetTagsForEntity(content2.Key);
                 Assert.AreEqual(2, result.Count());
             }
         }
@@ -404,35 +440,37 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_All()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                    {
+                        new Tag { Text = "tag1", Group = "test" },
+                        new Tag { Text = "tag2", Group = "test" },
+                        new Tag { Text = "tag3", Group = "test" },
+                        new Tag { Text = "tag4", Group = "test" }
+                    };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
-                var result = repository.GetMany();
+                IEnumerable<ITag> result = repository.GetMany();
                 Assert.AreEqual(4, result.Count());
             }
         }
@@ -440,40 +478,41 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_All_With_Ids()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var repository = CreateRepository(provider);
-                var tags = new[]
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
                 {
-                    new Tag {Text = "tag1", Group = "test"},
-                    new Tag {Text = "tag2", Group = "test"},
-                    new Tag {Text = "tag3", Group = "test"},
-                    new Tag {Text = "tag4", Group = "test"}
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test" }
                 };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    tags, false);
+                    tags,
+                    false);
 
                 // TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
-                //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
-                var all = repository.GetMany().ToArray();
+                // var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
+                ITag[] all = repository.GetMany().ToArray();
 
-                var result = repository.GetMany(all[0].Id, all[1].Id, all[2].Id);
+                IEnumerable<ITag> result = repository.GetMany(all[0].Id, all[1].Id, all[2].Id);
                 Assert.AreEqual(3, result.Count());
             }
         }
@@ -481,44 +520,48 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Content_For_Group()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test1" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" }
+                };
                 repository.Assign(
                     content2.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result = repository.GetTagsForEntity(content1.Id, "test1");
+                IEnumerable<ITag> result = repository.GetTagsForEntity(content1.Id, "test1");
                 Assert.AreEqual(2, result.Count());
             }
         }
@@ -526,43 +569,47 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Property_By_Id()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
+                ITag[] result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
+                ITag[] result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
                 Assert.AreEqual(4, result1.Length);
                 Assert.AreEqual(2, result2.Length);
             }
@@ -571,43 +618,47 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Property_By_Key()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias).ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
+                ITag[] result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias).ToArray();
+                ITag[] result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
                 Assert.AreEqual(4, result1.Length);
                 Assert.AreEqual(2, result2.Length);
             }
@@ -616,43 +667,47 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Property_For_Group()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test1" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias, "test1").ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1").ToArray();
+                ITag[] result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias, "test1").ToArray();
+                ITag[] result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1").ToArray();
 
                 Assert.AreEqual(2, result1.Length);
                 Assert.AreEqual(1, result2.Length);
@@ -662,49 +717,53 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Entity_Type()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+                MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
                 MediaTypeRepository.Save(mediaType);
 
-                var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaRepository.Save(media1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test1" }
+                };
                 repository.Assign(
                     media1.Id,
                     mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
-                var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
-                var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
+                ITag[] result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
+                ITag[] result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
+                ITag[] result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
                 Assert.AreEqual(3, result1.Length);
                 Assert.AreEqual(2, result2.Length);
@@ -719,49 +778,53 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+                MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
                 MediaTypeRepository.Save(mediaType);
 
-                var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaRepository.Save(media1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test1" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" }
+                };
                 repository.Assign(
                     media1.Id,
                     mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    tags2,
+                    false);
 
-                var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content,  "test1").ToArray();
-                var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
+                ITag[] result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content,  "test1").ToArray();
+                ITag[] result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
 
                 Assert.AreEqual(2, result1.Length);
                 Assert.AreEqual(1, result2.Length);
@@ -771,31 +834,33 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Cascade_Deletes_Tag_Relations()
         {
-            var provider = ScopeProvider;
-            using (var scope = ScopeProvider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test" },
+                    new Tag { Text = "tag3", Group = "test" },
+                    new Tag { Text = "tag4", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                        {
-                            new Tag {Text = "tag1", Group = "test"},
-                            new Tag {Text = "tag2", Group = "test"},
-                            new Tag {Text = "tag3", Group = "test"},
-                            new Tag {Text = "tag4", Group = "test"}
-                        }, false);
+                    tags,
+                    false);
 
                 DocumentRepository.Delete(content1);
 
@@ -808,79 +873,91 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-                var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+                MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
                 MediaTypeRepository.Save(mediaType);
 
-                var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaRepository.Save(media1);
 
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag {Text = "tag1", Group = "test"},
+                    new Tag {Text = "tag2", Group = "test1"},
+                    new Tag {Text = "tag3", Group = "test"}
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" }
+                };
                 repository.Assign(
                     content2.Id,
                     contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    tags2,
+                    false);
 
+                Tag[] tags3 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" }
+                };
                 repository.Assign(
                     media1.Id,
                     mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    tags3,
+                    false);
 
-                var contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
-                //there are two content items tagged against the 'test' group
+                TaggedEntity[] contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
+
+                // there are two content items tagged against the 'test' group
                 Assert.AreEqual(2, contentTestIds.Length);
-                //there are a total of two property types tagged against the 'test' group
+
+                // there are a total of two property types tagged against the 'test' group
                 Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 2 tags tagged against the 'test' group
+
+                // there are a total of 2 tags tagged against the 'test' group
                 Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var contentTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
-                //there are two content items tagged against the 'test1' group
+                TaggedEntity[] contentTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
+
+                // there are two content items tagged against the 'test1' group
                 Assert.AreEqual(2, contentTest1Ids.Length);
-                //there are a total of two property types tagged against the 'test1' group
+
+                // there are a total of two property types tagged against the 'test1' group
                 Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags tagged against the 'test1' group
+
+                // there are a total of 1 tags tagged against the 'test1' group
                 Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
+                IEnumerable<TaggedEntity> mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
                 Assert.AreEqual(1, mediaTestIds.Count());
 
-                var mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
+                IEnumerable<TaggedEntity> mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
                 Assert.AreEqual(1, mediaTest1Ids.Count());
             }
         }
@@ -888,86 +965,92 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag()
         {
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (ScopeProvider.CreateScope())
             {
-                //create data to relate to
+                // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
                 ContentTypeRepository.Save(contentType);
 
-
-                var content1 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content1 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content1);
 
-
-                var content2 = ContentBuilder.CreateSimpleContent(contentType);
+                Content content2 = ContentBuilder.CreateSimpleContent(contentType);
                 DocumentRepository.Save(content2);
 
-
-                var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+                MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
                 MediaTypeRepository.Save(mediaType);
 
-                var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaRepository.Save(media1);
 
-
-                var repository = CreateRepository(provider);
+                TagRepository repository = CreateRepository(provider);
+                Tag[] tags = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                    new Tag { Text = "tag3", Group = "test" }
+                };
                 repository.Assign(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    tags,
+                    false);
 
+                Tag[] tags2 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" },
+                };
                 repository.Assign(
                     content2.Id,
                     contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                    }, false);
+                    tags2,
+                    false);
 
+                Tag[] tags3 = new[]
+                {
+                    new Tag { Text = "tag1", Group = "test" },
+                    new Tag { Text = "tag2", Group = "test1" }
+                };
                 repository.Assign(
                     media1.Id,
                     mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    tags3,
+                    false);
 
-                var contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
-                //there are two content items tagged against the 'tag1' tag
+                TaggedEntity[] contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
+
+                // there are two content items tagged against the 'tag1' tag
                 Assert.AreEqual(2, contentTestIds.Length);
-                //there are a total of two property types tagged against the 'tag1' tag
+
+                // there are a total of two property types tagged against the 'tag1' tag
                 Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags since we're only looking against one tag
+
+                // there are a total of 1 tags since we're only looking against one tag
                 Assert.AreEqual(1, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
-                //there are 1 content items tagged against the 'tag3' tag
+                TaggedEntity[] contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
+
+                // there are 1 content items tagged against the 'tag3' tag
                 Assert.AreEqual(1, contentTest1Ids.Length);
-                //there are a total of two property types tagged against the 'tag3' tag
+
+                // there are a total of two property types tagged against the 'tag3' tag
                 Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags since we're only looking against one tag
+
+                // there are a total of 1 tags since we're only looking against one tag
                 Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
+                IEnumerable<TaggedEntity> mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
                 Assert.AreEqual(1, mediaTestIds.Count());
             }
         }
 
-        private TagRepository CreateRepository(IScopeProvider provider)
-        {
-            return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
-        }
+        private TagRepository CreateRepository(IScopeProvider provider) =>
+            new TagRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
     }
 }

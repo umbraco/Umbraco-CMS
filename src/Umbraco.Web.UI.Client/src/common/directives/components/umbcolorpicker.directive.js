@@ -5,7 +5,7 @@
 @scope
 
 @description
-<strong>Added in Umbraco v. 8.8:</strong> Use this directive to render a color picker.
+<strong>Added in Umbraco v. 8.10:</strong> Use this directive to render a color picker.
 
 <h3>Markup example</h3>
 <pre>

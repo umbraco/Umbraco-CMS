@@ -23,7 +23,8 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
 
-        public ContentTypeSortBuilder(ContentTypeBuilder parentBuilder) : base(parentBuilder)
+        public ContentTypeSortBuilder(ContentTypeBuilder parentBuilder)
+            : base(parentBuilder)
         {
         }
 

@@ -858,7 +858,7 @@
               <p> Devam etmek için lütfen "web.config" dosyasını düzenleyin (Visual Studio veya favori metin düzenleyicinizi kullanarak), en alta kaydırın, veritabanınız için "UmbracoDbDSN" adlı anahtara bağlantı dizesini ekleyin ve dosyayı kaydedin. </p>
               <p>
               <strong> Yeniden dene </strong> düğmesini tıklayın.
-              bitti. <br /> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              bitti. <br /> <a href=https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank">
                                                         Web.config'i düzenleme hakkında daha fazla bilgi burada. </a> </p>]]>
     </key>
     <key alias="databaseText">
@@ -924,7 +924,7 @@
     <key alias="runwayFromScratchText">
       <![CDATA[
         Web siteniz şu anda tamamen boş, bu nedenle sıfırdan başlamak ve kendi belge türlerinizi ve şablonlarınızı oluşturmak istiyorsanız bu mükemmel.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">nasıl yapılacağını öğrenin </a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">nasıl yapılacağını öğrenin </a>)
         Yine de Runway'i daha sonra kurmayı seçebilirsiniz. Lütfen Geliştirici bölümüne gidin ve Paketleri seçin.
       ]]>
     </key>
@@ -1009,7 +1009,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="instruction">Aşağıda oturum açın</key>
     <key alias="signInWith">ile oturum açın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align: right;">& copy; 2001 - %0% <br /> <a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com </a> </p>]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align: right;">&copy; 2015 - %0% <br /> <a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com </a> </p>]]></key>
     <key alias="forgottenPassword">Şifrenizi mi unuttunuz?</key>
     <key alias="forgottenPasswordInstruction">Parolanızı sıfırlamak için bir bağlantıyla belirtilen adrese bir e-posta gönderilecektir</key>
     <key alias="requestPasswordResetConfirmation">Kayıtlarımızla eşleşirse, şifre sıfırlama talimatlarını içeren bir e-posta, belirtilen adrese gönderilecektir</key>
@@ -1140,7 +1140,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
  
       İyi günler!
  
-      Umbraco robotunun alkışları
+      Umbraco robotundan teşekkürler
     ]]>
     </key>
     <key alias="mailBodyVariantSummary">Aşağıdaki diller %0% değiştirildi</key>
@@ -1204,7 +1204,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															İyi günler dilerim!<br /><br />
-															Umbraco robottan Alkış
+															Umbraco robotundan teşekkürler
 														</p>
 													</td>
 												</tr>
@@ -1858,7 +1858,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
  
       İyi günler!       
       
-      Umbraco robotunun alkışları     
+      Umbraco robotdan teşekkürler    
       ]]>
     </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>

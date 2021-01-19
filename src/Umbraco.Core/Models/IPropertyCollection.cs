@@ -34,5 +34,6 @@ namespace Umbraco.Core.Models
         void Add(IProperty property);
 
         int Count { get; }
+        void ClearCollectionChangedEvents();
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PublicAccessEntry : EntityBase
     {
-        private readonly ObservableCollection<PublicAccessRule> _ruleCollection;
+        private readonly EventClearingObservableCollection<PublicAccessRule> _ruleCollection;
         private int _protectedNodeId;
         private int _noAccessNodeId;
         private int _loginNodeId;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Models
             NoAccessNodeId = noAccessNode.Id;
             _protectedNodeId = protectedNode.Id;
 
-            _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
+            _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
 
             foreach (var rule in _ruleCollection)
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Models
             NoAccessNodeId = noAccessNodeId;
             _protectedNodeId = protectedNodeId;
 
-            _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
+            _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
 
             foreach (var rule in _ruleCollection)
@@ -148,7 +149,7 @@ namespace Umbraco.Core.Models
 
             if (cloneEntity._ruleCollection != null)
             {
-                cloneEntity._ruleCollection.CollectionChanged -= _ruleCollection_CollectionChanged;       //clear this event handler if any
+                cloneEntity._ruleCollection.ClearCollectionChangedEvents();       //clear this event handler if any
                 cloneEntity._ruleCollection.CollectionChanged += cloneEntity._ruleCollection_CollectionChanged; //re-assign correct event handler
             }
         }

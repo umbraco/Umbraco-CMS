@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Common.AspNetCore;
@@ -14,10 +17,11 @@ namespace Umbraco.Tests.Integration.Implementations
         }
 
         /// <summary>
-        /// Override for tests since we are not hosted
+        /// Gets a value indicating whether we are hosted.
         /// </summary>
         /// <remarks>
-        /// This is specifically used by IOHelper and we want this to return false so that the root path is manually calcualted which is what we want for tests.
+        /// This is specifically used by IOHelper and we want this to return false so that the root path is manually
+        /// calculated which is what we want for tests.
         /// </remarks>
         bool IHostingEnvironment.IsHosted { get; } = false;
     }

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Moq;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -10,7 +13,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         public static DataValueEditor CreateDataValueEditor(string name)
         {
-            var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
+            var valueType = ValueTypes.IsValue(name) ? name : ValueTypes.String;
 
             return new DataValueEditor(
                 Mock.Of<IDataTypeService>(),
@@ -21,9 +24,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 new DataEditorAttribute(name, name, name)
                 {
                     ValueType = valueType
-                }
-
-            );
+                });
         }
     }
 }

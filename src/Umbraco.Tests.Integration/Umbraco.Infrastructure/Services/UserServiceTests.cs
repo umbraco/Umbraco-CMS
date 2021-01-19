@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -27,23 +30,26 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UserServiceTests : UmbracoIntegrationTest
     {
-        private UserService UserService => (UserService) GetRequiredService<IUserService>();
+        private UserService UserService => (UserService)GetRequiredService<IUserService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private IFileService FileService => GetRequiredService<IFileService>();
+
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         [Test]
         public void Get_User_Permissions_For_Unassigned_Permission_Nodes()
         {
             // Arrange
-            var user = CreateTestUser(out _);
+            IUser user = CreateTestUser(out _);
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
                 {
                     ContentBuilder.CreateSimpleContent(contentType),
                     ContentBuilder.CreateSimpleContent(contentType),
@@ -52,7 +58,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Save(content);
 
             // Act
-            var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
+            EntityPermission[] permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
 
             // Assert
             Assert.AreEqual(3, permissions.Length);
@@ -65,14 +71,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_User_Permissions_For_Assigned_Permission_Nodes()
         {
             // Arrange
-            var user = CreateTestUser(out var userGroup);
+            IUser user = CreateTestUser(out IUserGroup userGroup);
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
                 {
                     ContentBuilder.CreateSimpleContent(contentType),
                     ContentBuilder.CreateSimpleContent(contentType),
@@ -87,7 +93,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
 
             // Act
-            var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
+            EntityPermission[] permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
 
             // Assert
             Assert.AreEqual(3, permissions.Length);
@@ -100,14 +106,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_UserGroup_Assigned_Permissions()
         {
             // Arrange
-            var userGroup = CreateTestUserGroup();
+            UserGroup userGroup = CreateTestUserGroup();
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
                 {
                     ContentBuilder.CreateSimpleContent(contentType),
                     ContentBuilder.CreateSimpleContent(contentType),
@@ -122,7 +128,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
 
             // Act
-            var permissions = UserService.GetPermissions(userGroup, false, content[0].Id, content[1].Id, content[2].Id).ToArray();
+            EntityPermission[] permissions = UserService.GetPermissions(userGroup, false, content[0].Id, content[1].Id, content[2].Id).ToArray();
 
             // Assert
             Assert.AreEqual(3, permissions.Length);
@@ -135,14 +141,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_UserGroup_Assigned_And_Default_Permissions()
         {
             // Arrange
-            var userGroup = CreateTestUserGroup();
+            UserGroup userGroup = CreateTestUserGroup();
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
                 {
                     ContentBuilder.CreateSimpleContent(contentType),
                     ContentBuilder.CreateSimpleContent(contentType),
@@ -156,7 +162,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
-            var permissions = UserService.GetPermissions(userGroup, true, content[0].Id, content[1].Id, content[2].Id)
+            EntityPermission[] permissions = UserService.GetPermissions(userGroup, true, content[0].Id, content[1].Id, content[2].Id)
                 .ToArray();
 
             // Assert
@@ -170,31 +176,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_All_User_Permissions_For_All_Nodes_With_Explicit_Permission()
         {
             // Arrange
-            var userGroup1 = CreateTestUserGroup();
-            var userGroup2 = CreateTestUserGroup("test2", "Test 2");
-            var userGroup3 = CreateTestUserGroup("test3", "Test 3");
-            var user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
+            UserGroup userGroup1 = CreateTestUserGroup();
+            UserGroup userGroup2 = CreateTestUserGroup("test2", "Test 2");
+            UserGroup userGroup3 = CreateTestUserGroup("test3", "Test 3");
+            IUser user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
 
-            var defaultPermissionCount = userGroup3.Permissions.Count();
+            int defaultPermissionCount = userGroup3.Permissions.Count();
 
             user.AddGroup(userGroup1);
             user.AddGroup(userGroup2);
             user.AddGroup(userGroup3);
             UserService.Save(user);
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
             {
                 ContentBuilder.CreateSimpleContent(contentType),
                 ContentBuilder.CreateSimpleContent(contentType),
                 ContentBuilder.CreateSimpleContent(contentType)
             };
             ContentService.Save(content);
-            //assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
+
+            // assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
             ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup1.Id });
             ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
             ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup2.Id });
@@ -203,46 +210,52 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
 
             // Act
-            //we don't pass in any nodes so it will return all of them
-            var result = UserService.GetPermissions(user).ToArray();
+            // we don't pass in any nodes so it will return all of them
+            EntityPermission[] result = UserService.GetPermissions(user).ToArray();
             var permissions = result
                 .GroupBy(x => x.EntityId)
                 .ToDictionary(x => x.Key, x => x.GroupBy(a => a.UserGroupId).ToDictionary(a => a.Key, a => a.ToArray()));
 
             // Assert
 
-            //there will be 3 since that is how many content items there are
+            // there will be 3 since that is how many content items there are
             Assert.AreEqual(3, permissions.Count);
 
-            //test permissions contains content[0]
+            // test permissions contains content[0]
             Assert.IsTrue(permissions.ContainsKey(content[0].Id));
-            //test that this permissions set contains permissions for all groups
+
+            // test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup1.Id));
             Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup2.Id));
             Assert.IsTrue(permissions[content[0].Id].ContainsKey(userGroup3.Id));
-            //test that the correct number of permissions are returned for each group
+
+            // test that the correct number of permissions are returned for each group
             Assert.AreEqual(2, permissions[content[0].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(1, permissions[content[0].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(defaultPermissionCount, permissions[content[0].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
 
-            //test permissions contains content[1]
+            // test permissions contains content[1]
             Assert.IsTrue(permissions.ContainsKey(content[1].Id));
-            //test that this permissions set contains permissions for all groups
+
+            // test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup1.Id));
             Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup2.Id));
             Assert.IsTrue(permissions[content[1].Id].ContainsKey(userGroup3.Id));
-            //test that the correct number of permissions are returned for each group
+
+            // test that the correct number of permissions are returned for each group
             Assert.AreEqual(1, permissions[content[1].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(1, permissions[content[1].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(defaultPermissionCount, permissions[content[1].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
 
-            //test permissions contains content[2]
+            // test permissions contains content[2]
             Assert.IsTrue(permissions.ContainsKey(content[2].Id));
-            //test that this permissions set contains permissions for all groups
+
+            // test that this permissions set contains permissions for all groups
             Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup1.Id));
             Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup2.Id));
             Assert.IsTrue(permissions[content[2].Id].ContainsKey(userGroup3.Id));
-            //test that the correct number of permissions are returned for each group
+
+            // test that the correct number of permissions are returned for each group
             Assert.AreEqual(1, permissions[content[2].Id][userGroup1.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(defaultPermissionCount, permissions[content[2].Id][userGroup2.Id].SelectMany(x => x.AssignedPermissions).Count());
             Assert.AreEqual(defaultPermissionCount, permissions[content[2].Id][userGroup3.Id].SelectMany(x => x.AssignedPermissions).Count());
@@ -252,14 +265,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_All_User_Group_Permissions_For_All_Nodes()
         {
             // Arrange
-            var userGroup = CreateTestUserGroup();
+            UserGroup userGroup = CreateTestUserGroup();
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var content = new[]
+            Content[] content = new[]
             {
                 ContentBuilder.CreateSimpleContent(contentType),
                 ContentBuilder.CreateSimpleContent(contentType),
@@ -274,7 +287,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
-            //we don't pass in any nodes so it will return all of them
+            // we don't pass in any nodes so it will return all of them
             var permissions = UserService.GetPermissions(userGroup, true)
                 .GroupBy(x => x.EntityId)
                 .ToDictionary(x => x.Key, x => x);
@@ -292,11 +305,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Calculate_Permissions_For_User_For_Path()
         {
-            //see: http://issues.umbraco.org/issue/U4-10075#comment=67-40085
+            // see: http://issues.umbraco.org/issue/U4-10075#comment=67-40085
             // for an overview of what this is testing
-
             const string path = "-1,1,2,3,4";
-            var pathIds = path.GetIdsFromPathReversed();
+            int[] pathIds = path.GetIdsFromPathReversed();
 
             const int groupA = 7;
             const int groupB = 8;
@@ -304,51 +316,51 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             var userGroups = new Dictionary<int, string[]>
             {
-                {groupA, new[] {"S", "D", "F"}},
-                {groupB, new[] {"S", "D", "G", "K"}},
-                {groupC, new[] {"F", "G"}}
+                { groupA, new[] { "S", "D", "F" } },
+                { groupB, new[] { "S", "D", "G", "K" } },
+                { groupC, new[] { "F", "G" } }
             };
 
-            var permissions = new[]
+            EntityPermission[] permissions = new[]
             {
-                new EntityPermission(groupA, 1, userGroups[groupA], isDefaultPermissions:true),
-                new EntityPermission(groupA, 2, userGroups[groupA], isDefaultPermissions:true),
-                new EntityPermission(groupA, 3, userGroups[groupA], isDefaultPermissions:true),
-                new EntityPermission(groupA, 4, userGroups[groupA], isDefaultPermissions:true),
+                new EntityPermission(groupA, 1, userGroups[groupA], isDefaultPermissions: true),
+                new EntityPermission(groupA, 2, userGroups[groupA], isDefaultPermissions: true),
+                new EntityPermission(groupA, 3, userGroups[groupA], isDefaultPermissions: true),
+                new EntityPermission(groupA, 4, userGroups[groupA], isDefaultPermissions: true),
 
-                new EntityPermission(groupB, 1, userGroups[groupB], isDefaultPermissions:true),
-                new EntityPermission(groupB, 2, new []{"F", "R"}, isDefaultPermissions:false),
-                new EntityPermission(groupB, 3, userGroups[groupB], isDefaultPermissions:true),
-                new EntityPermission(groupB, 4, userGroups[groupB], isDefaultPermissions:true),
+                new EntityPermission(groupB, 1, userGroups[groupB], isDefaultPermissions: true),
+                new EntityPermission(groupB, 2, new[] { "F", "R" }, isDefaultPermissions: false),
+                new EntityPermission(groupB, 3, userGroups[groupB], isDefaultPermissions: true),
+                new EntityPermission(groupB, 4, userGroups[groupB], isDefaultPermissions: true),
 
-                new EntityPermission(groupC, 1, userGroups[groupC], isDefaultPermissions:true),
-                new EntityPermission(groupC, 2, userGroups[groupC], isDefaultPermissions:true),
-                new EntityPermission(groupC, 3, new []{"Q", "Z"}, isDefaultPermissions:false),
-                new EntityPermission(groupC, 4, userGroups[groupC], isDefaultPermissions:true),
+                new EntityPermission(groupC, 1, userGroups[groupC], isDefaultPermissions: true),
+                new EntityPermission(groupC, 2, userGroups[groupC], isDefaultPermissions: true),
+                new EntityPermission(groupC, 3, new[] { "Q", "Z" }, isDefaultPermissions: false),
+                new EntityPermission(groupC, 4, userGroups[groupC], isDefaultPermissions: true),
             };
 
-            //Permissions for Id 4
-            var result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds);
+            // Permissions for Id 4
+            EntityPermissionSet result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds);
             Assert.AreEqual(4, result.EntityId);
-            var allPermissions = result.GetAllPermissions().ToArray();
+            string[] allPermissions = result.GetAllPermissions().ToArray();
             Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
             Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
-            //Permissions for Id 3
+            // Permissions for Id 3
             result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(1).ToArray());
             Assert.AreEqual(3, result.EntityId);
             allPermissions = result.GetAllPermissions().ToArray();
             Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
             Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
-            //Permissions for Id 2
+            // Permissions for Id 2
             result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(2).ToArray());
             Assert.AreEqual(2, result.EntityId);
             allPermissions = result.GetAllPermissions().ToArray();
             Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
             Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "R" }));
 
-            //Permissions for Id 1
+            // Permissions for Id 1
             result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(3).ToArray());
             Assert.AreEqual(1, result.EntityId);
             allPermissions = result.GetAllPermissions().ToArray();
@@ -359,16 +371,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_1()
         {
-            var path = "-1,1,2,3";
-            var pathIds = path.GetIdsFromPathReversed();
-            var defaults = new[] { "A", "B" };
+            string path = "-1,1,2,3";
+            int[] pathIds = path.GetIdsFromPathReversed();
+            string[] defaults = new[] { "A", "B" };
             var permissions = new List<EntityPermission>
             {
-                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
-                new EntityPermission(9876, 2, new []{"B","C", "D"}, isDefaultPermissions:false),
-                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions: true),
+                new EntityPermission(9876, 2, new[] { "B", "C", "D" }, isDefaultPermissions: false),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions: true)
             };
-            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
+            EntityPermission result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
             Assert.AreEqual(3, result.AssignedPermissions.Length);
             Assert.IsFalse(result.IsDefaultPermissions);
             Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }));
@@ -379,32 +391,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_2()
         {
-            var path = "-1,1,2,3";
-            var pathIds = path.GetIdsFromPathReversed();
-            var defaults = new[] { "A", "B", "C" };
+            string path = "-1,1,2,3";
+            int[] pathIds = path.GetIdsFromPathReversed();
+            string[] defaults = new[] { "A", "B", "C" };
             var permissions = new List<EntityPermission>
             {
-                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
-                new EntityPermission(9876, 2, defaults, isDefaultPermissions:true),
-                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions: true),
+                new EntityPermission(9876, 2, defaults, isDefaultPermissions: true),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions: true)
             };
-            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: false);
+            EntityPermission result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: false);
             Assert.IsNull(result);
         }
 
         [Test]
         public void Determine_Deepest_Explicit_Permissions_For_Group_For_Path_3()
         {
-            var path = "-1,1,2,3";
-            var pathIds = path.GetIdsFromPathReversed();
-            var defaults = new[] { "A", "B" };
+            string path = "-1,1,2,3";
+            int[] pathIds = path.GetIdsFromPathReversed();
+            string[] defaults = new[] { "A", "B" };
             var permissions = new List<EntityPermission>
             {
-                new EntityPermission(9876, 1, defaults, isDefaultPermissions:true),
-                new EntityPermission(9876, 2, defaults, isDefaultPermissions:true),
-                new EntityPermission(9876, 3, defaults, isDefaultPermissions:true)
+                new EntityPermission(9876, 1, defaults, isDefaultPermissions: true),
+                new EntityPermission(9876, 2, defaults, isDefaultPermissions: true),
+                new EntityPermission(9876, 3, defaults, isDefaultPermissions: true)
             };
-            var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
+            EntityPermission result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, fallbackToDefaultPermissions: true);
             Assert.AreEqual(2, result.AssignedPermissions.Length);
             Assert.IsTrue(result.IsDefaultPermissions);
             Assert.IsTrue(result.AssignedPermissions.ContainsAll(defaults));
@@ -416,18 +428,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_User_Implicit_Permissions()
         {
             // Arrange
-            var userGroup = CreateTestUserGroup();
+            UserGroup userGroup = CreateTestUserGroup();
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var parent = ContentBuilder.CreateSimpleContent(contentType);
+            Content parent = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(parent);
-            var child1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parent.Id);
+            Content child1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parent.Id);
             ContentService.Save(child1);
-            var child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
+            Content child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
             ContentService.Save(child2);
 
             ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -437,20 +449,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.SetPermission(parent, ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
-            var permissions = UserService.GetPermissionsForPath(userGroup, child2.Path);
+            EntityPermissionSet permissions = UserService.GetPermissionsForPath(userGroup, child2.Path);
 
             // Assert
-            var allPermissions = permissions.GetAllPermissions().ToArray();
+            string[] allPermissions = permissions.GetAllPermissions().ToArray();
             Assert.AreEqual(3, allPermissions.Length);
         }
 
         [Test]
         public void Can_Delete_User()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             UserService.Delete(user, true);
-            var deleted = UserService.GetUserById(user.Id);
+            IUser deleted = UserService.GetUserById(user.Id);
 
             // Assert
             Assert.That(deleted, Is.Null);
@@ -459,10 +471,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Disables_User_Instead_Of_Deleting_If_Flag_Not_Set()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             UserService.Delete(user);
-            var deleted = UserService.GetUserById(user.Id);
+            IUser deleted = UserService.GetUserById(user.Id);
 
             // Assert
             Assert.That(deleted, Is.Not.Null);
@@ -471,8 +483,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Exists_By_Username()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
-            var user2 = UserService.CreateUserWithIdentity("john2@umbraco.io", "john2@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user2 = UserService.CreateUserWithIdentity("john2@umbraco.io", "john2@umbraco.io");
             Assert.IsTrue(UserService.Exists("JohnDoe"));
             Assert.IsFalse(UserService.Exists("notFound"));
             Assert.IsTrue(UserService.Exists("john2@umbraco.io"));
@@ -481,7 +493,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_By_Email()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             Assert.IsNotNull(UserService.GetByEmail(user.Email));
             Assert.IsNull(UserService.GetByEmail("do@not.find"));
@@ -490,7 +502,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_By_Username()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             Assert.IsNotNull(UserService.GetByUsername(user.Username));
             Assert.IsNull(UserService.GetByUsername("notFound"));
@@ -499,7 +511,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_By_Username_With_Backslash()
         {
-            var user = UserService.CreateUserWithIdentity("mydomain\\JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("mydomain\\JohnDoe", "john@umbraco.io");
 
             Assert.IsNotNull(UserService.GetByUsername(user.Username));
             Assert.IsNull(UserService.GetByUsername("notFound"));
@@ -508,7 +520,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_By_Object_Id()
         {
-            var user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             Assert.IsNotNull(UserService.GetUserById(user.Id));
             Assert.IsNull(UserService.GetUserById(9876));
@@ -517,14 +529,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Find_By_Email_Starts_With()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
-            //don't find this
-            var customUser = UserBuilder.CreateUser();
+
+            // don't find this
+            User customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@hello.com";
             UserService.Save(customUser);
 
-            var found = UserService.FindByEmail("tes", 0, 100, out _, StringPropertyMatchType.StartsWith);
+            IEnumerable<IUser> found = UserService.FindByEmail("tes", 0, 100, out _, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -532,14 +545,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Find_By_Email_Ends_With()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
-            //include this
-            var customUser = UserBuilder.CreateUser();
+
+            // include this
+            User customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
-            var found = UserService.FindByEmail("test.com", 0, 100, out _, StringPropertyMatchType.EndsWith);
+            IEnumerable<IUser> found = UserService.FindByEmail("test.com", 0, 100, out _, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -547,14 +561,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Find_By_Email_Contains()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
-            //include this
-            var customUser = UserBuilder.CreateUser();
+
+            // include this
+            User customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
-            var found = UserService.FindByEmail("test", 0, 100, out _, StringPropertyMatchType.Contains);
+            IEnumerable<IUser> found = UserService.FindByEmail("test", 0, 100, out _, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -562,14 +577,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Find_By_Email_Exact()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
-            //include this
-            var customUser = UserBuilder.CreateUser();
+
+            // include this
+            User customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
-            var found = UserService.FindByEmail("hello@test.com", 0, 100, out _, StringPropertyMatchType.Exact);
+            IEnumerable<IUser> found = UserService.FindByEmail("hello@test.com", 0, 100, out _, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -577,12 +593,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_All_Paged_Users()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
 
-            var found = UserService.GetAll(0, 2, out var totalRecs);
+            IEnumerable<IUser> found = UserService.GetAll(0, 2, out long totalRecs);
 
             Assert.AreEqual(2, found.Count());
+
             // + 1 because of the built in admin user
             Assert.AreEqual(11, totalRecs);
             Assert.AreEqual("admin", found.First().Username);
@@ -592,10 +609,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_All_Paged_Users_With_Filter()
         {
-            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
+            IUser[] users = UserBuilder.CreateMulipleUsers(10).ToArray();
             UserService.Save(users);
 
-            var found = UserService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, filter: "test");
+            IEnumerable<IUser> found = UserService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending, filter: "test");
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(10, totalRecs);
@@ -606,19 +623,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_All_Paged_Users_For_Group()
         {
-            var userGroup = UserGroupBuilder.CreateUserGroup();
+            UserGroup userGroup = UserGroupBuilder.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
-            for (var i = 0; i < 10;)
+            IUser[] users = UserBuilder.CreateMulipleUsers(10).ToArray();
+            for (int i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
                 i = i + 2;
             }
+
             UserService.Save(users);
 
             long totalRecs;
-            var found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, includeUserGroups: new[] { userGroup.Alias });
+            IEnumerable<IUser> found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, includeUserGroups: new[] { userGroup.Alias });
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(5, totalRecs);
@@ -629,24 +647,26 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_All_Paged_Users_For_Group_With_Filter()
         {
-            var userGroup = UserGroupBuilder.CreateUserGroup();
+            UserGroup userGroup = UserGroupBuilder.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
-            for (var i = 0; i < 10;)
+            IUser[] users = UserBuilder.CreateMulipleUsers(10).ToArray();
+            for (int i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
                 i = i + 2;
             }
-            for (var i = 0; i < 10;)
+
+            for (int i = 0; i < 10;)
             {
                 users[i].Name = "blah" + users[i].Name;
                 i = i + 3;
             }
+
             UserService.Save(users);
 
             long totalRecs;
-            var found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] { userGroup.Alias }, filter: "blah");
+            IEnumerable<IUser> found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, userGroups: new[] { userGroup.Alias }, filter: "blah");
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(2, totalRecs);
@@ -657,12 +677,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Count_All_Users()
         {
-            var users = UserBuilder. CreateMulipleUsers(10);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10);
             UserService.Save(users);
-            var customUser = UserBuilder.CreateUser();
+            User customUser = UserBuilder.CreateUser();
             UserService.Save(customUser);
 
-            var found = UserService.GetCount(MemberCountType.All);
+            int found = UserService.GetCount(MemberCountType.All);
 
             // + 1 because of the built in admin user
             Assert.AreEqual(12, found);
@@ -672,24 +692,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Count_All_Online_Users()
         {
-            var users = UserBuilder. CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
             UserService.Save(users);
 
-            var customUser = UserBuilder.CreateUser();
+            User customUser = UserBuilder.CreateUser();
             throw new NotImplementedException();
         }
 
         [Test]
         public void Count_All_Locked_Users()
         {
-            var users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = UserBuilder.CreateUser();
+            User customUser = UserBuilder.CreateUser();
             customUser.IsLockedOut = true;
             UserService.Save(customUser);
 
-            var found = UserService.GetCount(MemberCountType.LockedOut);
+            int found = UserService.GetCount(MemberCountType.LockedOut);
 
             Assert.AreEqual(6, found);
         }
@@ -697,14 +717,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Count_All_Approved_Users()
         {
-            var users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
+            IEnumerable<IUser> users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = UserBuilder.CreateUser();
+            User customUser = UserBuilder.CreateUser();
             customUser.IsApproved = false;
             UserService.Save(customUser);
 
-            var found = UserService.GetCount(MemberCountType.Approved);
+            int found = UserService.GetCount(MemberCountType.Approved);
 
             // + 1 because of the built in admin user
             Assert.AreEqual(6, found);
@@ -714,7 +734,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Persist_New_User()
         {
             // Act
-            var membershipUser = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
+            IUser membershipUser = UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io");
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
@@ -728,10 +748,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // Act
             // NOTE: Normally the hash'ing would be handled in the membership provider, so the service just saves the password
-            var password = "123456";
+            string password = "123456";
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
-            var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
+            string encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
             var globalSettings = new GlobalSettings();
             var membershipUser = new User(globalSettings, "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
             UserService.Save(membershipUser);
@@ -756,11 +776,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             userGroup.AddAllowedSection("mediat");
             UserService.Save(userGroup);
 
-            var result1 = UserService.GetUserGroupById(userGroup.Id);
+            IUserGroup result1 = UserService.GetUserGroupById(userGroup.Id);
 
             Assert.AreEqual(2, result1.AllowedSections.Count());
 
-            //adds some allowed sections
+            // adds some allowed sections
             userGroup.AddAllowedSection("test1");
             userGroup.AddAllowedSection("test2");
             userGroup.AddAllowedSection("test3");
@@ -771,19 +791,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(6, result1.AllowedSections.Count());
 
-            //simulate clearing the sections
-            foreach (var s in userGroup.AllowedSections)
+            // simulate clearing the sections
+            foreach (string s in userGroup.AllowedSections)
             {
                 result1.RemoveAllowedSection(s);
             }
 
-            //now just re-add a couple
+            // now just re-add a couple
             result1.AddAllowedSection("test3");
             result1.AddAllowedSection("test4");
             UserService.Save(result1);
 
             // Assert
-            //re-get
+            // re-get
             result1 = UserService.GetUserGroupById(userGroup.Id);
             Assert.AreEqual(2, result1.AllowedSections.Count());
         }
@@ -804,18 +824,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             UserService.Save(userGroup1);
             UserService.Save(userGroup2);
 
-            //adds some allowed sections
+            // adds some allowed sections
             userGroup1.AddAllowedSection("test");
             userGroup2.AddAllowedSection("test");
             UserService.Save(userGroup1);
             UserService.Save(userGroup2);
 
-            //now clear the section from all users
+            // now clear the section from all users
             UserService.DeleteSectionFromAllUserGroups("test");
 
             // Assert
-            var result1 = UserService.GetUserGroupById(userGroup1.Id);
-            var result2 = UserService.GetUserGroupById(userGroup2.Id);
+            IUserGroup result1 = UserService.GetUserGroupById(userGroup1.Id);
+            IUserGroup result2 = UserService.GetUserGroupById(userGroup2.Id);
             Assert.IsFalse(result1.AllowedSections.Contains("test"));
             Assert.IsFalse(result2.AllowedSections.Contains("test"));
         }
@@ -847,15 +867,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             UserService.Save(userGroup3);
 
             // Assert
-            var result1 = UserService.GetUserGroupById(userGroup1.Id);
-            var result2 = UserService.GetUserGroupById(userGroup2.Id);
-            var result3 = UserService.GetUserGroupById(userGroup3.Id);
+            IUserGroup result1 = UserService.GetUserGroupById(userGroup1.Id);
+            IUserGroup result2 = UserService.GetUserGroupById(userGroup2.Id);
+            IUserGroup result3 = UserService.GetUserGroupById(userGroup3.Id);
             Assert.IsTrue(result1.AllowedSections.Contains("test"));
             Assert.IsTrue(result2.AllowedSections.Contains("test"));
             Assert.IsFalse(result3.AllowedSections.Contains("test"));
 
-            //now add the section to all groups
-            foreach (var userGroup in new[] { userGroup1, userGroup2, userGroup3 })
+            // now add the section to all groups
+            foreach (UserGroup userGroup in new[] { userGroup1, userGroup2, userGroup3 })
             {
                 userGroup.AddAllowedSection("test");
                 UserService.Save(userGroup);
@@ -881,7 +901,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_User_With_Empty_Username()
         {
             // Arrange
-            var user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
             user.Username = string.Empty;
 
             // Act & Assert
@@ -892,7 +912,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_User_With_Empty_Name()
         {
             // Arrange
-            var user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
+            IUser user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
             user.Name = string.Empty;
 
             // Act & Assert
@@ -903,10 +923,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Profile_Username()
         {
             // Arrange
-            var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            IUser user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
             // Act
-            var profile = UserService.GetProfileByUserName(user.Username);
+            IProfile profile = UserService.GetProfileByUserName(user.Username);
 
             // Assert
             Assert.IsNotNull(profile);
@@ -918,10 +938,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_By_Profile_Id()
         {
             // Arrange
-            var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            IUser user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
             // Act
-            var profile = UserService.GetProfileById((int)user.Id);
+            IProfile profile = UserService.GetProfileById((int)user.Id);
 
             // Assert
             Assert.IsNotNull(profile);
@@ -932,7 +952,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Get_By_Profile_Id_Must_Return_Null_If_User_Does_Not_Exist()
         {
-            var profile = UserService.GetProfileById(42);
+            IProfile profile = UserService.GetProfileById(42);
 
             // Assert
             Assert.IsNull(profile);
@@ -941,7 +961,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void GetProfilesById_Must_Return_Empty_If_User_Does_Not_Exist()
         {
-            var profiles = UserService.GetProfilesById(42);
+            IEnumerable<IProfile> profiles = UserService.GetProfilesById(42);
 
             // Assert
             CollectionAssert.IsEmpty(profiles);
@@ -951,10 +971,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Get_User_By_Username()
         {
             // Arrange
-            var originalUser = CreateTestUser(out _);
+            IUser originalUser = CreateTestUser(out _);
 
             // Act
-
             var updatedItem = (User)UserService.GetByUsername(originalUser.Username);
 
             // Assert
@@ -975,31 +994,35 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Get_Assigned_StartNodes_For_User()
         {
-            var startContentItems = BuildContentItems(3);
+            Content[] startContentItems = BuildContentItems(3);
 
-            var testUserGroup = CreateTestUserGroup();
+            UserGroup testUserGroup = CreateTestUserGroup();
 
-            var userGroupId = testUserGroup.Id;
+            int userGroupId = testUserGroup.Id;
 
             CreateTestUsers(startContentItems.Select(x => x.Id).ToArray(), testUserGroup, 3);
 
-            var usersInGroup = UserService.GetAllInGroup(userGroupId);
+            IEnumerable<IUser> usersInGroup = UserService.GetAllInGroup(userGroupId);
 
-            foreach (var user in usersInGroup)
+            foreach (IUser user in usersInGroup)
+            {
                 Assert.AreEqual(user.StartContentIds.Length, startContentItems.Length);
+            }
         }
 
         private Content[] BuildContentItems(int numberToCreate)
         {
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
             var startContentItems = new List<Content>();
 
-            for (var i = 0; i < numberToCreate; i++)
+            for (int i = 0; i < numberToCreate; i++)
+            {
                 startContentItems.Add(ContentBuilder.CreateSimpleContent(contentType));
+            }
 
             ContentService.Save(startContentItems);
 
@@ -1010,7 +1033,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             userGroup = CreateTestUserGroup();
 
-            var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            IUser user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
             user.AddGroup(userGroup.ToReadOnlyGroup());
 
@@ -1023,9 +1046,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             var users = new List<IUser>();
 
-            for (var i = 0; i < numberToCreate; i++)
+            for (int i = 0; i < numberToCreate; i++)
             {
-                var user = UserService.CreateUserWithIdentity($"test{i}", $"test{i}@test.com");
+                IUser user = UserService.CreateUserWithIdentity($"test{i}", $"test{i}@test.com");
                 user.AddGroup(userGroup.ToReadOnlyGroup());
 
                 var updateable = (User)user;
@@ -1041,8 +1064,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
         {
-            var permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToArray();
-            var userGroup = UserGroupBuilder.CreateUserGroup(alias, name, permissions: permissions);
+            string[] permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToArray();
+            UserGroup userGroup = UserGroupBuilder.CreateUserGroup(alias, name, permissions: permissions);
 
             UserService.Save(userGroup);
 

@@ -1,10 +1,12 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Text.RegularExpressions;
 
 namespace Umbraco.Tests.Integration.Testing
 {
     public class TestDbMeta
     {
-
         public string Name { get; }
 
         public bool IsEmpty { get; }
@@ -20,20 +22,16 @@ namespace Umbraco.Tests.Integration.Testing
 
         private static string ConstructConnectionString(string masterConnectionString, string databaseName)
         {
-            var prefix = Regex.Replace(masterConnectionString, "Database=.+?;", string.Empty);
-            var connectionString = $"{prefix};Database={databaseName};";
+            string prefix = Regex.Replace(masterConnectionString, "Database=.+?;", string.Empty);
+            string connectionString = $"{prefix};Database={databaseName};";
             return connectionString.Replace(";;", ";");
         }
 
-        public static TestDbMeta CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString)
-        {
-            return new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name));
-        }
+        public static TestDbMeta CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
+            new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name));
 
         // LocalDb mdf funtimes
-        public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty)
-        {
-            return new TestDbMeta(name, isEmpty, null);
-        }
+        public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty) =>
+            new TestDbMeta(name, isEmpty, null);
     }
 }

@@ -1,10 +1,15 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
@@ -16,25 +21,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         [SetUp]
-        public void SetUp()
-        {
-            CreateTestData();
-        }
+        public void SetUp() => CreateTestData();
 
-        private IDictionaryRepository CreateRepository()
-        {
-            return GetRequiredService<IDictionaryRepository>();
-        }
+        private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
         [Test]
         public void Can_Perform_Get_By_Key_On_DictionaryRepository()
         {
             // Arrange
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var provider = ScopeProvider;
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -45,7 +44,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 repository.Save(dictionaryItem);
 
-                //re-get
+                // re-get
                 dictionaryItem = repository.Get("Testing1235");
 
                 // Assert
@@ -61,11 +60,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
         {
             // Arrange
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var provider = ScopeProvider;
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -76,7 +75,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 repository.Save(dictionaryItem);
 
-                //re-get
+                // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Key);
 
                 // Assert
@@ -92,11 +91,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Get_On_DictionaryRepository()
         {
             // Arrange
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var provider = ScopeProvider;
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -107,9 +106,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 repository.Save(dictionaryItem);
 
-                //re-get
+                // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
-
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -124,17 +122,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
-                var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");
+                IDictionaryRepository repository = CreateRepository();
+                var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235");
 
                 repository.Save(dictionaryItem);
 
-                //re-get
+                // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
-
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -147,14 +144,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetAll_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var dictionaryItem = repository.Get(1);
-                var dictionaryItems = repository.GetMany();
+                IDictionaryItem dictionaryItem = repository.Get(1);
+                IEnumerable<IDictionaryItem> dictionaryItems = repository.GetMany();
 
                 // Assert
                 Assert.That(dictionaryItems, Is.Not.Null);
@@ -168,13 +165,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetAll_With_Params_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var dictionaryItems = repository.GetMany(1, 2);
+                IEnumerable<IDictionaryItem> dictionaryItems = repository.GetMany(1, 2);
 
                 // Assert
                 Assert.That(dictionaryItems, Is.Not.Null);
@@ -188,14 +185,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_GetByQuery_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
-                var result = repository.Get(query);
+                IQuery<IDictionaryItem> query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
+                IEnumerable<IDictionaryItem> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -208,14 +205,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Count_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
-                var result = repository.Count(query);
+                IQuery<IDictionaryItem> query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
+                int result = repository.Count(query);
 
                 // Assert
                 Assert.That(result, Is.EqualTo(1));
@@ -226,13 +223,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var languageRepository = GetRequiredService<ILanguageRepository>();
-                var repository = CreateRepository();
+                ILanguageRepository languageRepository = GetRequiredService<ILanguageRepository>();
+                IDictionaryRepository repository = CreateRepository();
 
-                var language = languageRepository.Get(1);
+                ILanguage language = languageRepository.Get(1);
 
                 var read = new DictionaryItem("Read");
                 var translations = new List<IDictionaryTranslation>
@@ -244,7 +241,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 // Act
                 repository.Save(read);
 
-                var exists = repository.Exists(read.Id);
+                bool exists = repository.Exists(read.Id);
 
                 // Assert
                 Assert.That(read.HasIdentity, Is.True);
@@ -256,20 +253,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var item = repository.Get(1);
+                IDictionaryItem item = repository.Get(1);
                 var translations = item.Translations.ToList();
                 translations[0].Value = "Read even more";
                 item.Translations = translations;
 
                 repository.Save(item);
 
-                var dictionaryItem = repository.Get(1);
+                IDictionaryItem dictionaryItem = repository.Get(1);
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -282,25 +279,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
         {
             // Arrange
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var provider = ScopeProvider;
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 var globalSettings = new GlobalSettings();
                 var languageNo = new Language(globalSettings, "nb-NO") { CultureName = "nb-NO" };
                 localizationService.Save(languageNo);
 
                 // Act
-                var item = repository.Get(1);
+                IDictionaryItem item = repository.Get(1);
                 var translations = item.Translations.ToList();
                 translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
                 item.Translations = translations;
 
                 repository.Save(item);
 
-                var dictionaryItem = (DictionaryItem) repository.Get(1);
+                var dictionaryItem = (DictionaryItem)repository.Get(1);
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -313,16 +310,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var item = repository.Get(1);
+                IDictionaryItem item = repository.Get(1);
                 repository.Delete(item);
 
-                var exists = repository.Exists(1);
+                bool exists = repository.Exists(1);
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -333,13 +330,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Exists_On_DictionaryRepository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                var exists = repository.Exists(1);
+                bool exists = repository.Exists(1);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -351,27 +348,29 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         {
             Dictionary<string, Guid> keyMap;
 
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var repository = CreateRepository();
+                IDictionaryRepository repository = CreateRepository();
                 keyMap = repository.GetDictionaryItemKeyMap();
             }
 
             Assert.IsNotNull(keyMap);
             Assert.IsNotEmpty(keyMap);
-            foreach (var kvp in keyMap)
+            foreach (KeyValuePair<string, Guid> kvp in keyMap)
+            {
                 Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
+            }
         }
 
         public void CreateTestData()
         {
-            var localizationService = GetRequiredService<ILocalizationService>();
-            var language = localizationService.GetLanguageByIsoCode("en-US");
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            ILanguage language = localizationService.GetLanguageByIsoCode("en-US");
 
             var globalSettings = new GlobalSettings();
             var languageDK = new Language(globalSettings, "da-DK") { CultureName = "da-DK" };
-            localizationService.Save(languageDK);//Id 2
+            localizationService.Save(languageDK); // Id 2
 
             var readMore = new DictionaryItem("Read More");
             var translations = new List<IDictionaryTranslation>
@@ -380,7 +379,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                                        new DictionaryTranslation(languageDK, "Læs mere")
                                    };
             readMore.Translations = translations;
-            localizationService.Save(readMore);//Id 1
+            localizationService.Save(readMore); // Id 1
 
             var article = new DictionaryItem("Article");
             var translations2 = new List<IDictionaryTranslation>
@@ -389,7 +388,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                                        new DictionaryTranslation(languageDK, "Artikel")
                                    };
             article.Translations = translations2;
-            localizationService.Save(article);//Id 2
+            localizationService.Save(article); // Id 2
         }
     }
 }

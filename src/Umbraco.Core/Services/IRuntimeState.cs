@@ -57,5 +57,6 @@ namespace Umbraco.Core
 
         void Configure(RuntimeLevel level, RuntimeLevelReason reason);
 
+        void DoUnattendedInstall();
     }
 }

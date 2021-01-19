@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -25,25 +29,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
-        private IIOHelper IOHelper => GetRequiredService<IIOHelper>();
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
         [SetUp]
         public void SetUpFileSystem()
         {
             _fileSystems = Mock.Of<IFileSystems>();
-            var path = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoCssPath);
+            string path = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoCssPath);
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
             Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
-            var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
+            Stream stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }
 
         [TearDown]
         public void TearDownFileSystem()
         {
-            //Delete all files
-            Purge((PhysicalFileSystem) _fileSystem, "");
+            // Delete all files
+            Purge((PhysicalFileSystem)_fileSystem, string.Empty);
             _fileSystem = null;
         }
 
@@ -60,8 +63,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             using (ScopeProvider.CreateScope())
             {
                 // Act
-                var repository = CreateRepository();
-
+                IStylesheetRepository repository = CreateRepository();
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -74,14 +76,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
-                //Assert
+                // Assert
                 Assert.That(_fileSystem.FileExists("test-add.css"), Is.True);
             }
         }
@@ -92,21 +93,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
-                var stylesheetUpdate = repository.Get("test-update.css");
+                IStylesheet stylesheetUpdate = repository.Get("test-update.css");
                 stylesheetUpdate.Content = "body { color:#000; }";
                 repository.Save(stylesheetUpdate);
 
+                IStylesheet stylesheetUpdated = repository.Get("test-update.css");
 
-                var stylesheetUpdated = repository.Get("test-update.css");
-
-                //Assert
+                // Assert
                 Assert.That(stylesheetUpdated, Is.Not.Null);
                 Assert.That(stylesheetUpdated.HasIdentity, Is.True);
                 Assert.That(stylesheetUpdated.Content, Is.EqualTo("body { color:#000; }"));
@@ -119,22 +118,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
                 IStylesheet stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
                 stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
                 repository.Save(stylesheet);
 
-
-                //re-get
+                // re-get
                 stylesheet = repository.Get(stylesheet.Name);
 
-                //Assert
+                // Assert
                 Assert.That(stylesheet.Content, Is.EqualTo("body { color:#000; } .bold {font-weight:bold;}\r\n\r\n/**umb_name:Test*/\r\np {\r\n\tfont-size:2em;\r\n}".Replace("\r\n", Environment.NewLine)));
                 Assert.AreEqual(1, stylesheet.Properties.Count());
             }
@@ -146,12 +143,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-
 
                 stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
@@ -165,17 +161,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
                 repository.Delete(stylesheet);
 
-
-                //Assert
+                // Assert
                 Assert.That(_fileSystem.FileExists("test-delete.css"), Is.False);
             }
         }
@@ -186,16 +180,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
-                var stylesheet = repository.Get("styles.css");
+                IStylesheet stylesheet = repository.Get("styles.css");
 
                 // Assert
                 Assert.That(stylesheet, Is.Not.Null);
                 Assert.That(stylesheet.HasIdentity, Is.True);
                 Assert.That(stylesheet.Content, Is.EqualTo("body {background:#EE7600; color:#FFF;}"));
-                //Assert.That(repository.ValidateStylesheet(stylesheet), Is.True); //TODO this can't be activated before we handle file systems correct
+                //// Assert.That(repository.ValidateStylesheet(stylesheet), Is.True); //TODO this can't be activated before we handle file systems correct
             }
         }
 
@@ -205,14 +199,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
                 // Act
-                var stylesheets = repository.GetMany();
+                IEnumerable<IStylesheet> stylesheets = repository.GetMany();
 
                 // Assert
                 Assert.That(stylesheets, Is.Not.Null);
@@ -228,14 +221,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
-
                 // Act
-                var stylesheets = repository.GetMany("styles-v2.css", "styles.css");
+                IEnumerable<IStylesheet> stylesheets = repository.GetMany("styles-v2.css", "styles.css");
 
                 // Assert
                 Assert.That(stylesheets, Is.Not.Null);
@@ -251,10 +243,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 // Act
-                var exists = repository.Exists("styles.css");
+                bool exists = repository.Exists("styles.css");
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -265,10 +257,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void PathTests()
         {
             // unless noted otherwise, no changes / 7.2.8
-
             using (ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository();
+                IStylesheetRepository repository = CreateRepository();
 
                 IStylesheet stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
@@ -281,7 +272,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(stylesheet);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
-                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);// fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
                 Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
 
                 stylesheet = repository.Get("path-2/test-path-2.css");
@@ -308,9 +299,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 stylesheet = new Stylesheet("\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
-                {
-                    repository.Save(stylesheet);
-                });
+                    repository.Save(stylesheet));
 
                 // fixed in 7.3 - 7.2.8 used to throw
                 stylesheet = repository.Get("missing.css");
@@ -328,13 +317,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         private void Purge(PhysicalFileSystem fs, string path)
         {
-            var files = fs.GetFiles(path, "*.css");
-            foreach (var file in files)
+            IEnumerable<string> files = fs.GetFiles(path, "*.css");
+            foreach (string file in files)
             {
                 fs.DeleteFile(file);
             }
-            var dirs = fs.GetDirectories(path);
-            foreach (var dir in dirs)
+
+            IEnumerable<string> dirs = fs.GetDirectories(path);
+            foreach (string dir in dirs)
             {
                 Purge(fs, dir);
                 fs.DeleteDirectory(dir);
@@ -344,9 +334,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         protected Stream CreateStream(string contents = null)
         {
             if (string.IsNullOrEmpty(contents))
+            {
                 contents = "/* test */";
+            }
 
-            var bytes = Encoding.UTF8.GetBytes(contents);
+            byte[] bytes = Encoding.UTF8.GetBytes(contents);
             var stream = new MemoryStream(bytes);
 
             return stream;

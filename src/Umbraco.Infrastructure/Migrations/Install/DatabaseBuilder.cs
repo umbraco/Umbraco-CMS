@@ -29,9 +29,9 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<DatabaseBuilder> _logger;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
+        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
@@ -47,9 +47,9 @@ namespace Umbraco.Core.Migrations.Install
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IConfigManipulator configManipulator)
+            IConfigManipulator configManipulator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             _scopeProvider = scopeProvider;
             _databaseFactory = databaseFactory;
@@ -59,9 +59,9 @@ namespace Umbraco.Core.Migrations.Install
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoVersion = umbracoVersion;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
 
         #region Status
@@ -130,6 +130,14 @@ namespace Umbraco.Core.Migrations.Install
                 }
                 scope.Complete();
                 return has;
+            }
+        }
+
+        internal bool IsUmbracoInstalled()
+        {
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            {
+                return scope.Database.IsUmbracoInstalled();
             }
         }
 
@@ -315,14 +323,15 @@ namespace Umbraco.Core.Migrations.Install
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Initialized == false)
-                return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
+                return new DatabaseSchemaResult();
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
-            _databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            _databaseSchemaValidationResult = scope.Database.ValidateSchema();
+
+            scope.Complete();
+
             return _databaseSchemaValidationResult;
         }
 
@@ -361,15 +370,14 @@ namespace Umbraco.Core.Migrations.Install
 
                 var schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
-                //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
-                //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
+                //If the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (!hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
+                    var creator = _databaseSchemaCreatorFactory.Create(database);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";

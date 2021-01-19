@@ -1,3 +1,7 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -20,21 +24,27 @@ namespace Umbraco.Tests.Integration.TestServerTest
         private readonly IBackOfficeSignInManager _backOfficeSignInManager;
 
         private readonly BackOfficeIdentityUser _fakeUser;
-        public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IBackOfficeSignInManager backOfficeSignInManager, IUserService userService, UmbracoMapper umbracoMapper)
+
+        public TestAuthHandler(
+            IOptionsMonitor<AuthenticationSchemeOptions> options,
+            ILoggerFactory logger,
+            UrlEncoder encoder,
+            ISystemClock clock,
+            IBackOfficeSignInManager backOfficeSignInManager,
+            IUserService userService,
+            UmbracoMapper umbracoMapper)
             : base(options, logger, encoder, clock)
         {
             _backOfficeSignInManager = backOfficeSignInManager;
 
-            var user = userService.GetUserById(Constants.Security.SuperUserId);
+            IUser user = userService.GetUserById(Constants.Security.SuperUserId);
             _fakeUser = umbracoMapper.Map<IUser, BackOfficeIdentityUser>(user);
             _fakeUser.SecurityStamp = "Needed";
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-
-            var principal = await _backOfficeSignInManager.CreateUserPrincipalAsync(_fakeUser);
+            ClaimsPrincipal principal = await _backOfficeSignInManager.CreateUserPrincipalAsync(_fakeUser);
             var ticket = new AuthenticationTicket(principal, TestAuthenticationScheme);
 
             return AuthenticateResult.Success(ticket);

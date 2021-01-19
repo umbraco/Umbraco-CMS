@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -17,6 +21,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class MemberTypeServiceTests : UmbracoIntegrationTest
     {
         private IMemberService MemberService => GetRequiredService<IMemberService>();
+
         private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
         [SetUp]
@@ -31,9 +36,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            //re-get
+
+            // re-get
             memberType = MemberTypeService.Get(memberType.Id);
-            foreach (var p in memberType.PropertyTypes)
+            foreach (IPropertyType p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
             }
@@ -44,15 +50,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var prop = memberType.PropertyTypes.First().Alias;
+            string prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanEditProperty(prop, true);
             MemberTypeService.Save(memberType);
-            //re-get
+
+            // re-get
             memberType = MemberTypeService.Get(memberType.Id);
-            foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
+            foreach (IPropertyType p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
             }
+
             Assert.IsTrue(memberType.MemberCanEditProperty(prop));
         }
 
@@ -61,9 +69,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            //re-get
+
+            // re-get
             memberType = MemberTypeService.Get(memberType.Id);
-            foreach (var p in memberType.PropertyTypes)
+            foreach (IPropertyType p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
             }
@@ -74,15 +83,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             MemberTypeService.Save(memberType);
-            var prop = memberType.PropertyTypes.First().Alias;
+            string prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanViewProperty(prop, true);
             MemberTypeService.Save(memberType);
-            //re-get
+
+            // re-get
             memberType = MemberTypeService.Get(memberType.Id);
-            foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
+            foreach (IPropertyType p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
             }
+
             Assert.IsTrue(memberType.MemberCanViewProperty(prop));
         }
 
@@ -93,14 +104,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
-            var initProps = member.Properties.Count;
+            int initProps = member.Properties.Count;
 
-            //remove a property (NOT ONE OF THE DEFAULTS)
-            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
+            // remove a property (NOT ONE OF THE DEFAULTS)
+            Dictionary<string, PropertyType> standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
             memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias);
             MemberTypeService.Save(memberType);
 
-            //re-load it from the db
+            // re-load it from the db
             member = MemberService.GetById(member.Id);
 
             Assert.AreEqual(initProps - 1, member.Properties.Count);
@@ -119,12 +130,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Empty_Description_Is_Always_Null_After_Saving_Member_Type()
         {
-            var service = MemberTypeService;
-            var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            IMemberTypeService service = MemberTypeService;
+            MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
             memberType.Description = null;
             service.Save(memberType);
 
-            var memberType2 = MemberTypeBuilder.CreateSimpleMemberType("memberType2", "Member Type 2");
+            MemberType memberType2 = MemberTypeBuilder.CreateSimpleMemberType("memberType2", "Member Type 2");
             memberType2.Description = string.Empty;
             service.Save(memberType2);
 
@@ -132,9 +143,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNull(memberType2.Description);
         }
 
-        //[Test]
-        //public void Can_Save_MemberType_Structure_And_Create_A_Member_Based_On_It()
-        //{
+        // [Test]
+        // public void Can_Save_MemberType_Structure_And_Create_A_Member_Based_On_It()
+        // {
         //    // Arrange
         //    var cs = MemberService;
         //    var cts = MemberTypeService;
@@ -148,7 +159,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //        /*,"Navigation"*/);
         //    cts.Save(ctBase);
 
-        //    var ctHomePage = new MemberType(ctBase)
+        // var ctHomePage = new MemberType(ctBase)
         //        {
         //            Name = "Home Page",
         //            Alias = "HomePage",
@@ -160,19 +171,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //        /*,"Navigation"*/);
         //    cts.Save(ctHomePage);
 
-        //    // Act
+        // // Act
         //    var homeDoc = cs.CreateMember("Test", "test@test.com", "test", "HomePage");
 
-        //    // Assert
+        // // Assert
         //    Assert.That(ctBase.HasIdentity, Is.True);
         //    Assert.That(ctHomePage.HasIdentity, Is.True);
         //    Assert.That(homeDoc.HasIdentity, Is.True);
         //    Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
-        //}
+        // }
 
-        //[Test]
-        //public void Can_Create_And_Save_MemberType_Composition()
-        //{
+        // [Test]
+        // public void Can_Create_And_Save_MemberType_Composition()
+        // {
         //    /*
         //     * Global
         //     * - Components
@@ -182,23 +193,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //    var global = MemberTypeBuilder.CreateSimpleContentType("global", "Global");
         //    service.Save(global);
 
-        //    var components = MemberTypeBuilder.CreateSimpleContentType("components", "Components", global);
+        // var components = MemberTypeBuilder.CreateSimpleContentType("components", "Components", global);
         //    service.Save(components);
 
-        //    var component = MemberTypeBuilder.CreateSimpleContentType("component", "Component", components);
+        // var component = MemberTypeBuilder.CreateSimpleContentType("component", "Component", components);
         //    service.Save(component);
 
-        //    var category = MemberTypeBuilder.CreateSimpleContentType("category", "Category", global);
+        // var category = MemberTypeBuilder.CreateSimpleContentType("category", "Category", global);
         //    service.Save(category);
 
-        //    var success = category.AddContentType(component);
+        // var success = category.AddContentType(component);
 
-        //    Assert.That(success, Is.False);
-        //}
+        // Assert.That(success, Is.False);
+        // }
 
-        //[Test]
-        //public void Can_Remove_ContentType_Composition_From_ContentType()
-        //{
+        // [Test]
+        // public void Can_Remove_ContentType_Composition_From_ContentType()
+        // {
         //    //Test for U4-2234
         //    var cts = ContentTypeService;
         //    //Arrange
@@ -211,11 +222,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //    var homepage = CreateHomepage(site);
         //    cts.Save(homepage);
 
-        //    //Add banner to homepage
+        // //Add banner to homepage
         //    var added = homepage.AddContentType(banner);
         //    cts.Save(homepage);
 
-        //    //Assert composition
+        // //Assert composition
         //    var bannerExists = homepage.ContentTypeCompositionExists(banner.Alias);
         //    var bannerPropertyExists = homepage.CompositionPropertyTypes.Any(x => x.Alias.Equals("bannerName"));
         //    Assert.That(added, Is.True);
@@ -223,42 +234,42 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //    Assert.That(bannerPropertyExists, Is.True);
         //    Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(6));
 
-        //    //Remove banner from homepage
+        // //Remove banner from homepage
         //    var removed = homepage.RemoveContentType(banner.Alias);
         //    cts.Save(homepage);
 
-        //    //Assert composition
+        // //Assert composition
         //    var bannerStillExists = homepage.ContentTypeCompositionExists(banner.Alias);
         //    var bannerPropertyStillExists = homepage.CompositionPropertyTypes.Any(x => x.Alias.Equals("bannerName"));
         //    Assert.That(removed, Is.True);
         //    Assert.That(bannerStillExists, Is.False);
         //    Assert.That(bannerPropertyStillExists, Is.False);
         //    Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(4));
-        //}
+        // }
 
-        //[Test]
-        //public void Can_Copy_ContentType_By_Performing_Clone()
-        //{
+        // [Test]
+        // public void Can_Copy_ContentType_By_Performing_Clone()
+        // {
         //    // Arrange
         //    var service = ContentTypeService;
         //    var metaContentType = MemberTypeBuilder.CreateMetaContentType();
         //    service.Save(metaContentType);
 
-        //    var simpleContentType = MemberTypeBuilder.CreateSimpleContentType("category", "Category", metaContentType);
+        // var simpleContentType = MemberTypeBuilder.CreateSimpleContentType("category", "Category", metaContentType);
         //    service.Save(simpleContentType);
         //    var categoryId = simpleContentType.Id;
 
-        //    // Act
+        // // Act
         //    var sut = simpleContentType.Clone("newcategory");
         //    service.Save(sut);
 
-        //    // Assert
+        // // Assert
         //    Assert.That(sut.HasIdentity, Is.True);
 
-        //    var contentType = service.GetContentType(sut.Id);
+        // var contentType = service.GetContentType(sut.Id);
         //    var category = service.GetContentType(categoryId);
 
-        //    Assert.That(contentType.CompositionAliases().Any(x => x.Equals("meta")), Is.True);
+        // Assert.That(contentType.CompositionAliases().Any(x => x.Equals("meta")), Is.True);
         //    Assert.AreEqual(contentType.ParentId, category.ParentId);
         //    Assert.AreEqual(contentType.Level, category.Level);
         //    Assert.AreEqual(contentType.PropertyTypes.Count(), category.PropertyTypes.Count());
@@ -269,10 +280,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //    Assert.AreNotEqual(contentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, category.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
         //    Assert.AreNotEqual(contentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, category.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
 
-        //}
+        // }
 
-        //private ContentType CreateComponent()
-        //{
+        // private ContentType CreateComponent()
+        // {
         //    var component = new ContentType(-1)
         //        {
         //            Alias = "component",
@@ -285,15 +296,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //            Trashed = false
         //        };
 
-        //    var contentCollection = new PropertyTypeCollection();
+        // var contentCollection = new PropertyTypeCollection();
         //    contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "componentGroup", Name = "Component Group", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
         //    component.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Component", SortOrder = 1 });
 
-        //    return component;
-        //}
+        // return component;
+        // }
 
-        //private ContentType CreateBannerComponent(ContentType parent)
-        //{
+        // private ContentType CreateBannerComponent(ContentType parent)
+        // {
         //    var banner = new ContentType(parent)
         //        {
         //            Alias = "banner",
@@ -306,7 +317,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //            Trashed = false
         //        };
 
-        //    var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+        // var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
         //        {
         //            Alias = "bannerName",
         //            Name = "Banner Name",
@@ -318,10 +329,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //        };
         //    banner.AddPropertyType(propertyType, "Component");
         //    return banner;
-        //}
+        // }
 
-        //private ContentType CreateSite()
-        //{
+        // private ContentType CreateSite()
+        // {
         //    var site = new ContentType(-1)
         //        {
         //            Alias = "site",
@@ -334,15 +345,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //            Trashed = false
         //        };
 
-        //    var contentCollection = new PropertyTypeCollection();
+        // var contentCollection = new PropertyTypeCollection();
         //    contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "hostname", Name = "Hostname", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
         //    site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", SortOrder = 1 });
 
-        //    return site;
-        //}
+        // return site;
+        // }
 
-        //private ContentType CreateHomepage(ContentType parent)
-        //{
+        // private ContentType CreateHomepage(ContentType parent)
+        // {
         //    var contentType = new ContentType(parent)
         //        {
         //            Alias = "homepage",
@@ -355,36 +366,36 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //            Trashed = false
         //        };
 
-        //    var contentCollection = new PropertyTypeCollection();
+        // var contentCollection = new PropertyTypeCollection();
         //    contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
         //    contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
         //    contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
 
-        //    contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+        // contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
-        //    return contentType;
-        //}
+        // return contentType;
+        // }
 
-        //private IEnumerable<IContentType> CreateContentTypeHierarchy()
-        //{
+        // private IEnumerable<IContentType> CreateContentTypeHierarchy()
+        // {
         //    //create the master type
         //    var masterContentType = MemberTypeBuilder.CreateSimpleContentType("masterContentType", "MasterContentType");
         //    masterContentType.Key = new Guid("C00CA18E-5A9D-483B-A371-EECE0D89B4AE");
         //    ContentTypeService.Save(masterContentType);
 
-        //    //add the one we just created
+        // //add the one we just created
         //    var list = new List<IContentType> { masterContentType };
 
-        //    for (var i = 0; i < 10; i++)
+        // for (var i = 0; i < 10; i++)
         //    {
         //        var contentType = MemberTypeBuilder.CreateSimpleContentType("childType" + i, "ChildType" + i,
         //                                                                     //make the last entry in the list, this one's parent
         //                                                                     list.Last());
 
-        //        list.Add(contentType);
+        // list.Add(contentType);
         //    }
 
-        //    return list;
-        //}
+        // return list;
+        // }
     }
 }

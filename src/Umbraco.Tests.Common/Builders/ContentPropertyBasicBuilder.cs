@@ -13,7 +13,8 @@ namespace Umbraco.Tests.Common.Builders
         private string _alias;
         private object _value;
 
-        public ContentPropertyBasicBuilder(TParent parentBuilder) : base(parentBuilder)
+        public ContentPropertyBasicBuilder(TParent parentBuilder)
+            : base(parentBuilder)
         {
         }
 

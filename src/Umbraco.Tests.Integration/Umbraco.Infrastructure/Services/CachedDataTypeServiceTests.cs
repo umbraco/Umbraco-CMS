@@ -1,4 +1,8 @@
-﻿using System.Threading;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -18,9 +22,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class CachedDataTypeServiceTests : UmbracoIntegrationTest
     {
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
+
         private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         /// <summary>
@@ -33,9 +41,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             DataTypeService.Save(dataType);
 
-            //Get all the first time (no cache)
-            var all = DataTypeService.GetAll();
-            //Get all a second time (with cache)
+            // Get all the first time (no cache)
+            IEnumerable<IDataType> all = DataTypeService.GetAll();
+
+            // Get all a second time (with cache)
             all = DataTypeService.GetAll();
 
             Assert.Pass();
