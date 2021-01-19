@@ -14,6 +14,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Register<NewInstallStep>(Lifetime.Scope);
             composition.Register<UpgradeStep>(Lifetime.Scope);
             composition.Register<FilePermissionsStep>(Lifetime.Scope);
+            composition.Register<TelemetryIdentifierStep>(Lifetime.Scope);
             composition.Register<ConfigureMachineKey>(Lifetime.Scope);
             composition.Register<DatabaseConfigureStep>(Lifetime.Scope);
             composition.Register<DatabaseInstallStep>(Lifetime.Scope);

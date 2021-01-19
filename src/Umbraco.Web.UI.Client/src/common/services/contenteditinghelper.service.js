@@ -589,7 +589,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         //instead of having a property editor $watch their expression to check if it has
                         // been updated, instead we'll check for the existence of a special method on their model
                         // and just call it.
-                        if (angular.isFunction(origProp.onValueChanged)) {
+                        if (Utilities.isFunction(origProp.onValueChanged)) {
                             //send the newVal + oldVal
                             origProp.onValueChanged(origProp.value, origVal);
                         }
@@ -643,7 +643,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
                         // In this case we need to detect what properties have changed and re-bind them with the server data.
-                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                        if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
 
@@ -690,7 +690,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
 
                 // In this case we need to detect what properties have changed and re-bind them with the server data.
-                if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                     args.rebindCallback();
                 }
             }

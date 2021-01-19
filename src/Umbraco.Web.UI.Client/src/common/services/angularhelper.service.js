@@ -147,12 +147,12 @@ function angularHelper($q) {
          */
         safeApply: function (scope, fn) {
             if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
-                if (angular.isFunction(fn)) {
+                if (Utilities.isFunction(fn)) {
                     fn();
                 }
             }
             else {
-                if (angular.isFunction(fn)) {
+                if (Utilities.isFunction(fn)) {
                     scope.$apply(fn);
                 }
                 else {

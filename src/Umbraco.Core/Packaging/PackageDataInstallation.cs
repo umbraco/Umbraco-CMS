@@ -604,6 +604,8 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
+            if (infoElement.Element("Key") != null)
+                contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -798,8 +800,13 @@ namespace Umbraco.Core.Packaging
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
-                        : ContentVariation.Nothing
+                        : ContentVariation.Nothing,
+                    LabelOnTop = property.Element("LabelOnTop") != null
+                        ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
+                        : false
                 };
+                if (property.Element("Key") != null)
+                    propertyType.Key = new Guid(property.Element("Key").Value);
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
