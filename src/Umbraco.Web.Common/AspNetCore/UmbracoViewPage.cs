@@ -1,6 +1,4 @@
 using System;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -8,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -69,6 +68,11 @@ namespace Umbraco.Web.Common.AspNetCore
             {
                 WriteLiteral(htmlEncodedString.ToHtmlString());
             }
+            else if (value is TagHelperOutput tagHelperOutput)
+            {
+                WriteUmbracoContent(tagHelperOutput);
+                base.Write(value);
+            }
             else
             {
                 base.Write(value);
@@ -76,18 +80,16 @@ namespace Umbraco.Web.Common.AspNetCore
         }
 
         /// <inheritdoc/>
-        public override void WriteLiteral(object value)
+        public void WriteUmbracoContent(TagHelperOutput tagHelperOutput)
         {
             // filter / add preview banner
             // ASP.NET default value is text/html
-            if (Context.Response.ContentType.InvariantEquals("text/html"))
+            if (Context.Response.ContentType.InvariantContains("text/html"))
             {
                 if (UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
                 {
-                    var text = value.ToString();
-                    var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
 
-                    if (pos > -1)
+                    if (tagHelperOutput.TagName.Equals("body", StringComparison.InvariantCultureIgnoreCase))
                     {
                         string markupToInject;
 
@@ -107,16 +109,10 @@ namespace Umbraco.Web.Common.AspNetCore
                             markupToInject = ProfilerHtml.Render();
                         }
 
-                        var sb = new StringBuilder(text);
-                        sb.Insert(pos, markupToInject);
-
-                        WriteLiteral(sb.ToString());
-                        return;
+                        tagHelperOutput.Content.AppendHtml(markupToInject);
                     }
                 }
             }
-
-            base.WriteLiteral(value);
         }
 
         /// <summary>

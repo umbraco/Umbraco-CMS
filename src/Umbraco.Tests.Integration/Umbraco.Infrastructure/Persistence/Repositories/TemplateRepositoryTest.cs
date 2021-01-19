@@ -1,10 +1,12 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -30,22 +32,21 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class TemplateRepositoryTest : UmbracoIntegrationTest
     {
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
-        private ITemplateRepository CreateRepository(IScopeProvider provider)
-        {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
-        }
+        private ITemplateRepository CreateRepository(IScopeProvider provider) =>
+            new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
 
         [Test]
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -56,18 +57,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_View()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test");
                 repository.Save(template);
 
-
-                //Assert
+                // Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
             }
@@ -77,11 +77,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_View_With_Default_Content()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 };
                 repository.Save(template);
 
-                //Assert
+                // Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
@@ -103,13 +103,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_View_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
-                //NOTE: This has to be persisted first
+                // NOTE: This has to be persisted first
                 var template = new Template(ShortStringHelper, "test", "test");
                 repository.Save(template);
 
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 template2.SetMasterTemplate(template);
                 repository.Save(template2);
 
-                //Assert
+                // Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
                 Assert.AreEqual(
@@ -131,11 +131,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Add_Unique_Alias()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 };
                 repository.Save(template2);
 
-                //Assert
+                // Assert
                 Assert.AreEqual("test1", template2.Alias);
             }
         }
@@ -159,11 +159,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_Unique_Alias()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 template.Alias = "test1";
                 repository.Save(template);
 
-                //Assert
+                // Assert
                 Assert.AreEqual("test11", template.Alias);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
@@ -192,11 +192,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Update_View()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 template.Content += "<html></html>";
                 repository.Save(template);
 
-                var updated = repository.Get("test");
+                ITemplate updated = repository.Get("test");
 
                 // Assert
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
@@ -220,11 +220,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_View()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(template);
 
                 // Act
-                var templates = repository.Get("test");
+                ITemplate templates = repository.Get("test");
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 repository.Delete(templates);
 
@@ -247,14 +247,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_When_Assigned_To_Doc()
         {
             // Arrange
-            var provider = ScopeProvider;
-            var scopeAccessor = (IScopeAccessor) provider;
-            var dataTypeService = GetRequiredService<IDataTypeService>();
-            var fileService = GetRequiredService<IFileService>();
+            IScopeProvider provider = ScopeProvider;
+            var scopeAccessor = (IScopeAccessor)provider;
+            IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
+            IFileService fileService = GetRequiredService<IFileService>();
 
             using (provider.CreateScope())
             {
-                var templateRepository = CreateRepository(provider);
+                ITemplateRepository templateRepository = CreateRepository(provider);
                 var globalSettings = new GlobalSettings();
                 var serializer = new JsonNetSerializer();
                 var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
@@ -268,20 +268,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
                 var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService, serializer);
 
-                var template = TemplateBuilder.CreateTextPageTemplate();
+                Template template = TemplateBuilder.CreateTextPageTemplate();
                 fileService.SaveTemplate(template); // else, FK violation on contentType!
 
-                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
                 contentTypeRepository.Save(contentType);
 
-                var textpage = ContentBuilder.CreateSimpleContent(contentType);
+                Content textpage = ContentBuilder.CreateSimpleContent(contentType);
                 contentRepo.Save(textpage);
 
                 textpage.TemplateId = template.Id;
                 contentRepo.Save(textpage);
 
                 // Act
-                var templates = templateRepository.Get("textPage");
+                ITemplate templates = templateRepository.Get("textPage");
                 templateRepository.Delete(templates);
 
                 // Assert
@@ -293,11 +293,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Perform_Delete_On_Nested_Templates()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent")
                 {
@@ -320,7 +320,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(baby);
 
                 // Act
-                var templates = repository.Get("parent");
+                ITemplate templates = repository.Get("parent");
                 repository.Delete(templates);
 
                 // Assert
@@ -332,18 +332,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Get_All()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
-                var created = CreateHierarchy(repository).ToArray();
+                ITemplate[] created = CreateHierarchy(repository).ToArray();
 
                 // Act
-                var all = repository.GetAll();
-                var allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
-                var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
+                IEnumerable<ITemplate> all = repository.GetAll();
+                IEnumerable<ITemplate> allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
+                IEnumerable<ITemplate> allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
 
                 // Assert
                 Assert.AreEqual(9, all.Count());
@@ -361,17 +361,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Get_Children()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
-                var created = CreateHierarchy(repository).ToArray();
+                ITemplate[] created = CreateHierarchy(repository).ToArray();
 
                 // Act
-                var childrenById = repository.GetChildren(created[1].Id);
-                var childrenByAlias = repository.GetChildren(created[1].Alias);
+                IEnumerable<ITemplate> childrenById = repository.GetChildren(created[1].Id);
+                IEnumerable<ITemplate> childrenByAlias = repository.GetChildren(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(2, childrenById.Count());
@@ -385,16 +385,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Get_Children_At_Root()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 CreateHierarchy(repository).ToArray();
 
                 // Act
-                var children = repository.GetChildren(-1);
+                IEnumerable<ITemplate> children = repository.GetChildren(-1);
 
                 // Assert
                 Assert.AreEqual(1, children.Count());
@@ -406,16 +406,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Can_Get_Descendants()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
-                var created = CreateHierarchy(repository).ToArray();
+                ITemplateRepository repository = CreateRepository(provider);
+                ITemplate[] created = CreateHierarchy(repository).ToArray();
 
                 // Act
-                var descendantsById = repository.GetDescendants(created[1].Id);
-                var descendantsByAlias = repository.GetDescendants(created[1].Alias);
+                IEnumerable<ITemplate> descendantsById = repository.GetDescendants(created[1].Id);
+                IEnumerable<ITemplate> descendantsByAlias = repository.GetDescendants(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(3, descendantsById.Count());
@@ -430,11 +430,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Path_Is_Set_Correctly_On_Creation()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
                 var child1 = new Template(ShortStringHelper, "child1", "child1");
@@ -492,11 +492,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Path_Is_Set_Correctly_On_Update()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
                 var child1 = new Template(ShortStringHelper, "child1", "child1");
@@ -519,11 +519,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 repository.Save(toddler1);
                 repository.Save(toddler2);
 
-                //Act
+                // Act
                 toddler2.SetMasterTemplate(child2);
                 repository.Save(toddler2);
 
-                //Assert
+                // Assert
                 Assert.AreEqual($"-1,{parent.Id},{child2.Id},{toddler2.Id}", toddler2.Path);
             }
         }
@@ -532,26 +532,27 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void Path_Is_Set_Correctly_On_Update_With_Master_Template_Removal()
         {
             // Arrange
-            var provider = ScopeProvider;
+            IScopeProvider provider = ScopeProvider;
 
             using (provider.CreateScope())
             {
-                var repository = CreateRepository(provider);
+                ITemplateRepository repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
-                var child1 = new Template(ShortStringHelper, "child1", "child1");
-
-                child1.MasterTemplateAlias = parent.Alias;
-                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                var child1 = new Template(ShortStringHelper, "child1", "child1")
+                {
+                    MasterTemplateAlias = parent.Alias,
+                    MasterTemplateId = new Lazy<int>(() => parent.Id)
+                };
 
                 repository.Save(parent);
                 repository.Save(child1);
 
-                //Act
+                // Act
                 child1.SetMasterTemplate(null);
                 repository.Save(child1);
 
-                //Assert
+                // Assert
                 Assert.AreEqual($"-1,{child1.Id}", child1.Path);
             }
         }
@@ -561,19 +562,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         {
             var testHelper = new TestHelper();
 
-            //Delete all files
+            // Delete all files
             var fsViews = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), HostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
-            var views = fsViews.GetFiles("", "*.cshtml");
-            foreach (var file in views)
+            IEnumerable<string> views = fsViews.GetFiles(string.Empty, "*.cshtml");
+            foreach (string file in views)
+            {
                 fsViews.DeleteFile(file);
+            }
         }
 
         protected Stream CreateStream(string contents = null)
         {
             if (string.IsNullOrEmpty(contents))
+            {
                 contents = "/* test */";
+            }
 
-            var bytes = Encoding.UTF8.GetBytes(contents);
+            byte[] bytes = Encoding.UTF8.GetBytes(contents);
             var stream = new MemoryStream(bytes);
 
             return stream;
@@ -620,7 +625,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Content = @"<%@ Master Language=""C#"" %>"
             };
 
-
             child1.MasterTemplateAlias = parent.Alias;
             child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
             child2.MasterTemplateAlias = parent.Alias;
@@ -652,8 +656,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             repository.Save(baby1);
             repository.Save(baby2);
 
-
-            return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};
+            return new[] { parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2 };
         }
     }
 }

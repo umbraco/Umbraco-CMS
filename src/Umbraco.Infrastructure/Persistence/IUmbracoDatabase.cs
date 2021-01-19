@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NPoco;
+using Umbraco.Core.Migrations.Install;
 
 namespace Umbraco.Core.Persistence
 {
@@ -25,5 +26,7 @@ namespace Umbraco.Core.Persistence
         bool EnableSqlCount { get; set; }
         int SqlCount { get; }
         int BulkInsertRecords<T>(IEnumerable<T> records);
+        bool IsUmbracoInstalled();
+        DatabaseSchemaResult ValidateSchema();
     }
 }

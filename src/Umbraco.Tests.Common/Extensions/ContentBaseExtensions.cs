@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Reflection;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing
@@ -12,16 +16,21 @@ namespace Umbraco.Tests.Testing
         public static void PropertyValues(this IContentBase content, object value, string culture = null, string segment = null)
         {
             if (value == null)
+            {
                 throw new Exception("No properties has been passed in");
+            }
 
-            var propertyInfos = value.GetType().GetProperties();
-            foreach (var propertyInfo in propertyInfos)
+            PropertyInfo[] propertyInfos = value.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in propertyInfos)
             {
                 if (!content.Properties.TryGetValue(propertyInfo.Name, out var property))
+                {
                     throw new Exception($"The property alias {propertyInfo.Name} is not valid, because no PropertyType with this alias exists");
+                }
 
                 property.SetValue(propertyInfo.GetValue(value, null), culture, segment);
-                //Update item with newly added value
+
+                // Update item with newly added value
                 content.Properties.Add(property);
             }
         }

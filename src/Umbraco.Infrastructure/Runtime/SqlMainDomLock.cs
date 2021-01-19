@@ -10,10 +10,12 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
 
 namespace Umbraco.Core.Runtime
 {
@@ -31,19 +33,21 @@ namespace Umbraco.Core.Runtime
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
         private object _locker = new object();
+        private bool _hasTable = false;
 
-        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-            _hostingEnvironment = hostingEnvironment;
+_hostingEnvironment = hostingEnvironment;
             _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                globalSettings,
                connectionStrings,
-               new Lazy<IMapperCollection>(() => new Persistence.Mappers.MapperCollection(Enumerable.Empty<BaseMapper>())),
-               dbProviderFactoryCreator);
+               new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+               dbProviderFactoryCreator,
+               databaseSchemaCreatorFactory);
 
             MainDomKey = MainDomKeyPrefix + "-" + (NetworkHelper.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }
@@ -52,7 +56,7 @@ namespace Umbraco.Core.Runtime
         {
             if (!_dbFactory.Configured)
             {
-                // if we aren't configured, then we're in an install state, in which case we have no choice but to assume we can acquire
+                // if we aren't configured then we're in an install state, in which case we have no choice but to assume we can acquire
                 return true;
             }
 
@@ -72,6 +76,14 @@ namespace Umbraco.Core.Runtime
             try
             {
                 db = _dbFactory.CreateDatabase();
+
+                _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                if (!_hasTable)
+                {
+                    // the Db does not contain the required table, we must be in an install state we have no choice but to assume we can acquire
+                    return true;
+                }
+
                 db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                 try
@@ -176,11 +188,24 @@ namespace Umbraco.Core.Runtime
                         _logger.LogDebug("Task canceled, exiting loop");
                         return;
                     }
-
                     IUmbracoDatabase db = null;
+
                     try
                     {
                         db = _dbFactory.CreateDatabase();
+
+                        if (!_hasTable)
+                        {
+                            // re-check if its still false, we don't want to re-query once we know its there since this
+                            // loop needs to use minimal resources
+                            _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                            if (!_hasTable)
+                            {
+                                // the Db does not contain the required table, we just keep looping since we can't query the db
+                                continue;
+                            }
+                        }
+
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
                         _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
@@ -414,7 +439,7 @@ namespace Umbraco.Core.Runtime
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
 
-                        if (_dbFactory.Configured)
+                        if (_dbFactory.Configured && _hasTable)
                         {
                             IUmbracoDatabase db = null;
                             try

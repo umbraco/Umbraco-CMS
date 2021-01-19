@@ -1,4 +1,8 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
@@ -27,9 +32,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     public class MediaRepositoryTest : UmbracoIntegrationTest
     {
         private IMediaService MediaService => GetRequiredService<IMediaService>();
+
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
         private ITemplateRepository TemplateRepository => GetRequiredService<ITemplateRepository>();
+
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         // Makes handing IDs easier, these are set by CreateTestData
@@ -38,15 +47,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private Media _testFile;
 
         [SetUp]
-        public void SetUpTestData()
-        {
-            CreateTestData();
-        }
+        public void SetUpTestData() => CreateTestData();
 
         private MediaRepository CreateRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository, AppCaches appCaches = null)
         {
-            appCaches = appCaches ?? AppCaches.NoCache;
-            var scopeAccessor = (IScopeAccessor) provider;
+            appCaches ??= AppCaches.NoCache;
+            var scopeAccessor = (IScopeAccessor)provider;
             var globalSettings = new GlobalSettings();
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
@@ -65,46 +71,46 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         [Test]
         public void CacheActiveForIntsAndGuids()
         {
-            MediaTypeRepository mediaTypeRepository;
-
             var realCache = new AppCaches(
                 new ObjectCacheAppCache(),
                 new DictionaryAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()));
 
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out mediaTypeRepository, appCaches: realCache);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository, appCaches: realCache);
 
-                var udb = scope.Database;
+                IUmbracoDatabase udb = scope.Database;
 
                 udb.EnableSqlCount = false;
 
-                var mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
+                MediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbTextpage1", "Textpage");
                 mediaTypeRepository.Save(mediaType);
 
-                var media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
+                Media media = MediaBuilder.CreateSimpleMedia(mediaType, "hello", -1);
                 repository.Save(media);
 
                 udb.EnableSqlCount = true;
 
-                //go get it, this should already be cached since the default repository key is the INT
-                var found = repository.Get(media.Id);
+                // go get it, this should already be cached since the default repository key is the INT
+                IMedia found = repository.Get(media.Id);
                 Assert.AreEqual(0, udb.SqlCount);
-                //retrieve again, this should use cache
+
+                // retrieve again, this should use cache
                 found = repository.Get(media.Id);
                 Assert.AreEqual(0, udb.SqlCount);
 
-                //reset counter
+                // reset counter
                 udb.EnableSqlCount = false;
                 udb.EnableSqlCount = true;
 
-                //now get by GUID, this won't be cached yet because the default repo key is not a GUID
+                // now get by GUID, this won't be cached yet because the default repo key is not a GUID
                 found = repository.Get(media.Key);
-                var sqlCount = udb.SqlCount;
+                int sqlCount = udb.SqlCount;
                 Assert.Greater(sqlCount, 0);
-                //retrieve again, this should use cache now
+
+                // retrieve again, this should use cache now
                 found = repository.Get(media.Key);
                 Assert.AreEqual(sqlCount, udb.SqlCount);
             }
@@ -114,26 +120,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void SaveMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
-                var mediaType = mediaTypeRepository.Get(1032);
-                var image = MediaBuilder.CreateMediaImage(mediaType, -1);
+                IMediaType mediaType = mediaTypeRepository.Get(1032);
+                Media image = MediaBuilder.CreateMediaImage(mediaType, -1);
 
                 // Act
                 mediaTypeRepository.Save(mediaType);
                 repository.Save(image);
 
-                var fetched = repository.Get(image.Id);
+                IMedia fetched = repository.Get(image.Id);
 
                 // Assert
                 Assert.That(mediaType.HasIdentity, Is.True);
                 Assert.That(image.HasIdentity, Is.True);
 
-                TestHelper.AssertPropertyValuesAreEqual(image, fetched, "yyyy-MM-dd HH:mm:ss");
+                TestHelper.AssertPropertyValuesAreEqual(image, fetched);
             }
         }
 
@@ -141,19 +146,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void SaveMediaMultiple()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
-                var mediaType = mediaTypeRepository.Get(1032);
-                var file = MediaBuilder.CreateMediaFile(mediaType, -1);
+                IMediaType mediaType = mediaTypeRepository.Get(1032);
+                Media file = MediaBuilder.CreateMediaFile(mediaType, -1);
 
                 // Act
                 repository.Save(file);
 
-                var image = MediaBuilder.CreateMediaImage(mediaType, -1);
+                Media image = MediaBuilder.CreateMediaImage(mediaType, -1);
                 repository.Save(image);
 
                 // Assert
@@ -170,14 +174,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetMediaIsNotDirty()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var media = repository.Get(_testImage.Id);
+                IMedia media = repository.Get(_testImage.Id);
                 bool dirty = ((ICanBeDirty)media).IsDirty();
 
                 // Assert
@@ -189,18 +192,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void UpdateMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var content = repository.Get(_testFile.Id);
+                IMedia content = repository.Get(_testFile.Id);
                 content.Name = "Test File Updated";
                 repository.Save(content);
 
-                var updatedContent = repository.Get(_testFile.Id);
+                IMedia updatedContent = repository.Get(_testFile.Id);
 
                 // Assert
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
@@ -212,18 +214,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void DeleteMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var media = repository.Get(_testFile.Id);
+                IMedia media = repository.Get(_testFile.Id);
                 repository.Delete(media);
 
-                var deleted = repository.Get(_testFile.Id);
-                var exists = repository.Exists(_testFile.Id);
+                IMedia deleted = repository.Get(_testFile.Id);
+                bool exists = repository.Exists(_testFile.Id);
 
                 // Assert
                 Assert.That(deleted, Is.Null);
@@ -235,14 +236,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var media = repository.Get(_testImage.Id);
+                IMedia media = repository.Get(_testImage.Id);
 
                 // Assert
                 Assert.That(media.Id, Is.EqualTo(_testImage.Id));
@@ -262,18 +262,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void QueryMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                var result = repository.Get(query);
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
-                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2)); //There should be two entities on level 2: File and Media
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2)); // There should be two entities on level 2: File and Media
             }
         }
 
@@ -281,23 +280,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void QueryMedia_ContentTypeIdFilter()
         {
             // Arrange
-            var folderMediaType = MediaTypeService.Get(1031);
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IMediaType folderMediaType = MediaTypeService.Get(1031);
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
                 for (int i = 0; i < 10; i++)
                 {
-                    var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+                    Media folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
                     repository.Save(folder);
                 }
 
-
-                var types = new[] { 1031 };
-                var query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
-                var result = repository.Get(query);
+                int[] types = new[] { 1031 };
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
+                IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(11));
@@ -312,23 +310,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             // and we don't absolutely need it now, so leaving it out for now
 
             // Arrange
-            var folderMediaType = MediaTypeService.Get(1031);
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IMediaType folderMediaType = MediaTypeService.Get(1031);
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
                 for (int i = 0; i < 10; i++)
                 {
-                    var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
+                    Media folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
                     repository.Save(folder);
                 }
 
-
-                var types = new[] { "Folder" };
-                var query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
-                var result = repository.Get(query);
+                string[] types = new[] { "Folder" };
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
+                IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(11));
@@ -339,15 +336,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_FirstPage()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
-                var result = repository.GetPage(query, 0, 1, out totalRecords, null, Ordering.By("SortOrder"));
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -360,16 +356,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_SecondPage()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
-                var result = repository.GetPage(query, 1, 1, out totalRecords, null, Ordering.By("SortOrder"));
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.GetPage(query, 1, 1, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -382,16 +376,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_SinglePage()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
-                var result = repository.GetPage(query, 0, 2, out totalRecords, null, Ordering.By("SortOrder"));
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 2, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -404,16 +396,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_DescendingOrder()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
-                var result = repository.GetPage(query, 0, 1, out totalRecords, null, Ordering.By("SortOrder", Direction.Descending));
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("SortOrder", Direction.Descending));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -426,15 +416,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_AlternateOrder()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name"));
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("Name"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -447,17 +436,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_FilterMatchingSome()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
 
-                var filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("File"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder"));
+                IQuery<IMedia> filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("File"));
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -470,16 +458,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetPagedResultsByQuery_FilterMatchingAll()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out _);
+                MediaRepository repository = CreateRepository(provider, out _);
 
                 // Act
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
 
-                var filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("Test"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder"));
+                IQuery<IMedia> filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("Test"));
+                IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));
@@ -492,14 +480,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetAllMediaByIds()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var medias = repository.GetMany(_testImage.Id, _testFile.Id);
+                IEnumerable<IMedia> medias = repository.GetMany(_testImage.Id, _testFile.Id);
 
                 // Assert
                 Assert.That(medias, Is.Not.Null);
@@ -512,14 +499,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void GetAllMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var medias = repository.GetMany();
+                IEnumerable<IMedia> medias = repository.GetMany();
 
                 // Assert
                 Assert.That(medias, Is.Not.Null);
@@ -542,16 +528,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void ExistMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                var exists = repository.Exists(_testImage.Id);
-                var existsToo = repository.Exists(_testImage.Id);
-                var doesntExists = repository.Exists(NodeDto.NodeIdSeed + 5);
+                bool exists = repository.Exists(_testImage.Id);
+                bool existsToo = repository.Exists(_testImage.Id);
+                bool doesntExists = repository.Exists(NodeDto.NodeIdSeed + 5);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -564,16 +549,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         public void CountMedia()
         {
             // Arrange
-            var provider = ScopeProvider;
-            using (var scope = provider.CreateScope())
+            IScopeProvider provider = ScopeProvider;
+            using (IScope scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
                 int level = 2;
-                var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == level);
-                var result = repository.Count(query);
+                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == level);
+                int result = repository.Count(query);
 
                 // Assert
                 Assert.That(result, Is.GreaterThanOrEqualTo(2));
@@ -582,18 +566,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
         public void CreateTestData()
         {
-            //Create and Save folder-Media -> (1051)
-            var folderMediaType = MediaTypeService.Get(1031);
+            // Create and Save folder-Media -> (1051)
+            IMediaType folderMediaType = MediaTypeService.Get(1031);
             _testFolder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
             MediaService.Save(_testFolder, 0);
 
-            //Create and Save image-Media -> (1052)
-            var imageMediaType = MediaTypeService.Get(1032);
+            // Create and Save image-Media -> (1052)
+            IMediaType imageMediaType = MediaTypeService.Get(1032);
             _testImage = MediaBuilder.CreateMediaImage(imageMediaType, _testFolder.Id);
             MediaService.Save(_testImage, 0);
 
-            //Create and Save file-Media -> (1053)
-            var fileMediaType = MediaTypeService.Get(1033);
+            // Create and Save file-Media -> (1053)
+            IMediaType fileMediaType = MediaTypeService.Get(1033);
             _testFile = MediaBuilder.CreateMediaFile(fileMediaType, _testFolder.Id);
             MediaService.Save(_testFile, 0);
         }

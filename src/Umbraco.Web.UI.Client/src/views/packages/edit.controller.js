@@ -50,6 +50,23 @@
 
         vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
 
+        vm.aceOption = {
+            mode: "xml",
+            theme: "chrome",
+            showPrintMargin: false,
+            advanced: {
+                fontSize: '14px',
+                enableSnippets: true,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: false
+            },
+            onLoad: function (_editor) {
+                vm.editor = _editor;
+
+                vm.editor.setValue(vm.package.actions);
+            }
+        };
+
         function onInit() {
 
             if (create) {

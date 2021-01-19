@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -26,10 +30,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [SetUp]
         public void SetupTest()
         {
-            var scopeProvider = ScopeProvider;
-            using (var scope = scopeProvider.CreateScope())
+            IScopeProvider scopeProvider = ScopeProvider;
+            using (IScope scope = scopeProvider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
 
                 repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
                 repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
@@ -42,7 +46,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Get_By_Alias()
         {
             // Act
-            var macro = MacroService.GetByAlias("test1");
+            IMacro macro = MacroService.GetByAlias("test1");
 
             // Assert
             Assert.IsNotNull(macro);
@@ -53,7 +57,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Get_All()
         {
             // Act
-            var result = MacroService.GetAll();
+            IEnumerable<IMacro> result = MacroService.GetAll();
 
             // Assert
             Assert.AreEqual(3, result.Count());
@@ -63,14 +67,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Create()
         {
             // Act
-            var macro = CreateMacro();
+            IMacro macro = CreateMacro();
             MacroService.Save(macro);
 
             // Assert
             Assert.IsTrue(macro.HasIdentity);
             Assert.Greater(macro.Id, 0);
             Assert.AreNotEqual(Guid.Empty, macro.Key);
-            var result = MacroService.GetById(macro.Id);
+            IMacro result = MacroService.GetById(macro.Id);
             Assert.AreEqual("test", result.Alias);
             Assert.AreEqual("Test", result.Name);
             Assert.AreEqual("~/Views/MacroPartials/Test.cshtml", result.MacroSource);
@@ -94,7 +98,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             MacroService.Delete(macro);
 
             // Assert
-            var result = MacroService.GetById(macro.Id);
+            IMacro result = MacroService.GetById(macro.Id);
             Assert.IsNull(result);
 
             result = MacroService.GetById(macro.Key);
@@ -105,11 +109,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Update()
         {
             // Arrange
-            var macro = CreateMacro();
+            IMacro macro = CreateMacro();
             MacroService.Save(macro);
 
             // Act
-            var currKey = macro.Key;
+            Guid currKey = macro.Key;
             macro.Name = "New name";
             macro.Alias = "NewAlias";
             MacroService.Save(macro);
@@ -120,21 +124,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual("New name", macro.Name);
             Assert.AreEqual("NewAlias", macro.Alias);
             Assert.AreEqual(currKey, macro.Key);
-
         }
 
         [Test]
         public void Can_Update_Property()
         {
             // Arrange
-            var macro = CreateMacro();
+            IMacro macro = CreateMacro();
             macro.Properties.Add(new MacroProperty("blah", "Blah", 0, "blah"));
             MacroService.Save(macro);
 
             Assert.AreNotEqual(Guid.Empty, macro.Properties[0].Key);
 
             // Act
-            var currPropKey = macro.Properties[0].Key;
+            Guid currPropKey = macro.Properties[0].Key;
             macro.Properties[0].Alias = "new Alias";
             macro.Properties[0].Name = "new Name";
             macro.Properties[0].SortOrder = 1;
@@ -157,14 +160,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Update_Remove_Property()
         {
             // Arrange
-            var macro = CreateMacro();
+            IMacro macro = CreateMacro();
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
             macro.Properties.Add(new MacroProperty("blah2", "Blah2", 1, "blah2"));
             macro.Properties.Add(new MacroProperty("blah3", "Blah3", 2, "blah3"));
             MacroService.Save(macro);
 
-            var lastKey = macro.Properties[0].Key;
-            for (var i = 1; i < macro.Properties.Count; i++)
+            Guid lastKey = macro.Properties[0].Key;
+            for (int i = 1; i < macro.Properties.Count; i++)
             {
                 Assert.AreNotEqual(Guid.Empty, macro.Properties[i].Key);
                 Assert.AreNotEqual(lastKey, macro.Properties[i].Key);
@@ -199,7 +202,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Add_And_Remove_Properties()
         {
-            var macro = CreateMacro();
+            IMacro macro = CreateMacro();
 
             // Adds some properties
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
@@ -208,11 +211,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             macro.Properties.Add(new MacroProperty("blah4", "Blah4", 0, "blah4"));
             MacroService.Save(macro);
 
-            var result1 = MacroService.GetById(macro.Id);
+            IMacro result1 = MacroService.GetById(macro.Id);
             Assert.AreEqual(4, result1.Properties.Values.Count());
 
             // Simulate clearing the sections
-            foreach (var s in result1.Properties.Values.ToArray())
+            foreach (IMacroProperty s in result1.Properties.Values.ToArray())
             {
                 result1.Properties.Remove(s.Alias);
             }
@@ -225,27 +228,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // Assert
             result1 = MacroService.GetById(result1.Id);
             Assert.AreEqual(2, result1.Properties.Values.Count());
-
         }
 
         [Test]
         public void Cannot_Save_Macro_With_Empty_Name()
         {
             // Arrange
-            var macro = CreateMacro(name: string.Empty);
+            IMacro macro = CreateMacro(name: string.Empty);
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => MacroService.Save(macro));
         }
 
-        private static IMacro CreateMacro(string name = "Test")
-        {
-            return new MacroBuilder()
+        private static IMacro CreateMacro(string name = "Test") =>
+            new MacroBuilder()
                 .WithAlias("test")
                 .WithName(name)
                 .WithSource("~/Views/MacroPartials/Test.cshtml")
                 .WithCacheDuration(1234)
                 .Build();
-        }
     }
 }

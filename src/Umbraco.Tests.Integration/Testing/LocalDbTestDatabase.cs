@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -16,19 +19,19 @@ namespace Umbraco.Tests.Integration.Testing
         public const string DatabaseName = "UmbracoTests";
 
         private readonly LocalDb _localDb;
-        private static LocalDb.Instance _localDbInstance;
-        private static string _filesPath;
+        private static LocalDb.Instance s_localDbInstance;
+        private static string s_filesPath;
 
         public static LocalDbTestDatabase Instance { get; private set; }
 
-        //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
+        // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
         internal LocalDbTestDatabase(ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
         {
             _loggerFactory = loggerFactory;
             _databaseFactory = dbFactory;
 
             _localDb = localDb;
-            _filesPath = filesPath;
+            s_filesPath = filesPath;
 
             Instance = this; // For GlobalSetupTeardown.cs
 
@@ -43,8 +46,8 @@ namespace Umbraco.Tests.Integration.Testing
                 TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-4", true),
             };
 
-            _localDbInstance = _localDb.GetInstance(InstanceName);
-            if (_localDbInstance != null)
+            s_localDbInstance = _localDb.GetInstance(InstanceName);
+            if (s_localDbInstance != null)
             {
                 return;
             }
@@ -54,30 +57,30 @@ namespace Umbraco.Tests.Integration.Testing
                 throw new Exception("Failed to create a LocalDb instance.");
             }
 
-            _localDbInstance = _localDb.GetInstance(InstanceName);
+            s_localDbInstance = _localDb.GetInstance(InstanceName);
         }
 
         protected override void Initialize()
         {
-            var tempName = Guid.NewGuid().ToString("N");
-            _localDbInstance.CreateDatabase(tempName, _filesPath);
-            _localDbInstance.DetachDatabase(tempName);
+            string tempName = Guid.NewGuid().ToString("N");
+            s_localDbInstance.CreateDatabase(tempName, s_filesPath);
+            s_localDbInstance.DetachDatabase(tempName);
 
             _prepareQueue = new BlockingCollection<TestDbMeta>();
             _readySchemaQueue = new BlockingCollection<TestDbMeta>();
             _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
 
-            for (var i = 0; i < _testDatabases.Count; i++)
+            for (int i = 0; i < _testDatabases.Count; i++)
             {
-                var meta = _testDatabases[i];
-                var isLast = i == _testDatabases.Count - 1;
+                TestDbMeta meta = _testDatabases[i];
+                bool isLast = i == _testDatabases.Count - 1;
 
-                _localDb.CopyDatabaseFiles(tempName, _filesPath, targetDatabaseName: meta.Name, overwrite: true, delete: isLast);
-                meta.ConnectionString = _localDbInstance.GetAttachedConnectionString(meta.Name, _filesPath);
+                _localDb.CopyDatabaseFiles(tempName, s_filesPath, targetDatabaseName: meta.Name, overwrite: true, delete: isLast);
+                meta.ConnectionString = s_localDbInstance.GetAttachedConnectionString(meta.Name, s_filesPath);
                 _prepareQueue.Add(meta);
             }
 
-            for (var i = 0; i < _threadCount; i++)
+            for (int i = 0; i < ThreadCount; i++)
             {
                 var thread = new Thread(PrepareDatabase);
                 thread.Start();
@@ -93,34 +96,41 @@ namespace Umbraco.Tests.Integration.Testing
 
             _prepareQueue.CompleteAdding();
             while (_prepareQueue.TryTake(out _))
-            { }
+            {
+            }
 
             _readyEmptyQueue.CompleteAdding();
             while (_readyEmptyQueue.TryTake(out _))
-            { }
+            {
+            }
 
             _readySchemaQueue.CompleteAdding();
             while (_readySchemaQueue.TryTake(out _))
-            { }
+            {
+            }
 
-            if (_filesPath == null)
+            if (s_filesPath == null)
             {
                 return;
             }
 
-            var filename = Path.Combine(_filesPath, DatabaseName).ToUpper();
+            string filename = Path.Combine(s_filesPath, DatabaseName).ToUpper();
 
-            foreach (var database in _localDbInstance.GetDatabases())
+            foreach (string database in s_localDbInstance.GetDatabases())
             {
                 if (database.StartsWith(filename))
                 {
-                    _localDbInstance.DropDatabase(database);
+                    s_localDbInstance.DropDatabase(database);
                 }
             }
 
-            foreach (var file in Directory.EnumerateFiles(_filesPath))
+            foreach (string file in Directory.EnumerateFiles(s_filesPath))
             {
-                if (file.EndsWith(".mdf") == false && file.EndsWith(".ldf") == false) continue;
+                if (file.EndsWith(".mdf") == false && file.EndsWith(".ldf") == false)
+                {
+                    continue;
+                }
+
                 try
                 {
                     File.Delete(file);

@@ -1,4 +1,7 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -18,8 +21,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void CanCrudConsent()
         {
             // can register
-
-            var consent = ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
+            IConsent consent = ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
             Assert.AreNotEqual(0, consent.Id);
 
             Assert.IsTrue(consent.Current);
@@ -32,14 +34,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(consent.IsGranted());
 
             // can register more
-
             ConsentService.RegisterConsent("user/1234", "app1", "do-something-else", ConsentState.Granted, "no comment");
             ConsentService.RegisterConsent("user/1236", "app1", "do-something", ConsentState.Granted, "no comment");
             ConsentService.RegisterConsent("user/1237", "app2", "do-something", ConsentState.Granted, "no comment");
 
             // can get by source
-
-            var consents = ConsentService.LookupConsent(source: "user/1235").ToArray();
+            IConsent[] consents = ConsentService.LookupConsent(source: "user/1235").ToArray();
             Assert.IsEmpty(consents);
 
             consents = ConsentService.LookupConsent(source: "user/1234").ToArray();
@@ -49,7 +49,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
 
             // can get by context
-
             consents = ConsentService.LookupConsent(context: "app3").ToArray();
             Assert.IsEmpty(consents);
 
@@ -62,7 +61,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
 
             // can get by action
-
             consents = ConsentService.LookupConsent(action: "do-whatever").ToArray();
             Assert.IsEmpty(consents);
 
@@ -73,7 +71,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(consents.Any(x => x.Source == "user/1236"));
 
             // can revoke
-
             consent = ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Revoked, "no comment");
 
             consents = ConsentService.LookupConsent(source: "user/1234", context: "app1", action: "do-something").ToArray();
@@ -82,27 +79,24 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(ConsentState.Revoked, consents[0].State);
 
             // can filter
-
             consents = ConsentService.LookupConsent(context: "app1", action: "do-", actionStartsWith: true).ToArray();
             Assert.AreEqual(3, consents.Length);
             Assert.IsTrue(consents.All(x => x.Context == "app1"));
             Assert.IsTrue(consents.All(x => x.Action.StartsWith("do-")));
 
             // can get history
-
             consents = ConsentService.LookupConsent(source: "user/1234", context: "app1", action: "do-something", includeHistory: true).ToArray();
             Assert.AreEqual(1, consents.Length);
             Assert.IsTrue(consents[0].Current);
             Assert.AreEqual(ConsentState.Revoked, consents[0].State);
             Assert.IsTrue(consents[0].IsRevoked());
             Assert.IsNotNull(consents[0].History);
-            var history = consents[0].History.ToArray();
+            IConsent[] history = consents[0].History.ToArray();
             Assert.AreEqual(1, history.Length);
             Assert.IsFalse(history[0].Current);
             Assert.AreEqual(ConsentState.Granted, history[0].State);
 
             // cannot be stupid
-
             Assert.Throws<ArgumentException>(() =>
                 ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted | ConsentState.Revoked, "no comment"));
         }
@@ -114,7 +108,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             ConsentService.RegisterConsent("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
 
             // Attempt to retrieve the consent we just added without a comment
-            var consents = ConsentService.LookupConsent(source: "user/1234", action: "consentWithoutComment").ToArray();
+            IConsent[] consents = ConsentService.LookupConsent(source: "user/1234", action: "consentWithoutComment").ToArray();
 
             // Confirm we got our expected consent record
             Assert.AreEqual(1, consents.Length);

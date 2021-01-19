@@ -1,7 +1,11 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
@@ -16,8 +20,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class PublicAccessServiceTests : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private IFileService FileService => GetRequiredService<IFileService>();
+
         private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
 
         private Content _content;
@@ -25,10 +32,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [SetUp]
         public void CreateTestData()
         {
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
-            var ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
+            ContentType ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
             ContentTypeService.Save(ct);
 
             _content = ContentBuilder.CreateSimpleContent(ct, "Test", -1);
@@ -39,17 +46,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Add_New_Entry()
         {
             // Arrange
-
-            // Act
-            var entry = new PublicAccessEntry(_content, _content, _content, new[]
+            PublicAccessRule[] rules = new[]
             {
                 new PublicAccessRule()
                 {
                     RuleType = "TestType",
                     RuleValue = "TestVal"
                 },
-            });
-            var result = PublicAccessService.Save(entry);
+            };
+            var entry = new PublicAccessEntry(_content, _content, _content, rules);
+
+            // Act
+            Attempt<OperationResult> result = PublicAccessService.Save(entry);
 
             // Assert
             Assert.IsTrue(result.Success);
@@ -65,19 +73,21 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Add_Rule()
         {
             // Arrange
-            var entry = new PublicAccessEntry(_content, _content, _content, new[]
+            PublicAccessRule[] rules = new[]
             {
                 new PublicAccessRule()
                 {
                     RuleType = "TestType",
                     RuleValue = "TestVal"
                 },
-            });
+            };
+            var entry = new PublicAccessEntry(_content, _content, _content, rules);
             PublicAccessService.Save(entry);
 
             // Act
-            var updated = PublicAccessService.AddRule(_content, "TestType2", "AnotherVal");
-            //re-get
+            Attempt<OperationResult<OperationResultType, PublicAccessEntry>> updated = PublicAccessService.AddRule(_content, "TestType2", "AnotherVal");
+
+            // re-get
             entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert
@@ -90,21 +100,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Add_Multiple_Value_For_Same_Rule_Type()
         {
             // Arrange
-            var entry = new PublicAccessEntry(_content, _content, _content, new[]
+            PublicAccessRule[] rules = new[]
             {
                 new PublicAccessRule()
                 {
                     RuleType = "TestType",
                     RuleValue = "TestVal"
                 },
-            });
+            };
+            var entry = new PublicAccessEntry(_content, _content, _content, rules);
             PublicAccessService.Save(entry);
 
             // Act
-            var updated1 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal1");
-            var updated2 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal2");
+            Attempt<OperationResult<OperationResultType, PublicAccessEntry>> updated1 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal1");
+            Attempt<OperationResult<OperationResultType, PublicAccessEntry>> updated2 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal2");
 
-            //re-get
+            // re-get
             entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert
@@ -119,7 +130,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Remove_Rule()
         {
             // Arrange
-            var entry = new PublicAccessEntry(_content, _content, _content, new[]
+            PublicAccessRule[] rules = new[]
             {
                 new PublicAccessRule()
                 {
@@ -131,12 +142,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                     RuleType = "TestType",
                     RuleValue = "TestValue2"
                 },
-            });
+            };
+            var entry = new PublicAccessEntry(_content, _content, _content, rules);
             PublicAccessService.Save(entry);
 
             // Act
-            var removed = PublicAccessService.RemoveRule(_content, "TestType", "TestValue1");
-            //re-get
+            Attempt<OperationResult> removed = PublicAccessService.RemoveRule(_content, "TestType", "TestValue1");
+
+            // re-get
             entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert

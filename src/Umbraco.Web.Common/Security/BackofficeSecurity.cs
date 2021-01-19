@@ -1,10 +1,5 @@
-﻿using System;
-using System.Security;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -18,34 +13,39 @@ namespace Umbraco.Web.Common.Security
     public class BackOfficeSecurity : IBackOfficeSecurity
     {
         private readonly IUserService _userService;
-        private readonly GlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private object _currentUserLock = new object();
+        private IUser _currentUser;
 
         public BackOfficeSecurity(
             IUserService userService,
-            IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
-            _globalSettings = globalSettings.Value;
-            _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private IUser _currentUser;
+
 
         /// <inheritdoc />
         public IUser CurrentUser
         {
             get
             {
+
                 //only load it once per instance! (but make sure groups are loaded)
                 if (_currentUser == null)
                 {
-                    var id = GetUserId();
-                    _currentUser = id ? _userService.GetUserById(id.Result) : null;
+                    lock (_currentUserLock)
+                    {
+                        //Check again
+                        if (_currentUser == null)
+                        {
+                            var id = GetUserId();
+                            _currentUser = id ? _userService.GetUserById(id.Result) : null;
+                        }
+                    }
                 }
 
                 return _currentUser;

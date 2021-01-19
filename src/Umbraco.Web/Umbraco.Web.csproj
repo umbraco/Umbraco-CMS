@@ -94,6 +94,9 @@
     <PackageReference Include="MiniProfiler" Version="4.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
+    <PackageReference Include="MiniProfiler" Version="4.0.138" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="NPoco" Version="4.0.3" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.5.3</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -263,6 +266,9 @@
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Install\InstallSteps" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

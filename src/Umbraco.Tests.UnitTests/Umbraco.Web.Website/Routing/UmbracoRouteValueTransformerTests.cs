@@ -10,7 +10,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -84,7 +83,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         public async Task Noop_When_Runtime_Level_Not_Run()
         {
             UmbracoRouteValueTransformer transformer = GetTransformer(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == null),
+                Mock.Of<IUmbracoContextAccessor>(),
                 Mock.Of<IRuntimeState>());
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
@@ -95,7 +94,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         public async Task Noop_When_No_Umbraco_Context()
         {
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == null));
+                Mock.Of<IUmbracoContextAccessor>());
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
             Assert.AreEqual(0, result.Count);

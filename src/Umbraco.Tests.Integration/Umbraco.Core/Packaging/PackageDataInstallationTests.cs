@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
@@ -13,6 +16,7 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -29,6 +33,7 @@ namespace Umbraco.Tests.Packaging
     public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     {
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         private IMacroService MacroService => GetRequiredService<IMacroService>();
 
         [HideFromTypeFinder]
@@ -46,40 +51,39 @@ namespace Umbraco.Tests.Packaging
         public class Editor2 : DataEditor
         {
             public Editor2(ILoggerFactory loggerFactory)
-                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
+                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
             {
             }
         }
 
-        // protected override void Compose()
-        // {
-        //     base.Compose();
-        //
-        //     // the packages that are used by these tests reference totally bogus property
-        //     // editors that must exist - so they are defined here - and in order not to
-        //     // pollute everything, they are ignored by the type finder and explicitely
-        //     // added to the editors collection
-        //
-        //     Builder.WithCollectionBuilder<DataEditorCollectionBuilder>()
-        //         .Add<Editor1>()
-        //         .Add<Editor2>();
-        // }
-        //
-        // protected override void ComposeApplication(bool withApplication)
-        // {
-        //     base.ComposeApplication(withApplication);
-        //
-        //     if (!withApplication) return;
-        //
-        //     // re-register with actual media fs
-        //     Builder.ComposeFileSystems();
-        // }
+        //// protected override void Compose()
+        //// {
+        ////     base.Compose();
+        ////
+        ////     // the packages that are used by these tests reference totally bogus property
+        ////     // editors that must exist - so they are defined here - and in order not to
+        ////     // pollute everything, they are ignored by the type finder and explicitely
+        ////     // added to the editors collection
+        ////
+        ////     Builder.WithCollectionBuilder<DataEditorCollectionBuilder>()
+        ////         .Add<Editor1>()
+        ////         .Add<Editor2>();
+        //// }
+        ////
+        //// protected override void ComposeApplication(bool withApplication)
+        //// {
+        ////     base.ComposeApplication(withApplication);
+        ////
+        ////     if (!withApplication) return;
+        ////
+        ////     // re-register with actual media fs
+        ////     Builder.ComposeFileSystems();
+        //// }
 
         private PackageDataInstallation PackageDataInstallation => GetRequiredService<PackageDataInstallation>();
-        private IContentService ContentService => GetRequiredService<IContentService>();
-        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
+
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         [Test]
@@ -88,17 +92,17 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.uBlogsy_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
-            var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            int numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
             Assert.That(dataTypes.Any(), Is.True);
@@ -107,11 +111,11 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
 
-            var uBlogsyBaseDocType = contentTypes.First(x => x.Alias == "uBlogsyBaseDocType");
+            IContentType uBlogsyBaseDocType = contentTypes.First(x => x.Alias == "uBlogsyBaseDocType");
             Assert.That(uBlogsyBaseDocType.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(uBlogsyBaseDocType.PropertyGroups.Any(), Is.False);
 
-            var uBlogsyBasePage = contentTypes.First(x => x.Alias == "uBlogsyBasePage");
+            IContentType uBlogsyBasePage = contentTypes.First(x => x.Alias == "uBlogsyBasePage");
             Assert.That(uBlogsyBasePage.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
             Assert.That(uBlogsyBasePage.PropertyTypes.Count(), Is.EqualTo(7));
             Assert.That(uBlogsyBasePage.PropertyGroups.Count, Is.EqualTo(3));
@@ -120,7 +124,7 @@ namespace Umbraco.Tests.Packaging
             Assert.That(uBlogsyBasePage.PropertyGroups["Navigation"].PropertyTypes.Count(), Is.EqualTo(1));
             Assert.That(uBlogsyBasePage.CompositionPropertyTypes.Count(), Is.EqualTo(12));
 
-            var uBlogsyLanding = contentTypes.First(x => x.Alias == "uBlogsyLanding");
+            IContentType uBlogsyLanding = contentTypes.First(x => x.Alias == "uBlogsyLanding");
             Assert.That(uBlogsyLanding.ContentTypeCompositionExists("uBlogsyBasePage"), Is.True);
             Assert.That(uBlogsyLanding.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
             Assert.That(uBlogsyLanding.PropertyTypes.Count(), Is.EqualTo(5));
@@ -133,23 +137,23 @@ namespace Umbraco.Tests.Packaging
         public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
         {
             // Arrange
-            var strXml = ImportResources.InheritedDocTypes_Package;
+            string strXml = ImportResources.InheritedDocTypes_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
             // Assert
-            var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
-            using (var scope = ScopeProvider.CreateScope())
-            foreach (var propertyType in mRBasePage.PropertyTypes)
+            IContentType mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
+            using IScope scope = ScopeProvider.CreateScope();
+            foreach (IPropertyType propertyType in mRBasePage.PropertyTypes)
             {
-                var propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                PropertyTypeDto propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
                 Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
             }
         }
@@ -160,16 +164,16 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.InheritedDocTypes_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
             Assert.That(dataTypes.Any(), Is.False);
@@ -177,18 +181,18 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
 
-            var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
+            IContentType mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
             Assert.That(mRBasePage.PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(mRBasePage.PropertyGroups.Count(), Is.EqualTo(1));
             Assert.That(mRBasePage.PropertyGroups["Metadaten"].PropertyTypes.Count(), Is.EqualTo(2));
 
-            var mRStartPage = contentTypes.First(x => x.Alias == "MRStartPage");
+            IContentType mRStartPage = contentTypes.First(x => x.Alias == "MRStartPage");
             Assert.That(mRStartPage.ContentTypeCompositionExists("MRBasePage"), Is.True);
             Assert.That(mRStartPage.PropertyTypes.Count(), Is.EqualTo(28));
             Assert.That(mRStartPage.PropertyGroups.Count(), Is.EqualTo(7));
 
-            var propertyGroups = mRStartPage.CompositionPropertyGroups.Where(x => x.Name == "Metadaten");
-            var propertyTypes = propertyGroups.SelectMany(x => x.PropertyTypes);
+            IEnumerable<PropertyGroup> propertyGroups = mRStartPage.CompositionPropertyGroups.Where(x => x.Name == "Metadaten");
+            IEnumerable<IPropertyType> propertyTypes = propertyGroups.SelectMany(x => x.PropertyTypes);
             Assert.That(propertyGroups.Count(), Is.EqualTo(2));
             Assert.That(propertyTypes.Count(), Is.EqualTo(6));
         }
@@ -199,14 +203,14 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var element = xml.Descendants("Templates").First();
+            XElement element = xml.Descendants("Templates").First();
 
-            var init = FileService.GetTemplates().Count();
+            int init = FileService.GetTemplates().Count();
 
             // Act
-            var templates = PackageDataInstallation.ImportTemplates(element.Elements("Template").ToList(), 0);
-            var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
-            var allTemplates = FileService.GetTemplates();
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(element.Elements("Template").ToList(), 0);
+            int numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
+            IEnumerable<ITemplate> allTemplates = FileService.GetTemplates();
 
             // Assert
             Assert.That(templates, Is.Not.Null);
@@ -223,11 +227,10 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var element = xml.Descendants("Templates").First();
-
+            XElement element = xml.Descendants("Templates").First();
 
             // Act
-            var templates = PackageDataInstallation.ImportTemplate(element.Elements("Template").First(), 0);
+            IEnumerable<ITemplate> templates = PackageDataInstallation.ImportTemplate(element.Elements("Template").First(), 0);
 
             // Assert
             Assert.That(templates, Is.Not.Null);
@@ -241,16 +244,15 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
-
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
@@ -261,13 +263,13 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(contentTypes.Count(x => x.ParentId == -1), Is.EqualTo(1));
 
-            var contentMaster = contentTypes.First(x => x.Alias == "ContentMaster");
+            IContentType contentMaster = contentTypes.First(x => x.Alias == "ContentMaster");
             Assert.That(contentMaster.PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(contentMaster.PropertyGroups.Count(), Is.EqualTo(1));
             Assert.That(contentMaster.PropertyGroups["SEO"].PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(contentMaster.ContentTypeCompositionExists("Base"), Is.True);
 
-            var propertyGroupId = contentMaster.PropertyGroups["SEO"].Id;
+            int propertyGroupId = contentMaster.PropertyGroups["SEO"].Id;
             Assert.That(contentMaster.PropertyGroups["SEO"].PropertyTypes.Any(x => x.PropertyGroupId.Value != propertyGroupId), Is.False);
         }
 
@@ -277,17 +279,17 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
-            //Assert - Re-Import contenttypes doesn't throw
+            // Assert - Re-Import contenttypes doesn't throw
             Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
@@ -301,17 +303,17 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.Fanoe_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
-            //Assert - Re-Import contenttypes doesn't throw
+            // Assert - Re-Import contenttypes doesn't throw
             Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
@@ -325,18 +327,18 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var docTypesElement = xml.Descendants("DocumentTypes").First();
-            var element = xml.Descendants("DocumentSet").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement docTypesElement = xml.Descendants("DocumentTypes").First();
+            XElement element = xml.Descendants("DocumentSet").First();
             var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
-            var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
-            var numberOfDocs = (from doc in element.Descendants()
-                where (string) doc.Attribute("isDoc") == ""
+            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
+            int numberOfDocs = (from doc in element.Descendants()
+                where (string)doc.Attribute("isDoc") == string.Empty
                 select doc).Count();
 
             // Assert
@@ -354,16 +356,16 @@ namespace Umbraco.Tests.Packaging
             Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
-            var mediaTypesElement = xml.Descendants("MediaTypes").First();
-            var element = xml.Descendants("MediaSet").First();
+            XElement mediaTypesElement = xml.Descendants("MediaTypes").First();
+            XElement element = xml.Descendants("MediaSet").First();
             var packageMedia = CompiledPackageContentBase.Create(element);
 
             // Act
-            var mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
+            IReadOnlyList<IMediaType> mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
             var importedMediaTypes = mediaTypes.ToDictionary(x => x.Alias, x => x);
-            var medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(),  importedMediaTypes, 0, MediaTypeService, MediaService);
-            var numberOfDocs = (from doc in element.Descendants()
-                where (string) doc.Attribute("isDoc") == ""
+            IReadOnlyList<IMedia> medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(),  importedMediaTypes, 0, MediaTypeService, MediaService);
+            int numberOfDocs = (from doc in element.Descendants()
+                where (string)doc.Attribute("isDoc") == string.Empty
                 select doc).Count();
 
             // Assert
@@ -374,35 +376,31 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
-        {
+        public void Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases() =>
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
-        }
-
-
 
         private void AssertCheckBoxListTests(string strXml)
         {
             // Arrange
             var xml = XElement.Parse(strXml);
-            var dataTypeElement = xml.Descendants("DataTypes").First();
-            var docTypesElement = xml.Descendants("DocumentTypes").First();
-            var element = xml.Descendants("DocumentSet").First();
+            XElement dataTypeElement = xml.Descendants("DataTypes").First();
+            XElement docTypesElement = xml.Descendants("DocumentTypes").First();
+            XElement element = xml.Descendants("DocumentSet").First();
             var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
-            var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
-            var numberOfDocs = (from doc in element.Descendants()
-                                where (string)doc.Attribute("isDoc") == ""
+            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
+            int numberOfDocs = (from doc in element.Descendants()
+                                where (string)doc.Attribute("isDoc") == string.Empty
                                 select doc).Count();
 
             string configuration;
-            using (var scope = ScopeProvider.CreateScope())
+            using (Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
-                var dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
+                List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;
             }
 
@@ -423,12 +421,11 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
-            var templateElement = xml.Descendants("Templates").First();
-
+            XElement templateElement = xml.Descendants("Templates").First();
 
             // Act
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            int numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
 
             // Assert
             Assert.That(templates.Any(), Is.True);
@@ -442,9 +439,8 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
 
-
             // Act
-            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -459,12 +455,12 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
 
-            var serializer = GetRequiredService<IEntityXmlSerializer>();
+            IEntityXmlSerializer serializer = GetRequiredService<IEntityXmlSerializer>();
 
             // Act
-            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
-            var contentType = contentTypes.FirstOrDefault();
-            var element = serializer.Serialize(contentType);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            IContentType contentType = contentTypes.FirstOrDefault();
+            XElement element = serializer.Serialize(contentType);
 
             // Assert
             Assert.That(element, Is.Not.Null);
@@ -472,8 +468,9 @@ namespace Umbraco.Tests.Packaging
             Assert.That(element.Element("Structure"), Is.Not.Null);
             Assert.That(element.Element("GenericProperties"), Is.Not.Null);
             Assert.That(element.Element("Tabs"), Is.Not.Null);
-            //Can't compare this XElement because the templates are not imported (they don't exist)
-            //Assert.That(XNode.DeepEquals(docTypeElement, element), Is.True);
+
+            // Can't compare this XElement because the templates are not imported (they don't exist)
+            //// Assert.That(XNode.DeepEquals(docTypeElement, element), Is.True);
         }
 
         [Test]
@@ -484,8 +481,8 @@ namespace Umbraco.Tests.Packaging
             var docTypeElement = XElement.Parse(strXml);
 
             // Act
-            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
-            var contentTypesUpdated = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            IReadOnlyList<IContentType> contentTypesUpdated = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -505,19 +502,19 @@ namespace Umbraco.Tests.Packaging
             var newPackageXml = XElement.Parse(ImportResources.TemplateOnly_Package);
             var updatedPackageXml = XElement.Parse(ImportResources.TemplateOnly_Updated_Package);
 
-            var templateElement = newPackageXml.Descendants("Templates").First();
-            var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
+            XElement templateElement = newPackageXml.Descendants("Templates").First();
+            XElement templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
 
-            var fileService = FileService;
+            IFileService fileService = FileService;
 
             // kill default test data
             fileService.DeleteTemplate("Textpage");
 
             // Act
-            var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var templatesAfterUpdate = PackageDataInstallation.ImportTemplates(templateElementUpdated.Elements("Template").ToList(), 0);
-            var allTemplates = fileService.GetTemplates();
+            int numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<ITemplate> templatesAfterUpdate = PackageDataInstallation.ImportTemplates(templateElementUpdated.Elements("Template").ToList(), 0);
+            IEnumerable<ITemplate> allTemplates = fileService.GetTemplates();
 
             // Assert
             Assert.That(templates.Any(), Is.True);
@@ -537,7 +534,7 @@ namespace Umbraco.Tests.Packaging
             const string expectedNorwegianChildValue = "BarnVerdi";
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+            XElement dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
             AddLanguages();
 
@@ -559,19 +556,19 @@ namespace Umbraco.Tests.Packaging
             const string childKey = "Child";
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+            XElement dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
             AddLanguages();
 
             // Act
-            var dictionaryItems = PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
+            IReadOnlyList<IDictionaryItem> dictionaryItems = PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
             Assert.That(LocalizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
             Assert.That(LocalizationService.DictionaryItemExists(childKey), "DictionaryItem childKey does not exist");
 
-            var parentDictionaryItem = LocalizationService.GetDictionaryItemByKey(parentKey);
-            var childDictionaryItem = LocalizationService.GetDictionaryItemByKey(childKey);
+            IDictionaryItem parentDictionaryItem = LocalizationService.GetDictionaryItemByKey(parentKey);
+            IDictionaryItem childDictionaryItem = LocalizationService.GetDictionaryItemByKey(childKey);
 
             Assert.That(parentDictionaryItem.ParentId, Is.Not.EqualTo(childDictionaryItem.ParentId));
             Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Key));
@@ -587,7 +584,7 @@ namespace Umbraco.Tests.Packaging
             const string expectedNorwegianChildValue = "BarnVerdi";
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+            XElement dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
             AddLanguages();
             AddExistingEnglishAndNorwegianParentDictionaryItem(expectedEnglishParentValue, expectedNorwegianParentValue);
@@ -612,7 +609,7 @@ namespace Umbraco.Tests.Packaging
             const string expectedNorwegianChildValue = "BarnVerdi";
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+            XElement dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
             AddLanguages();
             AddExistingEnglishParentDictionaryItem(expectedEnglishParentValue);
@@ -632,15 +629,15 @@ namespace Umbraco.Tests.Packaging
         {
             // Arrange
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var LanguageItemsElement = newPackageXml.Elements("Languages").First();
+            XElement languageItemsElement = newPackageXml.Elements("Languages").First();
 
             // Act
-            var languages = PackageDataInstallation.ImportLanguages(LanguageItemsElement.Elements("Language"), 0);
-            var allLanguages = LocalizationService.GetAllLanguages();
+            IReadOnlyList<ILanguage> languages = PackageDataInstallation.ImportLanguages(languageItemsElement.Elements("Language"), 0);
+            IEnumerable<ILanguage> allLanguages = LocalizationService.GetAllLanguages();
 
             // Assert
             Assert.That(languages.Any(x => x.HasIdentity == false), Is.False);
-            foreach (var language in languages)
+            foreach (ILanguage language in languages)
             {
                 Assert.That(allLanguages.Any(x => x.IsoCode == language.IsoCode), Is.True);
             }
@@ -652,8 +649,7 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.uBlogsy_Package;
             var xml = XElement.Parse(strXml);
-            var macrosElement = xml.Descendants("Macros").First();
-
+            XElement macrosElement = xml.Descendants("Macros").First();
 
             // Act
             var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
@@ -662,7 +658,7 @@ namespace Umbraco.Tests.Packaging
             Assert.That(macros.Any(), Is.True);
 
             var allMacros = MacroService.GetAll().ToList();
-            foreach (var macro in macros)
+            foreach (IMacro macro in macros)
             {
                 Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
             }
@@ -674,8 +670,7 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
-            var macrosElement = xml.Descendants("Macros").First();
-
+            XElement macrosElement = xml.Descendants("Macros").First();
 
             // Act
             var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
@@ -685,7 +680,7 @@ namespace Umbraco.Tests.Packaging
             Assert.That(macros.First().Properties.Values.Any(), Is.True);
 
             var allMacros = MacroService.GetAll().ToList();
-            foreach (var macro in macros)
+            foreach (IMacro macro in macros)
             {
                 Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
             }
@@ -697,14 +692,13 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.CompositionsTestPackage;
             var xml = XElement.Parse(strXml);
-            var templateElement = xml.Descendants("Templates").First();
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
-
+            XElement templateElement = xml.Descendants("Templates").First();
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
             Assert.That(contentTypes, Is.Not.Null);
@@ -712,7 +706,7 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(contentTypes.Count(x => x.ParentId == -1), Is.EqualTo(3));
 
-            var textpage = contentTypes.First(x => x.Alias.Equals("umbTextyPage"));
+            IContentType textpage = contentTypes.First(x => x.Alias.Equals("umbTextyPage"));
             Assert.That(textpage.ParentId, Is.Not.EqualTo(-1));
             Assert.That(textpage.ContentTypeComposition.Count(), Is.EqualTo(3));
             Assert.That(textpage.ContentTypeCompositionExists("umbMaster"), Is.True);
@@ -726,19 +720,18 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.CompositionsTestPackage_Random;
             var xml = XElement.Parse(strXml);
-            var docTypeElement = xml.Descendants("DocumentTypes").First();
-
+            XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
-            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
             Assert.That(contentTypes, Is.Not.Null);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
 
-            var testContentType = contentTypes.First(x => x.Alias.Equals("CompositeTest"));
+            IContentType testContentType = contentTypes.First(x => x.Alias.Equals("CompositeTest"));
             Assert.That(testContentType.ContentTypeComposition.Count(), Is.EqualTo(3));
             Assert.That(testContentType.ContentTypeCompositionExists("Content"), Is.True);
             Assert.That(testContentType.ContentTypeCompositionExists("Meta"), Is.True);
@@ -757,17 +750,17 @@ namespace Umbraco.Tests.Packaging
         private void AssertDictionaryItem(string key, string expectedValue, string cultureCode)
         {
             Assert.That(LocalizationService.DictionaryItemExists(key), "DictionaryItem key does not exist");
-            var dictionaryItem = LocalizationService.GetDictionaryItemByKey(key);
-            var translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
+            IDictionaryItem dictionaryItem = LocalizationService.GetDictionaryItemByKey(key);
+            IDictionaryTranslation translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
             Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
-            var value = translation.Value;
+            string value = translation.Value;
             Assert.That(value, Is.EqualTo(expectedValue), "Translation value was not set");
         }
 
         private void AddExistingEnglishParentDictionaryItem(string expectedEnglishParentValue)
         {
             var languages = LocalizationService.GetAllLanguages().ToList();
-            var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
+            ILanguage englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
             LocalizationService.Save(
                 new DictionaryItem("Parent")
                 {
@@ -775,15 +768,14 @@ namespace Umbraco.Tests.Packaging
                                     {
                                             new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
                                     }
-                }
-            );
+                });
         }
 
         private void AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue, string expectedNorwegianParentValue)
         {
             var languages = LocalizationService.GetAllLanguages().ToList();
-            var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
-            var norwegianLanguage = languages.Single(l => l.IsoCode == "nb-NO");
+            ILanguage englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
+            ILanguage norwegianLanguage = languages.Single(l => l.IsoCode == "nb-NO");
             LocalizationService.Save(
                 new DictionaryItem("Parent")
                 {
@@ -792,8 +784,7 @@ namespace Umbraco.Tests.Packaging
                                             new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
                                             new DictionaryTranslation(norwegianLanguage, expectedNorwegianParentValue),
                                     }
-                }
-            );
+                });
         }
     }
 }

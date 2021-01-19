@@ -1,4 +1,8 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -21,11 +25,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class DataTypeServiceTests : UmbracoIntegrationTest
     {
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private IFileService FileService => GetRequiredService<IFileService>();
+
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
+
         private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
         [Test]
@@ -47,26 +57,25 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void DataTypeService_Can_Delete_Textfield_DataType_And_Clear_Usages()
         {
             // Arrange
-            var textfieldId = "Umbraco.Textbox";
-            var dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            string textfieldId = "Umbraco.Textbox";
+            IEnumerable<IDataType> dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var doctype = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            ContentType doctype = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             ContentTypeService.Save(doctype);
 
-
             // Act
-            var definition = dataTypeDefinitions.First();
-            var definitionId = definition.Id;
+            IDataType definition = dataTypeDefinitions.First();
+            int definitionId = definition.Id;
             DataTypeService.Delete(definition);
 
-            var deletedDefinition = DataTypeService.GetDataType(definitionId);
+            IDataType deletedDefinition = DataTypeService.GetDataType(definitionId);
 
             // Assert
             Assert.That(deletedDefinition, Is.Null);
 
-            //Further assertions against the ContentType that contains PropertyTypes based on the TextField
-            var contentType = ContentTypeService.Get(doctype.Id);
+            // Further assertions against the ContentType that contains PropertyTypes based on the TextField
+            IContentType contentType = ContentTypeService.Get(doctype.Id);
             Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
         }
@@ -75,7 +84,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_DataType_With_Empty_Name()
         {
             // Act
-            var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
+            var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));

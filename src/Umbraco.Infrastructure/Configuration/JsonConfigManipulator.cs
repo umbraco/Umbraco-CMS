@@ -42,6 +42,7 @@ namespace Umbraco.Core.Configuration
             SaveJson(provider, json);
         }
 
+
         public void SaveConfigValue(string key, object value)
         {
             var provider = GetJsonConfigurationProvider();
@@ -77,6 +78,40 @@ namespace Umbraco.Core.Configuration
             json.Merge(item, new JsonMergeSettings());
 
             SaveJson(provider, json);
+        }
+
+        public void SetGlobalId(string id)
+        {
+            var provider = GetJsonConfigurationProvider();
+
+            var json = GetJson(provider);
+
+            var item = GetGlobalIdItem(id);
+
+            json.Merge(item, new JsonMergeSettings());
+
+            SaveJson(provider, json);
+        }
+
+        private object GetGlobalIdItem(string id)
+        {
+            JTokenWriter writer = new JTokenWriter();
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("Umbraco");
+            writer.WriteStartObject();
+            writer.WritePropertyName("CMS");
+            writer.WriteStartObject();
+            writer.WritePropertyName("Global");
+            writer.WriteStartObject();
+            writer.WritePropertyName("Id");
+            writer.WriteValue(id);
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+
+            return writer.Token;
         }
 
         private JToken GetDisableRedirectUrlItem(string value)

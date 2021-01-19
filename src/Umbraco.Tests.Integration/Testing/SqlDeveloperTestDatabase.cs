@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Concurrent;
 using System.Data.SqlClient;
@@ -6,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
 
 // ReSharper disable ConvertToUsingDeclaration
-
 namespace Umbraco.Tests.Integration.Testing
 {
     /// <remarks>
@@ -46,13 +48,13 @@ namespace Umbraco.Tests.Integration.Testing
             _readySchemaQueue = new BlockingCollection<TestDbMeta>();
             _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
 
-            foreach (var meta in _testDatabases)
+            foreach (TestDbMeta meta in _testDatabases)
             {
                 CreateDatabase(meta);
                 _prepareQueue.Add(meta);
             }
 
-            for (var i = 0; i < _threadCount; i++)
+            for (int i = 0; i < ThreadCount; i++)
             {
                 var thread = new Thread(PrepareDatabase);
                 thread.Start();
@@ -64,7 +66,7 @@ namespace Umbraco.Tests.Integration.Testing
             using (var connection = new SqlConnection(_masterConnectionString))
             {
                 connection.Open();
-                using (var command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
                     SetCommand(command, $@"CREATE DATABASE {LocalDb.QuotedName(meta.Name)}");
                     command.ExecuteNonQuery();
@@ -77,13 +79,13 @@ namespace Umbraco.Tests.Integration.Testing
             using (var connection = new SqlConnection(_masterConnectionString))
             {
                 connection.Open();
-                using (var command = connection.CreateCommand())
+                using (SqlCommand command = connection.CreateCommand())
                 {
-                    SetCommand(command, $@"
+                    string sql = $@"
                         ALTER DATABASE{LocalDb.QuotedName(meta.Name)}
                         SET SINGLE_USER
-                        WITH ROLLBACK IMMEDIATE
-                    ");
+                        WITH ROLLBACK IMMEDIATE";
+                    SetCommand(command, sql);
                     command.ExecuteNonQuery();
 
                     SetCommand(command, $@"DROP DATABASE {LocalDb.QuotedName(meta.Name)}");
@@ -95,18 +97,26 @@ namespace Umbraco.Tests.Integration.Testing
         public void Finish()
         {
             if (_prepareQueue == null)
+            {
                 return;
+            }
 
             _prepareQueue.CompleteAdding();
-            while (_prepareQueue.TryTake(out _)) { }
+            while (_prepareQueue.TryTake(out _))
+            {
+            }
 
             _readyEmptyQueue.CompleteAdding();
-            while (_readyEmptyQueue.TryTake(out _)) { }
+            while (_readyEmptyQueue.TryTake(out _))
+            {
+            }
 
             _readySchemaQueue.CompleteAdding();
-            while (_readySchemaQueue.TryTake(out _)) { }
+            while (_readySchemaQueue.TryTake(out _))
+            {
+            }
 
-            foreach (var testDatabase in _testDatabases)
+            foreach (TestDbMeta testDatabase in _testDatabases)
             {
                 Drop(testDatabase);
             }

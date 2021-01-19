@@ -31,6 +31,7 @@ using Umbraco.Core.Mail;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -487,7 +488,8 @@ namespace Umbraco.Tests.Testing
                 globalSettings,
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
-                TestHelper.DbProviderFactoryCreator));
+                TestHelper.DbProviderFactoryCreator,
+                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion)));
 
             Builder.Services.AddUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 

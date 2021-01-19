@@ -1,4 +1,7 @@
-﻿using System.Linq;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
@@ -14,15 +17,19 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+    [UmbracoTest(
+        Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
         WithApplication = true,
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceEventTests : UmbracoIntegrationTest
     {
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
         private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
+
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         private IFileService FileService => GetRequiredService<IFileService>();
 
         private GlobalSettings _globalSettings;
@@ -33,6 +40,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         {
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
+
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
             global::Umbraco.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
@@ -40,7 +48,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private void CreateTestData()
         {
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
@@ -48,10 +56,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [TearDown]
-        public void Teardown()
-        {
-            ContentRepositoryBase.ThrowOnWarning = false;
-        }
+        public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
 
         [Test]
         public void Saving_Culture()
@@ -59,8 +64,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             _contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in _contentType.PropertyTypes)
+            foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+            {
                 propertyType.Variations = ContentVariation.Culture;
+            }
+
             ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
@@ -68,7 +76,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             document.SetCultureName("bonjour", "fr-FR");
             ContentService.Save(document);
 
-            //re-get - dirty properties need resetting
+            // re-get - dirty properties need resetting
             document = ContentService.GetById(document.Id);
 
             // properties: title, bodyText, keywords, description
@@ -76,7 +84,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
@@ -86,7 +94,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaved(IContentService sender, ContentSavedEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
@@ -114,7 +122,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
@@ -123,12 +131,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaved(IContentService sender, ContentSavedEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.AreSame("title", document.GetValue<string>("title"));
 
-                //we're only dealing with invariant here
-                var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
+                // we're only dealing with invariant here
+                IPropertyValue propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.IsNull(propValue.PublishedValue);
@@ -153,8 +161,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             _contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in _contentType.PropertyTypes)
+            foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+            {
                 propertyType.Variations = ContentVariation.Culture;
+            }
+
             ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
@@ -165,12 +176,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsFalse(document.IsCulturePublished("en-US"));
 
-            //re-get - dirty properties need resetting
+            // re-get - dirty properties need resetting
             document = ContentService.GetById(document.Id);
 
             void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
-                var publishing = e.PublishedEntities.First();
+                IContent publishing = e.PublishedEntities.First();
 
                 Assert.AreSame(document, publishing);
 
@@ -180,7 +191,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnPublished(IContentService sender, ContentPublishedEventArgs e)
             {
-                var published = e.PublishedEntities.First();
+                IContent published = e.PublishedEntities.First();
 
                 Assert.AreSame(document, published);
 
@@ -214,7 +225,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
@@ -223,12 +234,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaved(IContentService sender, ContentSavedEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.AreSame("title", document.GetValue<string>("title"));
 
                 // We're only dealing with invariant here.
-                var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
+                IPropertyValue propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.AreEqual("title", propValue.PublishedValue);
@@ -253,13 +264,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Publishing_Set_Mandatory_Value()
         {
-            var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
+            IPropertyType titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
             titleProperty.Mandatory = true; // make this required!
             ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
 
-            var result = ContentService.SaveAndPublish(document);
+            PublishResult result = ContentService.SaveAndPublish(document);
             Assert.IsFalse(result.Success);
             Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
@@ -269,7 +280,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
-                var saved = e.SavedEntities.First();
+                IContent saved = e.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
@@ -283,7 +294,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             try
             {
                 result = ContentService.SaveAndPublish(document);
-                Assert.IsTrue(result.Success); //will succeed now because we were able to specify the required value in the Saving event
+                Assert.IsTrue(result.Success); // will succeed now because we were able to specify the required value in the Saving event
             }
             finally
             {
@@ -297,8 +308,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             _contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in _contentType.PropertyTypes)
+            foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+            {
                 propertyType.Variations = ContentVariation.Culture;
+            }
+
             ContentTypeService.Save(_contentType);
 
             var contentService = (ContentService)ContentService;
@@ -311,12 +325,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
 
-            //re-get - dirty properties need resetting
+            // re-get - dirty properties need resetting
             document = contentService.GetById(document.Id);
 
             void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
-                var publishing = e.PublishedEntities.First();
+                IContent publishing = e.PublishedEntities.First();
 
                 Assert.AreSame(document, publishing);
 
@@ -329,7 +343,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             void OnPublished(IContentService sender, ContentPublishedEventArgs e)
             {
-                var published = e.PublishedEntities.First();
+                IContent published = e.PublishedEntities.First();
 
                 Assert.AreSame(document, published);
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -43,6 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ICookieManager _cookieManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly ICompositeViewEngine _viewEngines;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -53,7 +55,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
             IRuntimeMinifier runtimeMinifier,
-            ICompositeViewEngine viewEngines)
+            ICompositeViewEngine viewEngines,
+            IUmbracoContextAccessor umbracoContextAccessor)
         {
             _features = features;
             _globalSettings = globalSettings.Value;
@@ -64,14 +67,22 @@ namespace Umbraco.Web.BackOffice.Controllers
             _cookieManager = cookieManager;
             _runtimeMinifier = runtimeMinifier;
             _viewEngines = viewEngines;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [DisableBrowserCache]
-        public ActionResult Index()
+        public ActionResult Index(int? id = null)
         {
             var availableLanguages = _localizationService.GetAllLanguages();
+            if (id.HasValue)
+            {
+                var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(true, id.Value);
+                if (content is null)
+                    return NotFound();
 
+                availableLanguages = availableLanguages.Where(language => content.Cultures.ContainsKey(language.IsoCode));
+            }
             var model = new BackOfficePreviewModel(_features, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
@@ -89,6 +100,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return View(viewPath, model);
         }
+
 
         /// <summary>
         /// Returns the JavaScript file for preview

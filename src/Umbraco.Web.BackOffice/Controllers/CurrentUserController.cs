@@ -16,15 +16,16 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -170,8 +171,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This only works when the user is logged in (partially)
         /// </remarks>
-        [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController
-        public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDetail>> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
             if (user == null) throw new InvalidOperationException("Could not find user");
@@ -184,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // so that is why it is being used here.
                 ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
-                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             //They've successfully set their password, we can now update their user account to be approved
@@ -201,10 +202,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [AppendUserModifiedHeader]
-        public IActionResult PostSetAvatar(IList<IFormFile> files)
+        public IActionResult PostSetAvatar(IList<IFormFile> file)
         {
             //borrow the logic from the user controller
-            return UsersController.PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
         }
 
         /// <summary>
@@ -214,7 +215,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// If the password is being reset it will return the newly reset password, otherwise will return an empty value
         /// </returns>
-        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
+        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel data)
         {
             // TODO: Why don't we inject this? Then we can just inject a logger
             var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
@@ -233,7 +234,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
         }
 
         // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController

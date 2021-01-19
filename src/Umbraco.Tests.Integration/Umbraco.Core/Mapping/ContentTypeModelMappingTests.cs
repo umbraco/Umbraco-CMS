@@ -1,4 +1,8 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -37,23 +41,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void MemberTypeSave_To_IMemberType()
         {
-            //Arrange
-            //TODO use builder
+            // Arrange
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
             _dataTypeService.Save(dataType);
 
-            var display = CreateMemberTypeSave(dataType.Id);
+            MemberTypeSave display = CreateMemberTypeSave(dataType.Id);
 
+            // Act
+            IMemberType result = _sut.Map<IMemberType>(display);
 
-            //Act
-
-            var result = _sut.Map<IMemberType>(display);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(display.Alias, result.Alias);
             Assert.AreEqual(display.Description, result.Description);
             Assert.AreEqual(display.Icon, result.Icon);
@@ -69,13 +70,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
-            for (var i = 0; i < display.Groups.Count(); i++)
+            for (int i = 0; i < display.Groups.Count(); i++)
             {
                 Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
                 Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
-                var propTypes = display.Groups.ElementAt(i).Properties;
+                IEnumerable<MemberPropertyTypeBasic> propTypes = display.Groups.ElementAt(i).Properties;
                 Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                for (int j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
@@ -86,7 +87,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < display.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
             }
@@ -95,22 +96,20 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void MediaTypeSave_To_IMediaType()
         {
-            //Arrange
-            //TODO use builder
+            // Arrange
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
             _dataTypeService.Save(dataType);
 
-            var display = CreateMediaTypeSave(dataType.Id);
+            MediaTypeSave display = CreateMediaTypeSave(dataType.Id);
 
-            //Act
+            // Act
+            IMediaType result = _sut.Map<IMediaType>(display);
 
-            var result = _sut.Map<IMediaType>(display);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(display.Alias, result.Alias);
             Assert.AreEqual(display.Description, result.Description);
             Assert.AreEqual(display.Icon, result.Icon);
@@ -126,13 +125,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
-            for (var i = 0; i < display.Groups.Count(); i++)
+            for (int i = 0; i < display.Groups.Count(); i++)
             {
                 Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
                 Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
-                var propTypes = display.Groups.ElementAt(i).Properties;
+                IEnumerable<PropertyTypeBasic> propTypes = display.Groups.ElementAt(i).Properties;
                 Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                for (int j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
@@ -140,7 +139,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < display.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
             }
@@ -149,8 +148,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void ContentTypeSave_To_IContentType()
         {
-            //Arrange
-            //TODO use builder
+            // Arrange
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
@@ -159,25 +158,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             var templates = new ITemplate[]
             {
-                //Note the aliases is important - TODO use builder
+                // Note the aliases is important - TODO use builder
                 new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 1", "test"),
                 new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 2", "template1"),
                 new Template(Services.GetRequiredService<IShortStringHelper>(), "Name 3", "template2"),
             };
 
-            foreach (var template in templates)
+            foreach (ITemplate template in templates)
             {
                 _fileService.SaveTemplate(template);
             }
 
-            var display = CreateContentTypeSave(dataType.Id);
+            DocumentTypeSave display = CreateContentTypeSave(dataType.Id);
 
-            //Act
+            // Act
+            IContentType result = _sut.Map<IContentType>(display);
 
-            var result = _sut.Map<IContentType>(display);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(display.Alias, result.Alias);
             Assert.AreEqual(display.Description, result.Description);
             Assert.AreEqual(display.Icon, result.Icon);
@@ -193,13 +190,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
-            for (var i = 0; i < display.Groups.Count(); i++)
+            for (int i = 0; i < display.Groups.Count(); i++)
             {
                 Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
                 Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
-                var propTypes = display.Groups.ElementAt(i).Properties;
+                IEnumerable<PropertyTypeBasic> propTypes = display.Groups.ElementAt(i).Properties;
                 Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                for (int j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
@@ -207,18 +204,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 }
             }
 
-            var allowedTemplateAliases = display.AllowedTemplates
-                .Concat(new[] {display.DefaultTemplate})
+            IEnumerable<string> allowedTemplateAliases = display.AllowedTemplates
+                .Concat(new[] { display.DefaultTemplate })
                 .Distinct();
 
             Assert.AreEqual(allowedTemplateAliases.Count(), result.AllowedTemplates.Count());
-            for (var i = 0; i < display.AllowedTemplates.Count(); i++)
+            for (int i = 0; i < display.AllowedTemplates.Count(); i++)
             {
                 Assert.AreEqual(display.AllowedTemplates.ElementAt(i), result.AllowedTemplates.ElementAt(i).Alias);
             }
 
             Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < display.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
             }
@@ -227,47 +224,43 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void MediaTypeSave_With_Composition_To_IMediaType()
         {
-            //Arrange
-            //TODO use builder
+            // Arrange
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
             _dataTypeService.Save(dataType);
 
+            MediaTypeSave display = CreateCompositionMediaTypeSave(dataType.Id);
 
-            var display = CreateCompositionMediaTypeSave(dataType.Id);
+            // Act
+            IMediaType result = _sut.Map<IMediaType>(display);
 
-            //Act
-
-            var result = _sut.Map<IMediaType>(display);
-
-            //Assert
+            // Assert
+            Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
 
             // TODO: Now we need to assert all of the more complicated parts
-            Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
         }
 
         [Test]
         public void ContentTypeSave_With_Composition_To_IContentType()
         {
-            //Arrange
+            // Arrange
 
-            //TODO use builder
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
             };
             _dataTypeService.Save(dataType);
 
-            var display = CreateCompositionContentTypeSave(dataType.Id);
+            DocumentTypeSave display = CreateCompositionContentTypeSave(dataType.Id);
 
-            //Act
+            // Act
+            IContentType result = _sut.Map<IContentType>(display);
 
-            var result = _sut.Map<IContentType>(display);
-
-            //Assert
-
+            // Assert
             // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
         }
@@ -275,20 +268,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void IMemberType_To_MemberTypeDisplay()
         {
-            //Arrange
-            var memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            var alias = memberType.PropertyTypes.Last().Alias;
+            // Arrange
+            MemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            string alias = memberType.PropertyTypes.Last().Alias;
             memberType.SetIsSensitiveProperty(alias, true);
             memberType.SetMemberCanEditProperty(alias, true);
             memberType.SetMemberCanViewProperty(alias, true);
             MemberTypeBuilder.EnsureAllIds(memberType, 8888);
 
-            //Act
+            // Act
+            MemberTypeDisplay result = _sut.Map<MemberTypeDisplay>(memberType);
 
-            var result = _sut.Map<MemberTypeDisplay>(memberType);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(memberType.Alias, result.Alias);
             Assert.AreEqual(memberType.Description, result.Description);
             Assert.AreEqual(memberType.Icon, result.Icon);
@@ -301,17 +292,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(memberType.CreateDate, result.CreateDate);
             Assert.AreEqual(memberType.UpdateDate, result.UpdateDate);
 
-            // TODO: Now we need to assert all of the more complicated parts
-
             Assert.AreEqual(memberType.PropertyGroups.Count(), result.Groups.Count());
-            for (var i = 0; i < memberType.PropertyGroups.Count(); i++)
+            for (int i = 0; i < memberType.PropertyGroups.Count(); i++)
             {
                 Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
                 Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
-                var propTypes = memberType.PropertyGroups.ElementAt(i).PropertyTypes;
+                PropertyTypeCollection propTypes = memberType.PropertyGroups.ElementAt(i).PropertyTypes;
 
                 Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                for (int j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
@@ -322,28 +311,23 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(memberType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < memberType.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < memberType.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
-
         }
-
 
         [Test]
         public void IMediaType_To_MediaTypeDisplay()
         {
-            //Arrange
-
-            var mediaType = MediaTypeBuilder.CreateImageMediaType();
+            // Arrange
+            MediaType mediaType = MediaTypeBuilder.CreateImageMediaType();
             MediaTypeBuilder.EnsureAllIds(mediaType, 8888);
 
-            //Act
+            // Act
+            MediaTypeDisplay result = _sut.Map<MediaTypeDisplay>(mediaType);
 
-            var result = _sut.Map<MediaTypeDisplay>(mediaType);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(mediaType.Alias, result.Alias);
             Assert.AreEqual(mediaType.Description, result.Description);
             Assert.AreEqual(mediaType.Icon, result.Icon);
@@ -356,17 +340,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(mediaType.CreateDate, result.CreateDate);
             Assert.AreEqual(mediaType.UpdateDate, result.UpdateDate);
 
-            // TODO: Now we need to assert all of the more complicated parts
-
             Assert.AreEqual(mediaType.PropertyGroups.Count(), result.Groups.Count());
-            for (var i = 0; i < mediaType.PropertyGroups.Count(); i++)
+            for (int i = 0; i < mediaType.PropertyGroups.Count(); i++)
             {
                 Assert.AreEqual(mediaType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
                 Assert.AreEqual(mediaType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
-                var propTypes = mediaType.PropertyGroups.ElementAt(i).PropertyTypes;
+                PropertyTypeCollection propTypes = mediaType.PropertyGroups.ElementAt(i).PropertyTypes;
 
                 Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                for (int j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
@@ -374,31 +356,27 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(mediaType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < mediaType.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < mediaType.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(mediaType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
-
         }
 
         [Test]
         public void IContentType_To_ContentTypeDisplay()
         {
-            //Arrange
-            // _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-            //     .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
+            // Arrange
+            //// _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
+            ////     .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
             //
-            // // setup the mocks to return the data we want to test against...
-
-            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            // setup the mocks to return the data we want to test against...
+            ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
             ContentTypeBuilder.EnsureAllIds(contentType, 8888);
 
-            //Act
+            // Act
+            DocumentTypeDisplay result = _sut.Map<DocumentTypeDisplay>(contentType);
 
-            var result = _sut.Map<DocumentTypeDisplay>(contentType);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(contentType.Alias, result.Alias);
             Assert.AreEqual(contentType.Description, result.Description);
             Assert.AreEqual(contentType.Icon, result.Icon);
@@ -412,17 +390,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
-            // TODO: Now we need to assert all of the more complicated parts
-
             Assert.AreEqual(contentType.PropertyGroups.Count, result.Groups.Count());
-            for (var i = 0; i < contentType.PropertyGroups.Count; i++)
+            for (int i = 0; i < contentType.PropertyGroups.Count; i++)
             {
                 Assert.AreEqual(contentType.PropertyGroups[i].Id, result.Groups.ElementAt(i).Id);
                 Assert.AreEqual(contentType.PropertyGroups[i].Name, result.Groups.ElementAt(i).Name);
-                var propTypes = contentType.PropertyGroups[i].PropertyTypes;
+                PropertyTypeCollection propTypes = contentType.PropertyGroups[i].PropertyTypes;
 
                 Assert.AreEqual(propTypes.Count, result.Groups.ElementAt(i).Properties.Count());
-                for (var j = 0; j < propTypes.Count; j++)
+                for (int j = 0; j < propTypes.Count; j++)
                 {
                     Assert.AreEqual(propTypes[j].Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
                     Assert.AreEqual(propTypes[j].DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
@@ -431,23 +407,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(contentType.AllowedTemplates.Count(), result.AllowedTemplates.Count());
-            for (var i = 0; i < contentType.AllowedTemplates.Count(); i++)
+            for (int i = 0; i < contentType.AllowedTemplates.Count(); i++)
             {
                 Assert.AreEqual(contentType.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
             }
 
             Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < contentType.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
-
         }
 
         [Test]
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
-            //TODO use builder
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
@@ -510,8 +485,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             // proper group properties mapping takes place when mapping the content type,
             // not when mapping the group - because of inherited properties and such
-            //var result = Mapper.Map<PropertyGroup>(basic);
-            var result = _sut.Map<IMemberType>(contentType).PropertyGroups[0];
+            // var result = Mapper.Map<PropertyGroup>(basic);
+            PropertyGroup result = _sut.Map<IMemberType>(contentType).PropertyGroups[0];
 
             Assert.AreEqual(basic.Name, result.Name);
             Assert.AreEqual(basic.Id, result.Id);
@@ -579,8 +554,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 
             // proper group properties mapping takes place when mapping the content type,
             // not when mapping the group - because of inherited properties and such
-            //var result = Mapper.Map<PropertyGroup>(basic);
-            var result = _sut.Map<IContentType>(contentType).PropertyGroups[0];
+            // var result = Mapper.Map<PropertyGroup>(basic);
+            PropertyGroup result = _sut.Map<IContentType>(contentType).PropertyGroups[0];
 
             Assert.AreEqual(basic.Name, result.Name);
             Assert.AreEqual(basic.Id, result.Id);
@@ -609,7 +584,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 }
             };
 
-            var result = _sut.Map<IPropertyType>(basic);
+            IPropertyType result = _sut.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -627,7 +602,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyType()
         {
-            //TODO use builder
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
@@ -652,7 +627,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 }
             };
 
-            var result = _sut.Map<IPropertyType>(basic);
+            IPropertyType result = _sut.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -670,50 +645,50 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
-            //Arrange
-            var ctMain = MediaTypeBuilder.CreateSimpleMediaType("parent", "Parent");
-            //not assigned to tab
+            // Arrange
+            MediaType ctMain = MediaTypeBuilder.CreateSimpleMediaType("parent", "Parent");
+
+            // not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlName",
                 Name = "Slug",
-                Description = "",
+                Description = string.Empty,
                 Mandatory = false,
                 SortOrder = 1,
                 DataTypeId = -88
             });
             MediaTypeBuilder.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = MediaTypeBuilder.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
-            ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
-            {
-                Alias = "someProperty",
-                Name = "Some Property",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88
-            }, "Another tab");
+            MediaType ctChild1 = MediaTypeBuilder.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
+            ctChild1.AddPropertyType(
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+                {
+                    Alias = "someProperty",
+                    Name = "Some Property",
+                    Description = string.Empty,
+                    Mandatory = false,
+                    SortOrder = 1,
+                    DataTypeId = -88
+                }, "Another tab");
             MediaTypeBuilder.EnsureAllIds(ctChild1, 7777);
-            var contentType = MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
-            //not assigned to tab
+            MediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+
+            // not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlAlias",
                 Name = "AltUrl",
-                Description = "",
+                Description = string.Empty,
                 Mandatory = false,
                 SortOrder = 1,
                 DataTypeId = -88
             });
             MediaTypeBuilder.EnsureAllIds(contentType, 6666);
 
+            // Act
+            MediaTypeDisplay result = _sut.Map<MediaTypeDisplay>(contentType);
 
-            //Act
-
-            var result = _sut.Map<MediaTypeDisplay>(contentType);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(contentType.Alias, result.Alias);
             Assert.AreEqual(contentType.Description, result.Description);
             Assert.AreEqual(contentType.Icon, result.Icon);
@@ -726,15 +701,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(contentType.CreateDate, result.CreateDate);
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
 
-            // TODO: Now we need to assert all of the more complicated parts
-
             Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
             Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
             Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
 
-            var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
-            var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
-            var allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
+            PropertyTypeDisplay[] allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
+            int[] allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
+            int[] allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
 
             Assert.AreEqual(contentType.PropertyTypes.Count(), allPropertiesMapped.Count(x => x.Inherited == false));
             Assert.AreEqual(allPropertyIdsMapped.Count(), allSourcePropertyIds.Count());
@@ -743,9 +716,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
             Assert.IsTrue(result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
 
-
             Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < contentType.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
@@ -754,41 +726,40 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void IContentTypeComposition_To_ContentTypeDisplay()
         {
-            //Arrange
+            // Arrange
+            ContentType ctMain = ContentTypeBuilder.CreateSimpleContentType();
 
-            var ctMain = ContentTypeBuilder.CreateSimpleContentType();
-            //not assigned to tab
+            // not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
-                Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
+                Alias = "umbracoUrlName", Name = "Slug", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             ContentTypeBuilder.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true);
-            ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
-            {
-                Alias = "someProperty",
-                Name = "Some Property",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88
-            }, "Another tab");
+            ContentType ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true);
+            ctChild1.AddPropertyType(
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+                {
+                    Alias = "someProperty",
+                    Name = "Some Property",
+                    Description = string.Empty,
+                    Mandatory = false,
+                    SortOrder = 1,
+                    DataTypeId = -88
+                }, "Another tab");
             ContentTypeBuilder.EnsureAllIds(ctChild1, 7777);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupName: "CustomGroup");
-            //not assigned to tab
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupName: "CustomGroup");
+
+            // not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
-                Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
+                Alias = "umbracoUrlAlias", Name = "AltUrl", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             ContentTypeBuilder.EnsureAllIds(contentType, 6666);
 
+            // Act
+            DocumentTypeDisplay result = _sut.Map<DocumentTypeDisplay>(contentType);
 
-            //Act
-
-            var result = _sut.Map<DocumentTypeDisplay>(contentType);
-
-            //Assert
-
+            // Assert
             Assert.AreEqual(contentType.Alias, result.Alias);
             Assert.AreEqual(contentType.Description, result.Description);
             Assert.AreEqual(contentType.Icon, result.Icon);
@@ -802,35 +773,32 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
-            // TODO: Now we need to assert all of the more complicated parts
-
             Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
             Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
             Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
 
-            var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
-            var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
-            var allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
+            PropertyTypeDisplay[] allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
+            int[] allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
+            int[] allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
 
             Assert.AreEqual(contentType.PropertyTypes.Count(), allPropertiesMapped.Count(x => x.Inherited == false));
             Assert.AreEqual(allPropertyIdsMapped.Count(), allSourcePropertyIds.Count());
             Assert.IsTrue(allPropertyIdsMapped.ContainsAll(allSourcePropertyIds));
 
             Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
-            Assert.IsTrue(result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] {ctMain.Id, ctChild1.Id}));
+            Assert.IsTrue(result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
 
             Assert.AreEqual(contentType.AllowedTemplates.Count(), result.AllowedTemplates.Count());
-            for (var i = 0; i < contentType.AllowedTemplates.Count(); i++)
+            for (int i = 0; i < contentType.AllowedTemplates.Count(); i++)
             {
                 Assert.AreEqual(contentType.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
             }
 
             Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
-            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            for (int i = 0; i < contentType.AllowedContentTypes.Count(); i++)
             {
                 Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
-
         }
 
         [Test]
@@ -855,7 +823,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 }
             };
 
-            var result = _sut.Map<MemberPropertyTypeDisplay>(basic);
+            MemberPropertyTypeDisplay result = _sut.Map<MemberPropertyTypeDisplay>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -873,7 +841,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
-            //TODO use builder
+            // TODO use builder
             var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer)
             {
                 Name = "TODO"
@@ -895,7 +863,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 }
             };
 
-            var result = _sut.Map<PropertyTypeDisplay>(basic);
+            PropertyTypeDisplay result = _sut.Map<PropertyTypeDisplay>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -907,9 +875,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
             Assert.AreEqual(basic.Validation, result.Validation);
         }
 
-        private MemberTypeSave CreateMemberTypeSave(int dataTypeId)
-        {
-            return new MemberTypeSave
+        private MemberTypeSave CreateMemberTypeSave(int dataTypeId) =>
+            new MemberTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,
@@ -924,41 +891,39 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
                 Groups = new[]
-                {
-                    new PropertyGroupBasic<MemberPropertyTypeBasic>()
                     {
-                        Id = 987,
-                        Name = "Tab 1",
-                        SortOrder = 0,
-                        Inherited = false,
-                        Properties = new[]
+                        new PropertyGroupBasic<MemberPropertyTypeBasic>()
                         {
-                            new MemberPropertyTypeBasic
+                            Id = 987,
+                            Name = "Tab 1",
+                            SortOrder = 0,
+                            Inherited = false,
+                            Properties = new[]
                             {
-                                MemberCanEditProperty = true,
-                                MemberCanViewProperty = true,
-                                IsSensitiveData = true,
-                                Alias = "property1",
-                                Description = "this is property 1",
-                                Inherited = false,
-                                Label = "Property 1",
-                                Validation = new PropertyTypeValidation
+                                new MemberPropertyTypeBasic
                                 {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                DataTypeId = dataTypeId
+                                    MemberCanEditProperty = true,
+                                    MemberCanViewProperty = true,
+                                    IsSensitiveData = true,
+                                    Alias = "property1",
+                                    Description = "this is property 1",
+                                    Inherited = false,
+                                    Label = "Property 1",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    DataTypeId = dataTypeId
+                                }
                             }
                         }
                     }
-                }
             };
-        }
 
-        private MediaTypeSave CreateMediaTypeSave(int dataTypeId)
-        {
-            return new MediaTypeSave
+        private MediaTypeSave CreateMediaTypeSave(int dataTypeId) =>
+            new MediaTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,
@@ -973,173 +938,44 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
                 Groups = new[]
-                {
-                    new PropertyGroupBasic<PropertyTypeBasic>()
                     {
-                        Id = 987,
-                        Name = "Tab 1",
-                        SortOrder = 0,
-                        Inherited = false,
-                        Properties = new[]
+                        new PropertyGroupBasic<PropertyTypeBasic>()
                         {
-                            new PropertyTypeBasic
+                            Id = 987,
+                            Name = "Tab 1",
+                            SortOrder = 0,
+                            Inherited = false,
+                            Properties = new[]
                             {
-                                Alias = "property1",
-                                Description = "this is property 1",
-                                Inherited = false,
-                                Label = "Property 1",
-                                Validation = new PropertyTypeValidation
+                                new PropertyTypeBasic
                                 {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                DataTypeId = dataTypeId
+                                    Alias = "property1",
+                                    Description = "this is property 1",
+                                    Inherited = false,
+                                    Label = "Property 1",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    DataTypeId = dataTypeId
+                                }
                             }
                         }
                     }
-                }
             };
-        }
 
-        private DocumentTypeSave CreateContentTypeSave(int dataTypeId)
-        {
-            return new DocumentTypeSave
-            {
-                Alias = "test",
-                AllowAsRoot = true,
-                AllowedTemplates = new []
-                {
-                    "template1",
-                    "template2"
-                },
-                AllowedContentTypes = new [] {666, 667},
-                DefaultTemplate = "test",
-                Description = "hello world",
-                Icon = "tree-icon",
-                Id = 1234,
-                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
-                Name = "My content type",
-                Path = "-1,1234",
-                ParentId = -1,
-                Thumbnail = "tree-thumb",
-                IsContainer = true,
-                Groups = new []
-                {
-                    new PropertyGroupBasic<PropertyTypeBasic>()
-                    {
-                        Id = 987,
-                        Name = "Tab 1",
-                        SortOrder = 0,
-                        Inherited = false,
-                        Properties = new[]
-                        {
-                            new PropertyTypeBasic
-                            {
-                                Alias = "property1",
-                                Description = "this is property 1",
-                                Inherited = false,
-                                Label = "Property 1",
-                                Validation = new PropertyTypeValidation
-                                {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                LabelOnTop = true,
-                                DataTypeId = dataTypeId
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        private MediaTypeSave CreateCompositionMediaTypeSave(int dataTypeId)
-        {
-            return new MediaTypeSave
-            {
-                Alias = "test",
-                AllowAsRoot = true,
-                AllowedContentTypes = new[] { 666, 667 },
-                Description = "hello world",
-                Icon = "tree-icon",
-                Id = 1234,
-                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
-                Name = "My content type",
-                Path = "-1,1234",
-                ParentId = -1,
-                Thumbnail = "tree-thumb",
-                IsContainer = true,
-                Groups = new[]
-                {
-                    new PropertyGroupBasic<PropertyTypeBasic>()
-                    {
-                        Id = 987,
-                        Name = "Tab 1",
-                        SortOrder = 0,
-                        Inherited = false,
-                        Properties = new[]
-                        {
-                            new PropertyTypeBasic
-                            {
-                                Alias = "property1",
-                                Description = "this is property 1",
-                                Inherited = false,
-                                Label = "Property 1",
-                                Validation = new PropertyTypeValidation
-                                {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                LabelOnTop = true,
-                                DataTypeId = dataTypeId
-                            }
-                        }
-                    },
-                    new PropertyGroupBasic<PropertyTypeBasic>()
-                    {
-                        Id = 894,
-                        Name = "Tab 2",
-                        SortOrder = 0,
-                        Inherited = true,
-                        Properties = new[]
-                        {
-                            new PropertyTypeBasic
-                            {
-                                Alias = "parentProperty",
-                                Description = "this is a property from the parent",
-                                Inherited = true,
-                                Label = "Parent property",
-                                Validation = new PropertyTypeValidation
-                                {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                LabelOnTop = false,
-                                DataTypeId = dataTypeId
-                            }
-                        }
-
-                    }
-                }
-
-            };
-        }
-
-        private DocumentTypeSave CreateCompositionContentTypeSave(int dataTypeId)
-        {
-            return new DocumentTypeSave
+        private DocumentTypeSave CreateContentTypeSave(int dataTypeId) =>
+            new DocumentTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,
                 AllowedTemplates = new[]
-                {
-                    "template1",
-                    "template2"
-                },
+                    {
+                        "template1",
+                        "template2"
+                    },
                 AllowedContentTypes = new[] { 666, 667 },
                 DefaultTemplate = "test",
                 Description = "hello world",
@@ -1152,61 +988,179 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
                 Groups = new[]
-                {
-                    new PropertyGroupBasic<PropertyTypeBasic>()
                     {
-                        Id = 987,
-                        Name = "Tab 1",
-                        SortOrder = 0,
-                        Inherited = false,
-                        Properties = new[]
+                        new PropertyGroupBasic<PropertyTypeBasic>()
                         {
-                            new PropertyTypeBasic
+                            Id = 987,
+                            Name = "Tab 1",
+                            SortOrder = 0,
+                            Inherited = false,
+                            Properties = new[]
                             {
-                                Alias = "property1",
-                                Description = "this is property 1",
-                                Inherited = false,
-                                Label = "Property 1",
-                                Validation = new PropertyTypeValidation
+                                new PropertyTypeBasic
                                 {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                LabelOnTop = true,
-                                DataTypeId = dataTypeId
+                                    Alias = "property1",
+                                    Description = "this is property 1",
+                                    Inherited = false,
+                                    Label = "Property 1",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    LabelOnTop = true,
+                                    DataTypeId = dataTypeId
+                                }
                             }
                         }
-                    },
-                    new PropertyGroupBasic<PropertyTypeBasic>()
-                    {
-                        Id = 894,
-                        Name = "Tab 2",
-                        SortOrder = 0,
-                        Inherited = true,
-                        Properties = new[]
-                        {
-                            new PropertyTypeBasic
-                            {
-                                Alias = "parentProperty",
-                                Description = "this is a property from the parent",
-                                Inherited = true,
-                                Label = "Parent property",
-                                Validation = new PropertyTypeValidation
-                                {
-                                    Mandatory = false,
-                                    Pattern = string.Empty
-                                },
-                                SortOrder = 0,
-                                LabelOnTop = false,
-                                DataTypeId = dataTypeId
-                            }
-                        }
-
                     }
-                }
-
             };
-        }
+
+        private MediaTypeSave CreateCompositionMediaTypeSave(int dataTypeId) =>
+            new MediaTypeSave
+            {
+                Alias = "test",
+                AllowAsRoot = true,
+                AllowedContentTypes = new[] { 666, 667 },
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new[]
+                    {
+                        new PropertyGroupBasic<PropertyTypeBasic>()
+                        {
+                            Id = 987,
+                            Name = "Tab 1",
+                            SortOrder = 0,
+                            Inherited = false,
+                            Properties = new[]
+                            {
+                                new PropertyTypeBasic
+                                {
+                                    Alias = "property1",
+                                    Description = "this is property 1",
+                                    Inherited = false,
+                                    Label = "Property 1",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    LabelOnTop = true,
+                                    DataTypeId = dataTypeId
+                                }
+                            }
+                        },
+                        new PropertyGroupBasic<PropertyTypeBasic>()
+                        {
+                            Id = 894,
+                            Name = "Tab 2",
+                            SortOrder = 0,
+                            Inherited = true,
+                            Properties = new[]
+                            {
+                                new PropertyTypeBasic
+                                {
+                                    Alias = "parentProperty",
+                                    Description = "this is a property from the parent",
+                                    Inherited = true,
+                                    Label = "Parent property",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    LabelOnTop = false,
+                                    DataTypeId = dataTypeId
+                                }
+                            }
+                        }
+                    }
+            };
+
+        private DocumentTypeSave CreateCompositionContentTypeSave(int dataTypeId) =>
+            new DocumentTypeSave
+            {
+                Alias = "test",
+                AllowAsRoot = true,
+                AllowedTemplates = new[]
+                    {
+                        "template1",
+                        "template2"
+                    },
+                AllowedContentTypes = new[] { 666, 667 },
+                DefaultTemplate = "test",
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new[]
+                    {
+                        new PropertyGroupBasic<PropertyTypeBasic>()
+                        {
+                            Id = 987,
+                            Name = "Tab 1",
+                            SortOrder = 0,
+                            Inherited = false,
+                            Properties = new[]
+                            {
+                                new PropertyTypeBasic
+                                {
+                                    Alias = "property1",
+                                    Description = "this is property 1",
+                                    Inherited = false,
+                                    Label = "Property 1",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    LabelOnTop = true,
+                                    DataTypeId = dataTypeId
+                                }
+                            }
+                        },
+                        new PropertyGroupBasic<PropertyTypeBasic>()
+                        {
+                            Id = 894,
+                            Name = "Tab 2",
+                            SortOrder = 0,
+                            Inherited = true,
+                            Properties = new[]
+                            {
+                                new PropertyTypeBasic
+                                {
+                                    Alias = "parentProperty",
+                                    Description = "this is a property from the parent",
+                                    Inherited = true,
+                                    Label = "Parent property",
+                                    Validation = new PropertyTypeValidation
+                                    {
+                                        Mandatory = false,
+                                        Pattern = string.Empty
+                                    },
+                                    SortOrder = 0,
+                                    LabelOnTop = false,
+                                    DataTypeId = dataTypeId
+                                }
+                            }
+                        }
+                    }
+            };
     }
 }

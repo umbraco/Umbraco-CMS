@@ -9,8 +9,6 @@ namespace Umbraco.Core.IO
     {
         public static string TinyMceConfig => Constants.SystemDirectories.Config + "/tinyMceConfig.config";
 
-        public static string TelemetricsIdentifier => Constants.SystemDirectories.Data + "/telemetrics-id.umb";
-
         // TODO: Kill this off we don't have umbraco.config XML cache we now have NuCache
         public static string GetContentCacheXml(IHostingEnvironment hostingEnvironment)
         {

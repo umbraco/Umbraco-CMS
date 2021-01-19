@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +39,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
     public class ThreadSafetyServiceTest : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
+
         private IMediaService MediaService => GetRequiredService<IMediaService>();
+
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         [SetUp]
@@ -45,12 +50,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             CreateTestData();
         }
 
-
         private const int MaxThreadCount = 20;
 
         private void Save(ContentService service, IContent content)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 service.Save(content);
@@ -60,7 +64,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
         private void Save(MediaService service, IMedia media)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 service.Save(media);
@@ -75,8 +79,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // comment out to trace locks
             return done;
 
-            //new Thread(() =>
-            //{
+            // new Thread(() =>
+            // {
             //    using (var scope = ScopeProvider.CreateScope())
             //    while (done.IsSet == false)
             //    {
@@ -89,17 +93,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             //        }
             //        Thread.Sleep(50);
             //    }
-            //}).Start();
-            //return done;
+            // }).Start();
+            // return done;
         }
 
         [Test]
         public void Ensure_All_Threads_Execute_Successfully_Content_Service()
         {
             if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
+            {
                 Assert.Ignore("Do not run on VSTS.");
+            }
 
-            var log = GetRequiredService<ILogger<ThreadSafetyServiceTest>>();
+            ILogger<ThreadSafetyServiceTest> log = GetRequiredService<ILogger<ThreadSafetyServiceTest>>();
 
             // the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
             var contentService = (ContentService)ContentService;
@@ -109,9 +115,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             log.LogInformation("Starting...");
 
-            var done = TraceLocks();
+            ManualResetEventSlim done = TraceLocks();
 
-            for (var i = 0; i < MaxThreadCount; i++)
+            for (int i = 0; i < MaxThreadCount; i++)
             {
                 var t = new Thread(() =>
                 {
@@ -119,23 +125,26 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         log.LogInformation("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
 
-                        var name1 = "test-" + Guid.NewGuid();
-                        var content1 = contentService.Create(name1, -1, "umbTextpage");
+                        string name1 = "test-" + Guid.NewGuid();
+                        IContent content1 = contentService.Create(name1, -1, "umbTextpage");
 
                         log.LogInformation("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
 
-                        Thread.Sleep(100); //quick pause for maximum overlap!
+                        Thread.Sleep(100); // quick pause for maximum overlap!
 
-                        var name2 = "test-" + Guid.NewGuid();
-                        var content2 = contentService.Create(name2, -1, "umbTextpage");
+                        string name2 = "test-" + Guid.NewGuid();
+                        IContent content2 = contentService.Create(name2, -1, "umbTextpage");
 
                         log.LogInformation("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);
                     }
                     catch (Exception e)
                     {
-                        lock (exceptions) { exceptions.Add(e); }
+                        lock (exceptions)
+                        {
+                            exceptions.Add(e);
+                        }
                     }
                 });
                 threads.Add(t);
@@ -154,8 +163,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             log.LogInformation("Checking exceptions");
             if (exceptions.Count == 0)
             {
-                //now look up all items, there should be 40!
-                var items = contentService.GetRootContent();
+                // now look up all items, there should be 40!
+                IEnumerable<IContent> items = contentService.GetRootContent();
                 Assert.AreEqual(2 * MaxThreadCount, items.Count());
             }
             else
@@ -168,9 +177,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         public void Ensure_All_Threads_Execute_Successfully_Media_Service()
         {
             if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
+            {
                 Assert.Ignore("Do not run on VSTS.");
+            }
 
-            var log = GetRequiredService<ILogger<ThreadSafetyServiceTest>>();
+            ILogger<ThreadSafetyServiceTest> log = GetRequiredService<ILogger<ThreadSafetyServiceTest>>();
 
             // mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
             var mediaService = (MediaService)MediaService;
@@ -180,9 +191,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             log.LogInformation("Starting...");
 
-            var done = TraceLocks();
+            ManualResetEventSlim done = TraceLocks();
 
-            for (var i = 0; i < MaxThreadCount; i++)
+            for (int i = 0; i < MaxThreadCount; i++)
             {
                 var t = new Thread(() =>
                 {
@@ -190,30 +201,33 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         log.LogInformation("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
 
-                        var name1 = "test-" + Guid.NewGuid();
-                        var media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
+                        string name1 = "test-" + Guid.NewGuid();
+                        IMedia media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
                         log.LogInformation("[{0}] Saving media #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media1);
 
-                        Thread.Sleep(100); //quick pause for maximum overlap!
+                        Thread.Sleep(100); // quick pause for maximum overlap!
 
-                        var name2 = "test-" + Guid.NewGuid();
-                        var media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
+                        string name2 = "test-" + Guid.NewGuid();
+                        IMedia media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
                         log.LogInformation("[{0}] Saving media #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media2);
                     }
                     catch (Exception e)
                     {
-                        lock (exceptions) { exceptions.Add(e); }
+                        lock (exceptions)
+                        {
+                            exceptions.Add(e);
+                        }
                     }
                 });
                 threads.Add(t);
             }
 
-            //start all threads
+            // start all threads
             threads.ForEach(x => x.Start());
 
-            //wait for all to complete
+            // wait for all to complete
             threads.ForEach(x => x.Join());
 
             done.Set();
@@ -221,20 +235,19 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             if (exceptions.Count == 0)
             {
                 // now look up all items, there should be 40!
-                var items = mediaService.GetRootMedia();
+                IEnumerable<IMedia> items = mediaService.GetRootMedia();
                 Assert.AreEqual(2 * MaxThreadCount, items.Count());
             }
             else
             {
                 throw new Exception("Exceptions!", exceptions.First()); // rethrow the first one...
             }
-
         }
 
         public void CreateTestData()
         {
             // Create and Save ContentType "umbTextpage" -> 1045
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
             ContentTypeService.Save(contentType);
         }

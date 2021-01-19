@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Security;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Install.Models;
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
         private readonly IBackOfficeUserManager _userManager;
+        private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
 
         public NewInstallStep(
             IUserService userService,
@@ -42,7 +44,8 @@ namespace Umbraco.Web.Install.InstallSteps
             IOptions<SecuritySettings> securitySettings,
             IOptions<ConnectionStrings> connectionStrings,
             ICookieManager cookieManager,
-            IBackOfficeUserManager userManager)
+            IBackOfficeUserManager userManager,
+            IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -51,6 +54,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _cookieManager = cookieManager;
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         }
 
         public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
@@ -120,26 +124,89 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                return RequiresExecution(null)
-              //the user UI
-                ? "user"
-              //the continue install UI
-              : "continueinstall";
+                return ShowView()
+                    // the user UI
+                    ? "user"
+                    // continue install UI
+                    : "continueinstall";
             }
+        }
+
+        private InstallState GetInstallState()
+        {
+            var installState = InstallState.Unknown;
+
+            var databaseSettings = _connectionStrings.UmbracoConnectionString;
+
+            var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
+            if (hasConnString)
+            {
+                installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
+            }
+
+            var connStringConfigured = databaseSettings.IsConnectionStringConfigured();
+            if (connStringConfigured)
+            {
+                installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
+            }
+
+            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings.ProviderName);
+            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings.ConnectionString, factory);
+            if (canConnect)
+            {
+                installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
+            }
+
+            var umbracoInstalled = canConnect ? _databaseBuilder.IsUmbracoInstalled() : false;
+            if (umbracoInstalled)
+            {
+                installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
+            }
+
+            var hasNonDefaultUser = umbracoInstalled ? _databaseBuilder.HasSomeNonDefaultUser() : false;
+            if (hasNonDefaultUser)
+            {
+                installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+            }
+
+            return installState;
+        }
+
+        private bool ShowView()
+        {
+            var installState = GetInstallState();
+
+            return installState.HasFlag(InstallState.Unknown)
+                || !installState.HasFlag(InstallState.UmbracoInstalled);
         }
 
         public override bool RequiresExecution(UserModel model)
         {
-            //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = _connectionStrings.UmbracoConnectionString;
-            if (databaseSettings.IsConnectionStringConfigured() && _databaseBuilder.IsDatabaseConfigured)
-                return _databaseBuilder.HasSomeNonDefaultUser() == false;
+            var installState = GetInstallState();
 
-            // In this one case when it's a brand new install and nothing has been configured, make sure the
-            // back office cookie is cleared so there's no old cookies lying around causing problems
-            _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
+            if (installState.HasFlag(InstallState.Unknown))
+            {
+                // In this one case when it's a brand new install and nothing has been configured, make sure the
+                // back office cookie is cleared so there's no old cookies lying around causing problems
+                _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
+            }
 
-                return true;
+            return installState.HasFlag(InstallState.Unknown)
+                || !installState.HasFlag(InstallState.HasNonDefaultUser);
+        }
+
+        [Flags]
+        private enum InstallState : short
+        {
+            // This is an easy way to avoid 0 enum assignment and not worry about
+            // manual calcs. https://www.codeproject.com/Articles/396851/Ending-the-Great-Debate-on-Enum-Flags
+            Unknown = 1,
+            HasVersion = 1 << 1,
+            HasConnectionString = 1 << 2,
+            ConnectionStringConfigured = 1 << 3,
+            CanConnect = 1 << 4,
+            UmbracoInstalled = 1 << 5,
+            HasNonDefaultUser = 1 << 6
         }
     }
 }

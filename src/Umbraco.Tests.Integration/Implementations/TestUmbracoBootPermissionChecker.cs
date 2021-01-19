@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Runtime;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Core.Runtime;
 
 namespace Umbraco.Tests.Integration.Implementations
 {

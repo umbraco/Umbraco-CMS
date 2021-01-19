@@ -114,9 +114,7 @@ namespace Umbraco.Core.DependencyInjection
             // Adds no-op registrations as many core services require these dependencies but these
             // dependencies cannot be fulfilled in the Core project
             Services.AddUnique<IMarchal, NoopMarchal>();
-            Services.AddUnique<IProfiler, NoopProfiler>();
             Services.AddUnique<IApplicationShutdownRegistry, NoopApplicationShutdownRegistry>();
-            Services.AddUnique<IUmbracoApplicationLifetimeManager, NoopUmbracoApplicationLifetimeManager>();
 
             Services.AddUnique<IMainDom, MainDom>();
             Services.AddUnique<IMainDomLock, MainDomSemaphoreLock>();

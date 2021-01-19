@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -16,7 +19,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserStoreResolvable()
         {
-            var userStore = Services.GetService<IUserStore<BackOfficeIdentityUser>>();
+            IUserStore<BackOfficeIdentityUser> userStore = Services.GetService<IUserStore<BackOfficeIdentityUser>>();
 
             Assert.IsNotNull(userStore);
             Assert.AreEqual(typeof(BackOfficeUserStore), userStore.GetType());
@@ -25,7 +28,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeClaimsPrincipalFactoryResolvable()
         {
-            var principalFactory = Services.GetService<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
+            IUserClaimsPrincipalFactory<BackOfficeIdentityUser> principalFactory = Services.GetService<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             Assert.IsNotNull(principalFactory);
             Assert.AreEqual(typeof(BackOfficeClaimsPrincipalFactory), principalFactory.GetType());
@@ -34,7 +37,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserManagerResolvable()
         {
-            var userManager = Services.GetService<IBackOfficeUserManager>();
+            IBackOfficeUserManager userManager = Services.GetService<IBackOfficeUserManager>();
 
             Assert.NotNull(userManager);
         }

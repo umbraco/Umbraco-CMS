@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.IO;
-
-namespace Umbraco.Core.Configuration
+﻿namespace Umbraco.Core.Configuration
 {
     public interface IConfigManipulator
     {
@@ -8,5 +6,6 @@ namespace Umbraco.Core.Configuration
         void SaveConnectionString(string connectionString, string providerName);
         void SaveConfigValue(string itemPath, object value);
         void SaveDisableRedirectUrlTracking(bool disable);
+        void SetGlobalId(string id);
     }
 }

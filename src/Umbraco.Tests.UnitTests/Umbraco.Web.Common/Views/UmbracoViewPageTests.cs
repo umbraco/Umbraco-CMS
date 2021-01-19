@@ -313,7 +313,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
         {
             public override Task ExecuteAsync() => throw new NotImplementedException();
 
-            public void SetViewData(ViewDataDictionary viewData) => ViewData = (ViewDataDictionary<TModel>)BindViewData(viewData);
+            public void SetViewData(ViewDataDictionary viewData) => ViewData = (ViewDataDictionary<TModel>)BindViewData(Context, viewData);
         }
 
         public class RenderModelTestPage : TestPage<ContentModel>

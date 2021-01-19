@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +16,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -35,13 +36,9 @@ using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -122,27 +119,27 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
-        public string[] GetCurrentUserAvatarUrls()
+        public ActionResult<string[]> GetCurrentUserAvatarUrls()
         {
             var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
-                throw new HttpResponseException(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint");
+                return new ValidationErrorResult("Could not access Gravatar endpoint");
 
             return urls;
         }
 
         [AppendUserModifiedHeader("id")]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
+        public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
         internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (files is null)
             {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+                return new UnsupportedMediaTypeResult();
             }
 
             var root = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
@@ -160,7 +157,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new NotFoundResult();
 
             if (files.Count > 1)
-                throw HttpResponseException.CreateValidationErrorResponse("The request was not formatted correctly, only one file can be attached to the request");
+                return new ValidationErrorResult("The request was not formatted correctly, only one file can be attached to the request");
 
             //get the file info
             var file = files.First();
@@ -225,12 +222,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public UserDisplay GetById(int id)
+        public ActionResult<UserDisplay> GetById(int id)
         {
             var user = _userService.GetUserById(id);
             if (user == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
             var result = _umbracoMapper.Map<IUser, UserDisplay>(user);
             return result;
@@ -243,20 +240,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        public ActionResult<IEnumerable<UserDisplay>> GetByIds([FromJsonPath]int[] ids)
         {
             if (ids == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             if (ids.Length == 0)
-                return Enumerable.Empty<UserDisplay>();
+                return Enumerable.Empty<UserDisplay>().ToList();
 
             var users = _userService.GetUsersById(ids);
             if (users == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var result = _umbracoMapper.MapEnumerable<IUser, UserDisplay>(users);
@@ -337,13 +334,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
-        public async Task<UserDisplay> PostCreateUser(UserInvite userSave)
+        public async Task<ActionResult<UserDisplay>> PostCreateUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -358,11 +355,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             CheckUniqueEmail(userSave.Email, null);
 
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
+
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
+                return Unauthorized(canSaveUser.Result);
             }
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
@@ -373,7 +375,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var created = await _userManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
             }
 
             string resetPassword;
@@ -382,7 +384,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var result = await _userManager.AddPasswordAsync(identityUser, password);
             if (result.Succeeded == false)
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
             }
 
             resetPassword = password;
@@ -418,11 +420,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userSave.Message.IsNullOrWhiteSpace())
                 ModelState.AddModelError("Message", "Message cannot be empty");
 
-            if (ModelState.IsValid == false)
-            {
-                return new ValidationErrorResult(ModelState);
-            }
-
             IUser user;
             if (_securitySettings.UsernameIsEmail)
             {
@@ -432,9 +429,20 @@ namespace Umbraco.Web.BackOffice.Controllers
             else
             {
                 //first validate the username if we're showing it
-                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                var userResult = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                if (!(userResult.Result is null))
+                {
+                    return userResult.Result;
+                }
+
+                user = userResult.Value;
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            if (ModelState.IsValid == false)
+            {
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            }
 
             if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
             {
@@ -519,12 +527,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
             }
             return user;
         }
 
-        private IUser CheckUniqueUsername(string username, Func<IUser, bool> extraCheck)
+        private ActionResult<IUser> CheckUniqueUsername(string username, Func<IUser, bool> extraCheck)
         {
             var user = _userService.GetByUsername(username);
             if (user != null && (extraCheck == null || extraCheck(user)))
@@ -532,9 +539,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(
                     _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
-            return user;
+
+            return new ActionResult<IUser>(user);
         }
 
         private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
@@ -548,9 +556,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 token.ToUrlBase64());
 
             // Get an mvc helper to get the URL
-            var action = _linkGenerator.GetPathByAction("VerifyInvite", "BackOffice", new
+            var action = _linkGenerator.GetPathByAction(
+                nameof(BackOfficeController.VerifyInvite),
+                ControllerExtensions.GetControllerName<BackOfficeController>(),
+                new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     invite = inviteToken
                 });
 
@@ -577,28 +588,29 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="userSave"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public UserDisplay PostSaveUser(UserSave userSave)
+        public ActionResult<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException(nameof(userSave));
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             var intId = userSave.Id.TryConvertTo<int>();
             if (intId.Success == false)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
+
 
             var found = _userService.GetUserById(intId.Result);
             if (found == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
+                return Unauthorized(canSaveUser.Result);
             }
 
             var hasErrors = false;
@@ -645,7 +657,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             if (hasErrors)
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
 
             //merge the save data onto the user
             var user = _umbracoMapper.Map(userSave, found);
@@ -654,7 +666,16 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/operationSavedHeader"), _localizedTextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var userHasChangedOwnLanguage =
+                user.Id == currentUser.Id && currentUser.Language != user.Language;
+
+            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(_localizedTextService.Localize(textToLocalise, culture), _localizedTextService.Localize("speechBubbles/editUserSaved", culture));
             return display;
         }
 
@@ -663,25 +684,25 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="changingPasswordModel"></param>
         /// <returns></returns>
-        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
+        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
             changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             var intId = changingPasswordModel.Id.TryConvertTo<int>();
             if (intId.Success == false)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var found = _userService.GetUserById(intId.Result);
             if (found == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             // TODO: Why don't we inject this? Then we can just inject a logger
@@ -700,7 +721,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
         }
 
 
@@ -714,7 +735,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
             if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
-                throw HttpResponseException.CreateNotificationValidationErrorResponse("The current user cannot disable itself");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot disable itself");
             }
 
             var users = _userService.GetUsersById(userIds).ToArray();
@@ -781,8 +802,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
-                    throw HttpResponseException.CreateValidationErrorResponse(
-                        string.Format("Could not unlock for user {0} - error {1}", u, unlockResult.Errors.ToErrorMessage()));
+                    return new ValidationErrorResult(
+                        $"Could not unlock for user {u} - error {unlockResult.Errors.ToErrorMessage()}");
                 }
 
                 if (userIds.Length == 1)

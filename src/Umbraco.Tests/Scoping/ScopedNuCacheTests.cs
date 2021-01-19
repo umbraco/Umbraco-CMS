@@ -25,10 +25,9 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -105,8 +104,6 @@ namespace Umbraco.Tests.Scoping
                 new NoopPublishedModelFactory(),
                 hostingEnvironment,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
-
-            lifetime.Raise(e => e.ApplicationInit += null, EventArgs.Empty);
 
             return snapshotService;
         }

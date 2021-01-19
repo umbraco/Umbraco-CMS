@@ -1,7 +1,11 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
@@ -18,8 +22,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Create_Template_Then_Assign_Child()
         {
-            var child = FileService.CreateTemplateWithIdentity("Child", "child", "test");
-            var parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
+            ITemplate child = FileService.CreateTemplateWithIdentity("Child", "child", "test");
+            ITemplate parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
 
             child.SetMasterTemplate(parent);
             FileService.SaveTemplate(child);
@@ -27,14 +31,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             child = FileService.GetTemplate(child.Id);
 
             Assert.AreEqual(parent.Alias, child.MasterTemplateAlias);
-
         }
 
         [Test]
         public void Create_Template_With_Child_Then_Unassign()
         {
-            var parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
-            var child = FileService.CreateTemplateWithIdentity("Child", "child", "test", parent);
+            ITemplate parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
+            ITemplate child = FileService.CreateTemplateWithIdentity("Child", "child", "test", parent);
 
             child.SetMasterTemplate(null);
             FileService.SaveTemplate(child);
@@ -47,11 +50,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Query_Template_Children()
         {
-            var parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
-            var child1 = FileService.CreateTemplateWithIdentity("Child1", "child1", "test", parent);
-            var child2 = FileService.CreateTemplateWithIdentity("Child2", "child2", "test", parent);
+            ITemplate parent = FileService.CreateTemplateWithIdentity("Parent", "parent", "test");
+            ITemplate child1 = FileService.CreateTemplateWithIdentity("Child1", "child1", "test", parent);
+            ITemplate child2 = FileService.CreateTemplateWithIdentity("Child2", "child2", "test", parent);
 
-            var children = FileService.GetTemplates(parent.Id).Select(x => x.Id).ToArray();
+            int[] children = FileService.GetTemplates(parent.Id).Select(x => x.Id).ToArray();
 
             Assert.IsTrue(children.Contains(child1.Id));
             Assert.IsTrue(children.Contains(child2.Id));
@@ -60,7 +63,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Create_Template_With_Custom_Alias()
         {
-            var template = FileService.CreateTemplateWithIdentity("Test template", "customTemplateAlias", "test");
+            ITemplate template = FileService.CreateTemplateWithIdentity("Test template", "customTemplateAlias", "test");
 
             FileService.SaveTemplate(template);
 
@@ -69,6 +72,5 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual("Test template", template.Name);
             Assert.AreEqual("customTemplateAlias", template.Alias);
         }
-
     }
 }
