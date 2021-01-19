@@ -1,18 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Web.WebAssets;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 
 /*
  * OVERVIEW:
@@ -70,84 +60,117 @@ using Umbraco.Web.WebAssets;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
+namespace Umbraco.ModelsBuilder.Embedded
 {
     /// <summary>
-    /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
+    /// Custom <see cref="IRazorViewEngine"/> that wraps aspnetcore's default implementation
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    /// <remarks>
+    /// This is used so that when new PureLive models are built, the entire razor stack is re-constructed so all razor
+    /// caches and assembly references, etc... are cleared.
+    /// </remarks>
+    internal class RefreshingRazorViewEngine : IRazorViewEngine
     {
+        private IRazorViewEngine _current;
+        private readonly PureLiveModelFactory _pureLiveModelFactory;
+        private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+
         /// <summary>
-        /// Adds umbraco's embedded model builder support
+        /// Initializes a new instance of the <see cref="RefreshingRazorViewEngine"/> class.
         /// </summary>
-        public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
+        /// <param name="defaultRazorViewEngineFactory">
+        /// A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine"/>
+        /// </param>
+        /// <param name="pureLiveModelFactory">The <see cref="PureLiveModelFactory"/></param>
+        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, PureLiveModelFactory pureLiveModelFactory)
         {
-            builder.AddPureLiveRazorEngine();
-            builder.Services.AddSingleton<UmbracoServices>();
-
-            // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
-            // would automatically just register for all implemented INotificationHandler{T}?
-            builder.AddNotificationHandler<UmbracoApplicationStarting, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
-            builder.Services.AddUnique<ModelsGenerator>();
-            builder.Services.AddUnique<LiveModelsProvider>();
-            builder.Services.AddUnique<OutOfDateModelsStatus>();
-            builder.Services.AddUnique<ModelsGenerationError>();
-
-            builder.Services.AddUnique<PureLiveModelFactory>();
-            builder.Services.AddUnique<IPublishedModelFactory>(factory =>
-            {
-                ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (config.ModelsMode == ModelsMode.PureLive)
-                {
-                    return factory.GetRequiredService<PureLiveModelFactory>();
-                }
-                else
-                {
-                    TypeLoader typeLoader = factory.GetRequiredService<TypeLoader>();
-                    IPublishedValueFallback publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
-                    IEnumerable<Type> types = typeLoader
-                        .GetTypes<PublishedElementModel>() // element models
-                        .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                    return new PublishedModelFactory(types, publishedValueFallback);
-                }
-            });
-
-            return builder;
+            _pureLiveModelFactory = pureLiveModelFactory;
+            _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
+            _current = _defaultRazorViewEngineFactory();
+            _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
         }
 
         /// <summary>
-        /// Can be called if using an external models builder to remove the embedded models builder controller features
+        /// When the pure live models change, re-construct the razor stack
         /// </summary>
-        public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
+        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e)
         {
-            builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();
-            return builder;
+            _locker.EnterWriteLock();
+            try
+            {
+                _current = _defaultRazorViewEngineFactory();
+            }
+            finally
+            {
+                _locker.ExitWriteLock();
+            }
         }
 
-        private static IUmbracoBuilder AddPureLiveRazorEngine(this IUmbracoBuilder builder)
+        public RazorPageResult FindPage(ActionContext context, string pageName)
         {
-            // See notes in RefreshingRazorViewEngine for information on what this is doing.
-
-            // copy the current collection, we need to use this later to rebuild a container
-            // to re-create the razor compiler provider
-            var initialCollection = new ServiceCollection
+            _locker.EnterReadLock();
+            try
             {
-                builder.Services
-            };
+                return _current.FindPage(context, pageName);
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
+        }
 
-            // Replace the default with our custom engine
-            builder.Services.AddSingleton<IRazorViewEngine>(
-                s => new RefreshingRazorViewEngine(
-                        () =>
-                        {
-                            // re-create the original container so that a brand new IRazorPageActivator
-                            // is produced, if we don't re-create the container then it will just return the same instance.
-                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-                            return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<PureLiveModelFactory>()));
+        public string GetAbsolutePath(string executingFilePath, string pagePath)
+        {
+            _locker.EnterReadLock();
+            try
+            {
+                return _current.GetAbsolutePath(executingFilePath, pagePath);
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
+        }
 
-            return builder;
+        public RazorPageResult GetPage(string executingFilePath, string pagePath)
+        {
+            _locker.EnterReadLock();
+            try
+            {
+                return _current.GetPage(executingFilePath, pagePath);
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
+        }
+
+        public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
+        {
+            _locker.EnterReadLock();
+            try
+            {
+                return _current.FindView(context, viewName, isMainPage);
+
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
+        }
+
+        public ViewEngineResult GetView(string executingFilePath, string viewPath, bool isMainPage)
+        {
+            _locker.EnterReadLock();
+            try
+            {
+                return _current.GetView(executingFilePath, viewPath, isMainPage);
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
         }
     }
 }
