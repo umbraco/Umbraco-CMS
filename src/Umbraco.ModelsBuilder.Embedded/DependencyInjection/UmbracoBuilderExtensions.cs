@@ -12,6 +12,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.WebAssets;
 
 /*
@@ -31,7 +32,9 @@ using Umbraco.Web.WebAssets;
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
  * requirement, we add the MB assembly to the assembly parts manager within the PureLiveModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
- * have already been resolved with the LazyInitializer in the RazorReferenceManager.
+ * have already been resolved with the LazyInitializer in the RazorReferenceManager. There is a known public API
+ * where you can add reference paths to the runtime razor compiler via it's IOptions: MvcRazorRuntimeCompilationOptions
+ * however this falls short too because those references are just loaded via the RazorReferenceManager and lazy initialized.
  * 
  * The services that can be replaced are: IViewCompilerProvider (default is the internal RuntimeViewCompilerProvider) and
  * IViewCompiler (default is the internal RuntimeViewCompiler). There is one specific public extension point that I was
