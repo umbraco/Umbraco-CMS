@@ -125,7 +125,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                             softRedirect: args.softRedirect,
                             err: err,
                             rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
+                                // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
+                                if(err.data) {
+                                    rebindCallback.apply(self, [args.content, err.data]);
+                                }
                             }
                         });
 
@@ -625,7 +628,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (!args.err) {
                 throw "args.err cannot be null";
             }
-            
+
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
