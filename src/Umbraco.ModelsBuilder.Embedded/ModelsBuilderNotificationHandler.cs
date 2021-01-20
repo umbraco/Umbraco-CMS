@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
@@ -16,7 +15,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
@@ -30,28 +28,19 @@ namespace Umbraco.ModelsBuilder.Embedded
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly LiveModelsProvider _liveModelsProvider;
-        private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly LinkGenerator _linkGenerator;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
         private readonly ContentModelBinder _modelBinder;
 
         public ModelsBuilderNotificationHandler(
             IOptions<ModelsBuilderSettings> config,
             IShortStringHelper shortStringHelper,
-            LiveModelsProvider liveModelsProvider,
-            OutOfDateModelsStatus outOfDateModels,
             LinkGenerator linkGenerator,
-            IUmbracoRequestLifetime umbracoRequestLifetime,
             ContentModelBinder modelBinder)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
-            _liveModelsProvider = liveModelsProvider;
-            _outOfDateModels = outOfDateModels;
             _shortStringHelper = shortStringHelper;
             _linkGenerator = linkGenerator;
-            _umbracoRequestLifetime = umbracoRequestLifetime;
             _modelBinder = modelBinder;
         }
 
@@ -62,23 +51,11 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
-            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
-
             _modelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
             if (_config.ModelsMode != ModelsMode.Nothing)
             {
                 FileService.SavingTemplate += FileService_SavingTemplate;
-            }
-
-            if (_config.ModelsMode.IsLiveNotPure())
-            {
-                _liveModelsProvider.Install();
-            }
-
-            if (_config.FlagOutOfDateModels)
-            {
-                _outOfDateModels.Install();
             }
 
             return Task.CompletedTask;
@@ -89,7 +66,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// </summary>
         public Task HandleAsync(ServerVariablesParsing notification, CancellationToken cancellationToken)
         {
-            var serverVars = notification.ServerVariables;
+            IDictionary<string, object> serverVars = notification.ServerVariables;
 
             if (!serverVars.ContainsKey("umbracoUrls"))
             {

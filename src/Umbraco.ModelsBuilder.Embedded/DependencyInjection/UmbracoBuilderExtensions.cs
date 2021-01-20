@@ -92,6 +92,8 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<UmbracoApplicationStarting, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
+            builder.AddNotificationHandler<UmbracoApplicationStarting, OutOfDateModelsStatus>();
             builder.Services.AddUnique<ModelsGenerator>();
             builder.Services.AddUnique<LiveModelsProvider>();
             builder.Services.AddUnique<OutOfDateModelsStatus>();
