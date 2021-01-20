@@ -10,16 +10,16 @@ namespace Umbraco.Tests.Integration.Testing
 {
     public class TestDatabaseFactory
     {
-        public static ITestDatabase Create(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        public static ITestDatabase Create(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
             string connectionString = Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString");
 
             return string.IsNullOrEmpty(connectionString)
-                ? CreateLocalDb(filesPath, loggerFactory, dbFactory)
-                : CreateSqlDeveloper(loggerFactory, dbFactory, connectionString);
+                ? CreateLocalDb(settings, filesPath, loggerFactory, dbFactory)
+                : CreateSqlDeveloper(settings, loggerFactory, dbFactory, connectionString);
         }
 
-        private static ITestDatabase CreateLocalDb(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
             if (!Directory.Exists(filesPath))
             {
@@ -33,10 +33,10 @@ namespace Umbraco.Tests.Integration.Testing
                 throw new InvalidOperationException("LocalDB is not available.");
             }
 
-            return new LocalDbTestDatabase(loggerFactory, localDb, filesPath, dbFactory.Create());
+            return new LocalDbTestDatabase(settings, loggerFactory, localDb, filesPath, dbFactory.Create());
         }
 
-        private static ITestDatabase CreateSqlDeveloper(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory, string connectionString)
+        private static ITestDatabase CreateSqlDeveloper(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory, string connectionString)
         {
             // NOTE: Example setup for Linux box.
             // $ export SA_PASSWORD=Foobar123!
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Integration.Testing
                 throw new InvalidOperationException("ENV: UmbracoIntegrationTestConnectionString is not set");
             }
 
-            return new SqlDeveloperTestDatabase(loggerFactory, dbFactory.Create(), connectionString);
+            return new SqlDeveloperTestDatabase(settings, loggerFactory, dbFactory.Create(), connectionString);
         }
     }
 }
