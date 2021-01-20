@@ -72,11 +72,11 @@
 
     const isNullOrEmpty = val => {
         return isUndefined(val) || !val;
-    };
+    }
 
     const isNullOrWhitespace = val => {
         return isNullOrEmpty(val) || val.trim() === '';
-    };
+    }
 
     const toJsonReplacer = (key, value) => {
         var val = value;      
@@ -90,7 +90,7 @@
           val = '$SCOPE';
         }      
         return val;
-    };
+    }
 
     /**
      * Equivalent to angular.toJson
@@ -101,7 +101,7 @@
           pretty = pretty ? 2 : null;
         }
         return JSON.stringify(obj, toJsonReplacer, pretty);
-    };
+    }
 
     /**
      * Equivalent to angular.fromJson
@@ -111,7 +111,7 @@
             return val;
         }
         return JSON.parse(val);
-    };
+    }
 
     /**
      * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
@@ -121,7 +121,7 @@
             return obj.forEach(iterator);
         }
         return obj;
-    };
+    }
 
     let _utilities = {
         noop: noop,
