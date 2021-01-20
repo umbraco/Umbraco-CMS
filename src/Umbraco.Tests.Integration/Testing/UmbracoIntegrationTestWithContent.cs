@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -46,6 +46,10 @@ namespace Umbraco.Tests.Integration.Testing
             Subpage2 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 2", Textpage.Id);
             ContentService.Save(Subpage2, 0);
 
+
+            Subpage3 = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 3", Textpage.Id);
+            ContentService.Save(Subpage3, 0);
+
             // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
             Trashed = ContentBuilder.CreateSimpleContent(ContentType, "Text Page Deleted", -20);
             Trashed.Trashed = true;
@@ -55,6 +59,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected Content Trashed { get; private set; }
 
         protected Content Subpage2 { get; private set; }
+        protected Content Subpage3 { get; private set; }
 
         protected Content Subpage { get; private set; }
 
