@@ -70,6 +70,14 @@
 
     const isScope = obj => obj && obj.$evalAsync && obj.$watch;
 
+    const isNullOrEmpty = val => {
+        return isUndefined(val) || !val;
+    }
+
+    const isNullOrWhitespace = val => {
+        return isNullOrEmpty(val) || val.trim() === '';
+    }
+
     const toJsonReplacer = (key, value) => {
         var val = value;      
         if (typeof key === 'string' && key.charAt(0) === '$' && key.charAt(1) === '$') {
@@ -82,7 +90,8 @@
           val = '$SCOPE';
         }      
         return val;
-      }
+    }
+
     /**
      * Equivalent to angular.toJson
      */
@@ -126,6 +135,8 @@
         isString: isString,
         isNumber: isNumber,
         isObject: isObject,
+        isNullOrEmpty: isNullOrEmpty,
+        isNullOrWhitespace: isNullOrWhitespace,
         fromJson: fromJson,
         toJson: toJson,
         forEach: forEach
