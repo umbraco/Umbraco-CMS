@@ -461,7 +461,7 @@
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
-                eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+                eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: true });
 
                 resetNestedFieldValiation(fieldsToRollback);
                 ensureDirtyIsSetIfAnyVariantIsDirty();
@@ -470,10 +470,13 @@
             },
                 function (err) {
 
-                    //needs to be manually set for infinite editing mode
-                    $scope.page.isNew = false;
 
                     syncTreeNode($scope.content, $scope.content.path);
+
+                    if (err.status === 400 && err.data) {
+                        // content was saved but is invalid.
+                        eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
+                    }
 
                     resetNestedFieldValiation(fieldsToRollback);
 
