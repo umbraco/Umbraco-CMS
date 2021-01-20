@@ -18,10 +18,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         public bool IsRequired { get; set; }
 
-        // public string IsRequiredMessage { get; set; }
+        public string IsRequiredMessage { get; set; }
 
         public string ValidationRegExp { get; set; }
 
-        // public string ValidationRegExpMessage { get; set; }
+        public string ValidationRegExpMessage { get; set; }
     }
 }

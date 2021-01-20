@@ -26,10 +26,10 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
         private bool _mandatory;
-        // private string _mandatoryMessage;
+        private string _mandatoryMessage;
         private int _sortOrder;
         private string _validationRegExp;
-        // private string _validationRegExpMessage;
+        private string _validationRegExpMessage;
         private ContentVariation _variations;
 
         /// <summary>
@@ -198,12 +198,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the custom validation message used when a value for this PropertyType is required
         /// </summary>
-        // [DataMember]
-        // public string MandatoryMessage
-        // {
-        //     get => _mandatoryMessage;
-        //     set => SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, nameof(MandatoryMessage));
-        // }
+        [DataMember]
+        public string MandatoryMessage
+        {
+            get => _mandatoryMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, nameof(MandatoryMessage));
+        }
 
         /// <summary>
         /// Gets of sets the sort order of the property type.
@@ -228,13 +228,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
         /// </summary>
-        // [DataMember]
-        //
-        // public string ValidationRegExpMessage
-        // {
-        //     get => _validationRegExpMessage;
-        //     set => SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, nameof(ValidationRegExpMessage));
-        // }
+        [DataMember]
+        public string ValidationRegExpMessage
+        {
+            get => _validationRegExpMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, nameof(ValidationRegExpMessage));
+        }
 
         /// <summary>
         /// Gets or sets the content variation of the property type.
@@ -439,7 +438,7 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyType)clone;
-
+            
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {

@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-
+                    
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }
@@ -297,12 +297,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 Mandatory = dto.Mandatory,
-                // MandatoryMessage = dto.MandatoryMessage,
+                MandatoryMessage = dto.MandatoryMessage,
                 Name = dto.Name,
                 PropertyGroupId = groupId.HasValue ? new Lazy<int>(() => groupId.Value) : null,
                 SortOrder = dto.SortOrder,
                 ValidationRegExp = dto.ValidationRegExp,
-                // ValidationRegExpMessage = dto.ValidationRegExpMessage,
+                ValidationRegExpMessage = dto.ValidationRegExpMessage,
                 Variations = (ContentVariation)dto.Variations
             };
         }

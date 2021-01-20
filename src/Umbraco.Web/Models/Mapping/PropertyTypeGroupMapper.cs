@@ -226,9 +226,9 @@ namespace Umbraco.Web.Models.Mapping
                     Validation = new PropertyTypeValidation
                         {
                             Mandatory = p.Mandatory,
-                            // MandatoryMessage = p.MandatoryMessage,
+                            MandatoryMessage = p.MandatoryMessage,
                             Pattern = p.ValidationRegExp,
-                            // PatternMessage = p.ValidationRegExpMessage,
+                            PatternMessage = p.ValidationRegExpMessage,
                         },
                     Label = p.Name,
                     View = propertyEditor.GetValueEditor().View,

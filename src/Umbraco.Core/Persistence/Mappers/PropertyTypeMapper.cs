@@ -24,11 +24,11 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.DataTypeId), nameof(PropertyTypeDto.DataTypeId));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Description), nameof(PropertyTypeDto.Description));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Mandatory), nameof(PropertyTypeDto.Mandatory));
-            // DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.MandatoryMessage), nameof(PropertyTypeDto.MandatoryMessage));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.MandatoryMessage), nameof(PropertyTypeDto.MandatoryMessage));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Name), nameof(PropertyTypeDto.Name));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.SortOrder), nameof(PropertyTypeDto.SortOrder));
             DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExp), nameof(PropertyTypeDto.ValidationRegExp));
-            // DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExpMessage), nameof(PropertyTypeDto.ValidationRegExpMessage));
+            DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExpMessage), nameof(PropertyTypeDto.ValidationRegExpMessage));
             DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.PropertyEditorAlias), nameof(DataTypeDto.EditorAlias));
             DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.ValueStorageType), nameof(DataTypeDto.DbType));
         }

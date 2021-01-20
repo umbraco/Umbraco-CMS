@@ -42,9 +42,9 @@ namespace Umbraco.Web.Models.Mapping
 
             //add the validation information
             dest.Validation.Mandatory = originalProp.PropertyType.Mandatory;
-            // dest.Validation.MandatoryMessage = originalProp.PropertyType.MandatoryMessage;
+            dest.Validation.MandatoryMessage = originalProp.PropertyType.MandatoryMessage;
             dest.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
-            // dest.Validation.PatternMessage = originalProp.PropertyType.ValidationRegExpMessage;
+            dest.Validation.PatternMessage = originalProp.PropertyType.ValidationRegExpMessage;
 
             if (dest.PropertyEditor == null)
             {
