@@ -363,7 +363,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             }
 
             // Assert
-            Assert.AreEqual(24, ContentService.Count());
+            Assert.AreEqual(25, ContentService.Count());
         }
 
         [Test]
@@ -1634,7 +1634,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
             Assert.IsFalse(descendants.Any(x => x.Trashed));
 
@@ -1649,7 +1649,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(-20, content.ParentId);
             Assert.IsTrue(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
             Assert.True(descendants.All(x => x.Trashed));
 
@@ -1942,7 +1942,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // Arrange
             IContent temp = ContentService.GetById(Textpage.Id);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, ContentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
             // Act
             IContent copy = ContentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
@@ -1952,7 +1952,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, ContentService.CountChildren(copy.Id));
+            Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
             IContent child = ContentService.GetById(Subpage.Id);
             IContent childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out long total).First();
@@ -1967,7 +1967,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             // Arrange
             IContent temp = ContentService.GetById(Textpage.Id);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, ContentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
             // Act
             IContent copy = ContentService.Copy(temp, temp.ParentId, false, false, Constants.Security.SuperUserId);

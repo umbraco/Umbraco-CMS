@@ -260,7 +260,7 @@ namespace Umbraco.Core.Services.Implement
         // this method must exist in this service as an implementation (legacy)
         void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date)
         {
-            throw new NotSupportedException("This method is not implemented or supported for users");
+            _logger.LogWarning("This method is not implemented. Using membership providers users is not advised, use ASP.NET Identity instead. See issue #9224 for more information.");
         }
 
         /// <summary>
