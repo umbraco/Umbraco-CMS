@@ -196,6 +196,7 @@ AnotherContentFinder
             Assert.IsNotNull(_typeLoader.ReadCache()); // works
         }
 
+        [Retry(5)] // TODO make this test non-flaky.
         [Test]
         public void Create_Cached_Plugin_File()
         {
