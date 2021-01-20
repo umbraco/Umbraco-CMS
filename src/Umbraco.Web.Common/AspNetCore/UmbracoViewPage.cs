@@ -56,7 +56,7 @@ namespace Umbraco.Web.Common.AspNetCore
             {
                 // Here we do the magic model swap
                 ViewContext ctx = value;
-                ctx.ViewData = BindViewData(ctx.HttpContext, ctx.ViewData);
+                ctx.ViewData = BindViewData(ctx.HttpContext.RequestServices.GetRequiredService<ContentModelBinder>(), ctx.ViewData);
                 base.ViewContext = ctx;
             }
         }
@@ -123,8 +123,18 @@ namespace Umbraco.Web.Common.AspNetCore
         /// <see cref="IContentModel"/> or <see cref="IPublishedContent"/>. This will use the <see cref="ContentModelBinder"/> to bind the models
         /// to the correct output type.
         /// </remarks>
-        protected ViewDataDictionary BindViewData(HttpContext context, ViewDataDictionary viewData)
+        protected ViewDataDictionary BindViewData(ContentModelBinder contentModelBinder, ViewDataDictionary viewData)
         {
+            if (contentModelBinder is null)
+            {
+                throw new ArgumentNullException(nameof(contentModelBinder));
+            }
+
+            if (viewData is null)
+            {
+                throw new ArgumentNullException(nameof(viewData));
+            }
+
             // check if it's already the correct type and continue if it is
             if (viewData is ViewDataDictionary<TModel> vdd)
             {
@@ -149,7 +159,6 @@ namespace Umbraco.Web.Common.AspNetCore
             viewData = MapViewDataDictionary(viewData, typeof(TModel));
 
             // bind the model
-            var contentModelBinder = context.RequestServices.GetRequiredService<ContentModelBinder>();
             var bindingContext = new DefaultModelBindingContext();
             contentModelBinder.BindModel(bindingContext, viewDataModel, typeof(TModel));
 
