@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.GetByUsername(username, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Services.Implement
         // this method must exist in this service as an implementation (legacy)
         void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date)
         {
-            throw new NotSupportedException("This method is not implemented or supported for users");
+            Logger.Warn<UserService>("This method is not implemented. Using membership providers users is not advised, use ASP.NET Identity instead. See issue #9224 for more information.");
         }
 
         /// <summary>
@@ -717,7 +717,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.Get(id, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
