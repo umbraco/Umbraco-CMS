@@ -2009,7 +2009,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
-        public void HasInitialContent() => Assert.AreEqual(4, ContentService.Count());
+        public void HasInitialContent() => Assert.AreEqual(5, ContentService.Count());
 
         #endregion
 
