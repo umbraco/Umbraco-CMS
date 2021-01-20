@@ -1,8 +1,8 @@
 using System;
 using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using Umbraco.Core;
@@ -15,8 +15,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Persistance.SqlCe;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Persistence.SqlCe;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.TestHelpers
 {

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -18,11 +18,11 @@
 
     <ItemGroup>
       <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
       <PackageReference Include="NUnit" Version="3.12.0" />
       <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-      <PackageReference Include="System.Data.Odbc" Version="4.7.0" />
-      <PackageReference Include="System.Data.OleDb" Version="4.7.1" />
+      <PackageReference Include="System.Data.Odbc" Version="5.0.0" />
+      <PackageReference Include="System.Data.OleDb" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>

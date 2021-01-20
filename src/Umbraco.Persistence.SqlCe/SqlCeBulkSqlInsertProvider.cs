@@ -7,7 +7,7 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Persistance.SqlCe
+namespace Umbraco.Persistence.SqlCe
 {
     public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {

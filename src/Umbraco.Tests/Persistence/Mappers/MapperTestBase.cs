@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Moq;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Infrastructure.Persistence.Mappers;
-using Umbraco.Persistance.SqlCe;
+using Umbraco.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {

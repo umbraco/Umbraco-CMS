@@ -2,21 +2,21 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence;
-using Umbraco.Persistance.SqlCe;
-using Umbraco.Web;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Persistence.SqlCe;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.TestHelpers
 {
