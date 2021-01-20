@@ -475,8 +475,7 @@
             },
                 function (err) {
 
-                    //needs to be manually set for infinite editing mode
-                    $scope.page.isNew = false;
+                    console.log("edit controller got error")
 
                     syncTreeNode($scope.content, $scope.content.path);
 
