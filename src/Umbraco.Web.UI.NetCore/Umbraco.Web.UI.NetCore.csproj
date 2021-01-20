@@ -31,16 +31,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="umbraco\Data\**" />
+    <Compile Remove="umbraco\logs\**" />
+    <Compile Remove="umbraco\MediaCache\**" />
+    <Compile Remove="umbraco\models\**" />
     <Compile Remove="wwwroot\Umbraco\**" />
     <Compile Remove="App_Data\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="App_Data\**" />
+    <EmbeddedResource Remove="umbraco\Data\**" />
+    <EmbeddedResource Remove="umbraco\logs\**" />
+    <EmbeddedResource Remove="umbraco\MediaCache\**" />
+    <EmbeddedResource Remove="umbraco\models\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="App_Data\**" />
+    <Content Remove="umbraco\Data\**" />
+    <Content Remove="umbraco\logs\**" />
+    <Content Remove="umbraco\MediaCache\**" />
+    <Content Remove="umbraco\models\**" />
     <Content Remove="wwwroot\Web.config" />
   </ItemGroup>
 
@@ -57,22 +69,15 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
     <None Remove="App_Data\**" />
+    <None Remove="umbraco\Data\**" />
+    <None Remove="umbraco\logs\**" />
+    <None Remove="umbraco\MediaCache\**" />
+    <None Remove="umbraco\models\**" />
     <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
   </ItemGroup>
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
-  <ItemGroup>
-    <None Remove="umbraco\Models\all.generated.cs" />
-    <Compile Remove="umbraco\Models\all.generated.cs" />
-    <None Remove="umbraco\Models\models.generated.cs" />
-    <Compile Remove="umbraco\Models\models.generated.cs" />
-    <Folder Remove="umbraco\Models\Compiled" />
-    <None Remove="umbraco\Models\Compiled\**" />
-    <None Remove="umbraco\Models\all.dll.path" />
-    <None Remove="umbraco\Models\models.hash" />
-    <None Remove="umbraco\Models\models.err" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
