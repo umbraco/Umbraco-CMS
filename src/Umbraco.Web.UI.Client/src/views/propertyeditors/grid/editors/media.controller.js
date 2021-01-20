@@ -64,7 +64,7 @@ angular.module("umbraco")
         };
         
         $scope.$watch('control.value', function(newValue, oldValue) {
-            if(angular.equals(newValue, oldValue)){
+            if(Utilities.equals(newValue, oldValue)){
                 return; // simply skip that
             }
             

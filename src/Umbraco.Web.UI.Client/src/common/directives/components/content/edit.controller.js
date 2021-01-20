@@ -475,6 +475,7 @@
             },
                 function (err) {
 
+
                     syncTreeNode($scope.content, $scope.content.path);
 
                     if (err.status === 400 && err.data) {
