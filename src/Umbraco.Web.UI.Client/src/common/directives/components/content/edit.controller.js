@@ -271,7 +271,7 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
-            
+
             var isBlueprint = content.isBlueprint;
 
             if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {
@@ -474,6 +474,10 @@
                 return $q.when(data);
             },
                 function (err) {
+
+                    //needs to be manually set for infinite editing mode
+                    $scope.page.isNew = false;
+
                     syncTreeNode($scope.content, $scope.content.path);
 
                     resetNestedFieldValiation(fieldsToRollback);
@@ -981,7 +985,7 @@
         $scope.appChanged = function (activeApp) {
 
             $scope.activeApp = activeApp;
-            
+
             _.forEach($scope.content.apps, function (app) {
                 app.active = false;
                 if (app.alias === $scope.activeApp.alias) {
