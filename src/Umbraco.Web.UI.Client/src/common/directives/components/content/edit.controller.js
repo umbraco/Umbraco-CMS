@@ -271,7 +271,7 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
-            
+
             var isBlueprint = content.isBlueprint;
 
             if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {
@@ -456,7 +456,8 @@
                 create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications,
-                softRedirect: true
+                softRedirect: true,
+                skipValidation: args.skipValidation
             }).then(function (data) {
                 //success
                 init();
@@ -468,7 +469,9 @@
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
-                resetNestedFieldValiation(fieldsToRollback);
+                if($scope.contentForm.$invalid !== true) {
+                    resetNestedFieldValiation(fieldsToRollback);
+                }
                 ensureDirtyIsSetIfAnyVariantIsDirty();
 
                 return $q.when(data);
@@ -476,7 +479,9 @@
                 function (err) {
                     syncTreeNode($scope.content, $scope.content.path);
 
-                    resetNestedFieldValiation(fieldsToRollback);
+                    if($scope.contentForm.$invalid !== true) {
+                        resetNestedFieldValiation(fieldsToRollback);
+                    }
 
                     return $q.reject(err);
                 });
@@ -729,9 +734,9 @@
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (hasVariants($scope.content)) {
-                //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
+                //before we launch the dialog we want to execute all client side validations first
+                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog", skipValidation:true, keepServerValidation:true })) {
                     var dialog = {
                         parentScope: $scope,
                         view: "views/content/overlays/save.html",
@@ -778,7 +783,8 @@
                 $scope.page.saveButtonState = "busy";
                 return performSave({
                     saveMethod: $scope.saveMethod(),
-                    action: "save"
+                    action: "save",
+                    skipValidation: true
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
                 }, function (err) {
@@ -981,7 +987,7 @@
         $scope.appChanged = function (activeApp) {
 
             $scope.activeApp = activeApp;
-            
+
             _.forEach($scope.content.apps, function (app) {
                 app.active = false;
                 if (app.alias === $scope.activeApp.alias) {
