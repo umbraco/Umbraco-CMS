@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Hosting;
@@ -20,10 +20,6 @@ namespace Umbraco.Core
 
         // always acquire
         public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;
-
-        /// <inheritdoc />
-        public bool Register(Action release, int weight = 100)
-            => Register(null, release, weight);
 
         /// <inheritdoc />
         public bool Register(Action install, Action release, int weight = 100)

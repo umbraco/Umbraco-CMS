@@ -69,22 +69,13 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.
         /// </summary>
-        /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
-        /// <param name="weight">An optional weight (lower goes first).</param>
-        /// <returns>A value indicating whether it was possible to register.</returns>
-        public bool Register(Action release, int weight = 100)
-            => Register(null, release, weight);
-
-        /// <summary>
-        /// Registers a resource that requires the current AppDomain to be the main domain to function.
-        /// </summary>
         /// <param name="install">An action to execute when registering.</param>
         /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
         /// <param name="weight">An optional weight (lower goes first).</param>
         /// <returns>A value indicating whether it was possible to register.</returns>
         /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
-        public bool Register(Action install, Action release, int weight = 100)
+        public bool Register(Action install = null, Action release = null, int weight = 100)
         {
             lock (_locko)
             {

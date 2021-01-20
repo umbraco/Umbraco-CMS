@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -18,14 +19,13 @@ namespace Umbraco.ModelsBuilder.Embedded
     // supports LiveAppData - but not PureLive
     public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>
     {
-        private static Mutex s_mutex;
         private static int s_req;
         private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
+        private readonly IMainDom _mainDom;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LiveModelsProvider"/> class.
@@ -35,15 +35,15 @@ namespace Umbraco.ModelsBuilder.Embedded
             IOptions<ModelsBuilderSettings> config,
             ModelsGenerator modelGenerator,
             ModelsGenerationError mbErrors,
-            IHostingEnvironment hostingEnvironment,
-            IUmbracoRequestLifetime umbracoRequestLifetime)
+            IUmbracoRequestLifetime umbracoRequestLifetime,
+            IMainDom mainDom)
         {
             _logger = logger;
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
-            _hostingEnvironment = hostingEnvironment;
             _umbracoRequestLifetime = umbracoRequestLifetime;
+            _mainDom = mainDom;
         }
 
         // we do not manage pure live here
@@ -66,18 +66,17 @@ namespace Umbraco.ModelsBuilder.Embedded
                 return;
             }
 
-            _umbracoRequestLifetime.RequestEnd += (sender, context) => AppEndRequest(context);
+            // Must register with maindom in order to function.
+            // If registration is not successful then events are not bound
+            // and we also don't generate models.
+            _mainDom.Register(() =>
+            {
+                _umbracoRequestLifetime.RequestEnd += (sender, context) => AppEndRequest(context);
 
-            // initialize mutex
-            // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
-            // name is system-wide and must be less than 260 chars
-            var name = _hostingEnvironment.ApplicationId + "/UmbracoLiveModelsProvider";
-
-            s_mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
-
-            // anything changes, and we want to re-generate models.
-            ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
-            DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
+                // anything changes, and we want to re-generate models.
+                ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
+                DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
+            });
         }
 
         // NOTE
@@ -100,28 +99,32 @@ namespace Umbraco.ModelsBuilder.Embedded
                 return;
             }
 
-            try
+            // cannot proceed unless we are MainDom
+            if (_mainDom.IsMainDom)
             {
-                _logger.LogDebug("Generate models...");
-                const int timeout = 2 * 60 * 1000; // 2 mins
-                s_mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                _logger.LogInformation("Generate models now.");
-                _modelGenerator.GenerateModels();
-                _mbErrors.Clear();
-                _logger.LogInformation("Generated.");
+                try
+                {
+                    _logger.LogDebug("Generate models...");
+                    _logger.LogInformation("Generate models now.");
+                    _modelGenerator.GenerateModels();
+                    _mbErrors.Clear();
+                    _logger.LogInformation("Generated.");
+                }
+                catch (TimeoutException)
+                {
+                    _logger.LogWarning("Timeout, models were NOT generated.");
+                }
+                catch (Exception e)
+                {
+                    _mbErrors.Report("Failed to build Live models.", e);
+                    _logger.LogError("Failed to generate models.", e);
+                }
             }
-            catch (TimeoutException)
+            else
             {
-                _logger.LogWarning("Timeout, models were NOT generated.");
-            }
-            catch (Exception e)
-            {
-                _mbErrors.Report("Failed to build Live models.", e);
-                _logger.LogError("Failed to generate models.", e);
-            }
-            finally
-            {
-                s_mutex.ReleaseMutex(); // release
+                // this will only occur if this appdomain was MainDom and it has
+                // been released while trying to regenerate models.
+                _logger.LogWarning("Cannot generate models while app is shutting down");
             }
         }
 

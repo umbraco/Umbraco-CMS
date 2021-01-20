@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -51,7 +51,9 @@ namespace Umbraco.Web.Scheduling
             internal bool Register()
             {
                 if (MainDom != null)
+                {
                     return MainDom.Register(Install, Release);
+                }
 
                 // tests
                 Install?.Invoke();

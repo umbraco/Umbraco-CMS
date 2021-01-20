@@ -151,7 +151,7 @@ namespace Umbraco.Core.Sync
             const int weight = 10;
 
             var registered = _mainDom.Register(
-                () =>
+                release: () =>
                 {
                     lock (_locko)
                     {
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Sync
                         Logger.LogWarning("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
                     }
                 },
-                weight);
+                weight: weight);
 
             if (registered == false)
             {

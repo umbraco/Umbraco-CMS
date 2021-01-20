@@ -1,12 +1,12 @@
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.Cache;
 using Umbraco.Core.Events;
-using System.Threading.Tasks;
-using System.Threading;
+using Umbraco.Core.Hosting;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -94,6 +94,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
 
             File.Delete(path);
-        }        
+        }
     }
 }
