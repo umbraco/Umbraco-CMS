@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IEnumerable<IMemberGroup> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
-            Assert.AreEqual("MyTestRole", found.Single());
+            Assert.AreEqual("MyTestRole", found.Single().Name);
         }
 
         [Test]
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             IEnumerable<IMemberGroup> found = MemberService.GetAllRoles();
 
             Assert.AreEqual(1, found.Count());
-            Assert.AreEqual("MyTestRole", found.Single());
+            Assert.AreEqual("MyTestRole", found.Single().Name);
         }
 
         [Test]
