@@ -13,7 +13,7 @@ function angularHelper($q) {
     function collectAllFormErrorsRecursively(formCtrl, allErrors) {
         // skip if the control is already added to the array
         if (allErrors.indexOf(formCtrl) !== -1) {
-            return
+            return;
         }
 
         // loop over the error dictionary (see https://docs.angularjs.org/api/ng/type/form.FormController#$error)
@@ -36,6 +36,7 @@ function angularHelper($q) {
                         allErrors.push(ctrl); // add the error
                         return;
                     }
+
                     // recurse with the sub form
                     collectAllFormErrorsRecursively(ctrl, allErrors);
                 }
@@ -48,6 +49,7 @@ function angularHelper($q) {
     }
 
     function isForm(obj) {
+
         // a method to check that the collection of object prop names contains the property name expected
         function allPropertiesExist(objectPropNames) {
             //ensure that every required property name exists on the current object
@@ -94,9 +96,9 @@ function angularHelper($q) {
 
         /**
          * Method used to re-run the $parsers for a given ngModel
-         * @param {} scope 
-         * @param {} ngModel 
-         * @returns {} 
+         * @param {} scope
+         * @param {} ngModel
+         * @returns {}
          */
         revalidateNgModel: function (scope, ngModel) {
             this.safeApply(scope, function() {
@@ -108,8 +110,8 @@ function angularHelper($q) {
 
         /**
          * Execute a list of promises sequentially. Unlike $q.all which executes all promises at once, this will execute them in sequence.
-         * @param {} promises 
-         * @returns {} 
+         * @param {} promises
+         * @returns {}
          */
         executeSequentialPromises: function (promises) {
 
@@ -183,7 +185,7 @@ function angularHelper($q) {
             //NOTE: There isn't a way in angular to get a reference to the current form object since the form object
             // is just defined as a property of the scope when it is named but you'll always need to know the name which
             // isn't very convenient. If we want to watch for validation changes we need to get a form reference.
-            // The way that we detect the form object is a bit hackerific in that we detect all of the required properties 
+            // The way that we detect the form object is a bit hackerific in that we detect all of the required properties
             // that exist on a form object.
             //
             //The other way to do it in a directive is to require "^form", but in a controller the only other way to do it
@@ -244,7 +246,7 @@ function angularHelper($q) {
                 $submitted: false,
                 $pending: undefined,
                 $addControl: Utilities.noop,
-                $removeControl: Utilities.noop, 
+                $removeControl: Utilities.noop,
                 $setValidity: Utilities.noop,
                 $setDirty: Utilities.noop,
                 $setPristine: Utilities.noop,
