@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -39,7 +41,8 @@ namespace Umbraco.Web.Routing
                 node = FindContentByAlias(frequest.UmbracoContext.Content,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
-                    frequest.Uri.GetAbsolutePathDecoded());
+                    frequest.Uri.GetAbsolutePathDecoded(),
+                    frequest.HasDomain ? frequest.Domain.Name : string.Empty);
 
                 if (node != null)
                 {
@@ -51,7 +54,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias, string domaineName)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -64,11 +67,22 @@ namespace Umbraco.Web.Routing
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
-            var test2 = ",/" + test1; // test2 is ",/alias,"
-            test1 = "," + test1; // test1 is ",alias,"
+            var hasDomain = !domaineName.IsNullOrWhiteSpace();
 
-            bool IsMatch(IPublishedContent c, string a1, string a2)
+            // Try to find any first relative path
+            var match = Regex.Match(domaineName, @"(?<!http:\/|http:|https:\/|https:)\/.+");
+
+            // Create the list of potential alias that can be found on umbracoAliasUrl
+            var trimAlias = hasDomain ? alias.TrimStart(match.Value) : alias;
+            var testList = new List<string>
+            {
+                trimAlias.TrimStart('/'), // is "alias"
+                trimAlias, // is "/alias"
+                trimAlias.EnsureEndsWith('/'), // is "alias/"
+                trimAlias.EnsureEndsWith('/') // is "/alias/"
+            };
+
+            bool IsMatch(IPublishedContent c)
             {
                 // this basically implements the original XPath query ;-(
                 //
@@ -91,8 +105,10 @@ namespace Umbraco.Web.Routing
                     v = c.Value<string>(propertyAlias);
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
-                v = "," + v.Replace(" ", "") + ",";
-                return v.InvariantContains(a1) || v.InvariantContains(a2);
+                v = v.Replace(" ", "");
+                // Split UrlAlias to a list
+                var t = v.Split(',');
+                return t.ContainsAny(testList);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
@@ -101,12 +117,12 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+                return rootNode?.Descendants().FirstOrDefault(IsMatch);
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(IsMatch);
                 if (c != null) return c;
             }
 
