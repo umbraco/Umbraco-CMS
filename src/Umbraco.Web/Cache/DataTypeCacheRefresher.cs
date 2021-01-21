@@ -58,9 +58,7 @@ namespace Umbraco.Web.Cache
                 _idkMap.ClearCache(payload.Id);
             }
 
-            // TODO: not sure I like these?
             TagsValueConverter.ClearCaches();
-            SliderValueConverter.ClearCaches();
 
             // refresh the models and cache
 
