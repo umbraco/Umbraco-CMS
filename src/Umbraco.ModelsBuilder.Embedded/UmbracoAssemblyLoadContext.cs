@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Loader;
-using System.Text;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
-    class UmbracoAssemblyLoadContext : AssemblyLoadContext
+    internal class UmbracoAssemblyLoadContext : AssemblyLoadContext
     {
-
         /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoAssemblyLoadContext"/> class.
+        /// </summary>
+        /// <remarks>
         /// Collectible AssemblyLoadContext used to load in the compiled generated models.
         /// Must be a collectible assembly in order to be able to be unloaded.
-        /// </summary>
-        public UmbracoAssemblyLoadContext() : base(isCollectible: true)
+        /// </remarks>
+        public UmbracoAssemblyLoadContext()
+            : base(isCollectible: true)
         {
-
         }
 
-        protected override Assembly Load(AssemblyName assemblyName)
-        {
-            return null;
-        }
+        // we never load anything directly by assembly name. This method will never be called
+        protected override Assembly Load(AssemblyName assemblyName) => null;
     }
 }

@@ -2,8 +2,11 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
@@ -12,8 +15,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
     public class ServerVariablesParserTests
     {
         [Test]
-        public void Parse()
+        public async Task Parse()
         {
+            var parser = new ServerVariablesParser(Mock.Of<IEventAggregator>());
+
             var d = new Dictionary<string, object>
             {
                 { "test1", "Test 1" },
@@ -23,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
                 { "test5", "Test 5" }
             };
 
-            var output = ServerVariablesParser.Parse(d).StripWhitespace();
+            var output = (await parser.ParseAsync(d)).StripWhitespace();
 
             Assert.IsTrue(output.Contains(@"Umbraco.Sys.ServerVariables = {
   ""test1"": ""Test 1"",

@@ -1,24 +1,29 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public class RoslynCompiler
     {
+        public const string GeneratedAssemblyName = "ModelsGeneratedAssembly";
+
         private OutputKind _outputKind;
         private CSharpParseOptions _parseOptions;
         private List<MetadataReference> _refs;
 
         /// <summary>
-        /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
+        /// Initializes a new instance of the <see cref="RoslynCompiler"/> class.
         /// </summary>
         /// <param name="referenceAssemblies">Referenced assemblies used in the source file</param>
+        /// <remarks>
+        /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
+        /// </remarks>
         public RoslynCompiler(IEnumerable<Assembly> referenceAssemblies)
         {
             _outputKind = OutputKind.DynamicallyLinkedLibrary;
@@ -28,7 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Making it kind of a waste to convert the Assembly types into MetadataReference
             // every time GetCompiledAssembly is called, so that's why I do it in the ctor
             _refs = new List<MetadataReference>();
-            foreach(var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
+            foreach (var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
             {
                 _refs.Add(MetadataReference.CreateFromFile(assembly.Location));
             };
@@ -54,13 +59,15 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, _parseOptions);
 
-            var compilation = CSharpCompilation.Create("ModelsGeneratedAssembly",
+            var compilation = CSharpCompilation.Create(
+                GeneratedAssemblyName,
                 new[] { syntaxTree },
                 references: _refs,
-                options: new CSharpCompilationOptions(_outputKind,
-                optimizationLevel: OptimizationLevel.Release,
-                // Not entirely certain that assemblyIdentityComparer is nececary? 
-                assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
+                options: new CSharpCompilationOptions(
+                    _outputKind,
+                    optimizationLevel: OptimizationLevel.Release,
+                    // Not entirely certain that assemblyIdentityComparer is nececary?
+                    assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
             compilation.Emit(savePath);
 

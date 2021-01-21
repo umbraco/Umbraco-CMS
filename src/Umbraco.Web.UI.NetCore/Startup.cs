@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
 using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.DependencyInjection;
@@ -48,6 +49,14 @@ namespace Umbraco.Web.UI.NetCore
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
+                // TODO: This call and AddDistributedCache are interesting ones. They are both required for back office and front-end to render
+                // but we don't want to force people to call so many of these ext by default and want to keep all of this relatively simple.
+                // but we still need to allow the flexibility for people to use their own ModelsBuilder. In that case people can call a different
+                // AddModelsBuilderCommunity (or whatever) after our normal calls to replace our services.
+                // So either we call AddModelsBuilder within AddBackOffice AND AddWebsite just like we do with AddDistributedCache or we
+                // have a top level method to add common things required for backoffice/frontend like .AddCommon()
+                // or we allow passing in options to these methods to configure what happens within them.
+                .AddModelsBuilder()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 

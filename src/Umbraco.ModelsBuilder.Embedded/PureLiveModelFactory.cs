@@ -1,23 +1,26 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -30,21 +33,22 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<PureLiveModelFactory> _logger;
         private readonly FileSystemWatcher _watcher;
-        private int _ver, _skipver;
+        private int _ver;
+        private int _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
         private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
-        private UmbracoServices UmbracoServices => _umbracoServices.Value;
-
-        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
-
+        private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
+        private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
         private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly ApplicationPartManager _applicationPartManager;
+        private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
@@ -53,7 +57,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             IOptions<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            IPublishedValueFallback publishedValueFallback)
+            IPublishedValueFallback publishedValueFallback,
+            ApplicationPartManager applicationPartManager)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -62,14 +67,20 @@ namespace Umbraco.ModelsBuilder.Embedded
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
+            _applicationPartManager = applicationPartManager;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
-            if (!hostingEnvironment.IsHosted) return;
+            if (!hostingEnvironment.IsHosted)
+            {
+                return;
+            }
 
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
+            {
                 Directory.CreateDirectory(modelsDirectory);
+            }
 
             // BEWARE! if the watcher is not properly released then for some reason the
             // BuildManager will start confusing types - using a 'registered object' here
@@ -81,30 +92,63 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // get it here, this need to be fast
             _debugLevel = _config.DebugLevel;
+
+            AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
         }
 
-        #region ILivePublishedModelFactory
+        public event EventHandler ModelsChanged;
+
+        private UmbracoServices UmbracoServices => _umbracoServices.Value;
+
+        /// <summary>
+        /// Gets the currently loaded pure live models assembly
+        /// </summary>
+        /// <remarks>
+        /// Can be null
+        /// </remarks>
+        public Assembly CurrentModelsAssembly { get; private set; }
 
         /// <inheritdoc />
         public object SyncRoot { get; } = new object();
 
-        /// <inheritdoc />
-        public void Refresh()
+        /// <summary>
+        /// Gets the RoslynCompiler
+        /// </summary>
+        private RoslynCompiler RoslynCompiler
         {
-            ResetModels();
-            EnsureModels();
+            get
+            {
+                if (_roslynCompiler != null)
+                {
+                    return _roslynCompiler;
+                }
+
+                _roslynCompiler = new RoslynCompiler(AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
+                return _roslynCompiler;
+            }
         }
 
-        #endregion
+        /// <inheritdoc />
+        public bool Enabled => _config.ModelsMode == ModelsMode.PureLive;
 
-        #region IPublishedModelFactory
+        /// <summary>
+        /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
+        /// </summary>
+        /// <remarks>
+        /// This is required because the razor engine will only try to load things from the default context, it doesn't know anything
+        /// about our context so we need to proxy.
+        /// </remarks>
+        private Assembly OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
+            => _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName);
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
             // get models, rebuilding them if needed
-            var infos = EnsureModels()?.ModelInfos;
+            Dictionary<string, ModelInfo> infos = EnsureModels()?.ModelInfos;
             if (infos == null)
+            {
                 return element;
+            }
 
             // be case-insensitive
             var contentTypeAlias = element.ContentType.Alias;
@@ -120,7 +164,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         // NOT when building models
         public Type MapModelType(Type type)
         {
-            var infos = EnsureModels();
+            Infos infos = EnsureModels();
             return ModelType.Map(type, infos.ModelTypeMap);
         }
 
@@ -128,92 +172,38 @@ namespace Umbraco.ModelsBuilder.Embedded
         // NOT when building models
         public IList CreateModelList(string alias)
         {
-            var infos = EnsureModels();
+            Infos infos = EnsureModels();
 
             // fail fast
             if (infos == null)
+            {
                 return new List<IPublishedElement>();
+            }
 
-            if (!infos.ModelInfos.TryGetValue(alias, out var modelInfo))
+            if (!infos.ModelInfos.TryGetValue(alias, out ModelInfo modelInfo))
+            {
                 return new List<IPublishedElement>();
+            }
 
-            var ctor = modelInfo.ListCtor;
-            if (ctor != null) return ctor();
+            Func<IList> ctor = modelInfo.ListCtor;
+            if (ctor != null)
+            {
+                return ctor();
+            }
 
-            var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
+            Type listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
             return ctor();
         }
 
         /// <inheritdoc />
-        public bool Enabled => _config.Enable;
-
-        /// <inheritdoc />
         public void Reset()
         {
-            if (_config.Enable)
+            if (Enabled)
+            {
                 ResetModels();
+            }
         }
-
-        #endregion
-
-        #region Compilation
-        // deadlock note
-        //
-        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
-        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
-        // and now wants to lock _locker.
-        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
-        // requires that the BuildManager can Monitor.Enter-ed itself.
-        // so:
-        //
-        // T1 - needs to ensure models, locks _locker
-        // T2 - needs to compile a view, locks BuildManager
-        //      hits RazorBuildProvider_CodeGenerationStarted
-        //      wants to lock _locker, wait
-        // T1 - needs to compile models, using BuildManager
-        //      wants to lock itself, wait
-        // <deadlock>
-        //
-        // until ASP.NET kills the long-running request (thread abort)
-        //
-        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
-        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
-        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
-        //
-        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
-        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
-        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
-        //
-        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
-
-        // private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
-        // {
-        //     try
-        //     {
-        //         _locker.EnterReadLock();
-        //
-        //         // just be safe - can happen if the first view is not an Umbraco view,
-        //         // or if something went wrong and we don't have an assembly at all
-        //         if (_modelsAssembly == null) return;
-        //
-        //         if (_debugLevel > 0)
-        //             _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-        //         if (!(sender is RazorBuildProvider provider)) return;
-        //
-        //         // add the assembly, and add a dependency to a text file that will change on each
-        //         // compilation as in some environments (could not figure which/why) the BuildManager
-        //         // would not re-compile the views when the models assembly is rebuilt.
-        //         provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
-        //         provider.AddVirtualPathDependency(ProjVirt);
-        //     }
-        //     finally
-        //     {
-        //         if (_locker.IsReadLockHeld)
-        //             _locker.ExitReadLock();
-        //     }
-        // }
-
 
         // tells the factory that it should build a new generation of models
         private void ResetModels()
@@ -229,30 +219,30 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                 var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
                 if (!Directory.Exists(modelsDirectory))
+                {
                     Directory.CreateDirectory(modelsDirectory);
+                }
 
                 // clear stuff
                 var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
                 var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
-                if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
-                if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
+                if (File.Exists(dllPathFile))
+                {
+                    File.Delete(dllPathFile);
+                }
+
+                if (File.Exists(modelsHashFile))
+                {
+                    File.Delete(modelsHashFile);
+                }
             }
             finally
             {
                 if (_locker.IsWriteLockHeld)
+                {
                     _locker.ExitWriteLock();
-            }
-        }
-
-        // gets the RoslynCompiler
-        private RoslynCompiler RoslynCompiler
-        {
-            get
-            {
-                if (_roslynCompiler != null) return _roslynCompiler;
-                _roslynCompiler = new RoslynCompiler(System.Runtime.Loader.AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
-                return _roslynCompiler;
+                }
             }
         }
 
@@ -260,50 +250,57 @@ namespace Umbraco.ModelsBuilder.Embedded
         internal Infos EnsureModels()
         {
             if (_debugLevel > 0)
+            {
                 _logger.LogDebug("Ensuring models.");
+            }
 
             // don't use an upgradeable lock here because only 1 thread at a time could enter it
             try
             {
                 _locker.EnterReadLock();
                 if (_hasModels)
+                {
                     return _infos;
+                }
             }
             finally
             {
                 if (_locker.IsReadLockHeld)
+                {
                     _locker.ExitReadLock();
+                }
             }
 
-            var roslynLocked = false;
             try
             {
-                // always take the BuildManager lock *before* taking the _locker lock
-                // to avoid possible deadlock situations (see notes above)
-                Monitor.Enter(RoslynCompiler, ref roslynLocked);
-
                 _locker.EnterUpgradeableReadLock();
 
-                if (_hasModels) return _infos;
+                if (_hasModels)
+                {
+                    return _infos;
+                }
 
                 _locker.EnterWriteLock();
 
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
-
                 using (_profilingLogger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
-                        var assembly = GetModelsAssembly(_pendingRebuild);
+                        Assembly assembly = GetModelsAssembly(_pendingRebuild);
 
-                        // the one below can be used to simulate an issue with BuildManager, ie it will register
-                        // the models with the factory but NOT with the BuildManager, which will not recompile views.
-                        // this is for U4-8043 which is an obvious issue but I cannot replicate
-                        //_modelsAssembly = _modelsAssembly ?? assembly;
+                        CurrentModelsAssembly = assembly;
 
-                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
+                        // Raise the model changing event.
+                        // NOTE: That on first load, if there is content, this will execute before the razor view engine
+                        // has loaded which means it hasn't yet bound to this event so there's no need to worry about if
+                        // it will be eagerly re-generated unecessarily on first render. BUT we should be aware that if we
+                        // change this to use the event aggregator that will no longer be the case.
+                        ModelsChanged?.Invoke(this, new EventArgs());
+
+                        IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
                         _errors.Clear();
                     }
@@ -317,6 +314,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                         }
                         finally
                         {
+                            CurrentModelsAssembly = null;
                             _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
                         }
                     }
@@ -330,43 +328,73 @@ namespace Umbraco.ModelsBuilder.Embedded
             finally
             {
                 if (_locker.IsWriteLockHeld)
+                {
                     _locker.ExitWriteLock();
+                }
+
                 if (_locker.IsUpgradeableReadLockHeld)
+                {
                     _locker.ExitUpgradeableReadLock();
-                if (roslynLocked)
-                    Monitor.Exit(RoslynCompiler);
+                }
             }
         }
 
+        // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)
         {
             // If there's a current AssemblyLoadContext, unload it before creating a new one.
-            if(!(_currentAssemblyLoadContext is null))
+            if (!(_currentAssemblyLoadContext is null))
             {
                 _currentAssemblyLoadContext.Unload();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+
+                // we need to remove the current part too
+                ApplicationPart currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
+                if (currentPart != null)
+                {
+                    _applicationPartManager.ApplicationParts.Remove(currentPart);
+                }
             }
 
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
             _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
 
-            // Use filestream to load in the new assembly, otherwise it'll be locked
-            // See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
-            using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
+            // NOTE: We cannot use in-memory assemblies due to the way the razor engine works which must use
+            // application parts in order to add references to it's own CSharpCompiler.
+            // These parts must have real paths since that is how the references are loaded. In that
+            // case we'll need to work on temp files so that the assembly isn't locked.
+
+            // Get a temp file path
+            // NOTE: We cannot use Path.GetTempFileName(), see this issue:
+            // https://github.com/dotnet/AspNetCore.Docs/issues/3589 which can cause issues, this is recommended instead
+            var tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            File.Copy(pathToAssembly, tempFile, true);
+
+            // Load it in
+            Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
+
+            // Add the assembly to the application parts - this is required because this is how
+            // the razor ReferenceManager resolves what to load, see
+            // https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L53
+            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
+            foreach (ApplicationPart applicationPart in partFactory.GetApplicationParts(assembly))
             {
-                return _currentAssemblyLoadContext.LoadFromStream(fs);
+                _applicationPartManager.ApplicationParts.Add(applicationPart);
             }
+
+            return assembly;
         }
 
+        // This is NOT thread safe but it is only called from within a lock
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
+            {
                 Directory.CreateDirectory(modelsDirectory);
+            }
 
-            var typeModels = UmbracoServices.GetAllTypes();
+            IList<TypeModel> typeModels = UmbracoServices.GetAllTypes();
             var currentHash = TypeModelHasher.Hash(typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
@@ -375,7 +403,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // caching the generated models speeds up booting
             // currentHash hashes both the types & the user's partials
-
             if (!forceRebuild)
             {
                 _logger.LogDebug("Looking for cached models.");
@@ -415,7 +442,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         assembly = ReloadAssembly(dllPath);
 
-                        var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+                        ModelsBuilderAssemblyAttribute attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
                         {
                             // if we were to resume at that revision, then _ver would keep increasing
@@ -431,17 +458,23 @@ namespace Umbraco.ModelsBuilder.Embedded
                         _logger.LogDebug("Cached models dll cannot be loaded (invalid assembly).");
                     }
                     else if (!File.Exists(dllPath))
+                    {
                         _logger.LogDebug("Cached models dll does not exist.");
+                    }
                     else if (File.Exists(dllPath + ".delete"))
+                    {
                         _logger.LogDebug("Cached models dll is marked for deletion.");
+                    }
                     else
+                    {
                         _logger.LogDebug("Cached models dll cannot be loaded (why?).");
+                    }
                 }
 
                 // must reset the version in the file else it would keep growing
                 // loading cached modules only happens when the app restarts
                 var text = File.ReadAllText(projFile);
-                var match = AssemblyVersionRegex.Match(text);
+                Match match = s_assemblyVersionRegex.Match(text);
                 if (match.Success)
                 {
                     text = text.Replace(match.Value, "AssemblyVersion(\"0.0.0." + _ver + "\")");
@@ -478,8 +511,9 @@ namespace Umbraco.ModelsBuilder.Embedded
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
-            code = code.Replace("//ASSATTR", $@"[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
-[assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
+            string mbAssemblyDirective = $@"[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+[assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]";
+            code = code.Replace("//ASSATTR", mbAssemblyDirective);
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -515,21 +549,20 @@ namespace Umbraco.ModelsBuilder.Embedded
             if (File.Exists(dllPathFile))
             {
                 var dllPath = File.ReadAllText(dllPathFile);
-                var dirInfo = new DirectoryInfo(dllPath).Parent;
-                var files = dirInfo.GetFiles().Where(f => f.FullName != dllPath);
-                foreach(var file in files)
+                DirectoryInfo dirInfo = new DirectoryInfo(dllPath).Parent;
+                IEnumerable<FileInfo> files = dirInfo.GetFiles().Where(f => f.FullName != dllPath);
+                foreach (FileInfo file in files)
                 {
                     try
                     {
                         File.Delete(file.FullName);
                     }
-                    catch(UnauthorizedAccessException)
+                    catch (UnauthorizedAccessException)
                     {
                         // The file is in use, we'll try again next time...
                         // This shouldn't happen anymore.
                     }
                 }
-
             }
         }
 
@@ -537,7 +570,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var dirInfo = new DirectoryInfo(Path.Combine(_config.ModelsDirectoryAbsolute(_hostingEnvironment), "Compiled"));
             if (!dirInfo.Exists)
+            {
                 Directory.CreateDirectory(dirInfo.FullName);
+            }
+
             return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
         }
 
@@ -551,51 +587,69 @@ namespace Umbraco.ModelsBuilder.Embedded
             // useful to have the source around for debugging.
             try
             {
-                if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
-                if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
-                if (File.Exists(projFile)) File.SetLastWriteTime(projFile, DateTime.Now);
+                if (File.Exists(dllPathFile))
+                {
+                    File.Delete(dllPathFile);
+                }
+
+                if (File.Exists(modelsHashFile))
+                {
+                    File.Delete(modelsHashFile);
+                }
+
+                if (File.Exists(projFile))
+                {
+                    File.SetLastWriteTime(projFile, DateTime.Now);
+                }
             }
             catch { /* enough */ }
         }
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedElement), typeof(IPublishedValueFallback) };
+            Type[] ctorArgTypes = new[] { typeof(IPublishedElement), typeof(IPublishedValueFallback) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
-            foreach (var type in types)
+            foreach (Type type in types)
             {
                 ConstructorInfo constructor = null;
                 Type parameterType = null;
 
-                foreach (var ctor in type.GetConstructors())
+                foreach (ConstructorInfo ctor in type.GetConstructors())
                 {
-                    var parms = ctor.GetParameters();
+                    ParameterInfo[] parms = ctor.GetParameters();
                     if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) && typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
                     {
                         if (constructor != null)
+                        {
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
+                        }
+
                         constructor = ctor;
                         parameterType = parms[0].ParameterType;
                     }
                 }
 
                 if (constructor == null)
+                {
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
+                }
 
-                var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
+                PublishedModelAttribute attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
+                {
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
+                }
 
                 // TODO: use Core's ReflectionUtilities.EmitCtor !!
                 // Yes .. DynamicMethod is uber slow
                 // TODO: But perhaps https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 is better still?
                 // See CtorInvokeBenchmarks
                 var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
-                var gen = meth.GetILGenerator();
+                ILGenerator gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Ldarg_1);
                 gen.Emit(OpCodes.Newobj, constructor);
@@ -613,10 +667,14 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
+            {
                 Directory.CreateDirectory(modelsDirectory);
+            }
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+            {
                 File.Delete(file);
+            }
 
             var builder = new TextBuilder(_config, typeModels);
 
@@ -627,9 +685,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             return code;
         }
 
-        private static readonly Regex UsingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex AattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
-
         private static string GenerateModelsProj(IDictionary<string, string> files)
         {
             // ideally we would generate a CSPROJ file but then we'd need a BuildProvider for csproj
@@ -637,21 +692,25 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // group all 'using' at the top of the file (else fails)
             var usings = new List<string>();
-            foreach (var k in files.Keys.ToList())
-                files[k] = UsingRegex.Replace(files[k], m =>
+            foreach (string k in files.Keys.ToList())
+            {
+                files[k] = s_usingRegex.Replace(files[k], m =>
                 {
                     usings.Add(m.Groups[1].Value);
                     return string.Empty;
                 });
+            }
 
             // group all '[assembly:...]' at the top of the file (else fails)
             var aattrs = new List<string>();
-            foreach (var k in files.Keys.ToList())
-                files[k] = AattrRegex.Replace(files[k], m =>
+            foreach (string k in files.Keys.ToList())
+            {
+                files[k] = s_aattrRegex.Replace(files[k], m =>
                 {
                     aattrs.Add(m.Groups[1].Value);
                     return string.Empty;
                 });
+            }
 
             var text = new StringBuilder();
             foreach (var u in usings.Distinct())
@@ -660,14 +719,16 @@ namespace Umbraco.ModelsBuilder.Embedded
                 text.Append(u);
                 text.Append(";\r\n");
             }
+
             foreach (var a in aattrs)
             {
                 text.Append("[assembly:");
                 text.Append(a);
                 text.Append("]\r\n");
             }
+
             text.Append("\r\n\r\n");
-            foreach (var f in files)
+            foreach (KeyValuePair<string, string> f in files)
             {
                 text.Append("// FILE: ");
                 text.Append(f.Key);
@@ -675,28 +736,11 @@ namespace Umbraco.ModelsBuilder.Embedded
                 text.Append(f.Value);
                 text.Append("\r\n\r\n\r\n");
             }
+
             text.Append("// EOF\r\n");
 
             return text.ToString();
         }
-
-        internal class Infos
-        {
-            public Dictionary<string, Type> ModelTypeMap { get; set; }
-            public Dictionary<string, ModelInfo> ModelInfos { get; set; }
-        }
-
-        internal class ModelInfo
-        {
-            public Type ParameterType { get; set; }
-            public Func<IPublishedElement, IPublishedValueFallback, IPublishedElement> Ctor { get; set; }
-            public Type ModelType { get; set; }
-            public Func<IList> ListCtor { get; set; }
-        }
-
-        #endregion
-
-        #region Watching
 
         private void WatcherOnChanged(object sender, FileSystemEventArgs args)
         {
@@ -715,13 +759,17 @@ namespace Umbraco.ModelsBuilder.Embedded
             //}
 
             // always ignore our own file changes
-            if (OurFiles.Contains(changed))
+            if (s_ourFiles.Contains(changed))
+            {
                 return;
+            }
 
             _logger.LogInformation("Detected files changes.");
 
             lock (SyncRoot) // don't reset while being locked
+            {
                 ResetModels();
+            }
         }
 
         public void Stop(bool immediate)
@@ -731,6 +779,22 @@ namespace Umbraco.ModelsBuilder.Embedded
             _hostingLifetime.UnregisterObject(this);
         }
 
-        #endregion
+        internal class Infos
+        {
+            public Dictionary<string, Type> ModelTypeMap { get; set; }
+
+            public Dictionary<string, ModelInfo> ModelInfos { get; set; }
+        }
+
+        internal class ModelInfo
+        {
+            public Type ParameterType { get; set; }
+
+            public Func<IPublishedElement, IPublishedValueFallback, IPublishedElement> Ctor { get; set; }
+
+            public Type ModelType { get; set; }
+
+            public Func<IList> ListCtor { get; set; }
+        }
     }
 }

@@ -14,6 +14,11 @@ namespace Umbraco.Web.Common.ModelBinders
     /// </summary>
     public class ContentModelBinder : IModelBinder
     {
+        /// <summary>
+        /// Occurs on model binding exceptions.
+        /// </summary>
+        public event EventHandler<ModelBindingArgs> ModelBindingException; // TODO: This cannot use IEventAggregator currently because it cannot be async
+
         /// <inheritdoc/>
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -193,10 +198,5 @@ namespace Umbraco.Web.Common.ModelBinders
             /// </summary>
             public bool Restart { get; set; }
         }
-
-        /// <summary>
-        /// Occurs on model binding exceptions.
-        /// </summary>
-        public static event EventHandler<ModelBindingArgs> ModelBindingException;
     }
 }
