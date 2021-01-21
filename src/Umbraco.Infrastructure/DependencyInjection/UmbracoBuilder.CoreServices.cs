@@ -27,6 +27,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
+using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Infrastructure.Runtime;
@@ -169,6 +170,10 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<PackageDataInstallation>();
 
             builder.AddInstaller();
+
+            // Services required to run background jobs (with out the handler)
+            builder.Services.AddUnique<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            builder.Services.AddUnique<TaskHelper>();
 
             return builder;
         }
