@@ -80,7 +80,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        private Sql<ISqlContext> ContentSourcesCount(IScope scope)
+        private Sql<ISqlContext> ContentSourcesCount(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
         {
             var sqlTemplate = scope.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesCount, tsql =>
                 tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"))
@@ -89,6 +89,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId));
 
             var sql = sqlTemplate.Sql();
+
+            if (joins != null)
+                sql = joins(sql);
 
             // TODO: We can't use a template with this one because of the 'right.Current' and 'right.Published' ends up being a parameter so not sure how we can do that
             sql = sql
@@ -147,12 +150,20 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     .Where<NodeDto>(x => x.NodeId == id, "x")
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            // create a more efficient COUNT query without the join on the cmsContentNu table
+            var sqlCountQuery = ContentSourcesCount(scope,
+                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                    .Where<NodeDto>(x => x.NodeId == id, "x");
+            var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
             {
                 yield return CreateContentNodeKit(row, serializer);
             }   
@@ -167,12 +178,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var sqlCountQuery = ContentSourcesCount(scope)
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
+            var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
             {
                 yield return CreateContentNodeKit(row, serializer);
             }   
@@ -182,7 +198,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = scope.SqlContext.Sql()
 
-                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                 .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
@@ -198,6 +214,22 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                 .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit");
+
+            return sql;
+        }
+        private Sql<ISqlContext> MediaSourcesCount(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        {
+            var sql = scope.SqlContext.Sql()
+
+                .Select<NodeDto>(x => Alias(x.NodeId, "Id"))
+                .From<NodeDto>();
+
+            if (joins != null)
+                sql = joins(sql);
+
+            sql = sql
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current);
 
             return sql;
         }
@@ -222,12 +254,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var sqlCountQuery = MediaSourcesCount(scope)
+               .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed);
+
+            var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }   
@@ -242,12 +279,19 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var sqlCountQuery = MediaSourcesCount(scope,
+                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeId == id, "x");
+
+            var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }   
@@ -262,12 +306,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var sqlCountQuery = MediaSourcesCount(scope)
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
+
+            var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }   
