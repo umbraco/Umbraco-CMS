@@ -79,7 +79,11 @@ namespace Umbraco.Core.Runtime
         {
             lock (_locko)
             {
-                if (_signaled) return false;
+                if (_signaled)
+                {
+                    return false;
+                }
+
                 if (_isMainDom == false)
                 {
                     _logger.LogWarning("Register called when MainDom has not been acquired");
@@ -88,7 +92,10 @@ namespace Umbraco.Core.Runtime
 
                 install?.Invoke();
                 if (release != null)
+                {
                     _callbacks.Add(new KeyValuePair<int, Action>(weight, release));
+                }
+
                 return true;
             }
         }
