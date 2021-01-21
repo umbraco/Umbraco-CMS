@@ -97,7 +97,7 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.3.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -179,6 +179,7 @@
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
+    <Compile Include="Install\InstallSteps\TelemetryIdentifierStep.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -312,10 +313,8 @@
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="Telemetry\ReportSiteTask.cs" />
-    <Compile Include="Telemetry\TelemetryMarkerComponent.cs" />
     <Compile Include="Telemetry\TelemetryComponent.cs" />
     <Compile Include="Telemetry\TelemetryComposer.cs" />
-    <Compile Include="Telemetry\TelemetryMarkerComposer.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
     <Compile Include="Templates\HtmlUrlParser.cs" />

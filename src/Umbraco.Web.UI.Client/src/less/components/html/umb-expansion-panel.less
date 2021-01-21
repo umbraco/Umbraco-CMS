@@ -10,11 +10,12 @@
     font-weight: bold;
     display: flex;
     align-items: center;
-    cursor: pointer;
     justify-content: space-between;
     color: @black;
+    width: 100%;
 
-    &:hover .umb-expansion-panel__expand {
+    &:hover .umb-expansion-panel__expand,
+    &:focus .umb-expansion-panel__expand {
         color: @gray-6;
     }
 }

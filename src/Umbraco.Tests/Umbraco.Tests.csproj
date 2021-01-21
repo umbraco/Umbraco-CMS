@@ -104,6 +104,8 @@
       <Version>4.14.5</Version>
     </PackageReference>
     <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
@@ -144,6 +146,7 @@
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\PropertyTests.cs" />
+    <Compile Include="Models\RangeTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
