@@ -25,8 +25,6 @@ namespace Umbraco.Core.DependencyInjection
             // Register the handler as transient. This ensures that anything can be injected into it.
             var descriptor = new ServiceDescriptor(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler), ServiceLifetime.Transient);
 
-            // TODO: Waiting on feedback here https://github.com/umbraco/Umbraco-CMS/pull/9556/files#r548365396 about whether
-            // we perform this duplicate check or not.
             if (!builder.Services.Contains(descriptor))
             {
                 builder.Services.Add(descriptor);
@@ -49,8 +47,6 @@ namespace Umbraco.Core.DependencyInjection
             // Register the handler as transient. This ensures that anything can be injected into it.
             var descriptor = new ServiceDescriptor(typeof(INotificationAsyncHandler<TNotification>), typeof(TNotificationAsyncHandler), ServiceLifetime.Transient);
 
-            // TODO: Waiting on feedback here https://github.com/umbraco/Umbraco-CMS/pull/9556/files#r548365396 about whether
-            // we perform this duplicate check or not.
             if (!builder.Services.Contains(descriptor))
             {
                 builder.Services.Add(descriptor);
