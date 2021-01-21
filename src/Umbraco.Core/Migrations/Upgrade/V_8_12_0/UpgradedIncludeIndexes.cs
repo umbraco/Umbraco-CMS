@@ -3,7 +3,7 @@ using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_11_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_12_0
 {
     public class UpgradedIncludeIndexes : MigrationBase
     {

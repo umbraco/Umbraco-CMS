@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeObjectType")] // TODO: db rename to 'objectType'
         [NullSetting(NullSetting = NullSettings.Null)]        
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", IncludeColumns = "parentId,level,path,sortOrder,trashed,nodeUser,text,createDate")]        
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "nodeObjectType,trashed", IncludeColumns = "uniqueId,parentId,level,path,sortOrder,nodeUser,text,createDate")]
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]
