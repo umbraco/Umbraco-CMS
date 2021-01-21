@@ -762,6 +762,7 @@
     <key alias="current">actuel</key>
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
+    <key alias="avatar">Avatar de</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>
