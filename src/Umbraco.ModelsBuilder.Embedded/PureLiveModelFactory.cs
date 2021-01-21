@@ -291,15 +291,14 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         Assembly assembly = GetModelsAssembly(_pendingRebuild);
 
-                        bool hasAssembly = CurrentModelsAssembly != null;
                         CurrentModelsAssembly = assembly;
 
-                        // raise the event that they've changed.
-                        // don't raise on the initial call, only when it's actually changed.
-                        if (hasAssembly)
-                        {
-                            ModelsChanged?.Invoke(this, new EventArgs());
-                        }
+                        // Raise the model changing event.
+                        // NOTE: That on first load, if there is content, this will execute before the razor view engine
+                        // has loaded which means it hasn't yet bound to this event so there's no need to worry about if
+                        // it will be eagerly re-generated unecessarily on first render. BUT we should be aware that if we
+                        // change this to use the event aggregator that will no longer be the case.
+                        ModelsChanged?.Invoke(this, new EventArgs());
 
                         IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
