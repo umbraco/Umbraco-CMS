@@ -2,7 +2,7 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [v8/contrib,v8/dev]
+    branches: [v8/contrib,v8/dev,v8/bug,v8/feature]
   pull_request:
     # The branches below must be a subset of the branches above
   schedule:

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -632,7 +634,15 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var userHasChangedOwnLanguage =
+                user.Id == Security.CurrentUser.Id && Security.CurrentUser.Language != user.Language;
+
+            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(Services.TextService.Localize(textToLocalise, culture), Services.TextService.Localize("speechBubbles/editUserSaved", culture));
             return display;
         }
 
