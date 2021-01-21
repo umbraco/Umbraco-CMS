@@ -1,87 +1,92 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
-    </PropertyGroup>
-    <PropertyGroup>
-        <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-    </PropertyGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
-      <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-      <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
-    </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="App_Plugins" />
-        <Folder Include="scripts" />
-        <Folder Include="umbraco\MediaCache\2\c\6\9\3\a\6\5" />
-        <Folder Include="umbraco\MediaCache\a\e\e\1\9\e\4\b" />
-        <Folder Include="umbraco\MediaCache\c\3\b\5\0\9\f\9" />
-        <Folder Include="Views" />
-        <Folder Include="wwwroot\Media" />
-      <Folder Include="Views" />
-      <Folder Include="wwwroot\Media" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Plugins" />
+    <Folder Include="scripts" />
+    <Folder Include="Views" />
+    <Folder Include="wwwroot\Media" />
+    <Folder Include="Views" />
+    <Folder Include="wwwroot\Media" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="wwwroot\Umbraco\**" />
-        <Compile Remove="App_Data\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="umbraco\Data\**" />
+    <Compile Remove="umbraco\logs\**" />
+    <Compile Remove="umbraco\MediaCache\**" />
+    <Compile Remove="umbraco\models\**" />
+    <Compile Remove="wwwroot\Umbraco\**" />
+    <Compile Remove="App_Data\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Remove="App_Data\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="App_Data\**" />
+    <EmbeddedResource Remove="umbraco\Data\**" />
+    <EmbeddedResource Remove="umbraco\logs\**" />
+    <EmbeddedResource Remove="umbraco\MediaCache\**" />
+    <EmbeddedResource Remove="umbraco\models\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Content Remove="App_Data\**" />
-        <Content Remove="wwwroot\Web.config" />
-    </ItemGroup>
+  <ItemGroup>
+    <Content Remove="App_Data\**" />
+    <Content Remove="umbraco\Data\**" />
+    <Content Remove="umbraco\logs\**" />
+    <Content Remove="umbraco\MediaCache\**" />
+    <Content Remove="umbraco\models\**" />
+    <Content Remove="wwwroot\Web.config" />
+  </ItemGroup>
 
 
-    <ItemGroup>
-        <None Include="config\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Include="umbraco\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Remove="App_Data\**" />
-        <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
-        <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="config\**\*.*">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+    <None Include="umbraco\**\*.*">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+    <None Remove="App_Data\**" />
+    <None Remove="umbraco\Data\**" />
+    <None Remove="umbraco\logs\**" />
+    <None Remove="umbraco\MediaCache\**" />
+    <None Remove="umbraco\models\**" />
+    <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
+    <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
+  </ItemGroup>
 
-    <!-- We don't want to include the generated files, they will throw a lot of errors -->
-    <ItemGroup>
-        <None Remove="umbraco\Models\all.generated.cs" />
-        <Compile Remove="umbraco\Models\all.generated.cs" />
-        <None Remove="umbraco\Models\models.generated.cs" />
-        <Compile Remove="umbraco\Models\models.generated.cs" />
-        <Folder Remove="umbraco\Models\Compiled" />
-        <None Remove="umbraco\Models\Compiled\**" />
-        <None Remove="umbraco\Models\all.dll.path" />
-        <None Remove="umbraco\Models\models.hash" />
-        <None Remove="umbraco\Models\models.err" />
-    </ItemGroup>
+  <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
-        <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
+    <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
 
+  <PropertyGroup>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+  </PropertyGroup>
 
 </Project>

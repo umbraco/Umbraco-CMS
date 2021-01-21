@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
         public void Initialize()
         {
             //let's deal with shutting down Examine with MainDom
-            var examineShutdownRegistered = _mainDom.Register(() =>
+            var examineShutdownRegistered = _mainDom.Register(release: () =>
             {
                 using (_profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {

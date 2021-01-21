@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Core.Models.PublishedContent
 {
 
     /// <summary>
@@ -10,15 +10,6 @@
         /// Gets an object that can be used to synchronize access to the factory.
         /// </summary>
         object SyncRoot { get; }
-
-        /// <summary>
-        /// Refreshes the factory.
-        /// </summary>
-        /// <remarks>
-        /// <para>This will typically re-compiled models/classes into a new DLL that are used to populate the cache.</para>
-        /// <para>This is called prior to refreshing the cache.</para>
-        /// </remarks>
-        void Refresh();
 
         /// <summary>
         /// Tells the factory that it should build a new generation of models

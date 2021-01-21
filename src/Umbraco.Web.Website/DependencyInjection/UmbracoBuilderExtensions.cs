@@ -28,8 +28,8 @@ namespace Umbraco.Web.Website.DependencyInjection
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 
             // Configure MVC startup options for custom view locations
-            builder.Services.AddTransient<IConfigureOptions<RazorViewEngineOptions>, RenderRazorViewEngineOptionsSetup>();
-            builder.Services.AddTransient<IConfigureOptions<RazorViewEngineOptions>, PluginRazorViewEngineOptionsSetup>();
+            builder.Services.ConfigureOptions<RenderRazorViewEngineOptionsSetup>();
+            builder.Services.ConfigureOptions<PluginRazorViewEngineOptionsSetup>();
 
             // Wraps all existing view engines in a ProfilerViewEngine
             builder.Services.AddTransient<IConfigureOptions<MvcViewOptions>, ProfilingViewEngineWrapperMvcViewOptionsSetup>();

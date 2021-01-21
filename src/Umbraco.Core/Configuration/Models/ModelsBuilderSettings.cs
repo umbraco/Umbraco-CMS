@@ -15,30 +15,15 @@ namespace Umbraco.Core.Configuration.Models
         private static string DefaultModelsDirectory => "~/umbraco/models";
 
         /// <summary>
-        /// Gets or sets a value indicating whether the whole models experience is enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>If this is false then absolutely nothing happens.</para>
-        ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
-        /// </remarks>
-        public bool Enable { get; set; } = false;
-
-        /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.Nothing;
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.PureLive;
 
         /// <summary>
         /// Gets or sets a value for models namespace.
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
         public string ModelsNamespace { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether we should enable the models factory.
-        /// </summary>
-        /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public bool EnableFactory { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether we should flag out-of-date models.

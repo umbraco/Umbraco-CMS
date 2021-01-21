@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration
+namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// Defines the models generation modes.
@@ -6,9 +6,12 @@
     public enum ModelsMode
     {
         /// <summary>
-        /// Do not generate models.
+        /// Do not generate strongly typed models.
         /// </summary>
-        Nothing = 0, // default value
+        /// <remarks>
+        /// This means that only IPublishedContent instances will be used.
+        /// </remarks>
+        Nothing = 0,
 
         /// <summary>
         /// Generate models in memory.

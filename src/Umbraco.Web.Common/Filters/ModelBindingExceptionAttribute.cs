@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.Filters
             public void OnException(ExceptionContext filterContext)
             {
                 var disabled = _exceptionFilterSettings?.Disabled ?? false;
-                if (_publishedModelFactory.IsLiveFactory()
+                if (_publishedModelFactory.IsLiveFactoryEnabled()
                     && !disabled
                     && !filterContext.ExceptionHandled
                     && (filterContext.Exception is ModelBindingException || filterContext.Exception is InvalidCastException)

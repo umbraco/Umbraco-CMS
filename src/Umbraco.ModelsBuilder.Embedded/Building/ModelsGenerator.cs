@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
@@ -27,16 +27,20 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         {
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
+            {
                 Directory.CreateDirectory(modelsDirectory);
+            }
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+            {
                 File.Delete(file);
+            }
 
-            var typeModels = _umbracoService.GetAllTypes();
+            System.Collections.Generic.IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
 
             var builder = new TextBuilder(_config, typeModels);
 
-            foreach (var typeModel in builder.GetModelsToGenerate())
+            foreach (TypeModel typeModel in builder.GetModelsToGenerate())
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
