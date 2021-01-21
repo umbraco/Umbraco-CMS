@@ -106,8 +106,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var syntax = s.SqlContext.SqlSyntax;
             var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ObjectTypeNotTrashedFilter, s =>
-                s.Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid?>("nodeObjectType") && !x.Trashed));
-            var sql = sqlTemplate.Sql(nodeObjectType);
+                s.Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid?>("nodeObjectType") && x.Trashed == SqlTemplate.Arg<bool>("trashed")));
+            var sql = sqlTemplate.Sql(nodeObjectType, false);
             return sql;
         }
 
