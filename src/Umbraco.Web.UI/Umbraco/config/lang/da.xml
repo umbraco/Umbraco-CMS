@@ -326,7 +326,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
-    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteketet.</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteket.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -527,7 +527,7 @@
     <key alias="fields">felter</key>
     <key alias="indexCannotRead">Indexet skal bygges igen, for at kunne læses</key>
     <key alias="processIsTakingLonger">Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen</key>
-    <key alias="indexCannotRebuild">Dette index kan ikke genbygess for det ikke har nogen</key>
+    <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
