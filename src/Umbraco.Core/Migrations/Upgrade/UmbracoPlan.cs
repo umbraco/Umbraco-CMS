@@ -131,6 +131,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}");
             To<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}");
             To<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
+            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");  // 8.6.0 changed, compatibility
+            To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
             To<LegacyPickersPropertyEditorsMigration>("{258CE811-4201-4004-95EF-402086B38B77}");
             To<NestedContentPropertyEditorsMigration>("{a730b327-300b-4b60-bd18-9a4f05b8e931}");
             To<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
@@ -157,7 +159,6 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
             To<MakeTagsVariant>("{C39BF2A7-1454-4047-BBFE-89E40F66ED63}");
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
-            To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
             To<ConvertRelatedLinksToMultiUrlPicker>("{ED28B66A-E248-4D94-8CDB-9BDF574023F0}");
             To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
             To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
@@ -192,7 +193,6 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.6.0...
             To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
             To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
-            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
