@@ -5,27 +5,6 @@
         <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
-    </PropertyGroup>
-    <PropertyGroup>
-        <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-    </PropertyGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
-      <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-      <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-      <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
-    </ItemGroup>
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
   </PropertyGroup>
