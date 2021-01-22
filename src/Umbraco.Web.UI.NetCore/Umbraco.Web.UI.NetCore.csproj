@@ -83,11 +83,6 @@
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
-    <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-  </ItemGroup>
 
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
