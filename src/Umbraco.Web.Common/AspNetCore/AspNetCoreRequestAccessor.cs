@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
-    public class AspNetCoreRequestAccessor : IRequestAccessor
+    public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBegin>,  INotificationHandler<UmbracoRequestEnd>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -19,7 +21,6 @@ namespace Umbraco.Web.Common.AspNetCore
         private Uri _currentApplicationUrl;
 
         public AspNetCoreRequestAccessor(IHttpContextAccessor httpContextAccessor,
-            IUmbracoRequestLifetime umbracoRequestLifetime,
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<WebRoutingSettings> webRoutingSettings)
         {
@@ -27,20 +28,8 @@ namespace Umbraco.Web.Common.AspNetCore
             _umbracoContextAccessor = umbracoContextAccessor;
             _webRoutingSettings = webRoutingSettings.Value;
 
-            umbracoRequestLifetime.RequestStart += RequestStart;
-            umbracoRequestLifetime.RequestEnd += RequestEnd;
         }
 
-        private void RequestEnd(object sender, HttpContext e)
-        {
-            EndRequest?.Invoke(sender, new UmbracoRequestEventArgs(_umbracoContextAccessor.UmbracoContext));
-        }
-
-        private void RequestStart(object sender, HttpContext e)
-        {
-            var reason = EnsureRoutableOutcome.IsRoutable; //TODO get the correct value here like in UmbracoInjectedModule
-            RouteAttempt?.Invoke(sender, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
-        }
 
         public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
@@ -92,5 +81,20 @@ namespace Umbraco.Web.Common.AspNetCore
 
             return _currentApplicationUrl;
         }
+
+        public Task HandleAsync(UmbracoRequestBegin notification, CancellationToken cancellationToken)
+        {
+            var reason = EnsureRoutableOutcome.IsRoutable; //TODO get the correct value here like in UmbracoInjectedModule
+            RouteAttempt?.Invoke(this, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
+            return Task.CompletedTask;
+        }
+
+        public Task HandleAsync(UmbracoRequestEnd notification, CancellationToken cancellationToken)
+        {
+            EndRequest?.Invoke(this, new UmbracoRequestEventArgs(_umbracoContextAccessor.UmbracoContext));
+            return Task.CompletedTask;
+        }
+
+
     }
 }

@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Common.Middleware
@@ -29,11 +29,12 @@ namespace Umbraco.Web.Common.Middleware
     public class UmbracoRequestMiddleware : IMiddleware
     {
         private readonly ILogger<UmbracoRequestMiddleware> _logger;
-        private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
+
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
+        private readonly IEventAggregator _eventAggregator;
         private static bool s_cacheInitialized = false;
         private static bool s_cacheInitializedFlag = false;
         private static object s_cacheInitializedLock = new object();
@@ -43,18 +44,18 @@ namespace Umbraco.Web.Common.Middleware
         /// </summary>
         public UmbracoRequestMiddleware(
             ILogger<UmbracoRequestMiddleware> logger,
-            IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
             IBackOfficeSecurityFactory backofficeSecurityFactory,
-            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler)
+            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
+            IEventAggregator eventAggregator)
         {
             _logger = logger;
-            _umbracoRequestLifetimeManager = umbracoRequestLifetimeManager;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
             _backofficeSecurityFactory = backofficeSecurityFactory;
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
+            _eventAggregator = eventAggregator;
         }
 
         /// <inheritdoc/>
@@ -86,7 +87,7 @@ namespace Umbraco.Web.Common.Middleware
 
                 try
                 {
-                    _umbracoRequestLifetimeManager.InitRequest(context);
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(context));
                 }
                 catch (Exception ex)
                 {
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Common.Middleware
                     }
                     finally
                     {
-                        _umbracoRequestLifetimeManager.EndRequest(context);
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(context));
                     }
                 }
             }

@@ -6,25 +6,22 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Profiler
 {
     /// <summary>
     /// Initialized the web profiling. Ensures the boot process profiling is stopped.
     /// </summary>
-    public class InitializeWebProfiling : INotificationHandler<UmbracoApplicationStarting>
+    public class InitializeWebProfiling : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestBegin>,  INotificationHandler<UmbracoRequestEnd>
     {
         private readonly bool _profile;
         private readonly WebProfiler _profiler;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializeWebProfiling"/> class.
         /// </summary>
-        public InitializeWebProfiling(IProfiler profiler, IUmbracoRequestLifetime umbracoRequestLifetime, ILogger<InitializeWebProfiling> logger)
+        public InitializeWebProfiling(IProfiler profiler, ILogger<InitializeWebProfiling> logger)
         {
-            _umbracoRequestLifetime = umbracoRequestLifetime;
             _profile = true;
 
             // although registered in UmbracoBuilderExtensions.AddUmbraco, ensure that we have not
@@ -50,12 +47,28 @@ namespace Umbraco.Web.Common.Profiler
         {
             if (_profile)
             {
-                _umbracoRequestLifetime.RequestStart += (sender, context) => _profiler.UmbracoApplicationBeginRequest(context);
-
-                _umbracoRequestLifetime.RequestEnd += (sender, context) => _profiler.UmbracoApplicationEndRequest(context);
-
                 // Stop the profiling of the booting process
                 _profiler.StopBoot();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task HandleAsync(UmbracoRequestBegin notification, CancellationToken cancellationToken)
+        {
+            if (_profile)
+            {
+                _profiler.UmbracoApplicationBeginRequest(notification.HttpContext);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task HandleAsync(UmbracoRequestEnd notification, CancellationToken cancellationToken)
+        {
+            if (_profile)
+            {
+                _profiler.UmbracoApplicationEndRequest(notification.HttpContext);
             }
 
             return Task.CompletedTask;
