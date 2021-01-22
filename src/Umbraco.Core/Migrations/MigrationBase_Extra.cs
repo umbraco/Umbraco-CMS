@@ -45,7 +45,7 @@ namespace Umbraco.Core.Migrations
 
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column);
-            
+
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
         }
 

@@ -115,7 +115,7 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
                 .OnColumn("propertyTypeId").Ascending()
                 .OnColumn("languageId").Ascending()
                 .OnColumn("segment").Ascending()
-                .Do();                
+                .Do();
         }
 
         private void MigrateContentAndPropertyTypes()
