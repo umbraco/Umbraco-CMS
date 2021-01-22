@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence
                 Assert.IsNull(exceptions[i]);
         }
 
-        [Retry(5)] // TODO make this test non-flaky.
+        [Retry(10)] // TODO make this test non-flaky.
         [Test]
         public void DeadLockTest()
         {
