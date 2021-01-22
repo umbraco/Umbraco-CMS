@@ -204,7 +204,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         ///  <remarks>
         ///  By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
-        /// 
+        ///
         ///  If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         ///  value to the DB will fail when it tries to validate the value type.
         ///  </remarks>

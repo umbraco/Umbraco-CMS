@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Install
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Migrations.Install
     /// </summary>
     internal class DatabaseSchemaResult
     {
-        public DatabaseSchemaResult(ISqlSyntaxProvider sqlSyntax)
+        public DatabaseSchemaResult()
         {
             Errors = new List<Tuple<string, string>>();
             TableDefinitions = new List<TableDefinition>();

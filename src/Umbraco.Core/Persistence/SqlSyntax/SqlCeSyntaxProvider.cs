@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
                                  : string.Join(", ", columnDefinition.PrimaryKeyColumns
-                                                                     .Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Split(Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                                                                      .Select(GetQuotedColumnName));
 
             return string.Format(CreateConstraint,

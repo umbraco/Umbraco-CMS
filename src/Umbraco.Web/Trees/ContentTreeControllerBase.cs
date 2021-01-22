@@ -369,7 +369,7 @@ namespace Umbraco.Web.Trees
 
                 if (startNodes.Any(x =>
                 {
-                    var pathParts = x.Path.Split(',');
+                    var pathParts = x.Path.Split(Constants.CharArrays.Comma);
                     return pathParts.Contains(e.Id.ToInvariantString());
                 }))
                 {

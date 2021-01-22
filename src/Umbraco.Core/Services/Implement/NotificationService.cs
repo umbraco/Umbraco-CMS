@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services.Implement
             if (entitiesL.Count == 0) return;
 
             //put all entity's paths into a list with the same indices
-            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
+            var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
-            var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 

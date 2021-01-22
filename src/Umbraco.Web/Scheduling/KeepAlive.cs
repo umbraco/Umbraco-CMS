@@ -62,7 +62,7 @@ namespace Umbraco.Web.Scheduling
                             return true; // repeat
                         }
 
-                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
+                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd(Constants.CharArrays.ForwardSlash));
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);

@@ -253,7 +253,7 @@ namespace Umbraco.Web.Models.Mapping
             if (parent == null)
                 return false;
 
-            var pathParts = parent.Path.Split(',').Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
+            var pathParts = parent.Path.Split(Constants.CharArrays.Comma).Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
 
             // reduce the path parts so we exclude top level content items that
             // are higher up than a user's start nodes

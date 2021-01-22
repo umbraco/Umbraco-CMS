@@ -125,7 +125,7 @@ namespace Umbraco.Web.Editors
                 return RedirectToAction("Default");
             }
 
-            var parts = Server.UrlDecode(invite).Split('|');
+            var parts = Server.UrlDecode(invite).Split(Constants.CharArrays.VerticalTab);
 
             if (parts.Length != 2)
             {

@@ -112,6 +112,14 @@ namespace Umbraco.Core.Migrations.Install
             }
         }
 
+        internal bool IsUmbracoInstalled()
+        {
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            {
+                return scope.Database.IsUmbracoInstalled(_logger);
+            }
+        }
+
         #endregion
 
         #region Configure Connection String
@@ -346,7 +354,7 @@ namespace Umbraco.Core.Migrations.Install
             var sqlCeDatabaseExists = false;
             if (dbIsSqlCe)
             {
-                var parts = databaseSettings.ConnectionString.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = databaseSettings.ConnectionString.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 var dataSourcePart = parts.FirstOrDefault(x => x.InvariantStartsWith("Data Source="));
                 if (dataSourcePart != null)
                 {
@@ -391,15 +399,15 @@ namespace Umbraco.Core.Migrations.Install
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Initialized == false)
-                return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
+                return new DatabaseSchemaResult();
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger);
-            _databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            _databaseSchemaValidationResult = scope.Database.ValidateSchema(_logger);
+
             scope.Complete();
+
             return _databaseSchemaValidationResult;
         }
 
@@ -438,11 +446,9 @@ namespace Umbraco.Core.Migrations.Install
 
                 var schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
-                //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
-                //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
-                //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && !hasInstalledVersion)
+                //If the determined version is "empty" its a new install - otherwise upgrade the existing
+                if (!hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
