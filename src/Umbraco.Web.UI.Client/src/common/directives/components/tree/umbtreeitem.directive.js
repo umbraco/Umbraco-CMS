@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState) {
+    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState, navigationService) {
     return {
         restrict: 'E',
         replace: true,

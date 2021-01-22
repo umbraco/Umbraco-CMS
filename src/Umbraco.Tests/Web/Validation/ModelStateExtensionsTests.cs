@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.Web
+namespace Umbraco.Tests.Web.Validation
 {
     [TestFixture]
     public class ModelStateExtensionsTests
@@ -22,19 +22,19 @@ namespace Umbraco.Tests.Web
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
             ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
 
-            var result = ms.GetCulturesWithErrors(localizationService.Object, "en-US");
+            var result = ms.GetVariantsWithErrors("en-US");
 
             //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("en-US", result[0]);
+            Assert.AreEqual("en-US", result[0].culture);
 
             ms = new ModelStateDictionary();
-            ms.AddCultureValidationError("en-US", "generic culture error");
+            ms.AddVariantValidationError("en-US", null, "generic culture error");
 
-            result = ms.GetCulturesWithErrors(localizationService.Object, "en-US");
+            result = ms.GetVariantsWithErrors("en-US");
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("en-US", result[0]);
+            Assert.AreEqual("en-US", result[0].culture);
         }
 
         [Test]
@@ -47,11 +47,11 @@ namespace Umbraco.Tests.Web
             ms.AddPropertyError(new ValidationResult("no header image"), "headerImage", null); //invariant property
             ms.AddPropertyError(new ValidationResult("title missing"), "title", "en-US"); //variant property
 
-            var result = ms.GetCulturesWithPropertyErrors(localizationService.Object, "en-US");
+            var result = ms.GetVariantsWithPropertyErrors("en-US");
 
             //even though there are 2 errors, they are both for en-US since that is the default language and one of the errors is for an invariant property
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("en-US", result[0]);
+            Assert.AreEqual("en-US", result[0].culture);
         }
 
         [Test]

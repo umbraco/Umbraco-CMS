@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 
@@ -15,16 +16,17 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtimeState;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IProfilingLogger _logger;
 
         public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IRuntimeState runtimeState,
-            IProfilingLogger logger)
+            IScopeProvider scopeProvider, IRuntimeState runtimeState, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;
             _notifications = notifications;
+            _scopeProvider = scopeProvider;
             _runtimeState = runtimeState;
             _logger = logger;
         }
@@ -51,6 +53,10 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // Ensure we use an explicit scope since we are running on a background thread and plugin health
+            // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
+            // isn't used since that can be problematic.
+            using (var scope = _scopeProvider.CreateScope())
             using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = Current.Configs.HealthChecks();

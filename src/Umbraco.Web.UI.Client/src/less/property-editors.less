@@ -320,6 +320,11 @@
   box-shadow:none !important;
 }
 
+.umb-sortable-thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: @white;
+}
 
 .umb-sortable-thumbnails {
     list-style-type: none;
@@ -724,6 +729,7 @@
 // --------------------------------------------------
 .umb-fileupload {
     display: flex;
+    flex-direction: column;
 }
 
 .umb-fileupload .preview {
@@ -863,11 +869,11 @@
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
 .umb-datepicker .input-append .on-top {
+    border: 0 none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
     display: inline-block;
-    height: 22px;
     padding: 5px 6px 3px 6px;
     font-size: @baseFontSize;
     font-weight: normal;

@@ -18,30 +18,28 @@
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
                     <div ng-if="!vm.loading">
-
                         <ul class="umb-card-grid -three-in-row">
-                            <li ng-repeat="dataTypeConfig in vm.configs | orderBy:'name'"
-                                data-element="datatypeconfig-{{dataTypeConfig.name}}"
-                                ng-click="vm.pickDataType(dataTypeConfig)">
+                            <li ng-repeat="dataTypeConfig in vm.configs | orderBy:'name' track by $index"
+                                data-element="datatypeconfig-{{dataTypeConfig.name}}">
                                 <div ng-if="dataTypeConfig.loading" class="umb-card-grid-item__loading">
                                     <div class="umb-button__progress"></div>
                                 </div>
-                                <a class="umb-card-grid-item" href="" title="{{ dataTypeConfig.name }}">
+                                <button umb-auto-focus="{{$index === 0}}" class="btn-reset umb-card-grid-item" type="button" ng-click="vm.pickDataType(dataTypeConfig)" title="Select {{ dataTypeConfig.name }}">
                                     <span>
-                                        <i class="{{ dataTypeConfig.icon }}" ng-class="{'icon-autofill': dataTypeConfig.icon == null}"></i>
-                                        {{ dataTypeConfig.name }}
+                                        <i class="{{ dataTypeConfig.icon }}" ng-class="{'icon-autofill': dataTypeConfig.icon == null}" aria-hidden="true"></i>
+                                        <span class="sr-only">Select</span> {{ dataTypeConfig.name }}
                                     </span>
-                                </a>
+                                </button>
                             </li>
                         </ul>
                         <ul class="umb-card-grid -three-in-row">
-                            <li ng-click="vm.newDataType()">
-                                <a class="umb-card-grid-item-slot" href="" title="Create a new configuration of {{ model.dataType.name }}">
+                            <li>
+                                <button umb-auto-focus="{{vm.configs.length === 0}}" class="btn-reset umb-card-grid-item-slot" type="button" ng-click="vm.newDataType()" title="Create a new configuration of {{ model.editor.name }}">
                                     <span>
-                                        <i class="icon icon-add"></i>
-                                        Create new
+                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        Create new <span class="sr-only">configuration of {{ model.editor.name }}</span>
                                     </span>
-                                </a>
+                                </button>
                             </li>
                         </ul>
 

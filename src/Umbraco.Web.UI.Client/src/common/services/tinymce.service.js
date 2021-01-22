@@ -133,7 +133,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
                             var split = rule.selector.split(".");
                             r.block = split[0];
-                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
+                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(/\./g, " ");
                         }
                         else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
                             var split = rule.selector.split("#");

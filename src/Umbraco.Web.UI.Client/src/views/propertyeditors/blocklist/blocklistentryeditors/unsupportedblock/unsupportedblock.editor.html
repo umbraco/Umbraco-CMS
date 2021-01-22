@@ -1,0 +1,15 @@
+<div class="blockelement-unsupportedblock-editor blockelement__draggable-element" ng-focus="block.focus">
+    <div class="__header">
+        <i class="icon icon-alert" aria-hidden="true"></i>
+        <span>{{block.label}}</span>
+    </div>
+    <div class="__body">
+        This content is no longer supported in this context.<br/>
+        You might want to remove this block, or contact your developer to take actions for making this block available again.<br/><br/>
+        <!-- TODO: Add link when we have one 
+		    <a href="http://our.umbraco.com" target="_blank" rel="noopener">Learn more about this warning</a>
+		-->
+        <h5>Block data:</h5>
+        <pre ng-bind="block.data | json : 4"></pre>
+    </div>
+</div>

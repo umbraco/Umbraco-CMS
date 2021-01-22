@@ -551,7 +551,6 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpPost]
-        [FileUploadCleanupFilter(false)]
         public async Task<ContentTypeImportModel> Upload()
         {
             if (Request.Content.IsMimeMultipartContent() == false)
@@ -577,19 +576,27 @@ namespace Umbraco.Web.Editors
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
-            // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
-            // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
-            // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
-            System.IO.File.Move(result.FileData[0].LocalFileName, root + "\\" + fileName);
+            var destFileName = root + "\\" + fileName;
+            try
+            {
+                // due to a bug before 8.7.0 we didn't delete temp files, so we need to make sure to delete before
+                // moving else you get errors and the upload fails without a message in the UI (there's a JS error)
+                if(System.IO.File.Exists(destFileName))
+                    System.IO.File.Delete(destFileName);
+
+                // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
+                // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
+                // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
+                System.IO.File.Move(result.FileData[0].LocalFileName, destFileName);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<ContentTypeController>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
+            }
 
             if (ext.InvariantEquals("udt"))
             {
                 model.TempFileName = Path.Combine(root, fileName);
-
-                model.UploadedFiles.Add(new ContentPropertyFile
-                {
-                    TempFilePath = model.TempFileName
-                });
 
                 var xd = new XmlDocument
                 {

@@ -68,14 +68,20 @@
 
             if(version && version.versionId) {
 
+                vm.loading = true;
+
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
                 contentResource.getRollbackVersion(version.versionId, culture)
-                    .then(function(data){
+                    .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
                         createDiff(vm.currentVersion, vm.previousVersion);
+
+                        vm.loading = false;
                         vm.rollbackButtonDisabled = false;
+                    }, function () {
+                        vm.loading = false;
                     });
 
             } else {
@@ -117,6 +123,10 @@
             currentVersion.tabs.forEach((tab, tabIndex) => {
                 tab.properties.forEach((property, propertyIndex) => {
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
+
+                    // copy existing properties, so it doesn't manipulate existing properties on page
+                    oldProperty = Utilities.copy(oldProperty);
+                    property = Utilities.copy(property);
 
                     // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                     if(property.value instanceof Object) {

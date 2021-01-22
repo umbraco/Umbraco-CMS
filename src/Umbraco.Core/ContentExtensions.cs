@@ -120,6 +120,15 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns all properties based on the editorAlias
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="editorAlias"></param>
+        /// <returns></returns>
+        public static IEnumerable<Property> GetPropertiesByEditor(this IContentBase content, string editorAlias)
+            => content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == editorAlias);
+
+        /// <summary>
         /// Returns properties that do not belong to a group
         /// </summary>
         /// <param name="content"></param>

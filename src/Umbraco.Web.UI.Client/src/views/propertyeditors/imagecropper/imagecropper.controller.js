@@ -55,6 +55,7 @@ angular.module('umbraco')
                 fileManager.setFiles({
                     propertyAlias: $scope.model.alias,
                     culture: $scope.model.culture,
+                    segment: $scope.model.segment,
                     files: []
                 });
             }
@@ -189,6 +190,7 @@ angular.module('umbraco')
                 fileManager.setFiles({
                     propertyAlias: $scope.model.alias,
                     culture: $scope.model.culture,
+                    segment: $scope.model.segment,
                     files: []
                 });
 

@@ -33,10 +33,11 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             vm.page.saveButtonState = "busy";
             
             macroResource.saveMacro(vm.macro).then(function (data) {
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                formHelper.resetForm({ scope: $scope });
                 bindMacro(data);
                 vm.page.saveButtonState = "success";
             }, function (error) {
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 contentEditingHelper.handleSaveError({
                     err: error
                 });

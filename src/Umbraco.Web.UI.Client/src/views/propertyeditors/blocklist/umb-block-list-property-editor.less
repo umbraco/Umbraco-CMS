@@ -1,0 +1,262 @@
+@umb-block-list__item_minimum_height: 48px;
+
+.umb-block-list {
+    padding-bottom:10px;
+}
+
+.umb-block-list .umb-load-indicator {
+    margin-bottom:20px;
+}
+
+.umb-block-list__wrapper {
+    position: relative;
+    max-width: 1024px;
+    > .ui-sortable > .ui-sortable-helper > .umb-block-list__block > .umb-block-list__block--content > * {
+        box-shadow: 0px 5px 10px 0 rgba(0,0,0,.2);
+    }
+}
+
+.umb-block-list__block {
+    position: relative;
+    width: 100%;
+
+    > .umb-block-list__block--actions {
+        opacity: 0;
+        transition: opacity 120ms;
+
+        .--error {
+            color: @formErrorBorder !important;
+        }
+    }
+
+    &:hover,
+    &:focus,
+    &:focus-within,
+    &.--active {
+
+        > .umb-block-list__block--actions {
+            opacity: 1;
+        }
+    }
+
+    &.--show-validation {
+        ng-form.ng-invalid-val-server-match-content > & {
+            border: 2px solid @formErrorText;
+            border-radius: @baseBorderRadius;
+            &::after {
+                content: "!";
+                position: absolute;
+                top: -12px;
+                right: -12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                font-size: 13px;
+                text-align: center;
+                font-weight: bold;
+                background-color: @errorBackground;
+                color: @errorText;
+                border: 2px solid @white;
+                font-weight: 900;
+    
+                animation-duration: 1.4s;
+                animation-iteration-count: infinite;
+                animation-name: umb-block-list__block--content--badge-bounce;
+                animation-timing-function: ease;
+                @keyframes umb-block-list__block--content--badge-bounce {
+                    0%   { transform: translateY(0); }
+                    20%  { transform: translateY(-6px); }
+                    40%  { transform: translateY(0); }
+                    55%  { transform: translateY(-3px); }
+                    70%  { transform: translateY(0); }
+                    100% { transform: translateY(0); }
+                }
+            }
+        }
+    }
+}
+ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-block-list__block--actions {
+    opacity: 1;
+}
+.umb-block-list__block--actions {
+    position: absolute;
+    z-index:999999999;// We always want to be on top of custom view, but we need to make sure we still are behind relevant Umbraco CMS UI. ToDo: Needs further testing.
+    top: 10px;
+    right: 10px;
+    font-size: 0;
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    .action {
+        position: relative;
+        display: inline-block;
+        color: @ui-action-discreet-type;
+        font-size: 18px;
+        padding: 5px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+        > .__error-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 8px;
+            color: @white;
+            background-color: @ui-active-type;
+            border: 2px solid @white;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px;
+            line-height: 8px;
+            background-color: @red;
+            display: none;
+            font-weight: 900;
+        }
+        &.--error > .__error-badge {
+            display: block;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-block-list__action--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-block-list__action--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-4px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-2px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+
+        }
+    }
+}
+
+.umb-block-list__block--content {
+
+    > div {
+        position: relative;
+        width: 100%;
+        min-height: @umb-block-list__item_minimum_height;
+        background-color: @white;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+    }
+
+}
+
+.blockelement__draggable-element {
+    cursor: grab;
+}
+
+
+.umb-block-list__block--create-button {
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    opacity: 0;
+    outline: none;
+    height: 12px;
+    margin-top: -9px;
+    padding-top: 6px;
+    margin-bottom: -6px;
+    transition: opacity 240ms;
+
+    &::before {
+        content: '';
+        position: absolute;
+        background-color: @blueMid;
+        border-top: 1px solid white;
+        border-bottom: 1px solid white;
+        border-radius: 2px;
+        top: 5px;
+        right: 0;
+        left: 0;
+        height: 2px;
+        animation: umb-block-list__block--create-button_before 400ms ease-in-out alternate infinite;
+
+        @keyframes umb-block-list__block--create-button_before {
+            0%   { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    }
+
+    > .__plus {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -16px - 8px;
+        margin-top: -16px;
+        padding: 0;
+        border-radius: 3em;
+        border: 2px solid @blueMid;
+        color: @blueMid;
+        line-height: 22px;
+        font-size: 20px;
+        font-weight: 800;
+        background-color: rgba(255, 255, 255, .96);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
+        transform: scale(0);
+        transition: transform 240ms ease-in;
+        animation: umb-block-list__block--create-button__plus 400ms ease-in-out infinite;
+
+        @keyframes umb-block-list__block--create-button__plus {
+            0%   { color: rgba(@blueMid, 0.8); }
+            50% { color: rgba(@blueMid, 1); }
+            100% { color: rgba(@blueMid, 0.8); }
+        }
+    }
+
+    &:focus {
+        > .__plus {
+            border: 2px solid @ui-outline;
+        }
+    }
+
+    &:hover, &:focus {
+        opacity: 1;
+        transition-duration: 120ms;
+
+        > .__plus {
+            transform: scale(1);
+            transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+}
+.umb-block-list__create-button {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
+    font-weight: bold;
+    margin: 2px 0;
+    padding: 5px 15px;
+    box-sizing: border-box;
+    border-radius: @baseBorderRadius;
+}
+
+.umb-block-list__create-button:hover {
+    color: @ui-action-discreet-type-hover;
+    border-color: @ui-action-discreet-border-hover;
+    text-decoration: none;
+}
+
+.umb-block-list__create-button.--disabled,
+.umb-block-list__create-button.--disabled:hover {
+    color: @gray-7;
+    border-color: @gray-7;
+    cursor: default;
+}

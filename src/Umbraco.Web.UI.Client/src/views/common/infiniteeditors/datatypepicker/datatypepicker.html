@@ -34,17 +34,19 @@
 
                     <div ng-if="vm.loading === false && vm.showDataTypes === true">
                         <div ng-repeat="(key,value) in vm.dataTypes">
-                            <h5>{{key | umbCmsTitleCase}}</h5>
+                            <h2 class="h5">{{key | umbCmsTitleCase}}</h2>
                             <ul class="umb-card-grid -six-in-row">
-                                <li ng-repeat="dataType in value | orderBy:'name'"
-                                    data-element="datatype-{{dataType.name}}"
-                                    ng-click="vm.viewOptionsForEditor(dataType)">
-                                    <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                <li ng-repeat="dataType in value | orderBy:'name'" data-element="datatype-{{dataType.name}}">
+                                    <button
+                                        type="button"
+                                        class="btn-reset umb-card-grid-item"
+                                        ng-click="vm.viewOptionsForEditor(dataType)"
+                                        title="{{ dataType.name }}">
                                         <span>
-                                            <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                            <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
                                             {{ dataType.name }}
                                         </span>
-                                    </a>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -52,40 +54,50 @@
 
                     <!-- SEARCH RESULTS -->
                     <div ng-if="vm.loading === false && vm.showDataTypes === false && vm.searchResult !== null">
-                        <h5 class="-border-bottom -black"><localize key="contentTypeEditor_searchResultSettings"></localize></h5>
+                        <h2 class="h5 -border-bottom -black">
+                            <localize key="contentTypeEditor_searchResultSettings">Available configurations</localize>
+                        </h2>
                         <div ng-repeat="result in vm.searchResult.configs">
                             <div ng-if="result.entries.length > 0">
-                                <h5>{{result.group | umbCmsTitleCase}}</h5>
+                                <h3 class="h5">{{result.group | umbCmsTitleCase}}</h3>
                                 <ul class="umb-card-grid -six-in-row">
                                     <li ng-repeat="dataType in result.entries | orderBy:'name'"
-                                        ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                        ng-click="vm.pickDataType(dataType)">
+                                        ng-mouseover="vm.showDetailsOverlay(dataType)">
                                         <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                             <div class="umb-button__progress"></div>
                                         </div>
-                                        <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                        <button
+                                            type="button"
+                                            class="btn-reset umb-card-grid-item"
+                                            ng-click="vm.pickDataType(dataType)"
+                                            title="{{ dataType.name }}">
                                             <span>
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
                                                 {{ dataType.name }}
                                             </span>
-                                        </a>
+                                        </button>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                        <h5 class="-border-bottom -black"><localize key="contentTypeEditor_searchResultEditors"></localize></h5>
+                        <h2 class="h5 -border-bottom -black">
+                            <localize key="contentTypeEditor_searchResultEditors">Create a new configuration</localize>
+                        </h2>
                         <div ng-repeat="result in vm.searchResult.dataTypes">
                             <div ng-if="result.entries.length > 0">
-                                <h5>{{result.group | umbCmsTitleCase}}</h5>
+                                <h3 class="h5">{{result.group | umbCmsTitleCase}}</h3>
                                 <ul class="umb-card-grid -six-in-row">
-                                    <li ng-repeat="dataType in result.entries | orderBy:'name'"
-                                        ng-click="vm.pickEditor(dataType)">
-                                        <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                    <li ng-repeat="dataType in result.entries | orderBy:'name'">
+                                        <button
+                                            type="button"
+                                            class="btn-reset umb-card-grid-item"
+                                            ng-click="vm.pickEditor(dataType)"
+                                            title="{{ dataType.name }}">
                                             <span>
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
                                                 {{ dataType.name }}
                                             </span>
-                                        </a>
+                                        </button>
                                     </li>
                                 </ul>
                             </div>

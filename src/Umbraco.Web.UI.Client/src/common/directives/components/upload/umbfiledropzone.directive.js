@@ -20,7 +20,7 @@ TODO
 
 angular.module("umbraco.directives")
     .directive('umbFileDropzone',
-        function($timeout, Upload, localizationService, umbRequestHelper) {
+        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -119,9 +119,8 @@ angular.module("umbraco.directives")
                             //auto-clear the done queue after 3 secs
                             var currentLength = scope.done.length;
                             $timeout(function() {
-                                    scope.done.splice(0, currentLength);
-                                },
-                                3000);
+                                scope.done.splice(0, currentLength);
+                            }, 3000);
                         }
                     }
 
@@ -197,30 +196,34 @@ angular.module("umbraco.directives")
                     }
 
                     function _chooseMediaType() {
-                        scope.mediatypepickerOverlay = {
-                            view: "mediatypepicker",
-                            title: "Choose media type",
-                            acceptedMediatypes: scope.acceptedMediatypes,
-                            hideSubmitButton: true,
-                            show: true,
-                            submit: function(model) {
-                                scope.contentTypeAlias = model.selectedType.alias;
-                                scope.mediatypepickerOverlay.show = false;
-                                scope.mediatypepickerOverlay = null;
-                                _processQueueItem();
-                            },
-                            close: function(oldModel) {
 
-                                scope.queue.map(function(file) {
+                        const dialog = {
+                            view: "itempicker",
+                            filter: scope.acceptedMediatypes.length > 15,
+                            availableItems: scope.acceptedMediatypes,
+                            submit: function (model) {
+                                scope.contentTypeAlias = model.selectedItem.alias;
+                                _processQueueItem();
+
+                                overlayService.close();
+                            },
+                            close: function () {
+
+                                scope.queue.map(function (file) {
                                     file.uploadStatus = "error";
                                     file.serverErrorMessage = "Cannot upload this file, no mediatype selected";
                                     scope.rejected.push(file);
                                 });
                                 scope.queue = [];
-                                scope.mediatypepickerOverlay.show = false;
-                                scope.mediatypepickerOverlay = null;
+
+                                overlayService.close();
                             }
                         };
+
+                        localizationService.localize("defaultdialogs_selectMediaType").then(value => {
+                            dialog.title = value;
+                            overlayService.open(dialog);
+                        });
                     }
 
                     scope.handleFiles = function(files, event) {

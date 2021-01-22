@@ -20,15 +20,14 @@
                         <div class="umb-mediapicker-upload">
                             <div class="form-search">
                                 <i class="icon-search" aria-hidden="true"></i>
-                                <input class="umb-search-field search-query -full-width-input"
+                                <input type="text"
+                                    class="umb-search-field search-query -full-width-input"
                                     ng-model="vm.searchOptions.filter"
                                     localize="placeholder"
                                     placeholder="@placeholders_search"
                                     ng-change="vm.changeSearch()"
-                                    type="text"
                                     umb-auto-focus
-                                    no-dirty-check
-                                    />
+                                    no-dirty-check />
 
                                 <div class="form-search__toggle">
                                     <umb-checkbox
@@ -56,17 +55,15 @@
                     <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
                         <ul class="umb-breadcrumbs">
                             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
-                            <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder()" ng-class="{'--current':path.length === 0}">
-                                <localize key="treeHeaders_media">Media</localize>
-                            </button>
-                            <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
+                                <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder()" ng-class="{'--current':path.length === 0}">
+                                    <localize key="treeHeaders_media">Media</localize>
+                                </button>
+                                <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                             </li>
-
                             <li ng-repeat="item in path" class="umb-breadcrumbs__ancestor">
-                            <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder(item)" ng-class="{'--current':$last}">{{item.name}}</button>
-                            <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
+                                <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder(item)" ng-class="{'--current':$last}">{{item.name}}</button>
+                                <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                             </li>
-
                             <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
                             <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
                                 <i class="icon icon-add small" aria-hidden="true"></i>
@@ -81,11 +78,10 @@
                                 ng-model="model.newFolderName"
                                 ng-keydown="enterSubmitFolder($event)"
                                 ng-blur="vm.submitFolder()"
-                                focus-when="{{model.showFolderInput}}"
-                            />
+                                focus-when="{{model.showFolderInput}}" />
                             </li>
                         </ul>
-                        <div class="umb-loader" ng-if="model.creatingFolder"></div>
+                        <umb-loader ng-if="model.creatingFolder"></umb-loader>
                     </div>
 
                     <umb-file-dropzone

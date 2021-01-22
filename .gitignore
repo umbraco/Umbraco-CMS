@@ -167,3 +167,10 @@ build/temp/
 # eof
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
+
+# Acceptance tests
+cypress.env.json
+/src/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
+/src/Umbraco.Tests.AcceptanceTest/package-lock.json
+/src/Umbraco.Tests.AcceptanceTest/cypress/videos/
+/src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/

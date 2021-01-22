@@ -110,6 +110,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
@@ -179,7 +180,7 @@ namespace Umbraco.Web.Runtime
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
-            
+
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()
@@ -203,8 +204,12 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
                 //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
+                .Append<ContentFinderByUrlAlias>();
+                //only append ContentFinderByRedirectUrl if RedirectUrlTracking is not disabled
+                if (composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false)
+                {
+                    composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
+                }
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
 
@@ -234,7 +239,11 @@ namespace Umbraco.Web.Runtime
             composition.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
-                .Append<ContentInfoContentAppFactory>();
+                .Append<ContentInfoContentAppFactory>()
+                .Append<ContentTypeDesignContentAppFactory>()
+                .Append<ContentTypeListViewContentAppFactory>()
+                .Append<ContentTypePermissionsContentAppFactory>()
+                .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register back office sections in the order we want them rendered
             composition.Sections()

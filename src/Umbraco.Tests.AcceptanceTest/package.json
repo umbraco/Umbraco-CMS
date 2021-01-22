@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "test": "npx cypress run",
+    "ui": "npx cypress open"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "ncp": "^2.0.0",
+    "cypress": "^4.6.0",
+    "umbraco-cypress-testhelpers": "1.0.0-beta-39"
+  },
+  "dependencies": {
+    "typescript": "^3.9.2"
+  }
+}

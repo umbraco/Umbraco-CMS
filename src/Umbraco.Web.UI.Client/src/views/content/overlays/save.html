@@ -18,13 +18,12 @@
                 <ng-form name="saveVariantSelectorForm">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': saveVariantSelectorForm.saveVariantSelector.$invalid}">
 
-                        <umb-checkbox
-                            input-id="{{variant.htmlId}}"
-                            name="saveVariantSelector"
-                            model="variant.save"
-                            on-change="vm.changeSelection(variant)"
-                            server-validation-field="{{variant.htmlId}}"
-                        >
+                        <umb-checkbox input-id="{{variant.htmlId}}"
+                                      name="saveVariantSelector"
+                                      model="variant.save"
+                                      on-change="vm.changeSelection(variant)"
+                                      server-validation-field="{{variant.htmlId}}">
+
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
@@ -42,12 +41,12 @@
                             <span class="umb-variant-selector-entry__description" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
                                 <span class="text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                             </span>
+
                         </umb-checkbox>
 
                         <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
 
                     </div>
-
                 </ng-form>
             </div>
             <br/>

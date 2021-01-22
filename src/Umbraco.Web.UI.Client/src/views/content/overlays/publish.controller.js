@@ -11,13 +11,13 @@
 
         /** Returns true if publish meets the requirements of mandatory languages */
         function canPublish() {
-            
+
             var hasSomethingToPublish = false;
 
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
 
-                // if varaint is mandatory and not already published:
+                // if varaint is mandatory and not already published, then we require it to be set to publish:
                 if (variant.publish === false && notPublishedMandatoryFilter(variant)) {
                     return false;
                 }
@@ -39,8 +39,9 @@
 
         function hasAnyDataFilter(variant) {
 
-            if (variant.name == null || variant.name.length === 0) {
-                return false;
+            // if we have a name, then we have data.
+            if (variant.name != null && variant.name.length > 0) {
+                return true;
             }
 
             if(variant.isDirty === true) {
@@ -77,7 +78,7 @@
         }
 
         function notPublishedMandatoryFilter(variant) {
-            return variant.state !== "Published" && isMandatoryFilter(variant);
+            return variant.state !== "Published" && variant.state !== "PublishedPendingChanges" && variant.isMandatory === true;
         }
         function isMandatoryFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
@@ -98,11 +99,11 @@
             vm.variants = $scope.model.variants;
 
             _.each(vm.variants, (variant) => {
-                
+
                 // reset to not be published
                 variant.publish = false;
                 variant.save = false;
-                
+
                 variant.isMandatory = isMandatoryFilter(variant);
 
                 // If we have a variant thats not in the state of NotCreated, then we know we have adata and its not a new content node.
@@ -112,12 +113,12 @@
             });
 
             _.each(vm.variants, (variant) => {
-                
+
                 // if this is a new node and we have data on this variant.
                 if(vm.isNew === true && hasAnyDataFilter(variant)) {
                     variant.save = true;
                 }
-                
+
             });
 
             vm.availableVariants = vm.variants.filter(publishableVariantFilter);
@@ -139,7 +140,7 @@
                         if (a.language.name < b.language.name) {
                             return 1;
                         }
-                    } 
+                    }
                     if (a.segment && b.segment) {
                         if (a.segment > b.segment) {
                             return -1;

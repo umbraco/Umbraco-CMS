@@ -38,6 +38,15 @@
     position: relative;
     text-align: left;
     background: @white;
+    border: 1px solid @gray-9;
+    border-radius: @baseBorderRadius;
+    transition: border-color 120ms;
+    margin-bottom: 4px;
+    margin-top: 4px;
+
+    &.--error {
+        border-color: @formErrorBorder !important;
+    }
 }
 
 .umb-nested-content__item.ui-sortable-placeholder {
@@ -54,7 +63,7 @@
 }
 
 .umb-nested-content__header-bar {
-    border-bottom: 1px solid @gray-9;
+    
     cursor: pointer;
     background-color: @white;
 
@@ -75,10 +84,8 @@
 .umb-nested-content__heading {
     line-height: 20px;
     position: relative;
-    margin-top:1px;
     padding: 15px 5px;
     color:@ui-option-type;
-    border-radius: 3px 3px 0 0;
 
     &:hover {
         color:@ui-option-type-hover;
@@ -207,9 +214,9 @@
 
 .umb-nested-content__content {
     border-top: 1px solid transparent;
-    border-bottom: 1px solid @gray-9;
-    border-left: 1px solid @gray-9;
-    border-right: 1px solid @gray-9;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
     border-radius: 0 0 3px 3px;
 }
 

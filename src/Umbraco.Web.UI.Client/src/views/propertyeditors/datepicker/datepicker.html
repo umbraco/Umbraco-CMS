@@ -20,10 +20,11 @@
                         ng-required="model.validation.mandatory"
                         val-server="value"
                         class="datepickerinput">
-                    <span class="on-top" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
-                        <i class="icon-delete"></i>
-                    </span>
-                    <span class="add-on">
+                    <button type="button" class="on-top" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
+                        <i class="icon-delete" aria-hidden="true"></i>
+                        <span class="sr-only"><localize key="content_removeDate">Clear date</localize></span>
+                    </button>
+                    <span class="add-on" aria-hidden="true">
                         <i class="icon-calendar"></i>
                     </span>
                 </div>

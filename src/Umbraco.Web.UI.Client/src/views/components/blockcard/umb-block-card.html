@@ -1,0 +1,11 @@
+
+    <div class="__showcase" ng-style="{'background-color':vm.blockConfigModel.backgroundColor, 'background-image': vm.styleBackgroundImage}">
+        <i ng-if="vm.blockConfigModel.thumbnail == null && vm.elementTypeModel.icon" class="__icon {{ vm.elementTypeModel.icon }}" ng-attr-style="{{'color:'+vm.blockConfigModel.iconColor+' !important'}}" aria-hidden="true"></i>
+    </div>
+    <div class="__info">
+        <div class="__name" ng-bind="vm.elementTypeModel.name"></div>
+        <div class="__subname" ng-if="vm.elementTypeModel.description" ng-bind="vm.elementTypeModel.description"></div>
+    </div>
+
+    <ng-transclude></ng-transclude>
+
