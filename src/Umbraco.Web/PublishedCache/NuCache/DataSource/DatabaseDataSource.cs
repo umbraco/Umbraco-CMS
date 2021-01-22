@@ -78,8 +78,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private Sql<ISqlContext> SqlContentSourcesSelectUmbracoNodeJoin(Sql<ISqlContext> s)
         {
             var syntax = s.SqlContext.SqlSyntax;
-            var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelectUmbracoNodeJoin, s =>
-                s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"));
+            var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.SourcesSelectUmbracoNodeJoin, s =>
+                s.InnerJoin<NodeDto>("x")
+                    .On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"));
             var sql = sqlTemplate.Sql();
             return sql;
         }
@@ -87,7 +88,16 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private Sql<ISqlContext> SqlWhereNodeId(Sql<ISqlContext> s, int id)
         {
             var syntax = s.SqlContext.SqlSyntax;
-            var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelectUmbracoNodeJoin, s =>
+            var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeId, s =>
+                s.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
+            var sql = sqlTemplate.Sql(id);
+            return sql;
+        }
+
+        private Sql<ISqlContext> SqlWhereNodeIdX(Sql<ISqlContext> s, int id)
+        {
+            var syntax = s.SqlContext.SqlSyntax;
+            var sqlTemplate = s.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeIdX, s =>
                 s.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id"), "x"));
             var sql = sqlTemplate.Sql(id);
             return sql;
@@ -225,13 +235,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = SqlContentSourcesSelect(scope, SqlContentSourcesSelectUmbracoNodeJoin)
                 .Append(SqlObjectTypeNotTrashed(scope.SqlContext.Sql(), Constants.ObjectTypes.Document))
-                .Append(SqlWhereNodeId(scope.SqlContext.Sql(), id))
+                .Append(SqlWhereNodeIdX(scope.SqlContext.Sql(), id))
                 .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext.Sql()));
 
             // Use a more efficient COUNT query
             var sqlCountQuery = SqlContentSourcesCount(scope, SqlContentSourcesSelectUmbracoNodeJoin)
                 .Append(SqlObjectTypeNotTrashed(scope.SqlContext.Sql(), Constants.ObjectTypes.Document))
-                .Append(SqlWhereNodeId(scope.SqlContext.Sql(), id));
+                .Append(SqlWhereNodeIdX(scope.SqlContext.Sql(), id));
             var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
 
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
@@ -255,7 +265,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext.Sql()));
 
             // Use a more efficient COUNT query
-            var sqlCountQuery = SqlContentSourcesCount(scope, SqlContentSourcesSelectUmbracoNodeJoin)
+            var sqlCountQuery = SqlContentSourcesCount(scope)
                 .Append(SqlObjectTypeNotTrashed(scope.SqlContext.Sql(), Constants.ObjectTypes.Document))
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
             var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
@@ -312,13 +322,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var sql = SqlMediaSourcesSelect(scope, SqlContentSourcesSelectUmbracoNodeJoin)
                 .Append(SqlObjectTypeNotTrashed(scope.SqlContext.Sql(), Constants.ObjectTypes.Media))
-                .Append(SqlWhereNodeId(scope.SqlContext.Sql(), id))
+                .Append(SqlWhereNodeIdX(scope.SqlContext.Sql(), id))
                 .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext.Sql()));
 
             // Use a more efficient COUNT query
-            var sqlCountQuery = SqlMediaSourcesCount(scope)
+            var sqlCountQuery = SqlMediaSourcesCount(scope, SqlContentSourcesSelectUmbracoNodeJoin)
                 .Append(SqlObjectTypeNotTrashed(scope.SqlContext.Sql(), Constants.ObjectTypes.Media))
-                .Append(SqlWhereNodeId(scope.SqlContext.Sql(), id));
+                .Append(SqlWhereNodeIdX(scope.SqlContext.Sql(), id));
             var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
 
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
