@@ -629,7 +629,7 @@ namespace Umbraco.Web.Editors
             var model = new ContentTypeImportModel();
 
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
             var destFileName = root + "\\" + fileName;

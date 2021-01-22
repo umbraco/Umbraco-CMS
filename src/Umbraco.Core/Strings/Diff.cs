@@ -232,7 +232,7 @@ namespace Umbraco.Core.Strings
 
             // strip off all cr, only use lf as text line separator.
             aText = aText.Replace("\r", "");
-            var lines = aText.Split('\n');
+            var lines = aText.Split(Constants.CharArrays.LineFeed);
 
             var codes = new int[lines.Length];
 
