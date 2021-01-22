@@ -11,13 +11,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "mandatory")]
         public bool Mandatory { get; set; }
 
-        // [DataMember(Name = "mandatoryMessage")]
-        // public string MandatoryMessage { get; set; }
+        [DataMember(Name = "mandatoryMessage")]
+        public string MandatoryMessage { get; set; }
 
         [DataMember(Name = "pattern")]
         public string Pattern { get; set; }
 
-        // [DataMember(Name = "patternMessage")]
-        // public string PatternMessage { get; set; }|
+        [DataMember(Name = "patternMessage")]
+        public string PatternMessage { get; set; }
     }
 }

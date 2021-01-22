@@ -43,19 +43,19 @@ namespace Umbraco.Core.Persistence.Dtos
         [Constraint(Default = "0")]
         public bool Mandatory { get; set; }
 
-        // [Column("mandatoryMessage")]
-        // [NullSetting(NullSetting = NullSettings.Null)]
-        // [Length(500)]
-        // public string MandatoryMessage { get; set; }
+        [Column("mandatoryMessage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string MandatoryMessage { get; set; }
 
         [Column("validationRegExp")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string ValidationRegExp { get; set; }
 
-        // [Column("validationRegExpMessage")]
-        // [NullSetting(NullSetting = NullSettings.Null)]
-        // [Length(500)]
-        // public string ValidationRegExpMessage { get; set; }
+        [Column("validationRegExpMessage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string ValidationRegExpMessage { get; set; }
 
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]

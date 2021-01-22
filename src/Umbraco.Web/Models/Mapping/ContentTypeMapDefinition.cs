@@ -224,9 +224,9 @@ namespace Umbraco.Web.Models.Mapping
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
-            // target.MandatoryMessage = source.Validation.MandatoryMessage;
+            target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
-            // target.ValidationRegExpMessage = source.Validation.PatternMessage;
+            target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
             target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
 
