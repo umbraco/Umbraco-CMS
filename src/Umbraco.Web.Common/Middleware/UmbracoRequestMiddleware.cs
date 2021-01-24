@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Common.Middleware
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Common.Middleware
         private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
+        private readonly WebProfiler _profiler;
         private static bool s_cacheInitialized = false;
         private static bool s_cacheInitializedFlag = false;
         private static object s_cacheInitializedLock = new object();
@@ -48,7 +50,8 @@ namespace Umbraco.Web.Common.Middleware
             IRequestCache requestCache,
             IBackOfficeSecurityFactory backofficeSecurityFactory,
             PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IProfiler profiler)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -56,6 +59,7 @@ namespace Umbraco.Web.Common.Middleware
             _backofficeSecurityFactory = backofficeSecurityFactory;
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
+            _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
 
         /// <inheritdoc/>
@@ -67,6 +71,10 @@ namespace Umbraco.Web.Common.Middleware
                 await next(context);
                 return;
             }
+
+            // Profiling start needs to be one of the first things that happens.
+            // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
+            _profiler?.UmbracoApplicationBeginRequest(context);
 
             EnsureContentCacheInitialized();
 
@@ -99,6 +107,7 @@ namespace Umbraco.Web.Common.Middleware
                     try
                     {
                         await next(context);
+
                     }
                     finally
                     {
@@ -123,6 +132,10 @@ namespace Umbraco.Web.Common.Middleware
                     umbracoContextReference.Dispose();
                 }
             }
+
+            // Profiling end needs to be last of the first things that happens.
+            // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
+            _profiler?.UmbracoApplicationEndRequest(context);
         }
 
         /// <summary>

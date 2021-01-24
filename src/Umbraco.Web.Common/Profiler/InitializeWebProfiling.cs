@@ -12,7 +12,7 @@ namespace Umbraco.Web.Common.Profiler
     /// <summary>
     /// Initialized the web profiling. Ensures the boot process profiling is stopped.
     /// </summary>
-    public class InitializeWebProfiling : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestBegin>,  INotificationHandler<UmbracoRequestEnd>
+    public class InitializeWebProfiling : INotificationHandler<UmbracoApplicationStarting>
     {
         private readonly bool _profile;
         private readonly WebProfiler _profiler;
@@ -54,24 +54,5 @@ namespace Umbraco.Web.Common.Profiler
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(UmbracoRequestBegin notification, CancellationToken cancellationToken)
-        {
-            if (_profile)
-            {
-                _profiler.UmbracoApplicationBeginRequest(notification.HttpContext);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public Task HandleAsync(UmbracoRequestEnd notification, CancellationToken cancellationToken)
-        {
-            if (_profile)
-            {
-                _profiler.UmbracoApplicationEndRequest(notification.HttpContext);
-            }
-
-            return Task.CompletedTask;
-        }
     }
 }

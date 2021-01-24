@@ -179,8 +179,6 @@ namespace Umbraco.Web.Common.DependencyInjection
                 options.ShouldProfile = request => false);
 
             builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
-            builder.AddNotificationHandler<UmbracoRequestBegin, InitializeWebProfiling>();
-            builder.AddNotificationHandler<UmbracoRequestEnd, InitializeWebProfiling>();
             return builder;
         }
 
