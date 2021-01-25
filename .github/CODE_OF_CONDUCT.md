@@ -4,11 +4,11 @@
 
 We are the friendly CMS. And our friendliness stems from our values. That's why we have set for ourselves, Umbraco HQ, and the community, five values to guide us in everything we do:  
 
-* Trust — We believe in and empower  people
-* Respect — We treat others as we would like to be treated
-* Open — We share our thoughts and knowledge 
-* Hungry — We want to do things better, best is next 
-* Friendly — We want to build long-lasting relationships
+* Trust - We believe in and empower  people
+* Respect - We treat others as we would like to be treated
+* Open - We share our thoughts and knowledge 
+* Hungry - We want to do things better, best is next 
+* Friendly - We want to build long-lasting relationships
 
 With these values in mind, we want to offer the Umbraco community a code of conduct that specifies a baseline standard of behavior so that people with different social values and communication styles can work together.  
 
@@ -34,7 +34,7 @@ Examples of unacceptable behavior include:
 * The use of sexualized language or imagery, and sexual attention or advances of any kind
 * Trolling, insulting or derogatory comments, and personal or political attacks
 * Public or private harassment
-* Publishing others’ private information, such as a physical or email address, without their explicit permission
+* Publishing others' private information, such as a physical or email address, without their explicit permission
 * Other conduct which could reasonably be considered inappropriate in a professional setting
 
 ## Enforcement Responsibilities
@@ -52,7 +52,7 @@ Instances of abusive, harassing, or otherwise unacceptable behavior, may be repo
 
 Or alternatively, you can reach out directly to any of the team members behind the address above:  
 
-* Sebastiaan Janssen (He, Him - Languages spoken: English, Dutch, Danish(Read))  [sebastiaan@umbraco.com](mailto:sebastiaan@umbraco.com)
+* Sebastiaan Janssen (He, Him - Languages spoken: English, Dutch, Danish(Read)) [sebastiaan@umbraco.com](mailto:sebastiaan@umbraco.com)
 * Ilham Boulghallat (She, Her - Languages spoken: English, French, Arabic) [ilham@umbraco.com](mailto:ilham@umbraco.com)
 * Arnold Visser (He, Him - Languages spoken: English, Dutch) [arnold@umbraco.com](mailto:arnold@umbraco.com)
 
