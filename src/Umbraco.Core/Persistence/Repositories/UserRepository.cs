@@ -209,6 +209,12 @@ ORDER BY colName";
             //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
             //and also business logic models for these objects but that's just so overkill for what we are doing
             //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+
+            if (cleanStaleSessions)
+            {
+                ClearLoginSessions(TimeSpan.FromDays(15));
+            }
+
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto
             {
@@ -221,10 +227,6 @@ ORDER BY colName";
             };
             Database.Insert(dto);
 
-            if (cleanStaleSessions)
-            {
-                ClearLoginSessions(TimeSpan.FromDays(15));
-            }
 
             return dto.SessionId;
         }

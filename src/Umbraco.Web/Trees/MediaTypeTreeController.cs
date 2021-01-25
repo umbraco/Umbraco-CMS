@@ -88,7 +88,7 @@ namespace Umbraco.Web.Trees
 
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/rename")))
                 {
                     Icon = "icon icon-edit"
                 });
