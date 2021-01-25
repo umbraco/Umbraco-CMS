@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
@@ -21,7 +19,7 @@ namespace Umbraco.Core.Runtime
             _globalSettings = globalSettings.Value;
         }
 
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             // ensure we have some essential directories
             // every other component can then initialize safely
@@ -31,7 +29,6 @@ namespace Umbraco.Core.Runtime
             _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews));
             _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials));
 
-            return Task.CompletedTask;
         }
     }
 }
