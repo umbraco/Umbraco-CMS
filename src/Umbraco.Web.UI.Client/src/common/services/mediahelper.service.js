@@ -13,7 +13,7 @@ function mediaHelper(umbRequestHelper, $log) {
 
         /**
          * Used when retreiving a media item from the entity resource to format it's data so that it contains the properties that
-         * other services and views are expecting. 
+         * other services and views are expecting.
          * @param {any} entity
          */
         formatMediaEntityData: function (mediaEntity) {
@@ -31,7 +31,9 @@ function mediaHelper(umbRequestHelper, $log) {
                     }
                 }
                 else if (mediaEntity.isFolder === undefined) {
-                    mediaEntity.isFolder = mediaEntity.metaData.ContentTypeAlias && mediaEntity.metaData.ContentTypeAlias.toLowerCase() === "folder";
+                    // We should never get here, resolveFileFromEntity should have worked
+                    var alias = mediaEntity.metaData.ContentTypeAlias.toLowerCase();
+                    mediaEntity.isFolder = mediaEntity.metaData.ContentTypeAlias && (alias.endsWith("folder"));
                 }
             }
         },

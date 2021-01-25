@@ -120,7 +120,7 @@ Use this directive to generate a thumbnail grid of media items.
                     setOriginalSize(item, itemMaxHeight);
 
                     // remove non images when onlyImages is set to true
-                    if (scope.onlyImages === "true" && item.isFolder === true) {
+                    if (scope.onlyImages === "true" && item.isFolder === false && item.thumbnail == null) {
                         scope.items.splice(i, 1);
                         i--;
                     }
@@ -165,7 +165,7 @@ Use this directive to generate a thumbnail grid of media items.
                     if (item.image) {
                         // handle entity
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
-                        item.extension = mediaHelper.getFileExtension(item.image);                        
+                        item.extension = mediaHelper.getFileExtension(item.image);
                     }
                     else {
                         // handle full media object

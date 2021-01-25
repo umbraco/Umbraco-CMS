@@ -1081,14 +1081,29 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    var mt = allMediaTypes.Value.FirstOrDefault(x => x.Alias == entity.Alias);
+                    var alias = entity.Alias;
+                    // For some reason it seems entity.Alias is always null here, but AdditionalData knows the truth
+
+                    if (entity.Alias == null)
+                    {
+                        entity.AdditionalData.TryGetValue("Alias", out var additionalDataAlias);
+                        if (additionalDataAlias is string)
+                        {
+                            alias = additionalDataAlias as string;
+                        }
+                    }
+
+                    var mt = allMediaTypes.Value.FirstOrDefault(x => x.Alias == alias);
                     if (mt != null)
                     {
                         // It's not a folder if it's media type has a property type of umbracoFile
                         entity.AdditionalData["IsFolder"] = !mt.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(Constants.Conventions.Media.File));
                     }
                 }
+
+                return entity;
             }
+
             return entity;
         }
 
