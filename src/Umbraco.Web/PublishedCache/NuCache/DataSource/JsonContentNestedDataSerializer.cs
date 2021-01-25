@@ -8,26 +8,25 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
     public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
     {
+        // by default JsonConvert will deserialize our numeric values as Int64
+        // which is bad, because they were Int32 in the database - take care
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+        {
+            Converters = new List<JsonConverter> { new ForceInt32Converter() },
+
+            // Explicitly specify date handling so that it's consistent and follows the same date handling as MessagePack
+            DateParseHandling = DateParseHandling.DateTime,
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+            DateFormatString = "o"
+        };
+
         public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
         {
             if (stringData == null && byteData != null)
                 throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
 
-            // by default JsonConvert will deserialize our numeric values as Int64
-            // which is bad, because they were Int32 in the database - take care
-
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() },
-
-                // Explicitly specify date handling so that it's consistent and follows the same date handling as MessagePack
-                DateParseHandling = DateParseHandling.DateTime,
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                DateFormatString = "o"
-            };
-
-            return JsonConvert.DeserializeObject<ContentCacheDataModel>(stringData, settings);
+            return JsonConvert.DeserializeObject<ContentCacheDataModel>(stringData, _jsonSerializerSettings);
         }
 
         public ContentCacheDataSerializationResult Serialize(int contentTypeId, ContentCacheDataModel model)
