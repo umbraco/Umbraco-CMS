@@ -16,7 +16,7 @@
         <tags>umbraco</tags>
         <dependencies>
             <group targetFramework="net452">
-                <dependency id="log4net" version="[2.0.8, 3.0.0)" />
+                <dependency id="log4net" version="[2.0.12, 3.0.0)" />
                 <dependency id="Log4Net.Async" version="[2.0.4, 3.0.0)" />
                 <dependency id="Microsoft.AspNet.Mvc" version="[5.2.7, 6.0.0)" />
                 <dependency id="Microsoft.AspNet.WebApi" version="[5.2.7, 6.0.0)" />
