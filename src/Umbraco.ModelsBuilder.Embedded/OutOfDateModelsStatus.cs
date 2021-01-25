@@ -1,6 +1,4 @@
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -40,10 +38,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             Install();
-            return Task.CompletedTask;
         }
 
         private void Install()

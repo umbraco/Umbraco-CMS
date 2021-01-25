@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core.Events;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
@@ -19,11 +17,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification to disable MB controller features
         /// </summary>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             // disable the embedded dashboard controller
             _features.Disabled.Controllers.Add<ModelsBuilderDashboardController>();
-            return Task.CompletedTask;
         }
     }
 }
