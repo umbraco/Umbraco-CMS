@@ -1,102 +1,104 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Configuration;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.ModelsBuilder.Embedded.Compose
+namespace Umbraco.ModelsBuilder.Embedded
 {
-    internal class ModelsBuilderComponent : IComponent
+
+    /// <summary>
+    /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
+    /// </summary>
+    internal class ModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<ServerVariablesParsing>
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly LiveModelsProvider _liveModelsProvider;
-        private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly LinkGenerator _linkGenerator;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
+        private readonly ContentModelBinder _modelBinder;
 
-        public ModelsBuilderComponent(IOptions<ModelsBuilderSettings> config, IShortStringHelper shortStringHelper,
-            LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
-            IUmbracoRequestLifetime umbracoRequestLifetime)
+        public ModelsBuilderNotificationHandler(
+            IOptions<ModelsBuilderSettings> config,
+            IShortStringHelper shortStringHelper,
+            LinkGenerator linkGenerator,
+            ContentModelBinder modelBinder)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
-            _liveModelsProvider = liveModelsProvider;
-            _outOfDateModels = outOfDateModels;
             _shortStringHelper = shortStringHelper;
             _linkGenerator = linkGenerator;
-            _umbracoRequestLifetime = umbracoRequestLifetime;
+            _modelBinder = modelBinder;
         }
 
-        public void Initialize()
+        /// <summary>
+        /// Handles the <see cref="UmbracoApplicationStarting"/> notification
+        /// </summary>
+        public void Handle(UmbracoApplicationStarting notification)
         {
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
-            InstallServerVars();
-            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
+            _modelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
-
-            if (_config.Enable)
+            if (_config.ModelsMode != ModelsMode.Nothing)
+            {
                 FileService.SavingTemplate += FileService_SavingTemplate;
-
-            if (_config.ModelsMode.IsLiveNotPure())
-                _liveModelsProvider.Install();
-
-            if (_config.FlagOutOfDateModels)
-                _outOfDateModels.Install();
+            }
         }
 
-        public void Terminate()
+        /// <summary>
+        /// Handles the <see cref="ServerVariablesParsing"/> notification
+        /// </summary>
+        public void Handle(ServerVariablesParsing notification)
         {
-            ServerVariablesParser.Parsing -= ServerVariablesParser_Parsing;
-            ContentModelBinder.ModelBindingException -= ContentModelBinder_ModelBindingException;
-            FileService.SavingTemplate -= FileService_SavingTemplate;
-        }
+            IDictionary<string, object> serverVars = notification.ServerVariables;
 
-
-        private void InstallServerVars()
-        {
-            // register our URL - for the backoffice API
-            ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
-        }
-
-        private void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> serverVars)
-        {
             if (!serverVars.ContainsKey("umbracoUrls"))
+            {
                 throw new ArgumentException("Missing umbracoUrls.");
+            }
+
             var umbracoUrlsObject = serverVars["umbracoUrls"];
             if (umbracoUrlsObject == null)
+            {
                 throw new ArgumentException("Null umbracoUrls");
+            }
+
             if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
+            {
                 throw new ArgumentException("Invalid umbracoUrls");
+            }
 
             if (!serverVars.ContainsKey("umbracoPlugins"))
+            {
                 throw new ArgumentException("Missing umbracoPlugins.");
-            if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
-                throw new ArgumentException("Invalid umbracoPlugins");
+            }
 
-                umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
-                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
+            if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
+            {
+                throw new ArgumentException("Invalid umbracoPlugins");
+            }
+
+            umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
+            umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
         }
 
         private Dictionary<string, object> GetModelsBuilderSettings()
         {
             var settings = new Dictionary<string, object>
             {
-                {"enabled", _config.Enable}
+                {"mode", _config.ModelsMode.ToString()}
             };
 
             return settings;
@@ -106,22 +108,22 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         /// Used to check if a template is being created based on a document type, in this case we need to
         /// ensure the template markup is correct based on the model name of the document type
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_SavingTemplate(IFileService sender, Core.Events.SaveEventArgs<Core.Models.ITemplate> e)
+        private void FileService_SavingTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
-            // don't do anything if the factory is not enabled
-            // because, no factory = no models (even if generation is enabled)
-            if (!_config.EnableFactory) return;
-
             // don't do anything if this special key is not found
-            if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
+            if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType"))
+            {
+                return;
+            }
 
             // ensure we have the content type alias
             if (!e.AdditionalData.ContainsKey("ContentTypeAlias"))
+            {
                 throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
+            }
 
-            foreach (var template in e.SavedEntities)
+            foreach (ITemplate template in e.SavedEntities)
+            {
                 // if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key
                 // is found, then it means a new template is being created based on the creation of a document type
                 if (!template.HasIdentity && string.IsNullOrWhiteSpace(template.Content))
@@ -135,29 +137,31 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                     var modelNamespace = _config.ModelsNamespace;
 
                     // we do not support configuring this at the moment, so just let Umbraco use its default value
-                    //var modelNamespaceAlias = ...;
-
+                    // var modelNamespaceAlias = ...;
                     var markup = ViewHelper.GetDefaultFileContent(
                         modelClassName: className,
                         modelNamespace: modelNamespace/*,
                         modelNamespaceAlias: modelNamespaceAlias*/);
 
-                    //set the template content to the new markup
+                    // set the template content to the new markup
                     template.Content = markup;
                 }
+            }
         }
 
         private void ContentModelBinder_ModelBindingException(object sender, ContentModelBinder.ModelBindingArgs args)
         {
-            var sourceAttr = args.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
-            var modelAttr = args.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute sourceAttr = args.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute modelAttr = args.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
 
             // if source or model is not a ModelsBuider type...
             if (sourceAttr == null || modelAttr == null)
             {
                 // if neither are ModelsBuilder types, give up entirely
                 if (sourceAttr == null && modelAttr == null)
+                {
                     return;
+                }
 
                 // else report, but better not restart (loops?)
                 args.Message.Append(" The ");
@@ -173,6 +177,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             var pureModel = modelAttr.PureLive;
 
             if (sourceAttr.PureLive || modelAttr.PureLive)
+            {
                 if (pureSource == false || pureModel == false)
                 {
                     // only one is pure - report, but better not restart (loops?)
@@ -193,6 +198,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                         : "different versions. The application is in an unstable state and is going to be restarted.");
                     args.Restart = sourceVersion != modelVersion;
                 }
+            }
         }
     }
 }

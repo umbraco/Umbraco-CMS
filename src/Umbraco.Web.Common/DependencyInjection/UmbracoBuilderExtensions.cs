@@ -150,6 +150,7 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
         {
+            builder.Services.AddHostedService<QueuedHostedService>();
             builder.Services.AddHostedService<HealthCheckNotifier>();
             builder.Services.AddHostedService<KeepAlive>();
             builder.Services.AddHostedService<LogScrubber>();
@@ -273,6 +274,8 @@ namespace Umbraco.Web.Common.DependencyInjection
 
             builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
             builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+
+            builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.AddHttpClients();
 

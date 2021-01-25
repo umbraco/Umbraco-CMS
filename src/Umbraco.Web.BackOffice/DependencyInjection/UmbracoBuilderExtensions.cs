@@ -19,6 +19,7 @@ using Umbraco.Web.BackOffice.Services;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.DependencyInjection;
+using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Web.BackOffice.DependencyInjection
 {
@@ -147,6 +148,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
 
         public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
         {
+            builder.Services.AddUnique<ServerVariablesParser>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();
             builder.Services.AddUnique<BackOfficeServerVariables>();

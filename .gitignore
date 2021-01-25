@@ -200,3 +200,4 @@ src/Umbraco.Tests/TEMP/
 /src/Umbraco.Web.UI.NetCore/Umbraco/Data/*
 
 /src/Umbraco.Web.UI/config/umbracoSettings.config
+/src/Umbraco.Web.UI.NetCore/Umbraco/models/*

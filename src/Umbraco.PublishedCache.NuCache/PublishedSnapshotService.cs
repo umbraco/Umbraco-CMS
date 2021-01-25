@@ -509,7 +509,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (draftChanged || publishedChanged)
             {
-                CurrentPublishedSnapshot.Resync();
+                CurrentPublishedSnapshot?.Resync();
             }
         }
 
@@ -609,7 +609,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (anythingChanged)
             {
-                CurrentPublishedSnapshot.Resync();
+                CurrentPublishedSnapshot?.Resync();
             }
         }
 
@@ -727,7 +727,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // we ran this on a background thread then those cache refreshers are going to not get 'live' data when they query the content cache which
                 // they require.
 
-                // These can be run side by side in parallel.
                 using (_contentStore.GetScopedWriteLock(_scopeProvider))
                 {
                     NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
@@ -739,7 +738,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            CurrentPublishedSnapshot.Resync();
+            CurrentPublishedSnapshot?.Resync();
         }
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<List<int>, List<int>, List<int>, List<int>> action)
@@ -831,7 +830,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            CurrentPublishedSnapshot.Resync();
+            CurrentPublishedSnapshot?.Resync();
         }
 
         public void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -1070,7 +1069,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                     scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
-                        ((PublishedSnapshot)svc.CurrentPublishedSnapshot)?.Resync();
+                        svc.CurrentPublishedSnapshot?.Resync();
                     }, int.MaxValue);
                 }
 

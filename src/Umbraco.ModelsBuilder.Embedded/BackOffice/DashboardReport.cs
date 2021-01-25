@@ -1,6 +1,7 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
@@ -27,34 +28,46 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 
         public string Text()
         {
-            if (!_config.Enable)
-                return "Version: " + ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
-
             var sb = new StringBuilder();
 
-            sb.Append("Version: ");
+            sb.Append("<p>Version: ");
             sb.Append(ApiVersion.Current.Version);
-            sb.Append("<br />&nbsp;<br />");
+            sb.Append("</p>");
 
-            sb.Append("ModelsBuilder is enabled, with the following configuration:");
+            sb.Append("<p>ModelsBuilder is enabled, with the following configuration:</p>");
 
             sb.Append("<ul>");
 
-            sb.Append("<li>The <strong>models factory</strong> is ");
-            sb.Append(_config.EnableFactory || _config.ModelsMode == ModelsMode.PureLive
-                ? "enabled"
-                : "not enabled. Umbraco will <em>not</em> use models");
-            sb.Append(".</li>");
+            sb.Append("<li>The <strong>models mode</strong> is '");
+            sb.Append(_config.ModelsMode.ToString());
+            sb.Append("'. ");
 
-            sb.Append(_config.ModelsMode != ModelsMode.Nothing
-                ? $"<li><strong>{_config.ModelsMode} models</strong> are enabled.</li>"
-                : "<li>No models mode is specified: models will <em>not</em> be generated.</li>");
+            switch (_config.ModelsMode)
+            {
+                case ModelsMode.Nothing:
+                    sb.Append("Strongly typed models are not generated. All content and cache will operate from instance of IPublishedContent only.");
+                    break;
+                case ModelsMode.PureLive:
+                    sb.Append("Strongly typed models are re-generated on startup and anytime schema changes (i.e. Content Type) are made. No recompilation necessary but the generated models are not available to code outside of Razor.");
+                    break;
+                case ModelsMode.AppData:
+                    sb.Append("Strongly typed models are generated on demand. Recompilation is necessary and models are available to all CSharp code.");
+                    break;
+                case ModelsMode.LiveAppData:
+                    sb.Append("Strong typed models are generated on demand and anytime schema changes (i.e. Content Type) are made. Recompilation is necessary and models are available to all CSharp code.");
+                    break;
+            }
 
-            sb.Append($"<li>Models namespace is {_config.ModelsNamespace}.</li>");
+            sb.Append("</li>");
 
-            sb.Append("<li>Tracking of <strong>out-of-date models</strong> is ");
-            sb.Append(_config.FlagOutOfDateModels ? "enabled" : "not enabled");
-            sb.Append(".</li>");
+            if (_config.ModelsMode != ModelsMode.Nothing)
+            {
+                sb.Append($"<li>Models namespace is {_config.ModelsNamespace ?? Constants.ModelsBuilder.DefaultModelsNamespace}.</li>");
+
+                sb.Append("<li>Tracking of <strong>out-of-date models</strong> is ");
+                sb.Append(_config.FlagOutOfDateModels ? "enabled" : "not enabled");
+                sb.Append(".</li>");
+            }
 
             sb.Append("</ul>");
 

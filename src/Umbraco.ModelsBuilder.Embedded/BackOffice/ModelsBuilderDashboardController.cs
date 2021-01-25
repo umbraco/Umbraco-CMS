@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Hosting;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
@@ -30,17 +28,14 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
-            //_umbracoServices = umbracoServices;
             _config = config.Value;
             _modelGenerator = modelsGenerator;
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;
             _dashboardReport = new DashboardReport(config, outOfDateModels, mbErrors);
-            _hostingEnvironment = hostingEnvironment;
         }
 
         // invoked by the dashboard
@@ -51,19 +46,12 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         {
             try
             {
-                var config = _config;
-
-                if (!config.ModelsMode.SupportsExplicitGeneration())
+                if (!_config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Ok(result2);
                 }
 
-                var bin = _hostingEnvironment.MapPathContentRoot("~/bin");
-                if (bin == null)
-                    throw new PanicException("bin is null.");
-
-                // EnableDllModels will recycle the app domain - but this request will end properly
                 _modelGenerator.GenerateModels();
                 _mbErrors.Clear();
             }
@@ -93,45 +81,44 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
         [HttpGet] // use the http one, not mvc, with api controllers!
-        public ActionResult<Dashboard> GetDashboard()
-        {
-            return GetDashboardResult();
-        }
+        public ActionResult<Dashboard> GetDashboard() => GetDashboardResult();
 
-        private Dashboard GetDashboardResult()
+        private Dashboard GetDashboardResult() => new Dashboard
         {
-            return new Dashboard
-            {
-                Enable = _config.Enable,
-                Text = _dashboardReport.Text(),
-                CanGenerate = _dashboardReport.CanGenerate(),
-                OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),
-                LastError = _dashboardReport.LastError(),
-            };
-        }
+            Mode = _config.ModelsMode,
+            Text = _dashboardReport.Text(),
+            CanGenerate = _dashboardReport.CanGenerate(),
+            OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),
+            LastError = _dashboardReport.LastError(),
+        };
 
         [DataContract]
         public class BuildResult
         {
             [DataMember(Name = "success")]
-            public bool Success;
+            public bool Success { get; set; }
+
             [DataMember(Name = "message")]
-            public string Message;
+            public string Message { get; set; }
         }
 
         [DataContract]
         public class Dashboard
         {
-            [DataMember(Name = "enable")]
-            public bool Enable;
+            [DataMember(Name = "mode")]
+            public ModelsMode Mode { get; set; }
+
             [DataMember(Name = "text")]
-            public string Text;
+            public string Text { get; set; }
+
             [DataMember(Name = "canGenerate")]
-            public bool CanGenerate;
+            public bool CanGenerate { get; set; }
+
             [DataMember(Name = "outOfDateModels")]
-            public bool OutOfDateModels;
+            public bool OutOfDateModels { get; set; }
+
             [DataMember(Name = "lastError")]
-            public string LastError;
+            public string LastError { get; set; }
         }
 
         public enum OutOfDateType

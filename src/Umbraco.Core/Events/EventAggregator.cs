@@ -38,7 +38,22 @@ namespace Umbraco.Core.Events
                 throw new ArgumentNullException(nameof(notification));
             }
 
+            PublishNotification(notification);
             return PublishNotificationAsync(notification, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public void Publish<TNotification>(TNotification notification)
+            where TNotification : INotification
+        {
+            // TODO: Introduce codegen efficient Guard classes to reduce noise.
+            if (notification == null)
+            {
+                throw new ArgumentNullException(nameof(notification));
+            }
+
+            PublishNotification(notification);
+            Task.WaitAll(PublishNotificationAsync(notification));
         }
     }
 

@@ -1,120 +1,131 @@
 using System;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Umbraco.Extensions;
+using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     // supports LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider
+    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>
     {
-        private static Mutex _mutex;
-        private static int _req;
+        private static int s_req;
         private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
+        private readonly IMainDom _mainDom;
 
-        // we do not manage pure live here
-        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
-
-        public LiveModelsProvider(ILogger<LiveModelsProvider> logger, IOptions<ModelsBuilderSettings> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LiveModelsProvider"/> class.
+        /// </summary>
+        public LiveModelsProvider(
+            ILogger<LiveModelsProvider> logger,
+            IOptions<ModelsBuilderSettings> config,
+            ModelsGenerator modelGenerator,
+            ModelsGenerationError mbErrors,
+            IUmbracoRequestLifetime umbracoRequestLifetime,
+            IMainDom mainDom)
         {
             _logger = logger;
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
-            _hostingEnvironment = hostingEnvironment;
+            _umbracoRequestLifetime = umbracoRequestLifetime;
+            _mainDom = mainDom;
         }
 
-        internal void Install()
+        // we do not manage pure live here
+        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
+
+        /// <summary>
+        /// Handles the <see cref="UmbracoApplicationStarting"/> notification
+        /// </summary>
+        public void Handle(UmbracoApplicationStarting notification)
         {
-            // just be sure
+            Install();
+        }
+
+        private void Install()
+        {
+            // don't run if not enabled
             if (!IsEnabled)
+            {
                 return;
+            }
 
-            // initialize mutex
-            // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
-            // name is system-wide and must be less than 260 chars
-            var name = _hostingEnvironment.ApplicationId + "/UmbracoLiveModelsProvider";
+            // Must register with maindom in order to function.
+            // If registration is not successful then events are not bound
+            // and we also don't generate models.
+            _mainDom.Register(() =>
+            {
+                _umbracoRequestLifetime.RequestEnd += (sender, context) => AppEndRequest(context);
 
-            _mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
-
-            // anything changes, and we want to re-generate models.
-            ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
-            DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
-
-            // at the end of a request since we're restarting the pool
-            // NOTE - this does NOT trigger - see module below
-            //umbracoApplication.EndRequest += GenerateModelsIfRequested;
+                // anything changes, and we want to re-generate models.
+                ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
+                DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
+            });
         }
 
         // NOTE
-        // Using HttpContext Items fails because CacheUpdated triggers within
-        // some asynchronous backend task where we seem to have no HttpContext.
-
-        // So we use a static (non request-bound) var to register that models
+        // CacheUpdated triggers within some asynchronous backend task where
+        // we have no HttpContext. So we use a static (non request-bound)
+        // var to register that models
         // need to be generated. Could be by another request. Anyway. We could
         // have collisions but... you know the risk.
 
         private void RequestModelsGeneration(object sender, EventArgs args)
         {
-            //HttpContext.Current.Items[this] = true;
             _logger.LogDebug("Requested to generate models.");
-            Interlocked.Exchange(ref _req, 1);
+            Interlocked.Exchange(ref s_req, 1);
         }
 
-        public void GenerateModelsIfRequested()
+        private void GenerateModelsIfRequested()
         {
-            //if (HttpContext.Current.Items[this] == null) return;
-            if (Interlocked.Exchange(ref _req, 0) == 0) return;
+            if (Interlocked.Exchange(ref s_req, 0) == 0)
+            {
+                return;
+            }
 
-            // cannot use a simple lock here because we don't want another AppDomain
-            // to generate while we do... and there could be 2 AppDomains if the app restarts.
-
-            try
+            // cannot proceed unless we are MainDom
+            if (_mainDom.IsMainDom)
             {
-                _logger.LogDebug("Generate models...");
-                const int timeout = 2 * 60 * 1000; // 2 mins
-                _mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                _logger.LogInformation("Generate models now.");
-                GenerateModels();
-                _mbErrors.Clear();
-                _logger.LogInformation("Generated.");
+                try
+                {
+                    _logger.LogDebug("Generate models...");
+                    _logger.LogInformation("Generate models now.");
+                    _modelGenerator.GenerateModels();
+                    _mbErrors.Clear();
+                    _logger.LogInformation("Generated.");
+                }
+                catch (TimeoutException)
+                {
+                    _logger.LogWarning("Timeout, models were NOT generated.");
+                }
+                catch (Exception e)
+                {
+                    _mbErrors.Report("Failed to build Live models.", e);
+                    _logger.LogError("Failed to generate models.", e);
+                }
             }
-            catch (TimeoutException)
+            else
             {
-                _logger.LogWarning("Timeout, models were NOT generated.");
-            }
-            catch (Exception e)
-            {
-                _mbErrors.Report("Failed to build Live models.", e);
-                _logger.LogError("Failed to generate models.", e);
-            }
-            finally
-            {
-                _mutex.ReleaseMutex(); // release
+                // this will only occur if this appdomain was MainDom and it has
+                // been released while trying to regenerate models.
+                _logger.LogWarning("Cannot generate models while app is shutting down");
             }
         }
 
-        private void GenerateModels()
-        {
-            // EnableDllModels will recycle the app domain - but this request will end properly
-            _modelGenerator.GenerateModels();
-        }
-
-        public void AppEndRequest(HttpContext context)
+        private void AppEndRequest(HttpContext context)
         {
             if (context.Request.IsClientSideRequest())
             {
