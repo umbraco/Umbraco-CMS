@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,7 +7,6 @@ using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
@@ -52,10 +50,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             Install();
-            return Task.CompletedTask;
         }
 
         private void Install()
