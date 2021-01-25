@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Persistence
                     if (id1 == 1)
                         otherEv.WaitOne();
                     else
-                        Thread.Sleep(1000); // cannot wait due to deadlock... just give it a bit of time
+                        Thread.Sleep(5200); // wait for deadlock...
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
                     scope.WriteLock(id2);
