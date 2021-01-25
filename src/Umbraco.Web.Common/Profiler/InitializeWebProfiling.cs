@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -43,15 +41,13 @@ namespace Umbraco.Web.Common.Profiler
         }
 
         /// <inheritdoc/>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             if (_profile)
             {
                 // Stop the profiling of the booting process
                 _profiler.StopBoot();
             }
-
-            return Task.CompletedTask;
         }
 
     }

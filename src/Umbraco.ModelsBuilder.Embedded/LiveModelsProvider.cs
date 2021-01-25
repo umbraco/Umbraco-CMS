@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
@@ -46,10 +45,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             Install();
-            return Task.CompletedTask;
         }
 
         private void Install()
@@ -120,16 +118,12 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-
-
-        public Task HandleAsync(UmbracoRequestEnd notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoRequestEnd notification)
         {
             if (IsEnabled && _mainDom.IsMainDom && !notification.HttpContext.Request.IsClientSideRequest())
             {
                 GenerateModelsIfRequested();
             }
-
-            return Task.CompletedTask;
         }
     }
 }

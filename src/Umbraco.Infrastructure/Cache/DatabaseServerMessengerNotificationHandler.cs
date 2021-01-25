@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
@@ -39,7 +37,7 @@ namespace Umbraco.Infrastructure.Cache
         }
 
         /// <inheritdoc/>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             // The scheduled tasks - TouchServerTask and InstructionProcessTask - run as .NET Core hosted services.
             // The former (as well as other hosted services that run outside of an HTTP request context) depends on the application URL
@@ -50,8 +48,6 @@ namespace Umbraco.Infrastructure.Cache
             _requestAccessor.EndRequest += EndRequest;
 
             Startup();
-
-            return Task.CompletedTask;
         }
 
         private void Startup()

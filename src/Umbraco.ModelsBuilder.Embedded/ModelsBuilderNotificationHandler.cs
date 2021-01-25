@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
@@ -47,7 +45,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoApplicationStarting notification)
         {
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
@@ -57,14 +55,12 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 FileService.SavingTemplate += FileService_SavingTemplate;
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Handles the <see cref="ServerVariablesParsing"/> notification
         /// </summary>
-        public Task HandleAsync(ServerVariablesParsing notification, CancellationToken cancellationToken)
+        public void Handle(ServerVariablesParsing notification)
         {
             IDictionary<string, object> serverVars = notification.ServerVariables;
 
@@ -96,8 +92,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
             umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
-
-            return Task.CompletedTask;
         }
 
         private Dictionary<string, object> GetModelsBuilderSettings()

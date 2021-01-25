@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
@@ -82,17 +80,15 @@ namespace Umbraco.Web.Common.AspNetCore
             return _currentApplicationUrl;
         }
 
-        public Task HandleAsync(UmbracoRequestBegin notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoRequestBegin notification)
         {
             var reason = EnsureRoutableOutcome.IsRoutable; //TODO get the correct value here like in UmbracoInjectedModule
             RouteAttempt?.Invoke(this, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
-            return Task.CompletedTask;
         }
 
-        public Task HandleAsync(UmbracoRequestEnd notification, CancellationToken cancellationToken)
+        public void Handle(UmbracoRequestEnd notification)
         {
             EndRequest?.Invoke(this, new UmbracoRequestEventArgs(_umbracoContextAccessor.UmbracoContext));
-            return Task.CompletedTask;
         }
 
 

@@ -15,17 +15,30 @@ namespace Umbraco.Core.Events
     /// </content>
     public partial class EventAggregator : IEventAggregator
     {
+        private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper> s_notificationAsyncHandlers
+            = new ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper>();
+
         private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> s_notificationHandlers
             = new ConcurrentDictionary<Type, NotificationHandlerWrapper>();
 
         private Task PublishNotificationAsync(INotification notification, CancellationToken cancellationToken = default)
         {
             Type notificationType = notification.GetType();
-            NotificationHandlerWrapper handler = s_notificationHandlers.GetOrAdd(
+            NotificationAsyncHandlerWrapper asyncHandler = s_notificationAsyncHandlers.GetOrAdd(
+                notificationType,
+                t => (NotificationAsyncHandlerWrapper)Activator.CreateInstance(typeof(NotificationAsyncHandlerWrapperImpl<>).MakeGenericType(notificationType)));
+
+            return asyncHandler.HandleAsync(notification, cancellationToken, _serviceFactory, PublishCoreAsync);
+        }
+
+        private void PublishNotification(INotification notification)
+        {
+            Type notificationType = notification.GetType();
+            NotificationHandlerWrapper asyncHandler = s_notificationHandlers.GetOrAdd(
                 notificationType,
                 t => (NotificationHandlerWrapper)Activator.CreateInstance(typeof(NotificationHandlerWrapperImpl<>).MakeGenericType(notificationType)));
 
-            return handler.HandleAsync(notification, cancellationToken, _serviceFactory, PublishCoreAsync);
+            asyncHandler.Handle(notification, _serviceFactory, PublishCore);
         }
 
         private async Task PublishCoreAsync(
@@ -38,9 +51,27 @@ namespace Umbraco.Core.Events
                 await handler(notification, cancellationToken).ConfigureAwait(false);
             }
         }
+
+        private void PublishCore(
+            IEnumerable<Action<INotification>> allHandlers,
+            INotification notification)
+        {
+            foreach (Action<INotification> handler in allHandlers)
+            {
+                handler(notification);
+            }
+        }
     }
 
     internal abstract class NotificationHandlerWrapper
+    {
+        public abstract void Handle(
+            INotification notification,
+            ServiceFactory serviceFactory,
+            Action<IEnumerable<Action<INotification>>, INotification> publish);
+    }
+
+    internal abstract class NotificationAsyncHandlerWrapper
     {
         public abstract Task HandleAsync(
             INotification notification,
@@ -49,7 +80,7 @@ namespace Umbraco.Core.Events
             Func<IEnumerable<Func<INotification, CancellationToken, Task>>, INotification, CancellationToken, Task> publish);
     }
 
-    internal class NotificationHandlerWrapperImpl<TNotification> : NotificationHandlerWrapper
+    internal class NotificationAsyncHandlerWrapperImpl<TNotification> : NotificationAsyncHandlerWrapper
         where TNotification : INotification
     {
         public override Task HandleAsync(
@@ -59,12 +90,30 @@ namespace Umbraco.Core.Events
             Func<IEnumerable<Func<INotification, CancellationToken, Task>>, INotification, CancellationToken, Task> publish)
         {
             IEnumerable<Func<INotification, CancellationToken, Task>> handlers = serviceFactory
-                .GetInstances<INotificationHandler<TNotification>>()
+                .GetInstances<INotificationAsyncHandler<TNotification>>()
                 .Select(x => new Func<INotification, CancellationToken, Task>(
                     (theNotification, theToken) =>
                     x.HandleAsync((TNotification)theNotification, theToken)));
 
             return publish(handlers, notification, cancellationToken);
+        }
+    }
+
+    internal class NotificationHandlerWrapperImpl<TNotification> : NotificationHandlerWrapper
+        where TNotification : INotification
+    {
+        public override void Handle(
+            INotification notification,
+            ServiceFactory serviceFactory,
+            Action<IEnumerable<Action<INotification>>, INotification> publish)
+        {
+            IEnumerable<Action<INotification>> handlers = serviceFactory
+                .GetInstances<INotificationHandler<TNotification>>()
+                .Select(x => new Action<INotification>(
+                    (theNotification) =>
+                        x.Handle((TNotification)theNotification)));
+
+            publish(handlers, notification);
         }
     }
 }

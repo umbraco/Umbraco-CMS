@@ -29,6 +29,22 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
         }
 
         [Test]
+        public async Task CanPublishAsyncEvents()
+        {
+            _builder.Services.AddScoped<Adder>();
+            _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
+            _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
+            _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
+            ServiceProvider provider = _builder.Services.BuildServiceProvider();
+
+            var notification = new Notification();
+            IEventAggregator aggregator = provider.GetService<IEventAggregator>();
+            await aggregator.PublishAsync(notification);
+
+            Assert.AreEqual(A + B + C, notification.SubscriberCount);
+        }
+
+        [Test]
         public async Task CanPublishEvents()
         {
             _builder.Services.AddScoped<Adder>();
@@ -51,19 +67,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 
         public class NotificationHandlerA : INotificationHandler<Notification>
         {
-            public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
+            public void Handle(Notification notification)
             {
                 notification.SubscriberCount += A;
-                return Task.CompletedTask;
             }
         }
 
         public class NotificationHandlerB : INotificationHandler<Notification>
         {
-            public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
+            public void Handle(Notification notification)
             {
                 notification.SubscriberCount += B;
-                return Task.CompletedTask;
             }
         }
 
@@ -73,13 +87,42 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
 
             public NotificationHandlerC(Adder adder) => _adder = adder;
 
+            public void Handle(Notification notification)
+            {
+                notification.SubscriberCount = _adder.Add(notification.SubscriberCount, C);
+            }
+        }
+
+           public class NotificationAsyncHandlerA : INotificationAsyncHandler<Notification>
+        {
+            public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
+            {
+                notification.SubscriberCount += A;
+                return Task.CompletedTask;
+            }
+        }
+
+        public class NotificationAsyncHandlerB : INotificationAsyncHandler<Notification>
+        {
+            public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
+            {
+                notification.SubscriberCount += B;
+                return Task.CompletedTask;
+            }
+        }
+
+        public class NotificationAsyncHandlerC : INotificationAsyncHandler<Notification>
+        {
+            private readonly Adder _adder;
+
+            public NotificationAsyncHandlerC(Adder adder) => _adder = adder;
+
             public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
             {
                 notification.SubscriberCount = _adder.Add(notification.SubscriberCount, C);
                 return Task.CompletedTask;
             }
         }
-
         public class Adder
         {
             public int Add(int a, int b) => a + b;
