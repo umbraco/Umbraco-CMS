@@ -135,6 +135,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\BackgroundTaskRunner.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\BackgroundTaskRunnerOptions.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\IBackgroundTask.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\IBackgroundTaskRunner.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\ILatchedBackgroundTask.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\LatchedBackgroundTaskBase.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\TaskEventArgs.cs" />
+    <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\ThreadingTaskImmutable.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
@@ -169,7 +177,6 @@
     <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlRoutesTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
-    <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
@@ -201,7 +208,6 @@
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
-    <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />

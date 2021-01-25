@@ -1,12 +1,13 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Threading;
-using Umbraco.Core.Logging;
-using Umbraco.Examine;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Web.Scheduling;
+using Umbraco.Examine;
+using Umbraco.Infrastructure.HostedServices;
 
 namespace Umbraco.Web.Search
 {
@@ -15,115 +16,68 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class BackgroundIndexRebuilder
     {
-        private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
-        private readonly IMainDom _mainDom;
-        // TODO: Remove unused ProfilingLogger?
-        private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<BackgroundIndexRebuilder> _logger;
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly IApplicationShutdownRegistry _hostingEnvironment;
-        private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        private readonly IMainDom _mainDom;
+        private readonly ILogger<BackgroundIndexRebuilder> _logger;
+
+        private volatile bool _isRunning = false;
+        private static readonly object s_rebuildLocker = new object();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackgroundIndexRebuilder"/> class.
+        /// </summary>
+        public BackgroundIndexRebuilder(
+            IMainDom mainDom,
+            ILogger<BackgroundIndexRebuilder> logger,
+            IndexRebuilder indexRebuilder,
+            IBackgroundTaskQueue backgroundTaskQueue)
         {
             _mainDom = mainDom;
-            _profilingLogger = profilingLogger ;
-            _loggerFactory = loggerFactory;
-            _logger = loggerFactory.CreateLogger<BackgroundIndexRebuilder>();
-            _hostingEnvironment = hostingEnvironment;
+            _logger = logger;
             _indexRebuilder = indexRebuilder;
+            _backgroundTaskQueue = backgroundTaskQueue;
         }
+
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
         /// </summary>
-        /// <param name="onlyEmptyIndexes"></param>
-        /// <param name="waitMilliseconds"></param>
-        public virtual void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
+        public virtual void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null)
         {
-            // TODO: need a way to disable rebuilding on startup
 
-            lock (RebuildLocker)
+            lock (s_rebuildLocker)
             {
-                if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
+                if (_isRunning)
                 {
                     _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
                     return;
                 }
 
                 _logger.LogInformation("Starting initialize async background thread.");
-                //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _loggerFactory.CreateLogger<RebuildOnStartupTask>(), onlyEmptyIndexes, waitMilliseconds);
 
-                _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
-                    "RebuildIndexesOnStartup",
-                    _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), _hostingEnvironment);
+                _backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken => RebuildIndexes(onlyEmptyIndexes, delay ?? TimeSpan.Zero, cancellationToken));
 
-                _rebuildOnStartupRunner.TryAdd(task);
             }
         }
 
-        /// <summary>
-        /// Background task used to rebuild empty indexes on startup
-        /// </summary>
-        private class RebuildOnStartupTask : IBackgroundTask
+        private Task RebuildIndexes(bool onlyEmptyIndexes, TimeSpan delay, CancellationToken cancellationToken)
         {
-            private readonly IMainDom _mainDom;
-
-            private readonly IndexRebuilder _indexRebuilder;
-            private readonly ILogger<RebuildOnStartupTask> _logger;
-            private readonly bool _onlyEmptyIndexes;
-            private readonly int _waitMilliseconds;
-
-            public RebuildOnStartupTask(IMainDom mainDom,
-                IndexRebuilder indexRebuilder, ILogger<RebuildOnStartupTask> logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+            if (!_mainDom.IsMainDom)
             {
-                _mainDom = mainDom;
-                _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _onlyEmptyIndexes = onlyEmptyIndexes;
-                _waitMilliseconds = waitMilliseconds;
+                return Task.CompletedTask;
             }
 
-            public bool IsAsync => false;
-
-            public void Dispose()
+            if (delay > TimeSpan.Zero)
             {
+                Thread.Sleep(delay);
             }
 
-            public void Run()
-            {
-                try
-                {
-                    // rebuilds indexes
-                    RebuildIndexes();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to rebuild empty indexes.");
-                }
-            }
-
-            public Task RunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            /// Used to rebuild indexes on startup or cold boot
-            /// </summary>
-            private void RebuildIndexes()
-            {
-                //do not attempt to do this if this has been disabled since we are not the main dom.
-                //this can be called during a cold boot
-                if (!_mainDom.IsMainDom) return;
-
-                if (_waitMilliseconds > 0)
-                    Thread.Sleep(_waitMilliseconds);
-
-                _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
-            }
+            _isRunning = true;
+            _indexRebuilder.RebuildIndexes(onlyEmptyIndexes);
+            _isRunning = false;
+            return Task.CompletedTask;
         }
     }
 }

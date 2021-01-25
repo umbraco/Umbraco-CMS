@@ -123,7 +123,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
                     () =>
                     {
                         var indexRebuilder = factory.GetRequiredService<BackgroundIndexRebuilder>();
-                        indexRebuilder.RebuildIndexes(false, 5000);
+                        indexRebuilder.RebuildIndexes(false, TimeSpan.FromSeconds(5));
                     }
                 }
         };

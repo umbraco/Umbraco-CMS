@@ -1,21 +1,19 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
 using Umbraco.Examine;
-using Microsoft.Extensions.Logging;
-using Umbraco.Web.Scheduling;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.Search
 {
@@ -29,13 +27,13 @@ namespace Umbraco.Web.Search
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
+        private readonly TaskHelper _taskHelper;
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -52,7 +50,7 @@ namespace Umbraco.Web.Search
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
             BackgroundIndexRebuilder backgroundIndexRebuilder,
-            IApplicationShutdownRegistry applicationShutdownRegistry)
+            TaskHelper taskHelper)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -62,11 +60,11 @@ namespace Umbraco.Web.Search
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
+            _taskHelper = taskHelper;
             _mainDom = mainDom;
             _profilingLogger = profilingLogger;
             _logger = loggerFactory.CreateLogger<ExamineComponent>();
             _indexCreator = indexCreator;
-            _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), applicationShutdownRegistry);
         }
 
         public void Initialize()
@@ -510,27 +508,27 @@ namespace Umbraco.Web.Search
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForContent(this, sender, isPublished));
+                actions.Add(new DeferedReIndexForContent(_taskHelper, this, sender, isPublished));
             else
-                DeferedReIndexForContent.Execute(this, sender, isPublished);
+                DeferedReIndexForContent.Execute(_taskHelper, this, sender, isPublished);
         }
 
         private void ReIndexForMember(IMember member)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForMember(this, member));
+                actions.Add(new DeferedReIndexForMember(_taskHelper, this, member));
             else
-                DeferedReIndexForMember.Execute(this, member);
+                DeferedReIndexForMember.Execute(_taskHelper, this, member);
         }
 
         private void ReIndexForMedia(IMedia sender, bool isPublished)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForMedia(this, sender, isPublished));
+                actions.Add(new DeferedReIndexForMedia(_taskHelper, this, sender, isPublished));
             else
-                DeferedReIndexForMedia.Execute(this, sender, isPublished);
+                DeferedReIndexForMedia.Execute(_taskHelper, this, sender, isPublished);
         }
 
         /// <summary>
@@ -594,12 +592,14 @@ namespace Umbraco.Web.Search
         /// </summary>
         private class DeferedReIndexForContent : DeferedAction
         {
+            private readonly TaskHelper _taskHelper;
             private readonly ExamineComponent _examineComponent;
             private readonly IContent _content;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool isPublished)
+            public DeferedReIndexForContent(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
             {
+                _taskHelper = taskHelper;
                 _examineComponent = examineComponent;
                 _content = content;
                 _isPublished = isPublished;
@@ -607,13 +607,12 @@ namespace Umbraco.Web.Search
 
             public override void Execute()
             {
-                Execute(_examineComponent, _content, _isPublished);
+                Execute(_taskHelper, _examineComponent, _content, _isPublished);
             }
 
-            public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
             {
-                // perform the ValueSet lookup on a background thread
-                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
+                taskHelper.RunBackgroundTask(async () =>
                 {
                     // for content we have a different builder for published vs unpublished
                     // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
@@ -631,7 +630,8 @@ namespace Umbraco.Web.Search
                         var valueSet = builders[index.PublishedValuesOnly].Value;
                         index.IndexItems(valueSet);
                     }
-                }));
+                });
+
             }
         }
 
@@ -640,12 +640,14 @@ namespace Umbraco.Web.Search
         /// </summary>
         private class DeferedReIndexForMedia : DeferedAction
         {
+            private readonly TaskHelper _taskHelper;
             private readonly ExamineComponent _examineComponent;
             private readonly IMedia _media;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForMedia(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            public DeferedReIndexForMedia(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
+                _taskHelper = taskHelper;
                 _examineComponent = examineComponent;
                 _media = media;
                 _isPublished = isPublished;
@@ -653,13 +655,13 @@ namespace Umbraco.Web.Search
 
             public override void Execute()
             {
-                Execute(_examineComponent, _media, _isPublished);
+                Execute(_taskHelper, _examineComponent, _media, _isPublished);
             }
 
-            public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
                 // perform the ValueSet lookup on a background thread
-                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
+                taskHelper.RunBackgroundTask(async () =>
                 {
                     var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
@@ -670,7 +672,7 @@ namespace Umbraco.Web.Search
                     {
                         index.IndexItems(valueSet);
                     }
-                }));
+                });
             }
         }
 
@@ -681,22 +683,24 @@ namespace Umbraco.Web.Search
         {
             private readonly ExamineComponent _examineComponent;
             private readonly IMember _member;
+            private readonly TaskHelper _taskHelper;
 
-            public DeferedReIndexForMember(ExamineComponent examineComponent, IMember member)
+            public DeferedReIndexForMember(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member)
             {
                 _examineComponent = examineComponent;
                 _member = member;
+                _taskHelper = taskHelper;
             }
 
             public override void Execute()
             {
-                Execute(_examineComponent, _member);
+                Execute(_taskHelper, _examineComponent, _member);
             }
 
-            public static void Execute(ExamineComponent examineComponent, IMember member)
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member)
             {
                 // perform the ValueSet lookup on a background thread
-                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
+                taskHelper.RunBackgroundTask(async () =>
                 {
                     var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
                     foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
@@ -705,7 +709,7 @@ namespace Umbraco.Web.Search
                     {
                         index.IndexItems(valueSet);
                     }
-                }));
+                });
             }
         }
 
