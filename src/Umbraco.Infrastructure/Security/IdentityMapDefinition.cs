@@ -104,11 +104,10 @@ namespace Umbraco.Infrastructure.Security
             target.IsApproved = source.IsApproved;
             //target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+
+            // NB: same comments re AutoMapper as per BackOfficeUser
         }
 
-        private static string GetPasswordHash(string storedPass)
-        {
-            return storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
-        }
+        private static string GetPasswordHash(string storedPass) => storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
     }
 }

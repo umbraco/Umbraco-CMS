@@ -65,8 +65,6 @@ namespace Umbraco.Infrastructure.Security
             }
 
             // create member
-            // TODO: are we keeping this method? The user service creates the member directly
-            // but this way we get the member type by alias first
             IMember memberEntity = _memberService.CreateMember(
                 user.UserName,
                 user.Email,

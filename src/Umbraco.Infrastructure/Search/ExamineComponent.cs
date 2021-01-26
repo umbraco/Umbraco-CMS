@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -513,7 +513,6 @@ namespace Umbraco.Web.Search
                 DeferedReIndexForContent.Execute(_taskHelper, this, sender, isPublished);
         }
 
-        //TODO: this causes an exception when deleting a member
         private void ReIndexForMember(IMember member)
         {
             var actions = DeferedActions.Get(_scopeProvider);
