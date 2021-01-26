@@ -150,7 +150,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 };
             }
 
-            // collect all ng-model controllers recursively within the umbProperty form 
+            // collect all ng-model controllers recursively within the umbProperty form
             // until it reaches the next nested umbProperty form
             function collectAllNgModelControllersRecursively(controls, ngModels) {
                 controls.forEach(ctrl => {
@@ -169,7 +169,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
             // We start the watch when there's server validation errors detected.
             // We watch on the current form's properties and on first watch or if they are dynamically changed
             // we find all ngModel controls recursively on this form (but stop recursing before we get to the next)
-            // umbProperty form). Then for each ngModelController we assign a new $validator. This $validator 
+            // umbProperty form). Then for each ngModelController we assign a new $validator. This $validator
             // will execute whenever the value is changed which allows us to check and reset the server validator
             function startWatch() {
                 if (!watcher) {
@@ -201,21 +201,25 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 hasError = false;
                 formCtrl.$setValidity('valPropertyMsg', true);
                 scope.errorMsg = "";
-                
+
             }
 
-            // This deals with client side validation changes and is executed anytime validators change on the containing 
+            // This deals with client side validation changes and is executed anytime validators change on the containing
             // valFormManager. This allows us to know when to display or clear the property error data for non-server side errors.
             function checkValidationStatus() {
                 if (formCtrl.$invalid) {
-                    //first we need to check if the valPropertyMsg validity is invalid
-                    if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
-                        //since we already have an error we'll just return since this means we've already set the 
+
+                    var otherErrors = _.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0;
+
+                    //first we need to check if the valPropertyMsg validity is invalid, but only if we have other errors (if not we need to re-check wether valPropertyMsg is still relevant and then call resetError)
+                    if (otherErrors && formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
+                        //since we already have an error we'll just return since this means we've already set the
                         //hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
                         return;
                     }
+
                     //if there are any errors in the current property form that are not valPropertyMsg
-                    else if (_.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0) {
+                    if (otherErrors) {
 
                         // errors exist, but if the property is NOT mandatory and has no value, the errors should be cleared
                         if (isMandatory !== undefined && isMandatory === false && !currentProperty.value) {
@@ -314,7 +318,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                                 // taken care of with the formHelper.resetForm method that should be used in all cases. $pristine is required because it's
                                 // a value that is cascaded to all form controls based on the hierarchy of child ng-model controls. This allows us to easily
                                 // know if a value has changed. The alternative is what we used to do which was to put a deep $watch on the entire complex value
-                                // which is hugely inefficient. 
+                                // which is hugely inefficient.
                                 if (propertyErrors.length === 1 && hadError && !formCtrl.$pristine) {
                                     var propertyValidationPath = umbPropCtrl.getValidationPath();
                                     serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, "", currentSegment);
