@@ -177,7 +177,6 @@
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
-    <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
@@ -192,7 +191,6 @@
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
@@ -217,7 +215,6 @@
     <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
-    <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ModelStateExtensions.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
@@ -268,7 +265,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Install\InstallSteps" />
+    <Folder Include="Install\InstallSteps\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
