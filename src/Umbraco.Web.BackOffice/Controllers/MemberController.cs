@@ -276,8 +276,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     return NotFound();
             }
 
-            // TODO: There's 3 things saved here and we should do this all in one transaction,
-            // which we can do here by wrapping in a scope
+            // TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope
             // but it would be nicer to have this taken care of within the Save method itself
 
             // return the updated model
@@ -469,7 +468,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
             {
-                // TODO: this currently stops the user interacting with the client-side when invalid
                 IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
                 if (!validPassword.Succeeded)
                 {
