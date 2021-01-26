@@ -159,7 +159,6 @@
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
-    <Compile Include="Models\RangeTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
@@ -189,7 +188,6 @@
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
@@ -200,7 +198,6 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Testing\TestingTests\MockTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
@@ -211,7 +208,6 @@
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
-    <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
@@ -319,6 +315,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Persistence\SyntaxProvider" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

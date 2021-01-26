@@ -13,33 +13,34 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.SyntaxProvider
 {
     [TestFixture]
-    public class SqlCeSyntaxProviderTests : BaseUsingSqlCeSyntax
+    public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
     {
+        private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
+
+        [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
         [Test]
         public void Can_Generate_Delete_SubQuery_Statement()
         {
             var mediaObjectType = Constants.ObjectTypes.Media;
-            var subQuery = Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
+            var subQuery = SqlContext.Sql()
+                            .Select("DISTINCT cmsContentNu.nodeId")
+                            .From<ContentNuDto>()
                             .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .On<ContentNuDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                             .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
 
-            var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+            var sqlOutput = SqlContext.SqlSyntax.GetDeleteSubquery("cmsContentNu", "nodeId", subQuery);
 
-            Assert.AreEqual(@"DELETE FROM [cmsContentXml] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentXml.nodeId
-FROM [cmsContentXml]
+            Assert.AreEqual(@"DELETE FROM [cmsContentNu] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentNu.nodeId
+FROM [cmsContentNu]
 INNER JOIN [umbracoNode]
-ON [cmsContentXml].[nodeId] = [umbracoNode].[id]
+ON [cmsContentNu].[nodeId] = [umbracoNode].[id]
 WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "),
                                                 sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
 
