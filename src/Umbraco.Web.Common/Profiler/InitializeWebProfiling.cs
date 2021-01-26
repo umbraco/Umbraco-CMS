@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.Web.Common.Profiler
 {
@@ -15,14 +14,12 @@ namespace Umbraco.Web.Common.Profiler
     {
         private readonly bool _profile;
         private readonly WebProfiler _profiler;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializeWebProfiling"/> class.
         /// </summary>
-        public InitializeWebProfiling(IProfiler profiler, IUmbracoRequestLifetime umbracoRequestLifetime, ILogger<InitializeWebProfiling> logger)
+        public InitializeWebProfiling(IProfiler profiler, ILogger<InitializeWebProfiling> logger)
         {
-            _umbracoRequestLifetime = umbracoRequestLifetime;
             _profile = true;
 
             // although registered in UmbracoBuilderExtensions.AddUmbraco, ensure that we have not
@@ -48,13 +45,10 @@ namespace Umbraco.Web.Common.Profiler
         {
             if (_profile)
             {
-                _umbracoRequestLifetime.RequestStart += (sender, context) => _profiler.UmbracoApplicationBeginRequest(context);
-
-                _umbracoRequestLifetime.RequestEnd += (sender, context) => _profiler.UmbracoApplicationEndRequest(context);
-
                 // Stop the profiling of the booting process
                 _profiler.StopBoot();
             }
         }
+
     }
 }

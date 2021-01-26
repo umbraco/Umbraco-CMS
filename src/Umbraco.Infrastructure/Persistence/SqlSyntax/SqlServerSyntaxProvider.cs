@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -260,7 +257,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
-            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+            WriteLock(db, TimeSpan.FromSeconds(5), lockIds);
         }
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
