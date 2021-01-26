@@ -13,24 +13,20 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
-using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
-using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -908,10 +904,10 @@ namespace Umbraco.Tests.PublishedContent
             documents = snapshot.Content.GetAtRoot("*").ToArray();
             AssertDocuments(documents, "N1-fr-FR", null, "N3-fr-FR");
 
-            documents = snapshot.Content.GetById(1).DescendantsOrSelf().ToArray();
+            documents = snapshot.Content.GetById(1).DescendantsOrSelf(_variationAccesor).ToArray();
             AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", "N12-fr-FR", "N6-fr-FR");
 
-            documents = snapshot.Content.GetById(1).DescendantsOrSelf("*").ToArray();
+            documents = snapshot.Content.GetById(1).DescendantsOrSelf(_variationAccesor, "*").ToArray();
             AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", null /*11*/, "N12-fr-FR", null /*5*/, "N6-fr-FR");
         }
 
