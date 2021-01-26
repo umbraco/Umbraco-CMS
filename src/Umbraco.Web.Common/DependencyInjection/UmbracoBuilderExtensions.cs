@@ -39,7 +39,6 @@ using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Localization;
 using Umbraco.Web.Common.Macros;
 using Umbraco.Web.Common.Middleware;
@@ -150,6 +149,7 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
         {
+            builder.Services.AddHostedService<QueuedHostedService>();
             builder.Services.AddHostedService<HealthCheckNotifier>();
             builder.Services.AddHostedService<KeepAlive>();
             builder.Services.AddHostedService<LogScrubber>();
@@ -232,9 +232,8 @@ namespace Umbraco.Web.Common.DependencyInjection
             // AspNetCore specific services
             builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-
-            // The umbraco request lifetime
-            builder.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+            builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
+            builder.AddNotificationHandler<UmbracoRequestEnd, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();

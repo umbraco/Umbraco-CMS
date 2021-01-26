@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using StackExchange.Profiling;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 
@@ -13,8 +11,14 @@ namespace Umbraco.Web.Common.Profiler
 
     public class WebProfiler : IProfiler
     {
+        public static readonly AsyncLocal<MiniProfiler> MiniProfilerContext = new AsyncLocal<MiniProfiler>(x =>
+        {
+            _ = x;
+        });
         private MiniProfiler _startupProfiler;
         private int _first;
+
+
 
         public IDisposable Step(string name)
         {
@@ -24,22 +28,14 @@ namespace Umbraco.Web.Common.Profiler
         public void Start()
         {
             MiniProfiler.StartNew();
+            MiniProfilerContext.Value = MiniProfiler.Current;
         }
 
-        public void StartBoot()
-        {
-            _startupProfiler = MiniProfiler.StartNew("Startup Profiler");
-        }
+        public void StartBoot() => _startupProfiler = MiniProfiler.StartNew("Startup Profiler");
 
-        public void StopBoot()
-        {
-            _startupProfiler.Stop();
-        }
+        public void StopBoot() => _startupProfiler.Stop();
 
-        public void Stop(bool discardResults = false)
-        {
-            MiniProfiler.Current?.Stop(discardResults);
-        }
+        public void Stop(bool discardResults = false) => MiniProfilerContext.Value?.Stop(discardResults);
 
 
         public void UmbracoApplicationBeginRequest(HttpContext context)
@@ -60,9 +56,9 @@ namespace Umbraco.Web.Common.Profiler
                 {
 
                     var startupDuration = _startupProfiler.Root.DurationMilliseconds.GetValueOrDefault();
-                    MiniProfiler.Current.DurationMilliseconds += startupDuration;
-                    MiniProfiler.Current.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
-                    MiniProfiler.Current.Root.AddChild(_startupProfiler.Root);
+                    MiniProfilerContext.Value.DurationMilliseconds += startupDuration;
+                    MiniProfilerContext.Value.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
+                    MiniProfilerContext.Value.Root.AddChild(_startupProfiler.Root);
 
                     _startupProfiler = null;
                 }

@@ -11,10 +11,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
@@ -22,6 +20,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
+using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -100,12 +99,16 @@ namespace Umbraco.Tests.Integration.DependencyInjection
         // replace the default so there is no background index rebuilder
         private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
-                : base(mainDom, profilingLogger, loggerFactory, hostingEnvironment, indexRebuilder)
+            public TestBackgroundIndexRebuilder(
+                IMainDom mainDom,
+                ILogger<BackgroundIndexRebuilder> logger,
+                IndexRebuilder indexRebuilder,
+                IBackgroundTaskQueue backgroundTaskQueue)
+                : base(mainDom, logger, indexRebuilder, backgroundTaskQueue)
             {
             }
 
-            public override void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
+            public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null)
             {
                 // noop
             }
