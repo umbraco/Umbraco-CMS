@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
@@ -10,19 +9,17 @@ using Umbraco.Core.Events;
 using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Common.Lifetime;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     // supports LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>
+    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,  INotificationHandler<UmbracoRequestEnd>
     {
         private static int s_req;
         private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
-        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
         private readonly IMainDom _mainDom;
 
         /// <summary>
@@ -33,14 +30,12 @@ namespace Umbraco.ModelsBuilder.Embedded
             IOptions<ModelsBuilderSettings> config,
             ModelsGenerator modelGenerator,
             ModelsGenerationError mbErrors,
-            IUmbracoRequestLifetime umbracoRequestLifetime,
             IMainDom mainDom)
         {
             _logger = logger;
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
-            _umbracoRequestLifetime = umbracoRequestLifetime;
             _mainDom = mainDom;
         }
 
@@ -68,8 +63,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             // and we also don't generate models.
             _mainDom.Register(() =>
             {
-                _umbracoRequestLifetime.RequestEnd += (sender, context) => AppEndRequest(context);
-
                 // anything changes, and we want to re-generate models.
                 ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
                 DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
@@ -125,19 +118,12 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-        private void AppEndRequest(HttpContext context)
+        public void Handle(UmbracoRequestEnd notification)
         {
-            if (context.Request.IsClientSideRequest())
+            if (IsEnabled && _mainDom.IsMainDom && !notification.HttpContext.Request.IsClientSideRequest())
             {
-                return;
+                GenerateModelsIfRequested();
             }
-
-            if (!IsEnabled)
-            {
-                return;
-            }
-
-            GenerateModelsIfRequested();
         }
     }
 }
