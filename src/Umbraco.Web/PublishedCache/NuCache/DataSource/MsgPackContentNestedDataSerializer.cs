@@ -79,6 +79,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// Used during serialization to compress properties
         /// </summary>
         /// <param name="model"></param>
+        /// <remarks>
+        /// This will essentially 'double compress' property data. The MsgPack data as a whole will already be compressed
+        /// but this will go a step further and double compress property data so that it is stored in the nucache file
+        /// as compressed bytes and therefore will exist in memory as compressed bytes. That is, until the bytes are
+        /// read/decompressed as a string to be displayed on the front-end. This allows for potentially a significant
+        /// memory savings but could also affect performance of first rendering pages while decompression occurs.
+        /// </remarks>
         private void Compress(int contentTypeId, ContentCacheDataModel model)
         {
             foreach(var propertyAliasToData in model.PropertyData)
