@@ -185,16 +185,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
             else if (value is LazyCompressedString lazyCompressedString)
             {
-                if (lazyCompressedString.IsDecompressed)
-                {
-                    PrimitiveSerializer.Char.WriteTo(PrefixString, stream);
-                    PrimitiveSerializer.String.WriteTo(lazyCompressedString, stream);
-                }
-                else
-                {
-                    PrimitiveSerializer.Char.WriteTo(PrefixCompressedStringByteArray, stream);
-                    PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
-                }
+                PrimitiveSerializer.Char.WriteTo(PrefixCompressedStringByteArray, stream);
+                PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
             }
             else if (value is sbyte signedByteValue)
             {
