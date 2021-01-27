@@ -243,10 +243,10 @@
     <key alias="formsInstall">Installera Umbraco Forms</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Stanna</key>
+    <key alias="discardChanges">Ignorera ändringar</key>
+    <key alias="unsavedChanges">Du har ändringar som inte är sparade</key>
+    <key alias="unsavedChangesWarning">Vill du verkligen lämna sidan? Du har ändringar som inte är sparade</key>
   </area>
   <area alias="bulk">
     <key alias="done">Klar</key>
@@ -504,7 +504,7 @@
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mer information om att redigera web.config hittar du här</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
@@ -532,7 +532,7 @@
     <key alias="permissionsSettingUpPermissions">Konfigurerar mapprättigheter</key>
     <key alias="permissionsText">Umbraco behöver skriv/ändra rättigheter till vissa mappar för att spara filer som bilder och PDFer. Umbraco sparar också temporär data (så kallad cache) för att öka prestandan på din webbplats.</key>
     <key alias="runwayFromScratch">Jag vill börja från början</key>
-    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
     <key alias="runwayHeader">Du har just installerat en ren Umbraco platform. Vad vill du göra härnäst?</key>
     <key alias="runwayInstalled">Runway är installerat</key>
     <key alias="runwayInstalledText"><![CDATA[Du har nu grunden på plats. Välj vilka moduler du vill installera ovanpå den.<br /> Det här är vår lista över rekommenderade moduler, markera de moduler du vill installera, eller visa den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fullständiga listan</a>]]></key>
@@ -567,7 +567,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
@@ -588,6 +588,11 @@
     <key alias="clickToUpload">Klicka för att ladda upp</key>
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
       <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
+  </area>
+  <area alias="member">
+        <key alias="createNewMember">Skapa en ny medlem</key>
+        <key alias="allMembers">Alla medlemmar</key>
+        <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -736,8 +741,8 @@
     <key alias="tabs">Flikar</key>
   </area>
   <area alias="sort">
-    <key alias="sortOrder">Sort order</key>
-    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortOrder">Sortera ordningen</key>
+    <key alias="sortCreationDate">Skapandedatum</key>
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
     <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
@@ -810,12 +815,12 @@
   </area>
   <area alias="grid">
     <key alias="media">Bild</key>
-    <key alias="macro">Macro</key>
+    <key alias="macro">Makro</key>
     <key alias="insertControl">Lägg till</key>
-    <key alias="chooseLayout">Choose layout</key>
+    <key alias="chooseLayout">Välj utformning</key>
     <key alias="addRows">Lägg till rad</key>
-    <key alias="addElement">Add content</key>
-    <key alias="dropElement">Drop content</key>
+    <key alias="addElement">Lägg till innehåll</key>
+    <key alias="dropElement">Släpp innehåll</key>
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
@@ -842,7 +847,7 @@
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt fält</key>
     <key alias="alternativeText">Alternativ text</key>
-    <key alias="casing">Casing</key>
+    <key alias="casing">Hölje</key>
     <key alias="chooseField">Välj fält</key>
     <key alias="convertLineBreaks">Konvertera radbrytningar</key>
     <key alias="convertLineBreaksHelp">Byter radbrytningar mot html-taggen &amp;lt;br&amp;gt;</key>
@@ -958,7 +963,7 @@
     <key alias="lastLockoutDate">Senast utlåst</key>
     <key alias="lastLogin">Senast inloggad</key>
     <key alias="lastPasswordChangeDate">Lösenordet ändrades</key>
-    <key alias="loginname">Login</key>
+    <key alias="loginname">Logga in</key>
     <key alias="mediastartnode">Startnod i mediabiblioteket</key>
     <key alias="mediastartnodehelp">Begränsa media sectionen till en specifik startnod</key>
     <key alias="mediastartnodes">Media startnoder</key>

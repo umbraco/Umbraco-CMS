@@ -175,7 +175,7 @@ namespace Umbraco.Web.Trees
             var nodeMenu = GetAllNodeMenuItems(item);            
             
             //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
                 nodeMenu = GetNodeMenuItemsForDeletedContent(item);

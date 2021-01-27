@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -101,7 +103,7 @@ namespace Umbraco.Web.Editors
 
             //get the file info
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -443,9 +445,9 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<UsersController>(ex, "An error occured in a custom event handler while inviting the user");
+                Logger.Error<UsersController>(ex, "An error occurred in a custom event handler while inviting the user");
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse($"An error occured inviting the user (check logs for more info): {ex.Message}"));
+                    Request.CreateNotificationValidationErrorResponse($"An error occurred inviting the user (check logs for more info): {ex.Message}"));
             }
 
             // If the event is handled then no need to send the email
@@ -632,7 +634,15 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var userHasChangedOwnLanguage =
+                user.Id == Security.CurrentUser.Id && Security.CurrentUser.Language != user.Language;
+
+            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(Services.TextService.Localize(textToLocalise, culture), Services.TextService.Localize("speechBubbles/editUserSaved", culture));
             return display;
         }
 
