@@ -85,6 +85,38 @@ namespace Umbraco.Web.Services
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<FileInfo> GetAllIconNames()
+        {
+            // add icons from plugins
+            var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+            var pluginIcons = new List<FileInfo>();
+
+            // iterate sub directories of app plugins
+            foreach (var dir in appPlugins.EnumerateDirectories())
+            {
+                var iconPath = dir.FullName + SystemDirectories.AppPluginIcons;
+                if (Directory.Exists(iconPath))
+                {
+                    var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
+                    pluginIcons.AddRange(dirIcons);
+                }
+            }
+
+            // add icons from IconsPath if not already added from plugins
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
+            var iconNames = directory.GetFiles("*.svg")
+                .Where(x => pluginIcons.Any(i => i.Name == x.Name) == false)
+                .ToList();
+
+            iconNames.AddRange(pluginIcons);
+
+         return iconNames;
+        }
+
         private Dictionary<string, IconModel> GetIconModels() => _cache.GetCacheItem(
             "Umbraco.Web.Services.IconService::AllIconModels",
             () => GetAllIconNames()
