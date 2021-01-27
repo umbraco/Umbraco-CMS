@@ -114,7 +114,7 @@ namespace Umbraco.Web.Services
 
             iconNames.AddRange(pluginIcons);
 
-         return iconNames;
+            return iconNames;
         }
 
         private Dictionary<string, IconModel> GetIconModels() => _cache.GetCacheItem(
