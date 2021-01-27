@@ -48,17 +48,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
         {
-            if (stringData != null)
+            if (byteData != null)
+            {
+                var content = MessagePackSerializer.Deserialize<ContentCacheDataModel>(byteData, _options);
+                Expand(contentTypeId, content);
+                return content;
+            }
+            else if (stringData != null)
             {
                 // NOTE: We don't really support strings but it's possible if manually used (i.e. tests)
                 var bin = Convert.FromBase64String(stringData);
                 var content = MessagePackSerializer.Deserialize<ContentCacheDataModel>(bin, _options);
-                Expand(contentTypeId, content);
-                return content;
-            }
-            else if (byteData != null)
-            {
-                var content = MessagePackSerializer.Deserialize<ContentCacheDataModel>(byteData, _options);
                 Expand(contentTypeId, content);
                 return content;
             }

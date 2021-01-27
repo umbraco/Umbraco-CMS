@@ -18,6 +18,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private const char PrefixByte = 'O';
         private const char PrefixByteArray = 'A';
         private const char PrefixCompressedStringByteArray = 'C';
+        private const char PrefixSignedByte = 'E';
+        private const char PrefixBool = 'M';
+        private const char PrefixGuid = 'G';
+        private const char PrefixTimeSpan = 'T';
+        private const char PrefixInt16 = 'Q';
+        private const char PrefixChar = 'R';
 
         protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
         protected int ReadInt(Stream stream) => PrimitiveSerializer.Int32.ReadFrom(stream);
@@ -93,6 +99,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
                 case PrefixByteArray:
                     return PrimitiveSerializer.Bytes.ReadFrom(stream);
+                case PrefixSignedByte:
+                    return PrimitiveSerializer.SByte.ReadFrom(stream);
+                case PrefixBool:
+                    return PrimitiveSerializer.Boolean.ReadFrom(stream);
+                case PrefixGuid:
+                    return PrimitiveSerializer.Guid.ReadFrom(stream);
+                case PrefixTimeSpan:
+                    return PrimitiveSerializer.TimeSpan.ReadFrom(stream);
+                case PrefixInt16:
+                    return PrimitiveSerializer.Int16.ReadFrom(stream);
+                case PrefixChar:
+                    return PrimitiveSerializer.Char.ReadFrom(stream);
                 case PrefixCompressedStringByteArray:
                     return new LazyCompressedString(PrimitiveSerializer.Bytes.ReadFrom(stream));
                 default:
@@ -167,8 +185,46 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
             else if (value is LazyCompressedString lazyCompressedString)
             {
-                PrimitiveSerializer.Char.WriteTo(PrefixCompressedStringByteArray, stream);
-                PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
+                if (lazyCompressedString.IsDecompressed)
+                {
+                    PrimitiveSerializer.Char.WriteTo(PrefixString, stream);
+                    PrimitiveSerializer.String.WriteTo(lazyCompressedString, stream);
+                }
+                else
+                {
+                    PrimitiveSerializer.Char.WriteTo(PrefixCompressedStringByteArray, stream);
+                    PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
+                }
+            }
+            else if (value is sbyte signedByteValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixSignedByte, stream);
+                PrimitiveSerializer.SByte.WriteTo(signedByteValue, stream);
+            }
+            else if (value is bool boolValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixBool, stream);
+                PrimitiveSerializer.Boolean.WriteTo(boolValue, stream);
+            }
+            else if (value is Guid guidValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixGuid, stream);
+                PrimitiveSerializer.Guid.WriteTo(guidValue, stream);
+            }
+            else if (value is TimeSpan timespanValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixTimeSpan, stream);
+                PrimitiveSerializer.TimeSpan.WriteTo(timespanValue, stream);
+            }
+            else if (value is short int16Value)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixInt16, stream);
+                PrimitiveSerializer.Int16.WriteTo(int16Value, stream);
+            }
+            else if (value is char charValue)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixChar, stream);
+                PrimitiveSerializer.Char.WriteTo(charValue, stream);
             }
             else
                 throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");
