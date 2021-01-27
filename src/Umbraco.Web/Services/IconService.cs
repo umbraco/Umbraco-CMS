@@ -101,7 +101,8 @@ namespace Umbraco.Web.Services
                 var iconPath = dir.FullName + SystemDirectories.AppPluginIcons;
                 if (Directory.Exists(iconPath))
                 {
-                    var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
+                    var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly)
+                        .Where(x => !pluginIcons.Any(i => i.Name == x.Name));
                     pluginIcons.AddRange(dirIcons);
                 }
             }
