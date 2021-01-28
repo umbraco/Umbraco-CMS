@@ -298,7 +298,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             throw new PanicException($"failed to get content with id={id}");
                     }
 
-                    id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+                    var next = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+
+#if DEBUG
+                    // I've seen this happen but I think that may have been due to corrupt DB data due to my own
+                    // bugs, but I'm leaving this here just in case we encounter it again while we're debugging.
+                    if (next == id)
+                    {
+                        throw new PanicException($"The current content id {id} is the same as it's next sibling id {next}");
+                    }
+#endif
+
+                    id = next;
                 }
             }
         }
