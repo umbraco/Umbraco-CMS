@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -12,7 +13,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.PublishedContent
             base.SetUp();
 
             // need to specify a different callback for testing
-            PublishedContentExtensions.GetPropertyAliasesAndNames = (services, alias) =>
+            PublishedContentExtensions.GetPropertyAliasesAndNames = (contentTypeService, mediaTypeService, memberTypeService, alias) =>
                 {
                     var userFields = new Dictionary<string, string>()
                         {
@@ -70,14 +71,14 @@ namespace Umbraco.Tests.PublishedContent
         public override void TearDown()
         {
             base.TearDown();
-            Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = null;
+            PublishedContentExtensions.GetPropertyAliasesAndNames = null;
         }
 
         [Test]
         public void To_DataTable()
         {
             var doc = GetContent(true, 1);
-            var dt = doc.ChildrenAsTable(ServiceContext);
+            var dt = doc.ChildrenAsTable(Mock.Of<IVariationContextAccessor>(), Mock.Of<IContentTypeService>(), Mock.Of<IMediaTypeService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublishedUrlProvider>());
 
             Assert.AreEqual(11, dt.Columns.Count);
             Assert.AreEqual(3, dt.Rows.Count);
@@ -100,7 +101,7 @@ namespace Umbraco.Tests.PublishedContent
             var c = (SolidPublishedContent)doc.Children.ElementAt(0);
             c.ContentType = new PublishedContentType(Guid.NewGuid(), 22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
-            var dt = doc.ChildrenAsTable(ServiceContext, "Child");
+            var dt = doc.ChildrenAsTable(Mock.Of<IVariationContextAccessor>(), Mock.Of<IContentTypeService>(), Mock.Of<IMediaTypeService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublishedUrlProvider>(), "Child");
 
             Assert.AreEqual(11, dt.Columns.Count);
             Assert.AreEqual(2, dt.Rows.Count);
@@ -116,7 +117,7 @@ namespace Umbraco.Tests.PublishedContent
         public void To_DataTable_No_Rows()
         {
             var doc = GetContent(false, 1);
-            var dt = doc.ChildrenAsTable(ServiceContext);
+            var dt = doc.ChildrenAsTable(Mock.Of<IVariationContextAccessor>(), Mock.Of<IContentTypeService>(), Mock.Of<IMediaTypeService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublishedUrlProvider>());
             //will return an empty data table
             Assert.AreEqual(0, dt.Columns.Count);
             Assert.AreEqual(0, dt.Rows.Count);

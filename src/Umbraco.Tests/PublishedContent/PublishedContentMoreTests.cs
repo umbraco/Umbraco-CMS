@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Position()
         {
             var items = Current.UmbracoContext.Content.GetAtRoot()
-                .Where(x => x.Value<int>("prop1") == 1234)
+                .Where(x => x.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1") == 1234)
                 .ToIndexedArray();
 
             Assert.IsTrue(items.First().IsFirst());

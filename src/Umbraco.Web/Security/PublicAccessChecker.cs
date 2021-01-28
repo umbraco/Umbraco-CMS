@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Security
@@ -10,12 +11,14 @@ namespace Umbraco.Web.Security
         private readonly Lazy<MembershipHelper> _membershipHelper;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IContentService _contentService;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public PublicAccessChecker(Lazy<MembershipHelper> membershipHelper, IPublicAccessService publicAccessService, IContentService contentService)
+        public PublicAccessChecker(Lazy<MembershipHelper> membershipHelper, IPublicAccessService publicAccessService, IContentService contentService, IPublishedValueFallback publishedValueFallback)
         {
             _membershipHelper = membershipHelper;
             _publicAccessService = publicAccessService;
             _contentService = contentService;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         public PublicAccessStatus HasMemberAccessToContent(int publishedContentId)
@@ -43,7 +46,7 @@ namespace Umbraco.Web.Security
             }
 
             if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) &&
-                member.Value<bool>(Constants.Conventions.Member.IsApproved))
+                member.Value<bool>(_publishedValueFallback, Constants.Conventions.Member.IsApproved))
             {
                 return PublicAccessStatus.LockedOut;
             }
