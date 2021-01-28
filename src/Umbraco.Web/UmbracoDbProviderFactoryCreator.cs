@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Persistance.SqlCe;
+using Umbraco.Persistence.SqlCe;
 
 namespace Umbraco.Web
 {
@@ -15,7 +15,7 @@ namespace Umbraco.Web
         {
         }
 
-        
+
         public DbProviderFactory CreateFactory(string providerName)
         {
             if (string.IsNullOrEmpty(providerName)) return null;

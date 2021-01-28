@@ -126,7 +126,7 @@
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
         npm run build --buildversion=$this.Version.Release >> $log 2>&1
-		
+
 		# We can ignore this warning, we need to update to node 12 at some point - https://github.com/jsdom/jsdom/issues/2939
 		$indexes = [System.Collections.ArrayList]::new()
 		$index = 0;
@@ -141,7 +141,7 @@
 			# Loop through the list of indexes and remove the errors that we expect and feel confident we can ignore
 			$error.Remove($error[$_])
 		}
-		
+
         if (-not $?) { throw "Failed to build" } # that one is expected to work
     } finally {
         Pop-Location
@@ -188,7 +188,7 @@
       --configuration Release --output "$($this.BuildTemp)\WebApp\bin\\" `
       > $log
 
-    & dotnet publish "$src\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" `
+    & dotnet publish "$src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" `
       --configuration Release --output "$($this.BuildTemp)\SqlCe\" `
       > $log
 
@@ -229,7 +229,7 @@
       Write-Host "Create packaging directory"
       mkdir "$($this.BuildTemp)\tests\Packaging" > $null
     }
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Tests\Packaging\Packages", "*", "$($this.BuildTemp)\tests\Packaging\Packages")
+    #$this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Tests\Packaging\Packages", "*", "$($this.BuildTemp)\tests\Packaging\Packages")
 
     # required for package install tests
     if (-not (Test-Path -Path "$($this.BuildTemp)\tests\bin" ))
@@ -267,8 +267,8 @@
       /p:UmbracoBuild=True `
       > $log
 
-      # copy Umbraco.Persistance.SqlCe files into WebApp
-      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistance.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
+      # copy Umbraco.Persistence.SqlCe files into WebApp
+      Copy-Item "$($this.BuildTemp)\tests\Umbraco.Persistence.SqlCe.*" "$($this.BuildTemp)\WebApp\bin"
 
     if (-not $?) { throw "Failed to compile tests." }
 
@@ -477,7 +477,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Configuration", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.ModelsBuilder.Embedded", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
 

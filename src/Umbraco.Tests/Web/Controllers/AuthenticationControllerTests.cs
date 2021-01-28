@@ -1,42 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.Http;
-using Moq;
-using Newtonsoft.Json;
+﻿using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.ControllerTesting;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
-using Umbraco.Web;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
-using Umbraco.Web.Models.ContentEditing;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Persistance.SqlCe;
-using Umbraco.Web.Routing;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Web.Controllers
 {

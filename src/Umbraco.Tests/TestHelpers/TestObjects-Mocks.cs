@@ -4,20 +4,19 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Persistance.SqlCe;
+using Umbraco.Persistence.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {

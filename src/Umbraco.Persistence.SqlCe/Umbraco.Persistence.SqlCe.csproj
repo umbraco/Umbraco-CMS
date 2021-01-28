@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DocumentationFile>bin\Release\Umbraco.Persistance.SqlCe.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\Umbraco.Persistence.SqlCe.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
