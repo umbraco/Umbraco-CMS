@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
@@ -1117,6 +1119,145 @@ namespace Umbraco.Core
                     throw new NotSupportedException();
             }
         }
+
+        #endregion
+
+        #region Axes: children
+
+        /// <summary>
+        /// Gets the children of the content in a DataTable.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="variationContextAccessor">Variation context accessor.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
+        /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The children of the content.</returns>
+        public static DataTable ChildrenAsTable(this IPublishedContent content,
+            IVariationContextAccessor variationContextAccessor, IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
+            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string culture = null)
+            => GenerateDataTable(content, variationContextAccessor, contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
+
+        /// <summary>
+        /// Gets the children of the content in a DataTable.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="variationContextAccessor">Variation context accessor.</param>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <param name="mediaTypeService">The media type service.</param>
+        /// <param name="memberTypeService">The member type service.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
+        /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
+        /// <returns>The children of the content.</returns>
+        private static DataTable GenerateDataTable(IPublishedContent content,
+            IVariationContextAccessor variationContextAccessor, IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
+            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string culture = null)
+        {
+            var firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
+                                ? content.Children(variationContextAccessor, culture).Any()
+                                    ? content.Children(variationContextAccessor, culture).ElementAt(0)
+                                    : null
+                                : content.Children(variationContextAccessor, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
+            if (firstNode == null)
+                return new DataTable(); //no children found
+
+            //use new utility class to create table so that we don't have to maintain code in many places, just one
+            var dt = Core.DataTableExtensions.GenerateDataTable(
+                //pass in the alias of the first child node since this is the node type we're rendering headers for
+                firstNode.ContentType.Alias,
+                //pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
+                alias => GetPropertyAliasesAndNames(contentTypeService, mediaTypeService, memberTypeService, alias),
+                //pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
+                () =>
+                {
+                    //create all row data
+                    var tableData = Core.DataTableExtensions.CreateTableData();
+                    //loop through each child and create row data for it
+                    foreach (var n in content.Children(variationContextAccessor).OrderBy(x => x.SortOrder))
+                    {
+                        if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
+                        {
+                            if (n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter) == false)
+                                continue; //skip this one, it doesn't match the filter
+                        }
+
+                        var standardVals = new Dictionary<string, object>
+                            {
+                                { "Id", n.Id },
+                                { "NodeName", n.Name(variationContextAccessor) },
+                                { "NodeTypeAlias", n.ContentType.Alias },
+                                { "CreateDate", n.CreateDate },
+                                { "UpdateDate", n.UpdateDate },
+                                { "CreatorId", n.CreatorId},
+                                { "WriterId", n.WriterId },
+                                { "Url", n.Url(publishedUrlProvider) }
+                            };
+
+                        var userVals = new Dictionary<string, object>();
+                        foreach (var p in from IPublishedProperty p in n.Properties where p.GetSourceValue() != null select p)
+                        {
+                            // probably want the "object value" of the property here...
+                            userVals[p.Alias] = p.GetValue();
+                        }
+                        //add the row data
+                        Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
+                    }
+
+                    return tableData;
+                });
+            return dt;
+        }
+
+        #endregion
+
+        #region PropertyAliasesAndNames
+
+        private static Func<IContentTypeService, IMediaTypeService, IMemberTypeService, string, Dictionary<string, string>> _getPropertyAliasesAndNames;
+
+        /// <summary>
+        /// This is used only for unit tests to set the delegate to look up aliases/names dictionary of a content type
+        /// </summary>
+        internal static Func<IContentTypeService, IMediaTypeService, IMemberTypeService, string, Dictionary<string, string>> GetPropertyAliasesAndNames
+        {
+            get => _getPropertyAliasesAndNames ?? GetAliasesAndNames;
+            set => _getPropertyAliasesAndNames = value;
+        }
+
+        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, string alias)
+        {
+            var type = contentTypeService.Get(alias)
+                       ?? mediaTypeService.Get(alias)
+                       ?? (IContentTypeBase)memberTypeService.Get(alias);
+            var fields = GetAliasesAndNames(type);
+
+            // ensure the standard fields are there
+            var stdFields = new Dictionary<string, string>
+            {
+                {"Id", "Id"},
+                {"NodeName", "NodeName"},
+                {"NodeTypeAlias", "NodeTypeAlias"},
+                {"CreateDate", "CreateDate"},
+                {"UpdateDate", "UpdateDate"},
+                {"CreatorName", "CreatorName"},
+                {"WriterName", "WriterName"},
+                {"Url", "Url"}
+            };
+
+            foreach (var field in stdFields.Where(x => fields.ContainsKey(x.Key) == false))
+            {
+                fields[field.Key] = field.Value;
+            }
+
+            return fields;
+        }
+
+        private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType) => contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
 
         #endregion
     }

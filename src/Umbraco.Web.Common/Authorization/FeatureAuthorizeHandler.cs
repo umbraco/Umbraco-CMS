@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Umbraco.Web.Features;
 
 namespace Umbraco.Web.BackOffice.Authorization
@@ -35,7 +36,25 @@ namespace Umbraco.Web.BackOffice.Authorization
 
         private bool? IsAllowed(AuthorizationHandlerContext context)
         {
-            if (!(context.Resource is Endpoint endpoint))
+            Endpoint? endpoint = null;
+
+            switch (context.Resource)
+            {
+                case DefaultHttpContext defaultHttpContext:
+                {
+                    IEndpointFeature endpointFeature = defaultHttpContext.Features.Get<IEndpointFeature>();
+                    endpoint = endpointFeature.Endpoint;
+                    break;
+                }
+
+                case Endpoint resourceEndpoint:
+                {
+                    endpoint = resourceEndpoint;
+                    break;
+                }
+            }
+
+            if (endpoint is null)
             {
                 throw new InvalidOperationException("This authorization handler can only be applied to controllers routed with endpoint routing");
             }

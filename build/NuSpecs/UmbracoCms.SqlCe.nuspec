@@ -31,13 +31,13 @@
     </metadata>
     <files>
         <!-- libs -->
-        <file src="$BuildTmp$\SqlCe\Umbraco.Persistance.SqlCe.dll" target="lib\netstandard2.0\Umbraco.Persistance.SqlCe.dll" />
+        <file src="$BuildTmp$\SqlCe\Umbraco.Persistence.SqlCe.dll" target="lib\netstandard2.0\Umbraco.Persistence.SqlCe.dll" />
         <file src="$BuildTmp$\SqlCe\System.Data.SqlServerCe.dll" target="lib\netstandard2.0\System.Data.SqlServerCe.dll" /> <!-- Hack because the file from the package is only added to net472 projects -->
 
         <!-- docs -->
-        <file src="$BuildTmp$\SqlCe\Umbraco.Persistance.SqlCe.xml" target="lib\netstandard2.0\Umbraco.Persistance.SqlCe.xml" />
+        <file src="$BuildTmp$\SqlCe\Umbraco.Persistence.SqlCe.xml" target="lib\netstandard2.0\Umbraco.Persistence.SqlCe.xml" />
 
         <!-- symbols -->
-        <file src="$BuildTmp$\SqlCe\Umbraco.Persistance.SqlCe.pdb" target="lib\netstandard2.0\Umbraco.Persistance.SqlCe.pdb" />
+        <file src="$BuildTmp$\SqlCe\Umbraco.Persistence.SqlCe.pdb" target="lib\netstandard2.0\Umbraco.Persistence.SqlCe.pdb" />
     </files>
 </package>

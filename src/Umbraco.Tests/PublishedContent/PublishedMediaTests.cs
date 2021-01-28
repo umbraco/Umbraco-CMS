@@ -1,4 +1,4 @@
-﻿using System.Web;
+using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using NUnit.Framework;
@@ -103,15 +103,15 @@ namespace Umbraco.Tests.PublishedContent
 
             var publishedMedia = GetNode(media.Id);
 
-            var propVal = publishedMedia.Value("content");
+            var propVal = publishedMedia.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "content");
             Assert.IsInstanceOf<IHtmlEncodedString>(propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-            var propVal2 = publishedMedia.Value<IHtmlEncodedString>("content");
+            var propVal2 = publishedMedia.Value<IHtmlEncodedString>(Factory.GetRequiredService<IPublishedValueFallback>(), "content");
             Assert.IsInstanceOf<IHtmlEncodedString>(propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
-            var propVal3 = publishedMedia.Value("Content");
+            var propVal3 = publishedMedia.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "Content");
             Assert.IsInstanceOf<IHtmlEncodedString>(propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
@@ -240,11 +240,11 @@ namespace Umbraco.Tests.PublishedContent
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
-                var rootDescendants = publishedMedia.Descendants();
+                var rootDescendants = publishedMedia.Descendants(Factory.GetRequiredService<IVariationContextAccessor>());
                 Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1113, 1114, 1115, 1116 }));
 
                 var publishedChild1 = cache.GetById(2222);
-                var subDescendants = publishedChild1.Descendants();
+                var subDescendants = publishedChild1.Descendants(Factory.GetRequiredService<IVariationContextAccessor>());
                 Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 3113 }));
             }
         }
@@ -268,11 +268,11 @@ namespace Umbraco.Tests.PublishedContent
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
-                var rootDescendants = publishedMedia.DescendantsOrSelf();
+                var rootDescendants = publishedMedia.DescendantsOrSelf(Factory.GetRequiredService<IVariationContextAccessor>());
                 Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 1111, 2112, 2222, 1113, 1114, 1115, 1116 }));
 
                 var publishedChild1 = cache.GetById(2222);
-                var subDescendants = publishedChild1.DescendantsOrSelf();
+                var subDescendants = publishedChild1.DescendantsOrSelf(Factory.GetRequiredService<IVariationContextAccessor>());
                 Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2222, 2112, 3113 }));
             }
         }
@@ -368,11 +368,11 @@ namespace Umbraco.Tests.PublishedContent
             var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
-            var rootDescendants = publishedMedia.Descendants();
+            var rootDescendants = publishedMedia.Descendants(Factory.GetRequiredService<IVariationContextAccessor>());
             Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 
             var publishedChild1 = GetNode(mChild1.Id);
-            var subDescendants = publishedChild1.Descendants();
+            var subDescendants = publishedChild1.Descendants(Factory.GetRequiredService<IVariationContextAccessor>());
             Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
         }
 
@@ -392,12 +392,12 @@ namespace Umbraco.Tests.PublishedContent
             var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
-            var rootDescendantsOrSelf = publishedMedia.DescendantsOrSelf();
+            var rootDescendantsOrSelf = publishedMedia.DescendantsOrSelf(Factory.GetRequiredService<IVariationContextAccessor>());
             Assert.IsTrue(rootDescendantsOrSelf.Select(x => x.Id).ContainsAll(
                 new[] { mRoot.Id, mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 
             var publishedChild1 = GetNode(mChild1.Id);
-            var subDescendantsOrSelf = publishedChild1.DescendantsOrSelf();
+            var subDescendantsOrSelf = publishedChild1.DescendantsOrSelf(Factory.GetRequiredService<IVariationContextAccessor>());
             Assert.IsTrue(subDescendantsOrSelf.Select(x => x.Id).ContainsAll(
                 new[] { mChild1.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
         }

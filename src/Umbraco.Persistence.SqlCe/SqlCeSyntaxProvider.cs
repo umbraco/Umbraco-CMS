@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
 
-namespace Umbraco.Persistance.SqlCe
+namespace Umbraco.Persistence.SqlCe
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce

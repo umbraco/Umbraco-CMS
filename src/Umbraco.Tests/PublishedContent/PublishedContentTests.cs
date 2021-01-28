@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children(VariationContextAccessor).Where(x => x.IsVisible()).ToIndexedArray();
+            var items = doc.Children(VariationContextAccessor).Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>())).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var items = doc
                 .Children(VariationContextAccessor)
-                .Where(x => x.IsVisible())
+                .Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>()))
                 .ToIndexedArray();
 
             Assert.AreEqual(4, items.Length);
@@ -274,7 +274,7 @@ namespace Umbraco.Tests.PublishedContent
                 // explicitely returns a PublishedContentSet, not an IEnumerable<T>
 
                 .OfType<Home>() // ours, return IEnumerable<Home> (actually a PublishedContentSet<Home>)
-                .Where(x => x.IsVisible()) // so, here it's linq again :-(
+                .Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>())) // so, here it's linq again :-(
                 .ToIndexedArray(); // so, we need that one for the test to pass
 
             Assert.AreEqual(1, items.Length);
@@ -363,16 +363,18 @@ namespace Umbraco.Tests.PublishedContent
             var exindex = 0;
 
             // must respect the XPath descendants-or-self axis!
-            foreach (var d in doc.DescendantsOrSelf())
+            foreach (var d in doc.DescendantsOrSelf(Mock.Of<IVariationContextAccessor>()))
+            {
                 Assert.AreEqual(expected[exindex++], d.Id);
+            }
         }
 
         [Test]
         public void Get_Property_Value_Recursive()
         {
             var doc = GetNode(1174);
-            var rVal = doc.Value("testRecursive", fallback: Fallback.ToAncestors);
-            var nullVal = doc.Value("DoNotFindThis", fallback: Fallback.ToAncestors);
+            var rVal = doc.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "testRecursive", fallback: Fallback.ToAncestors);
+            var nullVal = doc.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "DoNotFindThis", fallback: Fallback.ToAncestors);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }
@@ -382,15 +384,15 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var propVal = doc.Value("content");
+            var propVal = doc.Value(Mock.Of<IPublishedValueFallback>(), "content");
             Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-            var propVal2 = doc.Value<IHtmlEncodedString>("content");
+            var propVal2 = doc.Value<IHtmlEncodedString>(Mock.Of<IPublishedValueFallback>(), "content");
             Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
-            var propVal3 = doc.Value("Content");
+            var propVal3 = doc.Value(Mock.Of<IPublishedValueFallback>(), "Content");
             Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
@@ -402,8 +404,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var result = doc.Ancestors().OrderBy(x => x.Level)
                 .Single()
-                .Descendants()
-                .FirstOrDefault(x => x.Value<string>("selectedNodes", defaultValue: "").Split(',').Contains("1173"));
+                .Descendants(Mock.Of<IVariationContextAccessor>())
+                .FirstOrDefault(x => x.Value<string>(Mock.Of<IPublishedValueFallback>(), "selectedNodes", defaultValue: "").Split(',').Contains("1173"));
 
             Assert.IsNotNull(result);
         }
@@ -469,14 +471,14 @@ namespace Umbraco.Tests.PublishedContent
         public void FirstChild()
         {
             var doc = GetNode(1173); // has child nodes
-            Assert.IsNotNull(doc.FirstChild());
-            Assert.IsNotNull(doc.FirstChild(x => true));
-            Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+            Assert.IsNotNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>()));
+            Assert.IsNotNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>(), x => true));
+            Assert.IsNotNull(doc.FirstChild<IPublishedContent>(Mock.Of<IVariationContextAccessor>()));
 
             doc = GetNode(1175); // does not have child nodes
-            Assert.IsNull(doc.FirstChild());
-            Assert.IsNull(doc.FirstChild(x => true));
-            Assert.IsNull(doc.FirstChild<IPublishedContent>());
+            Assert.IsNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>()));
+            Assert.IsNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>(), x => true));
+            Assert.IsNull(doc.FirstChild<IPublishedContent>(Mock.Of<IVariationContextAccessor>()));
         }
 
         [Test]
@@ -484,7 +486,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1046); // has child nodes
 
-            var model = doc.FirstChild<Home>(x => true); // predicate
+            var model = doc.FirstChild<Home>(Mock.Of<IVariationContextAccessor>(), x => true); // predicate
 
             Assert.IsNotNull(model);
             Assert.IsTrue(model.Id == 1173);
@@ -492,8 +494,8 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsInstanceOf<IPublishedContent>(model);
 
             doc = GetNode(1175); // does not have child nodes
-            Assert.IsNull(doc.FirstChild<Anything>());
-            Assert.IsNull(doc.FirstChild<Anything>(x => true));
+            Assert.IsNull(doc.FirstChild<Anything>(Mock.Of<IVariationContextAccessor>()));
+            Assert.IsNull(doc.FirstChild<Anything>(Mock.Of<IVariationContextAccessor>(), x => true));
         }
 
         [Test]
@@ -521,8 +523,8 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var hasValue = doc.HasValue(Constants.Conventions.Content.UrlAlias);
-            var noValue = doc.HasValue("blahblahblah");
+            var hasValue = doc.HasValue(Mock.Of<IPublishedValueFallback>(), Constants.Conventions.Content.UrlAlias);
+            var noValue = doc.HasValue(Mock.Of<IPublishedValueFallback>(), "blahblahblah");
 
             Assert.IsTrue(hasValue);
             Assert.IsFalse(noValue);
@@ -533,7 +535,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1174);
 
-            var whereVisible = doc.Ancestors().Where(x => x.IsVisible());
+            var whereVisible = doc.Ancestors().Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>()));
             Assert.AreEqual(1, whereVisible.Count());
 
         }
@@ -544,8 +546,8 @@ namespace Umbraco.Tests.PublishedContent
             var hidden = GetNode(1046);
             var visible = GetNode(1173);
 
-            Assert.IsFalse(hidden.IsVisible());
-            Assert.IsTrue(visible.IsVisible());
+            Assert.IsFalse(hidden.IsVisible(Mock.Of<IPublishedValueFallback>()));
+            Assert.IsTrue(visible.IsVisible(Mock.Of<IPublishedValueFallback>()));
         }
 
         [Test]
@@ -701,7 +703,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1046);
 
-            var result = doc.DescendantsOrSelf().ToArray();
+            var result = doc.DescendantsOrSelf(Mock.Of<IVariationContextAccessor>()).ToArray();
 
             Assert.IsNotNull(result);
 
@@ -714,7 +716,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1046);
 
-            var result = doc.Descendants().ToArray();
+            var result = doc.Descendants(Mock.Of<IVariationContextAccessor>()).ToArray();
 
             Assert.IsNotNull(result);
 
@@ -845,17 +847,20 @@ namespace Umbraco.Tests.PublishedContent
 
             _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
 
-            CollectionAssertAreEqual(new []{root}, root.SiblingsAndSelf());
+            var variationContextAccessor = Factory.GetRequiredService<IVariationContextAccessor>();
+            var publishedSnapshot = _publishedSnapshotAccessorMock.Object.PublishedSnapshot;
 
-            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_1.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_2.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_3.SiblingsAndSelf());
+            CollectionAssertAreEqual(new []{root}, root.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
 
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_2.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_3.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_4.SiblingsAndSelf());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_5.SiblingsAndSelf());
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_1.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_2.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1, level1_2, level1_3}, level1_3.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_2.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_3.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_4.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_5.SiblingsAndSelf(publishedSnapshot, variationContextAccessor));
 
         }
 
@@ -884,17 +889,20 @@ namespace Umbraco.Tests.PublishedContent
 
             _publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot.Content.GetAtRoot(It.IsAny<string>())).Returns(new []{root});
 
-            CollectionAssertAreEqual(new IPublishedContent[0], root.Siblings());
+            var variationContextAccessor = Factory.GetRequiredService<IVariationContextAccessor>();
+            var publishedSnapshot = _publishedSnapshotAccessorMock.Object.PublishedSnapshot;
 
-            CollectionAssertAreEqual( new []{level1_2, level1_3}, level1_1.Siblings());
-            CollectionAssertAreEqual( new []{level1_1,  level1_3}, level1_2.Siblings());
-            CollectionAssertAreEqual( new []{level1_1, level1_2}, level1_3.Siblings());
+            CollectionAssertAreEqual(new IPublishedContent[0], root.Siblings(publishedSnapshot, variationContextAccessor));
 
-            CollectionAssertAreEqual( new []{ level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.Siblings());
-            CollectionAssertAreEqual( new []{level1_1_1,  level1_1_3, level1_1_4, level1_1_5}, level1_1_2.Siblings());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2,  level1_1_4, level1_1_5}, level1_1_3.Siblings());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3,  level1_1_5}, level1_1_4.Siblings());
-            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4}, level1_1_5.Siblings());
+            CollectionAssertAreEqual( new []{level1_2, level1_3}, level1_1.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1,  level1_3}, level1_2.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1, level1_2}, level1_3.Siblings(publishedSnapshot, variationContextAccessor));
+
+            CollectionAssertAreEqual( new []{ level1_1_2, level1_1_3, level1_1_4, level1_1_5}, level1_1_1.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1,  level1_1_3, level1_1_4, level1_1_5}, level1_1_2.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2,  level1_1_4, level1_1_5}, level1_1_3.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3,  level1_1_5}, level1_1_4.Siblings(publishedSnapshot, variationContextAccessor));
+            CollectionAssertAreEqual( new []{level1_1_1, level1_1_2, level1_1_3, level1_1_4}, level1_1_5.Siblings(publishedSnapshot, variationContextAccessor));
 
         }
 
@@ -968,11 +976,11 @@ namespace Umbraco.Tests.PublishedContent
             { }
 
 
-            public string Legend => this.Value<string>("legend");
+            public string Legend => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "legend");
 
-            public IPublishedContent Image => this.Value<IPublishedContent>("image");
+            public IPublishedContent Image => this.Value<IPublishedContent>(Mock.Of<IPublishedValueFallback>(), "image");
 
-            public int Size => this.Value<int>("size");
+            public int Size => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "size");
         }
     }
 }

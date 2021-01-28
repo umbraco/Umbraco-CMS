@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Diagnosers;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -10,7 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Infrastructure.Persistence.Mappers;
-using Umbraco.Persistance.SqlCe;
+using Umbraco.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Benchmarks
 {
