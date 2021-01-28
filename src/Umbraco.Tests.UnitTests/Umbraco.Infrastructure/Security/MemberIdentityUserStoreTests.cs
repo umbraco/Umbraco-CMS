@@ -33,14 +33,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         [Test]
         public void GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
         {
-            //arrange
+            // arrange
             MembersUserStore sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken(){};
 
-            //act
+            // act
             Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
 
-            //assert
+            // assert
             Assert.That(actual, Throws.ArgumentNullException);
         }
 
@@ -48,10 +48,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         [Test]
         public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
-            //arrange
+            // arrange
             MembersUserStore sut = CreateSut();
-            MembersIdentityUser fakeUser = new MembersIdentityUser() { };
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
+            var fakeUser = new MembersIdentityUser() { };
+            var fakeCancellationToken = new CancellationToken() { };
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
             IMember mockMember = Mock.Of<IMember>(m =>
@@ -67,30 +67,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(mockMember);
             _mockMemberService.Setup(x => x.Save(mockMember, raiseEvents));
 
-            //act
+            // act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser, fakeCancellationToken);
 
-            //assert
+            // assert
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
         }
 
-        //FindByNameAsync
-        [Test]
-        public async Task GivenIGetUserNameAsync()
-        {
-        }
-
-        [Test]
-        public async Task GivenIFindByNameAsync()
-        {
-        }
-
-        //SetNormalizedUserNameAsync
-        //SetUserNameAsync
-        //HasPasswordAsync
         //GetPasswordHashAsync
-        //SetPasswordHashAsync
         //GetUserIdAsync
     }
 }

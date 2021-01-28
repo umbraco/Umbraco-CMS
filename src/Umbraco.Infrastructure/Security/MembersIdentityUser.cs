@@ -17,18 +17,28 @@ namespace Umbraco.Infrastructure.Security
         private string _passwordConfig;
         private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
 
-        // TODO: reused from backoffice - share?
         // Custom comparer for enumerables
         private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
             (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
             groups => groups.GetHashCode());
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MembersIdentityUser"/> class.
+        /// </summary>
+        public MembersIdentityUser(int userId)
+        {
+            // use the property setters - they do more than just setting a field
+            Id = UserIdToString(userId);
+        }
+
+        public MembersIdentityUser()
+        {
+        }
 
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
-        public static MembersIdentityUser CreateNew(string username, string email, string memberTypeAlias,
-            string name = null)
+        public static MembersIdentityUser CreateNew(string username, string email, string memberTypeAlias, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -46,20 +56,7 @@ namespace Umbraco.Infrastructure.Security
             user.EnableChangeTracking();
             return user;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MembersIdentityUser"/> class.
-        /// </summary>
-        public MembersIdentityUser(int userId)
-        {
-            // use the property setters - they do more than just setting a field
-            Id = UserIdToString(userId);
-        }
-
-        public MembersIdentityUser()
-        {
-        }
-
+        
         /// <summary>
         /// Gets or sets the member's real name
         /// </summary>
@@ -80,7 +77,6 @@ namespace Umbraco.Infrastructure.Security
 
         /// <summary>
         /// Gets or sets the user groups
-        /// TBC: how to implement for members?
         /// </summary>
         public IReadOnlyCollection<IReadOnlyUserGroup> Groups
         {
@@ -113,13 +109,13 @@ namespace Umbraco.Infrastructure.Security
         {
             get
             {
-                var isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+                bool isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
                 return isLocked;
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating the member is approved
+        /// Gets or sets a value indicating whether the member is approved
         /// </summary>
         public bool IsApproved { get; set; }
 
@@ -129,9 +125,5 @@ namespace Umbraco.Infrastructure.Security
         public string MemberTypeAlias { get; set; }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString());
-
-        // TODO: implement as per base identity user
-        //public bool LoginsChanged;
-        //public bool RolesChanged;
     }
 }

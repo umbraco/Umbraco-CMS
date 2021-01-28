@@ -515,8 +515,6 @@ namespace Umbraco.Infrastructure.Security
                 : user.SecurityStamp);
         }
 
-        // TODO: share all possible between backoffice user
-
         private MembersIdentityUser AssignLoginsCallback(MembersIdentityUser user)
         {
             if (user != null)
@@ -672,8 +670,6 @@ namespace Umbraco.Infrastructure.Security
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override Task<IList<MembersIdentityUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        // TODO: We should support these
 
         /// <summary>
         /// Not supported in Umbraco

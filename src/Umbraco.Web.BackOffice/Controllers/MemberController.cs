@@ -351,7 +351,6 @@ namespace Umbraco.Web.BackOffice.Controllers
                 memberType.Alias,
                 contentItem.Name);
 
-            // TODO: may not need to add password like this
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
 
             if (created.Succeeded == false)
@@ -362,7 +361,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // now re-look the member back up which will now exist
             IMember member = _memberService.GetByEmail(contentItem.Email);
 
-            var creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+            int creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
             member.CreatorId = creatorId;
 
             // map the save info over onto the user
@@ -476,7 +475,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
                     return false;
                 }
-            }
+            }   
 
             IMember byUsername = _memberService.GetByUsername(contentItem.Username);
             if (byUsername != null && byUsername.Key != contentItem.Key)
