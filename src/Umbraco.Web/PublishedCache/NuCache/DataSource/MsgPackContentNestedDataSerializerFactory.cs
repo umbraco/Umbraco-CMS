@@ -12,14 +12,21 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ConcurrentDictionary<(int, string), CompressedStorageAttribute> _compressedStoragePropertyEditorCache = new ConcurrentDictionary<(int, string), CompressedStorageAttribute>();
+        private readonly IPropertyCacheCompressionOptions _compressionOptions;
+        private readonly ConcurrentDictionary<(int, string), bool> _isCompressedCache = new ConcurrentDictionary<(int, string), bool>();
 
-        public MsgPackContentNestedDataSerializerFactory(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, PropertyEditorCollection propertyEditors)
+        public MsgPackContentNestedDataSerializerFactory(
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            PropertyEditorCollection propertyEditors,
+            IPropertyCacheCompressionOptions compressionOptions)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _propertyEditors = propertyEditors;
+            _compressionOptions = compressionOptions;
         }
 
         public IContentCacheDataSerializer Create(ContentCacheDataSerializerEntityType types)
@@ -53,8 +60,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
             }
 
-            var options = new CompressedStoragePropertyEditorCompressionOptions(contentTypes, _propertyEditors, _compressedStoragePropertyEditorCache);
-            var serializer = new MsgPackContentNestedDataSerializer(options);
+            var compression = new PropertyCacheCompression(_compressionOptions, contentTypes, _propertyEditors, _isCompressedCache);
+            var serializer = new MsgPackContentNestedDataSerializer(compression);
 
             return serializer;
         }

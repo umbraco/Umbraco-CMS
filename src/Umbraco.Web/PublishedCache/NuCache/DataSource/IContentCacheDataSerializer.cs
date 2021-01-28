@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -14,19 +14,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// <summary>
         /// Deserialize the data into a <see cref="ContentCacheDataModel"/>
         /// </summary>
-        /// <param name="contentTypeId"></param>
-        /// <param name="stringData"></param>
-        /// <param name="byteData"></param>
-        /// <returns></returns>
-        ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData);
+        ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData);
 
         /// <summary>
         /// Serializes the <see cref="ContentCacheDataModel"/> 
         /// </summary>
-        /// <param name="contentTypeId"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        ContentCacheDataSerializationResult Serialize(int contentTypeId, ContentCacheDataModel model);
+        ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model);
     }
 
 }

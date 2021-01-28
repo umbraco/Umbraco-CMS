@@ -17,7 +17,6 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a grid property and parameter editor.
     /// </summary>
-    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.Grid,
         "Grid layout",

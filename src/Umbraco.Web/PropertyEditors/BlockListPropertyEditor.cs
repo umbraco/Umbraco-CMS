@@ -13,7 +13,6 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a block list property editor.
     /// </summary>
-    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.BlockList,
         "Block List",

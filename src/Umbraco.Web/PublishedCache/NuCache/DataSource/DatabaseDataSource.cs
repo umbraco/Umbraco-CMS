@@ -383,7 +383,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var deserializedContent = serializer.Deserialize(dto.ContentTypeId, dto.EditData, dto.EditDataRaw);
+                    var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
 
                     d = new ContentData
                     {
@@ -410,7 +410,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var deserializedContent = serializer.Deserialize(dto.ContentTypeId, dto.PubData, dto.PubDataRaw);
+                    var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw);
 
                     p = new ContentData
                     {
@@ -427,7 +427,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
             }
 
-            var n = new ContentNode(dto.Id, dto.Uid,
+            var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
             var s = new ContentNodeKit
@@ -446,7 +446,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (dto.EditData == null && dto.EditDataRaw == null)
                 throw new InvalidOperationException("No data for media " + dto.Id);
 
-            var deserializedMedia = serializer.Deserialize(dto.ContentTypeId, dto.EditData, dto.EditDataRaw);
+            var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
 
             var p = new ContentData
             {
@@ -460,7 +460,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 CultureInfos = deserializedMedia.CultureData
             };
 
-            var n = new ContentNode(dto.Id, dto.Uid,
+            var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
             var s = new ContentNodeKit

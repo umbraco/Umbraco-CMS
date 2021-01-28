@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             DateFormatString = "o"
         };
 
-        public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
+        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData)
         {
             if (stringData == null && byteData != null)
                 throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
@@ -29,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return JsonConvert.DeserializeObject<ContentCacheDataModel>(stringData, _jsonSerializerSettings);
         }
 
-        public ContentCacheDataSerializationResult Serialize(int contentTypeId, ContentCacheDataModel model)
+        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model)
         {
             // note that numeric values (which are Int32) are serialized without their
             // type (eg "value":1234) and JsonConvert by default deserializes them as Int64

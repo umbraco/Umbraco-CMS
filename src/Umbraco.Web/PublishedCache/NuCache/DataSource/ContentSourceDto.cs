@@ -1,12 +1,13 @@
 ﻿using System;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     // read-only dto
-    internal class ContentSourceDto
+    internal class ContentSourceDto : IReadOnlyContentBase
     {
         public int Id { get; set; }
-        public Guid Uid { get; set; }
+        public Guid Key { get; set; }
         public int ContentTypeId { get; set; }
 
         public int Level { get; set; }
@@ -37,5 +38,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public int PubTemplateId { get; set; }
         public string PubData { get; set; }
         public byte[] PubDataRaw { get; set; }
+
+        // Explicit implementation
+        DateTime IReadOnlyContentBase.UpdateDate => EditVersionDate;
+        string IReadOnlyContentBase.Name => EditName;
+        int IReadOnlyContentBase.WriterId => EditWriterId;
     }
 }
