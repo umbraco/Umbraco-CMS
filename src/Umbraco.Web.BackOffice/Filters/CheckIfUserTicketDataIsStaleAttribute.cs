@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
@@ -22,7 +23,7 @@ using Umbraco.Web.Common.Security;
 namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribute
     {
@@ -41,6 +42,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IOptions<GlobalSettings> _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
+            private readonly IScopeProvider _scopeProvider;
 
             public CheckIfUserTicketDataIsStaleFilter(
                 IRequestCache requestCache,
@@ -50,7 +52,8 @@ namespace Umbraco.Web.BackOffice.Filters
                 ILocalizedTextService localizedTextService,
                 IOptions<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
-                IBackOfficeAntiforgery backOfficeAntiforgery)
+                IBackOfficeAntiforgery backOfficeAntiforgery,
+                IScopeProvider scopeProvider)
             {
                 _requestCache = requestCache;
                 _umbracoMapper = umbracoMapper;
@@ -60,6 +63,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 _globalSettings = globalSettings;
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
+                _scopeProvider = scopeProvider;
             }
 
 
@@ -95,7 +99,9 @@ namespace Umbraco.Web.BackOffice.Filters
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)
             {
-                if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                {
+                       if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                 {
                     return;
                 }
@@ -151,6 +157,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     await ReSync(user, actionContext);
                 }
+              }
             }
 
             /// <summary>

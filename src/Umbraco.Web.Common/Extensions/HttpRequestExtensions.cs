@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,24 +74,36 @@ namespace Umbraco.Extensions
 
         public static string GetRawBodyString(this HttpRequest request, Encoding encoding = null)
         {
-            request.Body.Seek(0, SeekOrigin.Begin);
+            if (request.Body.CanSeek)
+            {
+                request.Body.Seek(0, SeekOrigin.Begin);
+            }
 
             using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
             {
                 var result = reader.ReadToEnd();
-                request.Body.Seek(0, SeekOrigin.Begin);
+                if (request.Body.CanSeek)
+                {
+                    request.Body.Seek(0, SeekOrigin.Begin);
+                }
                 return result;
             }
         }
 
         public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding encoding = null)
         {
+            if (!request.Body.CanSeek)
+            {
+                request.EnableBuffering();
+            }
+
             request.Body.Seek(0, SeekOrigin.Begin);
 
             using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
             {
                 var result = await reader.ReadToEndAsync();
                 request.Body.Seek(0, SeekOrigin.Begin);
+
                 return result;
             }
         }

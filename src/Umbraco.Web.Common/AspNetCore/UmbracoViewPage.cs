@@ -1,6 +1,5 @@
 using System;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -11,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -19,6 +17,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models;
+using Umbraco.Web.Website;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
@@ -32,6 +31,7 @@ namespace Umbraco.Web.Common.AspNetCore
     public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     {
         private IUmbracoContext _umbracoContext;
+        private UmbracoHelper _helper;
 
         private IUmbracoContextAccessor UmbracoContextAccessor => Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
 
@@ -43,6 +43,29 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
 
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco
+        {
+            get
+            {
+                if (_helper != null) return _helper;
+
+                var model = ViewData.Model;
+                var content = model as IPublishedContent;
+                if (content == null && model is IContentModel)
+                    content = ((IContentModel) model).Content;
+
+                _helper = Context.RequestServices.GetRequiredService<UmbracoHelper>();
+
+                if (content != null)
+                    _helper.AssignedContentItem = content;
+
+                return _helper;
+            }
+        }
         /// <summary>
         /// Gets the <see cref="IUmbracoContext"/>
         /// </summary>
@@ -190,7 +213,7 @@ namespace Umbraco.Web.Common.AspNetCore
                 // need to check whether that is possible
                 Type viewDataModelType = viewDataType.GenericTypeArguments[0];
 
-                if (viewDataModelType.IsAssignableFrom(modelType))
+                if (viewDataModelType != typeof(object) && viewDataModelType.IsAssignableFrom(modelType))
                 {
                     return viewData;
                 }
