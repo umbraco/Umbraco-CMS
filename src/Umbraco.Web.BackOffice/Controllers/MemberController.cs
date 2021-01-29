@@ -450,7 +450,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
             if (identityMember.LastPasswordChangeDateUtc != null)
             {
-                contentItem.PersistedContent.LastPasswordChangeDate = DateTime.Now;
+                contentItem.PersistedContent.LastPasswordChangeDate = DateTime.UtcNow;
+                identityMember.LastPasswordChangeDateUtc = contentItem.PersistedContent.LastPasswordChangeDate;
             }
 
             _memberService.Save(contentItem.PersistedContent);
