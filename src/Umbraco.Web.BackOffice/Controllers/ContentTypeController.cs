@@ -34,6 +34,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
@@ -113,7 +114,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given id
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(int id)
         {
@@ -130,7 +130,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given guid
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(Guid id)
         {
@@ -147,7 +146,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given udi
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(Udi id)
         {

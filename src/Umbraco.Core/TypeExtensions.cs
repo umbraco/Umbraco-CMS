@@ -398,7 +398,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="type">the source type</param>
         /// <returns></returns>
-        internal static Type GetEnumeratedType(this Type type)
+        public static Type GetEnumeratedType(this Type type)
         {
             if (typeof(IEnumerable).IsAssignableFrom(type) == false)
                 return null;

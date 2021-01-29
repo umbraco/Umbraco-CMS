@@ -22,6 +22,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         private readonly IMemberTypeService _memberTypeService;
@@ -61,7 +62,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberTypeDisplay> GetById(int id)
         {
             var mt = _memberTypeService.Get(id);
@@ -79,7 +79,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberTypeDisplay> GetById(Guid id)
         {
             var memberType = _memberTypeService.Get(id);
@@ -97,7 +96,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
