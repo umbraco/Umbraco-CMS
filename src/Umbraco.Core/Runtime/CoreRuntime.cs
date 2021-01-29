@@ -191,12 +191,12 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
+                // Create unattended user, we have to this after factory is created since we use UserService.
+                CreateUnattendedUser();
+
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
-
-                // Create unattended user
-                CreateUnattendedUser();
 
             }
             catch (Exception e)
@@ -292,6 +292,10 @@ namespace Umbraco.Core.Runtime
             }
         }
 
+        /// <summary>
+        /// Creates a user, using environment variables during Unattended Install.
+        /// This is purely for automated acceptance testing.
+        /// </summary>
         private void CreateUnattendedUser()
         {
             // Do a lot of checks and balances to ensure that we can, and should create the unattended user.
@@ -305,8 +309,13 @@ namespace Umbraco.Core.Runtime
             var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
             var unattendedEmail = Environment.GetEnvironmentVariable("unattendedEmail");
 
-            // Missing or incomplete environment data
-            if (unattendedUsername.IsNullOrWhiteSpace() || unattendedPassword.IsNullOrWhiteSpace() || unattendedEmail.IsNullOrWhiteSpace()) return;
+            // Missing environment variable(s)
+            if (unattendedUsername.IsNullOrWhiteSpace()
+                || unattendedPassword.IsNullOrWhiteSpace()
+                || unattendedEmail.IsNullOrWhiteSpace())
+            {
+                return;
+            }
 
             var userService = _factory.GetInstance<IUserService>();
 
@@ -315,7 +324,14 @@ namespace Umbraco.Core.Runtime
 
             // Everything looks good, create the user
             var membershipProvider = Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            membershipProvider.CreateUser(unattendedEmail, unattendedPassword, unattendedEmail, null, null, true, null, out var status);
+            membershipProvider.CreateUser(unattendedEmail,
+                unattendedPassword,
+                unattendedEmail,
+                null,
+                null,
+                true,
+                null,
+                out var status);
 
             // Fetch the user, in order to set up groups.
             var user = userService.GetByEmail(unattendedEmail);
