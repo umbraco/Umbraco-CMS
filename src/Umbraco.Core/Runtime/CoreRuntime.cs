@@ -196,8 +196,7 @@ namespace Umbraco.Core.Runtime
                 _components.Initialize();
 
                 // Create unattended user
-                var userService = _factory.GetInstance<IUserService>();
-                CreateUnattendedUser(userService);
+                CreateUnattendedUser();
 
             }
             catch (Exception e)
@@ -293,33 +292,39 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        private void CreateUnattendedUser(IUserService userService)
+        private void CreateUnattendedUser()
         {
+            // Do a lot of checks and balances to ensure that we can, and should create the unattended user.
+            // Unattended install is not enabled, don't touch users...
+            if (RuntimeOptions.InstallUnattended == false) return;
+
+            // We're doing a non unattended install or something, don't do anything
+            if (_state.Level != RuntimeLevel.Run) return;
+
             var unattendedUsername = Environment.GetEnvironmentVariable("unattendedName");
             var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
+            var unattendedEmail = Environment.GetEnvironmentVariable("unattendedEmail");
 
-            if (unattendedUsername.IsNullOrWhiteSpace() || unattendedPassword.IsNullOrWhiteSpace())
-            {
-                // No environment user.
-                return;
-            }
+            // Missing or incomplete environment data
+            if (unattendedUsername.IsNullOrWhiteSpace() || unattendedPassword.IsNullOrWhiteSpace() || unattendedEmail.IsNullOrWhiteSpace()) return;
 
-            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            var membershipUser = membershipProvider.GetUser(Constants.Security.SuperUserId, true);
-            if (membershipUser.LastPasswordChangedDate != DateTime.MinValue)
-            {
-                // User has already been created
-                return;
-            }
+            var userService = _factory.GetInstance<IUserService>();
 
-            var admin = userService.GetUserById(Constants.Security.SuperUserId);
+            // User has already been created.
+            if (userService.Exists(unattendedUsername)) return;
 
-            membershipUser.ChangePassword("default", unattendedPassword.Trim());
+            // Everything looks good, create the user
+            var membershipProvider = Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+            membershipProvider.CreateUser(unattendedEmail, unattendedPassword, unattendedEmail, null, null, true, null, out var status);
 
-            admin.Email = $"{unattendedUsername.Trim()}@umbraco.dk";
-            admin.Name = unattendedUsername.Trim();
-            admin.Username = admin.Email;
-            userService.Save(admin);
+            // Fetch the user, in order to set up groups.
+            var user = userService.GetByEmail(unattendedEmail);
+            user.Name = unattendedUsername;
+            user.AddGroup(userService.GetUserGroupByAlias("admin") as IReadOnlyUserGroup);
+            user.AddGroup(userService.GetUserGroupByAlias("sensitiveData") as IReadOnlyUserGroup);
+            user.IsApproved = true;
+            // And then re save the user
+            userService.Save(user);
         }
 
         protected virtual void ConfigureUnhandledException()
