@@ -807,11 +807,11 @@ namespace Umbraco.Infrastructure.Services.Implement
         /// <inheritdoc />
         public void Save(IMember member, bool raiseEvents = true)
         {
-            //trimming username and email to make sure we have no trailing space
+            // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
             member.Email = member.Email.Trim();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
@@ -834,6 +834,7 @@ namespace Umbraco.Infrastructure.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
+
                 Audit(AuditType.Save, 0, member.Id);
 
                 scope.Complete();

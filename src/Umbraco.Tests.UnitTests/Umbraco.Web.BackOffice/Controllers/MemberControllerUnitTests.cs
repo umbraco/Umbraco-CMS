@@ -221,15 +221,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Create membercontroller to test
+        /// Create member controller to test
         /// </summary>
-        /// <param name="memberService"></param>
-        /// <param name="memberTypeService"></param>
-        /// <param name="memberGroupService"></param>
-        /// <param name="membersUserManager"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="backOfficeSecurityAccessor"></param>
-        /// <returns></returns>
+        /// <param name="memberService">Member service</param>
+        /// <param name="memberTypeService">Member type service</param>
+        /// <param name="memberGroupService">Member group service</param>
+        /// <param name="membersUserManager">Members user manager</param>
+        /// <param name="dataTypeService">Data type service</param>
+        /// <param name="backOfficeSecurityAccessor">Back office security accessor</param>
+        /// <returns>A member controller for the tests</returns>
         private MemberController CreateSut(
             IMemberService memberService,
             IMemberTypeService memberTypeService,
