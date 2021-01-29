@@ -371,7 +371,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberService.Save(member);
             contentItem.PersistedContent = member;
 
-            AddOrUpdateRoles(contentItem);
+            AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -455,7 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             _memberService.Save(contentItem.PersistedContent);
 
-            AddOrUpdateRoles(contentItem);
+            AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -479,7 +479,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
                     return false;
                 }
-            }   
+            }
 
             IMember byUsername = _memberService.GetByUsername(contentItem.Username);
             if (byUsername != null && byUsername.Key != contentItem.Key)
@@ -516,16 +516,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// TODO: refactor using identity roles
+        /// Add or update the identity roles
         /// </summary>
-        /// <param name="contentItem"></param>
-        private void AddOrUpdateRoles(MemberSave contentItem)
+        /// <param name="contentItem">The member content item</param>
+        /// <param name="identityMember">The member as an identity user</param>
+        private async Task AddOrUpdateRoles(MemberSave contentItem, MembersIdentityUser identityMember)
         {
             // We're gonna look up the current roles now because the below code can cause
             // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
-            IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
+            IEnumerable<string> currentRoles = await _memberManager.GetRolesAsync(identityMember);
+            //IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
 
             // find the ones to remove and remove them
             IEnumerable<string> roles = currentRoles.ToList();
@@ -535,7 +537,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             // if we are changing the username, it must be persisted before looking up the member roles).
             if (rolesToRemove.Any())
             {
-                _memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
+                await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
+                //_memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
             }
 
             // find the ones to add and add them
@@ -543,7 +546,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (toAdd.Any())
             {
                 // add the ones submitted
-                _memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
+                IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, toAdd);
+                //_memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
             }
         }
 
@@ -556,6 +560,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteByKey(Guid key)
         {
+            //TODO: move to MembersUserStore
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {

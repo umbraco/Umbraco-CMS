@@ -138,7 +138,7 @@ namespace Umbraco.Web.Common.Security
 
             return result;
         }
-
+        
         /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset? lockoutEnd)
         {

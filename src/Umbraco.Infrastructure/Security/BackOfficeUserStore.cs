@@ -438,7 +438,7 @@ namespace Umbraco.Infrastructure.Security
         }
 
         /// <summary>
-        /// Returns the roles (user groups) for this user
+        /// Gets a list of role names the specified user belongs to.
         /// </summary>
         public override Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
         {

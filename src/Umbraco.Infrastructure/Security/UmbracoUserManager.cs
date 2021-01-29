@@ -102,12 +102,9 @@ namespace Umbraco.Infrastructure.Security
         /// <returns>The generated password</returns>
         public string GeneratePassword()
         {
-            if (_passwordGenerator == null)
-            {
-                _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
-            }
+            _passwordGenerator ??= new PasswordGenerator(PasswordConfiguration);
 
-            var password = _passwordGenerator.GeneratePassword();
+            string password = _passwordGenerator.GeneratePassword();
             return password;
         }
 

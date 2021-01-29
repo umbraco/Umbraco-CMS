@@ -303,7 +303,7 @@ namespace Umbraco.Infrastructure.Security
 
             return Task.FromResult((IList<UserLoginInfo>)user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.LoginProvider)).ToList());
         }
-        
+
         /// <inheritdoc />
         protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
@@ -355,10 +355,8 @@ namespace Umbraco.Infrastructure.Security
             });
         }
 
-        /// <summary>
-        /// Adds a user to a role (user group)
-        /// </summary>
-        public override Task AddToRoleAsync(MembersIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task AddToRoleAsync(MembersIdentityUser user, string role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -367,30 +365,76 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (normalizedRoleName == null)
+            if (role == null)
             {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
+                throw new ArgumentNullException(nameof(role));
             }
 
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
+            if (string.IsNullOrWhiteSpace(role))
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
 
             if (userRole == null)
             {
-                user.AddRole(normalizedRoleName);
+                user.AddRole(role);
             }
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Removes the role (user group) for the user
+        /// Add the specified user to the named roles
         /// </summary>
-        public override Task RemoveFromRoleAsync(MembersIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+        /// <param name="user">The user to add to the named roles</param>
+        /// <param name="roles">The name of the roles to add the user to.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation</returns>
+        public Task AddToRolesAsync(MembersIdentityUser user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            if (roles == null)
+            {
+                throw new ArgumentNullException(nameof(roles));
+            }
+
+            IEnumerable<string> enumerable = roles as string[] ?? roles.ToArray();
+            foreach (string role in enumerable)
+            {
+                if (string.IsNullOrWhiteSpace(role))
+                {
+                    throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
+                }
+
+                IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
+
+                if (userRole == null)
+                {
+                    user.AddRole(role);
+                }
+            }
+
+            _memberService.AssignRoles(new[] { user.UserName }, enumerable.ToArray());
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Removes the specified user from the named roles.
+        /// </summary>
+        /// <param name="user">The user to remove from the named roles.</param>
+        /// <param name="roles">The name of the roles to remove the user from.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation.</returns>
+        public Task RemoveFromRolesAsync(MembersIdentityUser user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -399,20 +443,62 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (normalizedRoleName == null)
+            if (roles == null)
             {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
+                throw new ArgumentNullException(nameof(roles));
             }
 
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
+            IEnumerable<string> enumerable = roles as string[] ?? roles.ToArray();
+            foreach (string role in enumerable)
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
+                if (string.IsNullOrWhiteSpace(role))
+                {
+                    throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
+                }
+
+                //TODO: is the role ID the role string passed in?
+                IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
+
+                if (userRole != null)
+                {
+                    user.Roles.Remove(userRole);
+                }
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            //TODO: confirm that when updating the identity member, we're also calling the service to update in the DB via repository
+            _memberService.DissociateRoles(new[] { user.UserName }, enumerable.ToArray());
+
+            return Task.CompletedTask;
+        }
+
+        //TODO: should we call the single remove from the multiple remove? or have it only in one place?
+        /// <inheritdoc/>
+        public override Task RemoveFromRoleAsync(MembersIdentityUser user, string role, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+
+            if (string.IsNullOrWhiteSpace(role))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
+            }
+
+            //TODO: is the role ID the role string passed in?
+            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
 
             if (userRole != null)
             {
+                //TODO: when updating the identity member, we're also calling the service to update in the DB via repository
+                _memberService.DissociateRole(userRole.UserId, userRole.RoleId);
                 user.Roles.Remove(userRole);
             }
 
@@ -420,7 +506,7 @@ namespace Umbraco.Infrastructure.Security
         }
 
         /// <summary>
-        /// Returns the roles (user groups) for this user
+        /// Gets a list of role names the specified user belongs to.
         /// </summary>
         public override Task<IList<string>> GetRolesAsync(MembersIdentityUser user, CancellationToken cancellationToken = default)
         {
@@ -431,6 +517,8 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
+            //TODO: should we have tests for the store?
+            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
             return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 

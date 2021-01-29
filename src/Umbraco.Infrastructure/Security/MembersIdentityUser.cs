@@ -56,7 +56,7 @@ namespace Umbraco.Infrastructure.Security
             user.EnableChangeTracking();
             return user;
         }
-        
+
         /// <summary>
         /// Gets or sets the member's real name
         /// </summary>
@@ -89,7 +89,7 @@ namespace Umbraco.Infrastructure.Security
                 foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
                 {
                     RoleId = x.Alias,
-                    UserId = Id?.ToString()
+                    UserId = Id
                 }))
                 {
                     roles.Add(identityUserRole);

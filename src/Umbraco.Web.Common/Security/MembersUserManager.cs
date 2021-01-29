@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -53,6 +54,7 @@ namespace Umbraco.Web.Common.Security
         }
 
         //TODO: have removed all other member audit events - can revisit if we need member auditing on a user level in future
+
         public void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, string userId) => throw new NotImplementedException();
 
         public void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, string userId) => throw new NotImplementedException();
