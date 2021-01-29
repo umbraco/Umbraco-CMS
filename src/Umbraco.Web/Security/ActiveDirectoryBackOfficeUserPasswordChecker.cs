@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.Security
 {

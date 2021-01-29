@@ -1,17 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
+using Umbraco.Core;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Infrastructure.Services.Implement
 {
     /// <summary>
     /// Represents the MemberService.
@@ -109,19 +110,20 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="email">Email of the Member to create</param>
         /// <param name="name">Name of the Member to create</param>
         /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+        /// <exception cref="ArgumentException">Thrown when a member type for the given alias isn't found</exception>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMember(string username, string email, string name, string memberTypeAlias)
         {
-            var memberType = GetMemberType(memberTypeAlias);
+            IMemberType memberType = GetMemberType(memberTypeAlias);
             if (memberType == null)
+            {
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
+            }
 
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMember(scope, member, 0, false);
-                scope.Complete();
-            }
+            using IScope scope = ScopeProvider.CreateScope();
+            CreateMember(scope, member, 0, false);
+            scope.Complete();
 
             return member;
         }
@@ -312,7 +314,9 @@ namespace Umbraco.Core.Services.Implement
                 // if saving is cancelled, media remains without an identity
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                {
                     return;
+                }
 
                 _memberRepository.Save(member);
 
@@ -321,7 +325,9 @@ namespace Umbraco.Core.Services.Implement
             }
 
             if (withIdentity == false)
+            {
                 return;
+            }
 
             Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }
@@ -924,18 +930,28 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<string> GetAllRoles()
+        /// <summary>
+        /// Returns a list of all member roles
+        /// </summary>
+        /// <returns>A list of member roles</returns>
+
+        public IEnumerable<IMemberGroup> GetAllRoles()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x => x.Name).Distinct();
+                return _memberGroupRepository.GetMany().Select(x=>x).Distinct();
             }
         }
 
+        /// <summary>
+        /// Returns a list of all member roles for a given member ID
+        /// </summary>
+        /// <param name="memberId"></param>
+        /// <returns>A list of member roles</returns>
         public IEnumerable<string> GetAllRoles(int memberId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
@@ -945,17 +961,17 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<string> GetAllRoles(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                var result = _memberGroupRepository.GetMemberGroupsForMember(username);
+                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
                 return result.Select(x => x.Name).Distinct();
             }
         }
 
         public IEnumerable<int> GetAllRolesIds()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
@@ -964,27 +980,27 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<int> GetAllRolesIds(int memberId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
                 return result.Select(x => x.Id).Distinct();
             }
         }
 
         public IEnumerable<int> GetAllRolesIds(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                var result = _memberGroupRepository.GetMemberGroupsForMember(username);
+                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
                 return result.Select(x => x.Id).Distinct();
             }
         }
 
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetByMemberGroup(roleName);
@@ -993,7 +1009,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.FindMembersInRole(roleName, usernameToMatch, matchType);
@@ -1002,71 +1018,66 @@ namespace Umbraco.Core.Services.Implement
 
         public bool DeleteRole(string roleName, bool throwIfBeingUsed)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
 
                 if (throwIfBeingUsed)
                 {
                     // get members in role
-                    var membersInRole = _memberRepository.GetByMemberGroup(roleName);
+                    IEnumerable<IMember> membersInRole = _memberRepository.GetByMemberGroup(roleName);
                     if (membersInRole.Any())
+                    {
                         throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
+                    }
                 }
 
-                var query = Query<IMemberGroup>().Where(g => g.Name == roleName);
-                var found = _memberGroupRepository.Get(query).ToArray();
+                IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(g => g.Name == roleName);
+                IMemberGroup[] found = _memberGroupRepository.Get(query).ToArray();
 
-                foreach (var memberGroup in found)
+                foreach (IMemberGroup memberGroup in found)
+                {
                     _memberGroupService.Delete(memberGroup);
+                }
 
                 scope.Complete();
                 return found.Length > 0;
             }
         }
 
-        public void AssignRole(string username, string roleName)
-        {
-            AssignRoles(new[] { username }, new[] { roleName });
-        }
+        public void AssignRole(string username, string roleName) => AssignRoles(new[] { username }, new[] { roleName });
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                var ids = _memberGroupRepository.GetMemberIds(usernames);
+                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
                 scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames), nameof(AssignedRoles));
                 scope.Complete();
             }
         }
 
-        public void DissociateRole(string username, string roleName)
-        {
-            DissociateRoles(new[] { username }, new[] { roleName });
-        }
+        public void DissociateRole(string username, string roleName) => DissociateRoles(new[] { username }, new[] { roleName });
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                var ids = _memberGroupRepository.GetMemberIds(usernames);
+                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
                 scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames), nameof(RemovedRoles));
                 scope.Complete();
             }
         }
 
-        public void AssignRole(int memberId, string roleName)
-        {
-            AssignRoles(new[] { memberId }, new[] { roleName });
-        }
+        public void AssignRole(int memberId, string roleName) => AssignRoles(new[] { memberId }, new[] { roleName });
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
@@ -1075,14 +1086,11 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DissociateRole(int memberId, string roleName)
-        {
-            DissociateRoles(new[] { memberId }, new[] { roleName });
-        }
+        public void DissociateRole(int memberId, string roleName) => DissociateRoles(new[] { memberId }, new[] { roleName });
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
@@ -1095,10 +1103,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null)
-        {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
-        }
+        private void Audit(AuditType type, int userId, int objectId, string message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
 
         #endregion
 
@@ -1153,12 +1158,15 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         public MemberExportModel ExportMember(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var query = Query<IMember>().Where(x => x.Key == key);
-                var member = _memberRepository.Get(query).FirstOrDefault();
+                IQuery<IMember> query = Query<IMember>().Where(x => x.Key == key);
+                IMember member = _memberRepository.Get(query).FirstOrDefault();
 
-                if (member == null) return null;
+                if (member == null)
+                {
+                    return null;
+                }
 
                 var model = new MemberExportModel
                 {
@@ -1182,11 +1190,14 @@ namespace Umbraco.Core.Services.Implement
 
         private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
         {
-            if (member == null) throw new ArgumentNullException(nameof(member));
+            if (member == null)
+            {
+                throw new ArgumentNullException(nameof(member));
+            }
 
             var exportProperties = new List<MemberExportProperty>();
 
-            foreach (var property in member.Properties)
+            foreach (IProperty property in member.Properties)
             {
                 var propertyExportModel = new MemberExportProperty
                 {
@@ -1214,15 +1225,14 @@ namespace Umbraco.Core.Services.Implement
         public void DeleteMembersOfType(int memberTypeId)
         {
             // note: no tree to manage here
-
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
 
                 // TODO: What about content that has the contenttype as part of its composition?
-                var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+                IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
-                var members = _memberRepository.Get(query).ToArray();
+                IMember[] members = _memberRepository.Get(query).ToArray();
                 var deleteEventArgs = new DeleteEventArgs<IMember>(members);
 
                 if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
@@ -1231,43 +1241,58 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                foreach (var member in members)
+                foreach (IMember member in members)
                 {
                     // delete media
                     // triggers the deleted event (and handles the files)
                     DeleteLocked(scope, member);
                 }
+
                 scope.Complete();
             }
         }
 
         private IMemberType GetMemberType(IScope scope, string memberTypeAlias)
         {
-            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
+            if (memberTypeAlias == null)
+            {
+                throw new ArgumentNullException(nameof(memberTypeAlias));
+            }
+
+            if (string.IsNullOrWhiteSpace(memberTypeAlias))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
+            }
 
             scope.ReadLock(Constants.Locks.MemberTypes);
 
-            var memberType = _memberTypeRepository.Get(memberTypeAlias);
+            IMemberType memberType = _memberTypeRepository.Get(memberTypeAlias);
 
             if (memberType == null)
+            {
                 throw new Exception($"No MemberType matching the passed in Alias: '{memberTypeAlias}' was found"); // causes rollback
+            }
 
             return memberType;
         }
 
         private IMemberType GetMemberType(string memberTypeAlias)
         {
-            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
+            if (memberTypeAlias == null)
+            {
+                throw new ArgumentNullException(nameof(memberTypeAlias));
+            }
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            if (string.IsNullOrWhiteSpace(memberTypeAlias))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
+            }
+
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return GetMemberType(scope, memberTypeAlias);
             }
         }
-
-
         #endregion
     }
 }

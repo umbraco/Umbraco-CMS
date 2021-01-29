@@ -9,12 +9,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Routing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Infrastructure.Services.Implement;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

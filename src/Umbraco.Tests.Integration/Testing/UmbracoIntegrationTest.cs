@@ -229,6 +229,8 @@ namespace Umbraco.Tests.Integration.Testing
             }
 
             services.AddSignalR();
+            builder.AddMembersIdentity();
+
             services.AddMvc();
 
             CustomTestSetup(builder);

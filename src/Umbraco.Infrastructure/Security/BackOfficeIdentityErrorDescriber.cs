@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     /// <summary>
     /// Umbraco back office specific <see cref="IdentityErrorDescriber"/>

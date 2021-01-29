@@ -17,6 +17,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.Security;
 

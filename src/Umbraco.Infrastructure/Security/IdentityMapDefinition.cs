@@ -1,13 +1,13 @@
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {
@@ -28,6 +28,20 @@ namespace Umbraco.Core.Security
                 (source, context) =>
                 {
                     var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
+                    target.DisableChangeTracking();
+                    return target;
+                },
+                (source, target, context) =>
+                {
+                    Map(source, target);
+                    target.ResetDirtyProperties(true);
+                    target.EnableChangeTracking();
+                });
+
+            mapper.Define<IMember, MembersIdentityUser>(
+                (source, context) =>
+                {
+                    var target = new MembersIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -76,9 +90,24 @@ namespace Umbraco.Core.Security
             //target.Roles =;
         }
 
-        private static string GetPasswordHash(string storedPass)
+        private void Map(IMember source, MembersIdentityUser target)
         {
-            return storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
+            target.Email = source.Email;
+            target.UserName = source.Username;
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            //target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
+            target.Name = source.Name;
+            target.AccessFailedCount = source.FailedPasswordAttempts;
+            target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
+            target.PasswordConfig = source.PasswordConfiguration;
+            target.IsApproved = source.IsApproved;
+            //target.SecurityStamp = source.SecurityStamp;
+            target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+
+            // NB: same comments re AutoMapper as per BackOfficeUser
         }
+
+        private static string GetPasswordHash(string storedPass) => storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
     }
 }

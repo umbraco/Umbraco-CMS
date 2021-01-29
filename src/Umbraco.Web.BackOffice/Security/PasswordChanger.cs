@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Web.Models;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 

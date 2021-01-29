@@ -4,11 +4,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
 
     /// <summary>
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     /// <typeparam name="TUser">The type of user</typeparam>
     public interface IUmbracoUserManager<TUser> : IDisposable
-        where TUser : BackOfficeIdentityUser
+        where TUser : UmbracoIdentityUser
     {
         /// <summary>
         /// Gets the user id of a user
@@ -223,11 +224,41 @@ namespace Umbraco.Core.Security
         /// </returns>
         Task<IdentityResult> CreateAsync(TUser user);
 
+
+        /// <summary>
+        /// Creates the specified <paramref name="user"/> in the backing store with a password,
+        /// as an asynchronous operation.
+        /// </summary>
+        /// <param name="user">The user to create.</param>
+        /// <param name="password">The password to add to the user.</param>
+        /// <returns>
+        /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
+        /// of the operation.
+        /// </returns>
+        Task<IdentityResult> CreateAsync(TUser user, string password);
+
         /// <summary>
         /// Generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
+
+        /// <summary>
+        /// Hashes a password for a null user based on the default password hasher
+        /// </summary>
+        /// <param name="password">The password to hash</param>
+        /// <returns>The hashed password</returns>
+        string HashPassword(string password);
+
+        /// <summary>
+        /// Used to validate the password without an identity user
+        /// Validation code is based on the default ValidatePasswordAsync code
+        /// Should return <see cref="IdentityResult.Success"/> if validation is successful
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
+
+        Task<IdentityResult> ValidatePasswordAsync(string password);
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.

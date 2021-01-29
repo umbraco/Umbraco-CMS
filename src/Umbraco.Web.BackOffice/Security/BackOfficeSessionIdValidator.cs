@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {

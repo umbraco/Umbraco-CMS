@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     /// <summary>
     /// A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office/>
