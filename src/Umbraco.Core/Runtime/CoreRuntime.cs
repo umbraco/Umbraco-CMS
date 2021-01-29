@@ -13,8 +13,10 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -193,6 +195,9 @@ namespace Umbraco.Core.Runtime
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
 
+                // Create unattended user
+                var userService = _factory.GetInstance<IUserService>();
+                CreateUnattendedUser(userService);
 
             }
             catch (Exception e)
@@ -267,7 +272,7 @@ namespace Umbraco.Core.Runtime
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-                
+
                 try
                 {
                     database.BeginTransaction();
@@ -286,6 +291,35 @@ namespace Umbraco.Core.Runtime
                         + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
                 }
             }
+        }
+
+        private void CreateUnattendedUser(IUserService userService)
+        {
+            var unattendedUsername = Environment.GetEnvironmentVariable("unattendedName");
+            var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
+
+            if (unattendedUsername.IsNullOrWhiteSpace() || unattendedPassword.IsNullOrWhiteSpace())
+            {
+                // No environment user.
+                return;
+            }
+
+            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+            var membershipUser = membershipProvider.GetUser(Constants.Security.SuperUserId, true);
+            if (membershipUser.LastPasswordChangedDate != DateTime.MinValue)
+            {
+                // User has already been created
+                return;
+            }
+
+            var admin = userService.GetUserById(Constants.Security.SuperUserId);
+
+            membershipUser.ChangePassword("default", unattendedPassword.Trim());
+
+            admin.Email = $"{unattendedUsername.Trim()}@umbraco.dk";
+            admin.Name = unattendedUsername.Trim();
+            admin.Username = admin.Email;
+            userService.Save(admin);
         }
 
         protected virtual void ConfigureUnhandledException()
