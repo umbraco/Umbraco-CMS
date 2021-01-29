@@ -436,13 +436,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                     return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
                 }
 
-                string token = await _memberManager.GeneratePasswordResetTokenAsync(identityMember);
-                IdentityResult resetPassword = await _memberManager.ResetPasswordAsync(identityMember, token, contentItem.Password.NewPassword);
-
-                if (resetPassword.Succeeded == false)
-                {
-                    return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
-                }
+                string newPassword = _memberManager.HashPassword(contentItem.Password.NewPassword);
+                identityMember.PasswordHash = newPassword;
             }
 
             IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
