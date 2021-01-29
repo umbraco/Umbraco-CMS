@@ -98,8 +98,6 @@ namespace Umbraco.Infrastructure.Security
             //            x.UserData)));
             //}
 
-            // TODO: confirm re roles implementations
-
             return Task.FromResult(IdentityResult.Success);
         }
 
