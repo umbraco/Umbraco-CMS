@@ -798,6 +798,7 @@
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
+    <key alias="avatar">Avatar for</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>

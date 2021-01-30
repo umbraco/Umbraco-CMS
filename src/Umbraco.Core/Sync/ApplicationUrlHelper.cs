@@ -38,7 +38,7 @@ namespace Umbraco.Core.Sync
             umbracoApplicationUrl = ApplicationUrlProvider?.Invoke(request);
             if (string.IsNullOrWhiteSpace(umbracoApplicationUrl) == false)
             {
-                umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd('/');
+                umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (provider)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Sync
             var url = settings.WebRouting.UmbracoApplicationUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
+                var umbracoApplicationUrl = url.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Sync
             url = serverRegistrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
+                var umbracoApplicationUrl = url.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (IServerRegistrar)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Sync
             var ssl = globalSettings.UseHttps ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            return url.TrimEnd('/');
+            return url.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
     }
 }

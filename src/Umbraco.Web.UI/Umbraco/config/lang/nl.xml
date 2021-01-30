@@ -806,6 +806,7 @@
     <key alias="articles">Artikels</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installeren</key>
+    <key alias="avatar">Avatar van</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blauw</key>
