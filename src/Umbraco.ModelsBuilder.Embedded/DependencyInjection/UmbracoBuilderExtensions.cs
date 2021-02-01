@@ -12,6 +12,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
 /*
@@ -84,23 +85,35 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
         {
+            var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
+            if (builder.Services.Contains(umbServices))
+            {
+                // if this ext method is called more than once just exit
+                return builder;
+            }
+
+            builder.Services.Add(umbServices);
+
             builder.AddPureLiveRazorEngine();
-            builder.Services.AddSingleton<UmbracoServices>();
 
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<UmbracoApplicationStarting, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEnd, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, OutOfDateModelsStatus>();
-            builder.Services.AddUnique<ModelsGenerator>();
-            builder.Services.AddUnique<LiveModelsProvider>();
-            builder.Services.AddUnique<OutOfDateModelsStatus>();
-            builder.Services.AddUnique<ModelsGenerationError>();
+            builder.Services.AddSingleton<ModelsGenerator>();
+            builder.Services.AddSingleton<LiveModelsProvider>();
+            builder.Services.AddSingleton<OutOfDateModelsStatus>();
+            builder.Services.AddSingleton<ModelsGenerationError>();
 
-            builder.Services.AddUnique<PureLiveModelFactory>();
-            builder.Services.AddUnique<IPublishedModelFactory>(factory =>
+            builder.Services.AddSingleton<PureLiveModelFactory>();
+
+            // This is what the community MB would replace, all of the above services are fine to be registered
+            // even if the community MB is in place.
+            builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
             {
                 ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)
@@ -109,12 +122,7 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                 }
                 else
                 {
-                    TypeLoader typeLoader = factory.GetRequiredService<TypeLoader>();
-                    IPublishedValueFallback publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
-                    IEnumerable<Type> types = typeLoader
-                        .GetTypes<PublishedElementModel>() // element models
-                        .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                    return new PublishedModelFactory(types, publishedValueFallback);
+                    return factory.CreateDefaultPublishedModelFactory();
                 }
             });
 

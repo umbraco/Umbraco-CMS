@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.ModelBinders;
@@ -311,7 +313,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
 
         public class TestPage<TModel> : UmbracoViewPage<TModel>
         {
-            private readonly ContentModelBinder _modelBinder = new ContentModelBinder();
+            private readonly ContentModelBinder _modelBinder = new ContentModelBinder(Mock.Of<IEventAggregator>());
 
             public override Task ExecuteAsync() => throw new NotImplementedException();
 

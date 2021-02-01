@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
@@ -254,7 +253,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             sb.AppendFormat(" {0} => ",
                 property.ClrName);
             WriteNonGenericClrType(sb, GetModelsNamespace() + "." + mixinClrName);
-            sb.AppendFormat(".{0}(this);\n",
+            sb.AppendFormat(".{0}(this, _publishedValueFallback);\n",
                 MixinStaticGetterName(property.ClrName));
         }
 
@@ -311,7 +310,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             {
                 sb.Append("\t\tpublic ");
                 WriteClrType(sb, property.ClrTypeName);
-                sb.AppendFormat(" {0} => {1}(this);\n",
+                sb.AppendFormat(" {0} => {1}(this, _publishedValueFallback);\n",
                     property.ClrName, MixinStaticGetterName(property.ClrName));
             }
             else
@@ -351,7 +350,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.Append("\t\tpublic static ");
             WriteClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(" {0}(I{1} that) => that.Value",
+            sb.AppendFormat(" {0}(I{1} that, IPublishedValueFallback publishedValueFallback) => that.Value",
                 mixinStaticGetterName, mixinClrName);
             if (property.ModelClrType != typeof(object))
             {
@@ -359,7 +358,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
                 WriteClrType(sb, property.ClrTypeName);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\");\n",
+            sb.AppendFormat("(publishedValueFallback, \"{0}\");\n",
                 property.Alias);
         }
 

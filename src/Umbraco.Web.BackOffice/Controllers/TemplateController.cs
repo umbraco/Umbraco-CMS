@@ -12,12 +12,12 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class TemplateController : BackOfficeNotificationsController
     {
         private readonly IFileService _fileService;
@@ -59,7 +59,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<TemplateDisplay> GetById(int id)
         {
             var template = _fileService.GetTemplate(id);
@@ -75,7 +74,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<TemplateDisplay> GetById(Guid id)
         {
             var template = _fileService.GetTemplate(id);
@@ -90,7 +88,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<TemplateDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;

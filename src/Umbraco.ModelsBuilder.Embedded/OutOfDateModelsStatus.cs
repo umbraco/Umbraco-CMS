@@ -8,19 +8,31 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
+    /// <summary>
+    /// Used to track if ModelsBuilder models are out of date/stale
+    /// </summary>
     public sealed class OutOfDateModelsStatus : INotificationHandler<UmbracoApplicationStarting>
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OutOfDateModelsStatus"/> class.
+        /// </summary>
         public OutOfDateModelsStatus(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
             _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether flagging out of date models is enabled
+        /// </summary>
         public bool IsEnabled => _config.FlagOutOfDateModels;
 
+        /// <summary>
+        /// Gets a value indicating whether models are out of date
+        /// </summary>
         public bool IsOutOfDate
         {
             get
@@ -38,10 +50,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public void Handle(UmbracoApplicationStarting notification)
-        {
-            Install();
-        }
+        public void Handle(UmbracoApplicationStarting notification) => Install();
 
         private void Install()
         {

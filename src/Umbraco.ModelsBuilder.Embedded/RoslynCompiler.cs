@@ -69,8 +69,13 @@ namespace Umbraco.ModelsBuilder.Embedded
                     // Not entirely certain that assemblyIdentityComparer is nececary?
                     assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
-            compilation.Emit(savePath);
+            var emitResult = compilation.Emit(savePath);
 
+            if (!emitResult.Success)
+            {
+                throw new InvalidOperationException("Roslyn compiler could not create ModelsBuilder dll:\n" +
+                                                    string.Join("\n", emitResult.Diagnostics.Select(x=>x.GetMessage())));
+            }
         }
     }
 }

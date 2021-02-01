@@ -3,8 +3,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {

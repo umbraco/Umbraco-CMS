@@ -50,6 +50,8 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MediaController : ContentControllerBase
     {
         private readonly IShortStringHelper _shortStringHelper;
@@ -170,7 +172,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
         {
             var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
@@ -191,7 +192,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
         {
             var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
@@ -212,7 +212,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.MediaPermissionPathById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MediaItemDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -299,7 +298,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Returns the child media objects - using the entity INT id
         /// </summary>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        [DetermineAmbiguousActionByPassingParameters]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
@@ -377,7 +375,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<PagedResult<ContentItemBasic<ContentPropertyBasic>>> GetChildren(Guid id,
            int pageNumber = 0,
            int pageSize = 0,
@@ -407,7 +404,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<PagedResult<ContentItemBasic<ContentPropertyBasic>>> GetChildren(Udi id,
            int pageNumber = 0,
            int pageSize = 0,

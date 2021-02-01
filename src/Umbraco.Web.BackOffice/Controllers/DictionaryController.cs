@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authorization;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ActionsResults;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -31,6 +30,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class DictionaryController : BackOfficeNotificationsController
     {
         private readonly ILogger<DictionaryController> _logger;
@@ -141,7 +141,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(int id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
@@ -160,7 +159,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(Guid id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
@@ -179,7 +177,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
