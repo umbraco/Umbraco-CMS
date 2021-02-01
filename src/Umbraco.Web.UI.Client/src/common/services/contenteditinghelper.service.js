@@ -128,7 +128,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
-                            err: err
+                            err: err,
+                            rebindCallback: function () {
+                                // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
+                                if(err.data) {
+                                    rebindCallback.apply(self, [args.content, err.data]);
+                                }
+                            }
                         });
 
                         //update editor state to what is current
