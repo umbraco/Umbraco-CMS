@@ -66,11 +66,12 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
-                    _.each(data, function (item) {
-                        data.forEach(item => searchResultFormatter.configureContentResult(item));
-                        return data;
+                return entityResource.search(args.term, 'Document', args.searchFrom, args.canceler, args.dataTypeKey).then(function (data) {
+                    data.forEach(function (item) {
+                        return searchResultFormatter.configureContentResult(item);
                     });
+                    return data;
+                });
             },
 
             /**
