@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -22,6 +23,7 @@ using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Mvc;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Website.Collections;
 using Umbraco.Web.Website.Controllers;
 
@@ -201,58 +203,58 @@ namespace Umbraco.Extensions
             return tagBuilder;
         }
 
-        // TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a strongly typed SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action<T>(this IHtmlHelper htmlHelper, string actionName)
-        //     where T : SurfaceController
-        // {
-        //     return htmlHelper.Action(actionName, typeof(T));
-        // }
-        //
+        /// <summary>
+        /// Returns the result of a child action of a strongly typed SurfaceController
+        /// </summary>
+        /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
+        public static IHtmlContent ActionLink<T>(this IHtmlHelper htmlHelper, string actionName)
+            where T : SurfaceController => htmlHelper.ActionLink(actionName, typeof(T));
 
-        // TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <param name="surfaceType"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
-        // {
-        //     if (actionName == null) throw new ArgumentNullException(nameof(actionName));
-        //     if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
-        //     if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
-        //
-        //     var routeVals = new RouteValueDictionary(new {area = ""});
-        //
-        //     var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
-        //     var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
-        //     if (surfaceController == null)
-        //         throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-        //     var metaData = PluginController.GetMetadata(surfaceController);
-        //     if (!metaData.AreaName.IsNullOrWhiteSpace())
-        //     {
-        //         //set the area to the plugin area
-        //         if (routeVals.ContainsKey("area"))
-        //         {
-        //             routeVals["area"] = metaData.AreaName;
-        //         }
-        //         else
-        //         {
-        //             routeVals.Add("area", metaData.AreaName);
-        //         }
-        //     }
-        //
-        //     return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
-        // }
+        /// <summary>
+        /// Returns the result of a child action of a SurfaceController
+        /// </summary>
+        public static IHtmlContent ActionLink(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
+        {
+            if (actionName == null)
+            {
+                throw new ArgumentNullException(nameof(actionName));
+            }
+
+            if (string.IsNullOrWhiteSpace(actionName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
+            }
+
+            if (surfaceType == null)
+            {
+                throw new ArgumentNullException(nameof(surfaceType));
+            }
+
+            SurfaceControllerTypeCollection surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
+            Type surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
+            if (surfaceController == null)
+            {
+                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+            }
+
+            var routeVals = new RouteValueDictionary(new { area = "" });
+
+            PluginControllerMetadata metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
+            {
+                // set the area to the plugin area
+                if (routeVals.ContainsKey("area"))
+                {
+                    routeVals["area"] = metaData.AreaName;
+                }
+                else
+                {
+                    routeVals.Add("area", metaData.AreaName);
+                }
+            }
+
+            return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
+        }
 
         #region BeginUmbracoForm
 
