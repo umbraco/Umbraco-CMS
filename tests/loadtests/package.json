@@ -1,0 +1,16 @@
+{
+  "name": "umbraco-load-testing",
+  "version": "1.0.0",
+  "description": "contains templates for running Artillery (https://artillery.io/docs/getting-started/#running-the-test) for load testing",
+  "main": "umbraco-flow.js",
+  "dependencies": {},
+  "devDependencies": {
+    "artillery": "^1.6.1",
+    "perfmon": "^0.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
