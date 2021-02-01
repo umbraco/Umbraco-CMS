@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

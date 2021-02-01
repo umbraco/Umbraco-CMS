@@ -1,3 +1,4 @@
+using System;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Security;
@@ -8,6 +9,8 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
+    //TODO: Delete: should not be used
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     public class MembersRoleProvider : RoleProvider
     {
         private readonly IMembershipRoleService<IMember> _roleService;

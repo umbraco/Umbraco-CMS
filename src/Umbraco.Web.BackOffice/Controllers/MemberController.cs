@@ -527,7 +527,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
             IEnumerable<string> currentRoles = await _memberManager.GetRolesAsync(identityMember);
-            //IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
 
             // find the ones to remove and remove them
             IEnumerable<string> roles = currentRoles.ToList();
@@ -538,7 +537,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (rolesToRemove.Any())
             {
                 await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
-                //_memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
             }
 
             // find the ones to add and add them

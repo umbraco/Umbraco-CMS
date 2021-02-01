@@ -32,13 +32,12 @@ namespace Umbraco.Infrastructure.Security
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
         /// <param name="describer">The error describer</param>
-        /// 
         public MembersUserStore(IMemberService memberService, UmbracoMapper mapper, IScopeProvider scopeProvider, IdentityErrorDescriber describer)
         : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-            _mapper = mapper;
-            _scopeProvider = scopeProvider;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace Umbraco.Infrastructure.Security
         public override Task SetNormalizedUserNameAsync(MembersIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
-        public override Task<IdentityResult> CreateAsync(MembersIdentityUser user, CancellationToken cancellationToken)
+        public override Task<IdentityResult> CreateAsync(MembersIdentityUser user, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -338,8 +337,10 @@ namespace Umbraco.Infrastructure.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
+            var logins = new List<IIdentityUserLogin>();
+
             // TODO: external login needed?
-            var logins = new List<IIdentityUserLogin>(); //_externalLoginService.Find(loginProvider, providerKey).ToList();
+            //_externalLoginService.Find(loginProvider, providerKey).ToList();
             if (logins.Count == 0)
             {
                 return Task.FromResult((IdentityUserLogin<string>)null);
@@ -379,99 +380,13 @@ namespace Umbraco.Infrastructure.Security
 
             if (userRole == null)
             {
+                _memberService.AssignRole(user.UserName, role);
                 user.AddRole(role);
             }
 
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Add the specified user to the named roles
-        /// </summary>
-        /// <param name="user">The user to add to the named roles</param>
-        /// <param name="roles">The name of the roles to add the user to.</param>
-        /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation</returns>
-        public Task AddToRolesAsync(MembersIdentityUser user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (roles == null)
-            {
-                throw new ArgumentNullException(nameof(roles));
-            }
-
-            IEnumerable<string> enumerable = roles as string[] ?? roles.ToArray();
-            foreach (string role in enumerable)
-            {
-                if (string.IsNullOrWhiteSpace(role))
-                {
-                    throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
-                }
-
-                IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
-
-                if (userRole == null)
-                {
-                    user.AddRole(role);
-                }
-            }
-
-            _memberService.AssignRoles(new[] { user.UserName }, enumerable.ToArray());
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Removes the specified user from the named roles.
-        /// </summary>
-        /// <param name="user">The user to remove from the named roles.</param>
-        /// <param name="roles">The name of the roles to remove the user from.</param>
-        /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation.</returns>
-        public Task RemoveFromRolesAsync(MembersIdentityUser user, IEnumerable<string> roles, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (roles == null)
-            {
-                throw new ArgumentNullException(nameof(roles));
-            }
-
-            IEnumerable<string> enumerable = roles as string[] ?? roles.ToArray();
-            foreach (string role in enumerable)
-            {
-                if (string.IsNullOrWhiteSpace(role))
-                {
-                    throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
-                }
-
-                //TODO: is the role ID the role string passed in?
-                IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
-
-                if (userRole != null)
-                {
-                    user.Roles.Remove(userRole);
-                }
-            }
-
-            //TODO: confirm that when updating the identity member, we're also calling the service to update in the DB via repository
-            _memberService.DissociateRoles(new[] { user.UserName }, enumerable.ToArray());
-
-            return Task.CompletedTask;
-        }
-
-        //TODO: should we call the single remove from the multiple remove? or have it only in one place?
         /// <inheritdoc/>
         public override Task RemoveFromRoleAsync(MembersIdentityUser user, string role, CancellationToken cancellationToken = default)
         {
@@ -492,13 +407,11 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
             }
 
-            //TODO: is the role ID the role string passed in?
             IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
 
             if (userRole != null)
             {
-                //TODO: when updating the identity member, we're also calling the service to update in the DB via repository
-                _memberService.DissociateRole(userRole.UserId, userRole.RoleId);
+                _memberService.DissociateRole(user.UserName, userRole.RoleId);
                 user.Roles.Remove(userRole);
             }
 
@@ -517,8 +430,14 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            //TODO: should we have tests for the store?
             IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
+            ICollection<IdentityUserRole<string>> roles = currentRoles.Select(role => new IdentityUserRole<string>
+            {
+                RoleId = role,
+                UserId = user.Id
+            }).ToList();
+
+            user.Roles = roles;
             return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
