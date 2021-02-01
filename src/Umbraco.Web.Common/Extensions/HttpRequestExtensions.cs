@@ -86,6 +86,7 @@ namespace Umbraco.Extensions
                 {
                     request.Body.Seek(0, SeekOrigin.Begin);
                 }
+
                 return result;
             }
         }

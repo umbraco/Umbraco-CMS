@@ -50,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return candidate;
             }
 
-            //if it's a post we can try to read from the body and bind from the json value
+            // if it's a post we can try to read from the body and bind from the json value
             if (context.RouteContext.HttpContext.Request.Method == HttpMethod.Post.ToString())
             {
                 // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
@@ -88,11 +88,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                         }
                         catch (JsonReaderException)
                         {
-                            //can't convert
+                            // can't convert
                         }
                         catch (JsonSerializationException)
                         {
-                            //can't convert
+                            // can't convert
                         }
                     }
                 }
@@ -112,22 +112,21 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (requestParam == string.Empty && _supportedTypes.Length > 0)
             {
-                //if it's empty then in theory we can select any of the actions since they'll all need to deal with empty or null parameters
-                //so we'll try to use the first one available
+                // if it's empty then in theory we can select any of the actions since they'll all need to deal with empty or null parameters
+                // so we'll try to use the first one available
                 foundCandidate = MatchByType(_supportedTypes[0], context);
                 if (foundCandidate.HasValue)
                 {
                     return true;
                 }
-
             }
 
             if (requestParam != null)
             {
                 foreach (var paramType in _supportedTypes)
                 {
-                    //check if this is IEnumerable and if so this will get it's type
-                    //we need to know this since the requestParam will always just be a string
+                    // check if this is IEnumerable and if so this will get it's type
+                    // we need to know this since the requestParam will always just be a string
                     var enumType = paramType.GetEnumeratedType();
 
                     var converted = requestParam.TryConvertTo(enumType ?? paramType);
@@ -150,11 +149,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (context.Candidates.Count() > 1)
             {
-                //choose the one that has the parameter with the T type
+                // choose the one that has the parameter with the T type
                 var candidate = context.Candidates.FirstOrDefault(x => x.Action.Parameters.FirstOrDefault(p => p.Name == _parameterName && p.ParameterType == idType) != null);
 
                 return candidate;
             }
+
             return null;
         }
 
