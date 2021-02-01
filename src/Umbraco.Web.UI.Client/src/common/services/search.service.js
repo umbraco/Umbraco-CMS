@@ -66,7 +66,7 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, 'Document', args.searchFrom, args.canceler, args.dataTypeKey)
+                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
                     .then(data => {
                         data.forEach(item => searchResultFormatter.configureContentResult(item));
                         return data;
