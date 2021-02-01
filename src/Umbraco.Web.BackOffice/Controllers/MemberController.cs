@@ -371,7 +371,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberService.Save(member);
             contentItem.PersistedContent = member;
 
-            AddOrUpdateRoles(contentItem, identityMember);
+            await AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -455,7 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             _memberService.Save(contentItem.PersistedContent);
 
-            AddOrUpdateRoles(contentItem, identityMember);
+            await AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -536,7 +536,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // if we are changing the username, it must be persisted before looking up the member roles).
             if (rolesToRemove.Any())
             {
-                await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
+                IdentityResult rolesIdentityResult = await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
             }
 
             // find the ones to add and add them
