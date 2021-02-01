@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Services.Changes;
@@ -19,13 +20,24 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// <summary>
         /// Adds distributed cache support
         /// </summary>
+        /// <remarks>
+        /// This is still required for websites that are not load balancing because this ensures that sites hosted
+        /// with managed hosts like IIS/etc... work correctly when AppDomains are running in parallel.
+        /// </remarks>
         public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
         {
+            var distCacheBinder = new UniqueServiceDescriptor(typeof(IDistributedCacheBinder), typeof(DistributedCacheBinder), ServiceLifetime.Singleton);
+            if (builder.Services.Contains(distCacheBinder))
+            {
+                // if this is called more than once just exit
+                return builder;
+            }
+
+            builder.Services.Add(distCacheBinder);
+
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, DatabaseServerMessengerNotificationHandler>();
-
-            builder.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             return builder;
         }
 

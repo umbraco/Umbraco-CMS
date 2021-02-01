@@ -53,7 +53,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         /// <summary>
-        /// Handles the <see cref="ServerVariablesParsing"/> notification
+        /// Handles the <see cref="ServerVariablesParsing"/> notification to add custom urls and MB mode
         /// </summary>
         public void Handle(ServerVariablesParsing notification)
         {
@@ -93,7 +93,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var settings = new Dictionary<string, object>
             {
-                {"mode", _config.ModelsMode.ToString()}
+                {"mode", _config.ModelsMode.ToString() }
             };
 
             return settings;
@@ -188,13 +188,12 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     // both are pure - report, and if different versions, restart
                     // if same version... makes no sense... and better not restart (loops?)
-                    var sourceVersion = notification.SourceType.Assembly.GetName().Version;
-                    var modelVersion = notification.ModelType.Assembly.GetName().Version;
+                    Version sourceVersion = notification.SourceType.Assembly.GetName().Version;
+                    Version modelVersion = notification.ModelType.Assembly.GetName().Version;
                     notification.Message.Append(" Both view and content models are PureLive, with ");
                     notification.Message.Append(sourceVersion == modelVersion
                         ? "same version. The application is in an unstable state and should be restarted."
-                        : "different versions. The application is in an unstable state and is going to be restarted.");
-                    notification.Restart = sourceVersion != modelVersion;
+                        : "different versions. The application is in an unstable state and should be restarted.");
                 }
             }
         }

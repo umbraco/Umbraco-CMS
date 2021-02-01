@@ -10,11 +10,14 @@ namespace Umbraco.Core.Events
     /// </summary>
     public class UmbracoRequestEnd : INotification
     {
-        public UmbracoRequestEnd(HttpContext httpContext)
-        {
-            HttpContext = httpContext;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoRequestEnd"/> class.
+        /// </summary>
+        public UmbracoRequestEnd(HttpContext httpContext) => HttpContext = httpContext;
 
+        /// <summary>
+        /// Gets the <see cref="HttpContext"/>
+        /// </summary>
         public HttpContext HttpContext { get; }
     }
 }
