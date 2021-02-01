@@ -481,12 +481,13 @@
 
                     syncTreeNode($scope.content, $scope.content.path);
 
+                    if($scope.contentForm.$invalid !== true) {
+                        resetNestedFieldValiation(fieldsToRollback);
+                    }
                     if (err.status === 400 && err.data) {
                         // content was saved but is invalid.
                         eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
                     }
-
-                    resetNestedFieldValiation(fieldsToRollback);
 
                     return $q.reject(err);
                 });
