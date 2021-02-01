@@ -101,63 +101,63 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 using (var scope = _scopeProvider.CreateScope(autoComplete: true))
                 {
-                       if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
-                {
-                    return;
-                }
-
-                // don't execute if it's already been done
-                if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
-                {
-                    return;
-                }
-
-                var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
-                if (identity == null)
-                {
-                    return;
-                }
-
-                Attempt<int> userId = identity.Id.TryConvertTo<int>();
-                if (userId == false)
-                {
-                    return;
-                }
-
-                IUser user = _userService.GetUserById(userId.Result);
-                if (user == null)
-                {
-                    return;
-                }
-
-                // a list of checks to execute, if any of them pass then we resync
-                var checks = new Func<bool>[]
-                {
-                    () => user.Username != identity.Username,
-                    () =>
+                    if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                     {
-                        CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
-                        return culture != null && culture.ToString() != identity.Culture;
-                    },
-                    () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
-                    () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
-                    () =>
-                    {
-                        var startContentIds = user.CalculateContentStartNodeIds(_entityService);
-                        return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
-                    },
-                    () =>
-                    {
-                        var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
-                        return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
+                        return;
                     }
-                };
 
-                if (checks.Any(check => check()))
-                {
-                    await ReSync(user, actionContext);
+                    // don't execute if it's already been done
+                    if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
+                    {
+                        return;
+                    }
+
+                    var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
+                    if (identity == null)
+                    {
+                        return;
+                    }
+
+                    Attempt<int> userId = identity.Id.TryConvertTo<int>();
+                    if (userId == false)
+                    {
+                        return;
+                    }
+
+                    IUser user = _userService.GetUserById(userId.Result);
+                    if (user == null)
+                    {
+                        return;
+                    }
+
+                    // a list of checks to execute, if any of them pass then we resync
+                    var checks = new Func<bool>[]
+                    {
+                        () => user.Username != identity.Username,
+                        () =>
+                        {
+                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
+                            return culture != null && culture.ToString() != identity.Culture;
+                        },
+                        () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
+                        () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
+                        () =>
+                        {
+                            var startContentIds = user.CalculateContentStartNodeIds(_entityService);
+                            return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
+                        },
+                        () =>
+                        {
+                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
+                            return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
+                        }
+                    };
+
+                    if (checks.Any(check => check()))
+                    {
+                        await ReSync(user, actionContext);
+                    }
                 }
-              }
             }
 
             /// <summary>

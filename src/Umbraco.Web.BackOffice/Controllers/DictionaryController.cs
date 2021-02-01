@@ -141,7 +141,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-     public ActionResult<DictionaryDisplay> GetById(int id)
+        public ActionResult<DictionaryDisplay> GetById(int id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
             if (dictionary == null)
