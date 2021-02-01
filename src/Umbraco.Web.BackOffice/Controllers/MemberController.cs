@@ -545,7 +545,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 // add the ones submitted
                 IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, toAdd);
-                //_memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
             }
         }
 
