@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -163,7 +165,8 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            db.Execute(@"SET LOCK_TIMEOUT 1800;");
+            var timeOut = Current.Configs.Global().SqlWriteLockTimeOut;
+            db.Execute(@"SET LOCK_TIMEOUT " + timeOut  + ";");
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
