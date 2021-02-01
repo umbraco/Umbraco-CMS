@@ -110,6 +110,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 requestParam = stringValues.ToString();
             }
 
+            if (requestParam is null && context.RouteContext.RouteData.Values.TryGetValue(_parameterName, out var value))
+            {
+                requestParam = value?.ToString();
+            }
+
             if (requestParam == string.Empty && _supportedTypes.Length > 0)
             {
                 // if it's empty then in theory we can select any of the actions since they'll all need to deal with empty or null parameters
