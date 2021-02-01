@@ -86,7 +86,7 @@
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
-      <Version>1.11.24</Version>
+      <Version>1.11.30</Version>
     </PackageReference>
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
@@ -317,7 +317,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Persistence\SyntaxProvider" />
+    <Folder Include="Persistence\SyntaxProvider\" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

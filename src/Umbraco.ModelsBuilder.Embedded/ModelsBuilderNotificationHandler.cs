@@ -22,24 +22,21 @@ namespace Umbraco.ModelsBuilder.Embedded
     /// <summary>
     /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
     /// </summary>
-    internal class ModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<ServerVariablesParsing>
+    internal class ModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<ServerVariablesParsing>, INotificationHandler<ModelBindingError>
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LinkGenerator _linkGenerator;
-        private readonly ContentModelBinder _modelBinder;
 
         public ModelsBuilderNotificationHandler(
             IOptions<ModelsBuilderSettings> config,
             IShortStringHelper shortStringHelper,
-            LinkGenerator linkGenerator,
-            ContentModelBinder modelBinder)
+            LinkGenerator linkGenerator)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
             _shortStringHelper = shortStringHelper;
             _linkGenerator = linkGenerator;
-            _modelBinder = modelBinder;
         }
 
         /// <summary>
@@ -49,8 +46,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
-            _modelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
-
             if (_config.ModelsMode != ModelsMode.Nothing)
             {
                 FileService.SavingTemplate += FileService_SavingTemplate;
@@ -58,7 +53,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         /// <summary>
-        /// Handles the <see cref="ServerVariablesParsing"/> notification
+        /// Handles the <see cref="ServerVariablesParsing"/> notification to add custom urls and MB mode
         /// </summary>
         public void Handle(ServerVariablesParsing notification)
         {
@@ -98,7 +93,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var settings = new Dictionary<string, object>
             {
-                {"mode", _config.ModelsMode.ToString()}
+                {"mode", _config.ModelsMode.ToString() }
             };
 
             return settings;
@@ -149,10 +144,13 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-        private void ContentModelBinder_ModelBindingException(object sender, ContentModelBinder.ModelBindingArgs args)
+        /// <summary>
+        /// Handles when a model binding error occurs
+        /// </summary>
+        public void Handle(ModelBindingError notification)
         {
-            ModelsBuilderAssemblyAttribute sourceAttr = args.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
-            ModelsBuilderAssemblyAttribute modelAttr = args.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute sourceAttr = notification.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            ModelsBuilderAssemblyAttribute modelAttr = notification.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
 
             // if source or model is not a ModelsBuider type...
             if (sourceAttr == null || modelAttr == null)
@@ -164,11 +162,11 @@ namespace Umbraco.ModelsBuilder.Embedded
                 }
 
                 // else report, but better not restart (loops?)
-                args.Message.Append(" The ");
-                args.Message.Append(sourceAttr == null ? "view model" : "source");
-                args.Message.Append(" is a ModelsBuilder type, but the ");
-                args.Message.Append(sourceAttr != null ? "view model" : "source");
-                args.Message.Append(" is not. The application is in an unstable state and should be restarted.");
+                notification.Message.Append(" The ");
+                notification.Message.Append(sourceAttr == null ? "view model" : "source");
+                notification.Message.Append(" is a ModelsBuilder type, but the ");
+                notification.Message.Append(sourceAttr != null ? "view model" : "source");
+                notification.Message.Append(" is not. The application is in an unstable state and should be restarted.");
                 return;
             }
 
@@ -181,22 +179,21 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (pureSource == false || pureModel == false)
                 {
                     // only one is pure - report, but better not restart (loops?)
-                    args.Message.Append(pureSource
+                    notification.Message.Append(pureSource
                         ? " The content model is PureLive, but the view model is not."
                         : " The view model is PureLive, but the content model is not.");
-                    args.Message.Append(" The application is in an unstable state and should be restarted.");
+                    notification.Message.Append(" The application is in an unstable state and should be restarted.");
                 }
                 else
                 {
                     // both are pure - report, and if different versions, restart
                     // if same version... makes no sense... and better not restart (loops?)
-                    var sourceVersion = args.SourceType.Assembly.GetName().Version;
-                    var modelVersion = args.ModelType.Assembly.GetName().Version;
-                    args.Message.Append(" Both view and content models are PureLive, with ");
-                    args.Message.Append(sourceVersion == modelVersion
+                    Version sourceVersion = notification.SourceType.Assembly.GetName().Version;
+                    Version modelVersion = notification.ModelType.Assembly.GetName().Version;
+                    notification.Message.Append(" Both view and content models are PureLive, with ");
+                    notification.Message.Append(sourceVersion == modelVersion
                         ? "same version. The application is in an unstable state and should be restarted."
-                        : "different versions. The application is in an unstable state and is going to be restarted.");
-                    args.Restart = sourceVersion != modelVersion;
+                        : "different versions. The application is in an unstable state and should be restarted.");
                 }
             }
         }

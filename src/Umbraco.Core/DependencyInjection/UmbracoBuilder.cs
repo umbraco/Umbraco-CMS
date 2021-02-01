@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -216,6 +217,11 @@ namespace Umbraco.Core.DependencyInjection
                     ? (IServerRoleAccessor)new SingleServerRoleAccessor()
                     : new ElectedServerRoleAccessor(f.GetRequiredService<IServerRegistrationService>());
             });
+
+            // For Umbraco to work it must have the default IPublishedModelFactory
+            // which may be replaced by models builder but the default is required to make plain old IPublishedContent
+            // instances.
+            Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
         }
     }
 }
