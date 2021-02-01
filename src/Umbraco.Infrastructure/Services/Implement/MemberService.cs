@@ -120,10 +120,7 @@ namespace Umbraco.Infrastructure.Services.Implement
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
             }
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using IScope scope = ScopeProvider.CreateScope();
-            CreateMember(scope, member, 0, false);
-            scope.Complete();
+            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -143,12 +140,7 @@ namespace Umbraco.Infrastructure.Services.Implement
         {
             if (memberType == null) throw new ArgumentNullException(nameof(memberType));
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMember(scope, member, 0, false);
-                scope.Complete();
-            }
+            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -225,8 +217,18 @@ namespace Umbraco.Infrastructure.Services.Implement
                 if (memberType == null)
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback // causes rollback
 
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
-                CreateMember(scope, member, -1, true);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
+
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                {
+                    _memberRepository.Save(member);
+
+                    saveEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+
+                    Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
+                }
 
                 scope.Complete();
                 return member;
@@ -297,39 +299,22 @@ namespace Umbraco.Infrastructure.Services.Implement
 
                 if (vrfy == null || vrfy.Id != memberType.Id)
                     throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
-                CreateMember(scope, member, -1, true);
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                {
+                    _memberRepository.Save(member);
+
+                    saveEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+
+                    Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
+                }
+
                 scope.Complete();
                 return member;
             }
-        }
-
-        private void CreateMember(IScope scope, Member member, int userId, bool withIdentity)
-        {
-            member.CreatorId = userId;
-
-            if (withIdentity)
-            {
-                // if saving is cancelled, media remains without an identity
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    return;
-                }
-
-                _memberRepository.Save(member);
-
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
-            }
-
-            if (withIdentity == false)
-            {
-                return;
-            }
-
-            Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }
 
         #endregion

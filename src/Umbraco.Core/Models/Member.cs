@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -85,6 +85,34 @@ namespace Umbraco.Core.Models
         /// <param name="name"></param>
         /// <param name="email"></param>
         /// <param name="username"></param>
+        /// <param name="contentType"></param>
+        /// <param name="userId"></param>
+        /// <param name="isApproved"></param>
+        public Member(string name, string email, string username, IMemberType contentType, int userId, bool isApproved = true)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (email == null) throw new ArgumentNullException(nameof(email));
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(email));
+            if (username == null) throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
+
+            _email = email;
+            _username = username;
+            CreatorId = userId;
+            IsApproved = isApproved;
+
+            //this cannot be null but can be empty
+            _rawPasswordValue = "";
+        }
+
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
         /// <param name="rawPasswordValue">
         /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
         /// </param>
@@ -116,6 +144,28 @@ namespace Umbraco.Core.Models
             _username = username;
             _rawPasswordValue = rawPasswordValue;
             IsApproved = isApproved;
+        }
+
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue">
+        /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
+        /// </param>
+        /// <param name="contentType"></param>
+        /// <param name="isApproved"></param>
+        /// <param name="userId"></param>
+        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved, int userId)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            _email = email;
+            _username = username;
+            _rawPasswordValue = rawPasswordValue;
+            IsApproved = isApproved;
+            CreatorId = userId;
         }
 
         /// <summary>
