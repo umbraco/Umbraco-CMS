@@ -20,7 +20,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IconModel GetIcon(string iconName)
         {
             return _iconService.GetIcon(iconName);

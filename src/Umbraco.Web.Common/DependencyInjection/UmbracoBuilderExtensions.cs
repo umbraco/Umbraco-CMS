@@ -52,6 +52,7 @@ using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 using Umbraco.Web.Telemetry;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Website;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.Common.DependencyInjection
@@ -274,6 +275,8 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
             builder.Services.AddSingleton<ContentModelBinder>();
+
+            builder.Services.AddScoped<UmbracoHelper>();
 
             builder.AddHttpClients();
 
