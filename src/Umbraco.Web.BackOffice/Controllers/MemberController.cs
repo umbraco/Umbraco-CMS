@@ -438,6 +438,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                 string newPassword = _memberManager.HashPassword(contentItem.Password.NewPassword);
                 identityMember.PasswordHash = newPassword;
+                contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
+                if (identityMember.LastPasswordChangeDateUtc != null)
+                {
+                    contentItem.PersistedContent.LastPasswordChangeDate = DateTime.UtcNow;
+                    identityMember.LastPasswordChangeDateUtc = contentItem.PersistedContent.LastPasswordChangeDate;
+                }
             }
 
             IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
@@ -445,12 +451,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (updatedResult.Succeeded == false)
             {
                 return new ValidationErrorResult(updatedResult.Errors.ToErrorMessage());
-            }
-
-            contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
-            if (identityMember.LastPasswordChangeDateUtc != null)
-            {
-                contentItem.PersistedContent.LastPasswordChangeDate = DateTime.Now;
             }
 
             _memberService.Save(contentItem.PersistedContent);
