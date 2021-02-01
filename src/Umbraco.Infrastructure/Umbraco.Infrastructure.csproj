@@ -102,8 +102,4 @@
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Scheduling" />
-    </ItemGroup>
-
 </Project>

@@ -12,6 +12,7 @@ using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
 /*
@@ -91,6 +92,7 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<UmbracoApplicationStarting, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEnd, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, OutOfDateModelsStatus>();

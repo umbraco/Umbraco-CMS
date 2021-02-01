@@ -3,21 +3,25 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Common.ModelBinders
 {
+
     /// <summary>
     /// Maps view models, supporting mapping to and from any <see cref="IPublishedContent"/> or <see cref="IContentModel"/>.
     /// </summary>
     public class ContentModelBinder : IModelBinder
     {
+        private readonly IEventAggregator _eventAggregator;
+
         /// <summary>
-        /// Occurs on model binding exceptions.
+        /// Initializes a new instance of the <see cref="ContentModelBinder"/> class.
         /// </summary>
-        public event EventHandler<ModelBindingArgs> ModelBindingException; // TODO: This cannot use IEventAggregator currently because it cannot be async
+        public ContentModelBinder(IEventAggregator eventAggregator) => _eventAggregator = eventAggregator;
 
         /// <inheritdoc/>
         public Task BindModelAsync(ModelBindingContext bindingContext)
@@ -156,47 +160,10 @@ namespace Umbraco.Web.Common.ModelBinders
             // raise event, to give model factories a chance at reporting
             // the error with more details, and optionally request that
             // the application restarts.
-            var args = new ModelBindingArgs(sourceType, modelType, msg);
-            ModelBindingException?.Invoke(this, args);
+            var args = new ModelBindingError(sourceType, modelType, msg);
+            _eventAggregator.Publish(args);
 
             throw new ModelBindingException(msg.ToString());
-        }
-
-        /// <summary>
-        /// Contains event data for the <see cref="ModelBindingException"/> event.
-        /// </summary>
-        public class ModelBindingArgs : EventArgs
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ModelBindingArgs"/> class.
-            /// </summary>
-            public ModelBindingArgs(Type sourceType, Type modelType, StringBuilder message)
-            {
-                SourceType = sourceType;
-                ModelType = modelType;
-                Message = message;
-            }
-
-            /// <summary>
-            /// Gets the type of the source object.
-            /// </summary>
-            public Type SourceType { get; set; }
-
-            /// <summary>
-            /// Gets the type of the view model.
-            /// </summary>
-            public Type ModelType { get; set; }
-
-            /// <summary>
-            /// Gets the message string builder.
-            /// </summary>
-            /// <remarks>Handlers of the event can append text to the message.</remarks>
-            public StringBuilder Message { get; }
-
-            /// <summary>
-            /// Gets or sets a value indicating whether the application should restart.
-            /// </summary>
-            public bool Restart { get; set; }
         }
     }
 }
