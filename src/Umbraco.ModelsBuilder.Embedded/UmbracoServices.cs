@@ -20,6 +20,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IShortStringHelper _shortStringHelper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoServices"/> class.
+        /// </summary>
         public UmbracoServices(
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,

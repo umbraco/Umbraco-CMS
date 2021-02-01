@@ -10,7 +10,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -19,6 +18,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
         private readonly IMemberGroupService _memberGroupService;
@@ -42,7 +42,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberGroupDisplay> GetById(int id)
         {
             var memberGroup = _memberGroupService.GetById(id);
@@ -61,7 +60,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberGroupDisplay> GetById(Guid id)
         {
             var memberGroup = _memberGroupService.GetById(id);
@@ -78,7 +76,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MemberGroupDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;

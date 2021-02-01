@@ -21,7 +21,6 @@ using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -34,6 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -90,7 +90,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DataTypeDisplay> GetById(int id)
         {
             var dataType = _dataTypeService.GetDataType(id);
@@ -107,7 +106,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DataTypeDisplay> GetById(Guid id)
         {
             var dataType = _dataTypeService.GetDataType(id);
@@ -124,7 +122,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DataTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;

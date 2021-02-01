@@ -43,6 +43,12 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <para>Some objects such as macros are not based on CMSNode</para>
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetPagedChildren), "id", typeof(int), typeof(string))]
+    [ParameterSwapControllerActionSelector(nameof(GetPath), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetUrlAndAnchors), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))]
+    [ParameterSwapControllerActionSelector(nameof(GetUrl), "id", typeof(int), typeof(Udi))]
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private readonly ITreeService _treeService;
@@ -201,7 +207,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
         {
             var foundContentResult = GetResultForId(id, type);
@@ -220,7 +225,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IConvertToActionResult GetPath(Guid id, UmbracoEntityTypes type)
         {
             var foundContentResult = GetResultForKey(id, type);
@@ -239,7 +243,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetPath(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
@@ -257,7 +260,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="udi">UDI of the entity to fetch URL for</param>
         /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
-       [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetUrl(Udi udi, string culture = "*")
         {
             var intId = _entityService.GetId(udi);
@@ -291,7 +293,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// We are not restricting this with security because there is no sensitive data
         /// </remarks>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
             culture = culture ?? ClientCulture();
@@ -363,7 +364,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<UrlAndAnchors> GetUrlAndAnchors(Udi id, string culture = "*")
         {
             var intId = _entityService.GetId(id);
@@ -373,7 +373,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             return GetUrlAndAnchors(intId.Result, culture);
         }
         [HttpGet]
-        [DetermineAmbiguousActionByPassingParameters]
         public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
         {
             culture = culture ?? ClientCulture();
@@ -400,7 +399,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<EntityBasic> GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
@@ -412,7 +410,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<EntityBasic> GetById(Guid id, UmbracoEntityTypes type)
         {
             return GetResultForKey(id, type);
@@ -424,7 +421,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<EntityBasic> GetById(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
@@ -449,8 +445,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        [DetermineAmbiguousActionByPassingParameters]
-        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]int[] ids, [FromQuery]UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -471,8 +466,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        [DetermineAmbiguousActionByPassingParameters]
-        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
+        public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]Guid[] ids, [FromQuery]UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -495,7 +489,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath]Udi[] ids, [FromQuery]UmbracoEntityTypes type)
         {
             if (ids == null)
@@ -572,7 +565,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="filter"></param>
         /// <param name="dataTypeKey"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<PagedResult<EntityBasic>> GetPagedChildren(
             string id,
             UmbracoEntityTypes type,
@@ -634,7 +626,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="orderDirection"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<PagedResult<EntityBasic>> GetPagedChildren(
             int id,
             UmbracoEntityTypes type,

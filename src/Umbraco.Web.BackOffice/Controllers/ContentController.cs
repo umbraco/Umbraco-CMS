@@ -45,6 +45,8 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetNiceUrl), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class ContentController : ContentControllerBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -332,7 +334,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -351,7 +352,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -371,7 +371,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -389,7 +388,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeAlias);
@@ -398,7 +396,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return GetEmpty(contentType, parentId);
+            return GetEmptyInner(contentType, parentId);
         }
 
 
@@ -416,10 +414,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return GetEmpty(contentType, parentId);
+            return GetEmptyInner(contentType, parentId);
         }
 
-        private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
+        private ContentItemDisplay GetEmptyInner(IContentType contentType, int parentId)
         {
             var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
@@ -436,8 +434,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [OutgoingEditorModelEvent]
-        [DetermineAmbiguousActionByPassingParameters]
-        public ActionResult<ContentItemDisplay> GetEmpty(int blueprintId, int parentId)
+        public ActionResult<ContentItemDisplay> GetEmptyBlueprint(int blueprintId, int parentId)
         {
             var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -462,7 +459,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(int id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
@@ -474,7 +470,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(Guid id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
@@ -486,7 +481,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -504,7 +498,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        [DetermineAmbiguousActionByPassingParameters]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
@@ -1641,7 +1634,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var toMoveResult = ValidateMoveOrCopy(move);
-            if (!(toMoveResult is null))
+            if (!(toMoveResult.Result is null))
             {
                 return toMoveResult.Result;
             }

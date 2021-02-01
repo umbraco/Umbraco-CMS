@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.ModelBinders;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         private ContentModelBinder _contentModelBinder;
 
         [SetUp]
-        public void SetUp() => _contentModelBinder = new ContentModelBinder();
+        public void SetUp() => _contentModelBinder = new ContentModelBinder(Mock.Of<IEventAggregator>());
 
         [Test]
         [TestCase(typeof(IPublishedContent), false)]

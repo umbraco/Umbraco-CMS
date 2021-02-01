@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Templates;
 using Umbraco.Core.Xml;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.Website
 {
@@ -36,15 +36,13 @@ namespace Umbraco.Web.Website
         /// <param name="componentRenderer"></param>
         /// <param name="publishedContentQuery"></param>
         /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
-        public UmbracoHelper(IPublishedContent currentPage,
-            ICultureDictionaryFactory cultureDictionary,
+        public UmbracoHelper(ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
             IPublishedContentQuery publishedContentQuery)
         {
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
             _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
-            _currentPage = currentPage;
         }
 
         /// <summary>

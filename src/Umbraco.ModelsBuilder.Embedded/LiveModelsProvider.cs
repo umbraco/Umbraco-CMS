@@ -45,10 +45,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification
         /// </summary>
-        public void Handle(UmbracoApplicationStarting notification)
-        {
-            Install();
-        }
+        public void Handle(UmbracoApplicationStarting notification) => Install();
 
         private void Install()
         {

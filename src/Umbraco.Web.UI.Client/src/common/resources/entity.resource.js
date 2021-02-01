@@ -220,7 +220,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     }),
                 'Failed to anchors data for rte content ' + rteContent);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds
@@ -245,6 +245,10 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          */
         getByIds: function (ids, type) {
+
+          if (!ids || ids.length === 0) {
+            return $q.when([]);
+          }
 
             var query = "type=" + type;
 
@@ -321,7 +325,7 @@ function entityResource($q, $http, umbRequestHelper) {
         getAll: function (type, postFilter) {
             //need to build the query string manually
             var query = "type=" + type + "&postFilter=" + (postFilter ? encodeURIComponent(postFilter) : "");
-         
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(

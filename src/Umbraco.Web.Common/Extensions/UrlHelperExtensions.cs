@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
+using Umbraco.Core.WebAssets;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.Common.Install;
-using Microsoft.AspNetCore.Routing;
-using Umbraco.Core.Hosting;
-using System.Globalization;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Extensions
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Extensions
     public static class UrlHelperExtensions
     {
 
-        
+
 
         /// <summary>
         /// Return the back office url if the back office is installed

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -13,6 +13,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelsGenerationError"/> class.
+        /// </summary>
         public ModelsGenerationError(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
             _config = config.Value;
@@ -22,7 +25,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         public void Clear()
         {
             var errFile = GetErrFile();
-            if (errFile == null) return;
+            if (errFile == null)
+            {
+                return;
+            }
 
             // "If the file to be deleted does not exist, no exception is thrown."
             File.Delete(errFile);
@@ -31,7 +37,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         public void Report(string message, Exception e)
         {
             var errFile = GetErrFile();
-            if (errFile == null) return;
+            if (errFile == null)
+            {
+                return;
+            }
 
             var sb = new StringBuilder();
             sb.Append(message);
@@ -47,14 +56,18 @@ namespace Umbraco.ModelsBuilder.Embedded
         public string GetLastError()
         {
             var errFile = GetErrFile();
-            if (errFile == null) return null;
+            if (errFile == null)
+            {
+                return null;
+            }
 
             try
             {
                 return File.ReadAllText(errFile);
             }
-            catch // accepted
+            catch
             {
+                // accepted
                 return null;
             }
         }
@@ -63,7 +76,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
+            {
                 return null;
+            }
 
             return Path.Combine(modelsDirectory, "models.err");
         }
