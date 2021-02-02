@@ -66,14 +66,12 @@ namespace Umbraco.Tests.Services
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(nestedContentDataSerializerFactory),
+                new DatabaseDataSource(nestedContentDataSerializerFactory, documentRepository, mediaRepository, memberRepository,
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() })),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                nestedContentDataSerializerFactory);
+                Mock.Of<IPublishedModelFactory>());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

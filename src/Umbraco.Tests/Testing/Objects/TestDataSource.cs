@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
 using Umbraco.Web;
@@ -70,6 +71,76 @@ namespace Umbraco.Tests.Testing.Objects
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
         {
             return Enumerable.Empty<ContentNodeKit>();
+        }
+
+        public void RemoveEntity(IScope scope, int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemovePublishedEntity(IScope scope, int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAllContentEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAllMediaEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAllMemberEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LoadAllContentEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LoadAllMediaEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LoadAllMemberEntities(IScope scope, IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MemberEntitiesValid(IScope scope)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ContentEntitiesValid(IScope scope)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MediaEntitiesValid(IScope scope)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpsertContentEntity(IScope scope, IContentBase contentBase, bool published)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpsertMediaEntity(IScope scope, IContentBase contentBase, bool published)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpsertMemberEntity(IScope scope, IContentBase contentBase, bool published)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -195,16 +195,11 @@ namespace Umbraco.Tests.PublishedContent
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
                 scopeProvider,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
                 new TestDefaultCultureAccessor(),
                 dataSource,
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                _contentNestedDataSerializerFactory);
+                Mock.Of<IPublishedModelFactory>());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,14 +12,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -37,15 +33,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
         private readonly IProfilingLogger _logger;
-        private readonly IDocumentRepository _documentRepository;
-        private readonly IMediaRepository _mediaRepository;
-        private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
-        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
         private readonly ContentDataSerializer _contentDataSerializer;
 
         // volatile because we read it with no lock
@@ -75,12 +66,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IProfilingLogger logger, IScopeProvider scopeProvider,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
-            IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders, IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, ContentDataSerializer contentDataSerializer = null)
+            IPublishedModelFactory publishedModelFactory, ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -91,13 +80,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _dataSource = dataSource;
             _logger = logger;
             _scopeProvider = scopeProvider;
-            _documentRepository = documentRepository;
-            _mediaRepository = mediaRepository;
-            _memberRepository = memberRepository;
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
-            _urlSegmentProviders = urlSegmentProviders;
-            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
             _contentDataSerializer = contentDataSerializer;
 
             // we need an Xml serializer here so that the member cache can support XPath,
@@ -1259,80 +1243,71 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            OnRemovedEntity(args.Scope, args.Entity);
         }
 
         private void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            OnRemovedEntity(args.Scope, args.Entity);
         }
 
         private void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            OnRemovedEntity(args.Scope, args.Entity);
         }
 
-        private void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
+        private void OnRemovedEntity(IScope scope, IContentBase item)
         {
-            db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = item.Id });
+            _dataSource.RemoveEntity(scope,item.Id);
         }
 
         private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
         {
-            var db = args.Scope.Database;
             var content = (Content)args.Entity;
 
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
             // always refresh the edited data
-            OnRepositoryRefreshed(serializer, db, content, false);
+            OnContentRepositoryRefreshed( args.Scope, content, false);
 
             // if unpublishing, remove published data from table
             if (content.PublishedState == PublishedState.Unpublishing)
-                db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
-
+            {
+                _dataSource.RemovePublishedEntity(args.Scope, content.Id);
+            }
             // if publishing, refresh the published data
             else if (content.PublishedState == PublishedState.Publishing)
-                OnRepositoryRefreshed(serializer, db, content, true);
+                OnContentRepositoryRefreshed( args.Scope, content, true);
         }
 
         private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
-            var db = args.Scope.Database;
             var media = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(serializer, db, media, false);
+            OnMediaRepositoryRefreshed( args.Scope, media, false);
         }
 
         private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
-
-            var db = args.Scope.Database;
             var member = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(serializer, db, member, false);
+            OnMemberRepositoryRefreshed(args.Scope, member, false);
         }
-
-        private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IUmbracoDatabase db, IContentBase content, bool published)
+        private void OnContentRepositoryRefreshed(IScope scope, IContentBase content, bool published)
         {
             // use a custom SQL to update row version on each update
-            //db.InsertOrUpdate(dto);
-
-            var dto = GetDto(content, published, serializer);
-            db.InsertOrUpdate(dto,
-                "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
-                new
-                {
-                    dataRaw = dto.RawData ?? Array.Empty<byte>(),
-                    data = dto.Data,
-                    id = dto.NodeId,
-                    published = dto.Published
-                });
+            _dataSource.UpsertContentEntity(scope, content, published);
+        }
+        private void OnMediaRepositoryRefreshed(IScope scope, IContentBase content, bool published)
+        {
+            // use a custom SQL to update row version on each update
+            _dataSource.UpsertMediaEntity(scope, content, published);
+        }
+        private void OnMemberRepositoryRefreshed(IScope scope, IContentBase content, bool published)
+        {
+            // use a custom SQL to update row version on each update
+            _dataSource.UpsertMemberEntity(scope, content, published);
         }
 
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
@@ -1377,318 +1352,86 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
-        {
-            // should inject these in ctor
-            // BUT for the time being we decide not to support ConvertDbToXml/String
-            //var propertyEditorResolver = PropertyEditorResolver.Current;
-            //var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-
-            var propertyData = new Dictionary<string, PropertyData[]>();
-            foreach (var prop in content.Properties)
-            {
-                var pdatas = new List<PropertyData>();
-                foreach (var pvalue in prop.Values)
-                {
-                    // sanitize - properties should be ok but ... never knows
-                    if (!prop.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment))
-                        continue;
-
-                    // note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
-                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                    if (value != null)
-                        pdatas.Add(new PropertyData { Culture = pvalue.Culture ?? string.Empty, Segment = pvalue.Segment ?? string.Empty, Value = value });
-
-                    //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>($"{content.Id} {prop.Alias} [{pvalue.LanguageId},{pvalue.Segment}] {value} {(published?"pub":"edit")}");
-
-                    //if (value != null)
-                    //{
-                    //    var e = propertyEditorResolver.GetByAlias(prop.PropertyType.PropertyEditorAlias);
-
-                    //    // We are converting to string, even for database values which are integer or
-                    //    // DateTime, which is not optimum. Doing differently would require that we have a way to tell
-                    //    // whether the conversion to XML string changes something or not... which we don't, and we
-                    //    // don't want to implement it as PropertyValueEditor.ConvertDbToXml/String should die anyway.
-
-                    //    // Don't think about improving the situation here: this is a corner case and the real
-                    //    // thing to do is to get rig of PropertyValueEditor.ConvertDbToXml/String.
-
-                    //    // Use ConvertDbToString to keep it simple, although everywhere we use ConvertDbToXml and
-                    //    // nothing ensures that the two methods are consistent.
-
-                    //    if (e != null)
-                    //        value = e.ValueEditor.ConvertDbToString(prop, prop.PropertyType, dataTypeService);
-                    //}
-                }
-                propertyData[prop.Alias] = pdatas.ToArray();
-            }
-
-            var cultureData = new Dictionary<string, CultureVariation>();
-
-            // sanitize - names should be ok but ... never knows
-            if (content.ContentType.VariesByCulture())
-            {
-                var infos = content is IContent document
-                    ? (published
-                        ? document.PublishCultureInfos
-                        : document.CultureInfos)
-                    : content.CultureInfos;
-
-                // ReSharper disable once UseDeconstruction
-                foreach (var cultureInfo in infos)
-                {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
-                    cultureData[cultureInfo.Culture] = new CultureVariation
-                    {
-                        Name = cultureInfo.Name,
-                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
-                        Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
-                        IsDraft = cultureIsDraft
-                    };
-                }
-            }
-
-            //the dictionary that will be serialized
-            var contentCacheData = new ContentCacheDataModel
-            {
-                PropertyData = propertyData,
-                CultureData = cultureData,
-                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
-            };
-
-            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData);
-
-            var dto = new ContentNuDto
-            {
-                NodeId = content.Id,
-                Published = published,
-                Data = serialized.StringData,
-                RawData = serialized.ByteData
-            };
-
-            //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
-
-            return dto;
-        }
-
+      
         #endregion
 
         #region Rebuild Database PreCache
 
         private const int DefaultSqlPagingSize = 1000;
 
-        private static int GetSqlPagingSize()
-        {
-            var appSetting = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.SqlPageSize"];
-            return appSetting != null && int.TryParse(appSetting, out var size) ? size : DefaultSqlPagingSize;
-        }
-
         public override void Rebuild()
         {
             _logger.Debug<PublishedSnapshotService>("Rebuilding...");
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media | ContentCacheDataSerializerEntityType.Member);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMediaDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMemberDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
+                RebuildContentDbCacheLocked( scope,  null);
+                RebuildMediaDbCacheLocked( scope, null);
+                RebuildMemberDbCacheLocked( scope,  null);
                 scope.Complete();
             }
         }
 
         public void RebuildContentDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                RebuildContentDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildContentDbCacheLocked( scope, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes content tree lock
-        private void RebuildContentDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentDbCacheLocked( IScope scope, IEnumerable<int> contentTypeIds)
         {
-            var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Constants.ObjectTypes.Document;
-            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
-            {
-                // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                    new { objType = contentObjectType });
-            }
-            else
-            {
-                // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                db.Execute($@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                    new { objType = contentObjectType, ctypes = contentTypeIdsA });
-            }
 
-            // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IContent>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
-
-            long pageIndex = 0;
-            long processed = 0;
-            long total;
-            do
-            {
-                // the tree is locked, counting and comparing to total is safe
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = new List<ContentNuDto>();
-                var count = 0;
-                foreach (var c in descendants)
-                {
-                    // always the edited version
-                    items.Add(GetDto(c, false, serializer));
-
-                    // and also the published version if it makes any sense
-                    if (c.Published)
-                        items.Add(GetDto(c, true, serializer));
-
-                    count++;
-                }
-
-                db.BulkInsertRecords(items);
-                processed += count;
-            } while (processed < total);
+            _dataSource.DeleteAllContentEntities(scope, contentTypeIds);
+            _dataSource.LoadAllContentEntities(scope, contentTypeIds);
         }
 
-        public void RebuildMediaDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
+        public void RebuildMediaDbCache(IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+            
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
-                RebuildMediaDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildMediaDbCacheLocked(scope, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes media tree lock
-        public void RebuildMediaDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMediaDbCacheLocked(IScope scope, IEnumerable<int> contentTypeIds)
         {
-            var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = scope.Database;
-
             // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
-            {
-                // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                    new { objType = mediaObjectType });
-            }
-            else
-            {
-                // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                db.Execute($@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                    new { objType = mediaObjectType, ctypes = contentTypeIdsA });
-            }
-
+            _dataSource.DeleteAllMediaEntities(scope, contentTypeIds);
             // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IMedia>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
-
-            long pageIndex = 0;
-            long processed = 0;
-            long total;
-            do
-            {
-                // the tree is locked, counting and comparing to total is safe
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false, serializer)).ToList();
-                db.BulkInsertRecords(items);
-                processed += items.Count;
-            } while (processed < total);
+            _dataSource.LoadAllMediaEntities(scope,  contentTypeIds);
         }
 
         public void RebuildMemberDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildMemberDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildMemberDbCacheLocked(scope, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes member tree lock
-        public void RebuildMemberDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMemberDbCacheLocked(IScope scope, IEnumerable<int> contentTypeIds)
         {
-            var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Constants.ObjectTypes.Member;
-            var db = scope.Database;
-
             // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
-            {
-                // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                    new { objType = memberObjectType });
-            }
-            else
-            {
-                // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                db.Execute($@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                    new { objType = memberObjectType, ctypes = contentTypeIdsA });
-            }
+            _dataSource.DeleteAllMemberEntities(scope,  contentTypeIds);
 
             // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IMember>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
-
-            long pageIndex = 0;
-            long processed = 0;
-            long total;
-            do
-            {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
-                db.BulkInsertRecords(items);
-                processed += items.Length;
-            } while (processed < total);
+            _dataSource.LoadAllMemberEntities(scope,  contentTypeIds);
         }
 
         public bool VerifyContentDbCache()
@@ -1705,22 +1448,8 @@ WHERE cmsContentNu.nodeId IN (
         // assumes content tree lock
         private bool VerifyContentDbCacheLocked(IScope scope)
         {
-            // every document should have a corresponding row for edited properties
-            // and if published, may have a corresponding row for published properties
-
-            var contentObjectType = Constants.ObjectTypes.Document;
-            var db = scope.Database;
-
-            var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
-FROM umbracoNode
-JOIN {Constants.DatabaseSchema.Tables.Document} ON umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId
-LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=0)
-LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
-WHERE umbracoNode.nodeObjectType=@objType
-AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=1 AND nuPublished.nodeId IS NULL);"
-                , new { objType = contentObjectType });
-
-            return count == 0;
+            return _dataSource.ContentEntitiesValid(scope);
+           
         }
 
         public bool VerifyMediaDbCache()
@@ -1737,19 +1466,8 @@ AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.publi
         // assumes media tree lock
         public bool VerifyMediaDbCacheLocked(IScope scope)
         {
-            // every media item should have a corresponding row for edited properties
-
-            var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = scope.Database;
-
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
-FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
-WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentNu.nodeId IS NULL
-", new { objType = mediaObjectType });
-
-            return count == 0;
+            return _dataSource.MediaEntitiesValid(scope);
+          
         }
 
         public bool VerifyMemberDbCache()
@@ -1766,19 +1484,9 @@ AND cmsContentNu.nodeId IS NULL
         // assumes member tree lock
         public bool VerifyMemberDbCacheLocked(IScope scope)
         {
-            // every member item should have a corresponding row for edited properties
+            return _dataSource.MemberEntitiesValid(scope);
 
-            var memberObjectType = Constants.ObjectTypes.Member;
-            var db = scope.Database;
-
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
-FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
-WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentNu.nodeId IS NULL
-", new { objType = memberObjectType });
-
-            return count == 0;
+           
         }
 
         #endregion
