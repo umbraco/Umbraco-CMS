@@ -222,6 +222,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = p.Id,
                     Alias = p.Alias,
                     Description = p.Description,
+                    LabelOnTop = p.LabelOnTop,
                     Editor = p.PropertyEditorAlias,
                     Validation = new PropertyTypeValidation
                         {
@@ -238,6 +239,8 @@ namespace Umbraco.Web.Models.Mapping
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
                     DataTypeKey = p.DataTypeKey,
+                    DataTypeName = dataType.Name,
+                    DataTypeIcon = propertyEditor.Icon,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,

@@ -110,6 +110,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
@@ -136,8 +137,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
-
             composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<IIconService, IconService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
@@ -269,7 +270,6 @@ namespace Umbraco.Web.Runtime
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
             composition.OEmbedProviders()
                 .Append<YouTube>()
-                .Append<Instagram>()
                 .Append<Twitter>()
                 .Append<Vimeo>()
                 .Append<DailyMotion>()

@@ -27,11 +27,14 @@
 
     'lib/chart.js/chart.min.js',
     'lib/angular-chart.js/angular-chart.min.js',
+    'lib/wicg-inert/dist/inert.min.js',
 
     'lib/umbraco/Extensions.js',
 
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
+
+    'js/utilities.js',
 
     'js/app.js',
 
@@ -42,5 +45,5 @@
     'js/umbraco.interceptors.js',
     'js/umbraco.controllers.js',
     'js/routes.js',
-    'js/init.js'
+    'js/init.js'    
 ]

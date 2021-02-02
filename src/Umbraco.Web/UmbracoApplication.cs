@@ -31,6 +31,8 @@ namespace Umbraco.Web
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = ConfigurationManager.AppSettings[Constants.AppSettings.MainDomLock];
 
+            // TODO: Can we automatically and consistently determine we're running on Azure without this app setting?
+
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
                 ? (IMainDomLock)new SqlMainDomLock(logger)
                 : new MainDomSemaphoreLock(logger);

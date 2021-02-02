@@ -54,7 +54,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //take the last child
             var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
             //check if this already exists, if so exit
-            if (expandedPaths.indexOf(childPath) !== -1) {
+            if (expandedPaths.includes(childPath)) {
                 return;
             }
 
@@ -65,18 +65,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
 
-            _.each(clonedPaths, function (p) {
+            clonedPaths.forEach(p => {
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    if (expandedPaths.indexOf(childPath) === -1) {
+                    if (expandedPaths.includes(childPath) === false) {
                         expandedPaths.push(childPath); //replace it
                     }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else if (expandedPaths.indexOf(childPath) === -1) {
+                else if (expandedPaths.includes(childPath) === false) {
                     expandedPaths.push(childPath); //track it
                 }
             });
@@ -135,7 +135,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (treeNode.iconIsClass === undefined || treeNode.iconIsClass) {
                     var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
                     treeNode.cssClass = standardCssClass + " " + converted;
-                    if (converted.startsWith('.')) {
+                    if (converted && converted.startsWith('.')) {
                         //its legacy so add some width/height
                         treeNode.style = "height:16px;width:16px;";
                     }

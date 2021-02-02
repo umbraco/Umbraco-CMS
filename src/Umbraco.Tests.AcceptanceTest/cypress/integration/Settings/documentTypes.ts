@@ -10,6 +10,7 @@ context('Document Types', () => {
     const name = "Test document type";
 
     cy.umbracoEnsureDocumentTypeNameNotExists(name);
+    cy.umbracoEnsureTemplateNameNotExists(name);
 
     cy.umbracoSection('settings');
     cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
@@ -31,10 +32,10 @@ context('Document Types', () => {
     cy.get('[data-element="editor-add"]').click();
 
     //Search for textstring
-    cy.get('.umb-search-field').type('Textstring');
+    cy.get('#datatype-search').type('Textstring');
 
     // Choose first item
-    cy.get('ul.umb-card-grid li a[title="Textstring"]').closest("li").click();
+    cy.get('ul.umb-card-grid li [title="Textstring"]').closest("li").click();
 
     // Save property
     cy.get('.btn-success').last().click();
@@ -44,6 +45,7 @@ context('Document Types', () => {
 
     //Assert
     cy.umbracoSuccessNotification().should('be.visible');
+    cy.umbracoEnsureTemplateNameNotExists(name);
 
     //Clean up
     cy.umbracoEnsureDocumentTypeNameNotExists(name);
@@ -68,7 +70,7 @@ context('Document Types', () => {
     cy.umbracoContextMenuAction("action-delete").click();
 
     cy.get('label.checkbox').click();
-    cy.umbracoButtonByLabelKey("general_ok").click();
+    cy.umbracoButtonByLabelKey("delete").click();
 
     cy.contains(name).should('not.exist');
 

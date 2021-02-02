@@ -347,23 +347,20 @@ input.umb-group-builder__group-title-input:disabled:hover {
 .umb-group-builder__property-actions {
     flex: 0 0 44px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-end;
 }
 
 .umb-group-builder__property-action {
-    
     position: relative;
     margin: 5px 0;
     
-    > button {
+    button.btn-icon {
         border: none;
-        
         font-size: 18px;
         position: relative;
         cursor: pointer;
         color: @ui-icon;
-        
         margin: 0;
         padding: 5px 10px;
         width: auto;
@@ -399,18 +396,21 @@ input.umb-group-builder__group-title-input:disabled:hover {
     padding: 0 4px;
     display: flex;
     border-radius: 3px;
-}
+    align-items: center;
 
-.umb-group-builder__property-tag:first-child {
-    margin-left: 0;
-}
+    &:first-child {
+        margin-left: 0;
+    }
 
-.umb-group-builder__property-tag.-white {
-    background-color: @white;
+    &.-white {
+        background-color: @white;
+    }
 }
 
 .umb-group-builder__property-tag-icon {
     margin-right: 3px;
+    display: flex;
+    align-items: center;
 }
 
 /* ---------- SORTABLE ---------- */
@@ -513,17 +513,14 @@ input.umb-group-builder__group-sort-value {
         display: flex;
         align-items: center;
         align-content: stretch;
-
         min-height: 80px;
-
         border: 1px solid @gray-9;
         color: @ui-action-discreet-type;
         border-radius: @baseBorderRadius;
-
     }
 
     .editor-info {
-        flex: 1 0 auto;
+        flex: 1 1 auto;
         text-align: left;
         display: flex;
         align-items: center;
@@ -537,6 +534,9 @@ input.umb-group-builder__group-sort-value {
     }
 
     .editor-icon-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 60px;
         height: 60px;
         text-align: center;
@@ -548,12 +548,12 @@ input.umb-group-builder__group-sort-value {
             font-size: 32px;
         }
     }
-    
+
     .editor-details {
         flex: 1 1 auto;
         margin-top: 10px;
         margin-bottom: 10px;
-        
+
         .editor-name {
             display: block;
             font-weight: bold;
@@ -570,9 +570,9 @@ input.umb-group-builder__group-sort-value {
         width: 48px;
         height: 48px;
         font-size: 18px;
-        
         min-height: 80px;
         color: @ui-action-discreet-type;
+
         &:hover {
             color: @ui-action-discreet-type-hover;
             background-color: @ui-action-discreet-hover;
