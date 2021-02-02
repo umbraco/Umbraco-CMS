@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Website.Collections;
@@ -43,6 +41,8 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
+
+            builder.Services.AddSingleton<FrontEndRoutes>();
 
             builder
                 .AddDistributedCache()

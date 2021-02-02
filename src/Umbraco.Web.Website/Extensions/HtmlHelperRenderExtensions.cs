@@ -35,34 +35,20 @@ namespace Umbraco.Extensions
     public static class HtmlHelperRenderExtensions
     {
         private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
-        {
-            return GetRequiredService<T>(htmlHelper.ViewContext);
-        }
+            => GetRequiredService<T>(htmlHelper.ViewContext);
 
         private static T GetRequiredService<T>(ViewContext viewContext)
-        {
-            return viewContext.HttpContext.RequestServices.GetRequiredService<T>();
-        }
+            => viewContext.HttpContext.RequestServices.GetRequiredService<T>();
 
         /// <summary>
         /// Renders the markup for the profiler
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         public static IHtmlContent RenderProfiler(this IHtmlHelper helper)
-        {
-            return new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
-        }
+            => new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
 
         /// <summary>
         /// Renders a partial view that is found in the specified area
         /// </summary>
-        /// <param name="helper"></param>
-        /// <param name="partial"></param>
-        /// <param name="area"></param>
-        /// <param name="model"></param>
-        /// <param name="viewData"></param>
-        /// <returns></returns>
         public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
         {
             var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
@@ -76,8 +62,6 @@ namespace Umbraco.Extensions
         /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
         /// using does not inherit from UmbracoViewPage
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
@@ -109,9 +93,9 @@ namespace Umbraco.Extensions
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
-            //let's always cache by the current culture to allow variants to have different cache results
+            // let's always cache by the current culture to allow variants to have different cache results
             var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-            if (!String.IsNullOrEmpty(cultureName))
+            if (!string.IsNullOrEmpty(cultureName))
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
@@ -123,16 +107,19 @@ namespace Umbraco.Extensions
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
+
                 cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
+
             if (cacheByMember)
             {
-                //TODO reintroduce when members are migrated
+                // TODO reintroduce when members are migrated
                 throw new NotImplementedException("Reintroduce when members are migrated");
                 // var helper = Current.MembershipHelper;
                 // var currentMember = helper.GetCurrentMember();
                 // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
+
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);

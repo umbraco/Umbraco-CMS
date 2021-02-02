@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -15,7 +15,7 @@ namespace Umbraco.Web.BackOffice.Routing
     /// <summary>
     /// Creates routes for the preview hub
     /// </summary>
-    public class PreviewRoutes : IAreaRoutes
+    public sealed class PreviewRoutes : IAreaRoutes
     {
         private readonly IRuntimeState _runtimeState;
         private readonly string _umbracoPathSegment;

@@ -22,11 +22,12 @@ namespace Umbraco.Web.Website.Controllers
     // [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SurfaceController"/> class.
+        /// </summary>
         protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
-        {
-            PublishedUrlProvider = publishedUrlProvider;
-        }
+            => PublishedUrlProvider = publishedUrlProvider;
 
         protected IPublishedUrlProvider PublishedUrlProvider { get; }
 
@@ -52,49 +53,37 @@ namespace Umbraco.Web.Website.Controllers
         /// Redirects to the Umbraco page with the given id
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey)
-        {
-            return new RedirectToUmbracoPageResult(contentKey, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(contentKey, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the Umbraco page with the given id and passes provided querystring
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid contentKey, QueryString queryString)
-        {
-            return new RedirectToUmbracoPageResult(contentKey, queryString, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(contentKey, queryString, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the Umbraco page with the given published content
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
-        {
-            return new RedirectToUmbracoPageResult(publishedContent, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(publishedContent, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the Umbraco page with the given published content and passes provided querystring
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, QueryString queryString)
-        {
-            return new RedirectToUmbracoPageResult(publishedContent, queryString, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(publishedContent, queryString, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the currently rendered Umbraco page
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
-        {
-            return new RedirectToUmbracoPageResult(CurrentPage, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(CurrentPage, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the currently rendered Umbraco page and passes provided querystring
         /// </summary>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(QueryString queryString)
-        {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryString, PublishedUrlProvider, UmbracoContextAccessor);
-        }
+            => new RedirectToUmbracoPageResult(CurrentPage, queryString, PublishedUrlProvider, UmbracoContextAccessor);
 
         /// <summary>
         /// Redirects to the currently rendered Umbraco URL
@@ -105,17 +94,13 @@ namespace Umbraco.Web.Website.Controllers
         /// Server.Transfer.*
         /// </remarks>
         protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl()
-        {
-            return new RedirectToUmbracoUrlResult(UmbracoContext);
-        }
+            => new RedirectToUmbracoUrlResult(UmbracoContext);
 
         /// <summary>
         /// Returns the currently rendered Umbraco page
         /// </summary>
         protected UmbracoPageResult CurrentUmbracoPage()
-        {
-            return new UmbracoPageResult(ProfilingLogger);
-        }
+            => new UmbracoPageResult(ProfilingLogger);
 
         /// <summary>
         /// we need to recursively find the route definition based on the parent view context
@@ -126,9 +111,9 @@ namespace Umbraco.Web.Website.Controllers
             while (!(currentContext is null))
             {
                 var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.Values.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
+                if (currentRouteData.Values.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken))
                 {
-                    return Attempt.Succeed((UmbracoRouteValues)currentRouteData.Values[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                    return Attempt.Succeed((UmbracoRouteValues)currentRouteData.Values[Constants.Web.UmbracoRouteDefinitionDataToken]);
                 }
             }
 
