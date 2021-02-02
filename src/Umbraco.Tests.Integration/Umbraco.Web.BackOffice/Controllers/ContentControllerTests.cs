@@ -12,11 +12,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Formatters;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Integration.TestServerTest.Controllers
+namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class ContentControllerTests : UmbracoTestServerTestBase
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
 
@@ -162,7 +163,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -227,7 +228,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -288,7 +289,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -352,7 +353,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .WithIsDefault(false)
                 .Build());
 
-            string url = PrepareUrl<ContentController>(x => x.PostSave(null));
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             IContentService contentService = GetRequiredService<IContentService>();
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();

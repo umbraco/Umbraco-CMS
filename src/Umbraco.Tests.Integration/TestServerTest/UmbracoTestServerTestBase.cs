@@ -19,7 +19,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
@@ -84,11 +83,32 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// This returns the url but also sets the HttpContext.request into to use this url.
         /// </summary>
         /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareUrl<T>(Expression<Func<T, object>> methodSelector)
+        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            string url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
+            string url = LinkGenerator.GetUmbracoApiService(methodSelector);
+            return PrepareUrl(url);
+        }
 
+        /// <summary>
+        /// Prepare a url before using <see cref="Client"/>.
+        /// This returns the url but also sets the HttpContext.request into to use this url.
+        /// </summary>
+        /// <returns>The string URL of the controller action.</returns>
+        protected string PrepareSurfaceControllerUrl<T>(Expression<Func<T, object>> methodSelector)
+            where T : SurfaceController
+        {
+            string url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector);
+            return PrepareUrl(url);
+        }
+
+        /// <summary>
+        /// Prepare a url before using <see cref="Client"/>.
+        /// This returns the url but also sets the HttpContext.request into to use this url.
+        /// </summary>
+        /// <returns>The string URL of the controller action.</returns>
+        protected string PrepareUrl(string url)
+        {
             IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
@@ -150,6 +170,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Web.Website
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
+
+                    // Adds Umbraco.Tests.Integration
+                    mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
                 })
                 .AddWebServer()
                 .AddWebsite()
