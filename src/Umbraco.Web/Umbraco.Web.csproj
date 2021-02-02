@@ -77,7 +77,7 @@
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="MessagePack">
-      <Version>2.1.152</Version>
+      <Version>2.2.85</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
