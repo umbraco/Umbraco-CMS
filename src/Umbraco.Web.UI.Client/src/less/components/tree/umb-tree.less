@@ -104,10 +104,9 @@ body.touch .umb-tree {
         .umb-button-ellipsis--hidden {
             opacity: 1;
         }
-        
+         
         .umb-tree-icon {
             color: @ui-option-type-hover;
-            flex-shrink: 0;
         }
     }
 }
@@ -157,13 +156,16 @@ body.touch .umb-tree {
 
         &-link {
             display: block;
+            width:100%;
         }
 
         &-name {
             display: flex;
 
-            &__text {
+            &__text { 
                 margin: 1px 0 0;
+                overflow:hidden;
+                text-overflow: ellipsis;
             }
         }
     }
@@ -338,7 +340,6 @@ body.touch .umb-tree {
 .umb-tree-icon { 
     vertical-align: middle;
     margin: 0 13px 0 0;
-    //color: @gray-1;
     color: @ui-option-type;
     font-size: 20px;   
     
