@@ -82,14 +82,18 @@ namespace Umbraco.Tests.Runtimes
 
             protected override IRuntime GetRuntime()
             {
-                return Runtime = new TestRuntime();
+                var logger = new DebugDiagnosticsLogger();
+                return Runtime = new TestRuntime(logger, new MainDom(logger, new MainDomSemaphoreLock(logger)));
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            protected override ILogger GetLogger() => new DebugDiagnosticsLogger();
+            public TestRuntime(ILogger logger, IMainDom mainDom) : base(logger, mainDom)
+            {
+            }
+
             protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory
@@ -100,6 +104,13 @@ namespace Umbraco.Tests.Runtimes
                 mock.Setup(x => x.Configured).Returns(true);
                 mock.Setup(x => x.CanConnect).Returns(true);
                 return mock.Object;
+            }
+
+            internal override void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
+            {
+                // mega hack to make it boot up without DB access.
+                var state = (RuntimeState)State;
+                state.Level = RuntimeLevel.Boot;
             }
 
             protected override Configs GetConfigs()
@@ -141,6 +152,8 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private IMainDom _mainDom;
+
+            
 
             public override IFactory Boot(IRegister container)
             {

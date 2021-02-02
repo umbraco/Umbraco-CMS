@@ -1,5 +1,9 @@
 function ItemPickerOverlay($scope, localizationService) {
 
+    $scope.filter = {
+        searchTerm: ''
+    };
+
     function onInit() {
         $scope.model.hideSubmitButton = true;
 

@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Runtimes
             coreRuntime.Compose(composition);
 
             // determine actual runtime level
-            runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
+            runtimeState.DetermineRuntimeLevel(databaseFactory);
             Console.WriteLine(runtimeState.Level);
             // going to be Install BUT we want to force components to be there (nucache etc)
             runtimeState.Level = RuntimeLevel.Run;

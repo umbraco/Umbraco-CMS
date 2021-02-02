@@ -176,3 +176,5 @@ cypress.env.json
 /src/Umbraco.Tests.AcceptanceTest/cypress/videos/
 /src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
 src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
+
+/src/Umbraco.Web.UI/config/umbracoSettings.config
