@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
   </PropertyGroup>
@@ -78,14 +78,15 @@
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
-        <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
+    <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+  </ItemGroup>
 
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
 </Project>

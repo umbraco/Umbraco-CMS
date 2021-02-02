@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
@@ -8,18 +9,20 @@ namespace Umbraco.Web.UI.NetCore
     public class Program
     {
         public static void Main(string[] args)
-        {
-            CreateHostBuilder(args)
+            => CreateHostBuilder(args)
                 .Build()
                 .Run();
-        }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(x =>
-                {
-                    x.ClearProviders();
-                })
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+#if DEBUG
+                .ConfigureAppConfiguration(config
+                    => config.AddJsonFile(
+                            "appsettings.Local.json",
+                            optional: true,
+                            reloadOnChange: true))
+#endif
+                .ConfigureLogging(x => x.ClearProviders())
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }
