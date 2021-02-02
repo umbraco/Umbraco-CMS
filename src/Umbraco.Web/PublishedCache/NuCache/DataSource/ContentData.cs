@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     // represents everything that is specific to edited or published version
-    internal class ContentData
+    public class ContentData
     {
         public string Name { get; set; }
         public string UrlSegment { get; set; }
