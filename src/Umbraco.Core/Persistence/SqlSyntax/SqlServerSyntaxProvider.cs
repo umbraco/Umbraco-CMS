@@ -339,5 +339,24 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         public override string DropIndex => "DROP INDEX {0} ON {1}";
 
         public override string RenameColumn => "sp_rename '{0}.{1}', '{2}', 'COLUMN'";
+
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}";
+        public override string Format(IndexDefinition index)
+        {
+            var name = string.IsNullOrEmpty(index.Name)
+                ? $"IX_{index.TableName}_{index.ColumnName}"
+                : index.Name;
+
+            var columns = index.Columns.Any()
+                ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                : GetQuotedColumnName(index.ColumnName);
+
+            var includeColumns = index.IncludeColumns?.Any() ?? false
+               ? $" INCLUDE ({string.Join(",", index.IncludeColumns.Select(x => GetQuotedColumnName(x.Name)))})"
+               : string.Empty;
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns, includeColumns);
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Serialization
             var str1 = "Hello";
             var obj = new Test
             {
-                Name = str1 + " " + "there"
+                Name = str1 + Guid.NewGuid()
             };
 
             // ensure the raw value is not interned
@@ -39,8 +39,8 @@ namespace Umbraco.Tests.Serialization
             {
                 Values = new Dictionary<string, int>
                 {
-                    [str1 + "1"] = 0,
-                    [str1 + "2"] = 1
+                    [str1 + Guid.NewGuid()] = 0,
+                    [str1 + Guid.NewGuid()] = 1
                 }
             };
 

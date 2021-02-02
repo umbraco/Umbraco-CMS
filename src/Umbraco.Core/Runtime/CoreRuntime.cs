@@ -216,7 +216,13 @@ namespace Umbraco.Core.Runtime
                     {
                         _factory = Current.Factory = composition?.CreateFactory();
                     }
-                    catch { /* yea */ }
+                    catch
+                    {
+                        // In this case we are basically dead, we do not have a factory but we need
+                        // to report on the state so we need to manually set that, this is the only time
+                        // we ever do this.
+                        Current.RuntimeState = _state;
+                    }
                 }
 
                 Debugger.Break();

@@ -1,10 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Tests.PublishedContent
@@ -13,13 +12,13 @@ namespace Umbraco.Tests.PublishedContent
     public class ContentSerializationTests
     {
         [Test]
-        public void Ensure_Same_Results()
+        public void GivenACacheModel_WhenItsSerializedAndDeserializedWithAnySerializer_TheResultsAreTheSame()
         {
             var jsonSerializer = new JsonContentNestedDataSerializer();
-            var msgPackSerializer = new MsgPackContentNestedDataSerializer();
+            var msgPackSerializer = new MsgPackContentNestedDataSerializer(Mock.Of<IPropertyCacheCompression>());
 
             var now = DateTime.Now;
-            var content = new ContentNestedData
+            var cacheModel = new ContentCacheDataModel
             {
                 PropertyData = new Dictionary<string, PropertyData[]>
                 {
@@ -55,14 +54,16 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "home"
             };
 
-            var json = jsonSerializer.Serialize(content);
-            var msgPack = msgPackSerializer.Serialize(content);
+            var content = Mock.Of<IReadOnlyContentBase>(x => x.ContentTypeId == 1);
+
+            var json = jsonSerializer.Serialize(content, cacheModel).StringData;
+            var msgPack = msgPackSerializer.Serialize(content, cacheModel).ByteData;
 
             Console.WriteLine(json);
             Console.WriteLine(msgPackSerializer.ToJson(msgPack));
 
-            var jsonContent = jsonSerializer.Deserialize(json);
-            var msgPackContent = msgPackSerializer.Deserialize(msgPack);
+            var jsonContent = jsonSerializer.Deserialize(content, json, null);
+            var msgPackContent = msgPackSerializer.Deserialize(content, null, msgPack);
 
 
             CollectionAssert.AreEqual(jsonContent.CultureData.Keys, msgPackContent.CultureData.Keys);

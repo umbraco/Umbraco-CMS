@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.PropertyEditors
 {
+
     /// <summary>
     /// Marks a class that represents a data editor.
     /// </summary>

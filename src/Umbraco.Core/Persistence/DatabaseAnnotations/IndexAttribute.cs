@@ -31,5 +31,10 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         /// Gets or sets the column name(s) for the current index
         /// </summary>
         public string ForColumns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column name(s) for the columns to include in the index
+        /// </summary>
+        public string IncludeColumns { get; set; }
     }
 }

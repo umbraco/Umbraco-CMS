@@ -27,19 +27,19 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public bool IsDraft { get; set; }
 
         //Legacy properties used to deserialize existing nucache db entries
-        [DataMember(Order = 4)]
+        [IgnoreDataMember]
         [JsonProperty("name")]
         private string LegacyName { set { Name = value; } }
 
-        [DataMember(Order = 5)]
+        [IgnoreDataMember]
         [JsonProperty("urlSegment")]
         private string LegacyUrlSegment { set { UrlSegment = value; } }
 
-        [DataMember(Order = 6)]
+        [IgnoreDataMember]
         [JsonProperty("date")]
         private DateTime LegacyDate { set { Date = value; } }
 
-        [DataMember(Order = 7)]
+        [IgnoreDataMember]
         [JsonProperty("isDraft")]
         private bool LegacyIsDraft { set { IsDraft = value; } }
     }

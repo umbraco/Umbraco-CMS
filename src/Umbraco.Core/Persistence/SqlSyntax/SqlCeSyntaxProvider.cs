@@ -14,6 +14,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+        public SqlCeSyntaxProvider()
+        {
+            BlobColumnDefinition = "IMAGE";
+            // This is silly to have to do this but the way these inherited classes are structured it's the easiest
+            // way without an overhaul in type map initialization
+            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
+        }
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
@@ -227,15 +235,29 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             }
         }
 
-
-
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        public override string Format(IndexDefinition index)
+        {
+            var name = string.IsNullOrEmpty(index.Name)
+                ? $"IX_{index.TableName}_{index.ColumnName}"
+                : index.Name;
 
+            var columns = index.Columns.Any()
+                ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                : GetQuotedColumnName(index.ColumnName);
+
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns);
+        }
+        
         public override string GetSpecialDbType(SpecialDbTypes dbTypes)
         {
             if (dbTypes == SpecialDbTypes.NVARCHARMAX) // SqlCE does not have nvarchar(max) for now
                 return "NTEXT";
             return base.GetSpecialDbType(dbTypes);
         }
+
     }
 }

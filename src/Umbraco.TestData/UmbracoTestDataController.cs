@@ -208,7 +208,8 @@ namespace Umbraco.TestData
             var docType = GetOrCreateContentType();
 
             var parent = Services.ContentService.Create(company, -1, docType.Alias);
-            parent.SetValue("review", faker.Rant.Review());
+            // give it some reasonable data (100 reviews)
+            parent.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
             parent.SetValue("desc", company);
             parent.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
             Services.ContentService.Save(parent);
@@ -218,7 +219,8 @@ namespace Umbraco.TestData
             return CreateHierarchy(parent, count, depth, currParent =>
             {
                 var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
-                content.SetValue("review", faker.Rant.Review());
+                // give it some reasonable data (100 reviews)
+                content.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
                 content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
                 content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 

@@ -71,6 +71,9 @@
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
+    <PackageReference Include="K4os.Compression.LZ4">
+      <Version>1.1.11</Version>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
@@ -263,8 +266,14 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
@@ -273,6 +282,7 @@
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -592,7 +602,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataModel.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
