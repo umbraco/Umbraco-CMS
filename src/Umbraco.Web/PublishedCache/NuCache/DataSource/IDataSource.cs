@@ -140,8 +140,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         void LoadAllMemberEntities(IScope scope, IEnumerable<int> contentTypeIds = null);
 
-        bool MemberEntitiesValid(IScope scope);
-        bool ContentEntitiesValid(IScope scope);
-        bool MediaEntitiesValid(IScope scope);
+        bool MemberEntitiesValid();
+        bool ContentEntitiesValid();
+        bool MediaEntitiesValid();
+
+        void RebuildMediaDbCache(IEnumerable<int> contentTypeIds = null);
+        void RebuildContentDbCache(IEnumerable<int> contentTypeIds = null);
+        void RebuildMemberDbCache(IEnumerable<int> contentTypeIds = null);
     }
 }

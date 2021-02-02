@@ -28,11 +28,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
+        private readonly IScopeProvider _scopeProvider;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         public DatabaseDataSource(IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
             IDocumentRepository documentRepository,
             IMediaRepository mediaRepository,
             IMemberRepository memberRepository,
+            IScopeProvider scopeProvider,
             UrlSegmentProviderCollection urlSegmentProviders)
         {
             _urlSegmentProviders = urlSegmentProviders;
@@ -40,6 +42,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
+            _scopeProvider = scopeProvider;
         }
 
         // we want arrays, we want them all loaded, not an enumerable
@@ -778,55 +781,111 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             DeleteAllEntities(scope, Constants.ObjectTypes.Member, contentTypeIds);
         }
 
-        public bool MemberEntitiesValid(IScope scope)
+        public void RebuildMediaDbCache(IEnumerable<int> contentTypeIds = null)
         {
-            // every member item should have a corresponding row for edited properties
-            var memberObjectType = Constants.ObjectTypes.Member;
-            var db = scope.Database;
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                // remove all - if anything fails the transaction will rollback
+                DeleteAllMediaEntities(scope, contentTypeIds);
+                // insert back - if anything fails the transaction will rollback
+                LoadAllMediaEntities(scope, contentTypeIds);
+                scope.Complete();
+            }
+        }
 
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
+        public void RebuildContentDbCache(IEnumerable<int> contentTypeIds = null)
+        {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                // remove all - if anything fails the transaction will rollback
+                DeleteAllContentEntities(scope, contentTypeIds);
+                LoadAllContentEntities(scope, contentTypeIds);
+                scope.Complete();
+            }
+        }
+        public void RebuildMemberDbCache(IEnumerable<int> contentTypeIds = null)
+        {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                // remove all - if anything fails the transaction will rollback
+                DeleteAllMemberEntities(scope, contentTypeIds);
+
+                // insert back - if anything fails the transaction will rollback
+                LoadAllMemberEntities(scope, contentTypeIds);
+                scope.Complete();
+            }
+        }
+
+
+        public bool MemberEntitiesValid()
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+
+
+                // every member item should have a corresponding row for edited properties
+                var memberObjectType = Constants.ObjectTypes.Member;
+                var db = scope.Database;
+
+                var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
             FROM umbracoNode
             LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
             WHERE umbracoNode.nodeObjectType=@objType
             AND cmsContentNu.nodeId IS NULL
             ", new { objType = memberObjectType });
 
-            return count == 0;
+                scope.Complete();
+                return count == 0;
+            }
         }
 
-        public bool ContentEntitiesValid(IScope scope)
+        public bool ContentEntitiesValid()
         {
-            // every document should have a corresponding row for edited properties
-            // and if published, may have a corresponding row for published properties
-            var contentObjectType = Constants.ObjectTypes.Document;
-            var db = scope.Database;
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                // every document should have a corresponding row for edited properties
+                // and if published, may have a corresponding row for published properties
+                var contentObjectType = Constants.ObjectTypes.Document;
+                var db = scope.Database;
 
-            var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
+                var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
             FROM umbracoNode
             JOIN {Constants.DatabaseSchema.Tables.Document} ON umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId
             LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=0)
             LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
             WHERE umbracoNode.nodeObjectType=@objType
             AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=1 AND nuPublished.nodeId IS NULL);"
-                , new { objType = contentObjectType });
-
-            return count == 0;
+                    , new { objType = contentObjectType });
+                scope.Complete();
+                return count == 0;
+            }
         }
 
-        public bool MediaEntitiesValid(IScope scope)
+        public bool MediaEntitiesValid()
         {
-            // every media item should have a corresponding row for edited properties
-            var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = scope.Database;
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                // every media item should have a corresponding row for edited properties
+                var mediaObjectType = Constants.ObjectTypes.Media;
+                var db = scope.Database;
 
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
-FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
-WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentNu.nodeId IS NULL
-", new { objType = mediaObjectType });
+                var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
+                FROM umbracoNode
+                LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
+                WHERE umbracoNode.nodeObjectType=@objType
+                AND cmsContentNu.nodeId IS NULL
+                ", new { objType = mediaObjectType });
 
-            return count == 0;
+                scope.Complete();
+                return count == 0;
+            }
+
         }
 
         private void DeleteAllEntities(IScope scope, Guid objectType, IEnumerable<int> contentTypeIds = null)

@@ -1258,7 +1258,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void OnRemovedEntity(IScope scope, IContentBase item)
         {
-            _dataSource.RemoveEntity(scope,item.Id);
+            _dataSource.RemoveEntity(scope, item.Id);
         }
 
         private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
@@ -1267,7 +1267,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 
             // always refresh the edited data
-            OnContentRepositoryRefreshed( args.Scope, content, false);
+            OnContentRepositoryRefreshed(args.Scope, content, false);
 
             // if unpublishing, remove published data from table
             if (content.PublishedState == PublishedState.Unpublishing)
@@ -1276,7 +1276,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             // if publishing, refresh the published data
             else if (content.PublishedState == PublishedState.Publishing)
-                OnContentRepositoryRefreshed( args.Scope, content, true);
+                OnContentRepositoryRefreshed(args.Scope, content, true);
         }
 
         private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
@@ -1284,7 +1284,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var media = args.Entity;
 
             // refresh the edited data
-            OnMediaRepositoryRefreshed( args.Scope, media, false);
+            OnMediaRepositoryRefreshed(args.Scope, media, false);
         }
 
         private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
@@ -1316,7 +1316,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (contentTypeIds.Any())
-                RebuildContentDbCache(contentTypeIds: contentTypeIds);
+                _dataSource.RebuildContentDbCache(contentTypeIds);
         }
 
         private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
@@ -1325,7 +1325,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (mediaTypeIds.Any())
-                RebuildMediaDbCache(contentTypeIds: mediaTypeIds);
+                _dataSource.RebuildMediaDbCache(mediaTypeIds);
         }
 
         private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
@@ -1334,7 +1334,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
             var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
-                RebuildMemberDbCache(contentTypeIds: memberTypeIds);
+                _dataSource.RebuildMemberDbCache(memberTypeIds);
         }
 
         /// <summary>
@@ -1348,146 +1348,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
             if (cultureChanged)
             {
-                RebuildContentDbCache();
+                _dataSource.RebuildContentDbCache(null);
             }
         }
 
-      
+
         #endregion
 
         #region Rebuild Database PreCache
 
-        private const int DefaultSqlPagingSize = 1000;
-
         public override void Rebuild()
         {
             _logger.Debug<PublishedSnapshotService>("Rebuilding...");
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                scope.ReadLock(Constants.Locks.MediaTree);
-                scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked( scope,  null);
-                RebuildMediaDbCacheLocked( scope, null);
-                RebuildMemberDbCacheLocked( scope,  null);
-                scope.Complete();
-            }
+
+            _dataSource.RebuildContentDbCache(null);
+            _dataSource.RebuildMediaDbCache(null);
+            _dataSource.RebuildMemberDbCache(null);
         }
 
-        public void RebuildContentDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
-        {
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                RebuildContentDbCacheLocked( scope, contentTypeIds);
-                scope.Complete();
-            }
-        }
-
-        // assumes content tree lock
-        private void RebuildContentDbCacheLocked( IScope scope, IEnumerable<int> contentTypeIds)
-        {
-
-            // remove all - if anything fails the transaction will rollback
-
-            _dataSource.DeleteAllContentEntities(scope, contentTypeIds);
-            _dataSource.LoadAllContentEntities(scope, contentTypeIds);
-        }
-
-        public void RebuildMediaDbCache(IEnumerable<int> contentTypeIds = null)
-        {
-            
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                RebuildMediaDbCacheLocked(scope, contentTypeIds);
-                scope.Complete();
-            }
-        }
-
-        // assumes media tree lock
-        public void RebuildMediaDbCacheLocked(IScope scope, IEnumerable<int> contentTypeIds)
-        {
-            // remove all - if anything fails the transaction will rollback
-            _dataSource.DeleteAllMediaEntities(scope, contentTypeIds);
-            // insert back - if anything fails the transaction will rollback
-            _dataSource.LoadAllMediaEntities(scope,  contentTypeIds);
-        }
-
-        public void RebuildMemberDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
-        {
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildMemberDbCacheLocked(scope, contentTypeIds);
-                scope.Complete();
-            }
-        }
-
-        // assumes member tree lock
-        public void RebuildMemberDbCacheLocked(IScope scope, IEnumerable<int> contentTypeIds)
-        {
-            // remove all - if anything fails the transaction will rollback
-            _dataSource.DeleteAllMemberEntities(scope,  contentTypeIds);
-
-            // insert back - if anything fails the transaction will rollback
-            _dataSource.LoadAllMemberEntities(scope,  contentTypeIds);
-        }
-
-        public bool VerifyContentDbCache()
-        {
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var ok = VerifyContentDbCacheLocked(scope);
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        // assumes content tree lock
-        private bool VerifyContentDbCacheLocked(IScope scope)
-        {
-            return _dataSource.ContentEntitiesValid(scope);
-           
-        }
-
-        public bool VerifyMediaDbCache()
-        {
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var ok = VerifyMediaDbCacheLocked(scope);
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        // assumes media tree lock
-        public bool VerifyMediaDbCacheLocked(IScope scope)
-        {
-            return _dataSource.MediaEntitiesValid(scope);
-          
-        }
-
-        public bool VerifyMemberDbCache()
-        {
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var ok = VerifyMemberDbCacheLocked(scope);
-                scope.Complete();
-                return ok;
-            }
-        }
-
-        // assumes member tree lock
-        public bool VerifyMemberDbCacheLocked(IScope scope)
-        {
-            return _dataSource.MemberEntitiesValid(scope);
-
-           
-        }
 
         #endregion
 
@@ -1495,9 +1373,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public string GetStatus()
         {
-            var dbCacheIsOk = VerifyContentDbCache()
-                && VerifyMediaDbCache()
-                && VerifyMemberDbCache();
+            var contentDbCacheIsOk = _dataSource.ContentEntitiesValid();
+            var mediaDbCacheIsOk = _dataSource.MediaEntitiesValid();
+            var memberDbCacheIsOk = _dataSource.MemberEntitiesValid();
+            var dbCacheIsOk = contentDbCacheIsOk
+                && mediaDbCacheIsOk
+                && memberDbCacheIsOk;
 
             var cg = _contentStore.GenCount;
             var mg = _mediaStore.GenCount;
