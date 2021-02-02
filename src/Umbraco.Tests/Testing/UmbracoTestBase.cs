@@ -226,7 +226,6 @@ namespace Umbraco.Tests.Testing
             services.AddUnique(ipResolver);
             services.AddUnique<IPasswordHasher, AspNetPasswordHasher>();
             services.AddUnique(TestHelper.ShortStringHelper);
-            services.AddUnique<IRequestAccessor, AspNetRequestAccessor>();
             services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 

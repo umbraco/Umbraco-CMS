@@ -233,7 +233,6 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
             builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
-            builder.AddNotificationHandler<UmbracoRequestEnd, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();

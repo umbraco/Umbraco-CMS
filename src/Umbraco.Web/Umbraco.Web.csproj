@@ -131,7 +131,6 @@
     </Compile>
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
-    <Compile Include="AspNet\AspNetRequestAccessor.cs" />
     <Compile Include="AspNet\AspNetSessionManager.cs" />
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
@@ -177,7 +176,6 @@
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
-    <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
@@ -245,7 +243,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
-    <Compile Include="UmbracoInjectedModule.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>

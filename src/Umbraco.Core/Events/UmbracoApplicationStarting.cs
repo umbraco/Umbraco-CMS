@@ -1,5 +1,9 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 namespace Umbraco.Core.Events
 {
+
     public class UmbracoApplicationStarting : INotification
     {
         /// <summary>

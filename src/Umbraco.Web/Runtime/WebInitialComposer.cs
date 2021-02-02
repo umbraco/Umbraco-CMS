@@ -21,9 +21,6 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(builder);
 
-            builder.Services.AddTransient<UmbracoInjectedModule>();
-
-
             // register membership stuff
             builder.Services.AddTransient(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             builder.Services.AddTransient(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));

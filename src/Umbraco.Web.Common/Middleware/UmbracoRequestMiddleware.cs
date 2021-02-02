@@ -95,7 +95,7 @@ namespace Umbraco.Web.Common.Middleware
 
                 try
                 {
-                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(context));
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +111,7 @@ namespace Umbraco.Web.Common.Middleware
                     }
                     finally
                     {
-                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(context));
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(umbracoContextReference.UmbracoContext));
                     }
                 }
             }
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Common.Middleware
             {
                 if (isFrontEndRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
                     _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
