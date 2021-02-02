@@ -81,7 +81,8 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-
+            var globalSettings = Factory.GetInstance<IGlobalSettings>();
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
             return new PublishedSnapshotService(
                 options,
@@ -96,10 +97,11 @@ namespace Umbraco.Tests.Scoping
                 ScopeProvider,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(nestedContentDataSerializerFactory, documentRepository, mediaRepository, memberRepository,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() })),
+                ScopeProvider,new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() })),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>());
+                Mock.Of<IPublishedModelFactory>(),
+                transactableDictionaryFactory);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

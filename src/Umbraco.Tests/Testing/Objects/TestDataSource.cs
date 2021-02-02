@@ -142,5 +142,35 @@ namespace Umbraco.Tests.Testing.Objects
         {
             throw new NotImplementedException();
         }
+
+        public bool MemberEntitiesValid()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ContentEntitiesValid()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MediaEntitiesValid()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RebuildMediaDbCache(IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RebuildContentDbCache(IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RebuildMemberDbCache(IEnumerable<int> contentTypeIds = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
