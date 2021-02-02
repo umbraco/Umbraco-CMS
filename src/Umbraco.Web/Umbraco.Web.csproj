@@ -175,7 +175,6 @@
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
@@ -224,7 +223,6 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Mvc\SurfaceController.cs" />
-    <Compile Include="Mvc\PluginControllerArea.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />

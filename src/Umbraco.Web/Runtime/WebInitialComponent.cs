@@ -116,82 +116,8 @@ namespace Umbraco.Web.Runtime
                 umbracoPath + "/RenderMvc/{action}/{id}",
                 new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
             );
+
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
-
-            // register install routes
-           // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
-
-            // register all back office routes
-           // RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, hostingEnvironment));
-
-            // plugin controllers must come first because the next route will catch many things
-            RoutePluginControllers(globalSettings, apiControllerTypes, hostingEnvironment);
-        }
-
-        private static void RoutePluginControllers(
-            GlobalSettings globalSettings,
-            UmbracoApiControllerTypeCollection apiControllerTypes,
-            IHostingEnvironment hostingEnvironment)
-        {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
-
-            // need to find the plugin controllers and route them
-            var pluginControllers = apiControllerTypes; //TODO was: surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
-
-            // local controllers do not contain the attribute
-            var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
-            foreach (var s in localControllers)
-            {
-                if (TypeHelper.IsTypeAssignableFrom<SurfaceController>(s))
-                    RouteLocalSurfaceController(s, umbracoPath);
-                else if (TypeHelper.IsTypeAssignableFrom<UmbracoApiController>(s))
-                    RouteLocalApiController(s, umbracoPath);
-            }
-
-            // get the plugin controllers that are unique to each area (group by)
-            var pluginSurfaceControlleres = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace() == false);
-            var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
-            // loop through each area defined amongst the controllers
-            foreach (var g in groupedAreas)
-            {
-                // create & register an area for the controllers (this will throw an exception if all controllers are not in the same area)
-                var pluginControllerArea = new PluginControllerArea(globalSettings, hostingEnvironment, g.Select(PluginController.GetMetadata));
-                RouteTable.Routes.RegisterArea(pluginControllerArea);
-            }
-        }
-
-        private static void RouteLocalApiController(Type controller, string umbracoPath)
-        {
-            var meta = PluginController.GetMetadata(controller);
-            var url = umbracoPath + (meta.IsBackOffice ? "/BackOffice" : "") + "/Api/" + meta.ControllerName + "/{action}/{id}";
-            var route = RouteTable.Routes.MapHttpRoute(
-                $"umbraco-api-{meta.ControllerName}",
-                url, // URL to match
-                new { controller = meta.ControllerName, id = UrlParameter.Optional },
-                new[] { meta.ControllerNamespace });
-            if (route.DataTokens == null) // web api routes don't set the data tokens object
-                route.DataTokens = new RouteValueDictionary();
-
-            // TODO: Pretty sure this is not necessary, we'll see
-            //route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "api"); //ensure the umbraco token is set
-        }
-
-        private static void RouteLocalSurfaceController(Type controller, string umbracoPath)
-        {
-            var meta = PluginController.GetMetadata(controller);
-            var url = umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}";
-            var route = RouteTable.Routes.MapRoute(
-                $"umbraco-surface-{meta.ControllerName}",
-                url, // URL to match
-                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
-                new[] { meta.ControllerNamespace }); // look in this namespace to create the controller
-
-            // TODO: Pretty sure this is not necessary, we'll see
-            //route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); // ensure the umbraco token is set
-
-            route.DataTokens.Add("UseNamespaceFallback", false); // don't look anywhere else except this namespace!
-            // make it use our custom/special SurfaceMvcHandler
-            route.RouteHandler = new SurfaceRouteHandler();
         }
     }
 }
