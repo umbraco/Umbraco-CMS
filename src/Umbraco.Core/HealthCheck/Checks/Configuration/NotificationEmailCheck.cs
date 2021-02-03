@@ -1,12 +1,19 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks.Configuration
+namespace Umbraco.Core.HealthChecks.Checks.Configuration
 {
-    [HealthCheck("3E2F7B14-4B41-452B-9A30-E67FBC8E1206", "Notification Email Settings",
+    /// <summary>
+    /// Health check for the recommended production configuration for Notification Email.
+    /// </summary>
+    [HealthCheck(
+        "3E2F7B14-4B41-452B-9A30-E67FBC8E1206",
+        "Notification Email Settings",
         Description = "If notifications are used, the 'from' email address should be specified and changed from the default value.",
         Group = "Configuration")]
     public class NotificationEmailCheck : AbstractSettingsCheck
@@ -14,26 +21,37 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         private readonly IOptionsMonitor<ContentSettings> _contentSettings;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptionsMonitor<ContentSettings> contentSettings)
-            : base(textService, loggerFactory)
-        {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotificationEmailCheck"/> class.
+        /// </summary>
+        public NotificationEmailCheck(
+            ILocalizedTextService textService,
+            IOptionsMonitor<ContentSettings> contentSettings)
+            : base(textService) =>
             _contentSettings = contentSettings;
-        }
 
+        /// <inheritdoc/>
         public override string ItemPath => Constants.Configuration.ConfigContentNotificationsEmail;
 
+        /// <inheritdoc/>
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
 
+        /// <inheritdoc/>
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
 
+        /// <inheritdoc/>
         public override string CurrentValue => _contentSettings.CurrentValue.Notifications.Email;
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
+        /// <inheritdoc/>
+        public override string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 
-        public override string CheckErrorMessage => TextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
-       
+        /// <inheritdoc/>
+        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+
+        /// <inheritdoc/>
+        public override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Configuration.NotificationEmailCheck;
     }
 }

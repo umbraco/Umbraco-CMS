@@ -46,4 +46,13 @@
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="HealthChecks\Checks\LiveEnvironment" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="HealthChecks\Checks\LiveEnvironment\CompilationDebugCheck.cs" />
+      <Compile Remove="HealthChecks\HealthCheckCollection.cs" />
+    </ItemGroup>
 </Project>

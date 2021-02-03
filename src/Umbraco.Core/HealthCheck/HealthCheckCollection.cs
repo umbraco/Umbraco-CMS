@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Core.HealthCheck
+namespace Umbraco.Core.HealthChecks
 {
-    public class HealthCheckCollection : BuilderCollectionBase<Core.HealthCheck.HealthCheck>
+    public class HealthCheckCollection : BuilderCollectionBase<HealthCheck>
     {
-        public HealthCheckCollection(IEnumerable<Core.HealthCheck.HealthCheck> items)
+        public HealthCheckCollection(IEnumerable<HealthCheck> items)
             : base(items)
         { }
     }

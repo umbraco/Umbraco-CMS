@@ -1,130 +1,131 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 
-namespace Umbraco.Core.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthChecks.Checks.Security
 {
+    /// <summary>
+    /// Provides a base class for health checks of http header values.
+    /// </summary>
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        protected ILocalizedTextService TextService { get; }
-
-        private const string SetHeaderInConfigAction = "setHeaderInConfig";
-
         private readonly string _header;
         private readonly string _value;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
         private readonly IRequestAccessor _requestAccessor;
+        private static HttpClient s_httpClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseHttpHeaderCheck"/> class.
+        /// </summary>
         protected BaseHttpHeaderCheck(
             IRequestAccessor requestAccessor,
             ILocalizedTextService textService,
-            string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
+            string header,
+            string value,
+            string localizedTextPrefix,
+            bool metaTagOptionAvailable)
         {
-            TextService = textService ?? throw new ArgumentNullException(nameof(textService));
+            LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
             _requestAccessor = requestAccessor;
             _header = header;
             _value = value;
             _localizedTextPrefix = localizedTextPrefix;
             _metaTagOptionAvailable = metaTagOptionAvailable;
-
         }
+
+        private static HttpClient HttpClient => s_httpClient ??= new HttpClient();
+
+
+        /// <summary>
+        /// Gets the localized text service.
+        /// </summary>
+        protected ILocalizedTextService LocalizedTextService { get; }
+
+        /// <summary>
+        /// Gets a link to an external read more page.
+        /// </summary>
+        protected abstract string ReadMoreLink { get; }
 
         /// <summary>
         /// Get the status for this health check
         /// </summary>
-        /// <returns></returns>
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            //return the statuses
-            return new[] { CheckForHeader() };
-        }
+        public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+            await Task.WhenAll(CheckForHeader());
 
         /// <summary>
         /// Executes the action and returns it's status
         /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
-            switch (action.Alias)
-            {
-                case SetHeaderInConfigAction:
-                    return SetHeaderInConfig();
-                default:
-                    throw new InvalidOperationException("HTTP Header action requested is either not executable or does not exist");
-            }
-        }
+            => throw new InvalidOperationException("HTTP Header action requested is either not executable or does not exist");
 
-        protected HealthCheckStatus CheckForHeader()
+        /// <summary>
+        /// The actual health check method.
+        /// </summary>
+        protected async Task<HealthCheckStatus> CheckForHeader()
         {
-            var message = string.Empty;
+            string message;
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = _requestAccessor.GetApplicationUrl();
-            var request = WebRequest.Create(url);
-            request.Method = "GET";
+            Uri url = _requestAccessor.GetApplicationUrl();
+
             try
             {
-                var response = request.GetResponse();
+                using HttpResponseMessage response = await HttpClient.GetAsync(url);
 
                 // Check first for header
-                success = HasMatchingHeader(response.Headers.AllKeys);
+                success = HasMatchingHeader(response.Headers.Select(x => x.Key));
 
                 // If not found, and available, check for meta-tag
                 if (success == false && _metaTagOptionAvailable)
                 {
-                    success = DoMetaTagsContainKeyForHeader(response);
+                    success = await DoMetaTagsContainKeyForHeader(response);
                 }
 
                 message = success
-                    ? TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
-                    : TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? LocalizedTextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
+                    : LocalizedTextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = TextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
-            }
-
-            var actions = new List<HealthCheckAction>();
-            if (success == false)
-            {
-                actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
-                {
-                    Name = TextService.Localize("healthcheck/setHeaderInConfig"),
-                    Description = TextService.Localize($"healthcheck/{_localizedTextPrefix}SetHeaderInConfigDescription")
-                });
+                message = LocalizedTextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             return
                 new HealthCheckStatus(message)
                 {
                     ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                    Actions = actions
+                    ReadMoreLink = success ? null : ReadMoreLink
                 };
         }
 
         private bool HasMatchingHeader(IEnumerable<string> headerKeys)
-        {
-            return headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
-        }
+            => headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
 
-        private bool DoMetaTagsContainKeyForHeader(WebResponse response)
+        private async Task<bool> DoMetaTagsContainKeyForHeader(HttpResponseMessage response)
         {
-            using (var stream = response.GetResponseStream())
+            using (Stream stream = await response.Content.ReadAsStreamAsync())
             {
-                if (stream == null) return false;
+                if (stream == null)
+                {
+                    return false;
+                }
+
                 using (var reader = new StreamReader(stream))
                 {
                     var html = reader.ReadToEnd();
-                    var metaTags = ParseMetaTags(html);
+                    Dictionary<string, string> metaTags = ParseMetaTags(html);
                     return HasMatchingHeader(metaTags.Keys);
                 }
             }
@@ -137,28 +138,6 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
             return regex.Matches(html)
                 .Cast<Match>()
                 .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
-        }
-
-        private HealthCheckStatus SetHeaderInConfig()
-        {
-            var errorMessage = string.Empty;
-            //TODO: edit to show fix suggestion instead of making fix
-            var success = true;
-
-            if (success)
-            {
-                return
-                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
-                    {
-                        ResultType = StatusResultType.Success
-                    };
-            }
-
-            return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new[] { errorMessage }))
-                {
-                    ResultType = StatusResultType.Error
-                };
         }
     }
 }
