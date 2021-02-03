@@ -39,14 +39,17 @@ namespace Umbraco.Core.HealthChecks.Checks.Configuration
         /// <inheritdoc/>
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
+            new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail },
+            new AcceptableConfiguration { IsRecommended = false, Value = string.Empty }
         };
 
         /// <inheritdoc/>
         public override string CurrentValue => _contentSettings.CurrentValue.Notifications.Email;
 
         /// <inheritdoc/>
-        public override string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
+        public override string CheckSuccessMessage =>
+            LocalizedTextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage",
+                new[] { CurrentValue ?? "&lt;null&gt;" });
 
         /// <inheritdoc/>
         public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
