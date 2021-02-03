@@ -341,7 +341,12 @@ body.touch .umb-tree {
     vertical-align: middle;
     margin: 0 13px 0 0;
     color: @ui-option-type;
-    font-size: 20px;   
+    font-size: 20px;
+
+    &.-hidden {
+        display: none;
+        visibility: hidden;
+    }
     
     &.blue {
         color: @blue;
