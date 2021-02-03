@@ -96,10 +96,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
         }
 
-
         [Test]
         [AutoMoqData]
-        public async Task PostSaveMember_SaveNew_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
+        public async Task PostSaveMember_SaveNew_NoCustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
             [Frozen] IMembersUserManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
@@ -134,6 +133,45 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.IsNotNull(result.Value);
             AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
         }
+
+        [Test]
+        [AutoMoqData]
+        public async Task PostSaveMember_SaveNew_CustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
+        [Frozen] IMembersUserManager umbracoMembersUserManager,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberGroupService memberGroupService,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IBackOfficeSecurity backOfficeSecurity)
+        {
+            // arrange
+            Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            Mock.Get(memberService).SetupSequence(
+                x => x.GetByEmail(It.IsAny<string>()))
+                .Returns(() => null)
+                .Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+            MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor);
+
+            // act
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
+
+            // assert
+            Assert.IsNull(result.Result);
+            Assert.IsNotNull(result.Value);
+            AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
+        }
+
 
         [Test]
         [AutoMoqData]
@@ -218,6 +256,68 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.IsNotNull(result.Result);
             Assert.IsNull(result.Value);
             Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
+        }
+
+        [Test]
+        [AutoMoqData]
+        public async Task PostSaveMember_SaveExistingMember_WithNoRoles_Add1Role_ExpectSuccessResponse(
+           [Frozen] IMembersUserManager umbracoMembersUserManager,
+           IMemberService memberService,
+           IMemberTypeService memberTypeService,
+           IMemberGroupService memberGroupService,
+           IDataTypeService dataTypeService,
+           IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+           IBackOfficeSecurity backOfficeSecurity)
+        {
+            // arrange
+            string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
+            var roleName = "anyrole";
+            IMember member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
+            fakeMemberData.Groups = new List<string>()
+            {
+                roleName
+            };
+            var membersIdentityUser = new MembersIdentityUser();
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => membersIdentityUser);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.HashPassword(It.IsAny<string>()))
+                .Returns(password);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+            Mock.Get(memberService).SetupSequence(
+                    x => x.GetByEmail(It.IsAny<string>()))
+                .Returns(() => null)
+                .Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+            MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor);
+
+            // act
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
+
+            // assert
+            Assert.IsNull(result.Result);
+            Assert.IsNotNull(result.Value);
+            Mock.Get(umbracoMembersUserManager)
+                .Verify(u => u.GetRolesAsync(membersIdentityUser));
+            //Mock.Get(umbracoMembersUserManager)
+            //    .Verify(u => u.RemoveFromRolesAsync(membersIdentityUser, new[] { "roles" }));
+            Mock.Get(umbracoMembersUserManager)
+                .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
+            Mock.Get(memberService)
+                .Verify(m => m.Save(member, false));
+            //Mock.Get(memberService)
+            //    .Verify(m => m.AssignRoles(new[] { member.Username }, new[] { roleName }));
+            AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
         }
 
         /// <summary>
@@ -428,12 +528,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             //Assert.AreEqual(memberDisplay.UpdateDate, resultValue.UpdateDate);
 
             //TODO: check all properties
-            //Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
-            //for (var index = 0; index < resultValue.Properties.Count(); index++)
-            //{
-            //    Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
-            //    Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
-            //}
+            Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
+            for (var index = 0; index < resultValue.Properties.Count(); index++)
+            {
+                Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+                Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+            }
         }
     }
 }

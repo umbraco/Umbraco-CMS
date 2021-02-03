@@ -70,7 +70,6 @@ namespace Umbraco.Infrastructure.Security
                 user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
                 user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
 
-
             UpdateMemberProperties(memberEntity, user);
 
             // create the member

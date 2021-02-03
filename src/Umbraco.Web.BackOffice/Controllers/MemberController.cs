@@ -55,6 +55,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -97,6 +98,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _jsonSerializer = jsonSerializer;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -358,14 +360,27 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new ValidationErrorResult(created.Errors.ToErrorMessage());
             }
 
-            // now re-look the member back up which will now exist
+            // now re-look up the member, which will now exist
             IMember member = _memberService.GetByEmail(contentItem.Email);
+
+            // map the save info over onto the user
+            member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
 
             int creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
             member.CreatorId = creatorId;
 
-            // map the save info over onto the user
-            member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
+            // assign the mapped property values that are not part of the identity properties
+            string[] builtInAliases = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
+            foreach (ContentPropertyBasic property in contentItem.Properties)
+            {
+                if (builtInAliases.Contains(property.Alias) == false)
+                {
+                    member.Properties[property.Alias].SetValue(property.Value);
+                }
+            }
+
+            //TODO: do we need to resave the key?
+            //contentItem.PersistedContent.Key = contentItem.Key;
 
             // now the member has been saved via identity, resave the member with mapped content properties
             _memberService.Save(member);
