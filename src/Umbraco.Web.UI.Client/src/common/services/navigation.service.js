@@ -20,16 +20,18 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
     //the main tree's API reference, this is acquired when the tree has initialized
     var mainTreeApi = null;
+    var evts = [];
 
-    eventsService.on("app.navigationReady", function (e, args) {
+    evts.push(eventsService.on("app.navigationReady", function (e, args) {
         mainTreeApi = args.treeApi;
         navReadyPromise.resolve(mainTreeApi);
-    });
+    }));
 
-    eventsService.on('appState.backdrop', function(e, args){
+    evts.push(eventsService.on('appState.backdrop', function(e, args){
         var element = $(args.element);
         element.addClass('above-backdrop');
-    });
+    }));
+    
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];

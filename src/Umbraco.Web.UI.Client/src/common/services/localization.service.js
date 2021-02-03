@@ -326,10 +326,11 @@ angular.module('umbraco.services')
     };
 
     //This happens after login / auth and assets loading
-    eventsService.on("app.authenticated", function () {
+    var appAuthenticated = eventsService.on("app.authenticated", function () {
         resourceFileLoadStatus = "none";
         resourceLoadingPromise = [];
     });
+    
 
     // return the local instance when called
     return service;
