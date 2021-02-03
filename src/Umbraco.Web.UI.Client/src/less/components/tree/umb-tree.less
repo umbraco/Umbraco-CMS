@@ -338,7 +338,12 @@ body.touch .umb-tree {
     margin: 0 13px 0 0;
     //color: @gray-1;
     color: @ui-option-type;
-    font-size: 20px;   
+    font-size: 20px;
+
+    &.-hidden {
+        display: none;
+        visibility: hidden;
+    }
     
     &.blue {
         color: @blue;
