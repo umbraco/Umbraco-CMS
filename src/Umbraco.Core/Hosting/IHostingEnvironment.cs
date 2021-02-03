@@ -31,8 +31,6 @@ namespace Umbraco.Core.Hosting
         /// </summary>
         bool IsHosted { get; }
 
-        Version IISVersion { get; }
-
         /// <summary>
         /// Maps a virtual path to a physical path to the application's web root
         /// </summary>

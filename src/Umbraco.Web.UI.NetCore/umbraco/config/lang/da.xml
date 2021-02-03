@@ -751,6 +751,7 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
+    <key alias="readMore">Læs mere</key>
     <key alias="reorder">Sortér</key>
     <key alias="reorderDone">Afslut sortering</key>
     <key alias="preview">Eksempel</key>
@@ -1876,5 +1877,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
     <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
     <key alias="viewPublishedContentDeclineButton">Forbliv i forhåndsvisning</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Mappeoprettelse</key>
+    <key alias="FileWritingForPackages">Filskrivning for pakker</key>
+    <key alias="FileWriting">Filskrivning</key>
+    <key alias="MediaFolderCreation">Medie mappeoprettelse</key>
   </area>
 </language>

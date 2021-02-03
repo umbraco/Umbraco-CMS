@@ -29,7 +29,6 @@ namespace Umbraco.Web.Hosting
             ApplicationVirtualPath = _hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
                                      ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/")
                                      ?? "/";
-            IISVersion = HttpRuntime.IISVersion;
         }
 
         public string SiteName { get; }
@@ -41,8 +40,6 @@ namespace Umbraco.Web.Hosting
         public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _hostingSettings.Debug;
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
-
-        public Version IISVersion { get; }
 
         public string MapPathWebRoot(string path)
         {

@@ -23,8 +23,6 @@ namespace Umbraco.Web.Common.AspNetCore
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
-
-            IISVersion = new Version(0, 0); // TODO not necessary IIS
         }
 
         /// <inheritdoc/>

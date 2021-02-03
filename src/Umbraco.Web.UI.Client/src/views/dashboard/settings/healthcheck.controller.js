@@ -73,7 +73,7 @@
             healthCheckResource.getStatus(check.id)
                 .then(function (response) {
                     check.loading = false;
-                    check.status = response;
+                  check.status = response;
                 });
         }
 

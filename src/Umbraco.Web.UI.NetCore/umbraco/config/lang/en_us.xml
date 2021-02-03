@@ -749,6 +749,7 @@
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
+    <key alias="readMore">Read more</key>
     <key alias="rebuild">Rebuild</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
@@ -2130,13 +2131,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
     <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
-    <key alias="httpsCheckEnableHttpsError">Could not update the 'Umbraco.Core.UseHttps' setting in your web.config file. Error: %0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The configuration value 'Umbraco:CMS:Global:UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The configuration value 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsError">Could not update the 'Umbraco:CMS:Global:UseHttps' setting in your web.config file. Error: %0%</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
     <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'Umbraco.Core.UseHttps' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">The configuration value 'Umbraco:CMS:Global:UseHttps' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
     <key alias="rectifyButton">Fix</key>
     <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
@@ -2186,10 +2187,10 @@ To manage your website, simply open the Umbraco back office and start adding con
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
-    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
+    <key alias="smtpMailSettingsNotFound">The 'Umbraco:CMS:Global:Smtp' configuration could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">The 'Umbraco:CMS:Global:Smtp:Host' configuration could not be found.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
-    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the configuration 'Umbraco:CMS:Global:Smtp' are correct.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
@@ -2571,5 +2572,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>
     <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Folder creation</key>
+    <key alias="FileWritingForPackages">File writing for packages</key>
+    <key alias="FileWriting">File writing</key>
+    <key alias="MediaFolderCreation">Media folder creation</key>
   </area>
 </language>
