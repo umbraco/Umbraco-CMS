@@ -11,7 +11,7 @@ angular.module('umbraco.directives')
   function contains(arr, item) {
     if (Utilities.isArray(arr)) {
       for (var i = 0; i < arr.length; i++) {
-        if (angular.equals(arr[i], item)) {
+        if (Utilities.equals(arr[i], item)) {
           return true;
         }
       }
@@ -19,23 +19,23 @@ angular.module('umbraco.directives')
     return false;
   }
 
-  // add 
+  // add
   function add(arr, item) {
     arr = Utilities.isArray(arr) ? arr : [];
     for (var i = 0; i < arr.length; i++) {
-      if (angular.equals(arr[i], item)) {
+      if (Utilities.equals(arr[i], item)) {
         return arr;
       }
-    }    
+    }
     arr.push(item);
     return arr;
-  }  
+  }
 
   // remove
   function remove(arr, item) {
     if (Utilities.isArray(arr)) {
       for (var i = 0; i < arr.length; i++) {
-        if (angular.equals(arr[i], item)) {
+        if (Utilities.equals(arr[i], item)) {
           arr.splice(i, 1);
           break;
         }
