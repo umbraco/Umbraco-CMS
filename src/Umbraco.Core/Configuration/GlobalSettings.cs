@@ -422,7 +422,7 @@ namespace Umbraco.Core.Configuration
                     }
                     else
                     {
-                      Current.Logger.Warn<GlobalSettings>($"The `Umbraco.Core.SqlWriteLockTimeOut` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
+                      Current.Logger.Warn<GlobalSettings>($"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
                     }
                 }
 
