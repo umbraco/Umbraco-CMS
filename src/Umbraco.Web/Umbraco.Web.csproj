@@ -287,7 +287,6 @@
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
-    <Compile Include="PublishedCache\NuCache\ITransactable.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
