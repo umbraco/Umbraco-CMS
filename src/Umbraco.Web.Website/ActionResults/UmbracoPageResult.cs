@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {
@@ -33,13 +35,15 @@ namespace Umbraco.Web.Website.ActionResults
             var routeData = context.RouteData;
 
             ResetRouteData(routeData);
-            ValidateRouteData(routeData);
+            ValidateRouteData(context);
 
-            var factory = context.HttpContext.RequestServices.GetRequiredService<IControllerFactory>();
+            IControllerFactory factory = context.HttpContext.RequestServices.GetRequiredService<IControllerFactory>();
             Controller controller = null;
 
             if (!(context is ControllerContext controllerContext))
-                return Task.FromCanceled(new System.Threading.CancellationToken());
+            {
+                return Task.FromCanceled(CancellationToken.None);
+            }
 
             try
             {
@@ -97,9 +101,10 @@ namespace Umbraco.Web.Website.ActionResults
         /// <summary>
         /// Validate that the current page execution is not being handled by the normal umbraco routing system
         /// </summary>
-        private static void ValidateRouteData(RouteData routeData)
+        private static void ValidateRouteData(ActionContext actionContext)
         {
-            if (routeData.Values.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken) == false)
+            UmbracoRouteValues umbracoRouteValues = actionContext.HttpContext.Features.Get<UmbracoRouteValues>();
+            if (umbracoRouteValues == null)
             {
                 throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
                                                     " in the context of an Http POST when using a SurfaceController form");
@@ -114,7 +119,9 @@ namespace Umbraco.Web.Website.ActionResults
             controller.ViewData.ModelState.Merge(context.ModelState);
 
             foreach (var d in controller.ViewData)
+            {
                 controller.ViewData[d.Key] = d.Value;
+            }
 
             // We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
             // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is
@@ -135,7 +142,9 @@ namespace Umbraco.Web.Website.ActionResults
         private static Controller CreateController(ControllerContext context, IControllerFactory factory)
         {
             if (!(factory.CreateController(context) is Controller controller))
+            {
                 throw new InvalidOperationException("Could not create controller with name " + context.ActionDescriptor.ControllerName + ".");
+            }
 
             return controller;
         }
@@ -146,7 +155,9 @@ namespace Umbraco.Web.Website.ActionResults
         private static void CleanupController(ControllerContext context, Controller controller, IControllerFactory factory)
         {
             if (!(controller is null))
+            {
                 factory.ReleaseController(context, controller);
+            }
 
             controller?.DisposeIfDisposable();
         }

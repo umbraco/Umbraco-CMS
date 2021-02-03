@@ -7,8 +7,6 @@ namespace Umbraco.Core
         /// </summary>
         public static class Web
         {
-            public const string UmbracoRouteDefinitionDataToken = "umbraco-route-def";
-
             /// <summary>
             /// The preview cookie name
             /// </summary>

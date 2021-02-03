@@ -11,19 +11,19 @@ using Umbraco.Web.Common.Controllers;
 namespace Umbraco.Web.Website.Routing
 {
     /// <summary>
-    /// Determines if a custom controller can hijack the current route
+    /// Used to find a controller/action in the current available routes
     /// </summary>
-    public class HijackedRouteEvaluator
+    public class ControllerActionSearcher : IControllerActionSearcher
     {
-        private readonly ILogger<HijackedRouteEvaluator> _logger;
+        private readonly ILogger<ControllerActionSearcher> _logger;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
         private const string DefaultActionName = nameof(RenderController.Index);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HijackedRouteEvaluator"/> class.
+        /// Initializes a new instance of the <see cref="ControllerActionSearcher"/> class.
         /// </summary>
-        public HijackedRouteEvaluator(
-            ILogger<HijackedRouteEvaluator> logger,
+        public ControllerActionSearcher(
+            ILogger<ControllerActionSearcher> logger,
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             _logger = logger;
@@ -33,7 +33,8 @@ namespace Umbraco.Web.Website.Routing
         /// <summary>
         /// Determines if a custom controller can hijack the current route
         /// </summary>
-        public HijackedRouteResult Evaluate(string controller, string action)
+        /// <typeparam name="T">The controller type to find</typeparam>
+        public ControllerActionSearchResult Find<T>(string controller, string action)
         {
             IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates(controller, action, DefaultActionName);
 
@@ -45,8 +46,8 @@ namespace Umbraco.Web.Website.Routing
             {
                 ControllerActionDescriptor controllerDescriptor = customControllerCandidates[0];
 
-                // ensure the controller is of type IRenderController and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerDescriptor.ControllerTypeInfo)
+                // ensure the controller is of type T and ControllerBase
+                if (TypeHelper.IsTypeAssignableFrom<T>(controllerDescriptor.ControllerTypeInfo)
                     && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerDescriptor.ControllerTypeInfo))
                 {
                     // now check if the custom action matches
@@ -61,8 +62,7 @@ namespace Umbraco.Web.Website.Routing
                     }
 
                     // it's a hijacked route with a custom controller, so return the the values
-                    return new HijackedRouteResult(
-                        true,
+                    return new ControllerActionSearchResult(
                         controllerDescriptor.ControllerName,
                         controllerDescriptor.ControllerTypeInfo,
                         resultingAction);
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Website.Routing
                         "The current Document Type {ContentTypeAlias} matches a locally declared controller of type {ControllerName}. Custom Controllers for Umbraco routing must implement '{UmbracoRenderController}' and inherit from '{UmbracoControllerBase}'.",
                         controller,
                         controllerDescriptor.ControllerTypeInfo.FullName,
-                        typeof(IRenderController).FullName,
+                        typeof(T).FullName,
                         typeof(ControllerBase).FullName);
 
                     // we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Website.Routing
                 }
             }
 
-            return HijackedRouteResult.Failed();
+            return ControllerActionSearchResult.Failed();
         }
 
         /// <summary>

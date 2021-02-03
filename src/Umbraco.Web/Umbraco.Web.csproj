@@ -180,10 +180,8 @@
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
-    <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
-    <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -216,7 +214,6 @@
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
     <Compile Include="Mvc\PostedDataProxyInfo.cs" />
-    <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -224,7 +221,6 @@
     </Compile>
     <Compile Include="Mvc\SurfaceController.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
-    <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />

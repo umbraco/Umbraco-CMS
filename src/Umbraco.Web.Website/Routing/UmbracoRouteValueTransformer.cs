@@ -1,14 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Common.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
 using RouteDirection = Umbraco.Web.Routing.RouteDirection;
@@ -35,6 +43,10 @@ namespace Umbraco.Web.Website.Routing
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoRouteValuesFactory _routeValuesFactory;
         private readonly IRoutableDocumentFilter _routableDocumentFilter;
+        private readonly IDataProtectionProvider _dataProtectionProvider;
+        private readonly IControllerActionSearcher _controllerActionSearcher;
+        private const string ControllerToken = "controller";
+        private const string ActionToken = "action";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -47,21 +59,25 @@ namespace Umbraco.Web.Website.Routing
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtime,
             IUmbracoRouteValuesFactory routeValuesFactory,
-            IRoutableDocumentFilter routableDocumentFilter)
+            IRoutableDocumentFilter routableDocumentFilter,
+            IDataProtectionProvider dataProtectionProvider,
+            IControllerActionSearcher controllerActionSearcher)
         {
             if (globalSettings is null)
             {
-                throw new System.ArgumentNullException(nameof(globalSettings));
+                throw new ArgumentNullException(nameof(globalSettings));
             }
 
-            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
-            _publishedRouter = publishedRouter ?? throw new System.ArgumentNullException(nameof(publishedRouter));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _globalSettings = globalSettings.Value;
-            _hostingEnvironment = hostingEnvironment ?? throw new System.ArgumentNullException(nameof(hostingEnvironment));
-            _runtime = runtime ?? throw new System.ArgumentNullException(nameof(runtime));
-            _routeValuesFactory = routeValuesFactory ?? throw new System.ArgumentNullException(nameof(routeValuesFactory));
-            _routableDocumentFilter = routableDocumentFilter ?? throw new System.ArgumentNullException(nameof(routableDocumentFilter));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
+            _routeValuesFactory = routeValuesFactory ?? throw new ArgumentNullException(nameof(routeValuesFactory));
+            _routableDocumentFilter = routableDocumentFilter ?? throw new ArgumentNullException(nameof(routableDocumentFilter));
+            _dataProtectionProvider = dataProtectionProvider;
+            _controllerActionSearcher = controllerActionSearcher;
         }
 
         /// <inheritdoc/>
@@ -87,23 +103,33 @@ namespace Umbraco.Web.Website.Routing
             // Check if there is no existing content and return the no content controller
             if (!_umbracoContextAccessor.UmbracoContext.Content.HasContent())
             {
-                values["controller"] = ControllerExtensions.GetControllerName<RenderNoContentController>();
-                values["action"] = nameof(RenderNoContentController.Index);
+                values[ControllerToken] = ControllerExtensions.GetControllerName<RenderNoContentController>();
+                values[ActionToken] = nameof(RenderNoContentController.Index);
 
-                return await Task.FromResult(values);
+                return values;
             }
 
             IPublishedRequest publishedRequest = await RouteRequestAsync(_umbracoContextAccessor.UmbracoContext);
 
-            UmbracoRouteValues routeDef = _routeValuesFactory.Create(httpContext, values, publishedRequest);
+            UmbracoRouteValues umbracoRouteValues = _routeValuesFactory.Create(httpContext, publishedRequest);
 
-            values["controller"] = routeDef.ControllerName;
-            if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
+            // Store the route values as a httpcontext feature
+            httpContext.Features.Set(umbracoRouteValues);
+
+            // Need to check if there is form data being posted back to an Umbraco URL
+            PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
+            if (postedInfo != null)
             {
-                values["action"] = routeDef.ActionName;
+                return HandlePostedValues(postedInfo, httpContext, values);
             }
 
-            return await Task.FromResult(values);
+            values[ControllerToken] = umbracoRouteValues.ControllerName;
+            if (string.IsNullOrWhiteSpace(umbracoRouteValues.ActionName) == false)
+            {
+                values[ActionToken] = umbracoRouteValues.ActionName;
+            }
+
+            return values;
         }
 
         private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
@@ -122,6 +148,93 @@ namespace Umbraco.Web.Website.Routing
             umbracoContext.PublishedRequest = routedRequest;
 
             return routedRequest;
+        }
+
+        /// <summary>
+        /// Checks the request and query strings to see if it matches the definition of having a Surface controller
+        /// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
+        /// </summary>
+        private PostedDataProxyInfo GetFormInfo(HttpContext httpContext, RouteValueDictionary values)
+        {
+            if (httpContext is null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
+            // if it is a POST/GET then a value must be in the request
+            if (!httpContext.Request.Query.TryGetValue("ufprt", out StringValues encodedVal)
+                && (!httpContext.Request.HasFormContentType || !httpContext.Request.Form.TryGetValue("ufprt", out encodedVal)))
+            {
+                return null;
+            }
+
+            if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(
+                _dataProtectionProvider,
+                encodedVal,
+                out IDictionary<string, string> decodedParts))
+            {
+                return null;
+            }
+
+            // Get all route values that are not the default ones and add them separately so they eventually get to action parameters
+            foreach (KeyValuePair<string, string> item in decodedParts.Where(x => ReservedAdditionalKeys.AllKeys.Contains(x.Key) == false))
+            {
+                values[item.Key] = item.Value;
+            }
+
+            // return the proxy info without the surface id... could be a local controller.
+            return new PostedDataProxyInfo
+            {
+                ControllerName = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Controller).Value),
+                ActionName = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Action).Value),
+                Area = WebUtility.UrlDecode(decodedParts.First(x => x.Key == ReservedAdditionalKeys.Area).Value),
+            };
+        }
+
+        private RouteValueDictionary HandlePostedValues(PostedDataProxyInfo postedInfo, HttpContext httpContext, RouteValueDictionary values)
+        {
+            // set the standard route values/tokens
+            values[ControllerToken] = postedInfo.ControllerName;
+            values[ActionToken] = postedInfo.ActionName;
+
+            ControllerActionSearchResult surfaceControllerQueryResult = _controllerActionSearcher.Find<SurfaceController>(postedInfo.ControllerName, postedInfo.ActionName);
+
+            if (surfaceControllerQueryResult == null || !surfaceControllerQueryResult.Success)
+            {
+                throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName);
+            }
+
+            // set the area if one is there.
+            if (!postedInfo.Area.IsNullOrWhiteSpace())
+            {
+                values["area"] = postedInfo.Area;
+            }
+
+            return values;
+        }
+
+        private class PostedDataProxyInfo
+        {
+            public string ControllerName { get; set; }
+
+            public string ActionName { get; set; }
+
+            public string Area { get; set; }
+        }
+
+        // Define reserved dictionary keys for controller, action and area specified in route additional values data
+        private static class ReservedAdditionalKeys
+        {
+            internal static readonly string[] AllKeys = new[]
+            {
+                Controller,
+                Action,
+                Area
+            };
+
+            internal const string Controller = "c";
+            internal const string Action = "a";
+            internal const string Area = "ar";
         }
     }
 }

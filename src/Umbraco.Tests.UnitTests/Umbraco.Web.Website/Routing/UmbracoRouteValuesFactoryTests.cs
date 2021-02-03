@@ -39,8 +39,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
                 renderingDefaults,
                 Mock.Of<IShortStringHelper>(),
                 new UmbracoFeatures(),
-                new HijackedRouteEvaluator(
-                    new NullLogger<HijackedRouteEvaluator>(),
+                new ControllerActionSearcher(
+                    new NullLogger<ControllerActionSearcher>(),
                     Mock.Of<IActionDescriptorCollectionProvider>()),
                 publishedRouter.Object);
 
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             UmbracoRouteValuesFactory factory = GetFactory(out Mock<IPublishedRouter> publishedRouter, out _);
 
-            UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), new RouteValueDictionary(), request);
+            UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), request);
 
             // The request has content, no template, no hijacked route and no disabled template features so UpdateRequestToNotFound will be called
             publishedRouter.Verify(m => m.UpdateRequestToNotFound(It.IsAny<IPublishedRequest>()), Times.Once);
@@ -73,11 +73,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
             UmbracoRouteValuesFactory factory = GetFactory(out _, out UmbracoRenderingDefaults renderingDefaults);
 
             var routeVals = new RouteValueDictionary();
-            UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), routeVals, request);
+            UmbracoRouteValues result = factory.Create(new DefaultHttpContext(), request);
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(routeVals.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken));
-            Assert.AreEqual(result, routeVals[Constants.Web.UmbracoRouteDefinitionDataToken]);
             Assert.AreEqual(renderingDefaults.DefaultControllerType, result.ControllerType);
             Assert.AreEqual(UmbracoRouteValues.DefaultActionName, result.ActionName);
             Assert.IsNull(result.TemplateName);

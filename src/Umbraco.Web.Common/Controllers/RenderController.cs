@@ -71,11 +71,11 @@ namespace Umbraco.Web.Common.Controllers
                     return _umbracoRouteValues;
                 }
 
-                _umbracoRouteValues = HttpContext.GetRouteValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken) as UmbracoRouteValues;
+                _umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
 
                 if (_umbracoRouteValues == null)
                 {
-                    throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
+                    throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
                 }
 
                 return _umbracoRouteValues;

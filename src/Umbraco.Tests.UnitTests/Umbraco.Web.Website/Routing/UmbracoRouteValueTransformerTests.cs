@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Routing;
@@ -49,7 +50,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
                 TestHelper.GetHostingEnvironment(),
                 state,
                 routeValuesFactory ?? Mock.Of<IUmbracoRouteValuesFactory>(),
-                filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true));
+                filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true),
+                Mock.Of<IDataProtectionProvider>(),
+                Mock.Of<IControllerActionSearcher>());
 
             return transformer;
         }
@@ -74,7 +77,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
                 typeof(TestController));
 
         private IUmbracoRouteValuesFactory GetRouteValuesFactory(IPublishedRequest request)
-            => Mock.Of<IUmbracoRouteValuesFactory>(x => x.Create(It.IsAny<HttpContext>(), It.IsAny<RouteValueDictionary>(), It.IsAny<IPublishedRequest>()) == GetRouteValues(request));
+            => Mock.Of<IUmbracoRouteValuesFactory>(x => x.Create(It.IsAny<HttpContext>(), It.IsAny<IPublishedRequest>()) == GetRouteValues(request));
 
         private IPublishedRouter GetRouter(IPublishedRequest request)
             => Mock.Of<IPublishedRouter>(x => x.RouteRequestAsync(It.IsAny<IPublishedRequestBuilder>(), It.IsAny<RouteRequestOptions>()) == Task.FromResult(request));
@@ -138,6 +141,25 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
             Assert.AreEqual(request, umbracoContext.PublishedRequest);
+        }
+
+        [Test]
+        public async Task Assigns_UmbracoRouteValues_To_HttpContext_Feature()
+        {
+            IUmbracoContext umbracoContext = GetUmbracoContext(true);
+            IPublishedRequest request = Mock.Of<IPublishedRequest>();
+
+            UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
+                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == umbracoContext),
+                router: GetRouter(request),
+                routeValuesFactory: GetRouteValuesFactory(request));
+
+            var httpContext = new DefaultHttpContext();
+            RouteValueDictionary result = await transformer.TransformAsync(httpContext, new RouteValueDictionary());
+
+            UmbracoRouteValues routeVals = httpContext.Features.Get<UmbracoRouteValues>();
+            Assert.IsNotNull(routeVals);
+            Assert.AreEqual(routeVals.PublishedRequest, umbracoContext.PublishedRequest);
         }
 
         [Test]

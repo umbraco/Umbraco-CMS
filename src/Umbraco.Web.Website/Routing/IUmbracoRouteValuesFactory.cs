@@ -13,6 +13,6 @@ namespace Umbraco.Web.Website.Routing
         /// <summary>
         /// Creates <see cref="UmbracoRouteValues"/>
         /// </summary>
-        UmbracoRouteValues Create(HttpContext httpContext, RouteValueDictionary values, IPublishedRequest request);
+        UmbracoRouteValues Create(HttpContext httpContext, IPublishedRequest request);
     }
 }

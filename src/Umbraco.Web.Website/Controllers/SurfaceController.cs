@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Specialized;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -38,14 +39,13 @@ namespace Umbraco.Web.Website.Controllers
         {
             get
             {
-                var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
-                if (routeDefAttempt.Success == false)
+                UmbracoRouteValues umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
+                if (umbracoRouteValues == null)
                 {
-                    throw routeDefAttempt.Exception;
+                    throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
                 }
 
-                var routeDef = routeDefAttempt.Result;
-                return routeDef.PublishedRequest.PublishedContent;
+                return umbracoRouteValues.PublishedRequest.PublishedContent;
             }
         }
 
@@ -101,24 +101,5 @@ namespace Umbraco.Web.Website.Controllers
         /// </summary>
         protected UmbracoPageResult CurrentUmbracoPage()
             => new UmbracoPageResult(ProfilingLogger);
-
-        /// <summary>
-        /// we need to recursively find the route definition based on the parent view context
-        /// </summary>
-        private Attempt<UmbracoRouteValues> TryGetRouteDefinitionFromAncestorViewContexts()
-        {
-            var currentContext = ControllerContext;
-            while (!(currentContext is null))
-            {
-                var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.Values.ContainsKey(Constants.Web.UmbracoRouteDefinitionDataToken))
-                {
-                    return Attempt.Succeed((UmbracoRouteValues)currentRouteData.Values[Constants.Web.UmbracoRouteDefinitionDataToken]);
-                }
-            }
-
-            return Attempt<UmbracoRouteValues>.Fail(
-                new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));
-        }
     }
 }

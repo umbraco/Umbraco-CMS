@@ -3,16 +3,12 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.SessionState;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Strings;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
@@ -27,28 +23,20 @@ namespace Umbraco.Web.Mvc
             internal const string Area = "ar";
         }
 
-        private readonly IControllerFactory _controllerFactory;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IUmbracoContext _umbracoContext;
 
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
-            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         public RenderRouteHandler(IUmbracoContext umbracoContext, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
-            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         private IUmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
-
-        private UmbracoFeatures Features => Current.Factory.GetRequiredService<UmbracoFeatures>(); // TODO: inject
 
         #region IRouteHandler Members
 
@@ -74,26 +62,15 @@ namespace Umbraco.Web.Mvc
 
         #endregion
 
-        private void UpdateRouteDataForRequest(ContentModel contentModel, RequestContext requestContext)
-        {
-            if (contentModel == null) throw new ArgumentNullException(nameof(contentModel));
-            if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
-
-            // requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoDataToken] = contentModel;
-            // the rest should not change -- it's only the published content that has changed
-        }
-
         /// <summary>
         /// Checks the request and query strings to see if it matches the definition of having a Surface controller
         /// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
         /// </summary>
-        /// <param name="requestContext"></param>
-        /// <returns></returns>
         internal static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
         {
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
 
-            //if it is a POST/GET then a value must be in the request
+            // if it is a POST/GET then a value must be in the request
             if (requestContext.HttpContext.Request.QueryString["ufprt"].IsNullOrWhiteSpace()
                 && requestContext.HttpContext.Request.Form["ufprt"].IsNullOrWhiteSpace())
             {
@@ -105,12 +82,12 @@ namespace Umbraco.Web.Mvc
             switch (requestContext.HttpContext.Request.RequestType)
             {
                 case "POST":
-                    //get the value from the request.
-                    //this field will contain an encrypted version of the surface route vals.
+                    // get the value from the request.
+                    // this field will contain an encrypted version of the surface route vals.
                     encodedVal = requestContext.HttpContext.Request.Form["ufprt"];
                     break;
                 case "GET":
-                    //this field will contain an encrypted version of the surface route vals.
+                    // this field will contain an encrypted version of the surface route vals.
                     encodedVal = requestContext.HttpContext.Request.QueryString["ufprt"];
                     break;
                 default:
@@ -144,8 +121,6 @@ namespace Umbraco.Web.Mvc
         /// Handles a posted form to an Umbraco URL and ensures the correct controller is routed to and that
         /// the right DataTokens are set.
         /// </summary>
-        /// <param name="requestContext"></param>
-        /// <param name="postedInfo"></param>
         internal static IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
         {
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));

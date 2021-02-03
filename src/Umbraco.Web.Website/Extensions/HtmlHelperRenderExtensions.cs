@@ -243,15 +243,12 @@ namespace Umbraco.Extensions
             return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
         }
 
-        #region BeginUmbracoForm
-
         /// <summary>
         /// Used for rendering out the Form for BeginUmbracoForm
         /// </summary>
         internal class UmbracoForm : MvcForm
         {
             private readonly ViewContext _viewContext;
-            private bool _disposed;
             private readonly string _encryptedString;
             private readonly string _controllerName;
 
@@ -272,15 +269,8 @@ namespace Umbraco.Extensions
                 _encryptedString = EncryptionHelper.CreateEncryptedRouteString(GetRequiredService<IDataProtectionProvider>(viewContext), controllerName, controllerAction, area, additionalRouteVals);
             }
 
-            protected new void Dispose()
+            protected override void GenerateEndForm()
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                _disposed = true;
-
                 // Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
                 // We have a controllerName and area so we can match
                 if (_controllerName == "UmbRegister"
@@ -295,7 +285,7 @@ namespace Umbraco.Extensions
                 // write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
 
-                base.Dispose();
+                base.GenerateEndForm();
             }
         }
 
@@ -710,7 +700,6 @@ namespace Umbraco.Extensions
             return theForm;
         }
 
-        #endregion
 
         #region If
 

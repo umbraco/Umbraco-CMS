@@ -21,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
 
     [TestFixture]
-    public class HijackedRouteEvaluatorTests
+    public class ControllerActionSearcherTests
     {
         private class TestActionDescriptorCollectionProvider : ActionDescriptorCollectionProvider
         {
@@ -88,11 +88,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         [TestCase("Custom", "Render1", nameof(Render1Controller.Custom), true)]
         public void Matches_Controller(string action, string controller, string resultAction, bool matches)
         {
-            var evaluator = new HijackedRouteEvaluator(
-                new NullLogger<HijackedRouteEvaluator>(),
+            var query = new ControllerActionSearcher(
+                new NullLogger<ControllerActionSearcher>(),
                 GetActionDescriptors());
 
-            HijackedRouteResult result = evaluator.Evaluate(controller, action);
+            ControllerActionSearchResult result = query.Find<IRenderController>(controller, action);
             Assert.AreEqual(matches, result.Success);
             if (matches)
             {
