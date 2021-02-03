@@ -74,12 +74,10 @@ namespace Umbraco.Core.HealthChecks.Checks.Services
                 }
             }
 
-            var actions = new List<HealthCheckAction>();
             return
                 new HealthCheckStatus(message)
                 {
                     ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                    Actions = actions,
                     ReadMoreLink = success ? null : Constants.HealthChecks.DocumentationLinks.SmtpCheck
                 };
         }

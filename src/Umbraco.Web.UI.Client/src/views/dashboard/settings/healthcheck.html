@@ -149,6 +149,11 @@
                                         <div class="umb-panel-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                     </div>
                                 </div>
+                              <div class="umb-panel-group__details-status-readMoreLink" ng-if="status.readMoreLink">
+                                <a href="{{status.readMoreLink}}" class="btn btn-success" target="_blank">
+                                  <localize key="general_readMore">Read more</localize></a>
+                              </div>
+
                             </div>
                         </div>
 
