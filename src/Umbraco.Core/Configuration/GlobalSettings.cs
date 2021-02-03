@@ -395,6 +395,7 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+
         /// <summary>
         /// An int value representing the time in milliseconds to lock the database for a write operation
         /// </summary>
