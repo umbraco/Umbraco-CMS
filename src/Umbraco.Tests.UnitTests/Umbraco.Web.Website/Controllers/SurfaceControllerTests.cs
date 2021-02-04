@@ -125,7 +125,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             builder.SetPublishedContent(content);
             IPublishedRequest publishedRequest = builder.Build();
 
-            var routeDefinition = new UmbracoRouteValues(publishedRequest);
+            var routeDefinition = new UmbracoRouteValues(publishedRequest, null);
 
             var httpContext = new DefaultHttpContext();
             httpContext.Features.Set(routeDefinition);

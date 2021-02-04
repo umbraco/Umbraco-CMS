@@ -41,7 +41,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
                 new UmbracoFeatures(),
                 new ControllerActionSearcher(
                     new NullLogger<ControllerActionSearcher>(),
-                    Mock.Of<IActionDescriptorCollectionProvider>()),
+                    Mock.Of<IActionSelector>()),
                 publishedRouter.Object);
 
             return factory;

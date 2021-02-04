@@ -78,7 +78,8 @@ namespace Umbraco.Extensions
                         umbrcoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
-            return new HtmlString(string.Empty);
+
+            return HtmlString.Empty;
 
         }
 
@@ -244,13 +245,54 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Outputs the hidden html input field for Surface Controller route information
+        /// </summary>
+        /// <typeparam name="TSurface">The <see cref="SurfaceController"/> type</typeparam>
+        /// <remarks>
+        /// Typically not used directly because BeginUmbracoForm automatically outputs this value when routing
+        /// for surface controllers. But this could be used in case a form tag is manually created.
+        /// </remarks>
+        public static IHtmlContent SurfaceControllerHiddenInput<TSurface>(
+            this IHtmlHelper htmlHelper,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+            where TSurface : SurfaceController
+        {
+            var inputField = GetSurfaceControllerHiddenInput(
+                GetRequiredService<IDataProtectionProvider>(htmlHelper),
+                ControllerExtensions.GetControllerName<TSurface>(),
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return new HtmlString(inputField);
+        }
+
+        private static string GetSurfaceControllerHiddenInput(
+            IDataProtectionProvider dataProtectionProvider,
+            string controllerName,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+        {
+            var encryptedString = EncryptionHelper.CreateEncryptedRouteString(
+                dataProtectionProvider,
+                controllerName,
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return "<input name=\"ufprt\" type=\"hidden\" value=\"" + encryptedString + "\" />";
+        }
+
+        /// <summary>
         /// Used for rendering out the Form for BeginUmbracoForm
         /// </summary>
         internal class UmbracoForm : MvcForm
         {
             private readonly ViewContext _viewContext;
-            private readonly string _encryptedString;
-            private readonly string _controllerName;
+            private readonly string _surfaceControllerInput;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="UmbracoForm"/> class.
@@ -265,25 +307,23 @@ namespace Umbraco.Extensions
                 : base(viewContext, htmlEncoder)
             {
                 _viewContext = viewContext;
-                _controllerName = controllerName;
-                _encryptedString = EncryptionHelper.CreateEncryptedRouteString(GetRequiredService<IDataProtectionProvider>(viewContext), controllerName, controllerAction, area, additionalRouteVals);
+                _surfaceControllerInput = GetSurfaceControllerHiddenInput(
+                    GetRequiredService<IDataProtectionProvider>(viewContext),
+                    controllerName,
+                    controllerAction,
+                    area,
+                    additionalRouteVals);
             }
 
             protected override void GenerateEndForm()
             {
-                // Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
-                // We have a controllerName and area so we can match
-                if (_controllerName == "UmbRegister"
-                    || _controllerName == "UmbProfile"
-                    || _controllerName == "UmbLoginStatus"
-                    || _controllerName == "UmbLogin")
-                {
-                    IAntiforgery antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
-                    _viewContext.Writer.Write(antiforgery.GetHtml(_viewContext.HttpContext).ToString());
-                }
+                // Always output an anti-forgery token
+                IAntiforgery antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+                IHtmlContent antiforgeryHtml = antiforgery.GetHtml(_viewContext.HttpContext);
+                _viewContext.Writer.Write(antiforgeryHtml.ToHtmlString());
 
                 // write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
+                _viewContext.Writer.Write(_surfaceControllerInput);
 
                 base.GenerateEndForm();
             }
@@ -403,7 +443,7 @@ namespace Umbraco.Extensions
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
             }
 
-            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
+            return html.BeginUmbracoForm(action, controllerName, string.Empty, additionalRouteVals, htmlAttributes);
         }
 
         /// <summary>

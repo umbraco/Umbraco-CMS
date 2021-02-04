@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -45,8 +46,9 @@ namespace Umbraco.Web.Website.Routing
         private readonly IRoutableDocumentFilter _routableDocumentFilter;
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
-        private const string ControllerToken = "controller";
-        private const string ActionToken = "action";
+
+        internal const string ControllerToken = "controller";
+        internal const string ActionToken = "action";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -197,9 +199,9 @@ namespace Umbraco.Web.Website.Routing
             values[ControllerToken] = postedInfo.ControllerName;
             values[ActionToken] = postedInfo.ActionName;
 
-            ControllerActionSearchResult surfaceControllerQueryResult = _controllerActionSearcher.Find<SurfaceController>(postedInfo.ControllerName, postedInfo.ActionName);
+            ControllerActionDescriptor surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName);
 
-            if (surfaceControllerQueryResult == null || !surfaceControllerQueryResult.Success)
+            if (surfaceControllerDescriptor == null)
             {
                 throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName);
             }

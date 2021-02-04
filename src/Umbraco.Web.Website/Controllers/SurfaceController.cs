@@ -21,6 +21,7 @@ namespace Umbraco.Web.Website.Controllers
     // TODO: Migrate MergeModelStateToChildAction and MergeParentContextViewData action filters
     // [MergeModelStateToChildAction]
     // [MergeParentContextViewData]
+    [AutoValidateAntiforgeryToken]
     public abstract class SurfaceController : PluginController
     {
         /// <summary>

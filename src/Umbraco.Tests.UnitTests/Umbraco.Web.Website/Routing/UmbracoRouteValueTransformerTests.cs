@@ -1,7 +1,9 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -73,8 +75,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         private UmbracoRouteValues GetRouteValues(IPublishedRequest request)
             => new UmbracoRouteValues(
                 request,
-                ControllerExtensions.GetControllerName<TestController>(),
-                typeof(TestController));
+                new ControllerActionDescriptor
+                {
+                    ControllerTypeInfo = typeof(TestController).GetTypeInfo(),
+                    ControllerName = ControllerExtensions.GetControllerName<TestController>()
+                });
 
         private IUmbracoRouteValuesFactory GetRouteValuesFactory(IPublishedRequest request)
             => Mock.Of<IUmbracoRouteValuesFactory>(x => x.Create(It.IsAny<HttpContext>(), It.IsAny<IPublishedRequest>()) == GetRouteValues(request));

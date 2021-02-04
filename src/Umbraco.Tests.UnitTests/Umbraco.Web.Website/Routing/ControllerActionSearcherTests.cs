@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Extensions;
@@ -88,12 +90,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         [TestCase("Custom", "Render1", nameof(Render1Controller.Custom), true)]
         public void Matches_Controller(string action, string controller, string resultAction, bool matches)
         {
+            IActionDescriptorCollectionProvider descriptors = GetActionDescriptors();
+
+            // TODO: Mock this more so that these tests work
+            IActionSelector actionSelector = Mock.Of<IActionSelector>();
+
             var query = new ControllerActionSearcher(
                 new NullLogger<ControllerActionSearcher>(),
-                GetActionDescriptors());
+                actionSelector);
 
-            ControllerActionSearchResult result = query.Find<IRenderController>(controller, action);
-            Assert.AreEqual(matches, result.Success);
+            var httpContext = new DefaultHttpContext();
+
+            ControllerActionDescriptor result = query.Find<IRenderController>(httpContext, controller, action);
+            Assert.IsTrue(matches == (result != null));
             if (matches)
             {
                 Assert.IsTrue(result.ActionName.InvariantEquals(resultAction), "expected {0} does not match resulting action {1}", resultAction, result.ActionName);

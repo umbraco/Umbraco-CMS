@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -14,7 +15,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Routing;
+using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {
@@ -30,49 +34,65 @@ namespace Umbraco.Web.Website.ActionResults
             _profilingLogger = profilingLogger;
         }
 
-        public Task ExecuteResultAsync(ActionContext context)
+        /// <inheritdoc/>
+        public async Task ExecuteResultAsync(ActionContext context)
         {
-            var routeData = context.RouteData;
-
-            ResetRouteData(routeData);
-            ValidateRouteData(context);
-
-            IControllerFactory factory = context.HttpContext.RequestServices.GetRequiredService<IControllerFactory>();
-            Controller controller = null;
-
-            if (!(context is ControllerContext controllerContext))
+            UmbracoRouteValues umbracoRouteValues = context.HttpContext.Features.Get<UmbracoRouteValues>();
+            if (umbracoRouteValues == null)
             {
-                return Task.FromCanceled(CancellationToken.None);
+                throw new InvalidOperationException($"Can only use {nameof(UmbracoPageResult)} in the context of an Http POST when using a {nameof(SurfaceController)} form");
             }
 
-            try
-            {
-                controller = CreateController(controllerContext, factory);
+            // Change the route values back to the original request vals
+            context.RouteData.Values[UmbracoRouteValueTransformer.ControllerToken] = umbracoRouteValues.ControllerName;
+            context.RouteData.Values[UmbracoRouteValueTransformer.ActionToken] = umbracoRouteValues.ActionName;
 
-                CopyControllerData(controllerContext, controller);
+            // Create a new context and excute the original controller
 
-                ExecuteControllerAction(controllerContext, controller);
-            }
-            finally
-            {
-                CleanupController(controllerContext, controller, factory);
-            }
+            // TODO: We need to take into account temp data, view data, etc... all like what we used to do below
+            // so that validation stuff gets carried accross
 
-            return Task.CompletedTask;
+            var renderActionContext = new ActionContext(context.HttpContext, context.RouteData, umbracoRouteValues.ControllerActionDescriptor);
+            IActionInvokerFactory actionInvokerFactory = context.HttpContext.RequestServices.GetRequiredService<IActionInvokerFactory>();
+            IActionInvoker actionInvoker = actionInvokerFactory.CreateInvoker(renderActionContext);
+            await ExecuteControllerAction(actionInvoker);
+
+            //ResetRouteData(context.RouteData);
+            //ValidateRouteData(context);
+
+            //IControllerFactory factory = context.HttpContext.RequestServices.GetRequiredService<IControllerFactory>();
+            //Controller controller = null;
+
+            //if (!(context is ControllerContext controllerContext))
+            //{
+            //    // TODO: Better to throw since this is not expected?
+            //    return Task.FromCanceled(CancellationToken.None);
+            //}
+
+            //try
+            //{
+            //    controller = CreateController(controllerContext, factory);
+
+            //    CopyControllerData(controllerContext, controller);
+
+            //    ExecuteControllerAction(controllerContext, controller);
+            //}
+            //finally
+            //{
+            //    CleanupController(controllerContext, controller, factory);
+            //}
+
+            //return Task.CompletedTask;
         }
 
         /// <summary>
         /// Executes the controller action
         /// </summary>
-        private void ExecuteControllerAction(ControllerContext context, Controller controller)
+        private async Task ExecuteControllerAction(IActionInvoker actionInvoker)
         {
             using (_profilingLogger.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
             {
-                //TODO I do not think this will work, We need to test this, when we can, in the .NET Core executable.
-                var aec = new ActionExecutingContext(context, new List<IFilterMetadata>(), new Dictionary<string, object>(), controller);
-                var actionExecutedDelegate = CreateActionExecutedDelegate(aec);
-
-                controller.OnActionExecutionAsync(aec, actionExecutedDelegate);
+                await actionInvoker.InvokeAsync();
             }
         }
 
@@ -89,36 +109,13 @@ namespace Umbraco.Web.Website.ActionResults
         }
 
         /// <summary>
-        /// Since we could be returning the current page from a surface controller posted values in which the routing values are changed, we
-        /// need to revert these values back to nothing in order for the normal page to render again.
-        /// </summary>
-        private static void ResetRouteData(RouteData routeData)
-        {
-            routeData.DataTokens["area"] = null;
-            routeData.DataTokens["Namespaces"] = null;
-        }
-
-        /// <summary>
-        /// Validate that the current page execution is not being handled by the normal umbraco routing system
-        /// </summary>
-        private static void ValidateRouteData(ActionContext actionContext)
-        {
-            UmbracoRouteValues umbracoRouteValues = actionContext.HttpContext.Features.Get<UmbracoRouteValues>();
-            if (umbracoRouteValues == null)
-            {
-                throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
-                                                    " in the context of an Http POST when using a SurfaceController form");
-            }
-        }
-
-        /// <summary>
         /// Ensure ModelState, ViewData and TempData is copied across
         /// </summary>
         private static void CopyControllerData(ControllerContext context, Controller controller)
         {
             controller.ViewData.ModelState.Merge(context.ModelState);
 
-            foreach (var d in controller.ViewData)
+            foreach (KeyValuePair<string, object> d in controller.ViewData)
             {
                 controller.ViewData[d.Key] = d.Value;
             }

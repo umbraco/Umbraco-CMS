@@ -205,7 +205,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
-            httpContext.Features.Set(new UmbracoRouteValues(publishedRequest));
+            httpContext.Features.Set(new UmbracoRouteValues(publishedRequest, null));
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();

@@ -1,7 +1,10 @@
-﻿namespace Umbraco.Web.Website.Routing
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
+
+namespace Umbraco.Web.Website.Routing
 {
     public interface IControllerActionSearcher
     {
-        ControllerActionSearchResult Find<T>(string controller, string action);
+        ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action);
     }
 }
