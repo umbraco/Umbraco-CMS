@@ -16,7 +16,7 @@ namespace Umbraco.Web.Website.ActionResults
     /// <summary>
     /// Redirects to an Umbraco page by Id or Entity
     /// </summary>
-    public class RedirectToUmbracoPageResult : IActionResult
+    public class RedirectToUmbracoPageResult : IActionResult, IKeepTempDataResult
     {
         private IPublishedContent _publishedContent;
         private readonly QueryString _queryString;
@@ -122,18 +122,14 @@ namespace Umbraco.Web.Website.ActionResults
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var httpContext = context.HttpContext;
-            var ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
-            var destinationUrl = ioHelper.ResolveUrl(Url);
+            HttpContext httpContext = context.HttpContext;
+            IIOHelper ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
+            string destinationUrl = ioHelper.ResolveUrl(Url);
 
             if (_queryString.HasValue)
             {
                 destinationUrl += _queryString.ToUriComponent();
             }
-
-            var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
-            var tempData = tempDataDictionaryFactory.GetTempData(context.HttpContext);
-            tempData?.Keep();
 
             httpContext.Response.Redirect(destinationUrl);
 

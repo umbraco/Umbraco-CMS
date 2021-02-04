@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -149,6 +150,20 @@ namespace Umbraco.Web.Common.Controllers
                     break;
                 case UmbracoRouteResult.Success:
                 default:
+
+                    // Check if there's a ProxyViewDataFeature in the request.
+                    // If there it is means that we are proxying/executing this controller
+                    // from another controller and we need to merge it's ViewData with this one
+                    // since this one will be empty.
+                    ProxyViewDataFeature saveViewData = HttpContext.Features.Get<ProxyViewDataFeature>();
+                    if (saveViewData != null)
+                    {
+                        foreach (KeyValuePair<string, object> kv in saveViewData.ViewData)
+                        {
+                            ViewData[kv.Key] = kv.Value;
+                        }
+                    }
+
                     // continue normally
                     await next();
                     break;

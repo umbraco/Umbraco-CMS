@@ -101,6 +101,9 @@ namespace Umbraco.Web.Website.Controllers
         /// Returns the currently rendered Umbraco page
         /// </summary>
         protected UmbracoPageResult CurrentUmbracoPage()
-            => new UmbracoPageResult(ProfilingLogger);
+        {
+            HttpContext.Features.Set(new ProxyViewDataFeature(ViewData));
+            return new UmbracoPageResult(ProfilingLogger);
+        }
     }
 }
