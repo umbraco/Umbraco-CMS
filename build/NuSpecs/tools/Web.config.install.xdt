@@ -394,7 +394,7 @@
             </dependentAssembly>
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="log4net" publicKeyToken="669e0ddf0bb1aa2a" culture="neutral"/>
-                <bindingRedirect oldVersion="0.0.0.0-2.0.8.0" newVersion="2.0.8.0"/>
+                <bindingRedirect oldVersion="0.0.0.0-2.0.12.0" newVersion="2.0.12.0"/>
             </dependentAssembly>
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="System.Data.SqlServerCe" publicKeyToken="89845DCD8080CC91" culture="neutral"/>
