@@ -309,14 +309,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.IsNotNull(result.Value);
             Mock.Get(umbracoMembersUserManager)
                 .Verify(u => u.GetRolesAsync(membersIdentityUser));
-            //Mock.Get(umbracoMembersUserManager)
-            //    .Verify(u => u.RemoveFromRolesAsync(membersIdentityUser, new[] { "roles" }));
-            Mock.Get(umbracoMembersUserManager)
+             Mock.Get(umbracoMembersUserManager)
                 .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
             Mock.Get(memberService)
-                .Verify(m => m.Save(member, false));
-            //Mock.Get(memberService)
-            //    .Verify(m => m.AssignRoles(new[] { member.Username }, new[] { roleName }));
+                .Verify(m => m.Save(It.IsAny<Member>(), true));
             AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
         }
 
@@ -454,11 +450,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 PersistedContent = member,
                 PropertyCollectionDto = new ContentPropertyCollectionDto()
                 {
-                    Properties = new List<ContentPropertyDto>()
-                    {
-                        new ContentPropertyDto(),
-                        new ContentPropertyDto()
-                    }
                 },
                 Groups = new List<string>(),
                 //Alias = "fakeAlias",
@@ -487,7 +478,41 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 {
                     new Tab<ContentPropertyDisplay>()
                     {
-                        Alias = "test"
+                        Alias = "test",
+                        Id = 77,
+                        Properties = new List<ContentPropertyDisplay>()
+                        {
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_id",
+                                View = "idwithguid",
+                                Value = new []
+                                {
+                                    "123",
+                                    "guid"
+                                }
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_doctype"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_login"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias= "_umb_email"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_password"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_membergroup"
+                            }
+                        }
                     }
                 }
             };
@@ -521,7 +546,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.AreEqual(memberDisplay.SortOrder, resultValue.SortOrder);
             Assert.AreEqual(memberDisplay.Trashed, resultValue.Trashed);
             Assert.AreEqual(memberDisplay.TreeNodeUrl, resultValue.TreeNodeUrl);
-            Assert.AreNotSame(memberDisplay.Properties, resultValue.Properties);
 
             //TODO: can we check create/update dates when saving?
             //Assert.AreEqual(memberDisplay.CreateDate, resultValue.CreateDate);
@@ -529,10 +553,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             //TODO: check all properties
             Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
+            Assert.AreNotSame(memberDisplay.Properties, resultValue.Properties);
             for (var index = 0; index < resultValue.Properties.Count(); index++)
             {
                 Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
-                Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+                //Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
             }
         }
     }
