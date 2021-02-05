@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthChecks;
 
 namespace Umbraco.Core.Configuration.Models
 {

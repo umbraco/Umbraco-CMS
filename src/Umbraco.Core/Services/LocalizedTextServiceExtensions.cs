@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services
@@ -12,6 +11,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
+
+        public static string Localize<T>(this ILocalizedTextService manager, string area, T key)
+        where T: System.Enum
+        {
+            var fullKey = string.Join("/", area, key);
+            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
+        }
         public static string Localize(this ILocalizedTextService manager, string area, string key)
         {
             var fullKey = string.Join("/", area, key);

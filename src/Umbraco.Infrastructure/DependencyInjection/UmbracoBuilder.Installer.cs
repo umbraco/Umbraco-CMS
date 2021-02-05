@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Core.Install.InstallSteps;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;

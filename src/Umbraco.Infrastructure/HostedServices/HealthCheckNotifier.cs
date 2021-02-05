@@ -11,13 +11,11 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Extensions;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthChecks;
+using Umbraco.Core.HealthChecks.NotificationMethods;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.HealthCheck;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.NotificationMethods;
 
 namespace Umbraco.Infrastructure.HostedServices
 {
@@ -118,10 +116,10 @@ namespace Umbraco.Infrastructure.HostedServices
                     .Distinct()
                     .ToArray();
 
-                IEnumerable<Core.HealthCheck.HealthCheck> checks = _healthChecks
+                IEnumerable<HealthCheck> checks = _healthChecks
                     .Where(x => disabledCheckIds.Contains(x.Id) == false);
 
-                var results = new HealthCheckResults(checks);
+                var results = await HealthCheckResults.Create(checks);
                 results.LogResults();
 
                 // Send using registered notification methods that are enabled.

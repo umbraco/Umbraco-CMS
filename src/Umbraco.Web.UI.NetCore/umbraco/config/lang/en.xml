@@ -740,6 +740,7 @@
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
+    <key alias="readMore">Read more</key>
     <key alias="rebuild">Rebuild</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
@@ -2550,5 +2551,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>
     <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Folder creation</key>
+    <key alias="FileWritingForPackages">File writing for packages</key>
+    <key alias="FileWriting">File writing</key>
+    <key alias="MediaFolderCreation">Media folder creation</key>
   </area>
 </language>

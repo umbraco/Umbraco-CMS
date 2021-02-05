@@ -12,14 +12,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthChecks;
+using Umbraco.Core.HealthChecks.NotificationMethods;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.NotificationMethods;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -186,7 +184,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new HealthCheckStatus("Check message");
 
-            public override IEnumerable<HealthCheckStatus> GetStatus() => Enumerable.Empty<HealthCheckStatus>();
+            public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() => Enumerable.Empty<HealthCheckStatus>();
         }
     }
 }

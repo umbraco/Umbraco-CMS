@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
-    <Folder Include="scripts" />
     <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
     <Folder Include="Views" />

@@ -1,8 +1,8 @@
-using System.Security.Cryptography;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthChecks;
+using Umbraco.Core.HealthChecks.NotificationMethods;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.PropertyEditors;
@@ -13,8 +13,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Sections;
@@ -54,7 +52,7 @@ namespace Umbraco.Core.DependencyInjection
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
             builder.EditorValidators().Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
-            builder.HealthChecks().Add(() => builder.TypeLoader.GetTypes<Core.HealthCheck.HealthCheck>());
+            builder.HealthChecks().Add(() => builder.TypeLoader.GetTypes<HealthCheck>());
             builder.HealthCheckNotificationMethods().Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
             builder.TourFilters();
             builder.UrlProviders()

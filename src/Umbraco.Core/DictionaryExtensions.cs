@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Umbraco.Core
 {
@@ -279,6 +280,25 @@ namespace Umbraco.Core
             return key.IsNullOrWhiteSpace() == false
                        ? dictionary[key]
                        : defaultValue;
+        }
+
+        public static async Task<Dictionary<TKey, TValue>> ToDictionaryAsync<TInput, TKey, TValue>(
+            this IEnumerable<TInput> enumerable,
+            Func<TInput, TKey> syncKeySelector,
+            Func<TInput, Task<TValue>> asyncValueSelector)
+        {
+            Dictionary<TKey,TValue> dictionary = new Dictionary<TKey, TValue>();
+
+            foreach (var item in enumerable)
+            {
+                var key = syncKeySelector(item);
+
+                var value = await asyncValueSelector(item);
+
+                dictionary.Add(key,value);
+            }
+
+            return dictionary;
         }
     }
 }
