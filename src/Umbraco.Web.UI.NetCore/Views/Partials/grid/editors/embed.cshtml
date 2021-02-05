@@ -1,5 +1,5 @@
 ﻿@using Umbraco.Core
-@model dynamic
+@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage<dynamic>
 
 @{
     string embedValue = Convert.ToString(Model.value);
