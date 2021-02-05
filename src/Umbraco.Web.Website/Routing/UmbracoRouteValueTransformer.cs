@@ -20,6 +20,7 @@ using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
+using static Umbraco.Core.Constants.Web.Routing;
 using RouteDirection = Umbraco.Web.Routing.RouteDirection;
 
 namespace Umbraco.Web.Website.Routing
@@ -46,9 +47,6 @@ namespace Umbraco.Web.Website.Routing
         private readonly IRoutableDocumentFilter _routableDocumentFilter;
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
-
-        internal const string ControllerToken = "controller";
-        internal const string ActionToken = "action";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.

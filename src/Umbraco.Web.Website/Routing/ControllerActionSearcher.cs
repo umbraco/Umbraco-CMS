@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Common.Controllers;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.Website.Routing
 {
@@ -58,8 +59,8 @@ namespace Umbraco.Web.Website.Routing
             // Use aspnetcore's IActionSelector to do the finding since it uses an optimized cache lookup
             var routeValues = new RouteValueDictionary
             {
-                [UmbracoRouteValueTransformer.ControllerToken] = customControllerName,
-                [UmbracoRouteValueTransformer.ActionToken] = customActionName, // first try to find the custom action
+                [ControllerToken] = customControllerName,
+                [ActionToken] = customActionName, // first try to find the custom action
             };
             var routeData = new RouteData(routeValues);
             var routeContext = new RouteContext(httpContext)
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Website.Routing
             }
 
             // now find for the default action since we couldn't find the custom one
-            routeValues[UmbracoRouteValueTransformer.ActionToken] = defaultActionName;
+            routeValues[ActionToken] = defaultActionName;
             candidates = _actionSelector.SelectCandidates(routeContext)
                 .Cast<ControllerActionDescriptor>()
                 .Where(x => TypeHelper.IsTypeAssignableFrom<T>(x.ControllerTypeInfo))

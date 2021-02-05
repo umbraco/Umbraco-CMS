@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {
@@ -39,8 +40,8 @@ namespace Umbraco.Web.Website.ActionResults
             }
 
             // Change the route values back to the original request vals
-            context.RouteData.Values[UmbracoRouteValueTransformer.ControllerToken] = umbracoRouteValues.ControllerName;
-            context.RouteData.Values[UmbracoRouteValueTransformer.ActionToken] = umbracoRouteValues.ActionName;
+            context.RouteData.Values[ControllerToken] = umbracoRouteValues.ControllerName;
+            context.RouteData.Values[ActionToken] = umbracoRouteValues.ActionName;
 
             // Create a new context and excute the original controller...
             // Copy the action context - this also copies the ModelState

@@ -22,6 +22,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
@@ -129,8 +130,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(ControllerExtensions.GetControllerName<RenderNoContentController>(), result["controller"]);
-            Assert.AreEqual(nameof(RenderNoContentController.Index), result["action"]);
+            Assert.AreEqual(ControllerExtensions.GetControllerName<RenderNoContentController>(), result[ControllerToken]);
+            Assert.AreEqual(nameof(RenderNoContentController.Index), result[ActionToken]);
         }
 
         [Test]
@@ -181,8 +182,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
 
-            Assert.AreEqual(routeValues.ControllerName, result["controller"]);
-            Assert.AreEqual(routeValues.ActionName, result["action"]);
+            Assert.AreEqual(routeValues.ControllerName, result[ControllerToken]);
+            Assert.AreEqual(routeValues.ActionName, result[ActionToken]);
         }
 
         private class TestController : RenderController
