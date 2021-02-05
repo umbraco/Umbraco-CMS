@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace Umbraco.Web.PublishedCache.NuCache
 {
     public interface ITransactableDictionary<TKey, TValue> :
-        ITransactable,
         IDictionary<TKey, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IEnumerable<KeyValuePair<TKey, TValue>>,
@@ -30,5 +29,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Drop the database
         /// </summary>
         void Drop();
+
+        /// <summary>
+        /// Begin Transaction
+        /// </summary>
+        /// <returns></returns>
+        ITransactionScope BeginTransaction();
     }
 }

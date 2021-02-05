@@ -196,14 +196,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             try
             {
-                if ((_localContentDb != null && _localContentDb.IsPopulated()) || _transactableDictionaryFactory.IsPopulated(ContentCacheEntityType.Document))
+                if ((_localContentDb != null && _localContentDb.IsPopulated()))
                     {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
                         _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
                 }
 
-                if ((_localMediaDb  != null && _localMediaDb.IsPopulated()) || _transactableDictionaryFactory.IsPopulated(ContentCacheEntityType.Media))
+                if ((_localMediaDb  != null && _localMediaDb.IsPopulated()))
                 {
                     okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                     if (!okMedia)
