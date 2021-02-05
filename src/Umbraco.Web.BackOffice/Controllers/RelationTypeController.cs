@@ -2,19 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.Common.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Umbraco.Web.Common.ActionsResults;
+using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -23,6 +22,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class RelationTypeController : BackOfficeNotificationsController
     {
         private readonly ILogger<RelationTypeController> _logger;
@@ -47,7 +47,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<RelationTypeDisplay> GetById(int id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
@@ -66,7 +65,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<RelationTypeDisplay> GetById(Guid id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
@@ -82,7 +80,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<RelationTypeDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
