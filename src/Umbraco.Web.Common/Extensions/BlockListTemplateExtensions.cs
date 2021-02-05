@@ -1,16 +1,16 @@
 ﻿using System;
-using Umbraco.Core.Models.Blocks;
-using Umbraco.Core.Models.PublishedContent;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Core.Models.Blocks;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions
 {
     public static class BlockListTemplateExtensions
     {
-        public const string DefaultFolder = "BlockList/";
-        public const string DefaultTemplate = "Default";
+        public const string DefaultFolder = "blocklist/";
+        public const string DefaultTemplate = "default";
 
         public static IHtmlContent GetBlockListHtml(this HtmlHelper html, BlockListModel model, string template = DefaultTemplate)
         {
