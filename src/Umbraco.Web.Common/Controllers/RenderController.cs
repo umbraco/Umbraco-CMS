@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -71,11 +72,11 @@ namespace Umbraco.Web.Common.Controllers
                     return _umbracoRouteValues;
                 }
 
-                _umbracoRouteValues = HttpContext.GetRouteValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken) as UmbracoRouteValues;
+                _umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
 
                 if (_umbracoRouteValues == null)
                 {
-                    throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
+                    throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
                 }
 
                 return _umbracoRouteValues;
@@ -149,6 +150,20 @@ namespace Umbraco.Web.Common.Controllers
                     break;
                 case UmbracoRouteResult.Success:
                 default:
+
+                    // Check if there's a ProxyViewDataFeature in the request.
+                    // If there it is means that we are proxying/executing this controller
+                    // from another controller and we need to merge it's ViewData with this one
+                    // since this one will be empty.
+                    ProxyViewDataFeature saveViewData = HttpContext.Features.Get<ProxyViewDataFeature>();
+                    if (saveViewData != null)
+                    {
+                        foreach (KeyValuePair<string, object> kv in saveViewData.ViewData)
+                        {
+                            ViewData[kv.Key] = kv.Value;
+                        }
+                    }
+
                     // continue normally
                     await next();
                     break;

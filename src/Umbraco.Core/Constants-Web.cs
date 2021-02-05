@@ -7,14 +7,12 @@ namespace Umbraco.Core
         /// </summary>
         public static class Web
         {
-            public const string UmbracoRouteDefinitionDataToken = "umbraco-route-def";
-
             /// <summary>
             /// The preview cookie name
             /// </summary>
             public const string PreviewCookieName = "UMB_PREVIEW";
-            /// <summary>
 
+            /// <summary>
             /// Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
             /// </summary>
             public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
@@ -53,6 +51,13 @@ namespace Umbraco.Core
                 public const string BackOfficeArea = "UmbracoBackOffice"; // Used for area routes of non-api controllers
                 public const string BackOfficeApiArea = "UmbracoApi"; // Same name as v8 so all routing remains the same
                 public const string BackOfficeTreeArea = "UmbracoTrees"; // Same name as v8 so all routing remains the same
+            }
+
+            public static class Routing
+            {
+                public const string ControllerToken = "controller";
+                public const string ActionToken = "action";
+                public const string AreaToken = "area";
             }
         }
     }

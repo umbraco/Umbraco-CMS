@@ -17,12 +17,13 @@ namespace Umbraco.Web.Common.Controllers
         /// </summary>
         protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
         {
-            if (!context.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var def))
+            UmbracoRouteValues routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
+            if (routeVals == null)
             {
-                throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
+                throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
             }
 
-            return (UmbracoRouteValues)def;
+            return routeVals;
         }
 
         /// <summary>

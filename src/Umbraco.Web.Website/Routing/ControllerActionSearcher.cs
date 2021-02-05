@@ -1,0 +1,93 @@
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Composing;
+using Umbraco.Web.Common.Controllers;
+using static Umbraco.Core.Constants.Web.Routing;
+
+namespace Umbraco.Web.Website.Routing
+{
+    /// <summary>
+    /// Used to find a controller/action in the current available routes
+    /// </summary>
+    public class ControllerActionSearcher : IControllerActionSearcher
+    {
+        private readonly ILogger<ControllerActionSearcher> _logger;
+        private readonly IActionSelector _actionSelector;
+        private const string DefaultActionName = nameof(RenderController.Index);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ControllerActionSearcher"/> class.
+        /// </summary>
+        public ControllerActionSearcher(
+            ILogger<ControllerActionSearcher> logger,
+            IActionSelector actionSelector)
+        {
+            _logger = logger;
+            _actionSelector = actionSelector;
+        }
+
+        /// <summary>
+        /// Determines if a custom controller can hijack the current route
+        /// </summary>
+        /// <typeparam name="T">The controller type to find</typeparam>
+        public ControllerActionDescriptor Find<T>(HttpContext httpContext, string controller, string action)
+        {
+            IReadOnlyList<ControllerActionDescriptor> candidates = FindControllerCandidates<T>(httpContext, controller, action, DefaultActionName);
+
+            if (candidates.Count > 0)
+            {
+                return candidates[0];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Return a list of controller candidates that match the custom controller and action names
+        /// </summary>
+        private IReadOnlyList<ControllerActionDescriptor> FindControllerCandidates<T>(
+            HttpContext httpContext,
+            string customControllerName,
+            string customActionName,
+            string defaultActionName)
+        {
+            // Use aspnetcore's IActionSelector to do the finding since it uses an optimized cache lookup
+            var routeValues = new RouteValueDictionary
+            {
+                [ControllerToken] = customControllerName,
+                [ActionToken] = customActionName, // first try to find the custom action
+            };
+            var routeData = new RouteData(routeValues);
+            var routeContext = new RouteContext(httpContext)
+            {
+                RouteData = routeData
+            };
+
+            // try finding candidates for the custom action
+            var candidates = _actionSelector.SelectCandidates(routeContext)
+                .Cast<ControllerActionDescriptor>()
+                .Where(x => TypeHelper.IsTypeAssignableFrom<T>(x.ControllerTypeInfo))
+                .ToList();
+
+            if (candidates.Count > 0)
+            {
+                // return them if found
+                return candidates;
+            }
+
+            // now find for the default action since we couldn't find the custom one
+            routeValues[ActionToken] = defaultActionName;
+            candidates = _actionSelector.SelectCandidates(routeContext)
+                .Cast<ControllerActionDescriptor>()
+                .Where(x => TypeHelper.IsTypeAssignableFrom<T>(x.ControllerTypeInfo))
+                .ToList();
+
+            return candidates;
+        }
+    }
+}

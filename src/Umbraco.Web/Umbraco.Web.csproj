@@ -131,23 +131,16 @@
     </Compile>
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
-    <Compile Include="AspNet\AspNetRequestAccessor.cs" />
     <Compile Include="AspNet\AspNetSessionManager.cs" />
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
-    <Compile Include="Mvc\IRenderController.cs" />
-    <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
-    <Compile Include="Mvc\RenderMvcController.cs" />
-    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
-    <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
-    <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
     <Compile Include="AspNet\AspNetCookieManager.cs" />
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
@@ -163,7 +156,6 @@
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
-    <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
@@ -176,17 +168,10 @@
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Composing\ModuleInjector.cs" />
-    <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
-    <Compile Include="Runtime\WebInitialComponent.cs" />
-    <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
-    <Compile Include="Mvc\ProfilingView.cs" />
-    <Compile Include="Mvc\NotFoundHandler.cs" />
-    <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -199,10 +184,6 @@
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
-    <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
-    <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
-    <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
@@ -211,31 +192,20 @@
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
-    <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
-    <Compile Include="Mvc\NotChildAction.cs" />
-    <Compile Include="Mvc\UmbracoControllerFactory.cs" />
-    <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="ModelStateExtensions.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
-    <Compile Include="Mvc\PostedDataProxyInfo.cs" />
-    <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Mvc\SurfaceController.cs" />
-    <Compile Include="Mvc\PluginControllerArea.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
-    <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="UmbracoHelper.cs" />
-    <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
-    <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
@@ -245,7 +215,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
-    <Compile Include="UmbracoInjectedModule.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
@@ -264,8 +233,6 @@
       <Link>Mvc\web.config</Link>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Install\InstallSteps\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

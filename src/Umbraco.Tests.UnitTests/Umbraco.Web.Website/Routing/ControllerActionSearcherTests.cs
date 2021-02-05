@@ -1,67 +1,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Website.Routing;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
 
     [TestFixture]
-    public class HijackedRouteEvaluatorTests
+    public class ControllerActionSearcherTests
     {
-        private class TestActionDescriptorCollectionProvider : ActionDescriptorCollectionProvider
-        {
-            private readonly IEnumerable<ActionDescriptor> _actions;
-
-            public TestActionDescriptorCollectionProvider(IEnumerable<ActionDescriptor> actions) => _actions = actions;
-
-            public override ActionDescriptorCollection ActionDescriptors => new ActionDescriptorCollection(_actions.ToList(), 1);
-
-            public override IChangeToken GetChangeToken() => NullChangeToken.Singleton;
-        }
-
-        private IActionDescriptorCollectionProvider GetActionDescriptors() => new TestActionDescriptorCollectionProvider(
-            new ActionDescriptor[]
+        private ControllerActionDescriptor GetDescriptor<T>(string action)
+            => new ControllerActionDescriptor
             {
-                new ControllerActionDescriptor
-                {
-                    ActionName = "Index",
-                    ControllerName = ControllerExtensions.GetControllerName<RenderController>(),
-                    ControllerTypeInfo = typeof(RenderController).GetTypeInfo()
-                },
-                new ControllerActionDescriptor
-                {
-                    ActionName = "Index",
-                    ControllerName = ControllerExtensions.GetControllerName<Render1Controller>(),
-                    ControllerTypeInfo = typeof(Render1Controller).GetTypeInfo()
-                },
-                new ControllerActionDescriptor
-                {
-                    ActionName = "Custom",
-                    ControllerName = ControllerExtensions.GetControllerName<Render1Controller>(),
-                    ControllerTypeInfo = typeof(Render1Controller).GetTypeInfo()
-                },
-                new ControllerActionDescriptor
-                {
-                    ActionName = "Index",
-                    ControllerName = ControllerExtensions.GetControllerName<Render2Controller>(),
-                    ControllerTypeInfo = typeof(Render2Controller).GetTypeInfo()
-                }
-            });
+                ActionName = action,
+                ControllerName = ControllerExtensions.GetControllerName<T>(),
+                ControllerTypeInfo = typeof(RenderController).GetTypeInfo(),
+                DisplayName = $"{ControllerExtensions.GetControllerName<T>()}.{action}"
+            };
+
+        private IReadOnlyList<ControllerActionDescriptor> GetActionDescriptors() => new List<ControllerActionDescriptor>
+        {
+            GetDescriptor<RenderController>(nameof(RenderController.Index)),
+            GetDescriptor<Render1Controller>(nameof(Render1Controller.Index)),
+            GetDescriptor<Render1Controller>(nameof(Render1Controller.Custom)),
+            GetDescriptor<Render2Controller>(nameof(Render2Controller.Index))
+        };
 
         private class Render1Controller : ControllerBase, IRenderController
         {
@@ -88,12 +69,26 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
         [TestCase("Custom", "Render1", nameof(Render1Controller.Custom), true)]
         public void Matches_Controller(string action, string controller, string resultAction, bool matches)
         {
-            var evaluator = new HijackedRouteEvaluator(
-                new NullLogger<HijackedRouteEvaluator>(),
-                GetActionDescriptors());
+            IReadOnlyList<ControllerActionDescriptor> descriptors = GetActionDescriptors();
 
-            HijackedRouteResult result = evaluator.Evaluate(controller, action);
-            Assert.AreEqual(matches, result.Success);
+            var actionSelector = new Mock<IActionSelector>();
+            actionSelector.Setup(x => x.SelectCandidates(It.IsAny<RouteContext>()))
+                .Returns((RouteContext r) =>
+                {
+                    // our own rudimentary search
+                    var controller = r.RouteData.Values[ControllerToken].ToString();
+                    var action = r.RouteData.Values[ActionToken].ToString();
+                    return descriptors.Where(x => x.ControllerName.InvariantEquals(controller) && x.ActionName.InvariantEquals(action)).ToList();
+                });
+
+            var query = new ControllerActionSearcher(
+                new NullLogger<ControllerActionSearcher>(),
+                actionSelector.Object);
+
+            var httpContext = new DefaultHttpContext();
+
+            ControllerActionDescriptor result = query.Find<IRenderController>(httpContext, controller, action);
+            Assert.IsTrue(matches == (result != null));
             if (matches)
             {
                 Assert.IsTrue(result.ActionName.InvariantEquals(resultAction), "expected {0} does not match resulting action {1}", resultAction, result.ActionName);

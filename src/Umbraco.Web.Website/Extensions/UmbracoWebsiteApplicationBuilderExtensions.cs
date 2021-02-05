@@ -37,6 +37,9 @@ namespace Umbraco.Extensions
         {
             app.UseEndpoints(endpoints =>
             {
+                FrontEndRoutes surfaceRoutes = app.ApplicationServices.GetRequiredService<FrontEndRoutes>();
+                surfaceRoutes.CreateRoutes(endpoints);
+
                 endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
             });
 

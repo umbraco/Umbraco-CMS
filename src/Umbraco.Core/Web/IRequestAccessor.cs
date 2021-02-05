@@ -5,13 +5,22 @@ namespace Umbraco.Web
 {
     public interface IRequestAccessor
     {
+        /// <summary>
+        /// Returns the request/form/querystring value for the given name
+        /// </summary>
         string GetRequestValue(string name);
+
+        /// <summary>
+        /// Returns the query string value for the given name
+        /// </summary>
         string GetQueryStringValue(string name);
-        event EventHandler<UmbracoRequestEventArgs> EndRequest;
-        event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+
+        /// <summary>
+        /// Returns the current request uri
+        /// </summary>
         Uri GetRequestUrl();
 
-        // TODO: Not sure this belongs here but we can leave it for now
+        // TODO: This doesn't belongs here
         Uri GetApplicationUrl();
     }
 }

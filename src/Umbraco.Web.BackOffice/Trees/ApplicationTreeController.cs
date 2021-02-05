@@ -18,6 +18,7 @@ using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.BackOffice.Trees
 {
@@ -302,8 +303,8 @@ namespace Umbraco.Web.BackOffice.Trees
             // create proxy route data specifying the action & controller to execute
             var routeData = new RouteData(new RouteValueDictionary()
             {
-                ["action"] = action,
-                ["controller"] = controllerName
+                [ActionToken] = action,
+                [ControllerToken] = controllerName
             });
             if (!(querystring is null))
             {

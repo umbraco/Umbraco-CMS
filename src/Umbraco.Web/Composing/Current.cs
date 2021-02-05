@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
@@ -142,28 +142,7 @@ namespace Umbraco.Web.Composing
 
         #endregion
 
-        #region Web Constants
-
-        // these are different - not 'resolving' anything, and nothing that could be managed
-        // by the container - just registering some sort of application-wide constants or
-        // settings - but they fit in Current nicely too
-
-        private static Type _defaultRenderMvcControllerType;
-
-        // internal - can only be accessed through Composition at compose time
-        internal static Type DefaultRenderMvcControllerType
-        {
-            get => _defaultRenderMvcControllerType;
-            set
-            {
-                if (value.Implements<IRenderController>() == false)
-                    throw new ArgumentException($"Type {value.FullName} does not implement {typeof(IRenderController).FullName}.", nameof(value));
-                _defaultRenderMvcControllerType = value;
-            }
-        }
-
-        #endregion
-
+        
         #region Core Getters
 
         // proxy Core for convenience

@@ -17,13 +17,14 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Formatters;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Integration.TestServerTest.Controllers
+namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class UsersControllerTests : UmbracoTestServerTestBase
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task Save_User()
         {
-            string url = PrepareUrl<UsersController>(x => x.PostSaveUser(null));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostSaveUser(null));
 
             IUserService userService = GetRequiredService<IUserService>();
 
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         public async Task GetPagedUsers_Empty()
         {
             // We get page 2 to force an empty response because there always in the useradmin user
-            string url = PrepareUrl<UsersController>(x => x.GetPagedUsers(2, 10, "username", Direction.Ascending, null, null, string.Empty));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(2, 10, "username", Direction.Ascending, null, null, string.Empty));
 
             // Act
             HttpResponseMessage response = await Client.GetAsync(url);
@@ -106,7 +107,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         {
             int totalNumberOfUsers = 11;
             int pageSize = totalNumberOfUsers - 1;
-            string url = PrepareUrl<UsersController>(x => x.GetPagedUsers(1, pageSize, "username", Direction.Ascending, null, null, string.Empty));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.GetPagedUsers(1, pageSize, "username", Direction.Ascending, null, null, string.Empty));
 
             IUserService userService = GetRequiredService<IUserService>();
 
@@ -144,7 +145,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         [Test]
         public async Task PostUnlockUsers_When_UserIds_Not_Supplied_Expect_Ok_Response()
         {
-            string url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(Array.Empty<int>()));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(Array.Empty<int>()));
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_Zero_Users_Message()
         {
             int userId = 42; // Must not exist
-            string url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(new[] { userId }));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { userId }));
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -184,7 +185,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 .Build();
 
             userService.Save(user);
-            string url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(new[] { user.Id }));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { user.Id }));
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -228,7 +229,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
                 userService.Save(user);
             }
 
-            string url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x => x.Id).ToArray()));
+            string url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x => x.Id).ToArray()));
 
             // Act
             HttpResponseMessage response = await Client.PostAsync(url, new StringContent(string.Empty));

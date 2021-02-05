@@ -1,7 +1,7 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.AspNetCore.Http;
+using Umbraco.Web;
 
 namespace Umbraco.Core.Events
 {
@@ -13,11 +13,11 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestEnd"/> class.
         /// </summary>
-        public UmbracoRequestEnd(HttpContext httpContext) => HttpContext = httpContext;
+        public UmbracoRequestEnd(IUmbracoContext umbracoContext) => UmbracoContext = umbracoContext;
 
         /// <summary>
-        /// Gets the <see cref="HttpContext"/>
+        /// Gets the <see cref="IUmbracoContext"/>
         /// </summary>
-        public HttpContext HttpContext { get; }
+        public IUmbracoContext UmbracoContext { get; }
     }
 }

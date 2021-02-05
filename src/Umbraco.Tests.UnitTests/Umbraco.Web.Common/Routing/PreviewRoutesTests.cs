@@ -14,6 +14,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Constants = Umbraco.Core.Constants;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
@@ -54,8 +55,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var previewControllerName = ControllerExtensions.GetControllerName<PreviewController>();
             Assert.AreEqual($"umbraco/{previewControllerName.ToLowerInvariant()}/{{action}}/{{id?}}", endpoint3.RoutePattern.RawText);
             Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint3.RoutePattern.Defaults["area"]);
-            Assert.AreEqual("Index", endpoint3.RoutePattern.Defaults["action"]);
-            Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual("Index", endpoint3.RoutePattern.Defaults[ActionToken]);
+            Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults[ControllerToken]);
             Assert.AreEqual(endpoint3.RoutePattern.Defaults["area"], typeof(PreviewController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
         }
 

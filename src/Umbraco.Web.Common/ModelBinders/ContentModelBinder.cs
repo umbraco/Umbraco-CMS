@@ -30,8 +30,8 @@ namespace Umbraco.Web.Common.ModelBinders
             // only IPublishedContent will ever exist in the request so when this model binder is used as an IModelBinder
             // in the aspnet pipeline it will really only support converting from IPublishedContent which is contained
             // in the UmbracoRouteValues --> IContentModel
-            if (!bindingContext.ActionContext.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var source)
-                || !(source is UmbracoRouteValues umbracoRouteValues))
+            UmbracoRouteValues umbracoRouteValues = bindingContext.HttpContext.Features.Get<UmbracoRouteValues>();
+            if (umbracoRouteValues is null)
             {
                 return Task.CompletedTask;
             }

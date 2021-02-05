@@ -198,7 +198,6 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
@@ -217,12 +216,10 @@
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
-    <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
-    <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
@@ -243,7 +240,6 @@
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
-    <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />

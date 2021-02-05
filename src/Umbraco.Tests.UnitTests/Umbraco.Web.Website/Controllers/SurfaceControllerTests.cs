@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -124,17 +125,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
             builder.SetPublishedContent(content);
             IPublishedRequest publishedRequest = builder.Build();
 
-            var routeDefinition = new UmbracoRouteValues(publishedRequest);
+            var routeDefinition = new UmbracoRouteValues(publishedRequest, null);
 
-            var routeData = new RouteData();
-            routeData.Values.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Features.Set(routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>())
             {
                 ControllerContext = new ControllerContext()
                 {
-                    HttpContext = Mock.Of<HttpContext>(),
-                    RouteData = routeData
+                    HttpContext = httpContext,
+                    RouteData = new RouteData()
                 }
             };
 
