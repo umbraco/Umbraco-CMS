@@ -7,7 +7,7 @@ namespace Umbraco.Extensions
 {
     public static class GridTemplateExtensions
     {
-        public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
+        public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property, string framework = "Bootstrap3")
         {
             var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new HtmlString(string.Empty);
@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedContent contentItem)
         {
-            return html.GetGridHtml(contentItem, "bodyText", "bootstrap3");
+            return html.GetGridHtml(contentItem, "bodyText", "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
@@ -26,7 +26,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
+            return html.GetGridHtml(contentItem, propertyAlias, "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string framework)
@@ -47,7 +47,7 @@ namespace Umbraco.Extensions
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedElement contentItem)
         {
-            return html.GetGridHtml(contentItem, "bodyText", "bootstrap3");
+            return html.GetGridHtml(contentItem, "bodyText", "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedElement contentItem, string propertyAlias)
@@ -55,7 +55,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            return html.GetGridHtml(contentItem, propertyAlias, "bootstrap3");
+            return html.GetGridHtml(contentItem, propertyAlias, "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedElement contentItem, string propertyAlias, string framework)
@@ -73,7 +73,7 @@ namespace Umbraco.Extensions
 
             return html.Partial(view, model);
         }
-        public static IHtmlContent GetGridHtml(this IPublishedProperty property, IHtmlHelper html, string framework = "bootstrap3")
+        public static IHtmlContent GetGridHtml(this IPublishedProperty property, IHtmlHelper html, string framework = "Bootstrap3")
         {
             var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new HtmlString(string.Empty);
@@ -84,7 +84,7 @@ namespace Umbraco.Extensions
 
         public static IHtmlContent GetGridHtml(this IPublishedContent contentItem, IHtmlHelper html)
         {
-            return GetGridHtml(contentItem, html, "bodyText", "bootstrap3");
+            return GetGridHtml(contentItem, html, "bodyText", "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IPublishedContent contentItem, IHtmlHelper html, string propertyAlias)
@@ -92,7 +92,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
+            return GetGridHtml(contentItem, html, propertyAlias, "Bootstrap3");
         }
 
         public static IHtmlContent GetGridHtml(this IPublishedContent contentItem, IHtmlHelper html, string propertyAlias, string framework)
