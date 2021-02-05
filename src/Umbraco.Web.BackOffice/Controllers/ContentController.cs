@@ -1661,7 +1661,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var toCopyResult = ValidateMoveOrCopy(copy);
-            if ((toCopyResult.Result is null))
+            if (!(toCopyResult.Result is null))
             {
                 return toCopyResult.Result;
             }
