@@ -10,11 +10,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// Lazily decompresses a LZ4 Pickler compressed UTF8 string
     /// </summary>
     [DebuggerDisplay("{Display}")]
-    internal struct LazyCompressedString
+    public struct LazyCompressedString
     {
         private byte[] _bytes;
         private string _str;
         private readonly object _locker;
+        public bool Decompressed { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -25,6 +26,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _locker = new object();
             _bytes = bytes;
             _str = null;
+            Decompressed = false;
         }
 
         public byte[] GetBytes()
@@ -64,6 +66,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 _str = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(_bytes));
                 _bytes = null;
+                Decompressed = true;
             }
             return _str;
         }
