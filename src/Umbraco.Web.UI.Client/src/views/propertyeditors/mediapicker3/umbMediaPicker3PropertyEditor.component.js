@@ -61,8 +61,6 @@
 
         vm.$onInit = function() {
 
-            console.log("property model: ", vm.model)
-
             vm.singleMode = vm.model.config.singleMode || false;
             vm.validationLimit = vm.model.config.validationLimit;
 
@@ -115,9 +113,6 @@
                 vm.allowAdd = hasAccessToMedia;
 
                 vm.loading = false;
-
-                // testing:
-                editMedia(vm.model.value[0]);
             });
 
         };
