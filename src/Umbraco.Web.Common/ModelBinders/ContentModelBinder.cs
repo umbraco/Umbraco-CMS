@@ -31,7 +31,7 @@ namespace Umbraco.Web.Common.ModelBinders
             // in the aspnet pipeline it will really only support converting from IPublishedContent which is contained
             // in the UmbracoRouteValues --> IContentModel
             UmbracoRouteValues umbracoRouteValues = bindingContext.HttpContext.Features.Get<UmbracoRouteValues>();
-            if (umbracoRouteValues == null)
+            if (umbracoRouteValues is null)
             {
                 return Task.CompletedTask;
             }
