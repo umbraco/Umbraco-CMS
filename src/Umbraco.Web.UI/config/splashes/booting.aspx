@@ -1,7 +1,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" Inherits="System.Web.UI.Page" %>
 <%
     // NH: Adds this inline check to avoid a simple codebehind file in the legacy project!
-    var url = Request["url"];
+    var url = Request.QueryString["url"];
     var isUrlLocal = System.Web.WebPages.RequestExtensions.IsUrlLocalToHost(null, url);
     if (url.ToLower().Contains("booting.aspx") || isUrlLocal == false)
     {
