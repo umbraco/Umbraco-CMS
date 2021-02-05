@@ -37,7 +37,7 @@ namespace Umbraco.Web.Common.Extensions
                 pattern.Append('/').Append(controllerName);
             }
 
-            pattern.Append('/').Append("{action}/{id?}");
+            pattern.Append("/{action}/{id?}");
 
             var defaults = defaultAction.IsNullOrWhiteSpace()
                 ? (object)new { controller = controllerName }

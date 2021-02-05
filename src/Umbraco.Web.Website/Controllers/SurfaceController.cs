@@ -41,7 +41,7 @@ namespace Umbraco.Web.Website.Controllers
             get
             {
                 UmbracoRouteValues umbracoRouteValues = HttpContext.Features.Get<UmbracoRouteValues>();
-                if (umbracoRouteValues == null)
+                if (umbracoRouteValues is null)
                 {
                     throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
                 }
