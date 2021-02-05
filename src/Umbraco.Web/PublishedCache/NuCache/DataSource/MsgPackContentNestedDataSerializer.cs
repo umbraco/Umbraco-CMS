@@ -38,7 +38,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             _options = defaultOptions
                 .WithResolver(resolver)
-                .WithCompression(MessagePackCompression.Lz4BlockArray);            
+                .WithCompression(MessagePackCompression.Lz4BlockArray)
+                .WithSecurity(MessagePackSecurity.UntrustedData);            
         }
 
         public string ToJson(byte[] bin)

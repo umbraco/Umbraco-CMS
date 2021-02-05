@@ -24,8 +24,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 composition.RegisterUnique<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();                
             }
-            
-            composition.RegisterUnique<ISerializer<ContentData>>(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+
+            composition.RegisterUnique<ISerializer<IDictionary<string, PropertyData[]>>, DictionaryOfPropertyDataSerializer>();
+            composition.RegisterUnique<ISerializer<IReadOnlyDictionary<string, CultureVariation>>, DictionaryOfCultureVariationSerializer>();
+            composition.RegisterUnique<ISerializer<ContentData>, ContentDataSerializer>();
+            composition.RegisterUnique<ISerializer<ContentNodeKit>, ContentNodeKitSerializer>(); 
 
             composition.RegisterUnique<ITransactableDictionaryFactory,BPlusTreeTransactableDictionaryFactory>();
 
