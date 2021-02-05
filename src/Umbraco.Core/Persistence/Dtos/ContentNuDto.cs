@@ -28,11 +28,15 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Data { get; set; }
 
+
+        [Column("rv")]
+        public long Rv { get; set; }
+
+        //Order of the properties matters for SQLCE bulk insert
+
         [Column("dataRaw")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public byte[] RawData { get; set; }
 
-        [Column("rv")]
-        public long Rv { get; set; }
     }
 }

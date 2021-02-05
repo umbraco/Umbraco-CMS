@@ -258,6 +258,14 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
                 return "NTEXT";
             return base.GetSpecialDbType(dbTypes);
         }
+        public override SqlDbType GetSqlDbType(DbType dbType)
+        {
+            if(DbType.Binary == dbType)
+            {
+                return SqlDbType.Image;
+            }
+            return base.GetSqlDbType(dbType);
+        }
 
     }
 }

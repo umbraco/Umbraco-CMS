@@ -43,6 +43,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // add the NuCache health check (hidden from type finder)
             // TODO: no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
+
+            composition.Components().Append< NuCacheSerializerComponent>();
         }
 
     }

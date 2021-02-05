@@ -73,7 +73,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             Compress(content, model);
             var bytes = MessagePackSerializer.Serialize(model, _options);
-            return new ContentCacheDataSerializationResult(null, bytes);
+            return new ContentCacheDataSerializationResult(string.Empty, bytes);
         }
 
         /// <summary>
