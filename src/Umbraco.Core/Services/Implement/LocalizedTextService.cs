@@ -145,15 +145,15 @@ namespace Umbraco.Core.Services.Implement
             // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-            var result = new Dictionary<string, string>();
+         
 
 
             if (_dictionarySource.ContainsKey(culture) == false)
             {
                 _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
-                return result;
+                return new Dictionary<string, string>(0);
             }
-
+            IDictionary<string, string> result = new Dictionary<string, string>();
             //convert all areas + keys to a single key with a '/'
             foreach (var area in _dictionarySource[culture])
             {
@@ -309,5 +309,20 @@ namespace Umbraco.Core.Services.Implement
             return value;
         }
 
+        public IDictionary<string, IDictionary<string, string>> GetAllStoredValuesByAreaAndAlias(CultureInfo culture)
+        {
+            if (culture == null) throw new ArgumentNullException("culture");
+
+            // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            culture = ConvertToSupportedCultureWithRegionCode(culture);
+
+            if (_dictionarySource.ContainsKey(culture) == false)
+            {
+                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                return new Dictionary<string, IDictionary<string, string>>(0);
+            }
+
+            return _dictionarySource[culture];
+        }
     }
 }

@@ -207,6 +207,13 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
+
+            if(Services.TextService is ILocalizedTextService2 localizedText2)
+            {
+                var nestedDictionary2 = localizedText2.GetAllStoredValuesByAreaAndAlias(cultureInfo);
+                return new JsonNetResult { Data = nestedDictionary2, Formatting = Formatting.None };
+            }
+
             var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
             var pathedValues = allValues.Select(kv =>
             {
