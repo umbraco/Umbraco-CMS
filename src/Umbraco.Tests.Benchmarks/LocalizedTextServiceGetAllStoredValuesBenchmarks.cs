@@ -41,6 +41,7 @@ namespace Umbraco.Tests.Benchmarks
             var result4 = _xmlService.GetAllStoredValues(culture);
             var result5 = _optimized.GetAllStoredValues(culture);
             var result6 = _xmlService.GetAllStoredValues(culture);
+            var result7 = _optimized.GetAllStoredValuesByAreaAndAlias(culture);
         }
 
         [Benchmark]
@@ -97,6 +98,15 @@ namespace Umbraco.Tests.Benchmarks
             for (int i = 0; i < 10000; i++)
             {
                 var result = _optimizedDict.GetAllStoredValues(culture);
+            }
+        }
+
+        [Benchmark]
+        public void OptimizedDictGetAllV2()
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                var result = _optimizedDict.GetAllStoredValuesByAreaAndAlias(culture);
             }
         }
 
