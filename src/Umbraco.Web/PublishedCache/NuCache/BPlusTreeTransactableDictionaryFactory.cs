@@ -125,6 +125,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return blockSize;
         }
-
+        public void Drop(ContentCacheEntityType entityType)
+        {
+            switch (entityType)
+            {
+                case ContentCacheEntityType.Document:
+                    var localContentDbPath = GetContentDbPath();
+                    var localContentCacheFilesExist = File.Exists(localContentDbPath);
+                    var dictDoc = new BPlusTreeTransactableDictionary<int, ContentNodeKit>(null, localContentDbPath, localContentCacheFilesExist);
+                    dictDoc.Drop();
+                    break;
+                case ContentCacheEntityType.Media:
+                    var localMediaDbPath = GetMediaDbPath();
+                    var localMediaCacheFilesExist = File.Exists(localMediaDbPath);
+                    var dictMedia = new BPlusTreeTransactableDictionary<int, ContentNodeKit>(null, localMediaDbPath, localMediaCacheFilesExist);
+                    dictMedia.Drop();
+                    break;
+                case ContentCacheEntityType.Member:
+                    throw new ArgumentException("Unsupported Entity Type", nameof(entityType));
+                default:
+                    throw new ArgumentException("Unsupported Entity Type", nameof(entityType));
+            }
+        }
     }
 }

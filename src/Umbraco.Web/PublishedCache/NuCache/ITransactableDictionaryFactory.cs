@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     public interface ITransactableDictionaryFactory
     {
         ITransactableDictionary<int, ContentNodeKit> Get(ContentCacheEntityType entityType);
-
+        void Drop(ContentCacheEntityType entityType);
         /// <summary>
         /// Ensures that the ITransactableDictionaryFactory has the proper environment to run.
         /// </summary>

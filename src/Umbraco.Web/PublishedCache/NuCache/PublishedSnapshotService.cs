@@ -289,16 +289,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_isReady && _localContentDb != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            _localContentDb.Drop();
+            _transactableDictionaryFactory.Drop(ContentCacheEntityType.Document);
         }
 
         private void DeleteLocalFilesForMedia()
         {
             if (_isReady && _localMediaDb != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            _localMediaDb.Drop();
+            _transactableDictionaryFactory.Drop(ContentCacheEntityType.Media);
         }
-
         #endregion
 
         #region Environment
