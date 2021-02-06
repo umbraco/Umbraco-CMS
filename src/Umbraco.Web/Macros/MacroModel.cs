@@ -32,6 +32,8 @@ namespace Umbraco.Web.Macros
 
         public bool RenderInEditor { get; set; }
 
+        public bool RenderInline { get; set; }
+
         public string CacheIdentifier { get; set; }
 
         public List<MacroPropertyModel> Properties { get; } = new List<MacroPropertyModel>();
@@ -52,7 +54,7 @@ namespace Umbraco.Web.Macros
             CacheByPage = macro.CacheByPage;
             CacheByMember = macro.CacheByMember;
             RenderInEditor = macro.UseInEditor;
-
+            RenderInline = macro.RenderInline;
             foreach (var prop in macro.Properties)
                 Properties.Add(new MacroPropertyModel(prop.Alias, string.Empty, prop.EditorAlias));
 

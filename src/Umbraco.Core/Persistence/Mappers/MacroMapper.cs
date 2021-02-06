@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<Macro, MacroDto>(nameof(Macro.CacheDuration), nameof(MacroDto.RefreshRate));
             DefineMap<Macro, MacroDto>(nameof(Macro.MacroSource), nameof(MacroDto.MacroSource));
             DefineMap<Macro, MacroDto>(nameof(Macro.UseInEditor), nameof(MacroDto.UseInEditor));
+            DefineMap<Macro, MacroDto>(nameof(Macro.RenderInline), nameof(MacroDto.RenderInline));
         }
     }
 }

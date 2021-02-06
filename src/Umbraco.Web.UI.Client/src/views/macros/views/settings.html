@@ -43,6 +43,9 @@
             <umb-control-group label="Render in rich text editor and the grid" ng-if="model.macro.useInEditor">
                 <umb-toggle checked="model.macro.renderInEditor && model.macro.useInEditor" on-click="model.toggle('renderInEditor')"></umb-toggle>
             </umb-control-group>
+            <umb-control-group label="Render as inline element in rich text editor preview" ng-if="model.macro.useInEditor">
+                <umb-toggle checked="model.macro.renderInline" on-click="model.toggle('renderInline')"></umb-toggle>
+            </umb-control-group>
         </umb-box-content>
     </umb-box>
     <umb-box>

@@ -40,6 +40,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.Udi = Udi.Create(Constants.UdiEntityType.Macro, source.Key);
+            target.AdditionalData.Add("renderInline", source.RenderInline);
         }
 
         private void Map(IMacro source, MacroDisplay target, MapperContext context)
@@ -57,6 +58,7 @@ namespace Umbraco.Web.Models.Mapping
             target.CachePeriod = source.CacheDuration;
             target.UseInEditor = source.UseInEditor;
             target.RenderInEditor = !source.DontRender;
+            target.RenderInline = source.RenderInline;
             target.View = source.MacroSource;
         }
         // Umbraco.Code.MapAll -Value

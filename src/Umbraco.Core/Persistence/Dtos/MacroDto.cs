@@ -22,6 +22,11 @@ namespace Umbraco.Core.Persistence.Dtos
         [Constraint(Default = "0")]
         public bool UseInEditor { get; set; }
 
+        [Column("macroRenderInline")]
+        [Constraint(Default = "0")]
+        public bool RenderInline { get; set; }
+
+
         [Column("macroRefreshRate")]
         [Constraint(Default = "0")]
         public int RefreshRate { get; set; }

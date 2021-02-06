@@ -1168,9 +1168,16 @@ namespace Umbraco.Core.Packaging
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
+            var renderInlineElement = macroElement.Element("renderInline");
+            var renderInline = false;
+            if (renderInlineElement != null && string.IsNullOrEmpty((string)renderInlineElement) == false)
+            {
+                renderInline = bool.Parse(renderInlineElement.Value);
+            }
+
             var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
             var macro = existingMacro ?? new Macro(macroAlias, macroName, macroSource, macroType,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
+                cacheByPage, cacheByMember, dontRender, useInEditor, renderInline, cacheDuration);
 
             var properties = macroElement.Element("properties");
             if (properties != null)
