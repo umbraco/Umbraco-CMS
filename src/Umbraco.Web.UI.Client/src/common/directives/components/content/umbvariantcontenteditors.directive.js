@@ -188,9 +188,6 @@
         }
 
         var unbindSplitViewRequest = eventsService.on("editors.content.splitViewRequest", (_, args) => requestSplitView(args));
-        $scope.on('$destroy', function () {
-            eventsService.unsubscribe(unbindSplitViewRequest);
-        });
         /** Closes the split view */
         function closeSplitView(editorIndex) {
             // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
@@ -203,7 +200,7 @@
 
             $location.search({"cculture": culture, "csegment": vm.editors[0].content.segment});
             splitViewChanged();
-            //unbindSplitViewRequest();
+            unbindSplitViewRequest();
         }
 
         /**
