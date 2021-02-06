@@ -265,6 +265,10 @@ namespace Umbraco.Core.Services.Implement
                 {
                     areaDictionary.TryGetValue(key, out found);
                 }
+                if(found == null)
+                {
+                    _noAreaDictionarySource[culture].TryGetValue(key, out found);
+                }
             }
 
 
