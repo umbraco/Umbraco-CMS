@@ -290,6 +290,7 @@
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSeriazlierComponent.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />

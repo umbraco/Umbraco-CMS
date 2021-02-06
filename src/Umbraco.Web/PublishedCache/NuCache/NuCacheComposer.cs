@@ -47,7 +47,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // TODO: no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
 
-            composition.Components().Append< NuCacheSerializerComponent>();
         }
 
     }

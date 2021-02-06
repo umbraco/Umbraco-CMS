@@ -12,7 +12,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
     /// <summary>
     /// Rebuilds the database cache if required when the serializer changes
     /// </summary>
-    [RuntimeLevel(MinLevel = Core.RuntimeLevel.Run)]
     public class NuCacheSerializerComponent : IComponent
     {
         private const string Nucache_Serializer_Key = "Umbraco.Web.PublishedCache.NuCache.Serializer";
