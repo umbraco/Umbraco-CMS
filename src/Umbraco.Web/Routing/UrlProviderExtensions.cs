@@ -164,7 +164,7 @@ namespace Umbraco.Web.Routing
         private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' URL
-            var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
+            var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
             if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
             uri = UriUtility.UriToUmbraco(uri);
             var pcr = publishedRouter.CreateRequest(umbracoContext, uri);

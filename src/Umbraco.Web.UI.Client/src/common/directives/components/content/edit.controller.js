@@ -271,7 +271,7 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
-            
+
             var isBlueprint = content.isBlueprint;
 
             if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {

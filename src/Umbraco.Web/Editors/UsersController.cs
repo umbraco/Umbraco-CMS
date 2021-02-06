@@ -103,7 +103,7 @@ namespace Umbraco.Web.Editors
 
             //get the file info
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
