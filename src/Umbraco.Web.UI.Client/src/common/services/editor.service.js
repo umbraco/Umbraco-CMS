@@ -173,15 +173,13 @@ When building a custom infinite editor view you can use the same components as a
 
 
         // events for backdrop
-        var backgroundEvent = eventsService.on("appState.backdrop", function (name, args) {
+        eventsService.on("appState.backdrop", function (name, args) {
             if (args.show === true) {
                 blur();
             } else {
                 focus();
             }
-        });
-       
-
+        });      
 
         /**
          * @ngdoc method

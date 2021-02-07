@@ -326,7 +326,7 @@ angular.module('umbraco.services')
     };
 
     //This happens after login / auth and assets loading
-    var appAuthenticated = eventsService.on("app.authenticated", function () {
+    eventsService.on("app.authenticated", function () {
         resourceFileLoadStatus = "none";
         resourceLoadingPromise = [];
     });
