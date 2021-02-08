@@ -1,10 +1,9 @@
 using System;
-using System.Text;
 using System.Linq;
-using Umbraco.Core.Logging;
+using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
@@ -39,7 +38,8 @@ namespace Umbraco.Web.Routing
                 node = FindContentByAlias(frequest.UmbracoContext.Content,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
-                    frequest.Uri.GetAbsolutePathDecoded());
+                    frequest.Uri.GetAbsolutePathDecoded(),
+                    frequest.UmbracoContext);
 
                 if (node != null)
                 {
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias, UmbracoContext umbracoContext)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Routing
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 
-            bool IsMatch(IPublishedContent c, string a1, string a2)
+            bool IsMatch(IPublishedContent c, string a1, string a2, Domain[] rootNodeDomains)
             {
                 // this basically implements the original XPath query ;-(
                 //
@@ -81,6 +81,7 @@ namespace Umbraco.Web.Routing
                 var p = c.GetProperty(propertyAlias);
                 var varies = p.PropertyType.VariesByCulture();
                 string v;
+
                 if (varies)
                 {
                     if (!c.HasCulture(culture)) return false;
@@ -90,9 +91,24 @@ namespace Umbraco.Web.Routing
                 {
                     v = c.Value<string>(propertyAlias);
                 }
+
                 if (string.IsNullOrWhiteSpace(v)) return false;
-                v = "," + v.Replace(" ", "") + ",";
-                return v.InvariantContains(a1) || v.InvariantContains(a2);
+
+                var sb = new StringBuilder(",");
+                foreach (var urlAlias in v.Split(','))
+                {
+                    sb.Append(urlAlias.Replace(" ", "") + ",");
+                    if (rootNodeDomains == null || rootNodeDomains.Length <= 0) continue;
+                    foreach (var domain in rootNodeDomains)
+                    {
+                        if (domain.Culture.Name == culture)
+                        {
+                            sb.Append(domain.Name + (urlAlias.StartsWith("/") || domain.Name.EndsWith("/") ? "" : "/") + urlAlias.Replace(" ", "") + ",");
+                        }
+                    }
+                }
+                var urlAliases = sb.ToString();
+                return urlAliases.InvariantContains(a1) || urlAliases.InvariantContains(a2);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
@@ -101,12 +117,14 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+                var rootNodeDomains = umbracoContext?.PublishedSnapshot?.Domains?.GetAssigned(rootNodeId)?.ToArray();
+                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                var rootNodeDomains = umbracoContext?.PublishedSnapshot?.Domains?.GetAssigned(rootContent.Id)?.ToArray();
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
                 if (c != null) return c;
             }
 
