@@ -118,7 +118,7 @@ namespace Umbraco.Web.Routing
             {
                 var rootNode = cache.GetById(rootNodeId);
                 var rootNodeDomains = umbracoContext?.PublishedSnapshot?.Domains?.GetAssigned(rootNodeId)?.ToArray();
-                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
+                return rootNode?.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
             }
 
             foreach (var rootContent in cache.GetAtRoot())
