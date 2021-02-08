@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Web;
@@ -19,7 +20,7 @@ namespace Umbraco.Infrastructure.HostedServices
     /// </summary>
     public class KeepAlive : RecurringHostedServiceBase
     {
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMainDom _mainDom;
         private readonly KeepAliveSettings _keepAliveSettings;
         private readonly ILogger<KeepAlive> _logger;
@@ -38,7 +39,7 @@ namespace Umbraco.Infrastructure.HostedServices
         /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
         /// <param name="httpClientFactory">Factory for <see cref="HttpClient" /> instances.</param>
         public KeepAlive(
-            IRequestAccessor requestAccessor,
+            IHostingEnvironment hostingEnvironment,
             IMainDom mainDom,
             IOptions<KeepAliveSettings> keepAliveSettings,
             ILogger<KeepAlive> logger,
@@ -47,7 +48,7 @@ namespace Umbraco.Infrastructure.HostedServices
             IHttpClientFactory httpClientFactory)
             : base(TimeSpan.FromMinutes(5), DefaultDelay)
         {
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;
             _keepAliveSettings = keepAliveSettings.Value;
             _logger = logger;
@@ -88,7 +89,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 {
                     if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))
                     {
-                        var umbracoAppUrl = _requestAccessor.GetApplicationUrl().ToString();
+                        var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl.ToString();
                         if (umbracoAppUrl.IsNullOrWhiteSpace())
                         {
                             _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");

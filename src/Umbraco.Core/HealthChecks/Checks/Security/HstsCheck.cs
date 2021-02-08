@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.Checks.Security
 {
@@ -26,8 +26,8 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
         /// If you want do to it perfectly, you have to submit it https://hstspreload.org/,
         /// but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
         /// </remarks>
-        public HstsCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService)
-            : base(requestAccessor, textService, "Strict-Transport-Security", "max-age=10886400", "hSTS", true)
+        public HstsCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
+            : base(hostingEnvironment, textService, "Strict-Transport-Security", "max-age=10886400", "hSTS", true)
         {
         }
 

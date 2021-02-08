@@ -32,6 +32,11 @@ namespace Umbraco.Core.Hosting
         bool IsHosted { get; }
 
         /// <summary>
+        /// Gets the main application url.
+        /// </summary>
+        Uri ApplicationMainUrl { get; }
+
+        /// <summary>
         /// Maps a virtual path to a physical path to the application's web root
         /// </summary>
         /// <remarks>
@@ -61,5 +66,10 @@ namespace Umbraco.Core.Hosting
         /// If virtualPath does not start with ~/ or /
         /// </exception>
         string ToAbsolute(string virtualPath);
+
+        /// <summary>
+        /// Ensures that the application know its main Url.
+        /// </summary>
+        void EnsureApplicationMainUrl(Uri currentApplicationUrl);
     }
 }

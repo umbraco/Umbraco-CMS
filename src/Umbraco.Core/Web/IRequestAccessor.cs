@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -19,8 +18,5 @@ namespace Umbraco.Web
         /// Returns the current request uri
         /// </summary>
         Uri GetRequestUrl();
-
-        // TODO: This doesn't belongs here
-        Uri GetApplicationUrl();
     }
 }

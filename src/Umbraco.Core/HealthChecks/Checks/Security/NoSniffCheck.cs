@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.Checks.Security
 {
@@ -19,8 +19,8 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="NoSniffCheck"/> class.
         /// </summary>
-        public NoSniffCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService)
-            : base(requestAccessor, textService, "X-Content-Type-Options", "nosniff", "noSniff", false)
+        public NoSniffCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
+            : base(hostingEnvironment, textService, "X-Content-Type-Options", "nosniff", "noSniff", false)
         {
         }
 
