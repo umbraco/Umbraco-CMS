@@ -16,6 +16,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.PublishedContent;
@@ -59,8 +60,8 @@ namespace Umbraco.Web.Editors
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
-            IScopeProvider scopeProvider)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            IScopeProvider scopeProvider, UmbracoMapper umbracoMapper)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
