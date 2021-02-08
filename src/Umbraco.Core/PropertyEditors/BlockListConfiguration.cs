@@ -50,6 +50,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
+        [DataContract]
         public class NumberRange
         {
             [DataMember(Name ="min")]
