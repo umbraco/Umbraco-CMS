@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.Checks.Security
 {
@@ -22,16 +22,16 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
     public class ExcessiveHeadersCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private static HttpClient s_httpClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExcessiveHeadersCheck"/> class.
         /// </summary>
-        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRequestAccessor requestAccessor)
+        public ExcessiveHeadersCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment)
         {
             _textService = textService;
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         private static HttpClient HttpClient => s_httpClient ??= new HttpClient();
@@ -52,7 +52,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
         {
             string message;
             var success = false;
-            Uri url = _requestAccessor.GetApplicationUrl();
+            Uri url = _hostingEnvironment.ApplicationMainUrl;
 
             // Access the site home page and check for the headers
             var request = new HttpRequestMessage(HttpMethod.Head, url);

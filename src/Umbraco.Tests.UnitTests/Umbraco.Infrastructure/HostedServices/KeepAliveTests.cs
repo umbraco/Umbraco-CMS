@@ -13,11 +13,11 @@ using Moq.Protected;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -78,8 +78,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 DisableKeepAliveTask = !enabled,
             };
 
-            var mockRequestAccessor = new Mock<IRequestAccessor>();
-            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(new Uri(ApplicationUrl));
+            var mockRequestAccessor = new Mock<IHostingEnvironment>();
+            mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl).Returns(new Uri(ApplicationUrl));
 
             var mockServerRegistrar = new Mock<IServerRoleAccessor>();
             mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);

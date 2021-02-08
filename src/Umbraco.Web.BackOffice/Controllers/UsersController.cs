@@ -55,7 +55,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly SecuritySettings _securitySettings;
-        private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly AppCaches _appCaches;
@@ -78,7 +77,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             IImageUrlGenerator imageUrlGenerator,
             IOptions<SecuritySettings> securitySettings,
-            IRequestAccessor requestAccessor,
             IEmailSender emailSender,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             AppCaches appCaches,
@@ -99,7 +97,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings.Value;
-            _requestAccessor = requestAccessor;
             _emailSender = emailSender;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _appCaches = appCaches;
@@ -567,7 +564,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _requestAccessor.GetApplicationUrl();
+            var applicationUri = _hostingEnvironment.ApplicationMainUrl;
             var inviteUri = new Uri(applicationUri, action);
 
             var emailSubject = _localizedTextService.Localize("user/inviteEmailCopySubject",

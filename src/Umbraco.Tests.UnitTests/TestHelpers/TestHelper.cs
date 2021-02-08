@@ -71,6 +71,7 @@ namespace Umbraco.Tests.TestHelpers
                 var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
                 return new AspNetCoreHostingEnvironment(
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings()),
+                    Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
                     Mock.Of<IWebHostEnvironment>(
                         x =>
                             x.WebRootPath == "/" &&

@@ -8,8 +8,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.Checks.Security
 {
@@ -18,18 +18,18 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
     /// </summary>
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string _header;
         private readonly string _value;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
-        private readonly IRequestAccessor _requestAccessor;
         private static HttpClient s_httpClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseHttpHeaderCheck"/> class.
         /// </summary>
         protected BaseHttpHeaderCheck(
-            IRequestAccessor requestAccessor,
+            IHostingEnvironment hostingEnvironment,
             ILocalizedTextService textService,
             string header,
             string value,
@@ -37,7 +37,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
             bool metaTagOptionAvailable)
         {
             LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
             _header = header;
             _value = value;
             _localizedTextPrefix = localizedTextPrefix;
@@ -78,7 +78,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            Uri url = _requestAccessor.GetApplicationUrl();
+            Uri url = _hostingEnvironment.ApplicationMainUrl;
 
             try
             {
