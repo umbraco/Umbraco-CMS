@@ -1530,21 +1530,27 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+
             long pageIndex = 0;
             long processed = 0;
-            long total =0;
-            bool totalCounted = false;
+            long total = 0;
+
+            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
+            {
+                total = db.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId IN (@ctypes)", new { ctypes = contentTypeIdsA });
+            }
+            else
+            {
+                total = db.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.Content}");
+            }
+                
+            var ordering = Ordering.By("Path");
+            var items = new List<ContentNuDto>(groupSize);
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                IEnumerable<IContent> descendants;
-                    if (!totalCounted)
-                    {
-                        total = _documentRepository.Count(query, null);
-                    }
-                    descendants = _documentRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"),null);
-              
-                var items = new List<ContentNuDto>();
+                var descendants = _documentRepository.GetPage(query, pageIndex, groupSize, ordering, null);
+
                 var count = 0;
                 foreach (var c in descendants)
                 {
@@ -1560,6 +1566,8 @@ WHERE cmsContentNu.nodeId IN (
 
                 db.BulkInsertRecords(items);
                 processed += count;
+                pageIndex++;
+                items.Clear();
             } while (processed < total);
         }
 
@@ -1612,22 +1620,17 @@ WHERE cmsContentNu.nodeId IN (
             
             long pageIndex = 0;
             long processed = 0;
-            long total = 0;
-            bool totalCounted = false;
+            long total = _mediaRepository.Count(query, null);
+            var ordering = Ordering.By("Path");
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                IEnumerable<IMedia> descendants;
-
-                    if (!totalCounted)
-                    {
-                        total = _mediaRepository.Count(query, null);
-                    }
-                    descendants = _mediaRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+                IEnumerable<IMedia>  descendants = _mediaRepository.GetPage(query, pageIndex, groupSize, ordering, null);
               
                 var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
                 processed += items.Count;
+                pageIndex++;
             } while (processed < total);
         }
 
@@ -1680,22 +1683,17 @@ WHERE cmsContentNu.nodeId IN (
            
             long pageIndex = 0;
             long processed = 0;
-            long total = 0;
-            bool totalCounted = false;
+            long total = _memberRepository.Count(query, null);
+            var ordering = Ordering.By("Path");
             do
             {
-                IEnumerable<IMember> descendants;
-                
-                    if (!totalCounted)
-                    {
-                        total = _memberRepository.Count(query, null);
-                    }
-                    descendants = _memberRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+                IEnumerable<IMember> descendants = _memberRepository.GetPage(query, pageIndex, groupSize, ordering, null);
                
 
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
+                pageIndex++;
             } while (processed < total);
         }
 
