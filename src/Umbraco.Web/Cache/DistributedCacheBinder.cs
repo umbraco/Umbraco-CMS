@@ -39,7 +39,6 @@ namespace Umbraco.Web.Cache
 
         private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
         {
-            var underscore = new[] { '_' };
 
             return typeof(DistributedCacheBinder)
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -47,7 +46,7 @@ namespace Umbraco.Web.Cache
                 {
                     if (x.Name.Contains("_") == false) return null;
 
-                    var parts = x.Name.Split(underscore, StringSplitOptions.RemoveEmptyEntries).Length;
+                    var parts = x.Name.Split(Constants.CharArrays.Underscore, StringSplitOptions.RemoveEmptyEntries).Length;
                     if (parts != 2) return null;
 
                     var parameters = x.GetParameters();

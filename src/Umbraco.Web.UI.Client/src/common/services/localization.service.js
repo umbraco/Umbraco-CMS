@@ -330,6 +330,7 @@ angular.module('umbraco.services')
         resourceFileLoadStatus = "none";
         resourceLoadingPromise = [];
     });
+    
 
     // return the local instance when called
     return service;

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Scoping;
@@ -75,7 +77,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         private static VersionName MapProductVersion(string productVersion)
         {
-            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split(Constants.CharArrays.Period)[0];
             switch (firstPart)
             {
                 case "??":
@@ -254,7 +256,8 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
-            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+            var timeOut = Current.Configs.Global().SqlWriteLockTimeOut;
+            WriteLock(db, TimeSpan.FromMilliseconds(timeOut), lockIds);
         }
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)

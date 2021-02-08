@@ -18,6 +18,8 @@
             scope.allowChangeTemplate = false;
             scope.allTemplates = [];
 
+            scope.historyLabelKey = scope.node.variants && scope.node.variants.length === 1 ? "general_history" : "auditTrails_historyIncludingVariants";
+
             function onInit() {
                 entityResource.getAll("Template").then(function (templates) {
                     scope.allTemplates = templates;
@@ -46,25 +48,21 @@
                     "content_notCreated",
                     "prompt_unsavedChanges",
                     "prompt_doctypeChangeWarning",
-                    "general_history",
-                    "auditTrails_historyIncludingVariants",
                     "content_itemNotPublished",
                     "general_choose"
                 ];
 
                 localizationService.localizeMany(keys)
                     .then(function (data) {
-                        labels.deleted = data[0];
-                        labels.unpublished = data[1]; //aka draft
-                        labels.published = data[2];
-                        labels.publishedPendingChanges = data[3];
-                        labels.notCreated = data[4];
-                        labels.unsavedChanges = data[5];
-                        labels.doctypeChangeWarning = data[6];
-                        labels.notPublished = data[9];
-
-                        scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
-                        scope.chooseLabel = data[10];
+                        [labels.deleted, 
+                        labels.unpublished, 
+                        labels.published,
+                        labels.publishedPendingChanges,
+                        labels.notCreated,
+                        labels.unsavedChanges,
+                        labels.doctypeChangeWarning,
+                        labels.notPublished,
+                        scope.chooseLabel] = data;
 
                         setNodePublishStatus();
 
@@ -233,7 +231,7 @@
             }
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
-                //check if Redirect Url Management is enabled
+                //check if Redirect URL Management is enabled
                 redirectUrlsResource.getEnableState().then(function (response) {
                     scope.urlTrackerDisabled = response.enabled !== true;
                     if (scope.urlTrackerDisabled === false) {
@@ -314,17 +312,17 @@
             }
 
             function updateCurrentUrls() {
-                // never show urls for element types (if they happen to have been created in the content tree)
-                if (scope.node.isElement) {
+                // never show URLs for element types (if they happen to have been created in the content tree)
+                if (scope.node.isElement || scope.node.urls === null) {
                     scope.currentUrls = null;
                     return;
                 }
 
-                // find the urls for the currently selected language.
+                // find the urls for the currently selected language
                 // when there is no selected language (allow vary by culture == false), show all urls of the node.
                 scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture));
 
-                // figure out if multiple cultures apply across the content urls
+                // figure out if multiple cultures apply across the content URLs
                 scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
             }
 

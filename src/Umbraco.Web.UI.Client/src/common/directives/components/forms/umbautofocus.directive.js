@@ -10,19 +10,14 @@ angular.module("umbraco.directives")
                 }
             };
 
-            var enabled = true;
-            //check if there's a value for the attribute, if there is and it's false then we conditionally don't
-            //use auto focus.
-            if (attrs.umbAutoFocus) {
-                attrs.$observe("umbAutoFocus", function (newVal) {
-                    enabled = (newVal === "false" || newVal === 0 || newVal === false) ? false : true;
-                });
-            }
+            attrs.$observe("umbAutoFocus", function (newVal) {
+                var enabled = (newVal === "false" || newVal === 0 || newVal === false) ? false : true;
+                if (enabled) {
+                    $timeout(function() {
+                        update();
+                    });
+                }
+            });
 
-            if (enabled) {
-                $timeout(function() {
-                    update();
-                });
-            }
         };
 });

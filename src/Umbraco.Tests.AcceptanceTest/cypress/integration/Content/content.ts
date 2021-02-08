@@ -1,10 +1,18 @@
 /// <reference types="Cypress" />
-import { DocumentTypeBuilder, ContentBuilder } from 'umbraco-cypress-testhelpers';
+import { DocumentTypeBuilder, ContentBuilder, AliasHelper } from 'umbraco-cypress-testhelpers';
 context('Content', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
     });
+
+    function refreshContentTree(){
+        // Refresh to update the tree
+        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
+        cy.umbracoContextMenuAction("action-refreshNode").click();
+        // We have to wait in case the execution is slow, otherwise we'll try and click the item before it appears in the UI
+        cy.get('.umb-tree-item__inner').should('exist', {timeout: 10000});
+    }
 
     it('Copy content', () => {
         const rootDocTypeName = "Test document type";
@@ -40,8 +48,8 @@ context('Content', () => {
                     .withContentTypeAlias(rootDocTypeAlias)
                     .withAction("saveNew")
                     .addVariant()
-                    .withName(nodeName)
-                    .withSave(true)
+                        .withName(nodeName)
+                        .withSave(true)
                     .done()
                     .build();
 
@@ -52,8 +60,8 @@ context('Content', () => {
                         .withAction("saveNew")
                         .withParent(contentNode["id"])
                         .addVariant()
-                        .withName(childNodeName)
-                        .withSave(true)
+                            .withName(childNodeName)
+                            .withSave(true)
                         .done()
                         .build();
 
@@ -64,8 +72,8 @@ context('Content', () => {
                     .withContentTypeAlias(rootDocTypeAlias)
                     .withAction("saveNew")
                     .addVariant()
-                    .withName(anotherNodeName)
-                    .withSave(true)
+                        .withName(anotherNodeName)
+                        .withSave(true)
                     .done()
                     .build();
 
@@ -74,8 +82,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Copy node
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).rightclick({ force: true });
@@ -125,8 +132,8 @@ context('Content', () => {
                     .withContentTypeAlias(rootDocTypeAlias)
                     .withAction("saveNew")
                     .addVariant()
-                    .withName(nodeName)
-                    .withSave(true)
+                        .withName(nodeName)
+                        .withSave(true)
                     .done()
                     .build();
 
@@ -137,8 +144,8 @@ context('Content', () => {
                         .withAction("saveNew")
                         .withParent(contentNode["id"])
                         .addVariant()
-                        .withName(childNodeName)
-                        .withSave(true)
+                            .withName(childNodeName)
+                            .withSave(true)
                         .done()
                         .build();
 
@@ -149,8 +156,8 @@ context('Content', () => {
                     .withContentTypeAlias(rootDocTypeAlias)
                     .withAction("saveNew")
                     .addVariant()
-                    .withName(anotherNodeName)
-                    .withSave(true)
+                        .withName(anotherNodeName)
+                        .withSave(true)
                     .done()
                     .build();
 
@@ -159,8 +166,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Move node
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).rightclick({ force: true });
@@ -209,8 +215,8 @@ context('Content', () => {
                     .withContentTypeAlias(generatedRootDocType["alias"])
                     .withAction("saveNew")
                     .addVariant()
-                    .withName(nodeName)
-                    .withSave(true)
+                        .withName(nodeName)
+                        .withSave(true)
                     .done()
                     .build();
 
@@ -223,8 +229,8 @@ context('Content', () => {
                         .withAction("saveNew")
                         .withParent(parentId)
                         .addVariant()
-                        .withName(firstChildNodeName)
-                        .withSave(true)
+                            .withName(firstChildNodeName)
+                            .withSave(true)
                         .done()
                         .build();
 
@@ -236,8 +242,8 @@ context('Content', () => {
                         .withAction("saveNew")
                         .withParent(parentId)
                         .addVariant()
-                        .withName(secondChildNodeName)
-                        .withSave(true)
+                            .withName(secondChildNodeName)
+                            .withSave(true)
                         .done()
                         .build();
 
@@ -247,8 +253,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Sort nodes
         cy.umbracoTreeItem("content", [nodeName]).rightclick({ force: true });
@@ -288,8 +293,8 @@ context('Content', () => {
             const rootContentNode = new ContentBuilder()
                 .withContentTypeAlias(generatedRootDocType["alias"])
                 .addVariant()
-                .withName(initialNodeName)
-                .withSave(true)
+                    .withName(initialNodeName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -297,8 +302,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [initialNodeName]).click();
@@ -309,15 +313,16 @@ context('Content', () => {
 
         // Save and publish
         cy.get('.btn-success').first().click();
+        cy.umbracoSuccessNotification().should('be.visible');
 
         // Rollback
         cy.get('.umb-box-header :button').click();
 
-        cy.get('.umb-box-content > .ng-scope > .input-block-level')
+        cy.get('.umb-box-content > div > .input-block-level')
             .find('option[label*=' + new Date().getDate() + ']')
             .then(elements => {
-                const option = elements[[elements.length - 1]].getAttribute('value');
-                cy.get('.umb-box-content > .ng-scope > .input-block-level')
+                const option = elements[elements.length - 1].getAttribute('value');
+                cy.get('.umb-box-content > div > .input-block-level')
                     .select(option);
             });
 
@@ -326,8 +331,8 @@ context('Content', () => {
         cy.reload();
 
         // Assert
-        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Save");
-        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Rollback");
+        cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
+        cy.get('.history').find('.umb-badge').contains('Rollback').should('be.visible');
         cy.get('#headerName').should('have.value', initialNodeName);
 
         // Clean up (content is automatically deleted when document types are gone)
@@ -343,9 +348,9 @@ context('Content', () => {
             .withName(rootDocTypeName)
             .withAllowAsRoot(true)
             .addGroup()
-            .addTextBoxProperty()
-            .withLabel(labelName)
-            .done()
+                .addTextBoxProperty()
+                    .withLabel(labelName)
+                .done()
             .done()
             .build();
 
@@ -356,8 +361,8 @@ context('Content', () => {
             const rootContentNode = new ContentBuilder()
                 .withContentTypeAlias(generatedRootDocType["alias"])
                 .addVariant()
-                .withName(nodeName)
-                .withSave(true)
+                    .withName(nodeName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -365,8 +370,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -398,8 +402,8 @@ context('Content', () => {
                 .withContentTypeAlias(generatedRootDocType["alias"])
                 .withAction("saveNew")
                 .addVariant()
-                .withName(nodeName)
-                .withSave(true)
+                    .withName(nodeName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -407,8 +411,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -437,8 +440,8 @@ context('Content', () => {
                 .withContentTypeAlias(generatedRootDocType["alias"])
                 .withAction("saveNew")
                 .addVariant()
-                .withName(nodeName)
-                .withSave(true)
+                    .withName(nodeName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -446,8 +449,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -478,8 +480,8 @@ context('Content', () => {
             const rootContentNode = new ContentBuilder()
                 .withContentTypeAlias(generatedRootDocType["alias"])
                 .addVariant()
-                .withName(nodeName)
-                .withSave(true)
+                    .withName(nodeName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -487,8 +489,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -498,5 +499,101 @@ context('Content', () => {
 
         // Clean up (content is automatically deleted when document types are gone)
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
+    });
+
+    it('Content with contentpicker', () => {
+        const pickerDocTypeName = 'Content picker doc type';
+        const pickerDocTypeAlias = AliasHelper.toAlias(pickerDocTypeName);
+        const pickedDocTypeName = 'Picked content document type';
+
+        cy.deleteAllContent();
+        cy.umbracoEnsureDocumentTypeNameNotExists(pickerDocTypeName);
+        cy.umbracoEnsureTemplateNameNotExists(pickerDocTypeName);
+        cy.umbracoEnsureDocumentTypeNameNotExists(pickedDocTypeName);
+
+        // Create the content type and content we'll be picking from.
+        const pickedDocType = new DocumentTypeBuilder()
+            .withName(pickedDocTypeName)
+            .withAllowAsRoot(true)
+            .addGroup()
+                .addTextBoxProperty()
+                    .withAlias('text')
+                .done()
+            .done()
+            .build();
+
+        cy.saveDocumentType(pickedDocType).then((generatedType) => {
+            const pickedContentNode = new ContentBuilder()
+                .withContentTypeAlias(generatedType["alias"])
+                .withAction("publishNew")
+                .addVariant()
+                .withName('Content to pick')
+                .withSave(true)
+                .withPublish(true)
+                .addProperty()
+                    .withAlias('text')
+                    .withValue('Acceptance test')
+                .done()
+                .withSave(true)
+                .withPublish(true)
+                .done()
+                .build();
+            cy.saveContent(pickedContentNode);
+        });
+
+        // Create the doctype with a the picker
+        const pickerDocType = new DocumentTypeBuilder()
+            .withName(pickerDocTypeName)
+            .withAlias(pickerDocTypeAlias)
+            .withAllowAsRoot(true)
+            .withDefaultTemplate(pickerDocTypeAlias)
+            .addGroup()
+                .withName('ContentPickerGroup')
+                .addContentPickerProperty()
+                    .withAlias('picker')
+                .done()
+            .done()
+            .build();
+
+        cy.saveDocumentType(pickerDocType);
+
+        // Edit it the template to allow us to verify the rendered view.
+        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.ContentPickerDocType>
+        @using ContentModels = Umbraco.Web.PublishedModels;
+        @{
+            Layout = null;
+        }
+
+        @{
+            IPublishedContent typedContentPicker = Model.Value<IPublishedContent>("picker");
+            if (typedContentPicker != null)
+            {
+                <p>@typedContentPicker.Value("text")</p>
+            }
+        }`);
+
+        // Create content with content picker
+        cy.get('.umb-tree-root-link').rightclick();
+        cy.get('.-opens-dialog > .umb-action-link').click();
+        cy.get('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
+        // Fill out content
+        cy.umbracoEditorHeaderName('ContentPickerContent');
+        cy.get('.umb-node-preview-add').click();
+        // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
+        cy.get('[ng-if="vm.treeReady"] > .umb-tree > [ng-if="!tree.root.containsGroups"] > .umb-animated > .umb-tree-item__inner').click();
+        // We have to wait for the picked content to show up or it wont be added.
+        cy.get('.umb-node-preview__description').should('be.visible');
+        //save and publish
+        cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
+        cy.umbracoSuccessNotification().should('be.visible');
+
+        // Assert
+        cy.log('Checking that content is rendered correctly.')
+        const expectedContent = '<p>Acceptance test</p>'
+        cy.umbracoVerifyRenderedViewContent('contentpickercontent', expectedContent, true).should('be.true');
+        // clean
+        cy.umbracoEnsureDocumentTypeNameNotExists(pickerDocTypeName);
+        cy.umbracoEnsureTemplateNameNotExists(pickerDocTypeName);
+        cy.umbracoEnsureDocumentTypeNameNotExists(pickedDocTypeName);
     });
 });

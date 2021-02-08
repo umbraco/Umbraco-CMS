@@ -34,7 +34,7 @@ namespace Umbraco.Web.Templates
 
             using (var timer = _logger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {
-                // find all relative urls (ie. urls that contain ~)
+                // find all relative URLs (ie. URLs that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
                 _logger.Debug(typeof(IOHelper), "After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Templates
                     if (tag.Groups[1].Success)
                         url = tag.Groups[1].Value;
 
-                    // The richtext editor inserts a slash in front of the url. That's why we need this little fix
+                    // The richtext editor inserts a slash in front of the URL. That's why we need this little fix
                     //                if (url.StartsWith("/"))
                     //                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
                     //                else

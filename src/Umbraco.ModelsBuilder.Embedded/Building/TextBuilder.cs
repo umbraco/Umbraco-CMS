@@ -446,7 +446,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             {
                 WriteNonGenericClrType(sb, type.Substring(0, p));
                 sb.Append("<");
-                var args = type.Substring(p + 1).TrimEnd('>').Split(','); // fixme will NOT work with nested generic types
+                var args = type.Substring(p + 1).TrimEnd(Umbraco.Core.Constants.CharArrays.GreaterThan).Split(Umbraco.Core.Constants.CharArrays.Comma); // fixme will NOT work with nested generic types
                 for (var i = 0; i < args.Length; i++)
                 {
                     if (i > 0) sb.Append(", ");

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boot Failed</title>
+    <style>
+    @font-face {
+        font-family: Lato;
+        src: local("LatoLatin Regular"), local("LatoLatin-Regular"),
+            url(/umbraco/assets/fonts/lato/LatoLatin-Regular.woff2) format("woff2");
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        text-rendering: optimizeLegibility;
+    }
+    @font-face {
+        font-family: Lato;
+        src: local("LatoLatin Bold"), local("LatoLatin-Bold"),
+            url(/umbraco/assets/fonts/lato/LatoLatin-Bold.woff2) format("woff2");
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        text-rendering: optimizeLegibility;
+    }
+    body {
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: 50%;
+        background-image: url(/umbraco/assets/img/login.jpg);
+        margin: 0;
+        padding: 0;
+        font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 15px;
+        line-height: 20px;
+        color: #000;
+        background-color: #f3f3f5;
+        -webkit-font-smoothing: antialiased;
+        font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .logo {
+        position: absolute;
+        top: 22px;
+        left: 25px;
+        width: 30px;
+        height: 30px;
+        z-index: 1;
+    }
+    .error-container {
+        display: grid;
+        justify-content: center;
+        align-content: center;
+        height: 100vh;
+    }
+    .error {
+        background: #fff;
+        padding: 30px;
+        max-width: 500px;
+        margin: auto 25px;
+        border-radius: 3px;
+    }
+    .error h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    </style>
+</head>
+<body>
+<main class="error-container">
+    <img src="/umbraco/assets/img/application/umbraco_logo_white.svg" class="logo">
+    <div class="error">
+        <h1>Boot Failed</h1>
+        <p>Umbraco failed to boot, if you are the owner of the website please see the log file for more details.</p>
+    </div>
+</main>
+</body>
+</html>

@@ -64,7 +64,7 @@ namespace Umbraco.Core
             public const string MediaPath = "umbracoMediaPath";
 
             /// <summary>
-            /// The reserved urls from web.config.
+            /// The reserved URLs from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
 
@@ -101,7 +101,7 @@ namespace Umbraco.Core
             public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage";
 
             /// <summary>
-            /// A true/false value indicating whether umbraco should hide top level nodes from generated urls.
+            /// A true/false value indicating whether umbraco should hide top level nodes from generated URLs.
             /// </summary>
             public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath";
 
@@ -140,6 +140,14 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string DatabaseFactoryServerVersion = "Umbraco.Core.Debug.DatabaseFactoryServerVersion";
             }
+
+            /// <summary>
+            /// An int value representing the time in milliseconds to lock the database for a write operation
+            /// </summary>
+            /// <remarks>
+            /// The default value is 1800 milliseconds
+            /// </remarks>
+            public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
         }
     }
 }
