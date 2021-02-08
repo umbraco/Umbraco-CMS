@@ -11,7 +11,6 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using Umbraco.Web;
 
 namespace Umbraco.Infrastructure.HostedServices
 {

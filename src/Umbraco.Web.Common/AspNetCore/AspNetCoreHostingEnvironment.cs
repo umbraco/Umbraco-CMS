@@ -142,7 +142,7 @@ namespace Umbraco.Web.Common.AspNetCore
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
 
-            if (currentApplicationUrl == null)
+            if (currentApplicationUrl is null)
             {
                 return;
             }
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Common.AspNetCore
                 return;
             }
 
-            var change = currentApplicationUrl != null && !_applicationUrls.Contains(currentApplicationUrl);
+            var change = !_applicationUrls.Contains(currentApplicationUrl);
             if (change)
             {
                 _applicationUrls.Add(currentApplicationUrl);

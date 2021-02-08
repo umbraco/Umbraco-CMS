@@ -18,7 +18,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
