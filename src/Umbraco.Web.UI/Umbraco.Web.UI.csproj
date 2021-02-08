@@ -82,6 +82,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="App_Plugins\" />
+    <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
@@ -295,7 +296,6 @@
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
     <Content Include="Umbraco\Views\web.config" />
     <Content Include="Views\Partials\BlockList\Default.cshtml" />
-    <Content Include="Views\MacroPartials\Test.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
