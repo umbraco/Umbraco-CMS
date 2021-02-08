@@ -54,15 +54,15 @@
 
                 localizationService.localizeMany(keys)
                     .then(function (data) {
-                        labels.deleted = data[0];
-                        labels.unpublished = data[1]; //aka draft
-                        labels.published = data[2];
-                        labels.publishedPendingChanges = data[3];
-                        labels.notCreated = data[4];
-                        labels.unsavedChanges = data[5];
-                        labels.doctypeChangeWarning = data[6];
-                        labels.notPublished = data[7];
-                        scope.chooseLabel = data[8];
+                        [labels.deleted, 
+                        labels.unpublished, 
+                        labels.published,
+                        labels.publishedPendingChanges,
+                        labels.notCreated,
+                        labels.unsavedChanges,
+                        labels.doctypeChangeWarning,
+                        labels.notPublished,
+                        scope.chooseLabel] = data;
 
                         setNodePublishStatus();
 
