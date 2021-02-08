@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -185,7 +186,7 @@ namespace Umbraco.Web.Compose
         public sealed class Notifier
         {
             private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-            private readonly IRequestAccessor _requestAccessor;
+            private readonly IHostingEnvironment _hostingEnvironment;
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
@@ -193,18 +194,11 @@ namespace Umbraco.Web.Compose
             private readonly ILogger<Notifier> _logger;
 
             /// <summary>
-            /// Constructor
+            /// Initializes a new instance of the <see cref="Notifier"/> class.
             /// </summary>
-            /// <param name="backOfficeSecurityAccessor"></param>
-            /// <param name="requestAccessor"></param>
-            /// <param name="notificationService"></param>
-            /// <param name="userService"></param>
-            /// <param name="textService"></param>
-            /// <param name="globalSettings"></param>
-            /// <param name="logger"></param>
             public Notifier(
                 IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-                IRequestAccessor requestAccessor,
+                IHostingEnvironment hostingEnvironment,
                 INotificationService notificationService,
                 IUserService userService,
                 ILocalizedTextService textService,
@@ -212,7 +206,7 @@ namespace Umbraco.Web.Compose
                 ILogger<Notifier> logger)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-                _requestAccessor = requestAccessor;
+                _hostingEnvironment = hostingEnvironment;
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
@@ -236,7 +230,7 @@ namespace Umbraco.Web.Compose
                     }
                 }
 
-                SendNotification(user, entities, action, _requestAccessor.GetApplicationUrl());
+                SendNotification(user, entities, action, _hostingEnvironment.ApplicationMainUrl);
             }
 
             private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)

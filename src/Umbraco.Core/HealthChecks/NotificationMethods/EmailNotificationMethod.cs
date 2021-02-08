@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Mail;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.NotificationMethods
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.HealthChecks.NotificationMethods
     public class EmailNotificationMethod : NotificationMethodBase
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEmailSender _emailSender;
         private readonly IMarkdownToHtmlConverter _markdownToHtmlConverter;
 
@@ -21,7 +21,7 @@ namespace Umbraco.Core.HealthChecks.NotificationMethods
 
         public EmailNotificationMethod(
             ILocalizedTextService textService,
-            IRequestAccessor requestAccessor,
+            IHostingEnvironment hostingEnvironment,
             IEmailSender emailSender,
             IOptions<HealthChecksSettings> healthChecksSettings,
             IOptions<ContentSettings> contentSettings,
@@ -38,7 +38,7 @@ namespace Umbraco.Core.HealthChecks.NotificationMethods
             RecipientEmail = recipientEmail;
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
             _emailSender = emailSender;
             _markdownToHtmlConverter = markdownToHtmlConverter;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -67,9 +67,9 @@ namespace Umbraco.Core.HealthChecks.NotificationMethods
 
             // Include the umbraco Application URL host in the message subject so that
             // you can identify the site that these results are for.
-            var host = _requestAccessor.GetApplicationUrl();
+            var host = _hostingEnvironment.ApplicationMainUrl?.ToString();
 
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
+            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host });
 
 
             var mailMessage = CreateMailMessage(subject, message);

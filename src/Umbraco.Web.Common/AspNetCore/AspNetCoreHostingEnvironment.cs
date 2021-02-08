@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -10,14 +11,20 @@ namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : Core.Hosting.IHostingEnvironment
     {
-        private IOptionsMonitor<HostingSettings> _hostingSettings;
+        private readonly ISet<Uri> _applicationUrls = new HashSet<Uri>();
+        private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
+        private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IOptionsMonitor<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
+        public AspNetCoreHostingEnvironment(
+            IOptionsMonitor<HostingSettings> hostingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IWebHostEnvironment webHostEnvironment)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
+            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
 
             SiteName = webHostEnvironment.ApplicationName;
@@ -29,6 +36,9 @@ namespace Umbraco.Web.Common.AspNetCore
         public bool IsHosted { get; } = true;
 
         /// <inheritdoc/>
+        public Uri ApplicationMainUrl { get; private set; }
+
+        /// <inheritdoc/>
         public string SiteName { get; }
 
         /// <inheritdoc/>
@@ -36,8 +46,6 @@ namespace Umbraco.Web.Common.AspNetCore
 
         /// <inheritdoc/>
         public string ApplicationPhysicalPath { get; }
-
-        public string ApplicationServerAddress { get; }
 
         // TODO how to find this, This is a server thing, not application thing.
         public string ApplicationVirtualPath => _hostingSettings.CurrentValue.ApplicationVirtualPath?.EnsureStartsWith('/') ?? "/";
@@ -122,6 +130,35 @@ namespace Umbraco.Web.Common.AspNetCore
             string fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart('~', '/');
 
             return fullPath;
+        }
+
+        public void EnsureApplicationMainUrl(Uri currentApplicationUrl)
+        {
+            // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+            // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
+            // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
+
+            // see U4-10626 - in some cases we want to reset the application url
+            // (this is a simplified version of what was in 7.x)
+            // note: should this be optional? is it expensive?
+
+            if (currentApplicationUrl is null)
+            {
+                return;
+            }
+
+            if (!(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is null))
+            {
+                return;
+            }
+
+            var change = !_applicationUrls.Contains(currentApplicationUrl);
+            if (change)
+            {
+                _applicationUrls.Add(currentApplicationUrl);
+
+                ApplicationMainUrl = currentApplicationUrl;
+            }
         }
     }
 

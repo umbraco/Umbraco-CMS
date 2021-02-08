@@ -10,8 +10,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Core.HealthChecks.Checks.Security
 {
@@ -27,7 +27,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private static HttpClient s_httpClient;
         private static HttpClientHandler s_httpClientHandler;
@@ -39,11 +39,11 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
         public HttpsCheck(
             ILocalizedTextService textService,
             IOptionsMonitor<GlobalSettings> globalSettings,
-            IRequestAccessor requestAccessor)
+            IHostingEnvironment hostingEnvironment)
         {
             _textService = textService;
             _globalSettings = globalSettings;
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         private static HttpClient HttpClient => s_httpClient ??= new HttpClient(HttpClientHandler);
@@ -85,7 +85,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
 
             // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
-            var url = _requestAccessor.GetApplicationUrl().ToString().Replace("http:", "https:");
+            var url = _hostingEnvironment.ApplicationMainUrl.ToString().Replace("http:", "https:");
 
             var request = new HttpRequestMessage(HttpMethod.Head, url);
 
@@ -148,7 +148,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
 
         private Task<HealthCheckStatus> CheckIfCurrentSchemeIsHttps()
         {
-            Uri uri = _requestAccessor.GetApplicationUrl();
+            Uri uri = _hostingEnvironment.ApplicationMainUrl;
             var success = uri.Scheme == "https";
 
             return Task.FromResult(new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
@@ -161,7 +161,7 @@ namespace Umbraco.Core.HealthChecks.Checks.Security
         private Task<HealthCheckStatus> CheckHttpsConfigurationSetting()
         {
             bool httpsSettingEnabled = _globalSettings.CurrentValue.UseHttps;
-            Uri uri = _requestAccessor.GetApplicationUrl();
+            Uri uri = _hostingEnvironment.ApplicationMainUrl;
 
             string resultMessage;
             StatusResultType resultType;
