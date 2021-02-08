@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
 
@@ -27,17 +28,18 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="persistedContent"></param>
         /// <param name="htmlAttributes">The HTML attributes to be added to the div</param>
+        /// <param name="macroService"></param>
         /// <returns></returns>
         /// <remarks>
         /// This converts the persisted macro format to this:
-        ///
+        /// 
         ///     {div class='umb-macro-holder'}
         ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
         ///         {ins}Macro alias: {strong}My Macro{/strong}{/ins}
         ///     {/div}
-        ///
+        /// 
         /// </remarks>
-        internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string, string> htmlAttributes)
+        internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string, string> htmlAttributes, IMacroService macroService)
         {
             return MacroPersistedFormat.Replace(persistedContent, match =>
             {
@@ -46,8 +48,8 @@ namespace Umbraco.Web.Macros
                     string wrapperElement = "div";
                     //<div || span class="umb-macro-holder (umb-macro-inline) myMacro mceNonEditable">
                     var alias = match.Groups[2].Value;
-
-                    IMacro macro = Current.Services.MacroService.GetByAlias(alias);
+                    
+                    IMacro macro = macroService.GetByAlias(alias);
                     bool renderInline = false;
                     if (macro != null && macro.RenderInline)
                     {
