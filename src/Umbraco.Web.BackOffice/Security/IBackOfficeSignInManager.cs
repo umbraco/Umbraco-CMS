@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.Common.Security
 {

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {

@@ -1,8 +1,7 @@
-﻿using System.Collections.Specialized;
+using System;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Security;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
@@ -10,9 +9,12 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
+    //TODO: Delete: should not be used
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     public class MembersRoleProvider : RoleProvider
     {
         private readonly IMembershipRoleService<IMember> _roleService;
+        private string _applicationName;
 
         public MembersRoleProvider(IMembershipRoleService<IMember> roleService)
         {
@@ -23,8 +25,6 @@ namespace Umbraco.Web.Security.Providers
             : this(Current.Services.MemberService)
         {
         }
-
-        private string _applicationName;
 
         public override bool IsUserInRole(string username, string roleName)
         {
@@ -46,10 +46,12 @@ namespace Umbraco.Web.Security.Providers
             return _roleService.DeleteRole(roleName, throwOnPopulatedRole);
         }
 
-        public override bool RoleExists(string roleName)
-        {
-            return _roleService.GetAllRoles().Any(x => x == roleName);
-        }
+        /// <summary>
+        /// Returns true if the specified member role name exists
+        /// </summary>
+        /// <param name="roleName">Member role name</param>
+        /// <returns>True if member role exists, otherwise false</returns>
+        public override bool RoleExists(string roleName) => _roleService.GetAllRoles().Any(x => x.Name == roleName);
 
         public override void AddUsersToRoles(string[] usernames, string[] roleNames)
         {
@@ -66,10 +68,11 @@ namespace Umbraco.Web.Security.Providers
             return _roleService.GetMembersInRole(roleName).Select(x => x.Username).ToArray();
         }
 
-        public override string[] GetAllRoles()
-        {
-            return _roleService.GetAllRoles().ToArray();
-        }
+        /// <summary>
+        /// Gets all the member roles
+        /// </summary>
+        /// <returns>A list of member roles</returns>
+        public override string[] GetAllRoles() => _roleService.GetAllRoles().Select(x => x.Name).ToArray();
 
         public override string[] FindUsersInRole(string roleName, string usernameToMatch)
         {
@@ -87,6 +90,7 @@ namespace Umbraco.Web.Security.Providers
             {
                 return _applicationName;
             }
+
             set
             {
                 if (string.IsNullOrEmpty(value))

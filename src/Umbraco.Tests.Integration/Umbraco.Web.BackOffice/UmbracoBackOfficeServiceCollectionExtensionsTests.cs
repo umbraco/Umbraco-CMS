@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Security;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.BackOffice.DependencyInjection;
 

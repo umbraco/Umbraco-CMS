@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -16,7 +17,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     // TODO: Make this into a base class that can be re-used
 
@@ -437,7 +438,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Returns the roles (user groups) for this user
+        /// Gets a list of role names the specified user belongs to.
         /// </summary>
         public override Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
         {

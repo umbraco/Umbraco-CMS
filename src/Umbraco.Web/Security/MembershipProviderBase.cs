@@ -1,24 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.Configuration;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
+    //TODO: Delete - should not be used
     /// <summary>
     /// A base membership provider class offering much of the underlying functionality for initializing and password encryption/hashing.
     /// </summary>
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     public abstract class MembershipProviderBase : MembershipProvider
     {
         private readonly IHostingEnvironment _hostingEnvironment;

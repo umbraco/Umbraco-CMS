@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +11,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security.Providers;
@@ -19,6 +18,15 @@ using Umbraco.Web.Security.Providers;
 namespace Umbraco.Web.Security
 {
     // MIGRATED TO NETCORE
+    // TODO: Analyse all - much can be moved/removed since most methods will occur on the manager via identity implementation
+
+    /// <summary>
+    /// Helper class containing logic relating to the built-in Umbraco members macros and controllers for:
+    /// - Registration
+    /// - Updating
+    /// - Logging in
+    /// - Current status
+    /// </summary>
     public class MembershipHelper
     {
         private readonly MembersMembershipProvider _membershipProvider;
@@ -118,7 +126,7 @@ namespace Umbraco.Web.Security
             var pathsWithAccess = HasAccess(pathsWithProtection, Roles.Provider);
 
             var result = new Dictionary<string, bool>();
-            foreach(var path in paths)
+            foreach (var path in paths)
             {
                 pathsWithAccess.TryGetValue(path, out var hasAccess);
                 // if it's not found it's false anyways
@@ -144,7 +152,8 @@ namespace Umbraco.Web.Security
             string[] userRoles = null;
             string[] getUserRoles(string username)
             {
-                if (userRoles != null) return userRoles;
+                if (userRoles != null)
+                    return userRoles;
                 userRoles = roleProvider.GetRolesForUser(username).ToArray();
                 return userRoles;
             }
@@ -185,7 +194,8 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
             var membershipUser = provider.GetCurrentUser();
             //NOTE: This should never happen since they are logged in
-            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
+            if (membershipUser == null)
+                throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
 
             try
             {
@@ -257,7 +267,8 @@ namespace Umbraco.Web.Security
                      null, null,
                      true, null, out status);
 
-            if (status != MembershipCreateStatus.Success) return null;
+            if (status != MembershipCreateStatus.Success)
+                return null;
 
             var member = _memberService.GetByUsername(membershipUser.UserName);
             member.Name = model.Name;
@@ -367,7 +378,8 @@ namespace Umbraco.Web.Security
         public virtual IPublishedContent Get(Udi udi)
         {
             var guidUdi = udi as GuidUdi;
-            if (guidUdi == null) return null;
+            if (guidUdi == null)
+                return null;
 
             var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
@@ -702,27 +714,32 @@ namespace Umbraco.Web.Security
 
             if (email != null)
             {
-                if (member.Email != email) update = true;
+                if (member.Email != email)
+                    update = true;
                 member.Email = email;
             }
             if (isApproved.HasValue)
             {
-                if (member.IsApproved != isApproved.Value) update = true;
+                if (member.IsApproved != isApproved.Value)
+                    update = true;
                 member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
-                if (member.LastLoginDate != lastLoginDate.Value) update = true;
+                if (member.LastLoginDate != lastLoginDate.Value)
+                    update = true;
                 member.LastLoginDate = lastLoginDate.Value;
             }
             if (lastActivityDate.HasValue)
             {
-                if (member.LastActivityDate != lastActivityDate.Value) update = true;
+                if (member.LastActivityDate != lastActivityDate.Value)
+                    update = true;
                 member.LastActivityDate = lastActivityDate.Value;
             }
             if (comment != null)
             {
-                if (member.Comment != comment) update = true;
+                if (member.Comment != comment)
+                    update = true;
                 member.Comment = comment;
             }
 
@@ -741,8 +758,8 @@ namespace Umbraco.Web.Security
         {
             var provider = _membershipProvider;
 
-                    var username = provider.GetCurrentUserName();
-        // The result of this is cached by the MemberRepository
+            var username = provider.GetCurrentUserName();
+            // The result of this is cached by the MemberRepository
             var member = _memberService.GetByUsername(username);
             return member;
         }
@@ -763,8 +780,10 @@ namespace Umbraco.Web.Security
 
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
-            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
+            if (passwordModel == null)
+                throw new ArgumentNullException(nameof(passwordModel));
+            if (membershipProvider == null)
+                throw new ArgumentNullException(nameof(membershipProvider));
             var userId = -1;
 
 

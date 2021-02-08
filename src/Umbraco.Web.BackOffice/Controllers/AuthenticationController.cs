@@ -20,6 +20,7 @@ using Umbraco.Core.Models.Security;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;

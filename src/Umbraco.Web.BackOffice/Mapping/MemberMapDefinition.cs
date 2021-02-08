@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -93,14 +93,11 @@ namespace Umbraco.Web.BackOffice.Mapping
             target.Path = $"-1,{source.Id}";
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
         }
-
+        
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
-
-
-
     }
 }

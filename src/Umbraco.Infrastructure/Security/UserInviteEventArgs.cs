@@ -2,7 +2,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {

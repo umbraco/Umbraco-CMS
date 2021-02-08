@@ -70,10 +70,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         protected ILocalizedTextService LocalizedTextService { get; }
 
+        /// <summary>
+        /// Handles if the content for the specified ID isn't found
+        /// </summary>
+        /// <param name="id">The content ID to find</param>
+        /// <param name="throwException">Whether to throw an exception</param>
+        /// <returns>The error response</returns>
         protected NotFoundObjectResult HandleContentNotFound(object id)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
-            var errorResponse = NotFound(ModelState);
+            NotFoundObjectResult errorResponse = NotFound(ModelState);
+
+
             return errorResponse;
         }
 
@@ -90,7 +98,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             where TSaved : IContentSave<TPersisted>
         {
             // map the property values
-            foreach (var propertyDto in dto.Properties)
+            foreach (ContentPropertyDto propertyDto in dto.Properties)
             {
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)
@@ -101,42 +109,53 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                 // get the value editor
                 // nothing to save/map if it is readonly
-                var valueEditor = propertyDto.PropertyEditor.GetValueEditor();
-                if (valueEditor.IsReadOnly) continue;
+                IDataValueEditor valueEditor = propertyDto.PropertyEditor.GetValueEditor();
+                if (valueEditor.IsReadOnly)
+                {
+                    continue;
+                }
 
                 // get the property
-                var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+                IProperty property = contentItem.PersistedContent.Properties[propertyDto.Alias];
 
                 // prepare files, if any matching property and culture
-                var files = contentItem.UploadedFiles
+                ContentPropertyFile[] files = contentItem.UploadedFiles
                     .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture && x.Segment == propertyDto.Segment)
                     .ToArray();
 
-                foreach (var file in files)
+                foreach (ContentPropertyFile file in files)
+                {
                     file.FileName = file.FileName.ToSafeFileName(ShortStringHelper);
+                }
 
                 // create the property data for the property editor
                 var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType.Configuration)
                 {
                     ContentKey = contentItem.PersistedContent.Key,
                     PropertyTypeKey = property.PropertyType.Key,
-                    Files =  files
+                    Files = files
                 };
 
                 // let the editor convert the value that was received, deal with files, etc
-                var value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
+                object value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
 
                 // set the value - tags are special
-                var tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
+                TagsPropertyEditorAttribute tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
                 if (tagAttribute != null)
                 {
-                    var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
-                    if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
+                    TagConfiguration tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
+                    if (tagConfiguration.Delimiter == default)
+                    {
+                        tagConfiguration.Delimiter = tagAttribute.Delimiter;
+                    }
+
                     var tagCulture = property.PropertyType.VariesByCulture() ? culture : null;
                     property.SetTagsValue(_serializer, value, tagConfiguration, tagCulture);
                 }
                 else
+                {
                     savePropertyValue(contentItem, property, value);
+                }
             }
         }
 
@@ -153,38 +172,45 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
         {
-            //checks if the request contains the key and the item is not null, if that is the case, return it from the request, otherwise return
+            // checks if the request contains the key and the item is not null, if that is the case, return it from the request, otherwise return
             // it from the callback
             return HttpContext.Items.ContainsKey(typeof(TPersisted).ToString()) && HttpContext.Items[typeof(TPersisted).ToString()] != null
-                ? (TPersisted) HttpContext.Items[typeof (TPersisted).ToString()]
+                ? (TPersisted)HttpContext.Items[typeof(TPersisted).ToString()]
                 : getFromService();
         }
 
         /// <summary>
         /// Returns true if the action passed in means we need to create something new
         /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        internal static bool IsCreatingAction(ContentSaveAction action)
-        {
-            return (action.ToString().EndsWith("New"));
-        }
+        /// <param name="action">The content action</param>
+        /// <returns>Returns true  if this is a creating action</returns>
+        internal static bool IsCreatingAction(ContentSaveAction action) => action.ToString().EndsWith("New");
 
-        protected void AddCancelMessage(INotificationModel display,
-            string header = "speechBubbles/operationCancelledHeader",
-            string message = "speechBubbles/operationCancelledText",
-            bool localizeHeader = true,
+        /// <summary>
+        /// Adds a cancelled message to the display
+        /// </summary>
+        /// <param name="display"></param>
+        /// <param name="header"></param>
+        /// <param name="message"></param>
+        /// <param name="localizeHeader"></param>
+        /// <param name="localizeMessage"></param>
+        /// <param name="headerParams"></param>
+        /// <param name="messageParams"></param>
+        protected void AddCancelMessage(INotificationModel display, string header = "speechBubbles/operationCancelledHeader", string message = "speechBubbles/operationCancelledText", bool localizeHeader = true,
             bool localizeMessage = true,
             string[] headerParams = null,
             string[] messageParams = null)
         {
-            //if there's already a default event message, don't add our default one
-            var msgs = EventMessages;
-            if (msgs != null && msgs.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage)) return;
+            // if there's already a default event message, don't add our default one
+            IEventMessagesFactory messages = EventMessages;
+            if (messages != null && messages.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage))
+            {
+                return;
+            }
 
             display.AddWarningNotification(
                 localizeHeader ? LocalizedTextService.Localize(header, headerParams) : header,
-                localizeMessage ? LocalizedTextService.Localize(message, messageParams): message);
+                localizeMessage ? LocalizedTextService.Localize(message, messageParams) : message);
         }
     }
 }

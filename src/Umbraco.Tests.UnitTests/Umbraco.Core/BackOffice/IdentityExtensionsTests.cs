@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
-using Umbraco.Extensions;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {

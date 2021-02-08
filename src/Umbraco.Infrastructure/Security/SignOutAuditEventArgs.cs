@@ -1,8 +1,8 @@
+using Umbraco.Core;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Infrastructure.Security
 {
-
     /// <summary>
     /// Event args used when signing out
     /// </summary>

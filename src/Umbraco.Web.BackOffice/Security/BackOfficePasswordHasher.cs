@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Serialization;
+using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Web.BackOffice.Security
 {
