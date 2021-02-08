@@ -535,6 +535,30 @@ namespace Umbraco.Core.Services.Implement
                 return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, 
+            IQuery<IMedia> filter = null, Ordering ordering = null)
+        {
+            if (ordering == null)
+                ordering = Ordering.By("Path");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    var mediaPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
+                    if (mediaPath.Length == 0)
+                    {
+                        return Enumerable.Empty<IMedia>();
+                    }
+                    return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize,  filter, ordering);
+                }
+                return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, filter, ordering);
+            }
+        }
 
         private IQuery<IMedia> GetPagedDescendantQuery(string mediaPath)
         {
@@ -552,6 +576,16 @@ namespace Umbraco.Core.Services.Implement
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        }
+        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, 
+            IQuery<IMedia> filter, Ordering ordering)
+        {
+           
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+
+            return _mediaRepository.GetPage(query, pageIndex, pageSize,  ordering, filter);
         }
 
         /// <summary>

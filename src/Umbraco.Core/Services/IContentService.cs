@@ -183,6 +183,17 @@ namespace Umbraco.Core.Services
             IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
+        /// Gets descendant documents of a given parent.
+        /// </summary>
+        /// <param name="id">The parent identifier.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="filter">Query filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize,
+            IQuery<IContent> filter = null, Ordering ordering = null);
+
+        /// <summary>
         /// Gets paged documents of a content
         /// </summary>
         /// <param name="contentTypeId">The page number.</param>

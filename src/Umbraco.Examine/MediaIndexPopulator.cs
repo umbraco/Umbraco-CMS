@@ -57,7 +57,8 @@ namespace Umbraco.Examine
 
             do
             {
-                media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out var total).ToArray();
+                media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize).ToArray();
+                
 
                 if (media.Length > 0)
                 {

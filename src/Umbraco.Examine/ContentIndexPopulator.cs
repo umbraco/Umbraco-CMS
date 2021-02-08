@@ -89,10 +89,11 @@ namespace Umbraco.Examine
         protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
         {
             IContent[] content;
-
             do
             {
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+               
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize).ToArray();
+                
 
                 if (content.Length > 0)
                 {
@@ -120,10 +121,10 @@ namespace Umbraco.Examine
             {
                 //add the published filter
                 //note: We will filter for published variants in the validator
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
-                    Ordering.By("Path", Direction.Ascending)).ToArray();
+                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, _publishedQuery,
+                        Ordering.By("Path", Direction.Ascending)).ToArray();
+              
 
-                
                 if (content.Length > 0)
                 {
                     var indexableContent = new List<IContent>();
