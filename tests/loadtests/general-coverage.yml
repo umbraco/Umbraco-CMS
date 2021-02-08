@@ -10,9 +10,6 @@ config:
   phases:
     - duration: 1
       arrivalRate: 1
-  defaults:
-    beforeRequest: "sendXsrf"
-    afterResponse: "captureXsrf"
 scenarios:
   - name: "Login and default back office load"
     beforeScenario: "beforeScenario"
