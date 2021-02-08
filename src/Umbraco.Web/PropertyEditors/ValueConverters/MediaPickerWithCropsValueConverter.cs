@@ -147,6 +147,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
 
+            public string GetLocalCropUrl(string cropAlias)
+            {
+                if (MediaItem == null) return null;
+
+                if (Crops.SingleOrDefault(x => x.Alias == cropAlias) == null) return null;
+
+                return "?magic";
+            }
         }
 
 
