@@ -34,24 +34,19 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MediaPicker3PropertyValueEditor : DataValueEditor
         {
+            ///<remarks>
+            /// Note no FromEditor() and ToEditor() methods
+            /// We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
+            /// </remarks>
             public MediaPicker3PropertyValueEditor(DataEditorAttribute attribute) : base(attribute)
             {
             }
 
-            /*
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
-            {
-                var asString = value is string str ? str : value?.ToString();
-
-                if (string.IsNullOrEmpty(asString)) yield break;
-
-                foreach (var udiStr in asString.Split(','))
-                {
-                    if (Udi.TryParse(udiStr, out var udi))
-                        yield return new UmbracoEntityReference(udi);
-                }
-            }
-            */
+            // TODO: Perhaps needed?! from IDataValueReference
+            //public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            //{
+            //    throw new NotImplementedException();
+            //}    
 
         }
 
