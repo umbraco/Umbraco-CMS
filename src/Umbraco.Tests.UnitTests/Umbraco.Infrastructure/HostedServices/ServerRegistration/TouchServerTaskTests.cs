@@ -9,9 +9,9 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration
 {
@@ -53,8 +53,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
 
         private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run, string applicationUrl = ApplicationUrl)
         {
-            var mockRequestAccessor = new Mock<IRequestAccessor>();
-            mockRequestAccessor.Setup(x => x.GetApplicationUrl()).Returns(!string.IsNullOrEmpty(applicationUrl) ? new Uri(ApplicationUrl) : null);
+            var mockRequestAccessor = new Mock<IHostingEnvironment>();
+            mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl).Returns(!string.IsNullOrEmpty(applicationUrl) ? new Uri(ApplicationUrl) : null);
 
             var mockRunTimeState = new Mock<IRuntimeState>();
             mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRe
             var mockLogger = new Mock<ILogger<TouchServerTask>>();
 
             _mockServerRegistrationService = new Mock<IServerRegistrationService>();
-            
+
             var settings = new GlobalSettings
             {
                 DatabaseServerRegistrar = new DatabaseServerRegistrarSettings

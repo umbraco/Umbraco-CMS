@@ -65,7 +65,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
-        private readonly IRequestAccessor _requestAccessor;
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
@@ -87,7 +86,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEmailSender emailSender,
             ISmsSender smsSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IRequestAccessor requestAccessor,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
@@ -106,7 +104,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _emailSender = emailSender;
             _smsSender = smsSender;
             _hostingEnvironment = hostingEnvironment;
-            _requestAccessor = requestAccessor;
             _linkGenerator = linkGenerator;
             _externalAuthenticationOptions = externalAuthenticationOptions;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
@@ -625,7 +622,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _requestAccessor.GetApplicationUrl();
+            var applicationUri = _hostingEnvironment.ApplicationMainUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

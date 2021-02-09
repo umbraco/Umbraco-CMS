@@ -141,12 +141,19 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
                 GetIOptionsMonitorOfHostingSettings(),
+                GetIOptionsMonitorOfWebRoutingSettings(),
                 _hostEnvironment);
 
         private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
         {
             var hostingSettings = new HostingSettings();
             return Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
+        }
+
+        private IOptionsMonitor<WebRoutingSettings> GetIOptionsMonitorOfWebRoutingSettings()
+        {
+            var webRoutingSettings = new WebRoutingSettings();
+            return Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
         }
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;

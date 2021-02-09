@@ -117,7 +117,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public void Handle(UmbracoRequestEnd notification)
         {
-            if (IsEnabled && _mainDom.IsMainDom && !notification.HttpContext.Request.IsClientSideRequest())
+            if (IsEnabled && _mainDom.IsMainDom)
             {
                 GenerateModelsIfRequested();
             }

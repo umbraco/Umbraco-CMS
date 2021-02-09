@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,12 +7,13 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using static Umbraco.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.WebApi
 {
     public class NamespaceHttpControllerSelector : DefaultHttpControllerSelector
     {
-        private const string ControllerKey = "controller";
+        private const string ControllerKey = ControllerToken;
         private readonly HttpConfiguration _configuration;
         private readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>> _duplicateControllerTypes;
 

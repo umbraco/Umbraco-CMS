@@ -13,7 +13,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Media;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.HealthCheck;
+using Umbraco.Web.BackOffice.HealthChecks;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;

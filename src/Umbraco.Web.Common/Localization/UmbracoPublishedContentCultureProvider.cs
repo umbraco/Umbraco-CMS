@@ -29,7 +29,8 @@ namespace Umbraco.Web.Common.Localization
         /// <inheritdoc/>
         public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
         {
-            if (httpContext.GetRouteValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken) is UmbracoRouteValues routeValues)
+            UmbracoRouteValues routeValues = httpContext.Features.Get<UmbracoRouteValues>();
+            if (routeValues != null)
             {
                 string culture = routeValues.PublishedRequest?.Culture;
                 if (culture != null)

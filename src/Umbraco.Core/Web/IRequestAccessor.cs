@@ -1,17 +1,22 @@
 using System;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
     public interface IRequestAccessor
     {
+        /// <summary>
+        /// Returns the request/form/querystring value for the given name
+        /// </summary>
         string GetRequestValue(string name);
-        string GetQueryStringValue(string name);
-        event EventHandler<UmbracoRequestEventArgs> EndRequest;
-        event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
-        Uri GetRequestUrl();
 
-        // TODO: Not sure this belongs here but we can leave it for now
-        Uri GetApplicationUrl();
+        /// <summary>
+        /// Returns the query string value for the given name
+        /// </summary>
+        string GetQueryStringValue(string name);
+
+        /// <summary>
+        /// Returns the current request uri
+        /// </summary>
+        Uri GetRequestUrl();
     }
 }

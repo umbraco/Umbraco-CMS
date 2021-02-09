@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -22,6 +23,7 @@ using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Mvc;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Website.Collections;
 using Umbraco.Web.Website.Controllers;
 
@@ -33,34 +35,20 @@ namespace Umbraco.Extensions
     public static class HtmlHelperRenderExtensions
     {
         private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
-        {
-            return GetRequiredService<T>(htmlHelper.ViewContext);
-        }
+            => GetRequiredService<T>(htmlHelper.ViewContext);
 
         private static T GetRequiredService<T>(ViewContext viewContext)
-        {
-            return viewContext.HttpContext.RequestServices.GetRequiredService<T>();
-        }
+            => viewContext.HttpContext.RequestServices.GetRequiredService<T>();
 
         /// <summary>
         /// Renders the markup for the profiler
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         public static IHtmlContent RenderProfiler(this IHtmlHelper helper)
-        {
-            return new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
-        }
+            => new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
 
         /// <summary>
         /// Renders a partial view that is found in the specified area
         /// </summary>
-        /// <param name="helper"></param>
-        /// <param name="partial"></param>
-        /// <param name="area"></param>
-        /// <param name="model"></param>
-        /// <param name="viewData"></param>
-        /// <returns></returns>
         public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
         {
             var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
@@ -74,8 +62,6 @@ namespace Umbraco.Extensions
         /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
         /// using does not inherit from UmbracoViewPage
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
@@ -92,7 +78,8 @@ namespace Umbraco.Extensions
                         umbrcoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
-            return new HtmlString(string.Empty);
+
+            return HtmlString.Empty;
 
         }
 
@@ -107,9 +94,9 @@ namespace Umbraco.Extensions
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
-            //let's always cache by the current culture to allow variants to have different cache results
+            // let's always cache by the current culture to allow variants to have different cache results
             var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-            if (!String.IsNullOrEmpty(cultureName))
+            if (!string.IsNullOrEmpty(cultureName))
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
@@ -121,16 +108,19 @@ namespace Umbraco.Extensions
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
+
                 cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
+
             if (cacheByMember)
             {
-                //TODO reintroduce when members are migrated
+                // TODO reintroduce when members are migrated
                 throw new NotImplementedException("Reintroduce when members are migrated");
                 // var helper = Current.MembershipHelper;
                 // var currentMember = helper.GetCurrentMember();
                 // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
+
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);
@@ -201,60 +191,100 @@ namespace Umbraco.Extensions
             return tagBuilder;
         }
 
-        // TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a strongly typed SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action<T>(this IHtmlHelper htmlHelper, string actionName)
-        //     where T : SurfaceController
-        // {
-        //     return htmlHelper.Action(actionName, typeof(T));
-        // }
-        //
+        /// <summary>
+        /// Returns the result of a child action of a strongly typed SurfaceController
+        /// </summary>
+        /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
+        public static IHtmlContent ActionLink<T>(this IHtmlHelper htmlHelper, string actionName)
+            where T : SurfaceController => htmlHelper.ActionLink(actionName, typeof(T));
 
-        // TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <param name="surfaceType"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
-        // {
-        //     if (actionName == null) throw new ArgumentNullException(nameof(actionName));
-        //     if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
-        //     if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
-        //
-        //     var routeVals = new RouteValueDictionary(new {area = ""});
-        //
-        //     var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
-        //     var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
-        //     if (surfaceController == null)
-        //         throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-        //     var metaData = PluginController.GetMetadata(surfaceController);
-        //     if (!metaData.AreaName.IsNullOrWhiteSpace())
-        //     {
-        //         //set the area to the plugin area
-        //         if (routeVals.ContainsKey("area"))
-        //         {
-        //             routeVals["area"] = metaData.AreaName;
-        //         }
-        //         else
-        //         {
-        //             routeVals.Add("area", metaData.AreaName);
-        //         }
-        //     }
-        //
-        //     return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
-        // }
+        /// <summary>
+        /// Returns the result of a child action of a SurfaceController
+        /// </summary>
+        public static IHtmlContent ActionLink(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
+        {
+            if (actionName == null)
+            {
+                throw new ArgumentNullException(nameof(actionName));
+            }
 
-        #region BeginUmbracoForm
+            if (string.IsNullOrWhiteSpace(actionName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
+            }
+
+            if (surfaceType == null)
+            {
+                throw new ArgumentNullException(nameof(surfaceType));
+            }
+
+            SurfaceControllerTypeCollection surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
+            Type surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
+            if (surfaceController == null)
+            {
+                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+            }
+
+            var routeVals = new RouteValueDictionary(new { area = "" });
+
+            PluginControllerMetadata metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
+            {
+                // set the area to the plugin area
+                if (routeVals.ContainsKey("area"))
+                {
+                    routeVals["area"] = metaData.AreaName;
+                }
+                else
+                {
+                    routeVals.Add("area", metaData.AreaName);
+                }
+            }
+
+            return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
+        }
+
+        /// <summary>
+        /// Outputs the hidden html input field for Surface Controller route information
+        /// </summary>
+        /// <typeparam name="TSurface">The <see cref="SurfaceController"/> type</typeparam>
+        /// <remarks>
+        /// Typically not used directly because BeginUmbracoForm automatically outputs this value when routing
+        /// for surface controllers. But this could be used in case a form tag is manually created.
+        /// </remarks>
+        public static IHtmlContent SurfaceControllerHiddenInput<TSurface>(
+            this IHtmlHelper htmlHelper,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+            where TSurface : SurfaceController
+        {
+            var inputField = GetSurfaceControllerHiddenInput(
+                GetRequiredService<IDataProtectionProvider>(htmlHelper),
+                ControllerExtensions.GetControllerName<TSurface>(),
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return new HtmlString(inputField);
+        }
+
+        private static string GetSurfaceControllerHiddenInput(
+            IDataProtectionProvider dataProtectionProvider,
+            string controllerName,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+        {
+            var encryptedString = EncryptionHelper.CreateEncryptedRouteString(
+                dataProtectionProvider,
+                controllerName,
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return "<input name=\"ufprt\" type=\"hidden\" value=\"" + encryptedString + "\" />";
+        }
 
         /// <summary>
         /// Used for rendering out the Form for BeginUmbracoForm
@@ -262,9 +292,7 @@ namespace Umbraco.Extensions
         internal class UmbracoForm : MvcForm
         {
             private readonly ViewContext _viewContext;
-            private bool _disposed;
-            private readonly string _encryptedString;
-            private readonly string _controllerName;
+            private readonly string _surfaceControllerInput;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="UmbracoForm"/> class.
@@ -279,34 +307,25 @@ namespace Umbraco.Extensions
                 : base(viewContext, htmlEncoder)
             {
                 _viewContext = viewContext;
-                _controllerName = controllerName;
-                _encryptedString = EncryptionHelper.CreateEncryptedRouteString(GetRequiredService<IDataProtectionProvider>(viewContext), controllerName, controllerAction, area, additionalRouteVals);
+                _surfaceControllerInput = GetSurfaceControllerHiddenInput(
+                    GetRequiredService<IDataProtectionProvider>(viewContext),
+                    controllerName,
+                    controllerAction,
+                    area,
+                    additionalRouteVals);
             }
 
-            protected new void Dispose()
+            protected override void GenerateEndForm()
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                _disposed = true;
-
-                // Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
-                // We have a controllerName and area so we can match
-                if (_controllerName == "UmbRegister"
-                    || _controllerName == "UmbProfile"
-                    || _controllerName == "UmbLoginStatus"
-                    || _controllerName == "UmbLogin")
-                {
-                    IAntiforgery antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
-                    _viewContext.Writer.Write(antiforgery.GetHtml(_viewContext.HttpContext).ToString());
-                }
+                // Always output an anti-forgery token
+                IAntiforgery antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+                IHtmlContent antiforgeryHtml = antiforgery.GetHtml(_viewContext.HttpContext);
+                _viewContext.Writer.Write(antiforgeryHtml.ToHtmlString());
 
                 // write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
+                _viewContext.Writer.Write(_surfaceControllerInput);
 
-                base.Dispose();
+                base.GenerateEndForm();
             }
         }
 
@@ -424,7 +443,7 @@ namespace Umbraco.Extensions
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
             }
 
-            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
+            return html.BeginUmbracoForm(action, controllerName, string.Empty, additionalRouteVals, htmlAttributes);
         }
 
         /// <summary>
@@ -721,7 +740,6 @@ namespace Umbraco.Extensions
             return theForm;
         }
 
-        #endregion
 
         #region If
 

@@ -29,20 +29,19 @@ namespace Umbraco.Web.Common.Extensions
             var pattern = new StringBuilder(rootSegment);
             if (!prefixPathSegment.IsNullOrWhiteSpace())
             {
-                pattern.Append("/").Append(prefixPathSegment);
+                pattern.Append('/').Append(prefixPathSegment);
             }
 
             if (includeControllerNameInRoute)
             {
-                pattern.Append("/").Append(controllerName);
+                pattern.Append('/').Append(controllerName);
             }
 
-            pattern.Append("/").Append("{action}/{id?}");
+            pattern.Append("/{action}/{id?}");
 
             var defaults = defaultAction.IsNullOrWhiteSpace()
                 ? (object)new { controller = controllerName }
                 : new { controller = controllerName, action = defaultAction };
-
 
             if (areaName.IsNullOrWhiteSpace())
             {
@@ -70,6 +69,7 @@ namespace Umbraco.Web.Common.Extensions
         /// <summary>
         /// Used to map Umbraco controllers consistently
         /// </summary>
+        /// <typeparam name="T">The <see cref="ControllerBase"/> type to route</typeparam>
         public static void MapUmbracoRoute<T>(
             this IEndpointRouteBuilder endpoints,
             string rootSegment,
@@ -82,8 +82,9 @@ namespace Umbraco.Web.Common.Extensions
             => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, prefixPathSegment, defaultAction, includeControllerNameInRoute, constraints);
 
         /// <summary>
-        /// Used to map Umbraco api controllers consistently
+        /// Used to map controllers as Umbraco API routes consistently
         /// </summary>
+        /// <typeparam name="T">The <see cref="ControllerBase"/> type to route</typeparam>
         public static void MapUmbracoApiRoute<T>(
             this IEndpointRouteBuilder endpoints,
             string rootSegment,
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Common.Extensions
             => endpoints.MapUmbracoApiRoute(typeof(T), rootSegment, areaName, isBackOffice, defaultAction, constraints);
 
         /// <summary>
-        /// Used to map Umbraco api controllers consistently
+        /// Used to map controllers as Umbraco API routes consistently
         /// </summary>
         public static void MapUmbracoApiRoute(
             this IEndpointRouteBuilder endpoints,

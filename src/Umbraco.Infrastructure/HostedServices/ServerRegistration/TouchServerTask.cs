@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 
 namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
     {
         private readonly IRuntimeState _runtimeState;
         private readonly IServerRegistrationService _serverRegistrationService;
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<TouchServerTask> _logger;
         private readonly GlobalSettings _globalSettings;
 
@@ -31,12 +31,17 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
         /// <param name="requestAccessor">Accessor for the current request.</param>
         /// <param name="logger">The typed logger.</param>
         /// <param name="globalSettings">The configuration for global settings.</param>
-        public TouchServerTask(IRuntimeState runtimeState, IServerRegistrationService serverRegistrationService, IRequestAccessor requestAccessor, ILogger<TouchServerTask> logger, IOptions<GlobalSettings> globalSettings)
+        public TouchServerTask(
+            IRuntimeState runtimeState,
+            IServerRegistrationService serverRegistrationService,
+            IHostingEnvironment hostingEnvironment,
+            ILogger<TouchServerTask> logger,
+            IOptions<GlobalSettings> globalSettings)
             : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
         {
             _runtimeState = runtimeState;
             _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));
-            _requestAccessor = requestAccessor;
+            _hostingEnvironment = hostingEnvironment;
             _logger = logger;
             _globalSettings = globalSettings.Value;
         }
@@ -48,7 +53,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
                 return Task.CompletedTask;
             }
 
-            var serverAddress = _requestAccessor.GetApplicationUrl()?.ToString();
+            var serverAddress = _hostingEnvironment.ApplicationMainUrl?.ToString();
             if (serverAddress.IsNullOrWhiteSpace())
             {
                 _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");

@@ -51,17 +51,29 @@ namespace Umbraco.Web.Common.AspNetCore
         {
             get
             {
-                if (_helper != null) return _helper;
+                if (_helper != null)
+                {
+                    return _helper;
+                }
 
-                var model = ViewData.Model;
+                TModel model = ViewData.Model;
                 var content = model as IPublishedContent;
-                if (content == null && model is IContentModel)
-                    content = ((IContentModel) model).Content;
+                if (content is null && model is IContentModel contentModel)
+                {
+                    content = contentModel.Content;
+                }
+
+                if (content is null)
+                {
+                    content = UmbracoContext?.PublishedRequest?.PublishedContent;
+                }
 
                 _helper = Context.RequestServices.GetRequiredService<UmbracoHelper>();
 
-                if (content != null)
+                if (!(content is null))
+                {
                     _helper.AssignedContentItem = content;
+                }
 
                 return _helper;
             }

@@ -1,38 +1,56 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Install;
+using Umbraco.Core.Services;
+using Umbraco.Web.Install;
 using Umbraco.Web.Install.Models;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Core.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-        "Permissions", 0, "",
+    /// <summary>
+    /// Represents a step in the installation that ensure all the required permissions on files and folders are correct.
+    /// </summary>
+    [InstallSetupStep(
+        InstallationType.NewInstall | InstallationType.Upgrade,
+        "Permissions",
+        0,
+        "",
         PerformsAppRestart = true)]
     public class FilePermissionsStep : InstallSetupStep<object>
     {
         private readonly IFilePermissionHelper _filePermissionHelper;
-        public FilePermissionsStep(IFilePermissionHelper filePermissionHelper)
+        private readonly ILocalizedTextService _localizedTextService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FilePermissionsStep"/> class.
+        /// </summary>
+        public FilePermissionsStep(
+            IFilePermissionHelper filePermissionHelper,
+            ILocalizedTextService localizedTextService)
         {
             _filePermissionHelper = filePermissionHelper;
+            _localizedTextService = localizedTextService;
         }
+
+        /// <inheritdoc/>
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             // validate file permissions
-            Dictionary<string, IEnumerable<string>> report;
-            var permissionsOk = _filePermissionHelper.RunFilePermissionTestSuite(out report);
+            var permissionsOk = _filePermissionHelper.RunFilePermissionTestSuite(out Dictionary<FilePermissionTest, IEnumerable<string>> report);
 
+            var translatedErrors = report.ToDictionary(x => _localizedTextService.Localize("permissions", x.Key), x => x.Value);
             if (permissionsOk == false)
-                throw new InstallException("Permission check failed", "permissionsreport", new { errors = report });
+            {
+                throw new InstallException("Permission check failed", "permissionsreport", new { errors = translatedErrors });
+            }
 
             return Task.FromResult<InstallSetupResult>(null);
         }
 
-        public override bool RequiresExecution(object model)
-        {
-            return true;
-        }
+        /// <inheritdoc/>
+        public override bool RequiresExecution(object model) => true;
     }
 }

@@ -33,7 +33,7 @@
                 <dependency id="System.Runtime.Caching" version="[5.0.0,5.999999)" />
                 <dependency id="System.Reflection.Emit.Lightweight" version="[4.7.0,4.999999)" />
 
-                <dependency id="HtmlAgilityPack" version="[1.11.29,1.999999)" />
+                <dependency id="HtmlAgilityPack" version="[1.11.30,1.999999)" />
                 <dependency id="MailKit" version="[2.10.1,2.999999)" />
                 <dependency id="Markdown" version="[2.2.1,2.999999)" />
                 <dependency id="Microsoft.CSharp" version="[4.7.0,4.999999)" />

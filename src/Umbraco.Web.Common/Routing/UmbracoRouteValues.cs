@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
@@ -21,29 +22,25 @@ namespace Umbraco.Web.Common.Routing
         /// </summary>
         public UmbracoRouteValues(
             IPublishedRequest publishedRequest,
-            string controllerName = null,
-            Type controllerType = null,
-            string actionName = DefaultActionName,
+            ControllerActionDescriptor controllerActionDescriptor,
             string templateName = null,
             bool hasHijackedRoute = false)
         {
-            ControllerName = controllerName ?? ControllerExtensions.GetControllerName<RenderController>();
-            ControllerType = controllerType ?? typeof(RenderController);
             PublishedRequest = publishedRequest;
+            ControllerActionDescriptor = controllerActionDescriptor;
             HasHijackedRoute = hasHijackedRoute;
-            ActionName = actionName;
             TemplateName = templateName;
         }
 
         /// <summary>
         /// Gets the controller name
         /// </summary>
-        public string ControllerName { get; }
+        public string ControllerName => ControllerActionDescriptor.ControllerName;
 
         /// <summary>
         /// Gets the action name
         /// </summary>
-        public string ActionName { get; }
+        public string ActionName => ControllerActionDescriptor.ActionName;
 
         /// <summary>
         /// Gets the template name
@@ -51,9 +48,14 @@ namespace Umbraco.Web.Common.Routing
         public string TemplateName { get; }
 
         /// <summary>
-        /// Gets the Controller type found for routing to
+        /// Gets the controller type
         /// </summary>
-        public Type ControllerType { get; }
+        public Type ControllerType => ControllerActionDescriptor.ControllerTypeInfo;
+
+        /// <summary>
+        /// Gets the Controller descriptor found for routing to
+        /// </summary>
+        public ControllerActionDescriptor ControllerActionDescriptor { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedRequest"/>

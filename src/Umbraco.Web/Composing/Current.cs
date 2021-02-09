@@ -1,35 +1,26 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Dictionary;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.HealthChecks;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.HealthCheck;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Templates;
-using Umbraco.Net;
-using Umbraco.Core.PackageActions;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Runtime;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Core.Templates;
 using Umbraco.Core.WebAssets;
+using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -151,28 +142,7 @@ namespace Umbraco.Web.Composing
 
         #endregion
 
-        #region Web Constants
-
-        // these are different - not 'resolving' anything, and nothing that could be managed
-        // by the container - just registering some sort of application-wide constants or
-        // settings - but they fit in Current nicely too
-
-        private static Type _defaultRenderMvcControllerType;
-
-        // internal - can only be accessed through Composition at compose time
-        internal static Type DefaultRenderMvcControllerType
-        {
-            get => _defaultRenderMvcControllerType;
-            set
-            {
-                if (value.Implements<IRenderController>() == false)
-                    throw new ArgumentException($"Type {value.FullName} does not implement {typeof(IRenderController).FullName}.", nameof(value));
-                _defaultRenderMvcControllerType = value;
-            }
-        }
-
-        #endregion
-
+        
         #region Core Getters
 
         // proxy Core for convenience

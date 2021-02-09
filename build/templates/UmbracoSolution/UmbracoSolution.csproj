@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
@@ -10,4 +9,33 @@
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="umbraco\Data\**" />
+        <Compile Remove="umbraco\logs\**" />
+        <Compile Remove="umbraco\MediaCache\**" />
+        <Compile Remove="umbraco\models\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Remove="umbraco\Data\**" />
+        <EmbeddedResource Remove="umbraco\logs\**" />
+        <EmbeddedResource Remove="umbraco\MediaCache\**" />
+        <EmbeddedResource Remove="umbraco\models\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="umbraco\models\**" />
+        <None Remove="umbraco\Data\**" />
+        <None Remove="umbraco\logs\**" />
+        <None Remove="umbraco\MediaCache\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="umbraco\Data\**" />
+        <Content Remove="umbraco\logs\**" />
+        <Content Remove="umbraco\MediaCache\**" />
+        <Content Remove="umbraco\models\**" />
+    </ItemGroup>
+
+    <!--Set this to true ModelsBuilder mode is not PureLive -->
+    <PropertyGroup>
+        <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    </PropertyGroup>
 </Project>
