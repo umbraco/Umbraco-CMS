@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Extensions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
@@ -17,11 +16,8 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.HostedServices
 {

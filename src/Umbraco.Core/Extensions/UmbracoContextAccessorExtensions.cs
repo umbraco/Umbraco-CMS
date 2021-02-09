@@ -1,9 +1,11 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
-
     public static class UmbracoContextAccessorExtensions
     {
         public static IUmbracoContext GetRequiredUmbracoContext(this IUmbracoContextAccessor umbracoContextAccessor)

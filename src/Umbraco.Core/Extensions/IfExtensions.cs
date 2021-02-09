@@ -1,14 +1,15 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core
+using System;
+
+namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// Extension methods for 'If' checking like checking If something is null or not null
     /// </summary>
     public static class IfExtensions
     {
-
         /// <summary>The if not null.</summary>
         /// <param name="item">The item.</param>
         /// <param name="action">The action.</param>

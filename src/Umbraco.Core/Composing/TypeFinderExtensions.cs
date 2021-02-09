@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Composing
+namespace Umbraco.Extensions
 {
     public static class TypeFinderExtensions
     {

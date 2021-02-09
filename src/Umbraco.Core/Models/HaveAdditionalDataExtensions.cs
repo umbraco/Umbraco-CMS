@@ -1,9 +1,11 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Extensions;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Models
+using Umbraco.Cms.Core.Models.Entities;
+
+namespace Umbraco.Extensions
 {
-    public static class EntityExtensions
+    public static class HaveAdditionalDataExtensions
     {
         /// <summary>
         /// Gets additional data.

@@ -12,13 +12,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Infrastructure.DependencyInjection

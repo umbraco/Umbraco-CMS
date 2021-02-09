@@ -1,5 +1,7 @@
-﻿using System;
-using Umbraco.Cms.Core;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 

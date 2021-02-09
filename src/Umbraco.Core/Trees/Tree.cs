@@ -1,6 +1,10 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Diagnostics;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Trees
 {

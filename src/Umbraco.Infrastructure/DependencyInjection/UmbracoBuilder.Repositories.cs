@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

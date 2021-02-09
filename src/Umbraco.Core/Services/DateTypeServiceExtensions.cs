@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Extensions
 {
     public static class DateTypeServiceExtensions
     {

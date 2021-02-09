@@ -1,8 +1,11 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class VersionExtensions
     {

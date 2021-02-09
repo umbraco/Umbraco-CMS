@@ -1,4 +1,7 @@
-﻿using Umbraco.Cms.Core.Cache;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Extensions
 {

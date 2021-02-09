@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache

@@ -1,11 +1,13 @@
-﻿using System.Threading;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class WaitHandleExtensions
     {
-
         // http://stackoverflow.com/questions/25382583/waiting-on-a-named-semaphore-with-waitone100-vs-waitone0-task-delay100
         // http://blog.nerdbank.net/2011/07/c-await-for-waithandle.html
         // F# has a AwaitWaitHandle method that accepts a time out... and seems pretty complex...

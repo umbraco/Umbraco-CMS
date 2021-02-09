@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 {

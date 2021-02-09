@@ -5,8 +5,8 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {

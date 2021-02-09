@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Configuration;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Authorization;

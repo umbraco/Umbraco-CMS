@@ -2,8 +2,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice

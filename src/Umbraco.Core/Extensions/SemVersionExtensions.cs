@@ -1,4 +1,7 @@
-﻿using Umbraco.Cms.Core.Semver;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions
 {

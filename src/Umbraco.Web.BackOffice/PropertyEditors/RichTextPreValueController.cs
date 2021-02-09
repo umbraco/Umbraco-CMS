@@ -4,7 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;

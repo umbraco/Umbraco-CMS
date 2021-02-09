@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 

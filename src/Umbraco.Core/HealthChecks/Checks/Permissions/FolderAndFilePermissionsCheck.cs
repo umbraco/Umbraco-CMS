@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Permissions
 {

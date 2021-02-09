@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Logging.Viewer;
-using Umbraco.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

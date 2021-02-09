@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;

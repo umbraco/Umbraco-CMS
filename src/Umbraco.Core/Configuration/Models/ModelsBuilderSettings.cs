@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>

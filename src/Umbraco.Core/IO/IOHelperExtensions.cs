@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Cms.Core.IO
+namespace Umbraco.Extensions
 {
     public static class IOHelperExtensions
     {

@@ -1,7 +1,7 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.ActionsResults
 {

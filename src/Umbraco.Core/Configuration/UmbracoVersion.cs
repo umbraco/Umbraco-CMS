@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Umbraco.Cms.Core.Semver;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration
 {

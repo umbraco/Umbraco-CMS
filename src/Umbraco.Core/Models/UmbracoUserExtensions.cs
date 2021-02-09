@@ -1,13 +1,16 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     public static class UmbracoUserExtensions
     {

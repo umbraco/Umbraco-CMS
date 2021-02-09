@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Install.InstallSteps
 {

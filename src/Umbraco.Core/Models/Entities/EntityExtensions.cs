@@ -1,6 +1,10 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Models.Entities
+using System;
+using Umbraco.Cms.Core.Models.Entities;
+
+namespace Umbraco.Extensions
 {
     public static class EntityExtensions
     {

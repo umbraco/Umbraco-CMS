@@ -1,4 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Models
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+
+namespace Umbraco.Extensions
 {
     public static class RelationTypeExtensions
     {

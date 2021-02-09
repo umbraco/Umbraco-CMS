@@ -1,6 +1,9 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class UmbracoContextExtensions
     {

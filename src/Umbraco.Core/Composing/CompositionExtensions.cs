@@ -2,7 +2,7 @@ using System;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Cms.Core.Composing
+namespace Umbraco.Extensions
 {
     public static class CompositionExtensions
     {

@@ -7,9 +7,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Manifest
 {

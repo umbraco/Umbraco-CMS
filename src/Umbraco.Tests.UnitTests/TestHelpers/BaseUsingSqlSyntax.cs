@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.TestHelpers

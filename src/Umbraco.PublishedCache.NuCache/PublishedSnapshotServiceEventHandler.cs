@@ -6,12 +6,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Web.PublishedCache.NuCache

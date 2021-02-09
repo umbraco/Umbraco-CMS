@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Core;
+using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Extensions;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Composing

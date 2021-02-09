@@ -4,7 +4,7 @@ using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Core.Models;
+using Umbraco.Extensions;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -12,7 +12,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
     // note
     // the whole PublishedMember thing should be refactored because as soon as a member
     // is wrapped on in a model, the inner IMember and all associated properties are lost
-
     internal class PublishedMember : PublishedContent //, IPublishedMember
     {
         private readonly IMember _member;

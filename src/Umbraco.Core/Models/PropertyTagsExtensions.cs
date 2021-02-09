@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Property"/> class to manage tags.

@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -17,12 +17,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Macros;
 
 namespace Umbraco.Web.Macros

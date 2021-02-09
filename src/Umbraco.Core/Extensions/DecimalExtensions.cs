@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Extensions
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for System.Decimal.

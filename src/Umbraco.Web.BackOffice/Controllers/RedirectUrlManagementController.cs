@@ -1,13 +1,10 @@
-﻿using System;
-using System.Xml;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Core.Configuration;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -18,7 +15,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
+using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers

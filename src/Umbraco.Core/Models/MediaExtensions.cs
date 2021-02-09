@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     public static class MediaExtensions
     {

@@ -1,15 +1,15 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Localization
 {
-
     /// <summary>
     /// Sets the request culture to the culture of the back office user if one is determined to be in the request
     /// </summary>

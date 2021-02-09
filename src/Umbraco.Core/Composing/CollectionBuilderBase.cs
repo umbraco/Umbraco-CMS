@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing
 {

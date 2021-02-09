@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Packaging
 {

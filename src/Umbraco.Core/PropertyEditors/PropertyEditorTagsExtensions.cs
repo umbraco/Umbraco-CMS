@@ -1,6 +1,6 @@
-﻿using Umbraco.Extensions;
+﻿using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="IDataEditor"/> interface to manage tags.

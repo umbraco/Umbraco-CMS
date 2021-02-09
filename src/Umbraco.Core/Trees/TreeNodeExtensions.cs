@@ -1,4 +1,9 @@
-﻿namespace Umbraco.Cms.Core.Trees
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Trees;
+
+namespace Umbraco.Extensions
 {
     public static class TreeNodeExtensions
     {

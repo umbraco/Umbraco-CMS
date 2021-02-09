@@ -1,15 +1,11 @@
-﻿using System.IO;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

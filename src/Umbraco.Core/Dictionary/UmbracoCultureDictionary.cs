@@ -5,10 +5,10 @@ using System.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Dictionary
 {
-
     /// <summary>
     /// A culture dictionary that uses the Umbraco ILocalizationService
     /// </summary>

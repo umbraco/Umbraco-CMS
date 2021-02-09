@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -18,19 +17,12 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {

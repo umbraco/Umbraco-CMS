@@ -5,6 +5,7 @@ using System.Net;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {

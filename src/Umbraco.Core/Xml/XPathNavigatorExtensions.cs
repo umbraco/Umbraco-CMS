@@ -1,6 +1,10 @@
-﻿using System.Xml.XPath;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Xml
+using System.Xml.XPath;
+using Umbraco.Cms.Core.Xml;
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extensions to XPathNavigator.

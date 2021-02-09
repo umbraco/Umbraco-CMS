@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Extensions
 {
     public static class UserServiceExtensions
     {

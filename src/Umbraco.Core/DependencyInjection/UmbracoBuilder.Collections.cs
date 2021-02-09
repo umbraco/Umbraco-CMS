@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {

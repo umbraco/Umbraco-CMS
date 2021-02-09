@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions
 {

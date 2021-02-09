@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +21,7 @@ namespace Umbraco.Extensions
                        ? Activator.CreateInstance(t)
                        : null;
         }
+
         internal static MethodInfo GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
         {
             var methods = type.GetMethods().Where(method => method.Name == name);

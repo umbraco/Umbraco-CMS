@@ -1,11 +1,15 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {

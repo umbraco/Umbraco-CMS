@@ -1,17 +1,15 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Events;
 using Umbraco.Core.Sync;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.Cache;
 using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Infrastructure.DependencyInjection

@@ -1,24 +1,27 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Umbraco.Cms.Core.Dictionary;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for ILocalizedTextService
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
-
         public static string Localize<T>(this ILocalizedTextService manager, string area, T key)
         where T: System.Enum
         {
             var fullKey = string.Join("/", area, key);
             return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
         }
+
         public static string Localize(this ILocalizedTextService manager, string area, string key)
         {
             var fullKey = string.Join("/", area, key);

@@ -1,8 +1,12 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods that return udis for Umbraco entities.

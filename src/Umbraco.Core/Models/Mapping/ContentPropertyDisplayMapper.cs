@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
 {

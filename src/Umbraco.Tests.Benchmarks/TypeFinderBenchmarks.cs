@@ -1,10 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
-using System;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Tests.Benchmarks.Config;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Benchmarks
 {

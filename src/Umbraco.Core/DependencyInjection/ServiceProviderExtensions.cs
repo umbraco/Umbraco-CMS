@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Cms.Core.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IFactory"/> class.

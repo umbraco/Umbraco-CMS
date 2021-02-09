@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 

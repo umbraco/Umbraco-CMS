@@ -1,19 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core;
-using System.Web.Mvc;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.Mvc;
 using System.Configuration;
+using System.Linq;
+using System.Web.Mvc;
 using Bogus;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -23,8 +12,11 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
+using Umbraco.Extensions;
+using Umbraco.Web.Mvc;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.TestData

@@ -7,10 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache

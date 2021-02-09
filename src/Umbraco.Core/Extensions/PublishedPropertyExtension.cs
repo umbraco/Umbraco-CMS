@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core
+using Umbraco.Cms.Core.Models.PublishedContent;
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for <c>IPublishedProperty</c>.

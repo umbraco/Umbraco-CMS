@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
-using Umbraco.Cms.Core.Models;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Services.Changes
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Changes;
+
+namespace Umbraco.Extensions
 {
     public static class ContentTypeChangeExtensions
     {

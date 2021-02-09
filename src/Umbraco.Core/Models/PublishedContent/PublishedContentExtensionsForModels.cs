@@ -1,8 +1,8 @@
 ﻿using System;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Cms.Core.Models.PublishedContent
+namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// Provides strongly typed published content models services.
     /// </summary>

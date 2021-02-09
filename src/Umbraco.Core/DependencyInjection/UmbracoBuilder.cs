@@ -34,6 +34,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {

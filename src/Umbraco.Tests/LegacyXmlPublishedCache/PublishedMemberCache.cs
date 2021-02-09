@@ -5,10 +5,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Cache;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 

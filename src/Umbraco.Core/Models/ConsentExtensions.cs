@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Models
+﻿using Umbraco.Cms.Core.Models;
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="IConsent"/> interface.

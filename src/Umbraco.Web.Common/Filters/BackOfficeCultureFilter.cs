@@ -1,8 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Security;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Globalization;
-using Umbraco.Cms.Core.Security;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Filters
 {

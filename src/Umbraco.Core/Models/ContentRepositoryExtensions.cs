@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods used to manipulate content variations by the document repository

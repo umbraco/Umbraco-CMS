@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
 {

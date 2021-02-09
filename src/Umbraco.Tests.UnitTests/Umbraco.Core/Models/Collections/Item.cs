@@ -7,9 +7,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
 {

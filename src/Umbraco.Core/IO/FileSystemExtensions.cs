@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Cms.Core.IO
+namespace Umbraco.Extensions
 {
     public static class FileSystemExtensions
     {

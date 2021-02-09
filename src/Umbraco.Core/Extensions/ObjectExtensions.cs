@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

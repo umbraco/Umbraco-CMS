@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -10,8 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;

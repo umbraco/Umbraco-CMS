@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Media;
 
-namespace Umbraco.Cms.Core.Media
+namespace Umbraco.Extensions
 {
     public static class ImageUrlGeneratorExtensions
     {

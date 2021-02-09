@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="IContentBase"/> class, to manage tags.

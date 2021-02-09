@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

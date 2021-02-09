@@ -4,6 +4,7 @@ using Serilog;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
 
 namespace Umbraco.Core.Logging.Viewer

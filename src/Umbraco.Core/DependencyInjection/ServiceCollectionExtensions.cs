@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.DependencyInjection
+namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {

@@ -1,23 +1,19 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
+using Umbraco.Tests.Common;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Routing
 {

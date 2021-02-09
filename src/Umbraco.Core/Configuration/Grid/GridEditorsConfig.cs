@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Grid
 {

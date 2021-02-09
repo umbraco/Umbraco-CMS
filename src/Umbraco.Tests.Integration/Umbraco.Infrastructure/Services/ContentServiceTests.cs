@@ -21,6 +21,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -5,9 +8,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security
 {

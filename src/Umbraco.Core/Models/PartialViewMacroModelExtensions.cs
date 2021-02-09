@@ -1,6 +1,6 @@
-﻿using Umbraco.Extensions;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for the PartialViewMacroModel object

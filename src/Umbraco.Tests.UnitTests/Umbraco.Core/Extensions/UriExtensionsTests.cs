@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions

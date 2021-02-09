@@ -6,18 +6,14 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {

@@ -1,10 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Extensions
 {
     public static class ContentTypeServiceExtensions
     {

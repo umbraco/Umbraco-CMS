@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +9,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for xml objects

@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Core.Cache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {

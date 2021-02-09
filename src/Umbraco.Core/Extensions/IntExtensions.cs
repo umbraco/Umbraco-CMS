@@ -1,6 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Cms.Core
+using System;
+
+namespace Umbraco.Extensions
 {
     public static class IntExtensions
     {
