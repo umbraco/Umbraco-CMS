@@ -62,7 +62,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -167,7 +167,7 @@ using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -258,9 +258,9 @@ namespace Umbraco.Web.PublishedModels
 
             Console.WriteLine(gen);
 
-            Assert.IsTrue(gen.Contains(" global::Umbraco.Core.Models.PublishedContent.IPublishedContent Prop1"));
+            Assert.IsTrue(gen.Contains(" global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent Prop1"));
             Assert.IsTrue(gen.Contains(" global::System.Text.StringBuilder Prop2"));
-            Assert.IsTrue(gen.Contains(" global::Umbraco.Core.Exceptions.BootFailedException Prop3"));
+            Assert.IsTrue(gen.Contains(" global::Umbraco.Cms.Core.Exceptions.BootFailedException Prop3"));
         }
 
         [TestCase("int", typeof(int))]

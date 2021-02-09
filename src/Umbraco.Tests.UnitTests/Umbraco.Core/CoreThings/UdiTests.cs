@@ -278,14 +278,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
             // unless we want to know
             Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-            Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
+            Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
 
             UdiParser.ResetUdiTypes();
 
             // not known
             Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-            Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
+            Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
 
             // scanned
             UdiParserServiceConnectors.RegisterServiceConnector<FooConnector>(); // this is the equivalent of scanning but we'll just manually register this one
