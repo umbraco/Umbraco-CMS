@@ -38,7 +38,7 @@ namespace Umbraco.Infrastructure.Security
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
             IOptions<TPasswordConfig> passwordConfiguration)
-            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoOpLookupNormalizer(), errors, services, logger)
+            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));

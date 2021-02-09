@@ -13,7 +13,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void NormalizeName_Expect_Input_Returned()
         {
             var name = Guid.NewGuid().ToString();
-            var sut = new NoOpLookupNormalizer();
+            var sut = new NoopLookupNormalizer();
 
             var normalizedName = sut.NormalizeName(name);
 
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void NormalizeEmail_Expect_Input_Returned()
         {
             var email = $"{Guid.NewGuid()}@umbraco";
-            var sut = new NoOpLookupNormalizer();
+            var sut = new NoopLookupNormalizer();
 
             var normalizedEmail = sut.NormalizeEmail(email);
 
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         [TestCase(" ")]
         public void NormalizeName_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string name)
         {
-            var sut = new NoOpLookupNormalizer();
+            var sut = new NoopLookupNormalizer();
 
             var normalizedName = sut.NormalizeName(name);
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         [TestCase(" ")]
         public void NormalizeEmail_When_Name_Null_Or_Whitespace_Expect_Same_Returned(string email)
         {
-            var sut = new NoOpLookupNormalizer();
+            var sut = new NoopLookupNormalizer();
 
             var normalizedEmail = sut.NormalizeEmail(email);
 
