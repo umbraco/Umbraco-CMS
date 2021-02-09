@@ -31,6 +31,8 @@ namespace Umbraco.Web
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator);
 
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator, imageCropperValue);
+
         /// <summary>
         /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
