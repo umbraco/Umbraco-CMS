@@ -5,6 +5,7 @@ using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Examine
 {

@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Examine;
 using Version = Lucene.Net.Util.Version;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for the LuceneIndex
