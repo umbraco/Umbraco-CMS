@@ -759,6 +759,27 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             //don't add a browser history for this
             $location.replace();
             return true;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#sortVariants
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Sorts the variants so mandatory languages are shown first and all other underneath. Both Mandatory and non mandatory languages are then
+         * sorted in the following groups 'Published', 'Draft', 'Not Created'. Within each of those groups the variants are
+         * sorted by the language display name.
+         * 
+         */
+        sortVariants: function (a, b) {
+            const statesOrder = ['Published', 'Draft', 'NotCreated'];
+            const compareMandatory = (a,b) => (!a.language.isMandatory ? 1 : 0) - (!b.language.isMandatory ? 1 : 0);
+            const compareState = (a, b) => statesOrder.indexOf(a.state) - statesOrder.indexOf(b.state);
+            const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
+    
+            return compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
         }
     };
 }

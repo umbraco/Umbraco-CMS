@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager, localizationService, editorState) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState, contentEditingHelper) {
         function link(scope) {
 
             var unsubscribe = [];
@@ -92,7 +92,6 @@
             }
 
             function onInit() {
-
                 // find default + check if we have variants.
                 scope.content.variants.forEach(function (variant) {
                     if (variant.language !== null && variant.language.isDefault) {
@@ -147,7 +146,12 @@
                     }
                     unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, null, onVariantValidation, variant.segment));
                 });
+                
+                scope.vm.variantMenu.sort(sortVariantsMenu);
+            }
 
+            function sortVariantsMenu (a, b) {
+                return contentEditingHelper.sortVariants(a.variant, b.variant);
             }
 
             scope.goBack = function () {
@@ -199,6 +203,14 @@
                 }
                 return false;
             }
+
+            scope.toggleDropdown = function () {
+                scope.vm.dropdownOpen = !scope.vm.dropdownOpen;
+                
+                if (scope.vm.dropdownOpen) {
+                    scope.vm.variantMenu.sort(sortVariantsMenu);
+                }
+            };
 
             onInit();
 
