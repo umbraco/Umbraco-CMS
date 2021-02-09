@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -35,7 +36,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// <param name="configureOptions"></param>
         /// <returns></returns>
         public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string displayName, Action<TOptions> configureOptions)
-        {            
+        {
             // Validate that the prefix is set
             if (!authenticationScheme.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
             {

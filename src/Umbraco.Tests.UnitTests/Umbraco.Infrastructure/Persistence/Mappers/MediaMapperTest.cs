@@ -5,7 +5,8 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
-using MediaModel = Umbraco.Core.Models.Media;
+using Constants = Umbraco.Cms.Core.Constants;
+using MediaModel = Umbraco.Cms.Core.Models.Media;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {

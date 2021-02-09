@@ -4,6 +4,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Authorization

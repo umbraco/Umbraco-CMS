@@ -3,6 +3,8 @@
 
 using System;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 

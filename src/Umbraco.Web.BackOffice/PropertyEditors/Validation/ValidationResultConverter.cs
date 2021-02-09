@@ -5,9 +5,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors.Validation
 {

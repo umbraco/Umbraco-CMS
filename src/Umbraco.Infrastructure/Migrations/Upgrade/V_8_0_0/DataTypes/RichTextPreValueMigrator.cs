@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             => editorAlias == "Umbraco.TinyMCEv3";
 
         public override string GetNewAlias(string editorAlias)
-            => Constants.PropertyEditors.Aliases.TinyMce;
+            => Cms.Core.Constants.PropertyEditors.Aliases.TinyMce;
 
         protected override object GetPreValueValue(PreValueDto preValue)
         {

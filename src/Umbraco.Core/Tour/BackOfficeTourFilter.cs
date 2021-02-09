@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Umbraco.Web.Tour
+namespace Umbraco.Cms.Core.Tour
 {
     /// <summary>
     /// Represents a back-office tour filter.
@@ -14,7 +14,7 @@ namespace Umbraco.Web.Tour
         /// <param name="tourFileName">Value to filter out a tour file, can be null</param>
         /// <param name="tourAlias">Value to filter out a tour alias, can be null</param>
         /// <remarks>
-        /// Depending on what is null will depend on how the filter is applied. 
+        /// Depending on what is null will depend on how the filter is applied.
         /// If pluginName is not NULL and it's matched then we check if tourFileName is not NULL and it's matched then we check tour alias is not NULL and then match it,
         /// if any steps is NULL then the filters upstream are applied.
         /// Example, pluginName = "hello", tourFileName="stuff", tourAlias=NULL = we will filter out the tour file "stuff" from the plugin "hello" but not from other plugins if the same file name exists.

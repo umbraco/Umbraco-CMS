@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Profiler

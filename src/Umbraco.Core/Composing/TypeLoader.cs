@@ -6,14 +6,13 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using File = System.IO.File;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Logging;
+using File = System.IO.File;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Provides methods to find and instantiate types.

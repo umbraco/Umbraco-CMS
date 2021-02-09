@@ -8,7 +8,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Web.BackOffice.Trees;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing

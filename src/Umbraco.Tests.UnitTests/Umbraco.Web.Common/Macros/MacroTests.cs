@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Macros;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Macros;
 

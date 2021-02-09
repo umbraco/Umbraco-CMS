@@ -1,6 +1,9 @@
 ﻿using Examine;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;

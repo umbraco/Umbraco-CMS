@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
 {

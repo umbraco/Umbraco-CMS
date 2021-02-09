@@ -2,12 +2,15 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core;
-using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
 
@@ -142,7 +145,7 @@ namespace Umbraco.Web.Website.Routing
                 && !_umbracoFeatures.Disabled.DisableTemplates
                 && !def.HasHijackedRoute)
             {
-                Core.Models.PublishedContent.IPublishedContent content = request.PublishedContent;
+                IPublishedContent content = request.PublishedContent;
 
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last

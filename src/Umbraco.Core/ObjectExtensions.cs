@@ -8,9 +8,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides object extension methods.

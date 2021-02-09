@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Umbraco.Web.Features;
+using Umbraco.Cms.Core.Features;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {

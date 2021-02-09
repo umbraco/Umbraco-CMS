@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Represents a model in the tree

@@ -1,11 +1,11 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Logging.Viewer;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Infrastructure.DependencyInjection

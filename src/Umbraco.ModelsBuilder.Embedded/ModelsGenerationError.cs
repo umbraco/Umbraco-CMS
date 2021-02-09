@@ -2,9 +2,10 @@ using System;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {

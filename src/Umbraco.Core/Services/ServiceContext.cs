@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Represents the Umbraco Service context, which provides access to all services.

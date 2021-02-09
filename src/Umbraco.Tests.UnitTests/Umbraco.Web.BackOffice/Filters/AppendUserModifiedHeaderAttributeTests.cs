@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Filters;
 

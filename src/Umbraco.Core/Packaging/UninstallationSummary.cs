@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Packaging;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     [Serializable]
     [DataContract(IsReference = true)]

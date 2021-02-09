@@ -3,10 +3,9 @@ using Microsoft.Extensions.Logging;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Lucene.Net.Store;
-using Umbraco.Core.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Examine
 {

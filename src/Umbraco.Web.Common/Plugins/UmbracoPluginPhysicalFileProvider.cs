@@ -5,7 +5,7 @@ using System.IO;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Web.Common.Plugins
 {
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Common.Plugins
         public new IFileInfo GetFileInfo(string subpath)
         {
             var extension = Path.GetExtension(subpath);
-            var subPathInclAppPluginsFolder = Path.Combine(Core.Constants.SystemDirectories.AppPlugins, subpath);
+            var subPathInclAppPluginsFolder = Path.Combine(Cms.Core.Constants.SystemDirectories.AppPlugins, subpath);
             if (!_options.Value.BrowsableFileExtensions.Contains(extension))
             {
                 return new NotFoundFileInfo(subPathInclAppPluginsFolder);

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Core.Media;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors
 {

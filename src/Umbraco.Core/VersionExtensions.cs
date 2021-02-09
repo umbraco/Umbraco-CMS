@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Semver;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class VersionExtensions
     {

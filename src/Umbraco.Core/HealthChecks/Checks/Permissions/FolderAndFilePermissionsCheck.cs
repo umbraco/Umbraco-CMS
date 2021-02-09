@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.Core.Install;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.HealthChecks.Checks.Permissions
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Permissions
 {
     /// <summary>
     /// Health check for the folder and file permissions.

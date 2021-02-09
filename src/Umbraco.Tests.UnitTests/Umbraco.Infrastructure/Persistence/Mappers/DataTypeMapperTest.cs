@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {

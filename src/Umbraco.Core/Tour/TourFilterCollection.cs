@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Tour
+namespace Umbraco.Cms.Core.Tour
 {
     /// <summary>
     /// Represents a collection of <see cref="BackOfficeTourFilter"/> items.

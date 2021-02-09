@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a temporary representation of an editor for cases where a data type is created but not editor is available.

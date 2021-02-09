@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Common.ModelBinders
@@ -9,7 +10,7 @@ namespace Umbraco.Web.Common.ModelBinders
     /// The provider for <see cref="ContentModelBinder"/> mapping view models, supporting mapping to and from any IPublishedContent or IContentModel.
     /// </summary>
     public class ContentModelBinderProvider : IModelBinderProvider
-    {        
+    {
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
             var modelType = context.Metadata.ModelType;

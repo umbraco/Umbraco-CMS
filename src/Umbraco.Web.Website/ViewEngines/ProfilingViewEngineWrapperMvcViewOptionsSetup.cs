@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Website.ViewEngines

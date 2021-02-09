@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Web.Website.Collections

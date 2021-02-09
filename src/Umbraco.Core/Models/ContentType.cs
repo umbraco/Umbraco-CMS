@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents the content type that a <see cref="Content"/> object is based on
@@ -65,7 +64,7 @@ namespace Umbraco.Core.Models
             get { return AllowedTemplates.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId); }
         }
 
-        
+
         [DataMember]
         public int DefaultTemplateId
         {

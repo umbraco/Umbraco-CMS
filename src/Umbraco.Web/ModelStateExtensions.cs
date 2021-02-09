@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Web

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Models.Packaging;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
     {
@@ -16,7 +15,7 @@ namespace Umbraco.Core.Events
         public ImportPackageEventArgs(TEntity eventObject, IPackageInfo packageMetaData)
             : this(eventObject, packageMetaData, true)
         {
-            
+
         }
 
         public IPackageInfo PackageMetaData { get; }

@@ -10,8 +10,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {

@@ -3,8 +3,9 @@
 
 using System;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Trees;
 using Umbraco.Core;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {

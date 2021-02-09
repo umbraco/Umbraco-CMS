@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Core;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Formatters;
-using Umbraco.Web.Models.TemplateQuery;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {

@@ -2,6 +2,7 @@
 using Examine.Search;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Examine
@@ -16,7 +17,7 @@ namespace Umbraco.Examine
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
-        
+
 
         //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
 

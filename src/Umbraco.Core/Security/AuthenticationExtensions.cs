@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Security.Principal;
 using System.Threading;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public static class AuthenticationExtensions
     {

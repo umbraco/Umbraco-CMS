@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.PackageActions;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.PackageActions;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class TypeLoaderExtensions
     {

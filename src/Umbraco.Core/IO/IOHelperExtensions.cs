@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public static class IOHelperExtensions
     {
@@ -49,6 +49,6 @@ namespace Umbraco.Core.IO
             return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
 
-       
+
     }
 }

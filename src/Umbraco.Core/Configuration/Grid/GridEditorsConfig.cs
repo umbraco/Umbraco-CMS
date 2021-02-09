@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid
 {
     internal class GridEditorsConfig : IGridEditorsConfig
     {

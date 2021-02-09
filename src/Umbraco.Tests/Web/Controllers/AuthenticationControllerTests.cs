@@ -1,10 +1,11 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Features;
 
 namespace Umbraco.Tests.Web.Controllers
 {

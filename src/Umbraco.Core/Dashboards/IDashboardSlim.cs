@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     /// <summary>
     /// Represents a dashboard with only minimal data.

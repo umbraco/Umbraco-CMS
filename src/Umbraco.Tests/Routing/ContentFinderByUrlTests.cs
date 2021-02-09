@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
@@ -9,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Web;
 using Moq;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Tests.Routing
 {

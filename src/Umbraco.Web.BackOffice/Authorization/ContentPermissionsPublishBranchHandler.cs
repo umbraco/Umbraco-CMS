@@ -5,9 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
@@ -41,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Authorization
         /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsPublishBranchRequirement requirement, IContent resource)
         {
-            Core.Models.Membership.IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
             var denied = new List<IUmbracoEntity>();
             var page = 0;

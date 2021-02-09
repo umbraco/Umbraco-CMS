@@ -1,6 +1,4 @@
-using System.Globalization;
-
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Represents a published snapshot domain.

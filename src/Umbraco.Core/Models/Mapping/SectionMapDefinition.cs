@@ -1,11 +1,10 @@
-﻿using Umbraco.Core.Manifest;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Sections;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Sections;
+﻿using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class SectionMapDefinition : IMapDefinition
     {

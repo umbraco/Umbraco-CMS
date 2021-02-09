@@ -7,9 +7,12 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Deploy;
 using Umbraco.Core;
 using Umbraco.Core.Deploy;
 using Umbraco.Core.Serialization;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
 {

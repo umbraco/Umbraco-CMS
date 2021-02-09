@@ -4,14 +4,17 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.WebAssets
 {

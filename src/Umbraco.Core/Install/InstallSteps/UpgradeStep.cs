@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Semver;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Core.Install.InstallSteps
 {
     /// <summary>
     /// This step is purely here to show the button to commence the upgrade

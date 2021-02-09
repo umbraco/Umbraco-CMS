@@ -3,7 +3,7 @@
 
 using Examine;
 using Examine.LuceneEngine.Providers;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Examine;
 
 namespace Umbraco.Tests.Integration.Testing

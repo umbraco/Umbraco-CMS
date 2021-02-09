@@ -1,8 +1,7 @@
 ﻿using Examine;
 using Examine.LuceneEngine.Providers;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Examine
 {

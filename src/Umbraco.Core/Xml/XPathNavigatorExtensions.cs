@@ -1,6 +1,6 @@
 ﻿using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// Provides extensions to XPathNavigator.

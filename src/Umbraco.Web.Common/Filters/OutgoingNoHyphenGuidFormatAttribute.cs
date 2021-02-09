@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Web.Common.Formatters;
 

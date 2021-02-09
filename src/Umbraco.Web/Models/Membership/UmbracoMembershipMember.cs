@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.Security;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.Membership
 {
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Membership
             if (member.Username != null)
                 _userName = member.Username.Trim();
             if (member.Email != null)
-                _email = member.Email.Trim();            
+                _email = member.Email.Trim();
             _providerName = providerName;
             _providerUserKey = member.Key;
             _comment = member.Comments;

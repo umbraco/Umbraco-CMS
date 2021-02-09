@@ -7,10 +7,11 @@ using System.Threading;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Common.Routing
 {
@@ -71,7 +72,7 @@ namespace Umbraco.Web.Common.Routing
             // /foo/bar/nil/
             // where /foo is not a reserved path
 
-            // if the path contains an extension 
+            // if the path contains an extension
             // then it cannot be a document request
             var extension = Path.GetExtension(absPath);
             if (maybeDoc && !extension.IsNullOrWhiteSpace())

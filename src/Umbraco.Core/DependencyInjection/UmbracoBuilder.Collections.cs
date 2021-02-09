@@ -1,24 +1,23 @@
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.HealthChecks;
-using Umbraco.Core.HealthChecks.NotificationMethods;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PackageActions;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Trees;
-using Umbraco.Web.Actions;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Dashboards;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Media.EmbedProviders;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Sections;
-using Umbraco.Web.Tour;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Media.EmbedProviders;
+using Umbraco.Cms.Core.PackageActions;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Tour;
+using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/>
@@ -44,7 +43,7 @@ namespace Umbraco.Core.DependencyInjection
                 .Append<ContentTypeTemplatesContentAppFactory>();
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup
-            builder.ContentFinders()                
+            builder.ContentFinders()
                 .Append<ContentFinderByPageIdQuery>()
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()

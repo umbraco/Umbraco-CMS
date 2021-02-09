@@ -6,12 +6,14 @@ using Examine.LuceneEngine;
 using Examine;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Examine
 {

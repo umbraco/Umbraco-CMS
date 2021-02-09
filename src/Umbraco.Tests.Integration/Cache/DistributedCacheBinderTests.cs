@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Web;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache

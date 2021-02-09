@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Media
+﻿namespace Umbraco.Cms.Core.Media
 {
     public struct ImageSize
     {

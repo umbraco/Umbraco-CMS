@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Compose
 {

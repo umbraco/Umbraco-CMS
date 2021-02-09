@@ -1,11 +1,10 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services.Changes;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresher, DomainCacheRefresher.JsonPayload>
     {

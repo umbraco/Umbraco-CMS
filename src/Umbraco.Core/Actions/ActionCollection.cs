@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.Membership;
 
-
-namespace Umbraco.Web.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     public class ActionCollection : BuilderCollectionBase<IAction>
     {

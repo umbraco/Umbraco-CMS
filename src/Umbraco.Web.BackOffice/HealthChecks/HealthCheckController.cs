@@ -9,12 +9,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.HealthChecks;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.HealthChecks
 {

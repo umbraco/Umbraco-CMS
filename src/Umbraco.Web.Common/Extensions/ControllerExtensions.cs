@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {
     public static class ControllerExtensions
     {
         /// <summary>
-        /// Runs the authentication process 
+        /// Runs the authentication process
         /// </summary>
         /// <param name="controller"></param>
         /// <returns></returns>

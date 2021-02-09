@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.HealthChecks.Checks.LiveEnvironment
+namespace Umbraco.Cms.Core.HealthChecks.Checks.LiveEnvironment
 {
     /// <summary>
     /// Health check for the configuration of debug-flag.

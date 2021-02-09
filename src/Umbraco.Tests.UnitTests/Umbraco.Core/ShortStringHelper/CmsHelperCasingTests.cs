@@ -3,9 +3,10 @@
 
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {

@@ -10,6 +10,7 @@ using Lucene.Net.Search;
 using Umbraco.Core;
 using Version = Lucene.Net.Util.Version;
 using System.Threading;
+using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Examine
 {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Login = entity.Username,
                 NoConsole = entity.IsLockedOut,
                 Password = entity.RawPasswordValue,
-                PasswordConfig = entity.PasswordConfiguration,                
+                PasswordConfig = entity.PasswordConfiguration,
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
                 SecurityStampToken = entity.SecurityStamp,

@@ -8,18 +8,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Net;
 using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Web.Common.Security
 {
 
-    using Constants = Umbraco.Core.Constants;
+    using Constants = Cms.Core.Constants;
 
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
     {

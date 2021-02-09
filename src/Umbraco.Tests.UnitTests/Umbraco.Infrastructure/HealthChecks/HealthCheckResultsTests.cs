@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.Core.HealthChecks;
+using Umbraco.Cms.Core.HealthChecks;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 {

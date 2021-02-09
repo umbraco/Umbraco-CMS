@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PropertyEditors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Compose
 {

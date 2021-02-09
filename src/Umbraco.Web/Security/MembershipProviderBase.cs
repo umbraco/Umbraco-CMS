@@ -9,10 +9,12 @@ using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security
 {

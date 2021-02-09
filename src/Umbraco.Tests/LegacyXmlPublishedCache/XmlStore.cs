@@ -8,9 +8,19 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -18,15 +28,13 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Xml;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Scheduling;
+using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
@@ -1522,7 +1530,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private static bool HasChangesImpactingAllVersions(IContent icontent)
         {
-            var content = (Core.Models.Content)icontent;
+            var content = (Content)icontent;
 
             // UpdateDate will be dirty
             // Published may be dirty if saving a Published entity

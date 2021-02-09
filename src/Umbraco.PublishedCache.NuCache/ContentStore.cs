@@ -6,9 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache.Snap;
 

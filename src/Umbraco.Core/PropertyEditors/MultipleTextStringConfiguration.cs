@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for a multiple textstring value editor.

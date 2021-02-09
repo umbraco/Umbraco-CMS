@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 

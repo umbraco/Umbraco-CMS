@@ -1,9 +1,8 @@
 using System;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Infrastructure.PublishedCache
+namespace Umbraco.Cms.Core.Composing
 {
     public static class CompositionExtensions
     {

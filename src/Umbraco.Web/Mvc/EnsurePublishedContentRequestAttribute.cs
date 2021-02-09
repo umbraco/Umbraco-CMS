@@ -3,8 +3,6 @@ using System.Web.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.PublishedContent;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc

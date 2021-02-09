@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions
 {

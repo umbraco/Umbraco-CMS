@@ -1,4 +1,5 @@
 using Examine;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Examine

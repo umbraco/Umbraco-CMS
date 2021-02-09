@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.PublishedCache
+﻿namespace Umbraco.Cms.Core.PublishedCache
 {
     /// <summary>
     /// Provides access to the "current" <see cref="IPublishedSnapshot"/>.

@@ -1,5 +1,9 @@
 ﻿using System.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -48,10 +52,10 @@ namespace Umbraco.Core.Compose
 
         private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinContentString)))
             {
 
-                const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+                const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
                 var relations = _relationService.GetByChildId(item.Entity.Id);
 
                 foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
@@ -63,9 +67,9 @@ namespace Umbraco.Core.Compose
 
         private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinMediaString)))
             {
-                const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+                const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
                 var relations = _relationService.GetByChildId(item.Entity.Id);
                 foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
                 {
@@ -78,15 +82,15 @@ namespace Umbraco.Core.Compose
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+                const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
                 var relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
 
                 // check that the relation-type exists, if not, then recreate it
                 if (relationType == null)
                 {
-                    var documentObjectType = Constants.ObjectTypes.Document;
+                    var documentObjectType = Cms.Core.Constants.ObjectTypes.Document;
                     const string relationTypeName =
-                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
+                        Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
                     relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType,
                         documentObjectType);
@@ -98,7 +102,7 @@ namespace Umbraco.Core.Compose
                     var originalPath = item.OriginalPath.ToDelimitedList();
                     var originalParentId = originalPath.Count > 2
                         ? int.Parse(originalPath[originalPath.Count - 2])
-                        : Constants.System.Root;
+                        : Cms.Core.Constants.System.Root;
 
                     //before we can create this relation, we need to ensure that the original parent still exists which
                     //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
@@ -129,14 +133,14 @@ namespace Umbraco.Core.Compose
             using (var scope = _scopeProvider.CreateScope())
             {
                 const string relationTypeAlias =
-                    Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+                    Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
                 var relationType = _relationService.GetRelationTypeByAlias(relationTypeAlias);
                 // check that the relation-type exists, if not, then recreate it
                 if (relationType == null)
                 {
-                    var documentObjectType = Constants.ObjectTypes.Document;
+                    var documentObjectType = Cms.Core.Constants.ObjectTypes.Document;
                     const string relationTypeName =
-                        Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
+                        Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
                     relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType,
                         documentObjectType);
                     _relationService.Save(relationType);
@@ -147,7 +151,7 @@ namespace Umbraco.Core.Compose
                     var originalPath = item.OriginalPath.ToDelimitedList();
                     var originalParentId = originalPath.Count > 2
                         ? int.Parse(originalPath[originalPath.Count - 2])
-                        : Constants.System.Root;
+                        : Cms.Core.Constants.System.Root;
                     //before we can create this relation, we need to ensure that the original parent still exists which
                     //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin
                     if (_entityService.Exists(originalParentId))

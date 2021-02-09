@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class AssemblyExtensions
     {

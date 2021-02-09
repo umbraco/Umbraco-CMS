@@ -3,6 +3,8 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 

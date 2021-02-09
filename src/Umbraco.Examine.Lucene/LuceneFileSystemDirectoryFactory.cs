@@ -1,13 +1,15 @@
 ﻿using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
 using Lucene.Net.Store;
 using System.IO;
 using System;
 using Examine.LuceneEngine.Directories;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Examine
 {

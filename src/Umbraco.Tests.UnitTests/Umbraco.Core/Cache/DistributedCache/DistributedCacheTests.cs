@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
 
@@ -16,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
     [TestFixture]
     public class DistributedCacheTests
     {
-        private global::Umbraco.Web.Cache.DistributedCache _distributedCache;
+        private global::Umbraco.Cms.Core.Cache.DistributedCache _distributedCache;
 
         private IServerRoleAccessor ServerRegistrar { get; set; }
 
@@ -33,7 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
                 new TestCacheRefresher()
             });
 
-            _distributedCache = new global::Umbraco.Web.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
+            _distributedCache = new global::Umbraco.Cms.Core.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
         }
 
         [Test]

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core.Persistence.Querying
 {

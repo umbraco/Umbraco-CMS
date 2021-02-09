@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Examine
 {

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 
@@ -16,7 +17,7 @@ namespace Umbraco.Examine
     {
         public PublishedContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IPublishedContentValueSetBuilder contentValueSetBuilder) :
             base(true, null, contentService, sqlContext, contentValueSetBuilder)
-        {   
+        {
         }
     }
 }

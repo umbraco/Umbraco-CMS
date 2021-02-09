@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Umbraco.Core.WebAssets
+namespace Umbraco.Cms.Core.WebAssets
 {
     /// <summary>
     /// Represents a dependency file

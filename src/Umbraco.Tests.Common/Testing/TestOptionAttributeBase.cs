@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using Umbraco.Core.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Tests.Testing
 {

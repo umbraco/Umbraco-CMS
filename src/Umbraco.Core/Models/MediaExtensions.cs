@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public static class MediaExtensions
     {
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
 
             // TODO: would need to be adjusted to variations, when media become variants
             if (mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaUrl))
-            {                
+            {
                 return mediaUrl;
             }
 

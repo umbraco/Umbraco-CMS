@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {

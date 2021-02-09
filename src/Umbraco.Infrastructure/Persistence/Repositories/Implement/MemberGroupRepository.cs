@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -69,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+            return $"{Cms.Core.Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -87,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.MemberGroup;
 
         protected override void PersistNewItem(IMemberGroup entity)
         {
@@ -195,7 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public int[] GetMemberIds(string[] usernames)
         {
-            var memberObjectType = Constants.ObjectTypes.Member;
+            var memberObjectType = Cms.Core.Constants.ObjectTypes.Member;
 
             var memberSql = Sql()
                 .Select("umbracoNode.id")

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {

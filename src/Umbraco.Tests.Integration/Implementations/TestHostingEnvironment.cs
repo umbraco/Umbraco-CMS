@@ -3,13 +3,13 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Web.Common.AspNetCore;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
-    public class TestHostingEnvironment : AspNetCoreHostingEnvironment, IHostingEnvironment
+    public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Cms.Core.Hosting.IHostingEnvironment
     {
         public TestHostingEnvironment(IOptionsMonitor<HostingSettings> hostingSettings,IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IWebHostEnvironment webHostEnvironment)
             : base(hostingSettings,webRoutingSettings, webHostEnvironment)

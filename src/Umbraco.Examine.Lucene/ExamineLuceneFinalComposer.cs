@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Examine
 {

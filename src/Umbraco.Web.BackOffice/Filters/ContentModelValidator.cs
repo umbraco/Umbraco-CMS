@@ -6,11 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -44,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Filters
         where TPersisted : class, IContentBase
         where TModelSave: IContentSave<TPersisted>
         where TModelWithProperties : IContentProperties<ContentPropertyBasic>
-    {   
+    {
         protected ContentModelValidator(
             ILogger<ContentModelValidator> logger,
             IPropertyValidationService propertyValidationService)

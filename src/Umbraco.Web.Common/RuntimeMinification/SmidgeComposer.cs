@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Smidge.FileProcessors;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Core.Runtime;
-using Umbraco.Core.WebAssets;
 
 namespace Umbraco.Web.Common.RuntimeMinification
 {

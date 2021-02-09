@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Website.ViewEngines

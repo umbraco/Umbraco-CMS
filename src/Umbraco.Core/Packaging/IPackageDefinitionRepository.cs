@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Packaging;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     /// <summary>
     /// Defines methods for persisting package definitions to storage

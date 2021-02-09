@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class PublishedContentExtensions
     {
@@ -1168,7 +1169,7 @@ namespace Umbraco.Core
                 return new DataTable(); //no children found
 
             //use new utility class to create table so that we don't have to maintain code in many places, just one
-            var dt = Core.DataTableExtensions.GenerateDataTable(
+            var dt = DataTableExtensions.GenerateDataTable(
                 //pass in the alias of the first child node since this is the node type we're rendering headers for
                 firstNode.ContentType.Alias,
                 //pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
@@ -1177,7 +1178,7 @@ namespace Umbraco.Core
                 () =>
                 {
                     //create all row data
-                    var tableData = Core.DataTableExtensions.CreateTableData();
+                    var tableData = DataTableExtensions.CreateTableData();
                     //loop through each child and create row data for it
                     foreach (var n in content.Children(variationContextAccessor).OrderBy(x => x.SortOrder))
                     {
@@ -1206,7 +1207,7 @@ namespace Umbraco.Core
                             userVals[p.Alias] = p.GetValue();
                         }
                         //add the row data
-                        Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
+                        DataTableExtensions.AddRowData(tableData, standardVals, userVals);
                     }
 
                     return tableData;

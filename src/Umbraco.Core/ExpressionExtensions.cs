@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     internal static class ExpressionExtensions
     {

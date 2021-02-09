@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Packaging
+﻿namespace Umbraco.Cms.Core.Models.Packaging
 {
     public enum ActionRunAt
     {

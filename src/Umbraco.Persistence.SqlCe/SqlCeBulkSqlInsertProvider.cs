@@ -6,6 +6,7 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Persistence.SqlCe
 {

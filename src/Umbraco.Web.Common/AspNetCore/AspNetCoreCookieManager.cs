@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Web.Common.AspNetCore
 {

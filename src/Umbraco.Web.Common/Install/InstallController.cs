@@ -6,16 +6,19 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
-using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
-using Umbraco.Web.Security;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.WebAssets;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -24,7 +27,7 @@ namespace Umbraco.Web.Common.Install
     /// The Installation controller
     /// </summary>
     [InstallAuthorize]
-    [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
+    [Area(Cms.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallController : Controller
     {
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -93,7 +96,7 @@ namespace Umbraco.Web.Common.Install
 
             await _installHelper.SetInstallStatusAsync(false, "");
 
-            return View(Path.Combine(baseFolder , Umbraco.Core.Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
+            return View(Path.Combine(baseFolder , Cms.Core.Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
         }
 
         /// <summary>

@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 {

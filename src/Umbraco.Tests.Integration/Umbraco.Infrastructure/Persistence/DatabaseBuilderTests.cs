@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Common.TestHelpers;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {

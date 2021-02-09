@@ -2,15 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -40,9 +45,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering, Action<Sql<ISqlContext>> sqlCustomization = null)
         {
-            var isContent = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
-            var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
-            var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
+            var isContent = objectTypes.Any(objectType => objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint);
+            var isMedia = objectTypes.Any(objectType => objectType == Cms.Core.Constants.ObjectTypes.Media);
+            var isMember = objectTypes.Any(objectType => objectType == Cms.Core.Constants.ObjectTypes.Member);
 
             Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
             {
@@ -118,9 +123,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEntitySlim Get(Guid key, Guid objectTypeId)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
-            var isMember = objectTypeId == Constants.ObjectTypes.Member;
+            var isContent = objectTypeId == Cms.Core.Constants.ObjectTypes.Document || objectTypeId == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Cms.Core.Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, key);
             return GetEntity(sql, isContent, isMedia, isMember);
@@ -135,9 +140,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEntitySlim Get(int id, Guid objectTypeId)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
-            var isMember = objectTypeId == Constants.ObjectTypes.Member;
+            var isContent = objectTypeId == Cms.Core.Constants.ObjectTypes.Document || objectTypeId == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Cms.Core.Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, id);
             return GetEntity(sql, isContent, isMedia, isMember);
@@ -180,9 +185,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IEntitySlim> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == Constants.ObjectTypes.Media;
-            var isMember = objectType == Constants.ObjectTypes.Member;
+            var isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectType == Cms.Core.Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
             return GetEntities(sql, isContent, isMedia, isMember);
@@ -222,9 +227,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
-            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == Constants.ObjectTypes.Media;
-            var isMember = objectType == Constants.ObjectTypes.Member;
+            var isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectType == Cms.Core.Constants.ObjectTypes.Member;
 
             var sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
 
@@ -510,7 +515,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 default:
                     orderBy = ordering.OrderBy;
                     break;
-            }            
+            }
 
             if (ordering.Direction == Direction.Ascending)
                 sql.OrderBy(orderBy);
@@ -605,11 +610,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private EntitySlim BuildEntity(BaseDto dto)
         {
-            if (dto.NodeObjectType == Constants.ObjectTypes.Document)
+            if (dto.NodeObjectType == Cms.Core.Constants.ObjectTypes.Document)
                 return BuildDocumentEntity(dto);
-            if (dto.NodeObjectType == Constants.ObjectTypes.Media)
+            if (dto.NodeObjectType == Cms.Core.Constants.ObjectTypes.Media)
                 return BuildMediaEntity(dto);
-            if (dto.NodeObjectType == Constants.ObjectTypes.Member)
+            if (dto.NodeObjectType == Cms.Core.Constants.ObjectTypes.Member)
                 return BuildMemberEntity(dto);
 
             // EntitySlim does not track changes
@@ -623,7 +628,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
             entity.UpdateDate = dto.VersionDate;
-            entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
+            entity.CreatorId = dto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
             entity.Id = dto.NodeId;
             entity.Key = dto.UniqueId;
             entity.Level = dto.Level;

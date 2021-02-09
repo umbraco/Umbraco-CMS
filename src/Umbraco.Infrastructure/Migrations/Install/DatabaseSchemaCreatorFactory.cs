@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache

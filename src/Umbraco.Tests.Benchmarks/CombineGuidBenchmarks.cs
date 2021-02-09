@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Tests.Benchmarks.Config;
 

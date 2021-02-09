@@ -4,8 +4,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 
-
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Member object

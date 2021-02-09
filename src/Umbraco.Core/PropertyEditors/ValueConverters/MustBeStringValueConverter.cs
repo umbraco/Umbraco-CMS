@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Ensures that no matter what is selected in (editor), the value results in a string.

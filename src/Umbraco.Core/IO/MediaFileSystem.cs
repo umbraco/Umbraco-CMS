@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// A custom file system provider for media

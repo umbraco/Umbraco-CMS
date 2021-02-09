@@ -4,8 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Strings.Css;
 using Umbraco.Core;
-using Umbraco.Core.Strings.Css;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {

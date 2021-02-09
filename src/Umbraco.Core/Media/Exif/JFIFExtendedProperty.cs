@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents the JFIF version as a 16 bit unsigned integer. (EXIF Specification: SHORT)

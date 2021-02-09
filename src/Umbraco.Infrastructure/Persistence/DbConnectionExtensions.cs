@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
@@ -20,10 +20,10 @@ namespace Umbraco.Core.Persistence
                 //this dictionary is case insensitive
                 && builder["Data source"].ToString().InvariantContains(".sdf"))
             {
-                return Constants.DbProviderNames.SqlCe;
+                return Cms.Core.Constants.DbProviderNames.SqlCe;
             }
 
-            return Constants.DbProviderNames.SqlServer;
+            return Cms.Core.Constants.DbProviderNames.SqlServer;
         }
 
     public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)

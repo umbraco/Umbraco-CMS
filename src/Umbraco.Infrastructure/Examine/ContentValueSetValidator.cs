@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Examine
 {

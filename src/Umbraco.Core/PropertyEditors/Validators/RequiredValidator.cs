@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.PropertyEditors.Validators
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value is not null or empty (if it is a string)

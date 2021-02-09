@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.CacheInstruction)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.CacheInstruction)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     public class CacheInstructionDto

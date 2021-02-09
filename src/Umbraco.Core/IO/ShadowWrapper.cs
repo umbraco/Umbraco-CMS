@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     internal class ShadowWrapper : IFileSystem
     {

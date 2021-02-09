@@ -9,12 +9,15 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using Smidge;
 using Smidge.Nuglify;
 using StackExchange.Profiling;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.Plugins;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {

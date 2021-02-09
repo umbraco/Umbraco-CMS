@@ -4,8 +4,9 @@
 using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.Common.AspNetCore;
 

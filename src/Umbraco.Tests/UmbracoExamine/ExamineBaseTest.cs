@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
 

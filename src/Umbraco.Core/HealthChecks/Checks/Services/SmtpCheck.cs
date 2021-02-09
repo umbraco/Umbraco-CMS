@@ -7,10 +7,10 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.HealthChecks.Checks.Services
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Services
 {
     /// <summary>
     /// Health check for the recommended setup regarding SMTP.

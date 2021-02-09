@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.RedirectUrl)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     class RedirectUrlDto

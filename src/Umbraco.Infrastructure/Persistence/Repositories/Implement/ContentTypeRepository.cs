@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -183,7 +187,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentType;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.DocumentType;
 
         /// <summary>
         /// Deletes a content type
@@ -207,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // like when we switch a document type, there is property data left over that is linked
             // to the previous document type. So we need to ensure it's removed.
             var sql = Sql()
-                .Select("DISTINCT " + Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid")
+                .Select("DISTINCT " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid")
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
@@ -216,7 +220,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
             //Delete all PropertyData where propertytypeid EXISTS in the subquery above
-            Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
+            Database.Execute(SqlSyntax.GetDeleteSubquery(Cms.Core.Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
 
             base.PersistDeletedItem(entity);
         }

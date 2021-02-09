@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     public class ContentVersionDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion;
         private int? _userId;
 
         [Column("id")]

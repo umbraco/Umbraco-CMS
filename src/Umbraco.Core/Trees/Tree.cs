@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     [DebuggerDisplay("Tree - {SectionAlias}/{TreeAlias}")]
     public class Tree : ITree

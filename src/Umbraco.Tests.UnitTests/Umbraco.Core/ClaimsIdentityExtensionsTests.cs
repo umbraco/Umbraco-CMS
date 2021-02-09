@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core

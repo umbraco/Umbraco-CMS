@@ -1,6 +1,6 @@
 ﻿using System;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Migrations;
 
 namespace Umbraco.Core.Migrations
 {

@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.PackageActions
+namespace Umbraco.Cms.Core.PackageActions
 {
     /// <summary>
     /// This class implements the IPackageAction Interface, used to execute code when packages are installed.

@@ -8,8 +8,10 @@ using System.Web.SessionState;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 

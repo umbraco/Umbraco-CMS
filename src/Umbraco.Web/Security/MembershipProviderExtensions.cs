@@ -3,11 +3,13 @@ using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using Umbraco.Core;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.Membership;
 using Umbraco.Web.Security.Providers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security
 {

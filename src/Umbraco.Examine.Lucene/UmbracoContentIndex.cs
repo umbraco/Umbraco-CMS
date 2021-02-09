@@ -9,11 +9,11 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Examine
 {

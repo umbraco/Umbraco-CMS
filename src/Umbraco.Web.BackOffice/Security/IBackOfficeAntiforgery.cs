@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.Security

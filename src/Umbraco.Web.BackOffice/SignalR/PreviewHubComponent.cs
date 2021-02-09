@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 

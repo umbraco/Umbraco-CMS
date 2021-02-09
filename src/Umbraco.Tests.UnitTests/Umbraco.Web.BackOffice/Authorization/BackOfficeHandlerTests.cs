@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;
@@ -100,7 +103,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 
         private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool currentUserIsAuthenticated, bool currentUserIsApproved)
         {
-            global::Umbraco.Core.Models.Membership.User user = new UserBuilder()
+            global::Umbraco.Cms.Core.Models.Membership.User user = new UserBuilder()
                 .WithIsApproved(currentUserIsApproved)
                 .Build();
             var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();

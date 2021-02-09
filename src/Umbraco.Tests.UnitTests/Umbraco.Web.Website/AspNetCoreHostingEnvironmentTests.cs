@@ -3,7 +3,7 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.Common.AspNetCore;
 

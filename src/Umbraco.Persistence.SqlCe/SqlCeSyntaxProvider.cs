@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Persistence.SqlCe
 {

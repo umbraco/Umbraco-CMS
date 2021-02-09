@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Serialization;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Cms.Core.Install
 {
     /// <summary>
     /// An internal in-memory status tracker for the current installation

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
 
     /// <inheritdoc cref="ITypeFinder"/>

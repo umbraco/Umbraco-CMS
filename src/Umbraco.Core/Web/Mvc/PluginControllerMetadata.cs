@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Cms.Core.Web.Mvc
 {
     /// <summary>
     /// Represents some metadata about the controller

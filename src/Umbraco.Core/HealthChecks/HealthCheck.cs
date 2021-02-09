@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.HealthChecks
+namespace Umbraco.Cms.Core.HealthChecks
 {
     /// <summary>
     /// Provides a base class for health checks, filling in the healthcheck metadata on construction

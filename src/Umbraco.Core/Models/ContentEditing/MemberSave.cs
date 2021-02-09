@@ -2,11 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Validation;
+using Umbraco.Cms.Core.Models.Validation;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <inheritdoc />
     public class MemberSave : ContentBaseSave<IMember>

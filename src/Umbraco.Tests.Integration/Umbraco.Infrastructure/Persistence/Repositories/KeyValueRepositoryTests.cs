@@ -4,8 +4,8 @@
 using System;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Testing;

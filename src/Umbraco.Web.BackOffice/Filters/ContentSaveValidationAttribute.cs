@@ -7,15 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -59,9 +61,9 @@ namespace Umbraco.Web.BackOffice.Filters
                 if (context.Result == null)
                 {
                     //need to pass the execution to next if a result was not set
-                    await next(); 
+                    await next();
                 }
-                
+
 
                 // on executed...
             }
@@ -238,7 +240,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 return true;
             }
 
-            
+
         }
     }
 }

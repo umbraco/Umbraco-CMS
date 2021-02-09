@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Web.Website.ViewEngines
 {
@@ -32,12 +33,12 @@ namespace Umbraco.Web.Website.ViewEngines
                 string[] umbViewLocations = new string[]
                 {
                     // area view locations for the plugin folder
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
+                    string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
+                    string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
 
                     // will be used when we have partial view and child action macros
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
-                    string.Concat(Core.Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml")
+                    string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
+                    string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml")
                 };
 
                 viewLocations = umbViewLocations.Concat(viewLocations);

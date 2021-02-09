@@ -1,10 +1,13 @@
-﻿using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
+﻿using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.ModelBinders
 {

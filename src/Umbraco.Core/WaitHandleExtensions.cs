@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class WaitHandleExtensions
     {

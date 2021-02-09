@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {
@@ -78,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Authorization
                 return Task.FromResult(true);
             }
 
-            IEnumerable<Core.Models.Membership.IUser> users = _userService.GetUsersById(userIds);
+            IEnumerable<IUser> users = _userService.GetUsersById(userIds);
             var isAuth = users.All(user => _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, null) != false);
 
             return Task.FromResult(isAuth);

@@ -1,12 +1,6 @@
 using System;
-using System.IO;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides extension methods to <see cref="Uri"/>.

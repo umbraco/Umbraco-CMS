@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Common.Builders.Interfaces;

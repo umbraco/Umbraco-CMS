@@ -3,9 +3,9 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
-using Umbraco.Core.Configuration.Models.Validation;
+using Umbraco.Cms.Core.Configuration.Models.Validation;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Matches MailKit.Security.SecureSocketOptions and defined locally to avoid having to take

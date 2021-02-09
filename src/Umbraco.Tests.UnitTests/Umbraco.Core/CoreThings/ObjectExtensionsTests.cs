@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers.Entities;

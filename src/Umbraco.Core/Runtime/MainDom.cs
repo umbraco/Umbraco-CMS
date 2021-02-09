@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
 
     /// <summary>

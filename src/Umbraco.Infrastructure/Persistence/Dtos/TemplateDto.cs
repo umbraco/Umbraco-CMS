@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Template)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Template)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class TemplateDto

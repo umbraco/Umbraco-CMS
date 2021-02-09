@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.BackOffice.Trees
 {

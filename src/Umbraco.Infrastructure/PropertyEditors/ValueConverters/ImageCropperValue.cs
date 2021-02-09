@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Umbraco.Core.Media;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {

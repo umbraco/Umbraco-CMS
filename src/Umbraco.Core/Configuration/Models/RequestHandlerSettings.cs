@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for request handler settings.

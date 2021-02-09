@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents an <see cref="IPublishedElement"/> type.
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             InitializeIndexes();
         }
-        
+
         [Obsolete("Use the overload specifying a key instead")]
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)

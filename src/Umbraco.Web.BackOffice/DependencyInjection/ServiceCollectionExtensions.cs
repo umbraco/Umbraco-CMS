@@ -2,17 +2,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Net;
-using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.DependencyInjection
 {

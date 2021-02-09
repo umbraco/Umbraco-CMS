@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     ///<summary>
     /// Extensions for enumerable sources

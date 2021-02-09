@@ -2,7 +2,7 @@ using System;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Web.Actions;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models.Trees;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// A menu item collection for a given tree node

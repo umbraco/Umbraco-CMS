@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IFactory"/> class.

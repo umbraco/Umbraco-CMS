@@ -7,11 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Install;
-using Umbraco.Core.IO;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Infrastructure.Install
 {

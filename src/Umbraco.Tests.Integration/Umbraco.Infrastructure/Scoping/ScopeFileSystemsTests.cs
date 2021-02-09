@@ -6,14 +6,15 @@ using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using FileSystems = Umbraco.Core.IO.FileSystems;
+using Constants = Umbraco.Cms.Core.Constants;
+using FileSystems = Umbraco.Cms.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
 {

@@ -5,6 +5,7 @@ using System;
 using System.Reflection;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Core.Events;
 using Umbraco.Core.Services.Implement;
 

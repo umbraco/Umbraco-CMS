@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Common.Macros

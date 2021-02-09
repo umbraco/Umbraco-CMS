@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

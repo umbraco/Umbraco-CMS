@@ -2,7 +2,9 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -21,7 +23,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override bool IsConverter(IPublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ImageCropper);
+            => propertyType.EditorAlias.InvariantEquals(Cms.Core.Constants.PropertyEditors.Aliases.ImageCropper);
 
         /// <inheritdoc />
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)

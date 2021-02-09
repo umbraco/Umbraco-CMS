@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models.Trees
+﻿namespace Umbraco.Cms.Core.Trees
 {
     public static class TreeNodeExtensions
     {

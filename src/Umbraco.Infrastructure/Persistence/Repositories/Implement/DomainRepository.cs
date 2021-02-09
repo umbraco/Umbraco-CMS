@@ -4,9 +4,14 @@ using System.Data;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -92,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
+                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
                 if (contentExists == 0) throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
             }
 
@@ -130,7 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
+                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
                 if (contentExists == 0) throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
             }
 

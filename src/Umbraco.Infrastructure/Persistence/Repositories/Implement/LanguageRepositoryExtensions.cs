@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Core.Persistence.Repositories.Implement
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Persistence.Repositories;
+
+namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal static class LanguageRepositoryExtensions
     {

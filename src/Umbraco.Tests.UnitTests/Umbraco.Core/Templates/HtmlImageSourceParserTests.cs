@@ -7,15 +7,19 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
 {

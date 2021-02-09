@@ -1,16 +1,15 @@
 using System;
-using System.Linq;
-using System.IO;
-using Umbraco.Web.Templates;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Web;
-using Umbraco.Web.Macros;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Core.Templates
+namespace Umbraco.Cms.Core.Templates
 {
 
     /// <summary>

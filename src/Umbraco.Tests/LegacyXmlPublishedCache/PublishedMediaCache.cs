@@ -9,16 +9,23 @@ using Microsoft.Extensions.Logging;
 using Examine;
 using Examine.Search;
 using Lucene.Net.Store;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
 using Umbraco.Examine;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

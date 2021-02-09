@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a property type.

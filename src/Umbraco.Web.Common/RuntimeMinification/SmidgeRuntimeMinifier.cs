@@ -7,10 +7,11 @@ using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
 using Smidge.Models;
 using Smidge.Nuglify;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
 using CssFile = Smidge.Models.CssFile;
 using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
@@ -118,7 +119,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
         public void Reset()
         {
             var version = DateTime.UtcNow.Ticks.ToString();
-            _configManipulator.SaveConfigValue(Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
+            _configManipulator.SaveConfigValue(Cms.Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
         }
 
 

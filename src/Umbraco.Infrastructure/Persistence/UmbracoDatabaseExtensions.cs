@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence

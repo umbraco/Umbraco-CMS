@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 

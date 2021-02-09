@@ -6,14 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Common.PublishedContent
@@ -77,13 +84,13 @@ namespace Umbraco.Tests.Common.PublishedContent
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null) => _content.Values.Where(x => x.Parent == null);
 
-        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
+        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override IPublishedContent GetSingleByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
+        public override IPublishedContent GetSingleByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars) => throw new NotImplementedException();
 
-        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars) => throw new NotImplementedException();
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, System.Xml.XPath.XPathExpression xpath, XPathVariable[] vars) => throw new NotImplementedException();
 
         public override System.Xml.XPath.XPathNavigator CreateNavigator(bool preview) => throw new NotImplementedException();
 

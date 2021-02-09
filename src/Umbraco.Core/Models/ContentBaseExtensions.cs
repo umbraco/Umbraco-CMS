@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Provides extension methods to IContentBase to get URL segments.

@@ -4,8 +4,9 @@
 using System;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;

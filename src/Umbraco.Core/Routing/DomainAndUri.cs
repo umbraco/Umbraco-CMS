@@ -1,7 +1,6 @@
 ﻿using System;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Represents a published snapshot domain with its normalized uri.

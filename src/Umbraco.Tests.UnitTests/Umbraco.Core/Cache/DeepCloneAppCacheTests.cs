@@ -5,10 +5,12 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache

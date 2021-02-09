@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Serialization

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Web.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors.Validation
 {

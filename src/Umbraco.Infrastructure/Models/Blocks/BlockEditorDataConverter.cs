@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Core.Models.Blocks
 {

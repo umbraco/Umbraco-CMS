@@ -5,11 +5,14 @@ using System.Linq;
 using System.Xml.XPath;
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
 using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web
 {

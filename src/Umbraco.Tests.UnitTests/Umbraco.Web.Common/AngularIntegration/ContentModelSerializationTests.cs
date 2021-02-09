@@ -6,8 +6,9 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Core;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 {

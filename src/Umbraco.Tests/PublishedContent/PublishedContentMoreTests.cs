@@ -1,15 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using NUnit.Framework;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Core;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.Composing;
-using Moq;
 using Examine;
-using System;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
+using Umbraco.Tests.Testing;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {

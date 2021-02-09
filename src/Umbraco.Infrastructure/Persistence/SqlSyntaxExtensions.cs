@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence

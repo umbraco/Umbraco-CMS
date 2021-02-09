@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Common

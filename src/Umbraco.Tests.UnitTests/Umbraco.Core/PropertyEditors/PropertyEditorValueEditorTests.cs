@@ -4,10 +4,13 @@
 using System;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors

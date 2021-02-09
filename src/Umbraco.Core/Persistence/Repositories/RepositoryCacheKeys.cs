@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     /// <summary>
     /// Provides cache keys for repositories.

@@ -7,14 +7,17 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Security;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Security;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Website.Security;
-using CoreConstants = Umbraco.Core.Constants;
+using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Security
 {

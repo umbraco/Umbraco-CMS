@@ -14,12 +14,14 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Website.Routing;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 {

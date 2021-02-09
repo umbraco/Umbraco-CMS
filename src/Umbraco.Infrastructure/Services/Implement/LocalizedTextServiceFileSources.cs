@@ -6,8 +6,9 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Core.Services.Implement
 {

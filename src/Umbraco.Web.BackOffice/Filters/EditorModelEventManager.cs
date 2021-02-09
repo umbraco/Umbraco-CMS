@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Dashboards;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Core.Events;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

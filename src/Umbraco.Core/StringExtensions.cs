@@ -8,10 +8,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     ///<summary>
     /// String extension methods

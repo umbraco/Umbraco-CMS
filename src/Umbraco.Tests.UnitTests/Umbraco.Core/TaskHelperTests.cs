@@ -8,6 +8,7 @@ using AutoFixture.NUnit3;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Tests.Common.TestHelpers;
 using Umbraco.Tests.UnitTests.AutoFixture;

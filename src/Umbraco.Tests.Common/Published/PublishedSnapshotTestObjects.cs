@@ -3,8 +3,9 @@
 
 using System.Collections.Generic;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Published
 {

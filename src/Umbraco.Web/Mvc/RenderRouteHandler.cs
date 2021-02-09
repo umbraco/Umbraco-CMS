@@ -5,8 +5,6 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Current = Umbraco.Web.Composing.Current;

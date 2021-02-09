@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Common.Attributes;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.PropertyEditors
 {

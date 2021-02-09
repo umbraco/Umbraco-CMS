@@ -5,6 +5,7 @@ using System;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;

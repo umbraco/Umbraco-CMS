@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Web;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
 
     public static class UmbracoContextAccessorExtensions

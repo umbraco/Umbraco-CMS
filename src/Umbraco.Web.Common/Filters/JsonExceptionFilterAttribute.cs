@@ -4,7 +4,7 @@ using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Web.Common.Filters
 {

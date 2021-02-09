@@ -1,10 +1,9 @@
 ﻿using System.Configuration;
 using System.IO;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     public static class ModelsBuilderConfigExtensions
     {

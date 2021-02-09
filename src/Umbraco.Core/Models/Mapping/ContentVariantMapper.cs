@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using Language = Umbraco.Web.Models.ContentEditing.Language;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class ContentVariantMapper
     {
@@ -96,17 +93,17 @@ namespace Umbraco.Web.Models.Mapping
             return variant.Language == null || variant.Language.IsDefault;
         }
 
-        private IEnumerable<Language> GetLanguages(MapperContext context)
+        private IEnumerable<ContentEditing.Language> GetLanguages(MapperContext context)
         {
             var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
             if (allLanguages.Count == 0)
             {
                 // This should never happen
-                return Enumerable.Empty<Language>();
+                return Enumerable.Empty<ContentEditing.Language>();
             }
             else
             {
-                return context.MapEnumerable<ILanguage, Language>(allLanguages).ToList();
+                return context.MapEnumerable<ILanguage, ContentEditing.Language>(allLanguages).ToList();
             }
         }
 
@@ -130,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
             return segments.Distinct();
         }
 
-        private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, Language language, string segment)
+        private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, ContentEditing.Language language, string segment)
         {
             context.SetCulture(language?.IsoCode);
             context.SetSegment(segment);
@@ -145,7 +142,7 @@ namespace Umbraco.Web.Models.Mapping
             return variantDisplay;
         }
 
-        private string GetDisplayName(Language language, string segment)
+        private string GetDisplayName(ContentEditing.Language language, string segment)
         {
             var isCultureVariant = language != null;
             var isSegmentVariant = !segment.IsNullOrWhiteSpace();

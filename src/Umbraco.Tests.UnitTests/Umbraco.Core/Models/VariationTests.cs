@@ -5,17 +5,23 @@ using System;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
@@ -117,7 +123,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/>
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation"/>
         /// </summary>
         /// <param name="exactAndWildcards">Validate using Exact + Wildcards flags</param>
         /// <param name="nonExactAndNoWildcards">Validate using non Exact + no Wildcard flags</param>

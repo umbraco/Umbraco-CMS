@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Default implementation of IUrlSegmentProvider.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Migrations
 
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column);
-            
+
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
         }
 

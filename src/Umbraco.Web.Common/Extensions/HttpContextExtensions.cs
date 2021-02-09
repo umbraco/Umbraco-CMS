@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.AspNetCore.Http.Features;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Extensions

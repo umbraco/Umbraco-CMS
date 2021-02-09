@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.IO
+﻿namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// Provides the system filesystems.

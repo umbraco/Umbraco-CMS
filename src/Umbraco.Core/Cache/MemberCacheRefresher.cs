@@ -1,13 +1,12 @@
 //using Newtonsoft.Json;
-using System;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Cache
+using System;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+
+namespace Umbraco.Cms.Core.Cache
 {
     public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresher, MemberCacheRefresher.JsonPayload>
     {

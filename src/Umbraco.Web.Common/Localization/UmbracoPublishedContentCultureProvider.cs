@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Routing;
 

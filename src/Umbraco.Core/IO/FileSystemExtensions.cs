@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public static class FileSystemExtensions
     {

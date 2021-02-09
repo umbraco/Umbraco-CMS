@@ -6,6 +6,7 @@ using System.Net;
 using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Web.Common.Constants;
 

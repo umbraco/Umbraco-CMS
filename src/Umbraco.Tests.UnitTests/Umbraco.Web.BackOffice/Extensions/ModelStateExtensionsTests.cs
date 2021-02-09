@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 

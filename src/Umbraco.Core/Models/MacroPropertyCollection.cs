@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A macro's property collection

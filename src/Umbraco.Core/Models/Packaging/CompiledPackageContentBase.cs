@@ -1,6 +1,6 @@
 using System.Xml.Linq;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     /// <summary>
     /// Compiled representation of a content base (Document or Media)

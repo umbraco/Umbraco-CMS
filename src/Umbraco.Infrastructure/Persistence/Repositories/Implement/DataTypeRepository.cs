@@ -5,11 +5,19 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -17,7 +25,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -109,7 +117,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Array.Empty<string>();
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.DataType;
 
         #endregion
 
@@ -313,7 +321,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
@@ -325,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
 
-        [TableName(Constants.DatabaseSchema.Tables.ContentType)]
+        [TableName(Cms.Core.Constants.DatabaseSchema.Tables.ContentType)]
         private class ContentTypeReferenceDto : ContentTypeDto
         {
             [ResultColumn]
@@ -333,7 +341,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public List<PropertyTypeReferenceDto> PropertyTypes { get; set; }
         }
 
-        [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+        [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
         private class PropertyTypeReferenceDto
         {
             [Column("ptAlias")]

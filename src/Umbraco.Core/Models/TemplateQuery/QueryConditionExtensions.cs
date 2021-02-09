@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Umbraco.Web.Models.TemplateQuery
+namespace Umbraco.Cms.Core.Models.TemplateQuery
 {
     public static class QueryConditionExtensions
     {

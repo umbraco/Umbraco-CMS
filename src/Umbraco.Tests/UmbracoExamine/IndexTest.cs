@@ -7,7 +7,6 @@ using Lucene.Net.Search;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
-using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Models;
@@ -15,8 +14,11 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -45,7 +47,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     Alias = "grid",
                     Name = "Grid",
-                    PropertyEditorAlias = Core.Constants.PropertyEditors.Aliases.Grid
+                    PropertyEditorAlias = Constants.PropertyEditors.Aliases.Grid
                 });
                 var content = MockedContent.CreateBasicContent(contentType);
                 content.Id = 555;

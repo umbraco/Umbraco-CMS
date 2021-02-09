@@ -12,16 +12,20 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Website.Controllers;
-using static Umbraco.Core.Constants.Web.Routing;
-using RouteDirection = Umbraco.Web.Routing.RouteDirection;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
+using RouteDirection = Umbraco.Cms.Core.Routing.RouteDirection;
 
 namespace Umbraco.Web.Website.Routing
 {

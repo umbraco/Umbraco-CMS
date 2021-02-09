@@ -3,7 +3,7 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
 {

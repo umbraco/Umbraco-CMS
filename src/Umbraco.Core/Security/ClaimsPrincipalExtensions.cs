@@ -3,10 +3,8 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Umbraco.Core;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Cms.Core.Security
 {
     public static class ClaimsPrincipalExtensions
     {

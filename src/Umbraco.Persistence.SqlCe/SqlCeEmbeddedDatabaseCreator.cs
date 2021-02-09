@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Persistence.SqlCe
 {

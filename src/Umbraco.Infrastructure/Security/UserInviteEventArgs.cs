@@ -1,6 +1,7 @@
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Core.Security
 {

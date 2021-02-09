@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Examine;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Runtime;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Examine
 {

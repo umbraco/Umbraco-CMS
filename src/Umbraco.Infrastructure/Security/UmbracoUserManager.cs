@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Net;
 
 namespace Umbraco.Core.Security
 {

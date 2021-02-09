@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     /// <summary>
     /// Provides extension methods for the <see cref="MapperContext"/> class.

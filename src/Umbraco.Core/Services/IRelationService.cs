@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IRelationService : IService
     {
@@ -351,7 +351,7 @@ namespace Umbraco.Core.Services
         /// <param name="relationType"><see cref="IRelationType"/> to Delete Relations for</param>
         void DeleteRelationsOfType(IRelationType relationType);
 
-        
+
 
     }
 }

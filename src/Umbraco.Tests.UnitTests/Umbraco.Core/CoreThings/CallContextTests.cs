@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Core;
 using Umbraco.Core.Scoping;
 

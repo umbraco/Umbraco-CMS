@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Benchmarks

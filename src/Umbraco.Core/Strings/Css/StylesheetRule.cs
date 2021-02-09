@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 
-namespace Umbraco.Core.Strings.Css
+namespace Umbraco.Cms.Core.Strings.Css
 {
     public class StylesheetRule
     {

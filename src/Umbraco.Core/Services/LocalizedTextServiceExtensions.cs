@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Dictionary;
+using Umbraco.Cms.Core.Dictionary;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Extension methods for ILocalizedTextService

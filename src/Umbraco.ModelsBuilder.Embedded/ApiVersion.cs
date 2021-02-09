@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Semver;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {

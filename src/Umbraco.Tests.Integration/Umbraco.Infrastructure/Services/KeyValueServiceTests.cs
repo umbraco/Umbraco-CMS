@@ -3,6 +3,7 @@
 
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;

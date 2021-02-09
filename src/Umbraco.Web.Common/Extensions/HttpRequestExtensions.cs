@@ -4,8 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {

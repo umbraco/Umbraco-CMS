@@ -8,7 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     ///<summary>
     /// Extension methods for Dictionary & ConcurrentDictionary

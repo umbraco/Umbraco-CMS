@@ -12,11 +12,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             // alter columns => non-null
-            AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "group");
-            AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "tag");
+            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "group");
+            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "tag");
 
             // kill unused parentId column
-            Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag).Do();
+            Delete.Column("ParentId").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.Tag).Do();
         }
     }
 }

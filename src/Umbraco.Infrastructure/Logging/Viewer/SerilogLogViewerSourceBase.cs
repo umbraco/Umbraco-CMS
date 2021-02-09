@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Serilog;
 using Serilog.Events;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Logging.Viewer

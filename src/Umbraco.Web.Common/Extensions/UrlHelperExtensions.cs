@@ -4,12 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.WebApi;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {

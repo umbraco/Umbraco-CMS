@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -18,9 +18,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var sqlDataTypes = Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Aliases.ContentPicker
-                                         || x.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker
-                                         || x.EditorAlias == Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
+                .Where<DataTypeDto>(x => x.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker
+                                         || x.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker
+                                         || x.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
 
             var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes).ToList();
 
@@ -28,8 +28,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             {
                 switch (datatype.EditorAlias)
                 {
-                    case Constants.PropertyEditors.Aliases.ContentPicker:
-                    case Constants.PropertyEditors.Aliases.MediaPicker:
+                    case Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker:
+                    case Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker:
                         {
                             var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
                             var startNodeId = config.Value<string>("startNodeId");
@@ -41,9 +41,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                                         Sql().Select<NodeDto>(x => x.UniqueId).From<NodeDto>().Where<NodeDto>(x => x.NodeId == intStartNode));
                                 if (guid.HasValue)
                                 {
-                                    var udi = new GuidUdi(datatype.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker
-                                        ? Constants.UdiEntityType.Media
-                                        : Constants.UdiEntityType.Document, guid.Value);
+                                    var udi = new GuidUdi(datatype.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker
+                                        ? Cms.Core.Constants.UdiEntityType.Media
+                                        : Cms.Core.Constants.UdiEntityType.Document, guid.Value);
                                     config["startNodeId"] = new JValue(udi.ToString());
                                 }
                                 else
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                             break;
                         }
-                    case Constants.PropertyEditors.Aliases.MultiNodeTreePicker:
+                    case Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker:
                         {
                             var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
                             var startNodeConfig = config.Value<JObject>("startNode");
@@ -76,13 +76,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                                     switch (objectType.ToLowerInvariant())
                                     {
                                         case "content":
-                                            entityType = Constants.UdiEntityType.Document;
+                                            entityType = Cms.Core.Constants.UdiEntityType.Document;
                                             break;
                                         case "media":
-                                            entityType = Constants.UdiEntityType.Media;
+                                            entityType = Cms.Core.Constants.UdiEntityType.Media;
                                             break;
                                         case "member":
-                                            entityType = Constants.UdiEntityType.Member;
+                                            entityType = Cms.Core.Constants.UdiEntityType.Member;
                                             break;
                                     }
 

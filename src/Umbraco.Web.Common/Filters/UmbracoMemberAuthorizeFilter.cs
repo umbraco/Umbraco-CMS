@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.Generic;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;

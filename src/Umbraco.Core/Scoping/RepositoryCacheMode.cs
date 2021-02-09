@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Scoping
+﻿namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Specifies the cache mode of repositories.

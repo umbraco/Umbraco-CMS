@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Umbraco.Core.Strings.Css
+namespace Umbraco.Cms.Core.Strings.Css
 {
     public class StylesheetHelper
     {

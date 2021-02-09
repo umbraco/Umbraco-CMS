@@ -3,11 +3,16 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -56,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null)

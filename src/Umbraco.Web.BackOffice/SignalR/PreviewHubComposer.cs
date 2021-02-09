@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.SignalR
 {

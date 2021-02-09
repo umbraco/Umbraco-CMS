@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Manifest;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Manifest;
 
-namespace Umbraco.Web.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     public class DashboardCollectionBuilder : WeightedCollectionBuilderBase<DashboardCollectionBuilder, DashboardCollection, IDashboard>
     {

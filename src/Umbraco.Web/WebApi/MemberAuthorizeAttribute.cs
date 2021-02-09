@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Web.Security;
-using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.WebApi

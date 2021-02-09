@@ -6,10 +6,12 @@ using System.Linq;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest

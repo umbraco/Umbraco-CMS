@@ -4,6 +4,7 @@
 using System;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.TestHelpers.Stubs

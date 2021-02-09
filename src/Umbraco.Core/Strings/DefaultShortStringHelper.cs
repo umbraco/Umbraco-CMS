@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Globalization;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// New default implementation of string functions for short strings such as aliases or URL segments.

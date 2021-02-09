@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using System;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -52,7 +53,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Insert.IntoTable(ContentScheduleDto.TableName)
                     .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date = date, action = action })
                     .Do();
-            }            
+            }
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// A custom menu list

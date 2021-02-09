@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines the Umbraco runtime.

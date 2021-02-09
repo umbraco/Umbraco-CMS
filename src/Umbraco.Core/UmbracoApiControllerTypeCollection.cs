@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.WebApi
+namespace Umbraco.Cms.Core
 {
     public class UmbracoApiControllerTypeCollection : BuilderCollectionBase<Type>
     {

@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 {

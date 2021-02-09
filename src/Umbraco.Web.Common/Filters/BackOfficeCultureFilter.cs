@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Security;
 using System.Globalization;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Web.Common.Filters
 {

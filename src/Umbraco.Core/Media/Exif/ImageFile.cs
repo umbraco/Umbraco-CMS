@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Umbraco.Web.Media.TypeDetector;
+using Umbraco.Cms.Core.Media.TypeDetector;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents the base class for image files.

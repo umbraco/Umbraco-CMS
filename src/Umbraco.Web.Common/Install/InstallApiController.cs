@@ -6,22 +6,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
-using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Common.Install
 {
     [UmbracoApiController]
     [AngularJsonOnlyConfiguration]
     [InstallAuthorize]
-    [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
+    [Area(Cms.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallApiController : ControllerBase
     {
         private readonly DatabaseBuilder _databaseBuilder;

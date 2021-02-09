@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Common.Builders
 {

@@ -4,12 +4,12 @@
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Integration.Umbraco.Core.Services
 {

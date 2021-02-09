@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;

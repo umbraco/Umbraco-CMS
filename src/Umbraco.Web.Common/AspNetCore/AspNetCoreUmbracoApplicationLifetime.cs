@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Hosting;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Web.Common.AspNetCore
 {

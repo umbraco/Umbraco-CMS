@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Media
+namespace Umbraco.Cms.Core.Media
 {
     public static class ImageUrlGeneratorExtensions
     {

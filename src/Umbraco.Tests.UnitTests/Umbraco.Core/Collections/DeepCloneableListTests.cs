@@ -3,7 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections

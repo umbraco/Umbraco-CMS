@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using System;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.Common.Builders.Interfaces;
@@ -50,7 +52,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public override DataType Build()
         {
-            Core.PropertyEditors.IDataEditor editor = _dataEditorBuilder.Build();
+            IDataEditor editor = _dataEditorBuilder.Build();
             var parentId = _parentId ?? -1;
             var id = _id ?? 1;
             Guid key = _key ?? Guid.NewGuid();

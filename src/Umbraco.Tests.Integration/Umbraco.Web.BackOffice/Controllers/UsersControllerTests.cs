@@ -11,9 +11,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -22,7 +26,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Formatters;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {

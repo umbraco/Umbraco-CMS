@@ -2,8 +2,9 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;

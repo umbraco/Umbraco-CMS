@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Web.Compose;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {

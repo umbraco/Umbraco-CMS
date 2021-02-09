@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Web.Macros
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents an entry in the image file directory.

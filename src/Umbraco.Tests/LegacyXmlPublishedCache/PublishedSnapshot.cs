@@ -1,4 +1,7 @@
 ﻿using System;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.PublishedCache;

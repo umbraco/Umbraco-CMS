@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class DelegateExtensions
     {

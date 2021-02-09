@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents the impact of a culture set.

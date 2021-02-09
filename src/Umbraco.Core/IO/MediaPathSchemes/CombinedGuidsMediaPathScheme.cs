@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Umbraco.Core.IO.MediaPathSchemes
+namespace Umbraco.Cms.Core.IO.MediaPathSchemes
 {
     /// <summary>
     /// Implements a combined-guids media path scheme.

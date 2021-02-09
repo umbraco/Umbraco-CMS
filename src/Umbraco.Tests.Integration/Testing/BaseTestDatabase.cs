@@ -10,6 +10,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -126,7 +128,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         private void RebuildSchemaFirstTime(TestDbMeta meta)
         {
-            _databaseFactory.Configure(meta.ConnectionString, Core.Constants.DatabaseProviders.SqlServer);
+            _databaseFactory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SqlServer);
 
             using (var database = (UmbracoDatabase)_databaseFactory.CreateDatabase())
             {

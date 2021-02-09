@@ -3,7 +3,7 @@ using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class PropertyTypeGroupReadOnlyDto

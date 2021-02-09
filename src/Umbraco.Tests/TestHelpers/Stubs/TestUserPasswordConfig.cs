@@ -1,5 +1,7 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Umbraco.Cms.Core.Configuration;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {

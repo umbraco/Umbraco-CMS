@@ -15,9 +15,17 @@ using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using System.Configuration;
 using Bogus;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.TestData
 {

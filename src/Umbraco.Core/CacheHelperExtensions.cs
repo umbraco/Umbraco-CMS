@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Cache;
+﻿using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
 
     /// <summary>

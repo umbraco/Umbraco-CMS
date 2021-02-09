@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     public class ContentModel<TContent> : ContentModel
         where TContent : IPublishedContent

@@ -1,4 +1,5 @@
-﻿using Umbraco.Web.Common.AspNetCore;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Common.Macros

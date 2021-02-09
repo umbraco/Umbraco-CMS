@@ -4,9 +4,9 @@ using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Extensions
 {

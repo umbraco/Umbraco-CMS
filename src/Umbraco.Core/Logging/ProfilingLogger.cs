@@ -1,9 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models;
 
-
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Provides logging and profiling services.

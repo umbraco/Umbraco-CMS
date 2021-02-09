@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Web.PublishedCache.NuCache

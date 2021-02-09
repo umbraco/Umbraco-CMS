@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Routing;
 

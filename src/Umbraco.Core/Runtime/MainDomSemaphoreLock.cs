@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
     /// <summary>
     /// Uses a system-wide Semaphore and EventWaitHandle to synchronize the current AppDomain

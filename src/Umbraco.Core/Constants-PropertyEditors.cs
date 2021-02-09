@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {

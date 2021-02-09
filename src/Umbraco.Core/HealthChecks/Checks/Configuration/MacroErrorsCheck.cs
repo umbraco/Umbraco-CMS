@@ -4,10 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.HealthChecks.Checks.Configuration
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
 {
     /// <summary>
     /// Health check for the recommended production configuration for Macro Errors.

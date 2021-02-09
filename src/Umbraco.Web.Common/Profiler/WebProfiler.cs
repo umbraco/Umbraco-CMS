@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Profiling;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 

@@ -3,8 +3,9 @@
 
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Routing;
 using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders

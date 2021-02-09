@@ -109,8 +109,8 @@ namespace Umbraco.Web.Common.Extensions
         {
             string prefixPathSegment = isBackOffice
                 ? areaName.IsNullOrWhiteSpace()
-                    ? $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
-                    : $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
+                    ? $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
+                    : $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
                 : areaName.IsNullOrWhiteSpace()
                     ? "Api"
                     : areaName;

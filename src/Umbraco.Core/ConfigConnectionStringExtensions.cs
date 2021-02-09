@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class ConfigConnectionStringExtensions
     {
@@ -11,7 +11,10 @@ namespace Umbraco.Core
         {
             var dbIsSqlCe = false;
             if (databaseSettings?.ProviderName != null)
+            {
                 dbIsSqlCe = databaseSettings.ProviderName == Constants.DbProviderNames.SqlCe;
+            }
+
             var sqlCeDatabaseExists = false;
             if (dbIsSqlCe)
             {

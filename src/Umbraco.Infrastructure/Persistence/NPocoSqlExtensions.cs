@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Web;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Web

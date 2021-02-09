@@ -1,11 +1,12 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Web.Common.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Profiling
 {

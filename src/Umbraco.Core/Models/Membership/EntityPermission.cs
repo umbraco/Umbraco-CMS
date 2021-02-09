@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents an entity permission (defined on the user group and derived to retrieve permissions for a given user)

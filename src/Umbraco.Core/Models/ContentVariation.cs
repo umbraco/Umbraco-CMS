@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Indicates how values can vary.

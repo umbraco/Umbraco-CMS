@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class LogDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.Log;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.Log;
 
         private int? _userId;
 

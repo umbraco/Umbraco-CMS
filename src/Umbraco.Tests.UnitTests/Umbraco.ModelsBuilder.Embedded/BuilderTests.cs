@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Semver;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedModels
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content)
 		{
-			_publishedValueFallback = publishedValueFallback; 
+			_publishedValueFallback = publishedValueFallback;
 		}
 
 		// properties
@@ -194,7 +194,7 @@ namespace Umbraco.Web.PublishedModels
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content)
 		{
-			_publishedValueFallback = publishedValueFallback; 
+			_publishedValueFallback = publishedValueFallback;
 		}
 
 		// properties
@@ -238,7 +238,7 @@ namespace Umbraco.Web.PublishedModels
             {
                 Alias = "prop3",
                 ClrName = "Prop3",
-                ModelClrType = typeof(global::Umbraco.Core.Exceptions.BootFailedException),
+                ModelClrType = typeof(global::Umbraco.Cms.Core.Exceptions.BootFailedException),
             });
             TypeModel[] types = new[] { type1 };
 

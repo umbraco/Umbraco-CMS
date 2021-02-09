@@ -1,5 +1,8 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace Umbraco.Core
+
+using Umbraco.Cms.Core.Runtime;
+
+namespace Umbraco.Cms.Core
 {
     static partial class Constants
     {

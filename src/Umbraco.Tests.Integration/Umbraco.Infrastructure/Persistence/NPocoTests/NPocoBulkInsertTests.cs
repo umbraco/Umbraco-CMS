@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;

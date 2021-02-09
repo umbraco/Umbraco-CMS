@@ -3,9 +3,12 @@
 
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
 {

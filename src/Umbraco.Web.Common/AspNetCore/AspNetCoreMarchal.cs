@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using Umbraco.Core.Diagnostics;
+using Umbraco.Cms.Core.Diagnostics;
 
 namespace Umbraco.Web.Common.AspNetCore
 {

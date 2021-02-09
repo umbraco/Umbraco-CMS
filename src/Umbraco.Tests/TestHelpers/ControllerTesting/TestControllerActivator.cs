@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting

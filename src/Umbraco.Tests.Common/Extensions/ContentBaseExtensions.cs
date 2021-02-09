@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing

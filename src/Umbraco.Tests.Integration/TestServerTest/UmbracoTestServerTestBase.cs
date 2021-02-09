@@ -14,10 +14,13 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Testing;
@@ -29,6 +32,7 @@ using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.DependencyInjection;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {

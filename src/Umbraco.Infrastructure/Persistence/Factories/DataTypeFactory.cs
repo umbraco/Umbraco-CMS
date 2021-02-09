@@ -1,5 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -39,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Path = dto.NodeDto.Path;
                 dataType.SortOrder = dto.NodeDto.SortOrder;
                 dataType.Trashed = dto.NodeDto.Trashed;
-                dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+                dataType.CreatorId = dto.NodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
 
                 dataType.SetLazyConfiguration(dto.Configuration);
 
@@ -74,7 +78,7 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 NodeId = entity.Id,
                 Level = Convert.ToInt16(entity.Level),
-                NodeObjectType = Constants.ObjectTypes.DataType,
+                NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType,
                 ParentId = entity.ParentId,
                 Path = entity.Path,
                 SortOrder = entity.SortOrder,

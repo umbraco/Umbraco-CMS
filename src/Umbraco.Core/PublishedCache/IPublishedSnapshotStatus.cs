@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.PublishedCache
+﻿namespace Umbraco.Cms.Core.PublishedCache
 {
     /// <summary>
     /// Returns the currents status for nucache

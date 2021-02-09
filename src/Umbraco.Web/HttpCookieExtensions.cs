@@ -6,7 +6,9 @@ using System.Net.Http.Headers;
 using System.Web;
 using Microsoft.Owin;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web
 {

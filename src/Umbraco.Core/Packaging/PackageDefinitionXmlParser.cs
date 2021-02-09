@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     /// <summary>
     /// Converts a <see cref="PackageDefinition"/> to and from XML

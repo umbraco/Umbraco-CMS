@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        public override string ProviderName => Constants.DatabaseProviders.SqlServer;
+        public override string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
 
         public ServerVersionInfo ServerVersion { get; private set; }
 

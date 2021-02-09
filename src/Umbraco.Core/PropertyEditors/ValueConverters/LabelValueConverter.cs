@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// We need this property converter so that we always force the value of a label to be a string

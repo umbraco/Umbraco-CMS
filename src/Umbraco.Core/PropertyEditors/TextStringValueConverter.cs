@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Templates;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Templates;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     [DefaultPropertyValueConverter]
     public class TextStringValueConverter : PropertyValueConverterBase

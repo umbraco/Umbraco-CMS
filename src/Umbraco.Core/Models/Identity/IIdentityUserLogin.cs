@@ -1,6 +1,6 @@
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Cms.Core.Models.Identity
 {
     /// <summary>
     /// An external login provider linked to a user

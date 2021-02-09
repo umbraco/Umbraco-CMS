@@ -1,9 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Trees;
 using Umbraco.Core;
 using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Web.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Common.Builders
 {

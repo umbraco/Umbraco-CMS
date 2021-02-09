@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -87,11 +91,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 // create content type
                 IContentTypeComposition contentType;
-                if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
+                if (contentTypeDto.NodeDto.NodeObjectType == Cms.Core.Constants.ObjectTypes.MediaType)
                     contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == Cms.Core.Constants.ObjectTypes.DocumentType)
                     contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == Cms.Core.Constants.ObjectTypes.MemberType)
                     contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, contentTypeDto);
                 else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);
@@ -250,12 +254,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (contentType is IMemberType memberType)
                 {
                     // ensure that the group exists (ok if it already exists)
-                    memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
+                    memberType.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
 
                     // ensure that property types exist (ok if they already exist)
                     foreach (var (alias, propertyType) in builtinProperties)
                     {
-                        var added = memberType.AddPropertyType(propertyType, Constants.Conventions.Member.StandardPropertiesGroupName);
+                        var added = memberType.AddPropertyType(propertyType, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
 
                         if (added)
                         {

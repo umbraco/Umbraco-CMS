@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Models

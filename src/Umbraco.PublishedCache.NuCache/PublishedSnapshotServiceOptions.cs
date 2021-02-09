@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.PublishedCache.NuCache
+﻿using Umbraco.Cms.Core.PublishedCache;
+
+namespace Umbraco.Web.PublishedCache.NuCache
 {
     /// <summary>
     /// Options class for configuring the <see cref="IPublishedSnapshotService"/>

@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Website.Controllers;
 using Umbraco.Web.Website.Routing;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.Website.ActionResults
 {

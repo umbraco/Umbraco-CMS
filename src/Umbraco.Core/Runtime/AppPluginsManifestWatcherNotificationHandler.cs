@@ -2,11 +2,11 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Manifest;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
     /// <summary>
     /// Starts monitoring AppPlugins directory during debug runs, to restart site when a plugin manifest changes.

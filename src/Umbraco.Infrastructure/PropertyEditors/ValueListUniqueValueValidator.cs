@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 

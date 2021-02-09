@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core.Trees;
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.BackOffice.Trees

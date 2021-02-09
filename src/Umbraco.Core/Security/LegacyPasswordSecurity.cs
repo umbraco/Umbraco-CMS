@@ -2,9 +2,8 @@
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
-using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>
@@ -86,7 +85,7 @@ namespace Umbraco.Core.Security
                 salt = string.Empty;
                 return storedString;
             }
-                
+
 
             var saltLen = GenerateSalt();
             salt = storedString.Substring(0, saltLen.Length);

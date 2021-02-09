@@ -4,7 +4,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -113,6 +115,6 @@ namespace Umbraco.Web.BackOffice.Security
             }
         }
 
-        
+
     }
 }

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {

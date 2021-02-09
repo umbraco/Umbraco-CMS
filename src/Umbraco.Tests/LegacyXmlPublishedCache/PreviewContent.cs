@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

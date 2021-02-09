@@ -1,6 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Routing;
