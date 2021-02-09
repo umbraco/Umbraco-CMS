@@ -276,6 +276,7 @@
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
