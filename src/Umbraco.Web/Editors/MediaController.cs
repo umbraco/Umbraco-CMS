@@ -239,7 +239,7 @@ namespace Umbraco.Web.Editors
 
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService)); }
+            get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches)); }
         }
 
         /// <summary>
@@ -835,6 +835,7 @@ namespace Umbraco.Web.Editors
                     Security.CurrentUser,
                     Services.MediaService,
                     Services.EntityService,
+                    AppCaches,
                     intParentId) == false)
             {
                 throw new HttpResponseException(Request.CreateResponse(
@@ -919,7 +920,7 @@ namespace Umbraco.Web.Editors
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="media">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
         /// <returns></returns>
-        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, IEntityService entityService, int nodeId, IMedia media = null)
+        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, IEntityService entityService, AppCaches appCaches, int nodeId, IMedia media = null)
         {
             if (storage == null) throw new ArgumentNullException("storage");
             if (user == null) throw new ArgumentNullException("user");
@@ -940,10 +941,10 @@ namespace Umbraco.Web.Editors
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                ? user.HasMediaRootAccess(entityService)
+                ? user.HasMediaRootAccess(entityService, appCaches)
                 : (nodeId == Constants.System.RecycleBinMedia)
-                    ? user.HasMediaBinAccess(entityService)
-                    : user.HasPathAccess(media, entityService);
+                    ? user.HasMediaBinAccess(entityService, appCaches)
+                    : user.HasPathAccess(media, entityService, appCaches);
 
             return hasPathAccess;
         }

@@ -115,11 +115,13 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
+            var permissionResult = ContentPermissionsHelper.CheckPermissions(
+                nodeId,
                 Current.UmbracoContext.Security.CurrentUser,
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.EntityService,
+                Current.AppCaches,
                 out var contentItem,
                 _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
 

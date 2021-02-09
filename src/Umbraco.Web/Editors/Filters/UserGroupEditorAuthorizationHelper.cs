@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -13,13 +14,15 @@ namespace Umbraco.Web.Editors.Filters
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
 
-        public UserGroupEditorAuthorizationHelper(IUserService userService, IContentService contentService, IMediaService mediaService, IEntityService entityService)
+        public UserGroupEditorAuthorizationHelper(IUserService userService, IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
         {
             _userService = userService;
             _contentService = contentService;
             _mediaService = mediaService;
             _entityService = entityService;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -111,7 +114,7 @@ namespace Umbraco.Web.Editors.Filters
                 var content = _contentService.GetById(proposedContentStartId.Value);
                 if (content != null)
                 {
-                    if (currentUser.HasPathAccess(content, _entityService) == false)
+                    if (currentUser.HasPathAccess(content, _entityService, _appCaches) == false)
                         return Attempt.Fail("Current user doesn't have access to the content path " + content.Path);
                 }
             }
@@ -121,7 +124,7 @@ namespace Umbraco.Web.Editors.Filters
                 var media = _mediaService.GetById(proposedMediaStartId.Value);
                 if (media != null)
                 {
-                    if (currentUser.HasPathAccess(media, _entityService) == false)
+                    if (currentUser.HasPathAccess(media, _entityService, _appCaches) == false)
                         return Attempt.Fail("Current user doesn't have access to the media path " + media.Path);
                 }
             }

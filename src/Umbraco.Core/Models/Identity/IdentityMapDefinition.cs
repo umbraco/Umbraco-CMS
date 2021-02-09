@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
@@ -11,12 +12,22 @@ namespace Umbraco.Core.Models.Identity
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
         private readonly IGlobalSettings _globalSettings;
+        private readonly AppCaches _appCaches;
 
+        [Obsolete("Use constructor specifying all dependencies")]
         public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
             _textService = textService;
             _entityService = entityService;
             _globalSettings = globalSettings;
+        }
+
+        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings, AppCaches appCaches)
+        {
+            _textService = textService;
+            _entityService = entityService;
+            _globalSettings = globalSettings;
+            _appCaches = appCaches;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -46,8 +57,8 @@ namespace Umbraco.Core.Models.Identity
             target.Groups = source.Groups.ToArray();
             */
 
-            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
-            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
+            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.Email = source.Email;
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
