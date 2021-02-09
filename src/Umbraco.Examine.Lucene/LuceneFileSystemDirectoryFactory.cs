@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.IO;
 using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
@@ -9,7 +12,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
     public class LuceneFileSystemDirectoryFactory : ILuceneDirectoryFactory
     {

@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {

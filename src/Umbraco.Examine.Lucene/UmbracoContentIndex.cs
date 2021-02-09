@@ -1,21 +1,20 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Services;
+using Examine.LuceneEngine;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
-using Umbraco.Core.Logging;
-using Examine.LuceneEngine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
     /// <summary>
     /// An indexer for Umbraco content and media

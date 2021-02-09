@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Examine
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+namespace Umbraco.Cms.Examine
 {
     public interface ILuceneDirectoryFactory
     {

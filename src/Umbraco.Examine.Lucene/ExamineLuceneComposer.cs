@@ -1,9 +1,13 @@
-﻿using System.Runtime.InteropServices;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
     // We want to run after core composers since we are replacing some items
     [ComposeAfter(typeof(ICoreComposer))]

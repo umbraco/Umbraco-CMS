@@ -1,7 +1,10 @@
-﻿using Lucene.Net.Store;
-using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Examine
+using System;
+using Lucene.Net.Store;
+
+namespace Umbraco.Cms.Examine
 {
     public class LuceneRAMDirectoryFactory : ILuceneDirectoryFactory
     {

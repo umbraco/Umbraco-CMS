@@ -1,7 +1,10 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.IO;
 using Lucene.Net.Store;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
     /// <summary>
     /// A custom <see cref="SimpleFSLockFactory"/> that ensures a prefixless lock prefix
@@ -21,6 +24,5 @@ namespace Umbraco.Examine
             get => base.LockPrefix;
             set => base.LockPrefix = null; //always set to null
         }
-        
     }
 }

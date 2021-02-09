@@ -1,16 +1,17 @@
-﻿using Examine;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Examine;
 using Lucene.Net.Analysis;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Examine;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
-
     /// <summary>
     /// Custom indexer for members
     /// </summary>

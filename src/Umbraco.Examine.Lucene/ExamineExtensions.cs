@@ -1,20 +1,22 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using System.Threading;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Umbraco.Core;
-using Version = Lucene.Net.Util.Version;
-using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Examine;
+using Version = Lucene.Net.Util.Version;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
-
     /// <summary>
     /// Extension methods for the LuceneIndex
     /// </summary>

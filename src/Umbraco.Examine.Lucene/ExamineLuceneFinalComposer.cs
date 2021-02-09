@@ -1,6 +1,9 @@
-﻿using Umbraco.Cms.Core.Composing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Examine
+using Umbraco.Cms.Core.Composing;
+
+namespace Umbraco.Cms.Examine
 {
     // examine's Lucene final composer composes after all user composers
     // and *also* after ICoreComposer (in case IUserComposer is disabled)

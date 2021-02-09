@@ -1,13 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Examine;
 using Examine.LuceneEngine.Directories;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core;
+using Umbraco.Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
-
     public sealed class ExamineLuceneComponent : IComponent
     {
         private readonly IndexRebuilder _indexRebuilder;

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
-        <RootNamespace>Umbraco.Examine</RootNamespace>
+        <RootNamespace>Umbraco.Cms.Examine</RootNamespace>
         <Product>Umbraco CMS</Product>
         <Title>Umbraco.Examine.Lucene</Title>
         <LangVersion>8</LangVersion>

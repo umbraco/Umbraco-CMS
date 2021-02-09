@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Examine;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 using Umbraco.Extensions;

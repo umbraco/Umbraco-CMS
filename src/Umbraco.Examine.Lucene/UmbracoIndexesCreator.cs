@@ -1,23 +1,22 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
-using Lucene.Net.Analysis.Standard;
-using Examine.LuceneEngine;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Examine;
-using Umbraco.Core.Configuration;
-using Umbraco.Core;
-using Microsoft.Extensions.Options;
+using Examine.LuceneEngine;
+using Lucene.Net.Analysis.Standard;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Examine;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Examine
 {
-
     /// <summary>
     /// Creates the indexes used by Umbraco
     /// </summary>
