@@ -1,7 +1,5 @@
-<div class="usky-grid usky-grid-configuration" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController as vm">
-
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController as vm">
     <umb-editor-view>
-
         <form novalidate name="RowConfigurationForm" val-form-manager>
 
             <umb-editor-header
@@ -15,112 +13,96 @@
             <umb-editor-container>
                 <umb-box>
                     <umb-box-content>
+                        <div class="umb-form-settings form-horizontal">
 
-                    <div class="umb-form-settings form-horizontal">
+                            <p><localize key="grid_addRowConfigurationDetail" /></p>
 
-                        <p><localize key="grid_addRowConfigurationDetail" /></p>
+                            <div class="alert alert-warn ng-scope" ng-show="nameChanged">
+                                <p>Modifying a row configuration name will result in loss of
+                                data for any existing content that is based on this configuration.</p>
+                                <p><strong>Modifying only the label will not result in data loss.</strong></p>
+                            </div>
 
-                        <div class="alert alert-warn ng-scope" ng-show="nameChanged">
-                            <p>Modifying a row configuration name will result in loss of
-                            data for any existing content that is based on this configuration.</p>
-                            <p><strong>Modifying only the label will not result in data loss.</strong></p>
-                        </div>
+                            <umb-control-group label="@general_name">
+                                <input type="text" ng-model="currentRow.name" />
+                            </umb-control-group>
 
-                        <umb-control-group label="@general_name">
-                            <input type="text" ng-model="currentRow.name" />
-                        </umb-control-group>
+                            <umb-control-group label="@general_label">
+                                <input type="text" ng-model="currentRow.label" placeholder="Overrides name" />
+                            </umb-control-group>
 
-                        <umb-control-group label="@general_label">
-                            <input type="text" ng-model="currentRow.label" placeholder="Overrides name" />
-                        </umb-control-group>
-
-                        <div class="uSky-templates-template"
-                            style="margin: 0; width: 350px; position: relative;">
-
-                            <div class="tb" style="height: auto; border: none !important; background: none">
-                                <div class="tr">
-
-                                    <button type="button" class="btn-reset td uSky-templates-column"
-                                        ng-class="{last:$last, selected:cell==currentCell}"
+                            <div class="umb-grid-preview--rows umb-grid-preview--rows__wide">
+                                <div class="umb-grid-preview--row">
+                                    <button type="button" class="btn-reset umb-grid-preview--col umb-grid-preview--col__deep -has-hover"
+                                        ng-class="{selected:cell==currentCell}"
                                         ng-repeat="cell in currentRow.areas"
                                         ng-click="configureCell(cell, currentRow)"
                                         ng-style="{width: percentage(cell.grid) + '%'}">
                                         <span class="sr-only">
-                                            <span class="sr-only">
-                                                <localize key="grid_editRowConfiguration">Edit row configuration</localize>
-                                            </span>
+                                            <localize key="grid_editRowConfiguration">Edit row configuration</localize>
                                         </span>
                                     </button>
 
-                                    <button type="button" class="btn-reset td uSky-templates-column add"
-                                       ng-click="configureCell(null, currentRow)"
-                                       ng-style="{width: percentage(availableRowSpace) + '%'}">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                    <button type="button" class="btn-reset umb-grid-preview--col__add" ng-if="availableRowSpace > 0"                                    
+                                    ng-click="configureCell(null, currentRow)"
+                                    ng-style="{width: percentage(availableRowSpace) + '%'}">
+                                        <umb-icon icon="icon-add"></umb-icon>
                                         <span class="sr-only">
                                             <localize key="grid_addRowConfiguration">Add row configuration</localize>
                                         </span>
                                     </button>
                                 </div>
                             </div>
-                        </div>
 
-                        <div ng-if="currentCell" style="padding-bottom: 50px;">
+                            <div ng-if="currentCell != null" class="mt2">
+                                <umb-control-group label="@general_width">
+                                    <div class="grid-size-scaler">
+                                        <button type="button" class="btn-link" ng-click="scaleDown(currentCell)" aria-label="Scale down">
+                                            <umb-icon icon="icon-remove"></umb-icon>
+                                        </button>
+                                        <span>{{currentCell.grid}}</span>
+                                        <button type="button" class="btn-link" ng-click="scaleUp(currentCell, availableRowSpace, true)" aria-label="Scale up">
+                                            <umb-icon icon="icon-add"></umb-icon>
+                                        </button>
+                                    </div>
+                                </umb-control-group>
 
-                            <umb-control-group label="@general_width">
-                                <div class="grid-size-scaler">
-                                    <button type="button" class="btn-link" ng-click="scaleDown(currentCell)">
-                                        <i class="icon icon-remove" aria-hidden="true"></i>
+                                <umb-control-group label="@grid_maxItems" description="@grid_maxItemsDescription">
+                                    <input type="number" ng-model="currentCell.maxItems" class="umb-property-editor-tiny" placeholder="Max" min="0" />
+                                </umb-control-group>
+
+                                <umb-control-group hide-label="true">  
+                                    <button type="button" class="btn btn-danger"
+                                            ng-click="deleteArea(currentCell, currentRow)">
+                                        <localize key="general_delete">Delete</localize>
                                     </button>
-                                    <span>{{currentCell.grid}}</span>
-                                    <button type="button" class="btn-link" ng-click="scaleUp(currentCell, availableRowSpace, true)">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </umb-control-group>
+                                </umb-control-group>    
 
-                            <umb-control-group label="@grid_maxItems" description="@grid_maxItemsDescription">
-                                <input type="number" ng-model="currentCell.maxItems" class="umb-property-editor-tiny" placeholder="Max" min="0" />
-                            </umb-control-group>
+                                <umb-control-group hide-label="true">
+                                    <umb-toggle checked="currentCell.allowAll"
+                                                on-click="toggleAllowed(currentCell)"
+                                                show-labels="true"
+                                                label-position="right"
+                                                label-off="{{vm.labels.allowAllEditors}}"
+                                                label-on="{{vm.labels.allowAllEditors}}">
+                                    </umb-toggle>
 
-                            <umb-control-group hide-label="true">
-	  		                    <i class="icon-delete red" aria-hidden="true"></i>
-	  		                    <button type="button" class="btn btn-small btn-link" ng-click="deleteArea(currentCell, currentRow)">
-	  			                    <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
-	  		                    </button>
-	  	                    </umb-control-group>
-
-                            <umb-control-group hide-label="true">
-
-                                <umb-toggle class="umb-toggle-group-item__toggle"
-                                            checked="currentCell.allowAll"
-                                            on-click="toggleAllowed(currentCell)"
-                                            show-labels="true"
-                                            label-position="right"
-                                            label-off="{{vm.labels.allowAllEditors}}"
-                                            label-on="{{vm.labels.allowAllEditors}}"
-                                            style="margin-left: 18px">
-                                </umb-toggle>
-
-                                <div ng-if="currentCell.allowAll === false">
-                                    <hr />
-                                    <ul class="unstyled">
-                                        <li ng-repeat="editor in editors track by $id(editor)">
-
-                                            <umb-checkbox model="editor.allowed"
-                                                          input-id="editorconfig-{{$index}}"
-                                                          on-change="selectEditor(currentCell, editor)">
-                                                <i class="icon {{editor.icon}}" aria-hidden="true"></i> {{editor.name}}
-                                                <small class="input-label--small">({{editor.alias}})</small>
-                                            </umb-checkbox>
-
-                                        </li>
-                                    </ul>
-                                </div>
-                            </umb-control-group>
+                                    <div ng-if="currentCell.allowAll === false">
+                                        <hr />
+                                        <ul class="unstyled">
+                                            <li ng-repeat="editor in editors track by $id(editor)">
+                                                <umb-checkbox model="editor.allowed"
+                                                            input-id="editorconfig-{{$index}}"
+                                                            on-change="selectEditor(currentCell, editor)">
+                                                    <umb-icon icon="{{editor.icon}}"></umb-icon> {{editor.name}}
+                                                    <small class="input-label--small">({{editor.alias}})</small>
+                                                </umb-checkbox>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </umb-control-group>
+                            </div>
                         </div>
-
-                    </div>
-
                     </umb-box-content>
                 </umb-box>
             </umb-editor-container>
@@ -144,7 +126,5 @@
             </umb-editor-footer>
 
         </form>
-
     </umb-editor-view>
-
 </div>
