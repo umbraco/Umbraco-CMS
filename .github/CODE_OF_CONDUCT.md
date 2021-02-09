@@ -43,6 +43,8 @@ Community leaders (e.g. Meetup & festival organizers, moderators, maintainers, .
 
 Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.  
 
+Specific enforcement steps are listed in the [Code of Conduct Enforcement Guidelines](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/.github/CODE_OF_CONDUCT_ENFORCEMENT.md) document which is an appendix of this document, updated and maintained by the Code of Conduct Team.
+
 ## Scope
 This Code of Conduct applies within all community spaces and events supported by Umbraco HQ or using the Umbraco name. It also applies when an individual is officially representing the community in public spaces. 
 
