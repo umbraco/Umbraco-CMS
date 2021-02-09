@@ -90,13 +90,6 @@ namespace Umbraco.Infrastructure.Security
         }
 
         /// <summary>
-        /// This will determine which password hasher to use based on what is defined in config
-        /// </summary>
-        /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
-        /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
-        protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
-
-        /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>The generated password</returns>
@@ -116,9 +109,7 @@ namespace Umbraco.Infrastructure.Security
         /// <returns>The hashed password</returns>
         public string HashPassword(string password)
         {
-            IPasswordHasher<TUser> passwordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
-
-            string hashedPassword = passwordHasher.HashPassword(null, password);
+            string hashedPassword = PasswordHasher.HashPassword(null, password);
             return hashedPassword;
         }
 
