@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {

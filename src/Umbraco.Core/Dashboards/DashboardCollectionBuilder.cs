@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Dashboards
 {

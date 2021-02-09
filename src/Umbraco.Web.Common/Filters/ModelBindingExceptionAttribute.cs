@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.Filters

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence
 {

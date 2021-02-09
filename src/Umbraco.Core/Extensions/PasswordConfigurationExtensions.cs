@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class PasswordConfigurationExtensions
     {

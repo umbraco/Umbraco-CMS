@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
 
 namespace Umbraco.Core.Runtime

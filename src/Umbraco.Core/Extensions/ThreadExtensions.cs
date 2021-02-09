@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Threading;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class ThreadExtensions
     {

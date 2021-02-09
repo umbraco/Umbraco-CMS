@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models
 {

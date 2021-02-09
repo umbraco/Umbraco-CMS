@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class NameValueCollectionExtensions
     {

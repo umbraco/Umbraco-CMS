@@ -1,7 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for <see cref="IPublishedModelFactory"/>.

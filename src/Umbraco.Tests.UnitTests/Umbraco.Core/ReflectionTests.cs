@@ -4,8 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {

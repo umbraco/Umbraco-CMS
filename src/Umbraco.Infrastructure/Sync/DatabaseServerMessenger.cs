@@ -17,11 +17,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Sync
 {

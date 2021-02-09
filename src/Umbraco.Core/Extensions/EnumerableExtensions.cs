@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
-    ///<summary>
+    /// <summary>
     /// Extensions for enumerable sources
-    ///</summary>
+    /// </summary>
     public static class EnumerableExtensions
     {
         public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;

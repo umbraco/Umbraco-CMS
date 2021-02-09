@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {

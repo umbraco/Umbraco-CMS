@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {

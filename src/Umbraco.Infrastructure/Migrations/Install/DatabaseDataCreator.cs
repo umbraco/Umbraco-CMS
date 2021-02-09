@@ -4,10 +4,9 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Install
 {

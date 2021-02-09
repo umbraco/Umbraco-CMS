@@ -6,9 +6,9 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Core;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Compose

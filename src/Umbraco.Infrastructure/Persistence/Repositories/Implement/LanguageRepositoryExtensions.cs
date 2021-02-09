@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Persistence.Repositories;
+﻿using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {

@@ -7,12 +7,9 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Web;
+using Umbraco.Extensions;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers.Stubs

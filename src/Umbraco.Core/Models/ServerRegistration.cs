@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models
 {

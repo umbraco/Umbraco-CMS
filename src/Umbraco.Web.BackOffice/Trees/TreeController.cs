@@ -3,8 +3,7 @@ using System.Collections.Concurrent;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Trees
 {

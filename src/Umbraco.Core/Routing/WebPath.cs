@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {

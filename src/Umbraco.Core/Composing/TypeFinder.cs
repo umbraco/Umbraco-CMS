@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing
 {

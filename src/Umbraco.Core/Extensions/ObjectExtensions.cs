@@ -8,16 +8,16 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides object extension methods.
     /// </summary>
     public static class ObjectExtensions
     {
-
         private static readonly ConcurrentDictionary<Type, Type> NullableGenericCache = new ConcurrentDictionary<Type, Type>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();

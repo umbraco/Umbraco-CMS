@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+﻿namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for System.Decimal.

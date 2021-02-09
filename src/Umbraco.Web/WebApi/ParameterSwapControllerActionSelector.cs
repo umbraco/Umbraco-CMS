@@ -6,7 +6,7 @@ using System.Web.Http.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.WebApi
 {

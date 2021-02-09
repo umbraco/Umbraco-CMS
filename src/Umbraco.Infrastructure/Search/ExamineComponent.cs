@@ -13,15 +13,9 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
 using Umbraco.Examine;
-using Umbraco.Web.Cache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Search
 {

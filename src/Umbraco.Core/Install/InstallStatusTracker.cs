@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Install
 {

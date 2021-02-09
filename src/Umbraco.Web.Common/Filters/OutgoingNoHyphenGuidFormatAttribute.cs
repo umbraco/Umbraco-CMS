@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Buffers;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.Filters

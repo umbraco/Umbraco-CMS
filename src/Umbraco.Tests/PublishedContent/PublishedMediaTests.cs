@@ -1,18 +1,10 @@
-using System.Web;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.UmbracoExamine;
-using Umbraco.Web;
 using System.Linq;
 using System.Threading;
 using System.Xml;
-using Examine;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -23,14 +15,13 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Cache;
 using Umbraco.Examine;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
+using Umbraco.Tests.UmbracoExamine;
 
 namespace Umbraco.Tests.PublishedContent
 {

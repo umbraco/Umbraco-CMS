@@ -3,8 +3,8 @@ using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Factories
 {

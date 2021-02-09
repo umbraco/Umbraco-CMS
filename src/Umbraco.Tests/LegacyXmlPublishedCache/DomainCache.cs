@@ -1,14 +1,9 @@
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

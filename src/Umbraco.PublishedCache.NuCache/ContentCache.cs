@@ -11,9 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Core.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Extensions;
 using Umbraco.Web.PublishedCache.NuCache.Navigable;
 using Constants = Umbraco.Cms.Core.Constants;
 

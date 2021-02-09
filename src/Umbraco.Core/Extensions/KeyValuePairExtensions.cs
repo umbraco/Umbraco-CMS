@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for the <see cref="KeyValuePair{TKey,TValue}"/> struct.

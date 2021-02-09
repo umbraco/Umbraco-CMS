@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security
 {

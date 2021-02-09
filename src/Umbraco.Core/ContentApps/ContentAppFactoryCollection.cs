@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.ContentApps
 {

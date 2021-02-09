@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {

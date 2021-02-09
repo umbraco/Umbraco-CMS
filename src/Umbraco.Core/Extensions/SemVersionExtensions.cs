@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class SemVersionExtensions
     {

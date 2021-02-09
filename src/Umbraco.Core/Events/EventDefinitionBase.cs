@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events
 {

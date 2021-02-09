@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent
+﻿using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     public static class VariationContextAccessorExtensions
     {
@@ -14,7 +16,10 @@
 
             // use context values
             var publishedVariationContext = variationContextAccessor?.VariationContext;
-            if (culture == null) culture = variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
+            if (culture == null)
+            {
+                culture = variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
+            }
 
             if (segment == null)
             {

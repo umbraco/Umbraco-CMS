@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {

@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class ConfigConnectionStringExtensions
     {

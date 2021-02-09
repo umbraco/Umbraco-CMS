@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing
 {

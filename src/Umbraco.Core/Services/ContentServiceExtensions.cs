@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {

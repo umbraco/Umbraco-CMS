@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {

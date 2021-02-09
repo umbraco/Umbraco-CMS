@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class MediaTypeExtensions
     {

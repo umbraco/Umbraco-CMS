@@ -1,8 +1,8 @@
-﻿using NPoco;
-using System;
-using Umbraco.Cms.Core;
+﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
 {

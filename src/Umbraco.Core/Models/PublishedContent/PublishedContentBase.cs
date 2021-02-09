@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
 {

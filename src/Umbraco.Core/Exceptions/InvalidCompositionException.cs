@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Exceptions
 {

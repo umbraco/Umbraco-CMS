@@ -7,7 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.Compose;
 using Constants = Umbraco.Cms.Core.Constants;
 

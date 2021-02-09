@@ -4,14 +4,10 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Web;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache

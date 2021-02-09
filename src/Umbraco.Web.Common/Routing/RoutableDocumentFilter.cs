@@ -7,11 +7,9 @@ using System.Threading;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Routing
 {

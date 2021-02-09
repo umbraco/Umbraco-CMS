@@ -5,6 +5,7 @@ using System.Threading;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Trees
 {

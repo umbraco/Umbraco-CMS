@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class TypeExtensions
     {

@@ -5,7 +5,7 @@ using System;
 using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core
 {

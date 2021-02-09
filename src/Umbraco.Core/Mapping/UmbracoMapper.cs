@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Mapping
 {

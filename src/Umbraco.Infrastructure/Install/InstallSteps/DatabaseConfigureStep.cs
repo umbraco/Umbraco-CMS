@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Core;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

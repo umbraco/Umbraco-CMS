@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings.Css
 {

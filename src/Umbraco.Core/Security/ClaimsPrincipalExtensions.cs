@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {

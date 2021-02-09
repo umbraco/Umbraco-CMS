@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
 {

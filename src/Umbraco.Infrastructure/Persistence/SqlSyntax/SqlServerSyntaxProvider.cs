@@ -5,8 +5,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {

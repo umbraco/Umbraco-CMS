@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Web;
 using Examine;
 using Microsoft.AspNetCore.Html;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Examine;
-using Umbraco.Web.Routing;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Website.Extensions

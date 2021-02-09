@@ -1,14 +1,12 @@
 ﻿using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// Extension methods for the cache helper
     /// </summary>
-    public static class CacheHelperExtensions
+    public static class CoreCacheHelperExtensions
     {
-
         public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
 
         /// <summary>

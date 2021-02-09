@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Website
 {

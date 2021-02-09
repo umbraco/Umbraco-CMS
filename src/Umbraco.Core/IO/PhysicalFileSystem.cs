@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {

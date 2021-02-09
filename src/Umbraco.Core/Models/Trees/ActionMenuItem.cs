@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Trees
 {

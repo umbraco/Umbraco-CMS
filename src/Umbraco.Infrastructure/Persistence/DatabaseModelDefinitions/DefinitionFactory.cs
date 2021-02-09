@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {

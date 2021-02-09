@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
-using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
-using Umbraco.Core;
-using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc

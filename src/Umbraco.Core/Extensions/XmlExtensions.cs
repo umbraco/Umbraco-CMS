@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core
 {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class DateTimeExtensions
     {
-
         /// <summary>
         /// Returns the DateTime as an ISO formatted string that is globally expectable
         /// </summary>

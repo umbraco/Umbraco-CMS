@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {

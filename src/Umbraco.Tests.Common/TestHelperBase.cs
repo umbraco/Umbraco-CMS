@@ -23,15 +23,10 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Common

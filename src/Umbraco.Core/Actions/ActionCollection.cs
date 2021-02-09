@@ -2,6 +2,7 @@
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Actions
 {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache
 {

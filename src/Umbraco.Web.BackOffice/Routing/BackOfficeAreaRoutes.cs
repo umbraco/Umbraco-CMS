@@ -7,11 +7,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Routing;
 using Constants = Umbraco.Cms.Core.Constants;
 

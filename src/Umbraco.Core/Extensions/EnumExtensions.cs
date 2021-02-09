@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to <see cref="Enum"/>.

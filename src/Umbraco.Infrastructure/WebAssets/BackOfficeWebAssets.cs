@@ -11,10 +11,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.WebAssets
 {

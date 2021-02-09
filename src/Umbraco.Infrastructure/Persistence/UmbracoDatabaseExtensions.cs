@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence
 {

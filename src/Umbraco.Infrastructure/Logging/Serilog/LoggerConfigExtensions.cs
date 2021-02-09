@@ -7,10 +7,10 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Logging.Serilog
 {

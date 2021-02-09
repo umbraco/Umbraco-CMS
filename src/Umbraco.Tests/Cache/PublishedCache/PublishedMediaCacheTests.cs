@@ -13,17 +13,13 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {

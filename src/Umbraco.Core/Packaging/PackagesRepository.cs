@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Packaging

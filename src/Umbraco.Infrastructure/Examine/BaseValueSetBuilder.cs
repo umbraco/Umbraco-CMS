@@ -3,13 +3,10 @@ using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {
-
     /// <inheritdoc />
     public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
         where TContent : IContentBase

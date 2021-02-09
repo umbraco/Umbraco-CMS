@@ -5,11 +5,10 @@ using System;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {

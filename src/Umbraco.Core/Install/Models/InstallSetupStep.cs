@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Install.Models
 {

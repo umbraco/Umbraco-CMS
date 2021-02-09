@@ -12,12 +12,7 @@ using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Extensions;
 using Umbraco.Web.Security.Providers;
 using Constants = Umbraco.Cms.Core.Constants;
 

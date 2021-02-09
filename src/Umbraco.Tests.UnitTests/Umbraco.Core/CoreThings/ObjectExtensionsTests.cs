@@ -9,8 +9,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings

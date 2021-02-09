@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Trees
 {

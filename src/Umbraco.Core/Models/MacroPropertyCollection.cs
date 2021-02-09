@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Cms.Core.Collections;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models
 {

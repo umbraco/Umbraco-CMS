@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models
 {

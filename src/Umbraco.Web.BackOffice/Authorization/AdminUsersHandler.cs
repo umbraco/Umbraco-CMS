@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Authorization
 {

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 using Examine.LuceneEngine.Providers;
-using Umbraco.Core;
 using Lucene.Net.Store;
-using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

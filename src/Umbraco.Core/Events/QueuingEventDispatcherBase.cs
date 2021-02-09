@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events
 {

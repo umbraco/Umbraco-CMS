@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using UserProfile = Umbraco.Cms.Core.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Cms.Core.Models.Mapping

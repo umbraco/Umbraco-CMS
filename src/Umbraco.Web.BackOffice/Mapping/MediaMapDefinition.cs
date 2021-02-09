@@ -9,11 +9,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.Mapping;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 

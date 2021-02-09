@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {

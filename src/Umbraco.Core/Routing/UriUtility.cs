@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {

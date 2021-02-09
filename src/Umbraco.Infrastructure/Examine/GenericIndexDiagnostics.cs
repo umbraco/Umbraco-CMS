@@ -4,7 +4,7 @@ using System.Linq;
 using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

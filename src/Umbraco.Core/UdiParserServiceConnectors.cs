@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Deploy;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core
 {

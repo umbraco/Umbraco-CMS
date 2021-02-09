@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
 {

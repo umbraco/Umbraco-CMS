@@ -19,15 +19,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Sync;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -35,7 +29,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Tests.Scoping

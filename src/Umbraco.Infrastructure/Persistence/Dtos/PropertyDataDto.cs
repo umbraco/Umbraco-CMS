@@ -1,7 +1,7 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {

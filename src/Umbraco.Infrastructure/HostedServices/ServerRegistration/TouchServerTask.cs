@@ -9,8 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
 {

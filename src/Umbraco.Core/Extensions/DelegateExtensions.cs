@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Extensions
 {
     public static class DelegateExtensions
     {

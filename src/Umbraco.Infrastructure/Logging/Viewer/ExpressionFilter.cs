@@ -2,7 +2,7 @@
 using System.Linq;
 using Serilog.Events;
 using Serilog.Filters.Expressions;
-using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Logging.Viewer
 {

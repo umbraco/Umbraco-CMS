@@ -1,10 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

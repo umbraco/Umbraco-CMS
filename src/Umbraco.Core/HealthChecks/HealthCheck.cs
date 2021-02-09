@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks
 {

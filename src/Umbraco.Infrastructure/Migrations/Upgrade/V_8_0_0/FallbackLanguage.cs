@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {

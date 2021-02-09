@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

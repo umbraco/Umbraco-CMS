@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Packaging;
 using File = System.IO.File;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
 {

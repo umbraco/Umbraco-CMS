@@ -1,9 +1,8 @@
-﻿using Examine;
-using Examine.Search;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Examine;
+using Examine.Search;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

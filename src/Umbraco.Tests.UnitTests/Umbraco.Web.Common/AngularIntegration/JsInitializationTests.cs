@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
