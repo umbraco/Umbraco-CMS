@@ -15,8 +15,10 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly ILogger _logger;
         private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
-        private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
-        private readonly IDictionary<CultureInfo, IDictionary<string, string>> _noAreaDictionarySource;
+        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource => _dictionarySourceLazy.Value;
+        private IDictionary<CultureInfo, IDictionary<string, string>> _noAreaDictionarySource => _noAreaDictionarySourceLazy.Value;
+        private readonly Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>> _dictionarySourceLazy;
+        private readonly Lazy<IDictionary<CultureInfo, IDictionary<string, string>>> _noAreaDictionarySourceLazy;
         private readonly char[] _splitter = new[] { '/' };
         /// <summary>
         /// Initializes with a file sources instance
@@ -28,9 +30,8 @@ namespace Umbraco.Core.Services.Implement
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
             if (fileSources == null) throw new ArgumentNullException("fileSources");
-            var dictionaries = FileSourcesToDictionarySources(fileSources.Value);
-            _dictionarySource = dictionaries.WithArea;
-            _noAreaDictionarySource = dictionaries.WithoutArea;
+            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(()=> FileSourcesToDictionarySources(fileSources.Value).WithArea);
+            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => FileSourcesToDictionarySources(fileSources.Value).WithoutArea);
             _fileSources = fileSources;
         }
 
@@ -72,9 +73,9 @@ namespace Umbraco.Core.Services.Implement
             if (source == null) throw new ArgumentNullException("source");
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            var dictionaries = XmlSourcesToDictionarySources(source);
-            _dictionarySource = dictionaries.WithArea;
-            _noAreaDictionarySource = dictionaries.WithoutArea;
+            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(()=> XmlSourcesToDictionarySources(source).WithArea);
+            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => XmlSourcesToDictionarySources(source).WithoutArea);
+            
         }
 
 
@@ -85,10 +86,11 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="logger"></param>
         public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger logger)
         {
-            _dictionarySource = source ?? throw new ArgumentNullException(nameof(source));
+            var dictionarySource = source ?? throw new ArgumentNullException(nameof(source));
+            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => dictionarySource);
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
-            foreach (var cultureDictionary in _dictionarySource)
+            foreach (var cultureDictionary in dictionarySource)
             {
                 var areaAliaValue = GetAreaStoredTranslations(source, cultureDictionary.Key);
                 var aliasValue = new Dictionary<string, string>();
@@ -104,7 +106,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 cultureNoAreaDictionary.Add(cultureDictionary.Key, aliasValue);
             }
-            _noAreaDictionarySource = cultureNoAreaDictionary;
+            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => cultureNoAreaDictionary);
         }
 
         public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)
