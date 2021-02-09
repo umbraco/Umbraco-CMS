@@ -60,6 +60,8 @@ Or alternatively, you can reach out directly to any of the team members behind t
 
 The review process is done with full respect for the privacy and security of the reporter of any incident.  
 
+People with a conflict of interest should exclude themselves or if necessary be excluded by the other team members.  
+
 ## Enforcement Guidelines
 
 Community leaders will follow these Community Impact Guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
