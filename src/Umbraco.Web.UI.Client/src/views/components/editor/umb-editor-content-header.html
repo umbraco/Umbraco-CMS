@@ -62,7 +62,8 @@
                                 <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
                                 <span class="umb-variant-switcher__state">
                                     <umb-variant-state variant="entry.variant"></umb-variant-state>
-                                    <span ng-if="entry.variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                                    <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
+                                    <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
                                 </span>
                             </button>
                             <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>

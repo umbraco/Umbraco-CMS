@@ -768,18 +768,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * @function
          *
          * @description
-         * Sorts the variants so mandatory languages are shown first and all other underneath. Both Mandatory and non mandatory languages are then
+         * Sorts the variants so default language is shown first. Mandatory languages are shown next and all other underneath. Both Mandatory and non mandatory languages are
          * sorted in the following groups 'Published', 'Draft', 'Not Created'. Within each of those groups the variants are
          * sorted by the language display name.
          * 
          */
         sortVariants: function (a, b) {
             const statesOrder = ['Published', 'Draft', 'NotCreated'];
+            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : 0) - (!b.language.isDefault ? 1 : 0);
             const compareMandatory = (a,b) => (!a.language.isMandatory ? 1 : 0) - (!b.language.isMandatory ? 1 : 0);
             const compareState = (a, b) => statesOrder.indexOf(a.state) - statesOrder.indexOf(b.state);
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
     
-            return compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
+            return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
         }
     };
 }
