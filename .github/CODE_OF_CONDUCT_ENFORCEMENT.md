@@ -1,4 +1,4 @@
-# Umbraco Code of Conduct Enforcement guidelines - Consequence Ladder
+# Umbraco Code of Conduct Enforcement guidelines - Consequence Ladder  
 
 These are the steps followed by the [Umbraco Code of Conduct Team](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/.github/CODE_OF_CONDUCT.md) when we respond to an issue or incident brought to our attention by a community member.  
 
@@ -17,23 +17,23 @@ A private, written warning from the Code of Conduct Team, with clarity of violat
 **Level 2: Warning**  
 A private, written warning from the Code of Conduct Team, with clarity of violation, consequences of continued behavior. Additionally:  
 
-* Communication of next-level consequences if behaviors are repeated (according to this ladder).
+* Communication of next-level consequences if behaviors are repeated (according to this ladder).  
 
 **Level 3: Warning + Mandatory Cooling Off Period (Access Retained)**  
 A private warning from the Code of Conduct Team, with clarity of violation, consequences of continued behavior. Additionally:  
 
 * Request to avoid interaction on community messaging platforms (public forums, Our, commenting on issues).  
-  * This includes avoiding any interactions in any Umbraco channels, spaces/offices, as well as external channels like social media (e.g. Twitter, Facebook, LinkedIn). For example, 'following/liking/retweeting' would be considered a violation of these terms, and consequence would escalate according to his ladder.
+  * This includes avoiding any interactions in any Umbraco channels, spaces/offices, as well as external channels like social media (e.g. Twitter, Facebook, LinkedIn). For example, 'following/liking/retweeting' would be considered a violation of these terms, and consequence would escalate according to this ladder.  
 * Require they do not interact with others in the report, or those who they suspect are involved in the report.  
 * Suggestions for 'out of office' type of message on platforms, to reduce curiosity, or suspicion among those not involved.  
 
 **Level 4: Temporary Ban (Access Revoked)**  
-Private communication of ban from the Code of Conduct Team, with clarity of violation, consequences of continued behavior. Additionally:
+Private communication of ban from the Code of Conduct Team, with clarity of violation, consequences of continued behavior. Additionally:  
 
 * 3-6 months imposed break.  
 * All accounts deactivated, or blocked during this time (Our, HQ Slack if applicable).  
 * Require to avoid interaction on community messaging platforms (public forums, Our, commenting on issues).  
-  * This includes avoiding any interactions in any Umbraco channels, spaces/offices, as well as external channels like social media (e.g. Twitter, Facebook, LinkedIn). For example, 'following/liking/retweeting' would be considered a violation of these terms, and consequence would escalate according to his ladder.  
+  * This includes avoiding any interactions in any Umbraco channels, spaces/offices, as well as external channels like social media (e.g. Twitter, Facebook, LinkedIn). For example, 'following/liking/retweeting' would be considered a violation of these terms, and consequence would escalate according to this ladder.  
 * All community leadership roles (e.g. Community Teams, Meetup/festival organizer, Commit right on Github..) suspended. (onboarding/reapplication required outside of this process)  
 * No attendance at Umbraco events during the ban period.  
 * Not allowed to enter Umbraco HQ offices during the ban period.  
