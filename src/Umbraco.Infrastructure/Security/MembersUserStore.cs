@@ -554,13 +554,13 @@ namespace Umbraco.Infrastructure.Security
                 member.LastPasswordChangeDate = identityUserMember.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
 
-            //if (identityUser.IsPropertyDirty(nameof(MembersIdentityUser.EmailConfirmed))
-            //    || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default && identityUser.EmailConfirmed == false)
-            //    || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default) && identityUser.EmailConfirmed))
-            //{
-            //    anythingChanged = true;
-            //    user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
-            //}
+            if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.EmailConfirmed))
+                || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUserMember.EmailConfirmed == false)
+                || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUserMember.EmailConfirmed))
+            {
+                anythingChanged = true;
+                member.EmailConfirmedDate = identityUserMember.EmailConfirmed ? (DateTime?)DateTime.Now : null;
+            }
 
             if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Name))
                 && member.Name != identityUserMember.Name && identityUserMember.Name.IsNullOrWhiteSpace() == false)
@@ -610,11 +610,11 @@ namespace Umbraco.Infrastructure.Security
                 member.PasswordConfiguration = identityUserMember.PasswordConfig;
             }
 
-            //if (user.SecurityStamp != identityUser.SecurityStamp)
-            //{
-            //    anythingChanged = true;
-            //    user.SecurityStamp = identityUser.SecurityStamp;
-            //}
+            if (member.SecurityStamp != identityUserMember.SecurityStamp)
+            {
+                anythingChanged = true;
+                member.SecurityStamp = identityUserMember.SecurityStamp;
+            }
 
             // TODO: Fix this for Groups too (as per backoffice comment)
             if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Roles)) || identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Groups)))

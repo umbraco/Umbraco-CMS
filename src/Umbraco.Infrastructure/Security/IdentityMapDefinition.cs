@@ -96,13 +96,13 @@ namespace Umbraco.Infrastructure.Security
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
             target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
-            //target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
+            target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
             target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
             target.PasswordConfig = source.PasswordConfiguration;
             target.IsApproved = source.IsApproved;
-            //target.SecurityStamp = source.SecurityStamp;
+            target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
 
             // NB: same comments re AutoMapper as per BackOfficeUser
