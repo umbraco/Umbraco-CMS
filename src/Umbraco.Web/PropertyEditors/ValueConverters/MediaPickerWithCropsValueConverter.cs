@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -91,8 +90,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     mediaItems.Add(new MediaWithCrops
                     {
                         MediaItem = item,
-                        Crops = media.Crops,
-                        FocalPoint = media.FocalPoint
+                        LocalCrops = new ImageCropperValue
+                        {
+                            Crops = media.Crops,
+                            FocalPoint = media.FocalPoint,
+                            Src = item.Url()
+                        }
                     });
                 }
             }
@@ -143,20 +146,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             public IPublishedContent MediaItem { get; set; }
 
-            public IEnumerable<ImageCropperValue.ImageCropperCrop> Crops { get; set; }
-
-            public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
-
-            public string GetLocalCropUrl(string cropAlias)
-            {
-                if (MediaItem == null) return null;
-
-                if (Crops.SingleOrDefault(x => x.Alias == cropAlias) == null) return null;
-
-                return "?magic";
-            }
+            public ImageCropperValue LocalCrops { get; set; }
         }
-
-
     }
 }
