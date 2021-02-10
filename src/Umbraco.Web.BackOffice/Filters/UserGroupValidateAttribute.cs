@@ -6,11 +6,11 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.ActionsResults;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
     {

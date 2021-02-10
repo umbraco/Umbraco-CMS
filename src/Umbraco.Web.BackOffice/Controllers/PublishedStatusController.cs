@@ -1,9 +1,8 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     public class PublishedStatusController : UmbracoAuthorizedApiController
     {

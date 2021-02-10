@@ -5,14 +5,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
@@ -20,7 +17,7 @@ using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 using Language = Umbraco.Cms.Core.Models.ContentEditing.Language;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// Backoffice controller supporting the dashboard for language administration.

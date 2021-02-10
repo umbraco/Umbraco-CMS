@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     internal class IsCurrentUserModelFilterAttribute : TypeFilterAttribute
     {

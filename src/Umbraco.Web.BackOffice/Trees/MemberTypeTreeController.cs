@@ -8,16 +8,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [CoreTree]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]

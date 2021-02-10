@@ -15,17 +15,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     ///

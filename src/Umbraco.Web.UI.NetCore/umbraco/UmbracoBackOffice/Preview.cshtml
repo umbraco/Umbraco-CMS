@@ -5,12 +5,11 @@
 @using Umbraco.Cms.Core.Logging
 @using Umbraco.Cms.Core.Services
 @using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Web.WebAssets
 @using Umbraco.Web.Common.Security
-@using Umbraco.Core.Configuration
 @using Umbraco.Extensions
-@using Umbraco.Core.Logging
-@using Umbraco.Web.BackOffice.Controllers
 @inject IBackOfficeSignInManager SignInManager
 @inject BackOfficeServerVariables BackOfficeServerVariables
 @inject IUmbracoVersion UmbracoVersion
@@ -19,7 +18,6 @@
 @inject IRuntimeMinifier RuntimeMinifier
 @inject IProfilerHtml ProfilerHtml
 @inject ILocalizedTextService LocalizedTextService
-@using Umbraco.Core.Services
 
 @model Umbraco.Cms.Core.Editors.BackOfficePreviewModel
 @{

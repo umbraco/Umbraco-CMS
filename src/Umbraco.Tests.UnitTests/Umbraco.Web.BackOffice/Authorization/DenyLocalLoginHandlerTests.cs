@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {

@@ -13,8 +13,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Install;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common

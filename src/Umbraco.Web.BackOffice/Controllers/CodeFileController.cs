@@ -17,12 +17,9 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Strings.Css;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
@@ -30,7 +27,7 @@ using Constants = Umbraco.Cms.Core.Constants;
 using Stylesheet = Umbraco.Cms.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Cms.Core.Models.ContentEditing.StylesheetRule;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     // TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/

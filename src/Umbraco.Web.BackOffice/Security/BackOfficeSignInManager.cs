@@ -1,25 +1,22 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Umbraco.Cms.Core;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
-    using Constants = Cms.Core.Constants;
+    using Constants = Core.Constants;
 
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
     {

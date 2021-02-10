@@ -15,7 +15,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// The content blueprint tree controller

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;

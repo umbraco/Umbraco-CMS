@@ -23,7 +23,7 @@ using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]

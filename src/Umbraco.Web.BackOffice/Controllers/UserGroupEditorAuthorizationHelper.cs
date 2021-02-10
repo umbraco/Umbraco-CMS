@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     internal class UserGroupEditorAuthorizationHelper
     {

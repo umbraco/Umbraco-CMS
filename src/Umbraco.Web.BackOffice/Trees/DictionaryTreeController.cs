@@ -14,7 +14,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
 
     // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the

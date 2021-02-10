@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// A controller used for type-ahead values for tags

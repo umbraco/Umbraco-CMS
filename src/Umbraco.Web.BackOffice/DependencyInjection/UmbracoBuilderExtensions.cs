@@ -8,22 +8,20 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Services;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Services;
+using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Middleware;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.BackOffice.Services;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.Web.BackOffice.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office

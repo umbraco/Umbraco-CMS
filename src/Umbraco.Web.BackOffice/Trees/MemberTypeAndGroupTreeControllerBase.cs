@@ -6,13 +6,10 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]

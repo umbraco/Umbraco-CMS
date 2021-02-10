@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Events;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
 
     /// <summary>

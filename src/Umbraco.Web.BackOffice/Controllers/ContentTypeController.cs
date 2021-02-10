@@ -29,7 +29,7 @@ using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 using ContentType = Umbraco.Cms.Core.Models.ContentType;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types

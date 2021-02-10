@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -27,28 +26,19 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Routing;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for editing content

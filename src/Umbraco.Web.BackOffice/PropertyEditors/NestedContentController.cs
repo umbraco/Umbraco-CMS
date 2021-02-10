@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class NestedContentController : UmbracoAuthorizedJsonController

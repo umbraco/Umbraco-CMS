@@ -3,12 +3,11 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Media.EmbedProviders;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Core;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// A controller used for the embed dialog

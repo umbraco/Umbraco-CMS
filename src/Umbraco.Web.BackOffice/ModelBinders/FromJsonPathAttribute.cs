@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
@@ -10,7 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.ModelBinders
+namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
     /// <summary>
     ///     Used to bind a value from an inner json property

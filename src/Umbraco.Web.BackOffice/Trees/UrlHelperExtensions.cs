@@ -5,10 +5,9 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Extensions;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public static class UrlHelperExtensions
     {

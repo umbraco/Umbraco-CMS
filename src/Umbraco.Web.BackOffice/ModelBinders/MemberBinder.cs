@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -14,10 +11,9 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Serialization;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 
-namespace Umbraco.Web.BackOffice.ModelBinders
+namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MemberSave" />

@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// Used to authorize if the user has the correct permission access to the content for the <see cref="IContent"/> specified.

@@ -3,9 +3,8 @@
 
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// The resource used for the <see cref="ContentPermissionsResourceRequirement"/>

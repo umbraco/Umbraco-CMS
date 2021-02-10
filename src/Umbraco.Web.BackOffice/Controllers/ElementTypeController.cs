@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Attributes;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class ElementTypeController : UmbracoAuthorizedJsonController

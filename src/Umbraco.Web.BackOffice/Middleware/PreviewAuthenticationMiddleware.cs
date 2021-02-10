@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Middleware
+namespace Umbraco.Cms.Web.BackOffice.Middleware
 {
     /// <summary>
     /// Ensures that preview pages (front-end routed) are authenticated with the back office identity appended to the principal alongside any default authentication that takes place

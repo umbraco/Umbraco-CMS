@@ -7,8 +7,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Compose;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Binds to events to write audit logs for the <see cref="IBackOfficeUserManager"/>

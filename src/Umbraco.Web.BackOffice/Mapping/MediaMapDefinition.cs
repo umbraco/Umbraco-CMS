@@ -9,11 +9,11 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Mapping
+namespace Umbraco.Cms.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for media.

@@ -2,9 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     public class MediaPermissionsResource
     {

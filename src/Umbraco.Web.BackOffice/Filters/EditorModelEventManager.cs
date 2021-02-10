@@ -4,9 +4,8 @@ using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Core.Events;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Used to emit events for editor models in the back office

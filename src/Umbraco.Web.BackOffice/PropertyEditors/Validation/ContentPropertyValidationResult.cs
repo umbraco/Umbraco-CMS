@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors.Validation
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
 {
     /// <summary>
     /// Custom <see cref="ValidationResult"/> for content properties

@@ -24,24 +24,18 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Filters;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting

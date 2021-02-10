@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;

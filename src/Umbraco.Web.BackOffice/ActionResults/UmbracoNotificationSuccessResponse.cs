@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.ActionResults
+namespace Umbraco.Cms.Web.BackOffice.ActionResults
 {
     public class UmbracoNotificationSuccessResponse : OkObjectResult
     {

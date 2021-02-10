@@ -13,8 +13,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Filters;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {

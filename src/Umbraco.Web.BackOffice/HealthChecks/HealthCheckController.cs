@@ -11,13 +11,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HealthChecks;
-using Umbraco.Core;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.HealthChecks
+namespace Umbraco.Cms.Web.BackOffice.HealthChecks
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions

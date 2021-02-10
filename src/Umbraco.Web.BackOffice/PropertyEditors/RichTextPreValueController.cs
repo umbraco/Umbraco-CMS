@@ -4,12 +4,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// ApiController to provide RTE configuration with available plugins and commands from the RTE config

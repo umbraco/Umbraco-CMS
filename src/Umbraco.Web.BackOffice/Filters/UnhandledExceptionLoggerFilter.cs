@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Applies the UnhandledExceptionLoggerMiddleware to a specific controller

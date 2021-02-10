@@ -10,14 +10,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Tour;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class TourController : UmbracoAuthorizedJsonController

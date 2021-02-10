@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     ///     Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads

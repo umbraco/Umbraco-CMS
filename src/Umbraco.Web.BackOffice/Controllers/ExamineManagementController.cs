@@ -4,21 +4,17 @@ using System.Linq;
 using Examine;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Examine;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ExamineManagementController : UmbracoAuthorizedJsonController

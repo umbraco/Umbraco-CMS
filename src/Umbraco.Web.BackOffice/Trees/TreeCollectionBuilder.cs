@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// Builds a <see cref="TreeCollection"/>.

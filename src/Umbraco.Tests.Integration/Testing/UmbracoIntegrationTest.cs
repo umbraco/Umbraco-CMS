@@ -37,7 +37,6 @@ using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.BackOffice.DependencyInjection;
 using Umbraco.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 

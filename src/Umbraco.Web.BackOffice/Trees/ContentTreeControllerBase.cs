@@ -13,16 +13,11 @@ using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {

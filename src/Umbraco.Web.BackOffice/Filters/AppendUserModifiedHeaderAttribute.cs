@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Appends a custom response header to notify the UI that the current user data has been modified

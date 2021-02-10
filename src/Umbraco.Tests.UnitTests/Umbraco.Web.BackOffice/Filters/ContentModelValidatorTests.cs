@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
-using Umbraco.Web.BackOffice.PropertyEditors.Validation;
+using Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
  {

@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
-using Umbraco.Core;
 using Umbraco.Extensions;
+using HttpRequestExtensions = Umbraco.Extensions.HttpRequestExtensions;
 
-namespace Umbraco.Web.BackOffice.Middleware
+namespace Umbraco.Cms.Web.BackOffice.Middleware
 {
     /// <summary>
     /// Used to handle errors registered by external login providers
     /// </summary>
     /// <remarks>
-    /// When an external login provider registers an error with <see cref="HttpContextExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
+    /// When an external login provider registers an error with <see cref="Extensions.HttpContextExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
     /// this middleware will detect that, store the errors into cookie data and redirect to the back office login so we can read the errors back out.
     /// </remarks>
     public class BackOfficeExternalLoginProviderErrorMiddleware : IMiddleware
@@ -21,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Middleware
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var shortCircuit = false;
-            if (!context.Request.IsClientSideRequest())
+            if (!HttpRequestExtensions.IsClientSideRequest(context.Request))
             {
                 // check if we have any errors registered
                 var errors = context.GetExternalLoginProviderErrors();

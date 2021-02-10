@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;

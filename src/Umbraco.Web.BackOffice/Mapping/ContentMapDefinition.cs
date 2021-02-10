@@ -14,11 +14,11 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Mapping
+namespace Umbraco.Cms.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares how model mappings for content

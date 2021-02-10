@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes

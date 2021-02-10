@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Services
+namespace Umbraco.Cms.Web.BackOffice.Services
 {
     public class IconService : IIconService
     {

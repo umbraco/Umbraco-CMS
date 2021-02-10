@@ -4,15 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.Models;
 using Constants = Umbraco.Cms.Core.Constants;
 using IUser = Umbraco.Cms.Core.Models.Membership.IUser;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     internal class PasswordChanger
     {

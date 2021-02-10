@@ -16,11 +16,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.TestServerTest;
-using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers

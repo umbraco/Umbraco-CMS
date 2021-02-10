@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Core.Security;
 using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {

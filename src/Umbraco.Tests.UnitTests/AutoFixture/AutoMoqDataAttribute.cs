@@ -15,11 +15,11 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Security;
 

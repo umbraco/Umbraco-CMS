@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.Website.DependencyInjection;
 

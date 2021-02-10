@@ -11,10 +11,10 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Routing;
 using Constants = Umbraco.Cms.Core.Constants;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 

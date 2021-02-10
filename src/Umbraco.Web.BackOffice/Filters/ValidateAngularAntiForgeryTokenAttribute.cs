@@ -7,14 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Security;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// An attribute/filter to check for the csrf token based on Angular's standard approach
