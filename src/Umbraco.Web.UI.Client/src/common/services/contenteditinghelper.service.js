@@ -781,6 +781,35 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
     
             return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#getSortedVariantsAndSegments
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns an array of variants and segments sorted by the rules in the sortVariants method. 
+         * A variant language is followed by its segments in the array. If a segment doesn't have a parent variant it is 
+         * added to the end of the array.
+         * 
+         */
+        getSortedVariantsAndSegments: function (variantsAndSegments) {
+            const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
+            let segments = variantsAndSegments.filter(variant => variant.segment);
+            let sortedAvailableVariants = [];
+
+            sortedVariants.forEach((variant) => {
+                const sortedMatchedSegments = segments.filter(segment => segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                segments = segments.filter(segment => segment.language.culture !== variant.language.culture);
+                sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
+            })
+            
+            // if we have segments without a parent language variant we need to add the remaining segments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
+
+            return sortedAvailableVariants;
         }
     };
 }

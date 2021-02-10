@@ -143,7 +143,7 @@
             });
 
             if (vm.availableVariants.length !== 0) {
-                vm.availableVariants.sort(contentEditingHelper.sortVariants);
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
             }
 
             $scope.model.disableSubmitButton = !canPublish();

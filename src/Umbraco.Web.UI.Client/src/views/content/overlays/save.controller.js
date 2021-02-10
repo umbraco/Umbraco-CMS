@@ -85,7 +85,7 @@
                     active.save = true;
                 }
 
-                vm.availableVariants.sort(contentEditingHelper.sortVariants);
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
 
             } else {
                 //disable save button if we have nothing to save
