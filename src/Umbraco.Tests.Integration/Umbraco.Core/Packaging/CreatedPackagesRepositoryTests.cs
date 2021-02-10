@@ -13,9 +13,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Core.Packaging
 {

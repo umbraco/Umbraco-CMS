@@ -7,8 +7,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Services

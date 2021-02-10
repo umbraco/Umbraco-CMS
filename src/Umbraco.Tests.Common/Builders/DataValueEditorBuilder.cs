@@ -8,11 +8,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataValueEditor>
     {

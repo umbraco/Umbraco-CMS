@@ -8,8 +8,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {

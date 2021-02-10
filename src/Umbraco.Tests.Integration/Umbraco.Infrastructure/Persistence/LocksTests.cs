@@ -7,9 +7,9 @@ using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Persistence

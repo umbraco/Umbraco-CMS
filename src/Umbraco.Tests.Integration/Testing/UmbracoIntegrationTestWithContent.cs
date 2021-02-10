@@ -5,10 +5,10 @@ using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Integration.Testing
 {

@@ -8,10 +8,10 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services

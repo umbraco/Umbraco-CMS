@@ -8,8 +8,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
 {

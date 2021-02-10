@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence
 {

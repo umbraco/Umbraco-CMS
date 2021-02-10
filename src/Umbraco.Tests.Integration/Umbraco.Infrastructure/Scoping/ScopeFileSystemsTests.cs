@@ -9,10 +9,10 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 using FileSystems = Umbraco.Cms.Core.IO.FileSystems;
 

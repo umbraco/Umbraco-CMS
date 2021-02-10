@@ -2,9 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Web;
-using Umbraco.Web;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     public class TestUmbracoContextAccessor : IUmbracoContextAccessor
     {

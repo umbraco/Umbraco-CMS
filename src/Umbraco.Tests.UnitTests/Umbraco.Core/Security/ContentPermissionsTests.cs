@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
 {

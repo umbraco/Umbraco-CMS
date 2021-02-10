@@ -14,12 +14,13 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Extensions;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 using Content = Umbraco.Cms.Core.Models.Content;
 

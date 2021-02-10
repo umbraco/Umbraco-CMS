@@ -3,7 +3,7 @@
 
 using System.Xml;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class XmlDocumentBuilder : BuilderBase<XmlDocument>
     {

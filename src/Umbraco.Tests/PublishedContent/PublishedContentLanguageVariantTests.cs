@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;

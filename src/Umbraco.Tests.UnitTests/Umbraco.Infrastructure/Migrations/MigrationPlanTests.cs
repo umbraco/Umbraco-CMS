@@ -11,6 +11,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
@@ -18,7 +19,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {

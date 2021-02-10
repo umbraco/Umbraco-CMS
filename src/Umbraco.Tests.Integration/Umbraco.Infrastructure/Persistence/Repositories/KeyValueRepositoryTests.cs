@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {

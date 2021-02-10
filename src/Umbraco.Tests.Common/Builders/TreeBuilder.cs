@@ -2,11 +2,10 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class TreeBuilder
         : BuilderBase<Tree>,

@@ -7,8 +7,8 @@ using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {

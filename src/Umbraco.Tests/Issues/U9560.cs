@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Testing;

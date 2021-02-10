@@ -5,10 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class PropertyGroupBuilder : PropertyGroupBuilder<NullPropertyGroupBuilderParent>
     {

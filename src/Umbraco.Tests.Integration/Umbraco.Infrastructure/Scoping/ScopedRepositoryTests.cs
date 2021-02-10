@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -21,7 +22,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 

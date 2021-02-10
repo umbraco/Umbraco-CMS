@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Tests.Routing
 {

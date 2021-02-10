@@ -27,16 +27,16 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Integration.Testing

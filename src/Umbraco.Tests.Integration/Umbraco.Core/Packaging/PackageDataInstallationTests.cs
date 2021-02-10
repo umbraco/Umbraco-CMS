@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
@@ -22,7 +23,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Services.Importing;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Packaging

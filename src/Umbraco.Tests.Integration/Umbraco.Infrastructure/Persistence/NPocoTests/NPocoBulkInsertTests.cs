@@ -9,13 +9,13 @@ using System.Text.RegularExpressions;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {

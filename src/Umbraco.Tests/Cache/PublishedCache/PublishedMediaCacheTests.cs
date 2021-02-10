@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;

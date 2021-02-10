@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core;
-using Umbraco.Tests.Common.TestHelpers;
 using Umbraco.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core

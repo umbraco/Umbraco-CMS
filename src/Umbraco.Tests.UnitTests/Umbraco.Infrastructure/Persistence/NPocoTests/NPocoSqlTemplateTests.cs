@@ -5,6 +5,7 @@ using System;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;

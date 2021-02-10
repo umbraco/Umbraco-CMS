@@ -7,9 +7,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Migrations;
 using Umbraco.Tests.Migrations.Stubs;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {

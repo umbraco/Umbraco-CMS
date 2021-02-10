@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ContentVariantSaveBuilder<TParent> : ChildBuilderBase<TParent, ContentVariantSave>,
         IWithNameBuilder,

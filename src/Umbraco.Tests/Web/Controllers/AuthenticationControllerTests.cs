@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

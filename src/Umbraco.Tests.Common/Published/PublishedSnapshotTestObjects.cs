@@ -3,11 +3,10 @@
 
 using System.Collections.Generic;
 using Moq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Cms.Tests.Common.Published
 {
     public class PublishedSnapshotTestObjects
     {

@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class DocumentEntitySlimBuilder
         : BuilderBase<DocumentEntitySlim>,

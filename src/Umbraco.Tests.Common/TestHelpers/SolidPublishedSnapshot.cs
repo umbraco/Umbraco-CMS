@@ -18,7 +18,7 @@ using Umbraco.Cms.Core.Xml;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Common.PublishedContent
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     public class SolidPublishedSnapshot : IPublishedSnapshot
     {

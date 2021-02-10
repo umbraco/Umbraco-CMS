@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;

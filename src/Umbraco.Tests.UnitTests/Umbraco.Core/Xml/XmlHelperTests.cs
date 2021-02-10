@@ -7,8 +7,8 @@ using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
 {

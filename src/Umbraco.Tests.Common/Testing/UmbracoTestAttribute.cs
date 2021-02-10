@@ -3,9 +3,8 @@
 
 using System;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.Testing
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, /*AllowMultiple = false,*/ Inherited = false)]
     public class UmbracoTestAttribute : TestOptionAttributeBase

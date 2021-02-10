@@ -3,9 +3,8 @@
 
 using System;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     public class TestClone : IDeepCloneable, IEquatable<TestClone>
     {

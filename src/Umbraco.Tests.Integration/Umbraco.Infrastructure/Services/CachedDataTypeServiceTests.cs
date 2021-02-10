@@ -7,9 +7,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {

@@ -19,9 +19,9 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 

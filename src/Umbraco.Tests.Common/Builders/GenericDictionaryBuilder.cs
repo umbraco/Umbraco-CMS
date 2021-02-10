@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class GenericDictionaryBuilder<TBuilder, TKey, TValue>
         : ChildBuilderBase<TBuilder, IDictionary<TKey, TValue>>

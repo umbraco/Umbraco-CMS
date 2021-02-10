@@ -15,9 +15,9 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Persistence.SqlCe;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers

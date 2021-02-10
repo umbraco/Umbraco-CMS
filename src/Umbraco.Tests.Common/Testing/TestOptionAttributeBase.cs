@@ -8,7 +8,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Exceptions;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {

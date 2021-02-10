@@ -3,7 +3,7 @@
 
 using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     /// <summary>
     /// Provides an implementation of <see cref="IVariationContextAccessor"/> for tests.

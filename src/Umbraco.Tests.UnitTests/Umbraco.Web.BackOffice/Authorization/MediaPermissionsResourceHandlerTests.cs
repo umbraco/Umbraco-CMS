@@ -11,11 +11,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {

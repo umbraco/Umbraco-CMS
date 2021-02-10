@@ -2,8 +2,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Routing

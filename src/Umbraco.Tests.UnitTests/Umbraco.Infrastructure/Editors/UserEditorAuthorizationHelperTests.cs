@@ -11,11 +11,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors

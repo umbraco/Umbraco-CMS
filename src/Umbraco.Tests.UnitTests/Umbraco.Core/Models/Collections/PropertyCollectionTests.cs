@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections

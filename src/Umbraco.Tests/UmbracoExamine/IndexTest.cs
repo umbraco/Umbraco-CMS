@@ -16,6 +16,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Constants = Umbraco.Cms.Core.Constants;

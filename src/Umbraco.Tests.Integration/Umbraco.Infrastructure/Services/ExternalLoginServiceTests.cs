@@ -9,12 +9,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {

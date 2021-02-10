@@ -5,11 +5,9 @@ using Moq;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.TestHelpers.Entities
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     public class MockedValueEditors
     {

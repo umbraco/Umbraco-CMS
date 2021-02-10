@@ -3,9 +3,8 @@
 
 using System.Collections.Generic;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ConfigurationEditorBuilder<TParent> : ChildBuilderBase<TParent, IConfigurationEditor>
     {

@@ -10,11 +10,11 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Core;
 using Umbraco.Core.Security;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {

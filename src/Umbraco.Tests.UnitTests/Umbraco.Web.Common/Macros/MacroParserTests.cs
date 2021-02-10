@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Macros

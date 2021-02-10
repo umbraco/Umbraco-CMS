@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Tests.Published;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
