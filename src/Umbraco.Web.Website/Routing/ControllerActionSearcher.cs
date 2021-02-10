@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Web.Common.Controllers;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     /// <summary>
     /// Used to find a controller/action in the current available routes

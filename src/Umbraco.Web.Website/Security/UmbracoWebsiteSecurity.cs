@@ -11,14 +11,9 @@ using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Website.Security
+namespace Umbraco.Cms.Web.Website.Security
 {
     public class UmbracoWebsiteSecurity : IUmbracoWebsiteSecurity
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Controllers;
 
 namespace Umbraco.Extensions
 {

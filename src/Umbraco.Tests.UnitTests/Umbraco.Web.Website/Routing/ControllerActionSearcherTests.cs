@@ -13,8 +13,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
-using Umbraco.Web.Website.Routing;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing

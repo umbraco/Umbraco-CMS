@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Security;
@@ -12,7 +11,7 @@ using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Web.Website.Controllers
 {
     public class UmbLoginController : SurfaceController
     {

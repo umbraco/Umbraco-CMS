@@ -7,12 +7,10 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Web.Common.Routing;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Web.Website.ActionResults
+namespace Umbraco.Cms.Web.Website.ActionResults
 {
     /// <summary>
     /// Used by posted forms to proxy the result to the page in which the current URL matches on

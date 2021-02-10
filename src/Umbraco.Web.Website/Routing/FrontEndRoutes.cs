@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Extensions;
-using Umbraco.Web.Website.Collections;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     /// <summary>
     /// Creates routes for surface controllers

@@ -3,14 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Routing;
-using Umbraco.Extensions;
+using Umbraco.Cms.Web.Website.Collections;
+using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Routing;
+using Umbraco.Cms.Web.Website.ViewEngines;
 using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Web.Website.Collections;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Routing;
-using Umbraco.Web.Website.ViewEngines;
 
-namespace Umbraco.Web.Website.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// <see cref="IUmbracoBuilder"/> extensions for umbraco front-end website

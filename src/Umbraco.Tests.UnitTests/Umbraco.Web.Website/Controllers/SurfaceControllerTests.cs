@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -28,7 +29,6 @@ using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
 using CoreConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers

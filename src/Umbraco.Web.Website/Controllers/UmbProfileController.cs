@@ -12,7 +12,7 @@ using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Web.Website.Controllers
 {
     [UmbracoMemberAuthorize]
     public class UmbProfileController : SurfaceController

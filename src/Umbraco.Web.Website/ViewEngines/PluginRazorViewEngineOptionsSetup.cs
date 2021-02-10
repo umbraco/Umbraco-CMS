@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Web.Website.ViewEngines
+namespace Umbraco.Cms.Web.Website.ViewEngines
 {
     /// <summary>
     /// Configure view engine locations for front-end rendering based on App_Plugins views

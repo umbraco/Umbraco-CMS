@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -21,7 +22,6 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.TestServerTest;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.Website.Routing
 {
