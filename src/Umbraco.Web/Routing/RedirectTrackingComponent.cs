@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
 
         private OldRoutesDictionary GetOldRoutes(IDictionary<string, object> eventState)
         {
-            if (! eventState.ContainsKey(_eventStateKey))
+            if (!eventState.ContainsKey(_eventStateKey))
             {
                 eventState[_eventStateKey] = new OldRoutesDictionary();
             }
@@ -108,7 +108,7 @@ namespace Umbraco.Web.Routing
         {
             var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
             var entityContent = contentCache.GetById(entity.Id);
-            if (entityContent == null) return;            
+            if (entityContent == null) return;
 
             var defaultCulture = _variationContextAccessor.VariationContext.Culture;
 
@@ -173,6 +173,7 @@ namespace Umbraco.Web.Routing
         }
 
         private class OldRoutesDictionary : Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>
-        { }
+        {
+        }
     }
 }
