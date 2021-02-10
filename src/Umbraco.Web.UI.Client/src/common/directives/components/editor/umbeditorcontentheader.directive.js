@@ -114,11 +114,13 @@
                 if (scope.vm.hasCulture) {
                     scope.content.variants.forEach((v) => {
                         if (v.language !== null && v.segment === null) {
+                            const subVariants = scope.content.variants.filter((subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null).sort(contentEditingHelper.sortVariants);
+
                             var variantMenuEntry = {
                                 key: String.CreateGuid(),
                                 open: v.language && v.language.culture === scope.editor.culture,
                                 variant: v,
-                                subVariants: scope.content.variants.filter((subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null)
+                                subVariants
                             };
                             scope.vm.variantMenu.push(variantMenuEntry);
                         }
