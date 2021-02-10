@@ -28,9 +28,9 @@ function valPropertyValidator(serverValidationManager) {
 
             var modelCtrl = ctrls[0];
             var propCtrl = ctrls.length > 1 ? ctrls[1] : null;
-            
-            // Check whether the scope has a valPropertyValidator method 
-            if (!scope.valPropertyValidator || !angular.isFunction(scope.valPropertyValidator)) {
+
+            // Check whether the scope has a valPropertyValidator method
+            if (!scope.valPropertyValidator || !Utilities.isFunction(scope.valPropertyValidator)) {
                 throw new Error('val-property-validator directive must specify a function to call');
             }
             

@@ -91,7 +91,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new [] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(Constants.CharArrays.Period, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
