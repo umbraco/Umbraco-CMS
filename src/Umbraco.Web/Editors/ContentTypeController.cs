@@ -282,6 +282,58 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
+        public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
+        {
+            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.	
+            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either	
+            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here	
+            if (!contentTypeSave.AllowCultureVariant)
+            {
+                foreach (var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
+                {
+                    prop.AllowCultureVariant = false;
+                }
+            }
+
+            var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
+                contentTypeSave: contentTypeSave,
+                getContentType: i => Services.ContentTypeService.Get(i),
+                saveContentType: type => Services.ContentTypeService.Save(type),
+                beforeCreateNew: ctSave =>
+                {
+                    //create a default template if it doesn't exist -but only if default template is == to the content type	
+                    if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
+                    {
+                        var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
+
+                        // If the alias has been manually updated before the first save,	
+                        // make sure to also update the first allowed template, as the	
+                        // name will come back as a SafeAlias of the document type name,	
+                        // not as the actual document type alias.	
+                        // For more info: http://issues.umbraco.org/issue/U4-11059	
+                        if (ctSave.DefaultTemplate != template.Alias)
+                        {
+                            var allowedTemplates = ctSave.AllowedTemplates.ToArray();
+                            if (allowedTemplates.Any())
+                                allowedTemplates[0] = template.Alias;
+                            ctSave.AllowedTemplates = allowedTemplates;
+                        }
+
+                        //make sure the template alias is set on the default and allowed template so we can map it back	
+                        ctSave.DefaultTemplate = template.Alias;
+
+                    }
+                });
+
+            var display = Mapper.Map<DocumentTypeDisplay>(savedCt);
+
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            string.Empty);
+
+            return display;
+        }
+
         public TemplateDisplay PostCreateDefaultTemplate(int id)
         {
             var contentType = Services.ContentTypeService.Get(id);
