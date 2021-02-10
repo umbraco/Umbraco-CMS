@@ -1,9 +1,8 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Migrations.Install;
+﻿using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Persistence.SqlCe
+namespace Umbraco.Cms.Persistence.SqlCe
 {
     public class SqlCeEmbeddedDatabaseCreator : IEmbeddedDatabaseCreator
     {
