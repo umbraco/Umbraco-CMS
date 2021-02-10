@@ -25,12 +25,16 @@ namespace Umbraco.Web.Routing
         private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService)
+        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService,
+            IVariationContextAccessor variationContextAccessor)
         {
             _umbracoSettings = umbracoSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         public void Initialize()
@@ -105,21 +109,27 @@ namespace Umbraco.Web.Routing
             var entityContent = contentCache.GetById(entity.Id);
             if (entityContent == null) return;            
 
-            // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures) 
-            var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
-                ?? new[] { (string)null };
-            foreach (var x in entityContent.DescendantsOrSelf())
-            {
-                // if this entity defines specific cultures, use those instead of the default ones
-                var cultures = x.Cultures.Any() ? x.Cultures.Keys : defaultCultures;
+            var defaultCulture = _variationContextAccessor.VariationContext.Culture;
 
-                foreach (var culture in cultures)
+            // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
+            var defaultCultures = entityContent.AncestorsOrSelf()
+                                      ?.FirstOrDefault(a => a.Cultures.Any())
+                                      ?.Cultures.Keys.ToArray()
+                                  ?? new[] {(string) null};
+
+            foreach (var culture in defaultCultures)
+            {
+                _variationContextAccessor.VariationContext = new VariationContext(culture);
+
+                foreach (var x in entityContent.DescendantsOrSelf())
                 {
                     var route = contentCache.GetRouteById(x.Id, culture);
                     if (IsNotRoute(route)) continue;
                     oldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route);
                 }
             }
+
+            _variationContextAccessor.VariationContext = new VariationContext(defaultCulture);
         }
 
         private void CreateRedirects(OldRoutesDictionary oldRoutes)
