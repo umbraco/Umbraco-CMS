@@ -11,11 +11,11 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Core.Xml.XPath;
+using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache.NuCache.Navigable;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {

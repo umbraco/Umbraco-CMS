@@ -9,11 +9,10 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Core;
+using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     /// <summary>
     /// Stores content in memory and persists it back to disk

@@ -18,13 +18,13 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Examine;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Tests.Integration.DependencyInjection

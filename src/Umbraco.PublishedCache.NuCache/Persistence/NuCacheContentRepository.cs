@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
@@ -17,12 +18,10 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Infrastructure.PublishedCache.Persistence
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
     public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepository
     {

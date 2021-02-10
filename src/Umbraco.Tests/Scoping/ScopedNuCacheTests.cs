@@ -19,17 +19,17 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Tests.Scoping
 {

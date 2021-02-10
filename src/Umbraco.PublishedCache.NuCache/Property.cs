@@ -7,10 +7,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]

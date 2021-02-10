@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     /// <summary>
     /// Generates a status report for <see cref="PublishedSnapshotService"/>

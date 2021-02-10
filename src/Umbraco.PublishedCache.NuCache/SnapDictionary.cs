@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class SnapDictionary<TKey, TValue>
         where TValue : class

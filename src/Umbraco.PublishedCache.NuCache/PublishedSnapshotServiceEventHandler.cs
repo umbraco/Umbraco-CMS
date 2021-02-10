@@ -6,12 +6,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     /// <summary>
     /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data

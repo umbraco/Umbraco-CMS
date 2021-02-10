@@ -1,8 +1,8 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     // what's needed to actually build a content node
     public struct ContentNodeKit

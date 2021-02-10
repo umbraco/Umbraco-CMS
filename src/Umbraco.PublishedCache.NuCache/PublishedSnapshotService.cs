@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -20,16 +19,16 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Web.PublishedCache;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-
     internal class PublishedSnapshotService : IPublishedSnapshotService
     {
         private readonly ServiceContext _serviceContext;

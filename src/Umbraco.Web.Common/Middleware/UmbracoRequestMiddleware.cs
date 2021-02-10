@@ -11,13 +11,13 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Common.Middleware
 {

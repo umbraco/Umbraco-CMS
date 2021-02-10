@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
@@ -23,7 +24,6 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.PublishedCache.NuCache;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services

@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;

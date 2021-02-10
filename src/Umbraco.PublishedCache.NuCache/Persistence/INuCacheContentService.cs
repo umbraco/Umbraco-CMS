@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
-using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Infrastructure.PublishedCache.Persistence
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
     /// <summary>
     /// Defines a data source for NuCache.

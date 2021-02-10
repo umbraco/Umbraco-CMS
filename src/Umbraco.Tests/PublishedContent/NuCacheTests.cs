@@ -18,6 +18,8 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
@@ -25,8 +27,6 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Tests.PublishedContent
 {
