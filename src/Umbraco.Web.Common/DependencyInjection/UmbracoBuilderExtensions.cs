@@ -315,9 +315,9 @@ namespace Umbraco.Extensions
                     var dllPath = Path.Combine(binFolder, "Umbraco.Persistence.SqlCe.dll");
                     var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
 
-                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeSyntaxProvider");
-                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
+                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
+                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
+                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
 
                     if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
                     {

@@ -93,7 +93,7 @@ namespace Umbraco.Core.Migrations.Install
             else if (integratedAuth)
             {
                 // has to be Sql Server
-                providerName = Cms.Core.Constants.DbProviderNames.SqlServer;
+                providerName = Constants.DbProviderNames.SqlServer;
                 connectionString = GetIntegratedSecurityDatabaseConnectionString(server, database);
             }
             else
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Migrations.Install
                 var sql = scope.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
-                    .Where<UserDto>(x => x.Id == Cms.Core.Constants.Security.SuperUserId && x.Password == "default");
+                    .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
                 var result = scope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory)
         {
-            _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Cms.Core.Constants.DbProviderNames.SqlCe);
+            _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
             var path = _hostingEnvironment.MapPathContentRoot(Path.Combine("App_Data", "Umbraco.sdf"));
             if (File.Exists(path) == false)
@@ -162,10 +162,10 @@ namespace Umbraco.Core.Migrations.Install
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
                 // of the side effects and it's been like this for quite some time now
 
-                _dbProviderFactoryCreator.CreateDatabase(Cms.Core.Constants.DbProviderNames.SqlCe);
+                _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe);
             }
 
-            factory.Configure(EmbeddedDatabaseConnectionString, Cms.Core.Constants.DbProviderNames.SqlCe);
+            factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <remarks>Has to be SQL Server</remarks>
         public void ConfigureDatabaseConnection(string connectionString)
         {
-            const string providerName = Cms.Core.Constants.DbProviderNames.SqlServer;
+            const string providerName = Constants.DbProviderNames.SqlServer;
 
             _configManipulator.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <returns>A connection string.</returns>
         public static string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
-            providerName = Cms.Core.Constants.DbProviderNames.SqlServer;
+            providerName = Constants.DbProviderNames.SqlServer;
             var provider = databaseProvider.ToLower();
             if (provider.InvariantContains("azure"))
                 return GetAzureConnectionString(server, databaseName, user, password);
@@ -224,8 +224,8 @@ namespace Umbraco.Core.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            _configManipulator.SaveConnectionString(connectionString, Cms.Core.Constants.DbProviderNames.SqlServer);
-            _databaseFactory.Configure(connectionString, Cms.Core.Constants.DbProviderNames.SqlServer);
+            _configManipulator.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
+            _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 
         /// <summary>
@@ -467,7 +467,7 @@ namespace Umbraco.Core.Migrations.Install
             {
                 Message =
                     "The database configuration failed with the following message: " + ex.Message +
-                    $"\n Please check log file for additional information (can be found in '{Cms.Core.Constants.SystemDirectories.LogFiles}')",
+                    $"\n Please check log file for additional information (can be found in '{Constants.SystemDirectories.LogFiles}')",
                 Success = false,
                 Percentage = "90"
             };
