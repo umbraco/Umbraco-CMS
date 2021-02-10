@@ -263,6 +263,7 @@
     <key alias="statistics">Statistiques</key>
     <key alias="titleOptional">Titre (optionnel)</key>
     <key alias="altTextOptional">Texte alternatif (optionnel)</key>
+    <key alias="captionTextOptional">Légende (optionnel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Dépublier</key>
     <key alias="unpublished">Dépublié</key>
