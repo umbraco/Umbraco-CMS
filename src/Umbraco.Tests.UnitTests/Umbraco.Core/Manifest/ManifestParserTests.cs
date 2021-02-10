@@ -20,14 +20,11 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
 {
     [TestFixture]
     public class ManifestParserTests

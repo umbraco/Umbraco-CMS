@@ -14,17 +14,13 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlSyntax

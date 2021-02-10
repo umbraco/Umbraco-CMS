@@ -7,7 +7,7 @@ using System.Security.Claims;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     public class ClaimsIdentityExtensionsTests
     {

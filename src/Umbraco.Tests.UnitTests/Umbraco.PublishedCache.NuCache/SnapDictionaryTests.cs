@@ -9,7 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Umbraco.PublishedCache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
 {
     [TestFixture]
     public class SnapDictionaryTests

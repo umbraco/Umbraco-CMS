@@ -15,14 +15,11 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Logging.Viewer;
-using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using File = System.IO.File;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Logging
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
 {
     [TestFixture]
     public class LogviewerTests

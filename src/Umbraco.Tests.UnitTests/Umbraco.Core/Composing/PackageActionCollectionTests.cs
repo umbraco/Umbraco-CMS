@@ -12,11 +12,10 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PackageActions;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class PackageActionCollectionTests : ComposingTestBase

@@ -17,7 +17,7 @@ using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class PreviewRoutesTests

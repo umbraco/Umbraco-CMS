@@ -23,7 +23,7 @@ using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class ContentTests

@@ -5,7 +5,7 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.Builders;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
 {
     [TestFixture]
     public class XmlDocumentBuilderTests

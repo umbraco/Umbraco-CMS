@@ -1,9 +1,8 @@
 ﻿using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class RangeTests

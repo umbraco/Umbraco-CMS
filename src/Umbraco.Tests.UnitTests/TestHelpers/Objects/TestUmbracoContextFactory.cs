@@ -13,13 +13,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.UmbracoContext;
-using Umbraco.Core.Security;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects
 {
     /// <summary>
     /// Simplify creating test UmbracoContext's

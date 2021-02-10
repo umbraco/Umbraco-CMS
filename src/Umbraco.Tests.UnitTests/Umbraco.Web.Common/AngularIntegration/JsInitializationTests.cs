@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Extensions;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 {
     [TestFixture]
     public class JsInitializationTests

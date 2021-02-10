@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
     /// <summary>
     /// Used for PluginTypeResolverTests

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Cms.Core.HealthChecks;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 {
     [TestFixture]
     public class HealthCheckResultsTests

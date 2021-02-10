@@ -5,10 +5,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Web.Common.Macros;
-using Umbraco.Core.Cache;
-using Umbraco.Web.Macros;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 {
     [TestFixture]
     public class MacroTests

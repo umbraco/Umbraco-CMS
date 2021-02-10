@@ -6,9 +6,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
 {
     [TestFixture]
     public class RelationBuilderTests

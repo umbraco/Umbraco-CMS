@@ -11,13 +11,10 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class PropertyEditorValueConverterTests

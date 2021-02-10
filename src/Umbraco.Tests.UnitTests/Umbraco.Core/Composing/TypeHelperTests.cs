@@ -12,9 +12,8 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
     /// <summary>
     /// Tests for TypeHelper

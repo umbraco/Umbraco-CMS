@@ -20,7 +20,7 @@ using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
 
     [TestFixture]

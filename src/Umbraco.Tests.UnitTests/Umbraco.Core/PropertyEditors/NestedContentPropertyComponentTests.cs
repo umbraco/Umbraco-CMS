@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Web.Compose;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class NestedContentPropertyComponentTests

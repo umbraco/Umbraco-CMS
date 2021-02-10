@@ -4,10 +4,8 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core;
-using Umbraco.Core.Scoping;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class CallContextTests

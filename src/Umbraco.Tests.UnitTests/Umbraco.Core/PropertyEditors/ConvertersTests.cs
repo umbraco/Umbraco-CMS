@@ -18,12 +18,11 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class ConvertersTests

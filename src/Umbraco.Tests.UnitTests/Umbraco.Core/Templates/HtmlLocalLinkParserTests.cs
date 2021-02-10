@@ -13,13 +13,9 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Tests.UnitTests.TestHelpers.Objects;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
 {
     [TestFixture]
     public class HtmlLocalLinkParserTests

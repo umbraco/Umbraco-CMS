@@ -7,7 +7,7 @@ using Umbraco.Cms.Web.Common.Exceptions;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Filters
 {
     [TestFixture]
     public class ValidateUmbracoFormRouteStringFilterTests

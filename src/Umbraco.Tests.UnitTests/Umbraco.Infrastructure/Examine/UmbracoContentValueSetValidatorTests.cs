@@ -10,12 +10,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Examine;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Examine
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine
 {
     [TestFixture]
     public class UmbracoContentValueSetValidatorTests

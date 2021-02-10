@@ -4,9 +4,8 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     public class GuidUtilsTests
     {

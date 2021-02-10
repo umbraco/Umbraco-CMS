@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Formatters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Formatters
 {
     [TestFixture]
     public class IgnoreRequiredAttributesResolverUnitTests

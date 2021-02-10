@@ -7,7 +7,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -18,7 +17,7 @@ using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class ConvertersTests

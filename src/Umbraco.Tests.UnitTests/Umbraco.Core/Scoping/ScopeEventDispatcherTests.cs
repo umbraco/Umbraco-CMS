@@ -14,14 +14,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.Scoping
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
     [TestFixture]
     public class ScopeEventDispatcherTests

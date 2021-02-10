@@ -12,10 +12,9 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class FullDataSetCachePolicyTests

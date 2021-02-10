@@ -11,7 +11,7 @@ using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Common.ModelBinders;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
     [TestFixture]
     public class HttpQueryStringModelBinderTests

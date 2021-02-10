@@ -10,13 +10,10 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
     public abstract class ComposingTestBase
     {

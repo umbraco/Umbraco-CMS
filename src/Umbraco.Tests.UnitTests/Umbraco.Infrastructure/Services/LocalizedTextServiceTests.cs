@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     public class LocalizedTextServiceTests

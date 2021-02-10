@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     public abstract class Item : IEntity, ICanBeDirty
     {

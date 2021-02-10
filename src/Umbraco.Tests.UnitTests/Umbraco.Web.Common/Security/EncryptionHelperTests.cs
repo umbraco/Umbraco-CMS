@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
 {
     [TestFixture]
     public class EncryptionHelperTests

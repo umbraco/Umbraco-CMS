@@ -17,13 +17,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
     [TestFixture]
     public class ContentModelBinderTests

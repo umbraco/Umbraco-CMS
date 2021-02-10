@@ -7,7 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class EnumerableExtensionsTests

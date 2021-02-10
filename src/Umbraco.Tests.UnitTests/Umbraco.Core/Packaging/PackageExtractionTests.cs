@@ -6,9 +6,8 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Core.Packaging;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
 {
     [TestFixture]
     public class PackageExtractionTests

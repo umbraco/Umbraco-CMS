@@ -17,15 +17,15 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
     [TestFixture]
     public class UmbracoRouteValueTransformerTests

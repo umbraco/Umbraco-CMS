@@ -19,11 +19,9 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.Install;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Tests.UnitTests.AutoFixture
+namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute

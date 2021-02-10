@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
 {
     [TestFixture]
     public class UserGroupBuilderTests

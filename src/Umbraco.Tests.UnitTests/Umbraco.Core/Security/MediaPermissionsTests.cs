@@ -10,11 +10,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
 {
     [TestFixture]
     public class MediaPermissionsTests

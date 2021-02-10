@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Configuration.Models
 {
     public class ConnectionStringsTests
     {

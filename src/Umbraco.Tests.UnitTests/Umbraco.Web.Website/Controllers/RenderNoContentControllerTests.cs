@@ -11,9 +11,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Models;
-using Umbraco.Web;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
     [TestFixture]
     public class RenderNoContentControllerTests

@@ -13,11 +13,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class MediaPermissionsResourceHandlerTests
     {

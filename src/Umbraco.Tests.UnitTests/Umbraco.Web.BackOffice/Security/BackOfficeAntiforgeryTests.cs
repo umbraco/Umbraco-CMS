@@ -17,7 +17,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
 {
     [TestFixture]
     public class BackOfficeAntiforgeryTests

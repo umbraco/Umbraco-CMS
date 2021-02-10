@@ -13,12 +13,9 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
 {
     [TestFixture]
     public class UserEditorAuthorizationHelperTests

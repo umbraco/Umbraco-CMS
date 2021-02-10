@@ -14,11 +14,9 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Core;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class TreeHandlerTests
     {

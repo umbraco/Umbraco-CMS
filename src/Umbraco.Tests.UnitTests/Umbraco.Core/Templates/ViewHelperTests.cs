@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
 {
     [TestFixture]
     public class ViewHelperTests

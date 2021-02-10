@@ -43,7 +43,7 @@ using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {
     /// <summary>
     /// Common helper properties and methods useful to testing

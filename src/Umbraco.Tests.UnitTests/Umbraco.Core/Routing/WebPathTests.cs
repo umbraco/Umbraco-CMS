@@ -5,7 +5,7 @@ using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class WebPathTests

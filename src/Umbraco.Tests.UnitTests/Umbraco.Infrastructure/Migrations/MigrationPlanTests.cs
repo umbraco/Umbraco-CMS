@@ -12,15 +12,15 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class MigrationPlanTests

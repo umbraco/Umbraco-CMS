@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core.Serialization;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Serialization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization
 {
     [TestFixture]
     public class JsonNetSerializerTests

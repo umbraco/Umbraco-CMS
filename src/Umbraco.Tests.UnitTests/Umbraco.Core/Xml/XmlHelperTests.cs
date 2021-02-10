@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Xml
 {
     [TestFixture]
     public class XmlHelperTests

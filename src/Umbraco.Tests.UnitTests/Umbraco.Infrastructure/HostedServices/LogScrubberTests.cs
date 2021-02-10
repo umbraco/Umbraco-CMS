@@ -15,15 +15,10 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
     public class LogScrubberTests

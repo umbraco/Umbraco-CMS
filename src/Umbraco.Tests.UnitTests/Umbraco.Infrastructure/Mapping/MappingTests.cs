@@ -9,9 +9,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Mapping
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
 {
     [TestFixture]
     public class MappingTests

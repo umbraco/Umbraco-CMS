@@ -13,11 +13,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Install;
-using Umbraco.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 {
     [TestFixture]
     internal class FileNameTests

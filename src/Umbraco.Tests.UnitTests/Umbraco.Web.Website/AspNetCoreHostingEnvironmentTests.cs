@@ -4,10 +4,10 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website
 {
     [TestFixture]
     public class AspNetCoreHostingEnvironmentTests

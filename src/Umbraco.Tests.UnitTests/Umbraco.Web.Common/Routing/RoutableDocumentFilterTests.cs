@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class RoutableDocumentFilterTests

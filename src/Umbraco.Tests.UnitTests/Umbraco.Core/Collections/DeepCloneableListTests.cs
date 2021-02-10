@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Tests.Common;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Collections
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections
 {
     [TestFixture]
     public class DeepCloneableListTests

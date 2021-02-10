@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 {
     [TestFixture]
     public class ImageCropperTest

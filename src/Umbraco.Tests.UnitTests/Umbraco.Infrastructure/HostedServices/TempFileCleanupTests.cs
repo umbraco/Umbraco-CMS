@@ -10,11 +10,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
     public class TempFileCleanupTests

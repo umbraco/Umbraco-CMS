@@ -12,7 +12,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Web.BackOffice.Filters;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class OnlyLocalRequestsAttributeTests

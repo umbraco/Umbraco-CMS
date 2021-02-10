@@ -13,9 +13,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Extensions;
-using Umbraco.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {
     [TestFixture]
     public abstract class BaseUsingSqlSyntax

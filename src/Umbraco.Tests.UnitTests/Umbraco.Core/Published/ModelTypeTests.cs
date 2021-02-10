@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Tests.Common.Published;
-using Umbraco.Tests.Published;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class ModelTypeTests
@@ -58,16 +57,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
             };
 
             Assert.AreEqual(
-                "Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1",
+                "Umbraco.Cms.Tests.Common.Published.PublishedSnapshotTestObjects+TestElementModel1",
                 ModelType.Map(ModelType.For("alias1"), map).ToString());
             Assert.AreEqual(
-                "Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
+                "Umbraco.Cms.Tests.Common.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
                 ModelType.Map(ModelType.For("alias1").MakeArrayType(), map).ToString());
             Assert.AreEqual(
-                "System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1]",
+                "System.Collections.Generic.IEnumerable`1[Umbraco.Cms.Tests.Common.Published.PublishedSnapshotTestObjects+TestElementModel1]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), map).ToString());
             Assert.AreEqual(
-                "System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
+                "System.Collections.Generic.IEnumerable`1[Umbraco.Cms.Tests.Common.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()), map).ToString());
         }
     }

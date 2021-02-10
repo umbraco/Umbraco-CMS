@@ -5,7 +5,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Tests.UnitTests.TestHelpers
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {
     public static class CompositionExtensions
     {

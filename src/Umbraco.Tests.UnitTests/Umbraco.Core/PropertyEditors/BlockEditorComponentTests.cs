@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Compose;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class BlockEditorComponentTests

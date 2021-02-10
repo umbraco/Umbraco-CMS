@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Core.Cache;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     public abstract class AppCacheTests
     {

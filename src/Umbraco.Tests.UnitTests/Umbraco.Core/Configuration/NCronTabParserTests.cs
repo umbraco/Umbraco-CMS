@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration
 {
     [TestFixture]
     public class NCronTabParserTests

@@ -11,7 +11,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Services
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {
     [TestFixture]
     public class ContentTypeServiceExtensionsTests

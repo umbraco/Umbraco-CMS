@@ -22,7 +22,7 @@ using Umbraco.Web.PropertyEditors;
 using static Umbraco.Cms.Core.Models.Property;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class DataValueReferenceFactoryCollectionTests

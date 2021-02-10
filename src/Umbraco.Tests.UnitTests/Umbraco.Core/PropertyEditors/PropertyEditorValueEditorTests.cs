@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class PropertyEditorValueEditorTests

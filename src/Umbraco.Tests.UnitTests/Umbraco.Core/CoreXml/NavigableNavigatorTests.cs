@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Xml.XPath;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml
 {
     [TestFixture]
     public class NavigableNavigatorTests

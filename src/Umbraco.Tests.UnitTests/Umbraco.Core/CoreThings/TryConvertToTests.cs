@@ -5,7 +5,7 @@ using System;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class TryConvertToTests

@@ -10,7 +10,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]

@@ -10,10 +10,9 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Tests.Common.TestHelpers;
-using Umbraco.Core;
-using Umbraco.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class TaskHelperTests

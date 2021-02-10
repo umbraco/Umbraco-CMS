@@ -10,7 +10,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class DenyLocalLoginHandlerTests
     {

@@ -18,7 +18,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class FilterAllowedOutgoingContentAttributeTests

@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
 {
     [TestFixture]
     public class UriExtensionsTests

@@ -7,10 +7,8 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Sync;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
 {
     /// <summary>
     /// Ensures that calls to DistributedCache methods carry through to the IServerMessenger correctly

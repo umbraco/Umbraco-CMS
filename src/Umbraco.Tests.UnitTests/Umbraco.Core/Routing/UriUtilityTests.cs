@@ -7,9 +7,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Web;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     // FIXME: not testing virtual directory!
 

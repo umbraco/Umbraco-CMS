@@ -6,10 +6,10 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     [TestFixture]
     public class PropertyCollectionTests

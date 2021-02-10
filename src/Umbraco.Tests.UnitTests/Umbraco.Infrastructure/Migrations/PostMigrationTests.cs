@@ -15,9 +15,8 @@ using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Migrations
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 {
     [TestFixture]
     public class PostMigrationTests

@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class DeepCloneAppCacheTests : RuntimeAppCacheTests

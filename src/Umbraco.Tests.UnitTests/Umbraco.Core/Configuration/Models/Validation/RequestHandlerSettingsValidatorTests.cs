@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {
     [TestFixture]
     public class RequestHandlerSettingsValidatorTests

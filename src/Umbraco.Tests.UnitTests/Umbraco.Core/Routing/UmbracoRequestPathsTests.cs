@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class UmbracoRequestPathsTests

@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -24,7 +23,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class NestedContentTests
