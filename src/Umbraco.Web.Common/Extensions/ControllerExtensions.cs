@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {
@@ -21,7 +19,7 @@ namespace Umbraco.Extensions
                 return AuthenticateResult.NoResult();
             }
 
-            var result = await controller.HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var result = await controller.HttpContext.AuthenticateAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
             return result;
         }
 

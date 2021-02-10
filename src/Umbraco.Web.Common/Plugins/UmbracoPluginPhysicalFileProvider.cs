@@ -7,7 +7,7 @@ using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.Plugins
+namespace Umbraco.Cms.Web.Common.Plugins
 {
     /// <summary>
     /// Looks up files using the on-disk file system and check file extensions are on a allow list

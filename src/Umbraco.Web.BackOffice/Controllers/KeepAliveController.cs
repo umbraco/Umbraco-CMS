@@ -1,8 +1,8 @@
 ﻿using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Controllers;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers

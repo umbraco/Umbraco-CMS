@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// Extension methods for the cache helper
     /// </summary>

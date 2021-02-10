@@ -5,7 +5,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// Applied to all Umbraco controllers to ensure the thread culture is set to the culture assigned to the back office identity

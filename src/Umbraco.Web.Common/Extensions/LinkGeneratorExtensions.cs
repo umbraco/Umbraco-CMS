@@ -9,9 +9,8 @@ using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Install;
-using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Install;
 
 namespace Umbraco.Extensions
 {
@@ -37,14 +36,14 @@ namespace Umbraco.Extensions
                 return hostingEnvironment.ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
             }
 
-            return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), values: new { area = Constants.Web.Mvc.BackOfficeApiArea });
+            return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), values: new { area = Cms.Core.Constants.Web.Mvc.BackOfficeApiArea });
         }
 
         /// <summary>
         /// Returns the URL for the installer
         /// </summary>
         public static string GetInstallerUrl(this LinkGenerator linkGenerator)
-            => linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Constants.Web.Mvc.InstallArea });
+            => linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea });
 
         /// <summary>
         /// Returns the URL for the installer api
@@ -53,7 +52,7 @@ namespace Umbraco.Extensions
             => linkGenerator.GetPathByAction(
                 nameof(InstallApiController.GetSetup),
                 ControllerExtensions.GetControllerName<InstallApiController>(),
-                new { area = Constants.Web.Mvc.InstallArea }).TrimEnd(nameof(InstallApiController.GetSetup));
+                new { area = Cms.Core.Constants.Web.Mvc.InstallArea }).TrimEnd(nameof(InstallApiController.GetSetup));
 
         /// <summary>
         /// Return the Url for a Web Api service

@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Utility class used to check if the current request is for a front-end request

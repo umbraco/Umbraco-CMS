@@ -1,6 +1,6 @@
 ﻿using Smidge.Nuglify;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     /// <summary>
     /// Custom Nuglify Js pre-process to specify custom nuglify options without changing the global defaults

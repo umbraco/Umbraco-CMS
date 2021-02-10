@@ -7,9 +7,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Web.Common.UmbracoContext
 {
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
@@ -146,7 +145,7 @@ namespace Umbraco.Web
                 && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
                 && _backofficeSecurity.CurrentUser != null)
             {
-                var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty
+                var previewToken = _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
             }
 

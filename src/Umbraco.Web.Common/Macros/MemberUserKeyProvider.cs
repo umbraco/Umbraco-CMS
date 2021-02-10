@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     internal class MemberUserKeyProvider : IMemberUserKeyProvider
     {

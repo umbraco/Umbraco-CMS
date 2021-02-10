@@ -17,11 +17,11 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
-using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
 {

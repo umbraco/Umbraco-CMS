@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Linq;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.ModelBinders;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
     /// <summary>
     /// Applies the <see cref="UmbracoJsonModelBinder"/> body model binder to any parameter binding source of type <see cref="BindingSource.Body"/>

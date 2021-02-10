@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Web.Common.ModelBinders
 {
     /// <summary>
     /// The provider for <see cref="ContentModelBinder"/> mapping view models, supporting mapping to and from any IPublishedContent or IContentModel.

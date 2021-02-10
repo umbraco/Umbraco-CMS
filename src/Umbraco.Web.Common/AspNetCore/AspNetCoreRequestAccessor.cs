@@ -7,11 +7,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Events;
 using Umbraco.Extensions;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBegin>
     {

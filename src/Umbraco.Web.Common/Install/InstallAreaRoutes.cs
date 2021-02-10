@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.Install
+namespace Umbraco.Cms.Web.Common.Install
 {
 
     public class InstallAreaRoutes : IAreaRoutes

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.Localization
+namespace Umbraco.Cms.Web.Common.Localization
 {
     /// <summary>
     /// Custom Umbraco options configuration for <see cref="RequestLocalizationOptions"/>

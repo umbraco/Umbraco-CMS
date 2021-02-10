@@ -4,19 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Represents the default front-end rendering controller.

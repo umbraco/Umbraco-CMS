@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {

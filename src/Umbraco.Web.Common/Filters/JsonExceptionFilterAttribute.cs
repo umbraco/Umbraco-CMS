@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     public class JsonExceptionFilterAttribute : TypeFilterAttribute
     {

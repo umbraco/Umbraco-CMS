@@ -6,10 +6,10 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Web.Common.ModelBinders
 {
 
     /// <summary>

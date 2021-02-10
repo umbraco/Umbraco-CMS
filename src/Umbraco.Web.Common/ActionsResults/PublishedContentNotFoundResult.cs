@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Common.ActionsResults
+namespace Umbraco.Cms.Web.Common.ActionsResults
 {
     /// <summary>
     /// Returns the Umbraco not found result

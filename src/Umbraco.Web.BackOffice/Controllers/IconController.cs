@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Attributes;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {

@@ -1,5 +1,5 @@
 using System;
-using Umbraco.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Web.Website.Controllers
 {

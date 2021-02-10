@@ -10,7 +10,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.DependencyInjection
+namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {

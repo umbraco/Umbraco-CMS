@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
     {

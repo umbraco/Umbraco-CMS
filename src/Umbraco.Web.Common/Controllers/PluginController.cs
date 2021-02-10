@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for plugin controllers.

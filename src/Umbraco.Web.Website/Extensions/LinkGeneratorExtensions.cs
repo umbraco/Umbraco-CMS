@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Extensions

@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Umbraco.Web.Common.Constants;
-using Umbraco.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Constants;
+using Umbraco.Cms.Web.Common.Controllers;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// This is a special filter which is required for the RTE to be able to render Partial View Macros that

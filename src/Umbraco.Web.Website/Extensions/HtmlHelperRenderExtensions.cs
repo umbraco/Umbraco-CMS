@@ -21,13 +21,9 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Web;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Mvc;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Web.Website.Collections;
 using Umbraco.Web.Website.Controllers;
 

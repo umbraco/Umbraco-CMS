@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Extensions;
 
 namespace Umbraco.Extensions
 {

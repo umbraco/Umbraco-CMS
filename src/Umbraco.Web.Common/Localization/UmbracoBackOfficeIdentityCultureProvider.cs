@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Localization
+namespace Umbraco.Cms.Web.Common.Localization
 {
     /// <summary>
     /// Sets the request culture to the culture of the back office user if one is determined to be in the request

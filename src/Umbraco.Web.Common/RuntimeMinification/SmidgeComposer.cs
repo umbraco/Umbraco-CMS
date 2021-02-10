@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     public sealed class SmidgeComposer : IComposer
     {

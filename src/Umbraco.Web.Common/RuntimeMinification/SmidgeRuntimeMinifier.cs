@@ -10,12 +10,10 @@ using Smidge.Nuglify;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using CssFile = Smidge.Models.CssFile;
 using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {

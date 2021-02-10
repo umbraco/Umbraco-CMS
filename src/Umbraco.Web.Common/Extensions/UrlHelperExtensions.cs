@@ -8,17 +8,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Web.Common.Controllers;
-using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Extensions
 {
-
     public static class UrlHelperExtensions
     {
-
-
-
         /// <summary>
         /// Return the back office url if the back office is installed
         /// </summary>
@@ -28,7 +23,7 @@ namespace Umbraco.Extensions
         {
             var backOfficeControllerType = Type.GetType("Umbraco.Web.BackOffice.Controllers");
             if (backOfficeControllerType == null) return "/"; // this would indicate that the installer is installed without the back office
-            return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Constants.Web.Mvc.BackOfficeApiArea });
+            return url.Action("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), new { area = Cms.Core.Constants.Web.Mvc.BackOfficeApiArea });
         }
 
         /// <summary>

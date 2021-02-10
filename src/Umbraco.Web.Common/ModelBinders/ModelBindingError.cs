@@ -1,9 +1,8 @@
 using System;
 using System.Text;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Core.Events;
 
-namespace Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Web.Common.ModelBinders
 {
     /// <summary>
     /// Contains event data for the <see cref="ModelBindingException"/> event.

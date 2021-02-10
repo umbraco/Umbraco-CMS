@@ -16,7 +16,6 @@ using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Web.BackOffice.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization

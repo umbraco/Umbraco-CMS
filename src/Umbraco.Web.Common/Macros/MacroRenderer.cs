@@ -18,9 +18,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Macros;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     public class MacroRenderer : IMacroRenderer
     {

@@ -29,10 +29,10 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common;
-using Umbraco.Web.Common.AspNetCore;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 

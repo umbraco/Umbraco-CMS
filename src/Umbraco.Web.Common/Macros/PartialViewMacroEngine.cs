@@ -17,10 +17,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
-using Umbraco.Web.Macros;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     /// <summary>
     /// A macro engine using MVC Partial Views to execute.

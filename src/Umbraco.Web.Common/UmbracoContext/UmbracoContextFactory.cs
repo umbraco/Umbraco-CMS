@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -7,10 +6,8 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Security;
-using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Web.Common.UmbracoContext
 {
     /// <summary>
     /// Creates and manages <see cref="IUmbracoContext"/> instances.

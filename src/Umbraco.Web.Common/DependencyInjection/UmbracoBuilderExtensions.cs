@@ -31,32 +31,31 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common;
+using Umbraco.Cms.Web.Common.ApplicationModels;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Localization;
+using Umbraco.Cms.Web.Common.Macros;
+using Umbraco.Cms.Web.Common.Middleware;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Common.Templates;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Web.Common.ApplicationModels;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Localization;
-using Umbraco.Web.Common.Macros;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Common.Mvc;
-using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Common.Templates;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Telemetry;
-using Umbraco.Web.Website;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.DependencyInjection
+namespace Umbraco.Extensions
 {
     // TODO: We could add parameters to configure each of these for flexibility
 

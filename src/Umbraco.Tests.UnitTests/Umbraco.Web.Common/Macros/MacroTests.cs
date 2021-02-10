@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Macros;
 

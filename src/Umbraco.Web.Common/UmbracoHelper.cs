@@ -9,8 +9,9 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
+using Umbraco.Web;
 
-namespace Umbraco.Web.Website
+namespace Umbraco.Cms.Web.Common
 {
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates

@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Web.Common.Install
+namespace Umbraco.Cms.Web.Common.Install
 {
     /// <summary>
     /// Ensures authorization occurs for the installer if it has already completed.

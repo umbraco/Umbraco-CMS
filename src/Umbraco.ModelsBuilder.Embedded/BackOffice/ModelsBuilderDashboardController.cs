@@ -7,8 +7,8 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Authorization;
 
 namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {

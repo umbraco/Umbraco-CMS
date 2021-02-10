@@ -12,10 +12,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security

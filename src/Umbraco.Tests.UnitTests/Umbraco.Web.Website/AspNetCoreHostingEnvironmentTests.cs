@@ -4,8 +4,8 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website
 {

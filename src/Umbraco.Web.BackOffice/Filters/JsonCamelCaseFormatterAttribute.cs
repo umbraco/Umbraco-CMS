@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Umbraco.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Formatters;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters
 {

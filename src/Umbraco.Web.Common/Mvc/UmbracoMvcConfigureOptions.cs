@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.ModelBinders;
 
-namespace Umbraco.Web.Common.Mvc
+namespace Umbraco.Cms.Web.Common.Mvc
 {
 
     /// <summary>

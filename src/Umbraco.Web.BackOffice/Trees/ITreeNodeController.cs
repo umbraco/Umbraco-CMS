@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.ModelBinders;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees
 {

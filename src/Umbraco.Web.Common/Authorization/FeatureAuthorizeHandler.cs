@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Umbraco.Cms.Core.Features;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.Common.Authorization
 {
     /// <summary>
     /// Ensures that the controller is an authorized feature.

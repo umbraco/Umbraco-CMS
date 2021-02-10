@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.ModelsBuilder.Embedded;
 using Umbraco.Cms.ModelsBuilder.Embedded.Building;
-using Umbraco.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
 /*

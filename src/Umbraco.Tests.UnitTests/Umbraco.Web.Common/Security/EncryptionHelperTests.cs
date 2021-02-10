@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Security
 {

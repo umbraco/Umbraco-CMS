@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {

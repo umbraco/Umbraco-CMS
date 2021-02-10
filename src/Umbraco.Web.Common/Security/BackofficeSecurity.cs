@@ -1,16 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     // TODO: This is only for the back office, does it need to be in common?
 

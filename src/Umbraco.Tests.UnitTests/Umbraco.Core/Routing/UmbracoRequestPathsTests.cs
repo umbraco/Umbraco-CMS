@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing

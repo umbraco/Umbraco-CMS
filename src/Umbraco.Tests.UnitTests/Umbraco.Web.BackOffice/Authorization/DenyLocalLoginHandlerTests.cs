@@ -9,7 +9,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Web.BackOffice.Authorization;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {

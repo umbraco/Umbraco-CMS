@@ -10,11 +10,12 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 

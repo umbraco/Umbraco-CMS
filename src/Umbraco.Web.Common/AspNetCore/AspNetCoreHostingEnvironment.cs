@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
@@ -13,15 +12,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
+using Umbraco.Cms.Web.Common.Middleware;
+using Umbraco.Cms.Web.Common.Plugins;
 using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.Plugins;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// <see cref="IApplicationBuilder"/> extensions for Umbraco
     /// </summary>

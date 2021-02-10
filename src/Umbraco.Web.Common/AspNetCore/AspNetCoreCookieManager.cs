@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreCookieManager : ICookieManager
     {

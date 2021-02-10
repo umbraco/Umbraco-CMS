@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;

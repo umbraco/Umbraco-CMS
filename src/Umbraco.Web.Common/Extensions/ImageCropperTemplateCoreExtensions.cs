@@ -1,17 +1,11 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using System.Globalization;
-using Umbraco.Cms.Core;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {
@@ -135,7 +129,7 @@ namespace Umbraco.Extensions
              IPublishedUrlProvider publishedUrlProvider,
              int? width = null,
              int? height = null,
-             string propertyAlias = Constants.Conventions.Media.File,
+             string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
              string cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,

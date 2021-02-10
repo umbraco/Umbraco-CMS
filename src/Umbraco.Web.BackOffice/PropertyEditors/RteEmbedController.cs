@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.PropertyEditors

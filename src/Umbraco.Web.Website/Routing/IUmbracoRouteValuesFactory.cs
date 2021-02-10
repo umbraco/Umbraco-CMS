@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Website.Routing

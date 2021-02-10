@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Controllers;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
 namespace Umbraco.Web.Website.Routing

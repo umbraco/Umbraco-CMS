@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Cms.Web.Common.Constants;
+using Umbraco.Cms.Web.Common.Exceptions;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Constants;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
 
     /// <summary>

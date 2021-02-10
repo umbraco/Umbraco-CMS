@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Core.Security;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Security;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions

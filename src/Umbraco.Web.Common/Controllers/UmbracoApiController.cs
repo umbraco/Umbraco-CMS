@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for auto-routed Umbraco API controllers.

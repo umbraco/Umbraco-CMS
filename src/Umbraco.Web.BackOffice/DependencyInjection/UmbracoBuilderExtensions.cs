@@ -15,10 +15,8 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Extensions

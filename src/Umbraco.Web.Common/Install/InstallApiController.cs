@@ -10,14 +10,14 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
 
-namespace Umbraco.Web.Common.Install
+namespace Umbraco.Cms.Web.Common.Install
 {
     [UmbracoApiController]
     [AngularJsonOnlyConfiguration]

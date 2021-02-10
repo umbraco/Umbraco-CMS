@@ -10,11 +10,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
-using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 {

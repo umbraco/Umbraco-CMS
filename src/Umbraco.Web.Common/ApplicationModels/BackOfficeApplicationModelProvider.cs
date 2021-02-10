@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Web.Common.Attributes;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
     // TODO: This should just exist in the back office project
 
@@ -52,6 +52,6 @@ namespace Umbraco.Web.Common.ApplicationModels
 
         private bool IsBackOfficeController(ControllerModel controller)
             => controller.Attributes.OfType<IsBackOfficeAttribute>().Any();
-        
+
     }
 }

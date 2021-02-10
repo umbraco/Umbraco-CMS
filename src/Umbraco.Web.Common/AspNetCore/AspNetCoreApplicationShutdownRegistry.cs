@@ -4,9 +4,8 @@ using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreApplicationShutdownRegistry : IApplicationShutdownRegistry
     {

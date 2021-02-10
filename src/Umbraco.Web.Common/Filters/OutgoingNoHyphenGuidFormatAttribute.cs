@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Web.Common.Formatters;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Formatters;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     public class OutgoingNoHyphenGuidFormatAttribute : TypeFilterAttribute
     {

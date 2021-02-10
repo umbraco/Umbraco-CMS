@@ -11,9 +11,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Core.Events;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views

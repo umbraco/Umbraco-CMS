@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreUmbracoApplicationLifetime : IUmbracoApplicationLifetime
     {
