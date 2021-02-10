@@ -7,8 +7,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Cms.ModelsBuilder.Embedded;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
@@ -70,7 +70,7 @@ using Umbraco.Web.WebAssets;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality

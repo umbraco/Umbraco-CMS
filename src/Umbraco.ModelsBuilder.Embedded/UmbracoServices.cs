@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
 
     public sealed class UmbracoServices

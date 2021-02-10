@@ -9,8 +9,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Cms.ModelsBuilder.Embedded;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {

@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {
     /// <summary>
     /// Used to validate the aliases for the content type when MB is enabled to ensure that

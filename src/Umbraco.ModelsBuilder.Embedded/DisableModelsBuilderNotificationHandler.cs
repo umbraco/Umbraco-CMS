@@ -1,10 +1,9 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
-using Umbraco.Core.Events;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
+using Umbraco.Cms.ModelsBuilder.Embedded.BackOffice;
+using Umbraco.Extensions;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     /// <summary>
     /// Used in conjunction with <see cref="UmbracoBuilderExtensions.DisableModelsBuilderControllers"/>

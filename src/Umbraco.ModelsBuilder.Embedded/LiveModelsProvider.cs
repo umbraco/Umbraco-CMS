@@ -3,17 +3,13 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core;
-using Umbraco.Core.Events;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     // supports LiveAppData - but not PureLive
     public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,  INotificationHandler<UmbracoRequestEnd>

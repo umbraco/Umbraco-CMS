@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Cms.ModelsBuilder.Embedded.Building
 {
     public class ModelsGenerator
     {

@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Cms.ModelsBuilder.Embedded;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {

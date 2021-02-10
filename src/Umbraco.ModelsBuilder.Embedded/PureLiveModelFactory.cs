@@ -18,11 +18,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {

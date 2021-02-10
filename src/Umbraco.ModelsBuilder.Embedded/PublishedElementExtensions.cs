@@ -2,8 +2,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.ModelsBuilder.Embedded;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded;
 
 // same namespace as original Umbraco.Web PublishedElementExtensions
 // ReSharper disable once CheckNamespace

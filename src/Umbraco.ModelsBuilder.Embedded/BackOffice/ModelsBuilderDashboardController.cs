@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Authorization;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {
     /// <summary>
     /// API controller for use in the Umbraco back office with Angular resources

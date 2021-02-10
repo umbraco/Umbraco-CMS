@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Cms.ModelsBuilder.Embedded.Building
 {
     /// <summary>
     /// Implements a builder that works by writing text.

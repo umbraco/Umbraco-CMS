@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Extensions;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Cms.ModelsBuilder.Embedded.Building
 {
     internal class TypeModelHasher
     {

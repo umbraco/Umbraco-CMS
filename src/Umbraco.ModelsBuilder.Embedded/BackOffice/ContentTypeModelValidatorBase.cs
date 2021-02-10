@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Editors;
@@ -11,7 +10,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {
     public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
         where TModel : ContentTypeSave<TProperty>

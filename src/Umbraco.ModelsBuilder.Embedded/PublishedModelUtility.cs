@@ -3,9 +3,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     /// <summary>
     /// This is called from within the generated model classes

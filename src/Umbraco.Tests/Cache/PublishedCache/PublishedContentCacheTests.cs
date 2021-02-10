@@ -9,16 +9,11 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {

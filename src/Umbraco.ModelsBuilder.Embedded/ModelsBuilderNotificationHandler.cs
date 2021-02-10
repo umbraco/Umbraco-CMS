@@ -10,19 +10,14 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
-
     /// <summary>
     /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
     /// </summary>

@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {
     internal class DashboardReport
     {
