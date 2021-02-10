@@ -7,7 +7,7 @@ using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
-    public class NoOpLookupNormalizerTests
+    public class NoopLookupNormalizerTests
     {
         [Test]
         public void NormalizeName_Expect_Input_Returned()
