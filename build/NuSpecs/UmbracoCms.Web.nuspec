@@ -42,7 +42,6 @@
                 <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1,4.999999)" />
                 <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1,4.999999)" />
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
-                <dependency id="HtmlSanitizer" version="[4.0.217,4.999999)" />
 
             </group>
 
