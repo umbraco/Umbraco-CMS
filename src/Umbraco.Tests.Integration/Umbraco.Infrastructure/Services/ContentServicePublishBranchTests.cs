@@ -9,12 +9,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]

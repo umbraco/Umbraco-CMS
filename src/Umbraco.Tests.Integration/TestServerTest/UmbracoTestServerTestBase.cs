@@ -20,15 +20,15 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.DependencyInjection;
-using Umbraco.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.TestServerTest
+namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]

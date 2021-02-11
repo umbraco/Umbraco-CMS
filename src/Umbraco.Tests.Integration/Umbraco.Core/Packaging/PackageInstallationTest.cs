@@ -10,10 +10,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Packaging;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Packaging
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]

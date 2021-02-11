@@ -6,7 +6,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Migrations.Expressions.Create.Index;
@@ -15,10 +15,9 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Persistence.SyntaxProvider
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider
 {
     [TestFixture]
     public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest

@@ -14,12 +14,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
 {
     [TestFixture]
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

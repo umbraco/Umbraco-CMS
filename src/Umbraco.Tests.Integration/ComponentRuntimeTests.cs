@@ -1,11 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Composing;
@@ -13,16 +9,10 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Extensions;
-using Umbraco.Tests.Integration.Extensions;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration
+namespace Umbraco.Cms.Tests.Integration
 {
-
     [TestFixture]
     [UmbracoTest(Boot = true)]
     public class ComponentRuntimeTests : UmbracoIntegrationTest

@@ -11,12 +11,10 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Core;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.TestServerTest
+namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {

@@ -9,12 +9,12 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Formatters;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.TestServerTest;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class TemplateQueryControllerTests : UmbracoTestServerTestBase

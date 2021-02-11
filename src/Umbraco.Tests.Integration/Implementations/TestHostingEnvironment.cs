@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Integration.Implementations
 {
     public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Cms.Core.Hosting.IHostingEnvironment
     {

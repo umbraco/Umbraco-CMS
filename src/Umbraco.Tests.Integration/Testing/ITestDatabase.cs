@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public interface ITestDatabase
     {

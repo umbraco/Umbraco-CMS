@@ -20,14 +20,14 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Examine;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
+using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web.Search;
 
-namespace Umbraco.Tests.Integration.DependencyInjection
+namespace Umbraco.Cms.Tests.Integration.DependencyInjection
 {
     /// <summary>
     /// This is used to replace certain services that are normally registered from our Core / Infrastructure that

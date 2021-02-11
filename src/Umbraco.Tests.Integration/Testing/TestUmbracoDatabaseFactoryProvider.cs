@@ -9,7 +9,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <summary>
     /// I want to be able to create a database for integration testsing without setting the connection string on the

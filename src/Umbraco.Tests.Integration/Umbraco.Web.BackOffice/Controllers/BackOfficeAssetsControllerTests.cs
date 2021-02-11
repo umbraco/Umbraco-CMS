@@ -5,10 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Tests.Integration.TestServerTest;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class BackOfficeAssetsControllerTests : UmbracoTestServerTestBase

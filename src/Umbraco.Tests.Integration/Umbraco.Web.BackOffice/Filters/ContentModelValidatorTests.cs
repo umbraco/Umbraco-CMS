@@ -22,14 +22,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.PropertyEditors;
 using DataType = Umbraco.Cms.Core.Models.DataType;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]

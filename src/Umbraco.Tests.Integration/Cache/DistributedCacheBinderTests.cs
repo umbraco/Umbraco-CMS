@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Cms.Tests.Integration.Cache
 {
     [TestFixture]
     [UmbracoTest(Boot = true)]

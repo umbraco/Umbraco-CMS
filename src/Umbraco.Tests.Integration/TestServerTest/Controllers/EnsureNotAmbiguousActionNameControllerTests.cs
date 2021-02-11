@@ -6,10 +6,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Core;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.TestServerTest.Controllers
+namespace Umbraco.Cms.Tests.Integration.TestServerTest.Controllers
 {
     [TestFixture]
     public class EnsureNotAmbiguousActionNameControllerTests : UmbracoTestServerTestBase

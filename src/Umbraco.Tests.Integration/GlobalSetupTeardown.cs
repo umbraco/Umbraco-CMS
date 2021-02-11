@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using NUnit.Framework;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
 // ReSharper disable once CheckNamespace
 

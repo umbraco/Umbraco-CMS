@@ -9,11 +9,11 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
     [UmbracoTest]

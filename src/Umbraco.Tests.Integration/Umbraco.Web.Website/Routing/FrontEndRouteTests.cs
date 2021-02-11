@@ -1,29 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Website.Controllers;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Integration.TestServerTest;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
 {
     [TestFixture]
     public class SurfaceControllerTests : UmbracoTestServerTestBase

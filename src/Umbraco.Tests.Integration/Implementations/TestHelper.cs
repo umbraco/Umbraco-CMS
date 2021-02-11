@@ -36,7 +36,7 @@ using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Integration.Implementations
 {
     public class TestHelper : TestHelperBase
     {

@@ -4,9 +4,8 @@
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Examine;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <summary>
     /// A component to customize some services to work nicely with integration tests

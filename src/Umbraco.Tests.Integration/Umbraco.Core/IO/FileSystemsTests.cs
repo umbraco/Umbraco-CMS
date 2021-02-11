@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.IO
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 {
     [TestFixture]
     [UmbracoTest]
