@@ -12,9 +12,8 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Examine;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     /// <summary>
     /// An indexer for Umbraco content and media

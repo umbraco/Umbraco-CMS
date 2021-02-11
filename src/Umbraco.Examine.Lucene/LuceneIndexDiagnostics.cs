@@ -7,10 +7,9 @@ using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {

@@ -5,9 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Examine;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
     {

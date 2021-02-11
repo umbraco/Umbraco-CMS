@@ -7,9 +7,8 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Examine;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     /// <inheritdoc />
     /// <summary>

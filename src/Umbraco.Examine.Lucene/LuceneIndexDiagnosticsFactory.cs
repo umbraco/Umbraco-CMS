@@ -5,9 +5,8 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Examine;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     /// <summary>
     /// Implementation of <see cref="IIndexDiagnosticsFactory"/> which returns <see cref="LuceneIndexDiagnostics"/>

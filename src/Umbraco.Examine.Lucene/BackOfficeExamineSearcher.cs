@@ -12,11 +12,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     {

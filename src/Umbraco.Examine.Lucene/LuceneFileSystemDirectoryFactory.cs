@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     public class LuceneFileSystemDirectoryFactory : ILuceneDirectoryFactory
     {

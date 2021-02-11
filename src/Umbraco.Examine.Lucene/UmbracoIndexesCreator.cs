@@ -12,10 +12,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Examine;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     /// <summary>
     /// Creates the indexes used by Umbraco

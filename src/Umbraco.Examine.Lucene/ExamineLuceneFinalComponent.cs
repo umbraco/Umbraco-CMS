@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
     public class ExamineLuceneFinalComponent : IComponent
     {

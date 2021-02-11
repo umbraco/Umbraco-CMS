@@ -16,10 +16,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Examine;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Cms.Examine
+namespace Umbraco.Examine
 {
 
     /// <summary>
