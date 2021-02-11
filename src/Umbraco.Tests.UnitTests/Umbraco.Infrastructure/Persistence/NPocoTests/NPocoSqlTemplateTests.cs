@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
         [Test]
         public void SqlTemplates()
         {
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(),DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
             var sqlTemplates = new SqlTemplates(sqlContext);
 
             // this can be used for queries that we know we'll use a *lot* and
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
         public void SqlTemplateArgs()
         {
             var mappers = new NPoco.MapperCollection { new PocoMapper() };
-            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(), mappers);
 
             var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, factory);
             var sqlTemplates = new SqlTemplates(sqlContext);

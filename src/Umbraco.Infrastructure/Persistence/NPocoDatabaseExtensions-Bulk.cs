@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Data.SqlClient;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
+using NPoco.SqlServer;
 
 namespace Umbraco.Core.Persistence
 {

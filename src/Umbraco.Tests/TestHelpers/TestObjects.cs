@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
+using NPoco.DatabaseTypes;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
-            var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(syntax, new SqlServer2008DatabaseType(), Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 

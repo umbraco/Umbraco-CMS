@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence
 
 
             var tin = innerConnection.GetType();
-            var fi = con is System.Data.SqlClient.SqlConnection
+            var fi = con is Microsoft.Data.SqlClient.SqlConnection
                 ? tin.BaseType?.BaseType?.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic)
                 : tin.BaseType?.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi == null)

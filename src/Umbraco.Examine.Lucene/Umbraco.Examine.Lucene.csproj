@@ -38,7 +38,7 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-      <PackageReference Include="NPoco" Version="4.0.2" />
+      <PackageReference Include="NPoco.SqlServer" Version="5.1.2" />
         <PackageReference Include="SecurityCodeScan">
             <Version>3.5.3</Version>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 
 namespace Umbraco.Core.Persistence
 {
@@ -25,8 +21,8 @@ namespace Umbraco.Core.Persistence
     /// rapid transfer of data to SQL Server.
     ///
     /// Subclasses should implement <see cref="BulkDataReader.SchemaName"/>, <see cref="BulkDataReader.TableName"/>,
-    /// <see cref="BulkDataReader.AddSchemaTableRows()"/>, <see cref="BulkDataReader.Read()"/>, <see cref="BulkDataReader.GetValue(Int32)"/>.
-    /// If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(Boolean)"/>.
+    /// <see cref="BulkDataReader.AddSchemaTableRows()"/>, <see cref="BulkDataReader.Read()"/>, <see cref="BulkDataReader.GetValue(int)"/>.
+    /// If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(bool)"/>.
     ///
     /// SD: Alternatively, we could have used a LinqEntityDataReader which is nicer to use but it uses quite a lot of reflection and
     /// I thought this would just be quicker.
@@ -108,7 +104,7 @@ namespace Umbraco.Core.Persistence
         /// Adds the input row set's schema to the object.
         /// </summary>
         /// <remarks>
-        /// Call <see cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
+        /// Call <see cref="AddSchemaTableRow(string,Nullable{int},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         /// to do this for each row.
         /// </remarks>
         /// <seealso cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>

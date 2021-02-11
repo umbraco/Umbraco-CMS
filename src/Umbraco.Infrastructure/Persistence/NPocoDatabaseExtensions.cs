@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Text.RegularExpressions;
+using Microsoft.Data.SqlClient;
 using NPoco;
 using StackExchange.Profiling.Data;
 using Umbraco.Core.Persistence.FaultHandling;

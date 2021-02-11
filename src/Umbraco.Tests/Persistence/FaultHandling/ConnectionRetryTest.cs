@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -7,8 +7,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.FaultHandling

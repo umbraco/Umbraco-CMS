@@ -282,7 +282,7 @@ namespace Umbraco.Core.Persistence
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
             // so that everything NPoco is properly cached for the lifetime of the application
             _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
-            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
+            var factory = new FluentPocoDataFactory((t, f) => GetPocoDataFactoryResolver(t,f), _pocoMappers);
             _pocoDataFactory = factory;
             var config = new FluentConfig(xmappers => factory);
 

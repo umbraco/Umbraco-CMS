@@ -64,9 +64,9 @@ namespace Umbraco.Tests.TestHelpers
             var factory = Current.Factory = composition.CreateServiceProvider();
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
-            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
+            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(), pocoMappers);
             var sqlSyntax = new SqlCeSyntaxProvider();
-            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe as NPoco.DatabaseTypes.SqlServerDatabaseType, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
             Mappers = factory.GetRequiredService<IMapperCollection>();
 
             SetUp();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.Mappers;
