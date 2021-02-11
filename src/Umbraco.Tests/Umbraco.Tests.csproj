@@ -119,7 +119,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Moq" Version="4.10.1" />
-    <PackageReference Include="NPoco.SqlServer" Version="5.1.2" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
