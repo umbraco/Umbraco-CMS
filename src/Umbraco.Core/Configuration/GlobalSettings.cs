@@ -391,5 +391,28 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
+
+
+        /// <summary>
+        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// </summary>
+        /// <remarks>
+        /// The default value is 1800 milliseconds
+        /// </remarks>
+        /// <value>The timeout in milliseconds.</value>
+        public int SqlWriteLockTimeOut
+        {
+            get
+            {
+                try
+                {
+                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut]);
+                }
+                catch
+                {
+                    return 1800;
+                }
+            }
+        }
     }
 }

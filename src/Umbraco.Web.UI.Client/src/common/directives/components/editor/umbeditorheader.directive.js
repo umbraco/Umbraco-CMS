@@ -357,8 +357,11 @@ Use this directive to construct a header inside the main editor window.
                     scope.$emit("$changeTitle", title);
             }
 
-            $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
+            var unbindEventHandler = $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
                 setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, name, contentTypeName, setTitle);
+            });
+            scope.$on('$destroy', function () {
+                unbindEventHandler();
             });
         }
 

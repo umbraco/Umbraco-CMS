@@ -35,7 +35,7 @@ namespace Umbraco.Core.Composing
                 var s = ConfigurationManager.AppSettings[Constants.AppSettings.AssembliesAcceptingLoadExceptions];
                 return _assembliesAcceptingLoadExceptions = string.IsNullOrWhiteSpace(s)
                     ? Array.Empty<string>()
-                    : s.Split(',').Select(x => x.Trim()).ToArray();
+                    : s.Split(Constants.CharArrays.Comma).Select(x => x.Trim()).ToArray();
             }
         }
 
