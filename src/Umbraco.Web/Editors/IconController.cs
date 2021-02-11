@@ -3,11 +3,16 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    public class IconController : UmbracoAuthorizedApiController
+    [IsBackOffice]
+    [UmbracoWebApiRequireHttps]
+    [UnhandedExceptionLoggerConfiguration]
+    [EnableDetailedErrors]
+    public class IconController : UmbracoApiController
     {
         private readonly IIconService _iconService;
 
