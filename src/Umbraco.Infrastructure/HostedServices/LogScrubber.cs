@@ -10,13 +10,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Log scrubbing hosted service.

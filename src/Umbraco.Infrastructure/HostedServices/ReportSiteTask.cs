@@ -9,9 +9,8 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Web.Telemetry
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     public class ReportSiteTask : RecurringHostedServiceBase
     {

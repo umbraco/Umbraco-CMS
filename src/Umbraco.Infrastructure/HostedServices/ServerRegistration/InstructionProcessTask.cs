@@ -9,10 +9,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Sync;
 
-namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
+namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 {
     /// <summary>
     /// Implements periodic database instruction processing as a hosted service.

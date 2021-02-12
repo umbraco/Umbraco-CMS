@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Core;
-using Umbraco.Infrastructure.HostedServices;
 
 namespace Umbraco.Web.Search
 {

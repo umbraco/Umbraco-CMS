@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Hosted service implementation for keep alive feature.
