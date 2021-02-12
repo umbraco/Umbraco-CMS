@@ -941,7 +941,7 @@ namespace Umbraco.Infrastructure.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x=>x).Distinct();
+                return _memberGroupRepository.GetMany().Distinct();
             }
         }
 
