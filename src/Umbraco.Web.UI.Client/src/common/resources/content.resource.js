@@ -42,6 +42,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#allowsCultureVariation
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Check whether any content types have culture variant enabled
+        *
+        * ##usage
+        * <pre>
+        * contentResource.allowsCultureVariation()
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        * 
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         allowsCultureVariation: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -51,6 +70,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve variant content types');
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#savePermissions
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Save user group permissions for the content
+        *
+        * ##usage
+        * <pre>
+        * contentResource.savePermissions(saveModel)
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        *
+        * @param {object} The object which contains the user group permissions for the content
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         savePermissions: function (saveModel) {
             if (!saveModel) {
                 throw "saveModel cannot be null";
@@ -68,7 +107,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to save permissions');
         },
 
-
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#getRecycleBin
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Get the recycle bin
+        *
+        * ##usage
+        * <pre>
+        * contentResource.getRecycleBin()
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        *
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -337,6 +394,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to delete item ' + id);
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#deleteBlueprint
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Deletes a content blueprint item with a given id
+        *
+        * ##usage
+        * <pre>
+        * contentResource.deleteBlueprint(1234)
+        *    .then(function() {
+        *        alert('its gone!');
+        *    });
+        * </pre>
+        *
+        * @param {Int} id id of content blueprint item to delete
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         deleteBlueprint: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
@@ -382,29 +459,90 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 });
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#getBlueprintById
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Gets a content blueprint item with a given id
+        *
+        * ##usage
+        * <pre>
+        * contentResource.getBlueprintById(1234)
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        *
+        * @param {Int} id id of content blueprint item to retrieve
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         getBlueprintById: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetBlueprintById",
-                        [{ id: id }])),
+                        { id: id })),
                 'Failed to retrieve data for content id ' + id)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#getNotifySettingsById
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Gets notification options for a content item with a given id for the current user
+        *
+        * ##usage
+        * <pre>
+        * contentResource.getNotifySettingsById(1234)
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        *
+        * @param {Int} id id of content item
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         getNotifySettingsById: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetNotificationOptions",
-                        [{ contentId: id }])),
+                        { contentId: id })),
                 'Failed to retrieve data for content id ' + id);
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#getNotifySettingsById
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Sets notification settings for a content item with a given id for the current user
+        *
+        * ##usage
+        * <pre>
+        * contentResource.setNotifySettingsById(1234,["D", "F", "H"])
+        *    .then(function() {
+        *       Do stuff...
+        *    });
+        * </pre>
+        *
+        * @param {Int} id id of content item
+        * @param {Array} options the notification options to set for the content item
+        * @returns {Promise} resourcePromise object.
+        *
+        */
         setNotifySettingsById: function (id, options) {
             if (!id) {
                 throw "contentId cannot be null";
@@ -442,9 +580,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            _.each(ids, function (item) {
-                idQuery += "ids=" + item + "&";
-            });
+            ids.forEach(id => idQuery += `ids=${id}&`);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -455,9 +591,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data for content with multiple ids')
                 .then(function (result) {
                     //each item needs to be re-formatted
-                    _.each(result, function (r) {
-                        umbDataFormatter.formatContentGetData(r)
-                    });
+                    result.forEach(r => umbDataFormatter.formatContentGetData(r));
                     return $q.when(result);
                 });
         },
@@ -502,8 +636,53 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                        { contentTypeAlias: alias, parentId: parentId })),
                 'Failed to retrieve data for empty content item type ' + alias)
+                .then(function (result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
+        },
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getScaffoldByKey
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a scaffold of an empty content item, given the id of the content item to place it underneath and the content type alias.
+          *
+         * - Parent Id must be provided so umbraco knows where to store the content
+          * - Content Type Id must be provided so umbraco knows which properties to put on the content scaffold
+          *
+         * The scaffold is used to build editors for content that has not yet been populated with data.
+          *
+         * ##usage
+         * <pre>
+         * contentResource.getScaffoldByKey(1234, '...')
+         *    .then(function(scaffold) {
+         *        var myDoc = scaffold;
+          *        myDoc.name = "My new document";
+         *
+         *        contentResource.publish(myDoc, true)
+         *            .then(function(content){
+         *                alert("Retrieved, updated and published again");
+         *            });
+         *    });
+          * </pre>
+          *
+         * @param {Int} parentId id of content item to return
+          * @param {String} contentTypeGuid contenttype guid to base the scaffold on
+         * @returns {Promise} resourcePromise object containing the content scaffold.
+         *
+         */
+        getScaffoldByKey: function (parentId, contentTypeKey) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByKey",
+                        { contentTypeKey: contentTypeKey, parentId: parentId })),
+                'Failed to retrieve data for empty content item id ' + contentTypeKey)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
@@ -516,7 +695,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                        { blueprintId: blueprintId, parentId: parentId })),
                 'Failed to retrieve blueprint for id ' + blueprintId)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -656,7 +835,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.contentResource
          *
          * @description
-         * Saves changes made to a content item to its current version, if the content item is new, the isNew paramater must be passed to force creation
+         * Saves changes made to a content item to its current version, if the content item is new, the isNew parameter must be passed to force creation
           * if the content item needs to have files attached, they must be provided as the files param and passed separately
           *
           *
@@ -686,6 +865,34 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#saveBlueprint
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Saves changes made to a content blueprint item to its current version, if the content blueprint item is new, the isNew parameter must be passed to force creation
+        * if the content item needs to have files attached, they must be provided as the files param and passed separately
+        *
+        * ##usage
+        * <pre>
+        * contentResource.getById(1234)
+        *    .then(function(content) {
+        *          content.name = "I want a new name!";
+        *          contentResource.saveBlueprint(content, false)
+        *            .then(function(content){
+        *                alert("Retrieved, updated and saved again");
+        *            });
+        *    });
+        * </pre>
+        *
+        * @param {Object} content The content blueprint item object with changes applied
+        * @param {Bool} isNew set to true to create a new item or to update an existing
+        * @param {Array} files collection of files for the document
+        * @param {Bool} showNotifications an option to disable/show notifications (default is true)
+        * @returns {Promise} resourcePromise object containing the saved content item.
+        *
+        */
         saveBlueprint: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
@@ -699,7 +906,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.contentResource
          *
          * @description
-         * Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew paramater must be passed to force creation
+         * Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew parameter must be passed to force creation
           * if the content item needs to have files attached, they must be provided as the files param and passed separately
           *
           *
@@ -729,6 +936,35 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#publish
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Saves and publishes changes made to a content item and its descendants to a new version, if the content item is new, the isNew parameter must be passed to force creation
+        * if the content items needs to have files attached, they must be provided as the files param and passed separately
+        *
+        *
+        * ##usage
+        * <pre>
+        * contentResource.getById(1234)
+        *    .then(function(content) {
+        *          content.name = "I want a new name, and be published!";
+        *          contentResource.publishWithDescendants(content, false)
+        *            .then(function(content){
+        *                alert("Retrieved, updated and published again");
+        *            });
+        *    });
+        * </pre>
+        *
+        * @param {Object} content The content item object with changes applied
+        * @param {Bool} isNew set to true to create a new item or to update an existing
+        * @param {Array} files collection of files for the document
+        * @param {Bool} showNotifications an option to disable/show notifications (default is true)
+        * @returns {Promise} resourcePromise object containing the saved content item.
+        *
+        */
         publishWithDescendants: function (content, isNew, force, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
@@ -832,6 +1068,27 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.contentResource#createBlueprintFromContent
+        * @methodOf umbraco.resources.contentResource
+        *
+        * @description
+        * Creates a content blueprint with a given name from a given content id
+        *
+        * ##usage
+        * <pre>
+        * contentResource.createBlueprintFromContent(1234,"name")
+        *    .then(function(content) {
+        *        alert("created");
+        *    });
+            * </pre>
+            *
+        * @param {Int} id The ID of the content to create the content blueprint from
+        * @param {string} id The name of the content blueprint
+        * @returns {Promise} resourcePromise object
+        *
+        */
         createBlueprintFromContent: function (contentId, name) {
             return umbRequestHelper.resourcePromise(
                 $http.post(

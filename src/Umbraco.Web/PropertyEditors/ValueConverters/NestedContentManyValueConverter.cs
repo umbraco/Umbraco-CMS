@@ -38,8 +38,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
             return contentTypes.Length == 1
-                ? typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
-                : typeof (IEnumerable<IPublishedElement>);
+                ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias))
+                : typeof(IEnumerable<IPublishedElement>);
         }
 
         /// <inheritdoc />

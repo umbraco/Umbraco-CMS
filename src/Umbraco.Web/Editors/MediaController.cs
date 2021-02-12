@@ -126,15 +126,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -146,15 +146,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Guid id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -645,7 +645,7 @@ namespace Umbraco.Web.Editors
             if (result.FormData.ContainsKey("path"))
             {
 
-                var folders = result.FormData["path"].Split('/');
+                var folders = result.FormData["path"].Split(Constants.CharArrays.ForwardSlash);
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
@@ -694,7 +694,7 @@ namespace Umbraco.Web.Editors
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName();
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -774,10 +774,13 @@ namespace Umbraco.Web.Editors
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                var children = Services.MediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
                     SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
-                foreach (var c in children)
-                    return c; //return first one if any are found
+                var match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
+                if (match != null)
+                {
+                    return match;
+                }
             }
             return null;
         }

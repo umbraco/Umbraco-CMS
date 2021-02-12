@@ -169,6 +169,7 @@
     <Content Include="Config\Lang\zh-CN.user.xml" />
     <Content Include="Config\splashes\noNodes.aspx" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
+    <Content Include="Umbraco\Config\Lang\cy.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Config\Splashes\noNodes.aspx" />
@@ -285,6 +286,7 @@
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
     <Content Include="Umbraco\Views\web.config" />
+    <Content Include="Views\Partials\BlockList\Default.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -345,9 +347,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8700</DevelopmentServerPort>
+          <DevelopmentServerPort>8111</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8700</IISUrl>          
+          <IISUrl>http://localhost:8111</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -375,6 +377,7 @@
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\umbracoSettings.Release.config" DestinationFiles="$(ProjectDir)Config\umbracoSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\umbracoSettings.config')" />
     <!-- Create Serilog.config & serilog.user.config file from Templates if it doesn't exist -->
     <Message Text="Copy serilog.$(Configuration).config to serilog.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\serilog.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />

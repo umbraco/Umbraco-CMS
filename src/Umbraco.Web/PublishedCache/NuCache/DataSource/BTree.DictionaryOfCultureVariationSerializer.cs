@@ -6,6 +6,9 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+    /// <summary>
+    /// Serializes/Deserializes culture variant data as a dictionary for BTree
+    /// </summary>
     internal class DictionaryOfCultureVariationSerializer : SerializerBase, ISerializer<IReadOnlyDictionary<string, CultureVariation>>
     {
         public IReadOnlyDictionary<string, CultureVariation> ReadFrom(Stream stream)

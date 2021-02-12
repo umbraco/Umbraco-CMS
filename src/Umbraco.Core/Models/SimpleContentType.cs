@@ -37,6 +37,7 @@ namespace Umbraco.Core.Models
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
 
             Id = contentType.Id;
+            Key = contentType.Key;
             Alias = contentType.Alias;
             Variations = contentType.Variations;
             Icon = contentType.Icon;
@@ -50,6 +51,8 @@ namespace Umbraco.Core.Models
         public string Alias { get; }
 
         public int Id { get; }
+
+        public Guid Key { get; }
 
         /// <inheritdoc />
         public ITemplate DefaultTemplate { get;  }
@@ -109,13 +112,14 @@ namespace Umbraco.Core.Models
         string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
         int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
         bool IEntity.HasIdentity => this.Id != default;
+        Guid IEntity.Key { get => this.Key; set => throw new NotImplementedException(); }
+
         int ITreeEntity.CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         int ITreeEntity.ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         int ITreeEntity.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         string ITreeEntity.Path { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         int ITreeEntity.SortOrder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        bool ITreeEntity.Trashed => throw new NotImplementedException();
-        Guid IEntity.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        bool ITreeEntity.Trashed => throw new NotImplementedException();        
         DateTime IEntity.CreateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         DateTime IEntity.UpdateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         DateTime? IEntity.DeleteDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

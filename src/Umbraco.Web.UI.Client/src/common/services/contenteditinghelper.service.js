@@ -32,6 +32,26 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         return true;
     }
 
+    function showNotificationsForModelsState(ms) {
+        for (const [key, value] of Object.entries(ms)) {
+
+            var errorMsg = value[0];
+            // if the error message is json it's a complex editor validation response that we need to parse
+            if ((Utilities.isString(errorMsg) && errorMsg.startsWith("[")) || Utilities.isArray(errorMsg)) {
+                // flatten the json structure, create validation paths for each property and add each as a property error
+                var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
+                idsToErrors.forEach(x => {
+                    if (x.modelState) {
+                        showNotificationsForModelsState(x.modelState);
+                    }
+                });
+            }
+            else if (value[0]) {
+                notificationsService.error("Validation", value[0]);
+            }
+        }
+    }
+
     return {
 
         //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
@@ -64,7 +84,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 //when true, the url will change but it won't actually re-route
                 //this is merely here for compatibility, if only the content/media/members used this service we'd prob be ok but tons of editors
                 //use this service unfortunately and probably packages too.
-                args.softRedirect = false; 
+                args.softRedirect = false;
             }
 
 
@@ -97,12 +117,18 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         return $q.resolve(data);
 
                     }, function (err) {
+
+                        formHelper.resetForm({ scope: args.scope, hasErrors: true });
+
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
                             err: err,
                             rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
+                                // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
+                                if(err.data) {
+                                    rebindCallback.apply(self, [args.content, err.data]);
+                                }
                             }
                         });
 
@@ -131,7 +157,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             // first check if tab is already added
             var foundInfoTab = false;
 
-            angular.forEach(tabs, function (tab) {
+            tabs.forEach(function (tab) {
                 if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
                     foundInfoTab = true;
                 }
@@ -278,7 +304,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 }
 
                 // if publishing is allowed also allow schedule publish
-                // we add this manually becuase it doesn't have a permission so it wont 
+                // we add this manually becuase it doesn't have a permission so it wont
                 // get picked up by the loop through permissions
                 if (_.contains(args.content.allowedActions, "U")) {
                     buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
@@ -569,7 +595,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         //instead of having a property editor $watch their expression to check if it has
                         // been updated, instead we'll check for the existence of a special method on their model
                         // and just call it.
-                        if (angular.isFunction(origProp.onValueChanged)) {
+                        if (Utilities.isFunction(origProp.onValueChanged)) {
                             //send the newVal + oldVal
                             origProp.onValueChanged(origProp.value, origVal);
                         }
@@ -602,7 +628,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (!args.err) {
                 throw "args.err cannot be null";
             }
-            
+
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
@@ -615,17 +641,15 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        for (var e in args.err.data.ModelState) {
-                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
-                        }
+                        showNotificationsForModelsState(args.err.data.ModelState);
                     }
 
                     if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
                         // If we are not redirecting it's because this is not newly created content, else in some cases we are
-                        // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
+                        // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
 
                         // In this case we need to detect what properties have changed and re-bind them with the server data.
-                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                        if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
 
@@ -669,10 +693,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id, args.softRedirect) || args.softRedirect) {
 
                 // If we are not redirecting it's because this is not newly created content, else in some cases we are
-                // soft-redirecting which means the URL will change but the route wont (i.e. creating content). 
+                // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
 
                 // In this case we need to detect what properties have changed and re-bind them with the server data.
-                if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                     args.rebindCallback();
                 }
             }
@@ -705,7 +729,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     navigationService.setSoftRedirect();
                 }
                 //change to new path
-                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);                
+                $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this
                 $location.replace();
                 return true;

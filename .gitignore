@@ -167,6 +167,7 @@ build/temp/
 # eof
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
+/src/Umbraco.Web.UI.Client/package-lock.json
 
 # Acceptance tests
 cypress.env.json
@@ -174,3 +175,6 @@ cypress.env.json
 /src/Umbraco.Tests.AcceptanceTest/package-lock.json
 /src/Umbraco.Tests.AcceptanceTest/cypress/videos/
 /src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
+
+/src/Umbraco.Web.UI/config/umbracoSettings.config

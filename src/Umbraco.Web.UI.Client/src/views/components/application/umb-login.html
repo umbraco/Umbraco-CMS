@@ -5,12 +5,12 @@
         <div class="login-overlay__background-image" ng-style="{'background-image': 'url('+vm.backgroundImage+')'}"></div>
 
         <div class="login-overlay__logo">
-            <img src="assets/img/application/umbraco_logo_white.svg">
+            <img ng-src="{{vm.logoImage}}" alt=""/>
         </div>
 
-        <div ng-show="vm.invitedUser != null" class="umb-login-container">
+        <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
 
-            <form name="inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
+            <form name="vm.inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
                 <div class="form" ng-if="vm.inviteStep === 1">
                     <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{vm.invitedUser.name}}</h1>
                     <p style="line-height: 1.6; margin-bottom: 25px;">
@@ -79,7 +79,7 @@
                                         size="xl"
                                         unknown-char="+"
                                         img-src="{{vm.invitedUser.avatars[3]}}"
-                                        img-srcset="{{vm.invitedUser.avatars[4]}} 2x, {{invitedUser.avatars[4]}} 3x">
+                                        img-srcset="{{vm.invitedUser.avatars[4]}} 2x, {{vm.invitedUser.avatars[4]}} 3x">
                             </umb-avatar>
                         </a>
 
@@ -100,7 +100,7 @@
             </div>
 
         </div>
-        <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="vm.inviteStep === 3" class="umb-login-container">
+        <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="!vm.denyLocalLogin && vm.inviteStep === 3" class="umb-login-container">
             <div class="form">
                 <h1 style="margin-bottom: 10px; text-align: left;">Hi there</h1>
                 <p style="line-height: 1.6; margin-bottom: 25px;">
@@ -120,29 +120,31 @@
                     </p>
 
                     <div class="external-logins" ng-if="vm.externalLoginProviders.length > 0">
+                        <div ng-repeat="login in vm.externalLoginProviders">
 
-                        <div class="text-error" ng-repeat="error in vm.externalLoginInfo.errors">
-                            <span>{{error}}</span>
-                        </div>
-
-                        <form method="POST" name="vm.externalLoginForm" action="{{vm.externalLoginFormAction}}">
-
-                            <div ng-repeat="login in vm.externalLoginProviders">
-
-                                <button type="submit" class="btn btn-block btn-social"
-                                        ng-class="login.properties.SocialStyle"
-                                        id="{{login.authType}}" name="provider" value="{{login.authType}}"
-                                        title="Log in using your {{login.caption}} account">
-                                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                                    <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
-                                </button>
-
+                            <div ng-if="!login.customView">
+                                <form method="POST" action="{{vm.externalLoginFormAction}}">
+                                    <button type="submit"
+                                            class="btn btn-block btn-social"
+                                            ng-class="login.properties.SocialStyle"
+                                            id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                            title="Log in using your {{login.caption}} account">
+                                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                                        <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
+                                    </button>
+                                </form>
+                                <div ng-if="login.errors">
+                                    <div class="text-error" ng-repeat="error in login.errors">
+                                        <span>{{error}}</span>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
 
+                            <div ng-if="login.customView" ng-include="login.customView"></div>
+                        </div>
                     </div>
 
-                    <form method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
+                    <form ng-if="!vm.denyLocalLogin" method="POST" name="vm.loginForm" ng-submit="vm.loginSubmit()">
 
                         <div ng-messages="vm.loginForm.$error" class="control-group" aria-live="assertive">
                             <p ng-message="auth" class="text-error" role="alert" tabindex="0">{{vm.errorMsg}}</p>
@@ -156,10 +158,10 @@
                             <label for="umb-passwordTwo"><localize key="general_password">Password</localize></label>
                             <input type="password" ng-model="vm.password" name="password" id="umb-passwordTwo" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" aria-required="true" />
                             <div class="password-toggle">
-                                <a href="#" prevent-default ng-click="vm.togglePassword()">
+                                <button type="button" class="btn-reset" ng-click="vm.togglePassword()">
                                     <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
                                     <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
-                                </a>
+                                </button>
                             </div>
                         </div>
 
@@ -171,14 +173,17 @@
                                         type="submit">
                             </umb-button>
                             <div ng-show="vm.allowPasswordReset">
-                                <a class="muted" style="text-decoration: underline;" href="#" prevent-default ng-click="vm.showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
+                                <button type="button" class="btn-reset muted" style="text-decoration: underline;"
+                                    ng-click="vm.showRequestPasswordReset()">
+                                    <localize key="login_forgottenPassword">Forgotten password?</localize>
+                                </button>
                             </div>
                         </div>
 
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'request-password-reset'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'request-password-reset'">
                     <p tabindex="0">
                         <localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</localize>
                     </p>
@@ -203,13 +208,15 @@
 
                         <div class="flex justify-between items-center">
                             <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
-                            <a class="muted" href="#" prevent-default ng-click="vm.showLogin()" style="text-decoration: underline;"><localize key="login_returnToLogin">Return to login form</localize></a>
+                            <button type="button" class="btn-reset muted" ng-click="vm.showLogin()" style="text-decoration: underline;">
+                                <localize key="login_returnToLogin">Return to login form</localize>
+                            </button>
                         </div>
 
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'set-password'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'set-password'">
 
                     <p ng-hide="vm.resetComplete">
                         <localize key="login_setPasswordInstruction">Please provide a new password.</localize>
@@ -239,23 +246,27 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <button ng-hide="vm.resetComplete" type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
-                            <a class="muted" href="#" prevent-default ng-click="vm.showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
+                            <button type="button" class="btn-reset muted" ng-click="vm.showLogin()">
+                                <localize key="login_returnToLogin">Return to login form</localize>
+                            </button>
                         </div>
 
                     </form>
                 </div>
 
-                <div ng-show="vm.view == 'password-reset-code-expired'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == 'password-reset-code-expired'">
                     <div class="text-error" ng-repeat="error in vm.resetPasswordCodeInfo.errors">
                         <p class="text-error">{{error}}</p>
                     </div>
 
                     <div class="switch-view">
-                        <a class="muted" href="#" prevent-default ng-click="vm.showLogin()"><localize key="login_returnToLogin">Return to login form</localize></a>
+                        <button type="button" class="btn-reset muted" ng-click="vm.showLogin()">
+                            <localize key="login_returnToLogin">Return to login form</localize>
+                        </button>
                     </div>
                 </div>
 
-                <div ng-show="vm.view == '2fa-login'">
+                <div ng-if="!vm.denyLocalLogin" ng-show="vm.view == '2fa-login'">
                     <div ng-include='vm.twoFactor.view'></div>
                 </div>
 

@@ -1,3 +1,4 @@
+const jsdom = require("jsdom");
 module.exports = function (config) {
 
     config.set({
@@ -11,7 +12,6 @@ module.exports = function (config) {
         files: [
 
             // Jasmine plugins
-            'node_modules/jasmine-promise-matchers/dist/jasmine-promise-matchers.js',
             
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
@@ -101,15 +101,17 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['ChromeHeadless'],
-
-        customLaunchers: {
-            ChromeDebugging: {
-                base: 'Chrome',
-                flags: ['--remote-debugging-port=9333']
-            }
-        },
-
+        browsers: ['jsdom'],
+		
+		// Configure a user agent so the log file gets generated properly
+		jsdomLauncher: {
+		  jsdom: {
+			resources: new jsdom.ResourceLoader({
+			  userAgent: "umbraco-test-suite",
+			})
+		  }
+		},
+		
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms
@@ -124,11 +126,9 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-jasmine'),
-            require('karma-phantomjs-launcher'),
-            require('karma-chrome-launcher'),
+            require('karma-jsdom-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
-
         ],
 
         // the default configuration

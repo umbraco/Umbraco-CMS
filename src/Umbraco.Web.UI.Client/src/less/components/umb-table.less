@@ -164,7 +164,7 @@ input.umb-table__input {
     }
 }
 
-.umb-table-body__icon {
+.umb-table-body .umb-table-body__icon {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
@@ -173,7 +173,7 @@ input.umb-table__input {
     text-decoration: none;
 }
 
-.umb-table-body__checkicon {
+.umb-table-body .umb-table-body__icon.umb-table-body__checkicon {
     display: none;
     font-size: 18px;
     line-height: 20px;
@@ -218,15 +218,15 @@ input.umb-table__input {
 }
 
 // Show checkmark when checked, hide file icon
-.umb-table-row.-selected {
-    
-    .umb-table-body__fileicon {
-        display: none;
-    }
-    .umb-table-body__checkicon {
-        display: inline-block;
-    }
-    
+.umb-table-body .umb-table-row.-selected {
+    .umb-table-body__icon {
+        &.umb-table-body__fileicon {
+            display: none;
+        }
+        &.umb-table-body__checkicon {
+            display: inline-block;
+        }
+    }    
 }
 
 // Table Row Styles

@@ -31,7 +31,7 @@
             vm.saveError = false;
             vm.saveSuccces = false;
             var selectedString = [];
-            angular.forEach(notifyOptions, function (option) {
+            notifyOptions.forEach(function (option) {
                     if (option.checked === true && option.notifyCode) {
                         selectedString.push(option.notifyCode);
                     }

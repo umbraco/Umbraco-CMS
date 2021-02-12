@@ -5,18 +5,19 @@
             <img ng-src="{{model.value}}" alt="">
 
             <div class="umb-sortable-thumbnails__actions">
-                <!--<a class="umb-sortable-thumbnails__action" href="" ng-click="goToItem(image)">
-                    <i class="icon icon-edit"></i>
-                </a>-->
-                <a class="umb-sortable-thumbnails__action -red" href="" ng-click="remove()">
-                    <i class="icon icon-delete"></i>
-                </a>
+                <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" ng-click="remove()">
+                    <i class="icon icon-delete" aria-hidden="true"></i>
+                </button>
             </div>
         </li>
     </ul>
 
-    <a href="#" class="add-link umb-outline umb-outline--surrounding" ng-click="add()" ng-class="{'add-link-square': !model.value }" ng-hide="model.value" prevent-default>
-        <i class="icon icon-add large"></i>
-    </a>
+    <button type="button"
+            class="add-link umb-outline umb-outline--surrounding"
+            ng-class="{'add-link-square': !model.value }"
+            ng-click="add()"
+            ng-hide="model.value">
+        <i class="icon icon-add large" aria-hidden="true"></i>
+    </button>
 
 </div>

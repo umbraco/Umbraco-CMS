@@ -6,7 +6,10 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>
+    /// <summary>
+    /// Serializes/Deserializes property data as a dictionary for BTree
+    /// </summary>
+    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {

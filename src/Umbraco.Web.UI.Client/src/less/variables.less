@@ -156,11 +156,11 @@
 @ui-active-type-hover:  @blueMid;
 
 @ui-selected:           @sand-5;
-@ui-selected-hover:     ligthen(@sand-5, 10);
+@ui-selected-hover:     ligthen(@sand-5, 10%);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
 @ui-selected-border:           @blueDark;
-@ui-selected-border-hover:     darken(@blueDark, 10);
+@ui-selected-border-hover:     darken(@blueDark, 10%);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -199,11 +199,13 @@
 @ui-btn-positive-type:          @white;
 
 @ui-btn-negative:               @red;
+@ui-btn-negative-type:          @white;
 @ui-btn-negative-hover:         @red;
 
 @ui-icon:             @blueNight;
 @ui-icon-hover:       @blueMid;
 
+@ui-drop-area-color: @blueMidLight;
 
 
 // Scaffolding
@@ -254,6 +256,7 @@
 
 // Disabled this to keep consistency throughout the backoffice UI. Untill a better solution is thought up, this will do.
 @baseBorderRadius:      3px; // 2px;
+@doubleBorderRadius:    6px;
 @borderRadiusLarge:     3px; // 6px;
 @borderRadiusSmall:     3px; // 3px;
 
@@ -271,8 +274,8 @@
 @btnBackgroundHighlight:            @gray-10;
 @btnBorder:                         @gray-9;
 
-@btnPrimaryBackground:              @ui-btn-positive;
-@btnPrimaryBackgroundHighlight:     @ui-btn-positive-hover;
+@btnPrimaryBackground:              @ui-btn;
+@btnPrimaryBackgroundHighlight:     @ui-btn-hover;
 
 @btnInfoType:                       @ui-btn-type;// updated 2019
 @btnInfoTypeHover:                  @ui-btn-type;// updated 2019
@@ -478,7 +481,7 @@
 
 @formErrorText:               @errorBackground;
 @formErrorBackground:         lighten(@errorBackground, 55%);
-@formErrorBorder:             darken(spin(@errorBackground, -10), 3%);
+@formErrorBorder:             @red;
 
 @formSuccessText:             @successBackground;
 @formSuccessBackground:       lighten(@successBackground, 48%);
@@ -515,7 +518,7 @@
 // -------------------------
 @gridColumns:             12;
 @gridColumnWidth:         60px;
-@gridGutterWidth:         0px;
+@gridGutterWidth:         0;
 @gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
 
 // 1200px min

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Scoping;
@@ -30,6 +32,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2014 = 6,
             V2016 = 7,
             V2017 = 8,
+            V2019 = 9,
             Other = 99
         }
 
@@ -38,7 +41,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Unknown = 0,
             Desktop = 1,
             Standard = 2,
-            Enterprise = 3,
+            Enterprise = 3,// Also developer edition
             Express = 4,
             Azure = 5
         }
@@ -74,11 +77,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         private static VersionName MapProductVersion(string productVersion)
         {
-            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split(Constants.CharArrays.Period)[0];
             switch (firstPart)
             {
                 case "??":
                     return VersionName.Invalid;
+                case "15":
+                    return VersionName.V2019;
                 case "14":
                     return VersionName.V2017;
                 case "13":
@@ -251,7 +256,8 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
-            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+            var timeOut = Current.Configs.Global().SqlWriteLockTimeOut;
+            WriteLock(db, TimeSpan.FromMilliseconds(timeOut), lockIds);
         }
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
@@ -336,5 +342,24 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         public override string DropIndex => "DROP INDEX {0} ON {1}";
 
         public override string RenameColumn => "sp_rename '{0}.{1}', '{2}', 'COLUMN'";
+
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}";
+        public override string Format(IndexDefinition index)
+        {
+            var name = string.IsNullOrEmpty(index.Name)
+                ? $"IX_{index.TableName}_{index.ColumnName}"
+                : index.Name;
+
+            var columns = index.Columns.Any()
+                ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                : GetQuotedColumnName(index.ColumnName);
+
+            var includeColumns = index.IncludeColumns?.Any() ?? false
+               ? $" INCLUDE ({string.Join(",", index.IncludeColumns.Select(x => GetQuotedColumnName(x.Name)))})"
+               : string.Empty;
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns, includeColumns);
+        }
     }
 }

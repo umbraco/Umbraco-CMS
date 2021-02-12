@@ -38,21 +38,21 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public object Value { get; set; }
 
         //Legacy properties used to deserialize existing nucache db entries
-        [DataMember(Order = 3)]
+        [IgnoreDataMember]
         [JsonProperty("culture")]
         private string LegacyCulture
         {
             set => Culture = value;
         }
 
-        [DataMember(Order = 4)]
+        [IgnoreDataMember]
         [JsonProperty("seg")]
         private string LegacySegment
         {
             set => Segment = value;
         }
 
-        [DataMember(Order = 5)]
+        [IgnoreDataMember]
         [JsonProperty("val")]
         private object LegacyValue
         {

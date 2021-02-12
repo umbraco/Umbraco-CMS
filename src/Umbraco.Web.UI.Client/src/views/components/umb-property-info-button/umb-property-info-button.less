@@ -1,0 +1,103 @@
+umb-property-info-button {
+    position: relative;
+    display: inline-block;
+    vertical-align: text-bottom;
+
+    .control-label + & {
+        margin-left: -8px;
+    }
+
+    > .__button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 15px;
+        height: 15px;
+        padding-top: 1px;
+        padding-left: 1px;
+        margin-top: -1px;
+        font-size: 12px;
+        font-weight: 700;
+
+        border-radius: 50%;
+        border: 1px solid @ui-option-type;
+        color: @ui-option-type;
+        &:hover {
+            border-color: @ui-option-type-hover;
+            color: @ui-option-type-hover;
+        }
+    }
+
+    > .__tooltip {
+        
+        position: absolute;
+        z-index: 1000;
+        top: 26px;
+        left: -8px;
+        font-size: 13px;
+
+        border-radius: 6px;
+        
+        min-width: 240px;
+        max-width: 320px;
+        padding: 10px 16px;
+        background-color:@blueExtraDark;
+        border: 1px solid @blueExtraDark;
+        color: white;
+        box-shadow: 0 2px 6px rgba(@blueExtraDark, .6);
+
+        a {
+            color: white;
+            text-decoration: underline;
+            &:hover {
+                color: @blueMidLight;
+            }
+        }
+
+        &::before {
+            content:'';
+            position: absolute;
+            transform: rotate(45deg);
+            background-color:@blueExtraDark;
+            top: -5px;
+            left: 10px;
+            width: 8px;
+            height: 8px;
+            border-left: 1px solid @blueExtraDark;
+            border-top: 1px solid @blueExtraDark;
+        }
+    }
+
+}
+
+// hide umb-info-button if inside umb-property
+.umb-property umb-property-info-button {
+    opacity: 0;
+}
+
+.umb-property:focus-within umb-property-info-button,
+.umb-property:hover umb-property-info-button,
+.umb-property umb-property-info-button:focus {
+    opacity: 1;
+}
+// Revert-style-hack that ensures that we only show property-actions on properties that are directly begin hovered.
+.umb-property:hover .umb-property:not(:hover) umb-property-info-button {
+    opacity: 0;
+}
+
+// hide umb-info-button if inside 
+.umb-control-group umb-property-info-button {
+    opacity: 0;
+}
+
+.umb-control-group:focus-within umb-property-info-button,
+.umb-control-group:hover umb-property-info-button,
+.umb-control-group umb-property-info-button:focus {
+    opacity: 1;
+}
+// Revert-style-hack that ensures that we only show property-actions on properties that are directly begin hovered.
+.umb-control-group:hover .umb-control-group:not(:hover) umb-property-info-button {
+    opacity: 0;
+}

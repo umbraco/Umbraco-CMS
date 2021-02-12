@@ -5,7 +5,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {
-        static readonly ContentDataSerializer DataSerializer = new ContentDataSerializer();
+        public ContentNodeKitSerializer(ContentDataSerializer contentDataSerializer = null)
+        {
+            _contentDataSerializer = contentDataSerializer;
+            if(_contentDataSerializer == null)
+            {
+                _contentDataSerializer = DefaultDataSerializer;
+            }
+        }
+        static readonly ContentDataSerializer DefaultDataSerializer = new ContentDataSerializer();
+        private readonly ContentDataSerializer _contentDataSerializer;
+
         //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
 
         public ContentNodeKit ReadFrom(Stream stream)
@@ -26,10 +36,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             };
             var hasDraft = PrimitiveSerializer.Boolean.ReadFrom(stream);
             if (hasDraft)
-                kit.DraftData = DataSerializer.ReadFrom(stream);
+                kit.DraftData = _contentDataSerializer.ReadFrom(stream);
             var hasPublished = PrimitiveSerializer.Boolean.ReadFrom(stream);
             if (hasPublished)
-                kit.PublishedData = DataSerializer.ReadFrom(stream);
+                kit.PublishedData = _contentDataSerializer.ReadFrom(stream);
             return kit;
         }
 
@@ -47,11 +57,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             PrimitiveSerializer.Boolean.WriteTo(value.DraftData != null, stream);
             if (value.DraftData != null)
-                DataSerializer.WriteTo(value.DraftData, stream);
+                _contentDataSerializer.WriteTo(value.DraftData, stream);
 
             PrimitiveSerializer.Boolean.WriteTo(value.PublishedData != null, stream);
             if (value.PublishedData != null)
-                DataSerializer.WriteTo(value.PublishedData, stream);
+                _contentDataSerializer.WriteTo(value.PublishedData, stream);
         }
     }
 }

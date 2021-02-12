@@ -22,6 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 
@@ -58,8 +59,8 @@ namespace Umbraco.Web.Editors
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Editors
                     {
                         // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
-                        // having each url defined here explicitly - we can do that in v8! for now
+                        // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
@@ -281,7 +282,7 @@ namespace Umbraco.Web.Editors
                         {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
-						},
+                        },
                         {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
                                 controller => controller.GetStatus())
@@ -299,12 +300,16 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllLanguages())
                         },
                         {
-						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
                                 controller => controller.GetById(1))
                         },
-						{
+                        {
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors(null, null))
+                        },
+                        {
+                            "iconApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<IconController>(
+                                controller => controller.GetIcon(""))
                         },
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
@@ -318,14 +323,18 @@ namespace Umbraco.Web.Editors
                             "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
                                 controller => controller.GetCropUrl(null, null, null, null, null))
                         },
+                        {
+                            "elementTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
+                                controller => controller.GetAll())
+                        },
                     }
                 },
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
-                        {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",
                             string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
@@ -344,9 +353,10 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
                         {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
-                        {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
+                        {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
@@ -371,8 +381,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _owinContext.Authentication.GetExternalAuthenticationTypes()
-                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                            "providers", _owinContext.Authentication.GetBackOfficeExternalLoginProviders()
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,

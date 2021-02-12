@@ -76,6 +76,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
+            target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
@@ -172,7 +173,7 @@ namespace Umbraco.Web.Models.Mapping
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null
-                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
+                ? new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") }
                 : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _logger).ToArray();
 
             return urls;
@@ -252,7 +253,7 @@ namespace Umbraco.Web.Models.Mapping
             if (parent == null)
                 return false;
 
-            var pathParts = parent.Path.Split(',').Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
+            var pathParts = parent.Path.Split(Constants.CharArrays.Comma).Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
 
             // reduce the path parts so we exclude top level content items that
             // are higher up than a user's start nodes

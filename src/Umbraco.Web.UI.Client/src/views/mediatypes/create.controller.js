@@ -22,7 +22,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm
+            formCtrl: $scope.createFolderForm
         })) {
             mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -30,11 +30,12 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "mediatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
                 var section = appState.getSectionState("currentSection");
 
-            }, function(err) {
+            }, function (err) {
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
                 $scope.error = err;
             });
         };

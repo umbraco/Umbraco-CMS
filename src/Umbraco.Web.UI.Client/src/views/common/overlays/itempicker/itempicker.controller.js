@@ -1,5 +1,9 @@
 function ItemPickerOverlay($scope, localizationService) {
 
+    $scope.filter = {
+        searchTerm: ''
+    };
+
     function onInit() {
         $scope.model.hideSubmitButton = true;
 
@@ -24,11 +28,11 @@ function ItemPickerOverlay($scope, localizationService) {
         event: null
     };
 
-    $scope.showTooltip = function(item, $event) {
+    $scope.showTooltip = function (item, $event) {
         if (!item.tooltip) {
-            $scope.mouseLeave();
             return;
         }
+
         $scope.tooltip = {
             show: true,
             event: $event,

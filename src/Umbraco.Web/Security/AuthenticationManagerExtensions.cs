@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using Umbraco.Core;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
@@ -34,6 +39,36 @@ namespace Umbraco.Web.Security
                 DefaultUserName = name,
                 Email = email
             };
+        }
+
+        public static IEnumerable<AuthenticationDescription> GetBackOfficeExternalLoginProviders(this IAuthenticationManager manager)
+        {
+            return manager.GetExternalAuthenticationTypes().Where(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType));
+        }
+
+        /// <summary>
+        /// Returns the authentication type for the last registered external login (oauth) provider that specifies an auto-login redirect option
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
+        public static string GetAutoLoginProvider(this IAuthenticationManager manager)
+        {
+            var found = manager.GetExternalAuthenticationTypes()
+                .LastOrDefault(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType)
+                    && p.Properties.TryGetValue(Constants.Security.BackOfficeExternalLoginOptionsProperty, out var options)
+                    && options is BackOfficeExternalLoginProviderOptions externalLoginProviderOptions
+                    && externalLoginProviderOptions.AutoRedirectLoginToExternalProvider);
+
+            return found?.AuthenticationType;
+        }
+
+        public static bool HasDenyLocalLogin(this IAuthenticationManager manager)
+        {
+            return manager.GetExternalAuthenticationTypes()
+                .Any(p => p.Properties.ContainsKey(Constants.Security.BackOfficeAuthenticationType)
+                    && p.Properties.TryGetValue(Constants.Security.BackOfficeExternalLoginOptionsProperty, out var options)
+                    && options is BackOfficeExternalLoginProviderOptions externalLoginProviderOptions
+                    && externalLoginProviderOptions.DenyLocalLogin);
         }
 
         /// <summary>

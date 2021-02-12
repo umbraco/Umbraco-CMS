@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -12,18 +13,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             var serializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.Serializer"];
-
-            if (serializer == "MsgPack")
+            if (serializer != "MsgPack")
             {
-                composition.Register<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();                
+                // TODO: This allows people to revert to the legacy serializer, by default it will be MessagePack
+                composition.RegisterUnique<IContentCacheDataSerializerFactory, JsonContentNestedDataSerializerFactory>();
             }
             else
             {
-                composition.Register<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
+                composition.RegisterUnique<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();                
             }
 
+            composition.RegisterUnique<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
+
+            composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+
             // register the NuCache database data source
-            composition.Register<IDataSource, DatabaseDataSource>();
+            composition.RegisterUnique<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
@@ -34,5 +39,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // TODO: no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
         }
+
     }
 }

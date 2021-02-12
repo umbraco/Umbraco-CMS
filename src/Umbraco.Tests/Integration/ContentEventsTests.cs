@@ -2171,7 +2171,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void HasInitialContent()
         {
-            Assert.AreEqual(4, ServiceContext.ContentService.Count());
+            Assert.AreEqual(5, ServiceContext.ContentService.Count());
         }
 
         #endregion

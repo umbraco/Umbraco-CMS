@@ -186,6 +186,9 @@ namespace Umbraco.Web.Search
 
             var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
+            // the chars [*-_] in the query will mess everything up so let's remove those
+            query = Regex.Replace(query, "[\\*\\-_]", "");
+
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
                                      || Regex.IsMatch(query, "^\'.*?\'$");
@@ -193,7 +196,7 @@ namespace Umbraco.Web.Search
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim('\"', '\'');
+                query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
@@ -227,7 +230,7 @@ namespace Umbraco.Web.Search
             }
             else
             {
-                var trimmed = query.Trim(new[] { '\"', '\'' });
+                var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
@@ -240,7 +243,7 @@ namespace Umbraco.Web.Search
                 {
                     query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
                     sb.Append("+(");
 

@@ -147,6 +147,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
+        useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
@@ -227,26 +228,21 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         if (err.status && err.status >= 500) {
 
             // Open ysod overlay
-            $scope.ysodOverlay = {
-                view: "ysod",
-                error: err,
-                show: true
-            };
+            overlayService.ysod(err);
         }
 
         $timeout(function () {
             $scope.bulkStatus = "";
             $scope.actionInProgress = false;
-        },
-            500);
+        }, 500);
 
-        if (successMsgPromise) {
-            localizationService.localize("bulk_done")
-                .then(function (v) {
-                    successMsgPromise.then(function (successMsg) {
-                        notificationsService.success(v, successMsg);
-                    })
-                });
+        if (successMsgPromise)
+        {
+            localizationService.localize("bulk_done").then(function (v) {
+                successMsgPromise.then(function (successMsg) {
+                    notificationsService.success(v, successMsg);
+                })
+            });
         }
     }
 
@@ -271,7 +267,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     with simple values */
 
     $scope.getContent = function (contentId) {
-
         $scope.reloadView($scope.contentId, true);
     }
 
@@ -326,8 +321,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
         });
     };
-
-    
 
     $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
@@ -408,7 +401,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             dialog.title = value;
             overlayService.open(dialog);
         });
-
     };
 
     function performDelete() {
@@ -696,7 +688,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
             if (e.nameExp) {
                 var newValue = e.nameExp({ value });
-                if (newValue && (newValue = $.trim(newValue))) {
+                if (newValue && (newValue = newValue.trim())) {
                     value = newValue;
                 }
             }
@@ -704,8 +696,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             // set what we've got on the result
             result[alias] = value;
         });
-
-
     }
 
     function isDate(val) {
@@ -811,6 +801,42 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function createBlank(entityType, docTypeAlias) {
+        if ($scope.options.useInfiniteEditor) {
+            
+            var editorModel = {
+                create: true,
+                submit: function(model) {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                },
+                close: function() {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                }
+            };
+
+            if (entityType == "content")
+            {
+                editorModel.parentId = $scope.contentId;
+                editorModel.documentTypeAlias = docTypeAlias;
+                editorService.contentEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "media")
+            {
+                editorService.mediaEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "member")
+            {
+                editorModel.doctype = docTypeAlias;
+                editorService.memberEditor(editorModel);
+                return;
+            }
+        }
+
         $location
             .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
             .search("doctype", docTypeAlias)

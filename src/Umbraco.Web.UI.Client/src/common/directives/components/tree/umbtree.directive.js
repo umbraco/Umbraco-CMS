@@ -88,9 +88,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
-                    _.each(registeredCallbacks[eventName], function (c) {
-                        c(args);//call it
-                    });
+                    // call it
+                    registeredCallbacks[eventName].forEach(c => c(args));
                 }
             }
 
@@ -342,26 +341,17 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 var css = [];
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function (c) {
-                        css.push(c);
-                    });
+                    node.cssClasses.forEach(c => css.push(c));
                 }
 
                 return css.join(" ");
             };
 
-            $scope.selectEnabledNodeClass = function (node) {
-                return node ?
-                    node.selected ?
-                        'icon umb-tree-icon sprTree icon-check green temporary' :
-                        '' :
-                    '';
-            };
+            $scope.selectEnabledNodeClass = node =>
+                node && node.selected ? 'icon sprTree icon-check green temporary' : '-hidden';
 
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = function (node, forceReload) {
-                return loadChildren(node, forceReload);
-            };
+            $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
 
             /**
               Method called when the options button next to the root node is called.
@@ -419,8 +409,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 //load the tree
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
-                    //like normal JS promises we could do resolve(...).then() 
-                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    //like normal JS promises we could do resolve(...).then()
+                    if (args && args.onLoaded && Utilities.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

@@ -27,7 +27,7 @@ namespace Umbraco.Web
             {
                 builder.Append(string.Format("{0}={1}&", i.Key, i.Value));
             }
-            return builder.ToString().TrimEnd('&');
+            return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
         }
 
         /// <summary>
