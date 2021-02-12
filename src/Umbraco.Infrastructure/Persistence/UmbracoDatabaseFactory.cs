@@ -7,7 +7,7 @@ using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;

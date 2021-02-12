@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class VariantsMigration : MigrationBase
     {
@@ -106,7 +105,7 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
         {
             // Creates a temporary index on umbracoPropertyData to speed up other migrations which update property values.
             // It will be removed in CreateKeysAndIndexes before the normal indexes for the table are created
-            var tableDefinition = Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(typeof(PropertyDataDto), SqlSyntax);
+            var tableDefinition = Umbraco.Core.Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(typeof(PropertyDataDto), SqlSyntax);
             Execute.Sql(SqlSyntax.FormatPrimaryKey(tableDefinition)).Do();
             Create.Index("IX_umbracoPropertyData_Temp").OnTable(PropertyDataDto.TableName)
                 .WithOptions().Unique()

@@ -1,16 +1,16 @@
 ﻿using System;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Delete.Column;
-using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
-using Umbraco.Core.Migrations.Expressions.Delete.Data;
-using Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint;
-using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
-using Umbraco.Core.Migrations.Expressions.Delete.ForeignKey;
-using Umbraco.Core.Migrations.Expressions.Delete.Index;
-using Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Column;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Constraint;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.DefaultConstraint;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.ForeignKey;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Index;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete
 {
     public class DeleteBuilder : IDeleteBuilder
     {

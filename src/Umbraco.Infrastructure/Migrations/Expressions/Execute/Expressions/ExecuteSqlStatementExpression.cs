@@ -1,7 +1,7 @@
 ﻿using NPoco;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core.Migrations.Expressions.Execute.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions
 {
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {

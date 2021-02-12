@@ -7,7 +7,7 @@ using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Provides a base class for migration expressions.

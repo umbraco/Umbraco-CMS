@@ -2,7 +2,7 @@
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 {
 
     /// <summary>

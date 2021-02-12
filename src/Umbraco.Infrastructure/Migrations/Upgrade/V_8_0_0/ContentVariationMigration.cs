@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NPoco;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class ContentVariationMigration : MigrationBase
     {
@@ -66,9 +58,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         // we *need* to use these private DTOs here, which does *not* have extra properties, which would kill the migration
 
-        
 
-       
+
+
 
     }
 }

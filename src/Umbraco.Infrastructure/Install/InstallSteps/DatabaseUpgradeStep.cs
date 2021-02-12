@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Extensions;
-using Umbraco.Web.Migrations.PostMigrations;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {

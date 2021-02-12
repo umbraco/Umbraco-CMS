@@ -2,9 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Migrations.Upgrade
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 {
     /// <summary>
     /// Represents an upgrader.

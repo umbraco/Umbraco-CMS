@@ -9,7 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 

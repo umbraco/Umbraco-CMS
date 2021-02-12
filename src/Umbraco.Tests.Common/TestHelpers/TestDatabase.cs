@@ -12,7 +12,7 @@ using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NPoco.Linq;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 

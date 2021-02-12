@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.PostMigrations
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
     /// Rebuilds the published snapshot.

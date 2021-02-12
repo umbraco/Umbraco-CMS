@@ -5,13 +5,13 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Supports building and configuring the database.

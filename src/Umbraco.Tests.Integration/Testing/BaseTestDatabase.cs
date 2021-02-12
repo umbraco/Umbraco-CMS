@@ -12,7 +12,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Testing

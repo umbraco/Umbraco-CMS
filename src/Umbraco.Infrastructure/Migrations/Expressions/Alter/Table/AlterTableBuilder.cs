@@ -1,11 +1,11 @@
 ﻿using System.Data;
-using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
-using Umbraco.Core.Migrations.Expressions.Common.Expressions;
-using Umbraco.Core.Migrations.Expressions.Create.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Alter.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
 {
     public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAlterTableColumnOptionBuilder>,
                                                IAlterTableColumnTypeBuilder,

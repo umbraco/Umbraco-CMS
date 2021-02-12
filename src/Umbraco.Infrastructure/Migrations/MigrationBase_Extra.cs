@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Provides a base class to all migrations.

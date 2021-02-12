@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Implements <see cref="IMigrationContext"/>.

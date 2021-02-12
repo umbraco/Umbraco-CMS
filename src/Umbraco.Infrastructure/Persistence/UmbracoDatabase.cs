@@ -7,7 +7,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.Data
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data
 {
     public class DeleteDataBuilder : ExpressionBuilderBase<DeleteDataExpression>,
         IDeleteDataBuilder

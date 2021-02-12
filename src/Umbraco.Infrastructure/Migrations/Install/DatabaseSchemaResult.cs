@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Represents ...

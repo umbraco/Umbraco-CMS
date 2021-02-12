@@ -1,10 +1,9 @@
 ﻿using System.Data;
-using NPoco;
-using Umbraco.Core.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Column
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
 {
     public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression, ICreateColumnOptionBuilder>,
                                              ICreateColumnOnTableBuilder,
@@ -113,7 +112,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
             var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
-                TableName = Expression.TableName,               
+                TableName = Expression.TableName,
                 IndexType = IndexTypes.UniqueNonClustered
             });
 

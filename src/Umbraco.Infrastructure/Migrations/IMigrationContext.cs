@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Provides context to migrations.

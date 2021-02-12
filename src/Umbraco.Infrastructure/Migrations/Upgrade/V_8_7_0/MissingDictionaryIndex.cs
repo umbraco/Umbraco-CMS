@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0
 {
     public class MissingDictionaryIndex : MigrationBase
     {
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
         /// if it doesn't already exist
         /// </summary>
         public override void Migrate()
-        {          
+        {
             var indexName = "IX_" + DictionaryDto.TableName + "_Parent";
 
             if (!IndexExists(indexName))

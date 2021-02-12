@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence

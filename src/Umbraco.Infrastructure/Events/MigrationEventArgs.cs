@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.Core.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Core.Events
 {

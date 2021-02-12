@@ -1,10 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.KeysAndIndexes
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.KeysAndIndexes
 {
     public class CreateKeysAndIndexesBuilder : IExecutableBuilder
     {

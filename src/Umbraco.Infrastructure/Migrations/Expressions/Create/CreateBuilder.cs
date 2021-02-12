@@ -1,17 +1,16 @@
 ﻿using System;
-using NPoco;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Common.Expressions;
-using Umbraco.Core.Migrations.Expressions.Create.Column;
-using Umbraco.Core.Migrations.Expressions.Create.Constraint;
-using Umbraco.Core.Migrations.Expressions.Create.Expressions;
-using Umbraco.Core.Migrations.Expressions.Create.ForeignKey;
-using Umbraco.Core.Migrations.Expressions.Create.Index;
-using Umbraco.Core.Migrations.Expressions.Create.KeysAndIndexes;
-using Umbraco.Core.Migrations.Expressions.Create.Table;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.KeysAndIndexes;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create
 {
     public class CreateBuilder : ICreateBuilder
     {

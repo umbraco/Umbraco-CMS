@@ -1,7 +1,6 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions
 {
     public class CreateIndexExpression : MigrationExpressionBase
     {

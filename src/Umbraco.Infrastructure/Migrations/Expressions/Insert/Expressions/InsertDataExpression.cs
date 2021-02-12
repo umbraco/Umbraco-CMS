@@ -2,7 +2,7 @@
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions
 {
     public class InsertDataExpression : MigrationExpressionBase
     {

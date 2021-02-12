@@ -1,14 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Creates the initial database data during install.

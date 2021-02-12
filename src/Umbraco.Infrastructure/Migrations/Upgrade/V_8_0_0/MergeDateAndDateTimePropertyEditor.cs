@@ -7,9 +7,8 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class MergeDateAndDateTimePropertyEditor : MigrationBase
     {
