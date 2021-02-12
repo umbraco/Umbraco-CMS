@@ -8,8 +8,8 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Extensions;
-using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {

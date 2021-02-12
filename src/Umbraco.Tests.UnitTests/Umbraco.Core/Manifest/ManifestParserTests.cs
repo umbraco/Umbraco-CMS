@@ -21,7 +21,6 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest

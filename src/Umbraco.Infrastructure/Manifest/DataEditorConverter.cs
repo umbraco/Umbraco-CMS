@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     /// <summary>
     /// Provides a json read converter for <see cref="IDataEditor"/> in manifests.

@@ -51,7 +51,6 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;

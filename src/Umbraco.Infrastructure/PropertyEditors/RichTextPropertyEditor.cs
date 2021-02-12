@@ -12,8 +12,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Extensions;
-using Umbraco.Web.Macros;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors

@@ -30,7 +30,6 @@ using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Core;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
