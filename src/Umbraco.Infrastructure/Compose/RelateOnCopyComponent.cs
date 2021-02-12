@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     // TODO: This should just exist in the content service/repo!
     public sealed class RelateOnCopyComponent : IComponent

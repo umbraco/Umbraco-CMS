@@ -7,8 +7,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Compose;
 using Umbraco.Extensions;
-using Umbraco.Web.Compose;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors

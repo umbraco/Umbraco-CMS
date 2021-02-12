@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Extensions;
 using Umbraco.Web.PropertyEditors;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     /// <summary>
     /// A component for NestedContent used to bind to events

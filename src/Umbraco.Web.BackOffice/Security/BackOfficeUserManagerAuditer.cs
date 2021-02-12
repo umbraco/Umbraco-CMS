@@ -1,11 +1,11 @@
 using System;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Compose;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core.Compose;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 

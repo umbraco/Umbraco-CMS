@@ -19,9 +19,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     public sealed class NotificationsComponent : IComponent
     {
