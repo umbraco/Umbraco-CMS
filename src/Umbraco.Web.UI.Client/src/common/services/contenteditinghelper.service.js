@@ -774,10 +774,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * 
          */
         sortVariants: function (a, b) {
-            const statesOrder = ['Published', 'Draft', 'NotCreated'];
-            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : 0) - (!b.language.isDefault ? 1 : 0);
-            const compareMandatory = (a,b) => (!a.language.isMandatory ? 1 : 0) - (!b.language.isMandatory ? 1 : 0);
-            const compareState = (a, b) => statesOrder.indexOf(a.state) - statesOrder.indexOf(b.state);
+            const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
+            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : -1) - (!b.language.isDefault ? 1 : -1);
+            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (!a.language.isMandatory ? 1 : -1) - (!b.language.isMandatory ? 1 : -1);
+            const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
     
             return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
