@@ -17,11 +17,11 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Common.Security
 {
-    public class MembersUserManager : UmbracoUserManager<MembersIdentityUser, MemberPasswordConfigurationSettings>, IMembersUserManager
+    public class MemberManager : UmbracoUserManager<MembersIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MembersUserManager(
+        public MemberManager(
             IIpResolver ipResolver,
             IUserStore<MembersIdentityUser> store,
             IOptions<MembersIdentityOptions> optionsAccessor,

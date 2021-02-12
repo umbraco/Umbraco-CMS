@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
         [Test]
         public void AddMembersIdentity_ExpectMembersUserManagerResolvable()
         {
-            IMembersUserManager userManager = Services.GetService<IMembersUserManager>();
+            IMemberManager userManager = Services.GetService<IMemberManager>();
 
             Assert.NotNull(userManager);
         }

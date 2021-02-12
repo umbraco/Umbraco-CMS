@@ -64,7 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public void PostSaveMember_WhenModelStateIsNotValid_ExpectFailureResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveNew_NoCustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveNew_CustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-        [Frozen] IMembersUserManager umbracoMembersUserManager,
+        [Frozen] IMemberManager umbracoMembersUserManager,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
         IMemberGroupService memberGroupService,
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveExisting_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectFailResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveExistingMember_WithNoRoles_Add1Role_ExpectSuccessResponse(
-           [Frozen] IMembersUserManager umbracoMembersUserManager,
+           [Frozen] IMemberManager umbracoMembersUserManager,
            IMemberService memberService,
            IMemberTypeService memberTypeService,
            IMemberGroupService memberGroupService,
@@ -330,7 +330,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
-            IMembersUserManager membersUserManager,
+            IMemberManager membersUserManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {

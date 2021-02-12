@@ -50,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IMembersUserManager _memberManager;
+        private readonly IMemberManager _memberManager;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -83,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IMembersUserManager memberManager,
+            IMemberManager memberManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer)

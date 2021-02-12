@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<MembersUserStore>()
-                .AddMembersUserManager<IMembersUserManager, MembersUserManager>();
+                .AddMembersUserManager<IMemberManager, MemberManager>();
 
         private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
