@@ -18,9 +18,6 @@ namespace Umbraco.Web.Website.Controllers
     /// <summary>
     /// Provides a base class for front-end add-in controllers.
     /// </summary>
-    // TODO: Migrate MergeModelStateToChildAction and MergeParentContextViewData action filters
-    // [MergeModelStateToChildAction]
-    // [MergeParentContextViewData]
     [AutoValidateAntiforgeryToken]
     public abstract class SurfaceController : PluginController
     {
