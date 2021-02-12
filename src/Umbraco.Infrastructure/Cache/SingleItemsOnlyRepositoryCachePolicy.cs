@@ -1,8 +1,10 @@
-﻿using Umbraco.Cms.Core.Cache;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents a special policy that does not cache the result of GetAll.

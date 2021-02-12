@@ -18,7 +18,6 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {

@@ -1,8 +1,7 @@
 ﻿using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Migrations.PostMigrations
 {

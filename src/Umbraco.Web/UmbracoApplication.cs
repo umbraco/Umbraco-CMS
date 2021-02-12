@@ -2,7 +2,6 @@
 using System.Web;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;

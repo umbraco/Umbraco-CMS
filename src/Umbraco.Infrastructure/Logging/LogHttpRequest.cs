@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Logging
 {

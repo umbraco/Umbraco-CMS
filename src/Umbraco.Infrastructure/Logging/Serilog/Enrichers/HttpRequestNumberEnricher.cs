@@ -3,7 +3,6 @@ using System.Threading;
 using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {

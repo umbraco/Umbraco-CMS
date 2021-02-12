@@ -5,11 +5,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Cache;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {

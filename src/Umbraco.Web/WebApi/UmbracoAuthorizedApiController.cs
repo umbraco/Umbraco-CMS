@@ -6,16 +6,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Web.Security;
-using Umbraco.Core.Security;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.WebApi
 {

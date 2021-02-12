@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;

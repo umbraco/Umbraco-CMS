@@ -1,8 +1,5 @@
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

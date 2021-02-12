@@ -18,7 +18,6 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Extensions;
-using Umbraco.Web.Cache;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services

@@ -3,8 +3,6 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 

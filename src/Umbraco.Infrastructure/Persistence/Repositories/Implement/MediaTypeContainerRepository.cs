@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
