@@ -6,7 +6,7 @@ using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {

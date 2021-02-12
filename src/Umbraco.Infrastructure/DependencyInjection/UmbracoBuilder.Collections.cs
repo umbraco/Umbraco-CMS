@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.

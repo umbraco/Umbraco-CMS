@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.

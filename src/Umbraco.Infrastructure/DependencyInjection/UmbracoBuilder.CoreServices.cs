@@ -52,7 +52,7 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {

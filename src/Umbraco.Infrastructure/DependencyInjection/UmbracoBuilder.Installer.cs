@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {
