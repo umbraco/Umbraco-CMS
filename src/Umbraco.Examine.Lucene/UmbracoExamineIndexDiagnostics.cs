@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Examine
 {

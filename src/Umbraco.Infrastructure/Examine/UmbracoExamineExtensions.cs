@@ -4,7 +4,7 @@ using Examine;
 using Examine.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public static class UmbracoExamineExtensions
     {

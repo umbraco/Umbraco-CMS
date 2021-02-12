@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Used to validate a ValueSet for content/media - based on permissions, parent id, etc....

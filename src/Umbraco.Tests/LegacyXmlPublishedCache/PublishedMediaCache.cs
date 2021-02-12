@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Examine;
 using Umbraco.Web.Composing;

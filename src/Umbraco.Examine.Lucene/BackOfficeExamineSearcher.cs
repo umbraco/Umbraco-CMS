@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
 
     /// <summary>

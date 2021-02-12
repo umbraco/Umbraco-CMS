@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Examine;
-using Umbraco.Core;
+﻿using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Custom <see cref="FieldDefinitionCollection"/> allowing dynamic creation of <see cref="FieldDefinition"/>

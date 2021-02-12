@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

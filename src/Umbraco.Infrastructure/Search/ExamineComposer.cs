@@ -5,8 +5,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Core.Scoping;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.Search

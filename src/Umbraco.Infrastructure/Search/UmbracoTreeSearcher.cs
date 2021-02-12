@@ -10,8 +10,8 @@ using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Core.Persistence;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

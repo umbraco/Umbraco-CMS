@@ -13,8 +13,8 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Core.Scoping;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.Search

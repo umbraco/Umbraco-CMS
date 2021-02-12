@@ -1,9 +1,7 @@
 ﻿using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Performs the data lookups required to rebuild a content index containing only published content

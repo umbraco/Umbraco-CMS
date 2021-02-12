@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.Web.Macros;
 using Constants = Umbraco.Cms.Core.Constants;

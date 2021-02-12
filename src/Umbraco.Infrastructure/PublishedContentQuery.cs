@@ -9,7 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -10,7 +9,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Builds <see cref="ValueSet"/>s for <see cref="IContent"/> items

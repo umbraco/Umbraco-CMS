@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web

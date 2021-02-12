@@ -1,6 +1,6 @@
 using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public interface IUmbracoIndexConfig
     {

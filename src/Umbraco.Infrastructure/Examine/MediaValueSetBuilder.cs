@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -13,7 +12,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     {
