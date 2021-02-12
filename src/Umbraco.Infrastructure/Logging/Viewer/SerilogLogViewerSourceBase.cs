@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public abstract class SerilogLogViewerSourceBase : ILogViewer
     {

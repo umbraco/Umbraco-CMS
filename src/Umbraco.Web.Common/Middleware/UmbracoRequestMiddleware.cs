@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Web.Common.Profiler;
-using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware

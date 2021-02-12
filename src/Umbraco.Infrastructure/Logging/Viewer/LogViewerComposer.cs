@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     // ReSharper disable once UnusedMember.Global
     public class LogViewerComposer : ICoreComposer

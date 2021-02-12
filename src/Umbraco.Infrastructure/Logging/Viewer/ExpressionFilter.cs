@@ -4,7 +4,7 @@ using Serilog.Events;
 using Serilog.Filters.Expressions;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     //Log Expression Filters (pass in filter exp string)
     internal class ExpressionFilter : ILogFilter

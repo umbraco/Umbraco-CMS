@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Hosting;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
-namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enriches the log if there are ThreadAbort exceptions and will automatically create a minidump if it can

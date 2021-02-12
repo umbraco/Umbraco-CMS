@@ -8,11 +8,10 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Logging;
-using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Logging.Serilog
+namespace Umbraco.Cms.Core.Logging.Serilog
 {
     public static class LoggerConfigExtensions
     {

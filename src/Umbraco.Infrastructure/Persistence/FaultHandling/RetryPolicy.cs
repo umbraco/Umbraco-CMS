@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Core.Persistence.FaultHandling
