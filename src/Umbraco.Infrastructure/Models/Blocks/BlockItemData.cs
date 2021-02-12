@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
+using Newtonsoft.Json;
 using Umbraco.Core.Serialization;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
     /// Represents a single block's data in raw form

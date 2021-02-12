@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
