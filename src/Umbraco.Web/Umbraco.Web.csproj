@@ -251,6 +251,8 @@
     <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
