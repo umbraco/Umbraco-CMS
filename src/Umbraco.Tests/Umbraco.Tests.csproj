@@ -198,7 +198,6 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />

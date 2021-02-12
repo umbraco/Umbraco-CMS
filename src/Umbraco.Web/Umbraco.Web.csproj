@@ -176,7 +176,6 @@
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
@@ -193,7 +192,6 @@
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
     <Compile Include="ModelStateExtensions.cs" />
-    <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
