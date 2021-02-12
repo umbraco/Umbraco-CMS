@@ -5,9 +5,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 
 namespace Umbraco.Web.Install.InstallSteps

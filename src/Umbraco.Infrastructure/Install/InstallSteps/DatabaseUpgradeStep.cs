@@ -9,8 +9,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Extensions;

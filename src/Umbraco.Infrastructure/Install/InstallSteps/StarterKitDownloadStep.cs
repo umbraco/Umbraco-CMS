@@ -8,9 +8,6 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Services;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

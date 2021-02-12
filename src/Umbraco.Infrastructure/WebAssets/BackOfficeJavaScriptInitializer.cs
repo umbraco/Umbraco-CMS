@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.WebAssets
 {

@@ -25,7 +25,6 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
