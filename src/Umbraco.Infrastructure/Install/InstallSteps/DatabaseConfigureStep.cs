@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
-using Umbraco.Core;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",

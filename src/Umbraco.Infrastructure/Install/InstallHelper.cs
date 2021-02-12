@@ -18,7 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Cms.Infrastructure.Install
 {
     public sealed class InstallHelper
     {

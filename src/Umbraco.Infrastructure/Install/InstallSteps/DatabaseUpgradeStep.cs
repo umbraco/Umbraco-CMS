@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -14,7 +14,7 @@ using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Extensions;
 using Umbraco.Web.Migrations.PostMigrations;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
         "DatabaseUpgrade", 12, "")]

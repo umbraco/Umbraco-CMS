@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
@@ -16,7 +15,7 @@ using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     /// <summary>
     /// This is the first UI step for a brand new install

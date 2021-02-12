@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Infrastructure.Install
+namespace Umbraco.Cms.Infrastructure.Install
 {
     /// <inheritdoc />
     public class FilePermissionHelper : IFilePermissionHelper
