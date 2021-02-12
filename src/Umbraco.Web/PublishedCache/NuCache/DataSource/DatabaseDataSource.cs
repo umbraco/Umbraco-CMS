@@ -31,7 +31,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private Sql<ISqlContext> SqlContentSourcesSelect(IScope scope, Func<ISqlContext, Sql<ISqlContext>> joins = null)
         {
             var sqlTemplate = scope.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect, tsql =>
-                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
@@ -163,7 +163,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private Sql<ISqlContext> SqlMediaSourcesSelect(IScope scope, Func<ISqlContext, Sql<ISqlContext>> joins = null)
         {
             var sqlTemplate = scope.SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
-                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
