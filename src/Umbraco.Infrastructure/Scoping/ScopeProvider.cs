@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
 #if DEBUG_SCOPES

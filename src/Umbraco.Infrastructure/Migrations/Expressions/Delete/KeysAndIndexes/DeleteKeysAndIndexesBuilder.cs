@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes

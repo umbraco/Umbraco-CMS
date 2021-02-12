@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;

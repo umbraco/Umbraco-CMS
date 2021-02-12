@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using NPoco;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     /// <summary>
     /// Represents an expression tree parser used to turn strongly typed expressions into SQL statements.

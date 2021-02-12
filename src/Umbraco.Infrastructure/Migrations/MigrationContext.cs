@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
 {

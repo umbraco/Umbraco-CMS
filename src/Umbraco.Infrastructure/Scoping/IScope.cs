@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Core.Scoping
 {

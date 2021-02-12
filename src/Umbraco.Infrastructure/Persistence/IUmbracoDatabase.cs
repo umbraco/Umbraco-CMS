@@ -2,7 +2,7 @@
 using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public interface IUmbracoDatabase : IDatabase
     {

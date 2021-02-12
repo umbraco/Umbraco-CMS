@@ -1,9 +1,9 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("id")]

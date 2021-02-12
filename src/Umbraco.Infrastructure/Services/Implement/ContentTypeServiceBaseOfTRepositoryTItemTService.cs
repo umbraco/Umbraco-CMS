@@ -10,8 +10,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

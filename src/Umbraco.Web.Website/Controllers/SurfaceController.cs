@@ -7,10 +7,10 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.ActionResults;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Cms.Web.Website.Controllers
 {

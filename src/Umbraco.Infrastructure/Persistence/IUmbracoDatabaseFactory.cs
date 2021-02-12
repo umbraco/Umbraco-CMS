@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// Creates and manages the "ambient" database.

@@ -8,9 +8,10 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// Extends NPoco Database for Umbraco.

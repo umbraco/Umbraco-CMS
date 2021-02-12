@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0

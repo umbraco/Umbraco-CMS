@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     public class IndexColumnDefinition
     {

@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

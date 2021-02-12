@@ -1,7 +1,7 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Member2MemberGroup)]
     [PrimaryKey("Member", AutoIncrement = false)]

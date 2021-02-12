@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.KeysAndIndexes;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create
 {

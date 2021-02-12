@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations

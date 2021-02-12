@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     public class ColumnDefinition
     {

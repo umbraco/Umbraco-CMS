@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement

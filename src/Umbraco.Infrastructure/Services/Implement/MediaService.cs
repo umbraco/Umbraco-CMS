@@ -13,8 +13,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

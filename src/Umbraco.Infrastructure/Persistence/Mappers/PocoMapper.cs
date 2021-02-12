@@ -2,7 +2,7 @@
 using System.Reflection;
 using NPoco;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     /// <summary>
     /// Extends NPoco default mapper and ensures that nullable dates are not saved to the database.

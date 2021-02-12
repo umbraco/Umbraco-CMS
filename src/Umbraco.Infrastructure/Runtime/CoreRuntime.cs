@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Infrastructure.Runtime

@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Override the base content repository so we can change the node object type

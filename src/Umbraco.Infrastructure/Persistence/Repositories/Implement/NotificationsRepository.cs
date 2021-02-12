@@ -5,11 +5,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     public class NotificationsRepository : INotificationsRepository
     {

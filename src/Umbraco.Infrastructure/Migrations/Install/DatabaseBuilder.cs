@@ -6,8 +6,8 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

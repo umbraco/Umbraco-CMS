@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using NPoco;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// Umbraco's implementation of NPoco <see cref="PocoDataBuilder"/>.

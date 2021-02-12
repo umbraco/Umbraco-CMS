@@ -2,8 +2,8 @@
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
 {

@@ -1,6 +1,6 @@
 ﻿using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute
 {

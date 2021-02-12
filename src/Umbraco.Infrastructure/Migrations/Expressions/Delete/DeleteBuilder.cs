@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.ForeignKey;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Index;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete
 {

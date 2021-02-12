@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;

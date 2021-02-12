@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.FaultHandling.Strategies;
+﻿using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
-namespace Umbraco.Core.Persistence.FaultHandling
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
     /// <summary>
     /// Provides a factory class for instantiating application-specific retry policies.

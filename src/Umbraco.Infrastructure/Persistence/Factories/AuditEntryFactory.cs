@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class AuditEntryFactory
     {

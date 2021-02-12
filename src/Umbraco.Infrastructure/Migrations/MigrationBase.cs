@@ -8,8 +8,8 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
 {

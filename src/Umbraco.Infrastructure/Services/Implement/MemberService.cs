@@ -9,8 +9,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

@@ -5,9 +5,10 @@ using System;
 using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying

@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {

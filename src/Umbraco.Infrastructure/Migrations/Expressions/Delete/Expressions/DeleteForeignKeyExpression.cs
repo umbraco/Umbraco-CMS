@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions
 {

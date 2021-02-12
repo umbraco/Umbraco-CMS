@@ -7,8 +7,8 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Controllers

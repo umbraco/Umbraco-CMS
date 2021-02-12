@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 

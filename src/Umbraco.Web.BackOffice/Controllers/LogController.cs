@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Core.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers

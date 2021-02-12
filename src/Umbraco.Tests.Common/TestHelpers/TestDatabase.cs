@@ -13,8 +13,8 @@ using NPoco;
 using NPoco.DatabaseTypes;
 using NPoco.Linq;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Tests.Common.TestHelpers
 {

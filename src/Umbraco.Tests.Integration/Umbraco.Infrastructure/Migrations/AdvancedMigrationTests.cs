@@ -12,10 +12,10 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations

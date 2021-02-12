@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Migrations;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
     {

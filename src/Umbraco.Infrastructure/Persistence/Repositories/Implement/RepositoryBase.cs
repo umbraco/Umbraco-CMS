@@ -3,10 +3,10 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Base repository class for all <see cref="IRepository"/> instances

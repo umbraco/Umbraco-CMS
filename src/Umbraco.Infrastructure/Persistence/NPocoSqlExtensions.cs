@@ -8,14 +8,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     public static partial class NPocoSqlExtensions
     {
-
         #region Where
 
         /// <summary>

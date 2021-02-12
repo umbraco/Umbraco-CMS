@@ -7,10 +7,10 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     // TODO: are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
     // try to use NPoco's version !

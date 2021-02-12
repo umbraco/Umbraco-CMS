@@ -35,6 +35,8 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
@@ -50,8 +52,6 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions

@@ -14,7 +14,6 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.PropertyEditors;

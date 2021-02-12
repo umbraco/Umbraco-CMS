@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {

@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
     {

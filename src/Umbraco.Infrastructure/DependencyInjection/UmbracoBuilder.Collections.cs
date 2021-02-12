@@ -1,5 +1,5 @@
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {

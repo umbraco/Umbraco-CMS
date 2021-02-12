@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data
 {

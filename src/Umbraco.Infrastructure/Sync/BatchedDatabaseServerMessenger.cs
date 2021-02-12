@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 

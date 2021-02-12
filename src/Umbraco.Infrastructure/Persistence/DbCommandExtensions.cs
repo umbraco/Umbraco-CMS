@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     internal static class DbCommandExtensions
     {

@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
 {

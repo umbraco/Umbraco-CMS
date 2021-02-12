@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence.FaultHandling.Strategies
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
 {
     /// <summary>
     /// A retry strategy with a specified number of retry attempts and a default fixed time interval between retries.

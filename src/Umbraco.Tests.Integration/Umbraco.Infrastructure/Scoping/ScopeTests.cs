@@ -5,9 +5,9 @@ using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
