@@ -1,8 +1,6 @@
-using System;
 using System.Data;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 
 #if DEBUG_SCOPES

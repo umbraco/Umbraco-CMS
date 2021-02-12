@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Cms.Core.Deploy;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Defines methods that can convert a grid cell value to / from an environment-agnostic string.

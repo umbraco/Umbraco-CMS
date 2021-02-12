@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Core.Events;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement

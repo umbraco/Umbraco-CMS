@@ -3,8 +3,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement

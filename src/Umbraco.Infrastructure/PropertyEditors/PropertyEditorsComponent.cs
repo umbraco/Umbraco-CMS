@@ -6,10 +6,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.PropertyEditors
