@@ -152,6 +152,5 @@ namespace Umbraco.Extensions
                 return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
             }
         }
-
     }
 }
