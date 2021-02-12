@@ -218,6 +218,7 @@ namespace Umbraco.Tests.Integration.Testing
                 .AddRuntimeMinifier()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)
@@ -229,8 +230,6 @@ namespace Umbraco.Tests.Integration.Testing
             }
 
             services.AddSignalR();
-            builder.AddMembersIdentity();
-
             services.AddMvc();
 
             CustomTestSetup(builder);
