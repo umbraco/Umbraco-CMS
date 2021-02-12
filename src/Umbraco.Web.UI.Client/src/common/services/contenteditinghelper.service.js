@@ -771,15 +771,17 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * Sorts the variants so default language is shown first. Mandatory languages are shown next and all other underneath. Both Mandatory and non mandatory languages are
          * sorted in the following groups 'Published', 'Draft', 'Not Created'. Within each of those groups the variants are
          * sorted by the language display name.
-         * 
+         *
          */
         sortVariants: function (a, b) {
             const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
             const compareDefault = (a,b) => (!a.language.isDefault ? 1 : -1) - (!b.language.isDefault ? 1 : -1);
+
+            // Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
             const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (!a.language.isMandatory ? 1 : -1) - (!b.language.isMandatory ? 1 : -1);
             const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
-    
+
             return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
         },
 
@@ -790,10 +792,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          * @function
          *
          * @description
-         * Returns an array of variants and segments sorted by the rules in the sortVariants method. 
-         * A variant language is followed by its segments in the array. If a segment doesn't have a parent variant it is 
+         * Returns an array of variants and segments sorted by the rules in the sortVariants method.
+         * A variant language is followed by its segments in the array. If a segment doesn't have a parent variant it is
          * added to the end of the array.
-         * 
+         *
          */
         getSortedVariantsAndSegments: function (variantsAndSegments) {
             const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
@@ -805,7 +807,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 segments = segments.filter(segment => segment.language.culture !== variant.language.culture);
                 sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
             })
-            
+
             // if we have segments without a parent language variant we need to add the remaining segments to the array
             sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
 
