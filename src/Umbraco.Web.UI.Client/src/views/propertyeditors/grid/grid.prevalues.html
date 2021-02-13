@@ -117,11 +117,10 @@
 
                 <li ng-repeat="configValue in model.value.config">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
-
                     <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.config, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
-                        {{configValue.label}}
                     </button>
+                    <span>{{configValue.label}}</span>
                 </li>
             </ul>
 
@@ -145,12 +144,10 @@
 
                 <li ng-repeat="style in model.value.styles">
                     <i class="icon icon-navigation handle" aria-hidden="true"></i>
-
                     <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.styles, $index)">
                         <i class="icon icon-delete red" aria-hidden="true"></i>
-                        {{style.label}}
                     </button>
-
+                    <span>{{style.label}}</span>
                 </li>
             </ul>
 
