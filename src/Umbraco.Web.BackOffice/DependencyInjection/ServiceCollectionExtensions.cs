@@ -10,6 +10,7 @@ using Umbraco.Infrastructure.Security;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Web.BackOffice.Extensions;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Authorization;
@@ -37,15 +38,6 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
             services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
         }
-
-        /// <summary>
-        /// Adds the services required for using Members Identity
-        /// </summary>
-        public static void AddMembersIdentity(this IServiceCollection services) =>
-            services.BuildMembersIdentity()
-                .AddDefaultTokenProviders()
-                .AddUserStore<MembersUserStore>()
-                .AddMembersUserManager<IMemberManager, MemberManager>();
 
         private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
@@ -83,15 +75,6 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);
-        }
-
-        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
-        {
-            // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
-            return new MembersIdentityBuilder(services);
         }
 
         /// <summary>

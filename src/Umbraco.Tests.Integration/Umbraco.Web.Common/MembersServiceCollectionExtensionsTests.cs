@@ -4,9 +4,9 @@ using NUnit.Framework;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Infrastructure.Security;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.BackOffice.DependencyInjection;
+using Umbraco.Web.Common.DependencyInjection;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
+namespace Umbraco.Tests.Integration.Umbraco.Web.Common
 {
     [TestFixture]
     public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
