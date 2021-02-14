@@ -67,7 +67,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<MembersUserStore>()
-                .AddMembersUserManager<IMemberManager, MemberManager>();
+                .AddMembersManager<IMemberManager, MemberManager>();
 
 
         private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
