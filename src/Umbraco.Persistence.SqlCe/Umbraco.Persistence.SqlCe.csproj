@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <LangVersion>8</LangVersion>
         <TargetFramework>net472</TargetFramework>
         <RootNamespace>Umbraco.Cms.Persistence.SqlCe</RootNamespace>
     </PropertyGroup>

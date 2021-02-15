@@ -8,6 +8,7 @@
         <InformationalVersion>0.5.0</InformationalVersion>
         <FileVersion>0.5.0</FileVersion>
         <Product>Umbraco CMS</Product>
+        <RootNamespace>Umbraco.Core</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
