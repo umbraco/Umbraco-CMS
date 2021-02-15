@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Web.Common.Attributes;
 
 namespace Umbraco.Web.Common.ApplicationModels
 {
+
     // TODO: This should just exist in the back office project
 
     /// <summary>
@@ -13,45 +14,43 @@ namespace Umbraco.Web.Common.ApplicationModels
     /// </summary>
     public class BackOfficeApplicationModelProvider : IApplicationModelProvider
     {
-        public BackOfficeApplicationModelProvider(IModelMetadataProvider modelMetadataProvider)
+        private readonly List<IActionModelConvention> _actionModelConventions = new List<IActionModelConvention>()
         {
-            ActionModelConventions = new List<IActionModelConvention>()
-            {
-                new BackOfficeIdentityCultureConvention()
-            };
-        }
+            new BackOfficeIdentityCultureConvention()
+        };
 
+        /// <inheritdoc />
         /// <summary>
         /// Will execute after <see cref="DefaultApplicationModelProvider"/>
         /// </summary>
         public int Order => 0;
 
-        public List<IActionModelConvention> ActionModelConventions { get; }
-
+        /// <inheritdoc/>
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
         }
 
+        /// <inheritdoc/>
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
         {
-            foreach (var controller in context.Result.Controllers)
+            foreach (ControllerModel controller in context.Result.Controllers)
             {
                 if (!IsBackOfficeController(controller))
-                    continue;
-
-                foreach (var action in controller.Actions)
                 {
-                    foreach (var convention in ActionModelConventions)
+                    continue;
+                }
+
+                foreach (ActionModel action in controller.Actions)
+                {
+                    foreach (IActionModelConvention convention in _actionModelConventions)
                     {
                         convention.Apply(action);
                     }
                 }
-
             }
         }
 
         private bool IsBackOfficeController(ControllerModel controller)
             => controller.Attributes.OfType<IsBackOfficeAttribute>().Any();
-        
     }
 }
