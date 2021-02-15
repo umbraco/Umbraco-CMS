@@ -25,14 +25,14 @@ namespace Umbraco.Web.Routing
     {
         private const string _eventStateKey = "Umbraco.Web.Redirects.RedirectTrackingEventHandler";
 
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public RedirectTrackingComponent(IOptions<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        public RedirectTrackingComponent(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
         {
-            _webRoutingSettings = webRoutingSettings.Value;
+            _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Routing
         private void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.DisableRedirectUrlTracking) return;
+            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking) return;
 
             var oldRoutes = GetOldRoutes(args.EventState);
             foreach (var entity in args.PublishedEntities)
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Routing
         private void ContentService_Published(IContentService sender, ContentPublishedEventArgs args)
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.DisableRedirectUrlTracking) return;
+            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking) return;
 
             var oldRoutes = GetOldRoutes(args.EventState);
             CreateRedirects(oldRoutes);
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Routing
         private void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> args)
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.DisableRedirectUrlTracking) return;
+            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking) return;
 
             var oldRoutes = GetOldRoutes(args.EventState);
             foreach (var info in args.MoveInfoCollection)
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Routing
         private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> args)
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.DisableRedirectUrlTracking) return;
+            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking) return;
 
             var oldRoutes = GetOldRoutes(args.EventState);
             CreateRedirects(oldRoutes);
