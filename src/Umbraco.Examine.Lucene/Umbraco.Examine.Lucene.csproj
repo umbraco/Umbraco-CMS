@@ -3,16 +3,14 @@
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
         <RootNamespace>Umbraco.Examine</RootNamespace>
-        <Product>Umbraco CMS</Product>
         <Title>Umbraco.Examine.Lucene</Title>
-        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DebugSymbols>true</DebugSymbols>
       <DocumentationFile>bin\Release\Umbraco.Examine.Lucene.xml</DocumentationFile>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <Compile Remove="obj\**" />
     </ItemGroup>

@@ -126,9 +126,6 @@
     <!--
     <Compile Include="**\*.cs" Exclude="obj\**\*.cs;**\*.aspx.cs;**\*.ascx.cs;**\*.designer.cs" />
     -->
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
     <Compile Include="AspNet\AspNetSessionManager.cs" />
