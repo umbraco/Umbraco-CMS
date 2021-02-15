@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Tests.Macros
@@ -24,14 +27,14 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -47,14 +50,14 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>(){{"test1", "value1"},{"test2", "value2"}});
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
 
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
@@ -71,14 +74,14 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" ></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -94,14 +97,14 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -117,14 +120,14 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -141,7 +144,7 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
             //            Assert.AreEqual(@"<p>asdfasdf</p>
             //<p>asdfsadf</p>
@@ -168,7 +171,7 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
             //            Assert.AreEqual(@"<p>asdfasdf</p>
             //<p>asdfsadf</p>
@@ -202,6 +205,124 @@ namespace Umbraco.Tests.Macros
         }
 
         [Test]
+        public void Format_RTE_Data_For_Editor_Inline_Single_Macro_No_Parameters()
+        {
+            var content = @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<?UMBRACO_MACRO macroAlias=""Map"" ></?UMBRACO_MACRO>
+<p>asdfasdf</p>";
+            var macroMock = new Mock<IMacro>();
+            macroMock.Setup(x => x.RenderInline).Returns(true);
+            var macroServiceMock = new Mock<IMacroService>();
+            macroServiceMock.Setup(x => x.GetByAlias("Map"))
+                .Returns(macroMock.Object);
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>(), macroServiceMock.Object);
+
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"">
+<!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></span>
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+        [Test]
+        public void Format_RTE_Data_For_Editor_Inline_Single_Macro_With_Parameters()
+        {
+            var content = @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
+<p>asdfasdf</p>";
+            var macroMock = new Mock<IMacro>();
+            macroMock.Setup(x => x.RenderInline).Returns(true);
+            var macroServiceMock = new Mock<IMacroService>();
+            macroServiceMock.Setup(x => x.GetByAlias("Map"))
+                .Returns(macroMock.Object);
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() {{ "test1", "value1" }, { "test2", "value2" } }, macroServiceMock.Object);
+
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"" test1=""value1"" test2=""value2"">
+<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></span>
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+        [Test]
+        public void Format_RTE_Data_For_Editor_Inline_With_Multiple_Macros()
+        {
+
+            var content = @"<p>asdfasdf</p>
+<?UMBRACO_MACRO macroAlias=""Breadcrumb"" />
+<p>asdfsadf</p>
+<p> </p>
+<?UMBRACO_MACRO macroAlias=""login"" />
+<p> </p>";
+
+            var macroBreadcrumbMock = new Mock<IMacro>();
+            macroBreadcrumbMock.Setup(x => x.RenderInline).Returns(true);
+
+            var macroLoginMock = new Mock<IMacro>();
+            macroLoginMock.Setup(x => x.RenderInline).Returns(true);
+
+
+            var macroServiceMock = new Mock<IMacroService>();
+            macroServiceMock.Setup(x => x.GetByAlias("Breadcrumb"))
+                .Returns(macroBreadcrumbMock.Object);
+
+            macroServiceMock.Setup(x => x.GetByAlias("login"))
+                .Returns(macroLoginMock.Object);
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>(), macroServiceMock.Object);
+
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"">
+<!-- <?UMBRACO_MACRO macroAlias=""Breadcrumb"" /> -->
+<ins>Macro alias: <strong>Breadcrumb</strong></ins></span>
+<p>asdfsadf</p>
+<p> </p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"">
+<!-- <?UMBRACO_MACRO macroAlias=""login"" /> -->
+<ins>Macro alias: <strong>login</strong></ins></span>
+<p> </p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+        [Test]
+        public void Format_RTE_Data_For_Editor_Inline_With_Params_When_Multiple_Macros()
+        {
+            var content = @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" />
+<p>asdfsadf</p>
+<?UMBRACO_MACRO test1=""value1"" macroAlias=""Map"" test2=""value2"" />
+<p>asdfsadf</p>
+<?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
+<p>asdfasdf</p>";
+
+            var macroMock = new Mock<IMacro>();
+            macroMock.Setup(x => x.RenderInline).Returns(true);
+            var macroServiceMock = new Mock<IMacroService>();
+            macroServiceMock.Setup(x => x.GetByAlias("Map"))
+                .Returns(macroMock.Object);
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, macroServiceMock.Object);
+            
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"" test1=""value1"" test2=""value2"">
+<!-- <?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></span>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"" test1=""value1"" test2=""value2"">
+<!-- <?UMBRACO_MACRO test1=""value1"" macroAlias=""Map"" test2=""value2"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></span>
+<p>asdfsadf</p>
+<span class=""umb-macro-holder umb-macro-inline mceNonEditable"" test1=""value1"" test2=""value2"">
+<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></span>
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+
+        [Test]
         public void Format_RTE_Data_For_Editor_With_Multiple_Macros()
         {
             var content = @"<p>asdfasdf</p>
@@ -210,7 +331,7 @@ namespace Umbraco.Tests.Macros
 <p> </p>
 <?UMBRACO_MACRO macroAlias=""login"" />
 <p> </p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>());
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>(), Mock.Of<IMacroService>());
 
             Assert.AreEqual(@"<p>asdfasdf</p>
 <div class=""umb-macro-holder mceNonEditable"">
@@ -266,14 +387,14 @@ asdfsdf
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -289,14 +410,14 @@ asdfsdf
 <p>asdfsadf</p>
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ><img src='blah.jpg'/></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } }, Mock.Of<IMacroService>());
 
-//            Assert.AreEqual(@"<p>asdfasdf</p>
-//<p>asdfsadf</p>
-//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
-//<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-//<ins>Macro alias: <strong>Map</strong></ins></div>
-//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            //            Assert.AreEqual(@"<p>asdfasdf</p>
+            //<p>asdfsadf</p>
+            //<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+            //<ins>Macro alias: <strong>Map</strong></ins></div>
+            //<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
@@ -315,7 +436,7 @@ asdfsdf
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2
 test"" />
 <p>asdfasdf</p>";
-            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2\r\ntest" } });
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2\r\ntest" } }, Mock.Of<IMacroService>());
 
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
@@ -330,22 +451,22 @@ test"" /> -->
         [Test]
         public void Format_RTE_Data_For_Persistence()
         {
-//            var content = @"<html>
-//<body>
-//<h1>asdfasdf</h1>
-//<div class='umb-macro-holder Map mceNonEditable' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
-//<!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
-//asdfasdf
-//asdfas
-//<span>asdfasdfasdf</span>
-//<p>asdfasdf</p>
-//</div>
-//<span>asdfdasf</span>
-//<div>
-//asdfsdf
-//</div>
-//</body>
-//</html>";
+            //            var content = @"<html>
+            //<body>
+            //<h1>asdfasdf</h1>
+            //<div class='umb-macro-holder Map mceNonEditable' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
+            //<!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
+            //asdfasdf
+            //asdfas
+            //<span>asdfasdfasdf</span>
+            //<p>asdfasdf</p>
+            //</div>
+            //<span>asdfdasf</span>
+            //<div>
+            //asdfsdf
+            //</div>
+            //</body>
+            //</html>";
             var content = @"<html>
 <body>
 <h1>asdfasdf</h1>
@@ -412,14 +533,14 @@ asdfsdf
         [Test]
         public void Format_RTE_Data_For_Persistence_Custom_Single_Entry()
         {
-//            var content = @"<div class=""umb-macro-holder Test mceNonEditable umb-macro-mce_1""><!-- <?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" /> --><ins>
-//<div class=""facts-box"">
-//<div class=""fatcs-box-header"">
-//<h3>null</h3>
-//</div>
-//<div class=""fatcs-box-body"">1089</div>
-//</div>
-//</ins></div>";
+            //            var content = @"<div class=""umb-macro-holder Test mceNonEditable umb-macro-mce_1""><!-- <?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" /> --><ins>
+            //<div class=""facts-box"">
+            //<div class=""fatcs-box-header"">
+            //<h3>null</h3>
+            //</div>
+            //<div class=""fatcs-box-body"">1089</div>
+            //</div>
+            //</ins></div>";
             var content = @"<div class=""umb-macro-holder mceNonEditable umb-macro-mce_1""><!-- <?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" /> --><ins>
 <div class=""facts-box"">
 <div class=""fatcs-box-header"">
@@ -432,6 +553,9 @@ asdfsdf
 
             Assert.AreEqual(@"<?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" />", result);
         }
+
+
+
 
     }
 }

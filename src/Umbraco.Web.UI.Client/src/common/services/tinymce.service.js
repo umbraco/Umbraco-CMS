@@ -778,6 +778,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
+                
                 //this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
                 editor.serializer.addRules('div');
 
@@ -886,7 +887,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         },
 
         insertMacroInEditor: function (editor, macroObject, activeMacroElement) {
-
             //Important note: the TinyMce plugin "noneditable" is used here so that the macro cannot be edited,
             // for this to work the mceNonEditable class needs to come last and we also need to use the attribute contenteditable = false
             // (even though all the docs and examples say that is not necessary)
@@ -896,35 +896,36 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
             //create an id class for this element so we can re-select it after inserting
             var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-            var macroDiv = editor.dom.create('div',
+            var macroWrapperElementType = macroObject.renderInline ? 'span' : 'div';
+            var macroElement = editor.dom.create(macroWrapperElementType,
                 {
-                    'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable',
+                    'class': 'umb-macro-holder ' + (macroObject.renderInline? 'umb-macro-inline ':' ') + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable',
                     'contenteditable': 'false'
                 },
                 macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
             //if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
             if (activeMacroElement) {
-                activeMacroElement.replaceWith(macroDiv); //directly replaces the html node
+                activeMacroElement.replaceWith(macroElement); //directly replaces the html node
             }
             else {
-                editor.selection.setNode(macroDiv);
+                editor.selection.setNode(macroElement);
             }
 
-            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+            var $macroElement = $(editor.dom.select(macroWrapperElementType+".umb-macro-holder." + uniqueId));
             editor.setDirty(true);
 
             //async load the macro content
-            this.loadMacroContent($macroDiv, macroObject, editor);
+            this.loadMacroContent($macroElement, macroObject, editor);
 
         },
 
         /** loads in the macro content async from the server */
-        loadMacroContent: function ($macroDiv, macroData, editor) {
+        loadMacroContent: function ($macroElement, macroData, editor) {
 
             //if we don't have the macroData, then we'll need to parse it from the macro div
             if (!macroData) {
-                var contents = $macroDiv.contents();
+                var contents = $macroElement.contents();
                 var comment = _.find(contents, function (item) {
                     return item.nodeType === 8;
                 });
@@ -936,15 +937,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 macroData = parsed;
             }
 
-            var $ins = $macroDiv.find("ins");
+            var $ins = $macroElement.find("ins");
 
             //show the throbber
-            $macroDiv.addClass("loading");
+            $macroElement.addClass("loading");
 
             // Add the contenteditable="false" attribute
             // As just the CSS class of .mceNonEditable is not working by itself?!
             // TODO: At later date - use TinyMCE editor DOM manipulation as opposed to jQuery
-            $macroDiv.attr("contenteditable", "false");
+            $macroElement.attr("contenteditable", "false");
 
             var contentId = $routeParams.id;
 
@@ -953,7 +954,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
                     .then(function (htmlResult) {
 
-                        $macroDiv.removeClass("loading");
+                        $macroElement.removeClass("loading");
                         htmlResult = htmlResult.trim();
                         if (htmlResult !== "") {
                             var wasDirty = editor.isDirty();

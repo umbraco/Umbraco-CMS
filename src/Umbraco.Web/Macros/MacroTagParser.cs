@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Macros
 {
@@ -25,26 +28,40 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="persistedContent"></param>
         /// <param name="htmlAttributes">The HTML attributes to be added to the div</param>
+        /// <param name="macroService"></param>
         /// <returns></returns>
         /// <remarks>
         /// This converts the persisted macro format to this:
-        ///
+        /// 
         ///     {div class='umb-macro-holder'}
         ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
         ///         {ins}Macro alias: {strong}My Macro{/strong}{/ins}
         ///     {/div}
-        ///
+        /// 
         /// </remarks>
-        internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string ,string> htmlAttributes)
+        internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string, string> htmlAttributes, IMacroService macroService)
         {
             return MacroPersistedFormat.Replace(persistedContent, match =>
             {
                 if (match.Groups.Count >= 3)
                 {
-                    //<div class="umb-macro-holder myMacro mceNonEditable">
+                    string wrapperElement = "div";
+                    //<div || span class="umb-macro-holder (umb-macro-inline) myMacro mceNonEditable">
                     var alias = match.Groups[2].Value;
-                    var sb = new StringBuilder("<div class=\"umb-macro-holder ");
-                    //sb.Append(alias.ToSafeAlias());
+                    
+                    IMacro macro = macroService.GetByAlias(alias);
+                    bool renderInline = false;
+                    if (macro != null && macro.RenderInline)
+                    {
+                        renderInline = macro.RenderInline;
+                        wrapperElement = "span";
+                    }
+
+                    var sb = new StringBuilder($"<{wrapperElement} class=\"umb-macro-holder ");
+                    if (renderInline)
+                    {
+                        sb.Append("umb-macro-inline ");
+                    }
                     sb.Append("mceNonEditable\"");
                     foreach (var htmlAttribute in htmlAttributes)
                     {
@@ -63,7 +80,7 @@ namespace Umbraco.Web.Macros
                     sb.Append("Macro alias: ");
                     sb.Append("<strong>");
                     sb.Append(alias);
-                    sb.Append("</strong></ins></div>");
+                    sb.Append($"</strong></ins></{wrapperElement}>");
                     return sb.ToString();
                 }
                 //replace with nothing if we couldn't find the syntax for whatever reason
@@ -148,7 +165,7 @@ namespace Umbraco.Web.Macros
         internal static void ParseMacros(
             string text,
             Action<string> textFoundCallback,
-            Action<string, Dictionary<string, string>> macroFoundCallback )
+            Action<string, Dictionary<string, string>> macroFoundCallback)
         {
             if (textFoundCallback == null) throw new ArgumentNullException("textFoundCallback");
             if (macroFoundCallback == null) throw new ArgumentNullException("macroFoundCallback");

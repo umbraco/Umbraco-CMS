@@ -9,6 +9,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Core.Migrations.Upgrade.V8_11_2;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -202,6 +203,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
+            To<AddPropertyRenderInlineToMacro>("{2ddca6d9-bce4-4510-baef-0eff64968fec}");
             //FINAL
         }
     }

@@ -30,6 +30,7 @@ namespace Umbraco.Core.Models
         /// <param name="id"></param>
         /// <param name="key"></param>
         /// <param name="useInEditor"></param>
+        /// <param name="renderInline"></param>
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
@@ -37,7 +38,8 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
+        /// <param name="macroType"></param>
+        public Macro(int id, Guid key, bool useInEditor, bool renderInline, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
             : this()
         {
             Id = id;
@@ -51,15 +53,18 @@ namespace Umbraco.Core.Models
             DontRender = dontRender;
             MacroSource = macroSource;
             MacroType = macroType;
+            RenderInline = renderInline;
         }
 
         /// <summary>
         /// Creates an instance for persisting a new item
         /// </summary>
         /// <param name="useInEditor"></param>
+        /// <param name="renderInline"></param>
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
+        /// <param name="macroType"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
@@ -71,10 +76,12 @@ namespace Umbraco.Core.Models
             bool cacheByMember = false,
             bool dontRender = true,
             bool useInEditor = false,
+            bool renderInline = false,
             int cacheDuration = 0)
             : this()
         {
             UseInEditor = useInEditor;
+            RenderInline = renderInline;
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
@@ -88,6 +95,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _name;
         private bool _useInEditor;
+        private bool _renderInline;
         private int _cacheDuration;
         private bool _cacheByPage;
         private bool _cacheByMember;
@@ -192,6 +200,16 @@ namespace Umbraco.Core.Models
         {
             get => _useInEditor;
             set => SetPropertyValueAndDetectChanges(value, ref _useInEditor, nameof(UseInEditor));
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean indicating whether the Macro should be rendered inline with a span instead of div
+        /// </summary>
+        [DataMember]
+        public bool RenderInline
+        {
+            get => _renderInline;
+            set => SetPropertyValueAndDetectChanges(value, ref _renderInline, nameof(RenderInline));
         }
 
         /// <summary>

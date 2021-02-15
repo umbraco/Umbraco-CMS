@@ -411,6 +411,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XElement("macroType", macro.MacroType));
             xml.Add(new XElement("macroSource", macro.MacroSource));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
+            xml.Add(new XElement("renderInline", macro.RenderInline.ToString()));
             xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
             xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
             xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));

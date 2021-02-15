@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IMacro BuildEntity(MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
+            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RenderInline, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
 
             try
             {
@@ -34,18 +34,19 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new MacroDto
             {
-                    UniqueId = entity.Key,
-                    Alias = entity.Alias,
-                    CacheByPage = entity.CacheByPage,
-                    CachePersonalized = entity.CacheByMember,
-                    DontRender = entity.DontRender,
-                    Name = entity.Name,
-                    MacroSource = entity.MacroSource,
-                    RefreshRate = entity.CacheDuration,
-                    UseInEditor = entity.UseInEditor,
-                    MacroPropertyDtos = BuildPropertyDtos(entity),
-                    MacroType = (int)entity.MacroType
-                };
+                UniqueId = entity.Key,
+                Alias = entity.Alias,
+                CacheByPage = entity.CacheByPage,
+                CachePersonalized = entity.CacheByMember,
+                DontRender = entity.DontRender,
+                Name = entity.Name,
+                MacroSource = entity.MacroSource,
+                RefreshRate = entity.CacheDuration,
+                UseInEditor = entity.UseInEditor,
+                RenderInline = entity.RenderInline,
+                MacroPropertyDtos = BuildPropertyDtos(entity),
+                MacroType = (int)entity.MacroType
+            };
 
             if (entity.HasIdentity)
                 dto.Id = int.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));

@@ -202,6 +202,7 @@ namespace Umbraco.Web.Editors
             macro.CacheDuration = macroDisplay.CachePeriod;
             macro.DontRender = !macroDisplay.RenderInEditor;
             macro.UseInEditor = macroDisplay.UseInEditor;
+            macro.RenderInline = macroDisplay.RenderInline;
             macro.MacroSource = macroDisplay.View;
             macro.MacroType = MacroTypes.PartialView;
             macro.Properties.ReplaceAll(macroDisplay.Parameters.Select((x,i) => new MacroProperty(x.Key, x.Label, i, x.Editor)));

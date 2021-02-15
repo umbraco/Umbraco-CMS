@@ -35,6 +35,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool RenderInEditor { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the macro should be rendered inline with a span in the rich text editor.
+        /// </summary>
+        [DataMember(Name = "renderInline")]
+        public bool RenderInline { get; set; }
+
+        /// <summary>
         /// Gets or sets the cache period.
         /// </summary>
         [DataMember(Name = "cachePeriod")]

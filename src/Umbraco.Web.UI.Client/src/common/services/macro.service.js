@@ -9,10 +9,10 @@
 function macroService() {
 
     return {
-       
+
         /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
         parseMacroSyntax: function (syntax) {
-            
+
             //This regex will match an alias of anything except characters that are quotes or new lines (for legacy reasons, when new macros are created
             // their aliases are cleaned an invalid chars are stripped)
             var expression = /(<\?UMBRACO_MACRO (?:.+?)?macroAlias=["']([^\"\'\n\r]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
@@ -24,9 +24,9 @@ function macroService() {
 
             //this will leave us with just the parameters
             var paramsChunk = match[1].trim().replace(new RegExp("UMBRACO_MACRO macroAlias=[\"']" + alias + "[\"']"), "").trim();
-            
+
             var paramExpression = /(\w+?)=['\"]([\s\S]*?)['\"]/g;
-            
+
             var paramMatch;
             var returnVal = {
                 macroAlias: alias,
@@ -72,7 +72,7 @@ function macroService() {
                         var encoded = encodeURIComponent(json);
                         keyVal = key + "=\"" + encoded + "\" ";
                     }
-                    
+
                     macroString += keyVal;
                 });
 
@@ -82,7 +82,7 @@ function macroService() {
 
             return macroString;
         },
-        
+
         /**
          * @ngdoc function
          * @name umbraco.services.macroService#generateMvcSyntax
@@ -101,18 +101,18 @@ function macroService() {
             var hasParams = false;
             var paramString;
             if (args.macroParamsDictionary) {
-                
+
                 paramString = ", new {";
 
-                _.each(args.macroParamsDictionary, function(val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
 
                     hasParams = true;
-                    
+
                     var keyVal = key + "=\"" + (val ? val : "") + "\", ";
 
                     paramString += keyVal;
                 });
-                
+
                 //remove the last , 
                 paramString = paramString.trimEnd(", ");
 
@@ -126,7 +126,7 @@ function macroService() {
             return macroString;
         },
 
-        collectValueData: function(macro, macroParams, renderingEngine) {
+        collectValueData: function (macro, macroParams, renderingEngine) {
 
             var paramDictionary = {};
             var macroAlias = macro.alias;
@@ -165,7 +165,8 @@ function macroService() {
             var macroObject = {
                 "macroParamsDictionary": paramDictionary,
                 "macroAlias": macroAlias,
-                "syntax": syntax
+                "syntax": syntax,
+                "renderInline": macro.metaData["renderInline"]
             };
 
             return macroObject;

@@ -29,6 +29,12 @@ namespace Umbraco.Core.Models
         bool UseInEditor { get; set; }
 
         /// <summary>
+        /// Gets or sets a boolean indicating whether the Macro should be rendered with a span instead of a div wrapper in the editor
+        /// </summary>
+        [DataMember]
+        bool RenderInline { get; set; }
+
+        /// <summary>
         /// Gets or sets the Cache Duration for the Macro
         /// </summary>
         [DataMember]

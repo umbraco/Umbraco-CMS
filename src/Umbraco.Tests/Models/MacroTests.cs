@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var macro = new Macro(1, Guid.NewGuid(), true, 3, "test", "Test", false, true, true, "~/script.cshtml", MacroTypes.PartialView);
+            var macro = new Macro(1, Guid.NewGuid(), true, true, 3, "test", "Test", false, true, true, "~/script.cshtml", MacroTypes.PartialView);
             macro.Properties.Add(new MacroProperty(6, Guid.NewGuid(), "rewq", "REWQ", 1, "asdfasdf"));
 
             var clone = (Macro)macro.DeepClone();
