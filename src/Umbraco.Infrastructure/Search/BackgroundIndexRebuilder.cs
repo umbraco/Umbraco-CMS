@@ -8,9 +8,8 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
     /// <summary>
     /// Utility to rebuild all indexes on a background thread

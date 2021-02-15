@@ -37,12 +37,12 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Core;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Web;
-using Umbraco.Web.Search;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {

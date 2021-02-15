@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Web.Search;
+using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Web
 {

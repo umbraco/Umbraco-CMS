@@ -20,12 +20,12 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 using Umbraco.Extensions;
-using Umbraco.Web.Search;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection
 {

@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Examine;
 using Umbraco.Extensions;
-using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
