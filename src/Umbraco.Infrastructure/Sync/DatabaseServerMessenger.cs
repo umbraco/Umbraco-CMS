@@ -22,7 +22,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Infrastructure.Sync
 {
     /// <summary>
     /// An <see cref="IServerMessenger"/> that works by storing messages in the database.

@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Infrastructure.Sync
 {
     /// <summary>
     /// An <see cref="IServerMessenger"/> implementation that works by storing messages in the database.

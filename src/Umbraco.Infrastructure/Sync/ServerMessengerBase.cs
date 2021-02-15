@@ -7,7 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Infrastructure.Sync
 {
     /// <summary>
     /// Provides a base class for all <see cref="IServerMessenger"/> implementations.

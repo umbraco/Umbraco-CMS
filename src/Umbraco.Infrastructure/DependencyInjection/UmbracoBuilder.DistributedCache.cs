@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Search;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
