@@ -66,7 +66,6 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using FileSystems = Umbraco.Cms.Core.IO.FileSystems;

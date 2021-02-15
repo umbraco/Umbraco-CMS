@@ -1,11 +1,12 @@
-﻿using System;
-using Umbraco.Cms.Core;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Converts json block objects into <see cref="IPublishedElement"/>

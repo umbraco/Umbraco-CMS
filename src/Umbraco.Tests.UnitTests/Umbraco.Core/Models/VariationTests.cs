@@ -17,7 +17,6 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Umbraco.Web.PropertyEditors;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models

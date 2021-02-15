@@ -2,9 +2,8 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Compose
 {

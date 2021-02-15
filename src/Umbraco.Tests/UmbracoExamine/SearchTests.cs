@@ -4,20 +4,14 @@ using System.Linq;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using Moq;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

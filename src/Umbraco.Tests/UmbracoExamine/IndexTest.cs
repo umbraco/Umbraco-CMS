@@ -1,25 +1,20 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using NUnit.Framework;
-using Umbraco.Tests.Testing;
-using Umbraco.Examine;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Models;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.UmbracoExamine
