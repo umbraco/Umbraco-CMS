@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     /// <summary>
     /// Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType"/>

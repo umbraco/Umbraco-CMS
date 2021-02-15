@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence

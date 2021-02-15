@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     // TODO: that one does not add anything = kill
     public abstract class ScopeRepositoryService : RepositoryService

@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Services;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

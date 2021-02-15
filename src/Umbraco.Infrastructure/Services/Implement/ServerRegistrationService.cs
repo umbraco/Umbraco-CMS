@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     /// <summary>
     /// Manages server registrations in the database.

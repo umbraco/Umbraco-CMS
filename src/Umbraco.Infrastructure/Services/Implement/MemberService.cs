@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     /// <summary>
     /// Represents the MemberService.

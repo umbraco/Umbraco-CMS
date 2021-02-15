@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     public abstract class ContentTypeServiceBase<TItem, TService> : ContentTypeServiceBase
         where TItem : class, IContentTypeComposition

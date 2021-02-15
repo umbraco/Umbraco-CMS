@@ -23,7 +23,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;

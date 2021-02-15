@@ -17,7 +17,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
@@ -148,7 +148,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            var media = new Media(name, parentId, mediaType);
+            var media = new Core.Models.Media(name, parentId, mediaType);
             using (var scope = ScopeProvider.CreateScope())
             {
                 CreateMedia(scope, media, parent, userId, false);
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            var media = new Media(name, -1, mediaType);
+            var media = new Core.Models.Media(name, -1, mediaType);
             using (var scope = ScopeProvider.CreateScope())
             {
                 CreateMedia(scope, media, null, userId, false);
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Services.Implement
                     throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 }
 
-                var media = new Media(name, parent, mediaType);
+                var media = new Core.Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, false);
 
                 scope.Complete();
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Services.Implement
                 if (parentId > 0 && parent == null)
                     throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
 
-                var media = parentId > 0 ? new Media(name, parent, mediaType) : new Media(name, parentId, mediaType);
+                var media = parentId > 0 ? new Core.Models.Media(name, parent, mediaType) : new Core.Models.Media(name, parentId, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
 
                 scope.Complete();
@@ -281,7 +281,7 @@ namespace Umbraco.Core.Services.Implement
                 if (mediaType == null)
                     throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
 
-                var media = new Media(name, parent, mediaType);
+                var media = new Core.Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, true);
 
                 scope.Complete();
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        private void CreateMedia(IScope scope, Media media, IMedia parent, int userId, bool withIdentity)
+        private void CreateMedia(IScope scope, Core.Models.Media media, IMedia parent, int userId, bool withIdentity)
         {
             media.CreatorId = userId;
 
@@ -1163,7 +1163,7 @@ namespace Umbraco.Core.Services.Implement
                 if (report.FixedIssues.Count > 0)
                 {
                     //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
-                    var root = new Media("root", -1, new MediaType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
+                    var root = new Core.Models.Media("root", -1, new MediaType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>.EventArgs(new TreeChange<IMedia>(root, TreeChangeTypes.RefreshAll)));
                 }
 

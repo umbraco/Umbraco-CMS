@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
     public abstract class ContentTypeServiceBase : ScopeRepositoryService
     {

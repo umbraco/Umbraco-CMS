@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Infrastructure.Services
 {
     public class IdKeyMap : IIdKeyMap
     {
