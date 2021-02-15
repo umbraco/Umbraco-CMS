@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
@@ -21,12 +21,14 @@ namespace Umbraco.Examine
     public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         private readonly IContentService _contentService;
+        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
 
         /// <summary>
         /// This is a static query, it's parameters don't change so store statically
         /// </summary>
-        private static IQuery<IContent> _publishedQuery;
+        private IQuery<IContent> _publishedQuery;
+        private IQuery<IContent> PublishedQuery => _publishedQuery ??= _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
         private readonly bool _publishedValuesOnly;
         private readonly int? _parentId;
@@ -37,26 +39,20 @@ namespace Umbraco.Examine
         /// <param name="contentService"></param>
         /// <param name="sqlContext"></param>
         /// <param name="contentValueSetBuilder"></param>
-        public ContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IContentValueSetBuilder contentValueSetBuilder)
-            : this(false, null, contentService, sqlContext, contentValueSetBuilder)
+        public ContentIndexPopulator(IContentService contentService, IUmbracoDatabaseFactory umbracoDatabaseFactory, IContentValueSetBuilder contentValueSetBuilder)
+            : this(false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
         {
         }
 
         /// <summary>
         /// Optional constructor allowing specifying custom query parameters
         /// </summary>
-        /// <param name="publishedValuesOnly"></param>
-        /// <param name="parentId"></param>
-        /// <param name="contentService"></param>
-        /// <param name="sqlContext"></param>
-        /// <param name="contentValueSetBuilder"></param>
-        public ContentIndexPopulator(bool publishedValuesOnly, int? parentId, IContentService contentService, ISqlContext sqlContext, IValueSetBuilder<IContent> contentValueSetBuilder)
+        public ContentIndexPopulator(bool publishedValuesOnly, int? parentId, IContentService contentService, IUmbracoDatabaseFactory umbracoDatabaseFactory, IValueSetBuilder<IContent> contentValueSetBuilder)
         {
-            if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
+            if (umbracoDatabaseFactory == null) throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
-            if (_publishedQuery == null)
-                _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
             _publishedValuesOnly = publishedValuesOnly;
             _parentId = parentId;
         }
@@ -124,7 +120,7 @@ namespace Umbraco.Examine
             {
                 //add the published filter
                 //note: We will filter for published variants in the validator
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, PublishedQuery,
                     Ordering.By("Path", Direction.Ascending)).ToArray();
 
 

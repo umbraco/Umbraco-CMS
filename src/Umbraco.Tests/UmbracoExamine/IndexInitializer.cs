@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
@@ -16,6 +15,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Examine;
 using Umbraco.Tests.TestHelpers;
@@ -43,10 +43,10 @@ namespace Umbraco.Tests.UmbracoExamine
             return contentValueSetBuilder;
         }
 
-        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, bool publishedValuesOnly)
+        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, bool publishedValuesOnly)
         {
             var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, scopeProvider, publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
+            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder);
             return contentIndexDataSource;
         }
 
