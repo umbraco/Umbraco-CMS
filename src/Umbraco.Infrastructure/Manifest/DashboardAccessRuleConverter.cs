@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Dashboards;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Core.Manifest
 {

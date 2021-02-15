@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PublishedContent

@@ -16,7 +16,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;

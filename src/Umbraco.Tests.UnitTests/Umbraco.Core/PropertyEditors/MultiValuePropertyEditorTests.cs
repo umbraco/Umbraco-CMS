@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {

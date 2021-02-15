@@ -38,9 +38,9 @@ using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Web;
 

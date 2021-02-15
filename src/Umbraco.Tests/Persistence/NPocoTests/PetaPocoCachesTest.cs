@@ -2,8 +2,8 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Serialization;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
 using Umbraco.Tests.Services;

@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {

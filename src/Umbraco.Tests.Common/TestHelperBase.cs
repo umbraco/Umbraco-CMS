@@ -24,8 +24,8 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

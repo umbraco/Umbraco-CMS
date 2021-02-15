@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Umbraco.Core.Serialization
+namespace Umbraco.Cms.Infrastructure.Serialization
 {
     /// <summary>
     /// This is required if we want to force JSON.Net to not use .Net TypeConverters during serialization/deserialization
