@@ -60,11 +60,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 using System;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.ModelsBuilder.Embedded;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
@@ -168,11 +166,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 using System;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.ModelsBuilder.Embedded;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
