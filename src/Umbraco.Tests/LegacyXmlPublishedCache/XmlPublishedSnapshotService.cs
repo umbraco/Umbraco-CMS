@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

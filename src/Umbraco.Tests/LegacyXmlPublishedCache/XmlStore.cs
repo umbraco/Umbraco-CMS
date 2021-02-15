@@ -28,7 +28,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Scheduling;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;

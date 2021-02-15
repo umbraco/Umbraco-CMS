@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Xml.XPath;
 using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {

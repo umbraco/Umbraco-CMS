@@ -23,7 +23,6 @@ using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 

@@ -33,7 +33,6 @@ using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Cms.Core.Constants;
 
