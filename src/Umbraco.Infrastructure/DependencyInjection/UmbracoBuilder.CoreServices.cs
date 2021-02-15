@@ -35,13 +35,12 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Core;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
 using Umbraco.Web.Search;
 

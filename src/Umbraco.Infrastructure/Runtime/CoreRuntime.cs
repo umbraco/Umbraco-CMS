@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Infrastructure.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class CoreRuntime : IRuntime
     {

@@ -20,7 +20,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class SqlMainDomLock : IMainDomLock
     {
