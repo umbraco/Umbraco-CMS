@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;

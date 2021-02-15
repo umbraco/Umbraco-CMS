@@ -4,10 +4,9 @@
 using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     // We want to run after core composers since we are replacing some items
     [ComposeAfter(typeof(ICoreComposer))]

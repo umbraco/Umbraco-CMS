@@ -24,7 +24,6 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
-using Umbraco.Examine;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection

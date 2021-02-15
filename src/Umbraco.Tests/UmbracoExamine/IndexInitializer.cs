@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Examine;
 using Umbraco.Tests.TestHelpers;
 using IContentService = Umbraco.Cms.Core.Services.IContentService;
 using IMediaService = Umbraco.Cms.Core.Services.IMediaService;

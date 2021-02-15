@@ -6,10 +6,9 @@ using Examine.LuceneEngine.Directories;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public sealed class ExamineLuceneComponent : IComponent
     {
