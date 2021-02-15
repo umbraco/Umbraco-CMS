@@ -1,4 +1,5 @@
 ﻿using Examine;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
     {
-        
+
         public UmbracoFieldDefinitionCollection()
             : base(UmbracoIndexFieldDefinitions)
         {
@@ -88,6 +89,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
             return false;
         }
 
-        
+
     }
 }

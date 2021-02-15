@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
