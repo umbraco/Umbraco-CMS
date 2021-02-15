@@ -43,7 +43,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.Runtime;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection

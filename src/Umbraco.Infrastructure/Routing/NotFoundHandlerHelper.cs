@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -9,8 +8,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
+using Umbraco.Web;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Used to determine the node to display when content is not found based on the configured error404 elements in umbracoSettings.config

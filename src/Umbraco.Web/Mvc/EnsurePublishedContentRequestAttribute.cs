@@ -1,9 +1,4 @@
-using System;
 using System.Web.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.Routing;
-using Umbraco.Core;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
