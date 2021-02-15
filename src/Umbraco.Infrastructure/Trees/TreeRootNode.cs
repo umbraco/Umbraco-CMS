@@ -1,10 +1,7 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Runtime.Serialization;
-using Umbraco.Cms.Core;
+﻿using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <summary>
     /// A tree node that represents various types of root nodes
