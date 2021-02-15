@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
         <LangVersion>latest</LangVersion>
+        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
