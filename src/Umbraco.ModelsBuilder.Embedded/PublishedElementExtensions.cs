@@ -3,11 +3,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.ModelsBuilder.Embedded;
-using Umbraco.Extensions;
 
 // same namespace as original Umbraco.Web PublishedElementExtensions
 // ReSharper disable once CheckNamespace
-namespace Umbraco.Core
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to models.

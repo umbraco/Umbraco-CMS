@@ -24,7 +24,6 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

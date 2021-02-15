@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Core.Composing;
-using Umbraco.Core;
 
 namespace Umbraco.Cms.Core.Compose
 {

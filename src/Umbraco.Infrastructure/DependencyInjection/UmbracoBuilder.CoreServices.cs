@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
@@ -39,8 +40,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Packaging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection

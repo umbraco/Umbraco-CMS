@@ -5,10 +5,9 @@ using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Packaging;
-using Umbraco.Cms.Core.Packaging;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public class PackageInstallation : IPackageInstallation
     {

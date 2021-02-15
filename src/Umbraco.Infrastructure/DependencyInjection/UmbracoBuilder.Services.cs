@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
-using Umbraco.Core.Packaging;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

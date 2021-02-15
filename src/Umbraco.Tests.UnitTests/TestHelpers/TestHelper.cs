@@ -38,7 +38,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;

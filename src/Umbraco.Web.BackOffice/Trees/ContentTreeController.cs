@@ -20,7 +20,6 @@ using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
