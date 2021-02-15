@@ -10,11 +10,12 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Cms.ModelsBuilder.Embedded
 {

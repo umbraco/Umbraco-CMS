@@ -8,7 +8,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Middleware;
@@ -17,7 +19,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Extensions
 {

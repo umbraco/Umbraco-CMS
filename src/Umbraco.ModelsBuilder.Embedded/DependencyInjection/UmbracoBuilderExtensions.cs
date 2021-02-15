@@ -7,10 +7,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.ModelsBuilder.Embedded;
 using Umbraco.Cms.ModelsBuilder.Embedded.Building;
 using Umbraco.Cms.Web.Common.ModelBinders;
-using Umbraco.Web.WebAssets;
 
 /*
  * OVERVIEW:
