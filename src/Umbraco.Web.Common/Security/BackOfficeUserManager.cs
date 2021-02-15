@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security

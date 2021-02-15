@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security

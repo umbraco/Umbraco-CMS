@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 using SecurityConstants = Umbraco.Cms.Core.Constants.Security;
 
 namespace Umbraco.Cms.Web.BackOffice.Security

@@ -11,7 +11,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions

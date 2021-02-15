@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A user manager for Umbraco (either back office users or front-end members)
     /// </summary>

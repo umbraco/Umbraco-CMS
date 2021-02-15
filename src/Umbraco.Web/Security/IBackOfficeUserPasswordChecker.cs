@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Web.Security
 {

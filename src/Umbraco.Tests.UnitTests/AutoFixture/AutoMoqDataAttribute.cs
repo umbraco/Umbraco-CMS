@@ -14,12 +14,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.Install;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {

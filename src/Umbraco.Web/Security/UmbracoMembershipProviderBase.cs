@@ -2,7 +2,6 @@
 using System.Web.Security;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {

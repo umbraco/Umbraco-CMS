@@ -8,7 +8,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Benchmarks
 {

@@ -3,7 +3,7 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
 {

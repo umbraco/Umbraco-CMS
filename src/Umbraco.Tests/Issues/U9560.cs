@@ -4,11 +4,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Testing;
-using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Issues
 {

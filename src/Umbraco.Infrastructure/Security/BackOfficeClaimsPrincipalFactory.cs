@@ -4,17 +4,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office/>
     /// </summary>
     public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackOfficeIdentityUser>
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeClaimsPrincipalFactory"/> class.
         /// </summary>

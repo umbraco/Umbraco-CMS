@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {

@@ -6,13 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Net;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Models.Identity;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
     /// </summary>
