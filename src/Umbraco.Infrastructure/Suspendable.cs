@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Search;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Infrastructure
 {
     internal static class Suspendable
     {

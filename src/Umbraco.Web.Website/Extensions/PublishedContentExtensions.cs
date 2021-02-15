@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Examine;
-using Umbraco.Web;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions

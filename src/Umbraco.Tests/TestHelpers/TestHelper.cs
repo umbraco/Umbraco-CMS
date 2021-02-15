@@ -32,6 +32,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlCe;

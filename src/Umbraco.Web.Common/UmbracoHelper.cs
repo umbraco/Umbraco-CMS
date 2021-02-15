@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Web.Common
 {

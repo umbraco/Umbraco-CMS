@@ -42,7 +42,6 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Packaging;
 using Umbraco.Extensions;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {

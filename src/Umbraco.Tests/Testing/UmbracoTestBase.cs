@@ -48,6 +48,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations.Install;

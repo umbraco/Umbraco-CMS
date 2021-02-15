@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {

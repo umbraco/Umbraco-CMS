@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Core.Routing
 {

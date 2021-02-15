@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Web;
+using Umbraco.Cms.Infrastructure;
 
 namespace Umbraco.Cms.Core.Routing
 {

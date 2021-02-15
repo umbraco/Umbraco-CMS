@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Implements <see cref="ITagQuery"/>.

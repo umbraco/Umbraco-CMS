@@ -13,7 +13,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Infrastructure
 {
     /// <summary>
     ///     A class used to query for published content, media items

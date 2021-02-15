@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Infrastructure.Search
 {
