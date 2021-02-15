@@ -5,8 +5,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement

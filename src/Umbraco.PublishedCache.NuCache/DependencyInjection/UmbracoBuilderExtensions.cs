@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Extensions

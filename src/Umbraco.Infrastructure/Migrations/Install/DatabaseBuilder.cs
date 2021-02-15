@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install

@@ -1,8 +1,8 @@
 ﻿using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {

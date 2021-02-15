@@ -14,9 +14,9 @@ using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices

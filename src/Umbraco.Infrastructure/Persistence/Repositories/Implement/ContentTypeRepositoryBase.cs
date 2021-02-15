@@ -11,12 +11,12 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement

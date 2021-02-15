@@ -13,12 +13,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 

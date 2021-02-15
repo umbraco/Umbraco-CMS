@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {

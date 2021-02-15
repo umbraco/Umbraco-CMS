@@ -14,8 +14,8 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security

@@ -11,10 +11,10 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {

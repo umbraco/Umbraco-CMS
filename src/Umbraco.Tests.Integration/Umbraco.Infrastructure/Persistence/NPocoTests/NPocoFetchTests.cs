@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests

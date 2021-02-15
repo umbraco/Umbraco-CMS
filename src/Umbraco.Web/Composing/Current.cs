@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -23,9 +24,7 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Core.Scoping;
 using Umbraco.Web.Security;
-
 
 namespace Umbraco.Web.Composing
 {

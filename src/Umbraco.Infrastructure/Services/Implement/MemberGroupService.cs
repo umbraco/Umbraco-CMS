@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {

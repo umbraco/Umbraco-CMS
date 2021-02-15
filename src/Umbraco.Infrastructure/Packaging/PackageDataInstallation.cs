@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -15,10 +14,10 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Core.Packaging

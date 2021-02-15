@@ -12,10 +12,10 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Core.Services.Implement

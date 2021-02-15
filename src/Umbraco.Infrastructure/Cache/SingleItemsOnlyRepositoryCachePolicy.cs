@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Cache
 {

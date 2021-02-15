@@ -6,8 +6,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
-using Umbraco.Core;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Constants = Umbraco.Cms.Core.Constants;
 

@@ -1,10 +1,9 @@
 ﻿using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Represents a scope.

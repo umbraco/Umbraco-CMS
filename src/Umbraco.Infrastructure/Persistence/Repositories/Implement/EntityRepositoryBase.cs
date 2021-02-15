@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement

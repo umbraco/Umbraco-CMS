@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -24,7 +25,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {

@@ -5,16 +5,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.Testing.Objects
 {
-
     internal class TestDataSource : INuCacheContentService
     {
-
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 
         public TestDataSource(params ContentNodeKit[] kits)

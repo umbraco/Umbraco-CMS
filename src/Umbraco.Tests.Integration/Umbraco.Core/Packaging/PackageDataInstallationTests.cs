@@ -13,13 +13,13 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.Services.Importing;
@@ -399,7 +399,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                                 select doc).Count();
 
             string configuration;
-            using (global::Umbraco.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;

@@ -21,7 +21,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;

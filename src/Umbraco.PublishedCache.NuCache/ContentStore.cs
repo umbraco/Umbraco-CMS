@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
