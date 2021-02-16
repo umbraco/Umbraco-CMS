@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
@@ -26,6 +27,8 @@ namespace Umbraco.Web.Search
 
         public int FieldCount => -1; //unknown
 
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
+
         public Attempt<string> IsHealthy()
         {
             if (!_index.IndexExists())
@@ -34,8 +37,8 @@ namespace Umbraco.Web.Search
             try
             {
                 var searcher = _index.GetSearcher();
-                var testQuery = searcher.CreateQuery().SelectFirstFieldOnly().And().ManagedQuery("test");
-                var result = testQuery.Execute(1,0);
+                var testQuery = searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet);
+                var result = testQuery.Execute(1).Skip(0);
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)

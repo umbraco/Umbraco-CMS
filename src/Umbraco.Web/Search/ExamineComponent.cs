@@ -19,6 +19,7 @@ using Umbraco.Core.Composing;
 using System.ComponentModel;
 using System.Threading;
 using Umbraco.Web.Scheduling;
+using Examine.Search;
 
 namespace Umbraco.Web.Search
 {
@@ -426,10 +427,9 @@ namespace Umbraco.Web.Search
                         var total = long.MaxValue;
                         while (page * pageSize < total)
                         {
-                            var query = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).And().SelectFields(_idOnlyFieldSet);
-                            var results = query.Execute(pageSize,pageSize * page);
+                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).SelectFields(_idOnlyFieldSet).Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
-                            var paged = results.Skip(0);
+                            var paged = results.Skip(page * pageSize);
 
                             foreach (var item in paged)
                                 if (int.TryParse(item.Id, out var contentId))

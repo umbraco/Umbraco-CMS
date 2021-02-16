@@ -11,7 +11,7 @@ using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
-
+using Examine.Search;
 namespace Umbraco.Examine
 {
     /// <summary>
@@ -132,8 +132,11 @@ namespace Umbraco.Examine
                 var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
                 var searcher = GetSearcher();
                 var c = searcher.CreateQuery();
-                var filtered = c.NativeQuery(rawQuery, _idOnlyFieldSet);
-                var results = filtered.Execute();
+                //_idOnlyFieldSet
+                var filtered = c.NativeQuery(rawQuery);
+
+                var selectedFields = filtered.SelectFields(_idOnlyFieldSet);
+                var results = selectedFields.Execute();
 
                 ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 

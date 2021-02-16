@@ -212,10 +212,7 @@ namespace Umbraco.Web
             }
 
             var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
-            if(loadedFields != null)
-            {
-                query.SelectFields(loadedFields);
-            }
+
 
             IQueryExecutor queryExecutor;
             if (culture == "*")
@@ -235,14 +232,41 @@ namespace Umbraco.Web
                 var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
                 queryExecutor = query.ManagedQuery(term, fields);
             }
-
-            var results = skip == 0 && take == 0
-                ? queryExecutor.Execute()
-                : queryExecutor.Execute(take,skip);
+            if (loadedFields != null && queryExecutor is IBooleanOperation booleanOperation)
+            {
+                queryExecutor = booleanOperation.SelectFields(loadedFields);
+            }
+            ISearchResults results;
+            IEnumerable<ISearchResult> searchResults;
+            if(skip == 0 && take == 0)
+            {
+                results = queryExecutor.Execute();
+                //if (results is ISearchResults2 results2)
+                //{
+                //    searchResults = results.SkipTake(0);
+                //}
+                //else
+                //{
+                    searchResults = results.Skip(0);
+                //}
+            }
+            else
+            {
+                results = queryExecutor.Execute(take);
+                //if (results is ISearchResults2 results2)
+                //{
+                //    searchResults = results.SkipTake(skip,take);
+                //}
+                //else
+                //{
+                    searchResults = results.Skip(skip);
+                //}
+            }
+           
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.Skip(0).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(searchResults.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
         }
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
@@ -288,13 +312,36 @@ namespace Umbraco.Web
                 queryExecutor = query.ManagedQuery(term, fields);
             }
 
-            var results = skip == 0 && take == 0
-                ? queryExecutor.Execute()
-                : queryExecutor.Execute(take, skip);
+            ISearchResults results;
+            IEnumerable<ISearchResult> searchResults;
+            if (skip == 0 && take == 0)
+            {
+                results = queryExecutor.Execute();
+                //if (results is ISearchResults2 results2)
+                //{
+                //    searchResults = results.SkipTake(0);
+                //}
+                //else
+                //{
+                    searchResults = results.Skip(0);
+                //}
+            }
+            else
+            {
+                results = queryExecutor.Execute(take);
+                //if (results is ISearchResults2 results2)
+                //{
+                //    searchResults = results.SkipTake(skip, take);
+                //}
+                //else
+                //{
+                    searchResults = results.Skip(skip);
+                //}
+            }
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.Skip(0).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(searchResults.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
         }
 
         /// <inheritdoc />

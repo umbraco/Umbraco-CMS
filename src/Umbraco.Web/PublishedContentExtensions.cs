@@ -12,6 +12,7 @@ using Umbraco.Examine;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Examine.Search;
 
 namespace Umbraco.Web
 {
@@ -222,9 +223,8 @@ namespace Umbraco.Web
             var query = searcher.CreateQuery()
                 .Field(UmbracoExamineIndex.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
-                .SelectFields(_idFieldNameOnly)
-                .And()
-                .ManagedQuery(term);
+                .ManagedQuery(term)
+                .SelectFields(_idFieldNameOnly);
 
             return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }
@@ -245,9 +245,8 @@ namespace Umbraco.Web
             var query = searcher.CreateQuery()
                 .Field("parentID", content.Id)
                 .And()
-                .SelectFields(_idFieldNameOnly)
-                .And()
-                .ManagedQuery(term);
+                .ManagedQuery(term)
+                .SelectFields(_idFieldNameOnly);
 
             return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }

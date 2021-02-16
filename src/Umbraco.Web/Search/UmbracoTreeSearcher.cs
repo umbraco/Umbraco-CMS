@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -149,13 +150,14 @@ namespace Umbraco.Web.Search
                 return Enumerable.Empty<SearchResultEntity>();
             }
 
-            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString(), fieldsToLoad)
-                //only return the number of items specified to read
-                .Execute(pageSize,Convert.ToInt32(pageIndex) * pageSize);
+            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString()).SelectFields(fieldsToLoad)
+               //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
+               .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
 
             totalFound = result.TotalItemCount;
 
-            var pagedResult = result.Skip(0);
+            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
+
 
             switch (entityType)
             {
